@@ -1,6 +1,6 @@
 $(document).on 'click', 'form .add_fields', (event) ->
   event.preventDefault()
-  time = new Date().getTime()
+  time = dchbx_enroll_date_of_record().getTime()
   regexp = new RegExp($(this).data('id'), 'g')
   html = $(this).data('fields').replace(regexp, time)
   target = $(this).closest('.form-inputs')

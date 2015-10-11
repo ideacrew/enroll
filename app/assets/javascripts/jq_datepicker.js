@@ -4,8 +4,8 @@ function applyJQDatePickerSetup(ele) {
     if (el.is(".jq_datepicker_already_applied")) {
       return;
     }
-    var yearMax = ((new Date).getFullYear() + 10);
-    var yearMin = (new Date).getFullYear()-110;
+    var yearMax = dchbx_enroll_date_of_record().getFullYear() + 10;
+    var yearMin = dchbx_enroll_date_of_record().getFullYear() - 110;
     var otherFieldSelector = el.attr("data-submission-field");
     var otherField = $(otherFieldSelector);
     otherField.hide();

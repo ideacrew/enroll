@@ -16,6 +16,7 @@ class Family
   field :is_active, type: Boolean, default: true # ApplicationGroup active on the Exchange?
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
+  field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
 
@@ -382,8 +383,24 @@ class Family
     latest_household.try(:enrolled_hbx_enrollments)
   end
 
+  def update_aptc_block_status
+    max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+
+    if is_under_special_enrollment_period? and max_aptc > 0
+      self.set(status: "aptc_block")
+    else
+      self.set(status: "")
+    end
+  end
+
+  def aptc_blocked?
+    status == "aptc_block"
+  end
+
   def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
     return false if assistance.blank? or qle.blank?
+    return false if status == "aptc_unblock"
+    return true if status == "aptc_block"
 
     max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
 

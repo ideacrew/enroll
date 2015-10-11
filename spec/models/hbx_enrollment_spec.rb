@@ -435,22 +435,22 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.status_step).to eq 2
       end
 
-      it "return 1 when enrolled_contingent" do
+      it "return 3 when enrolled_contingent" do
         hbx_enrollment.aasm_state = "enrolled_contingent"
         expect(hbx_enrollment.status_step).to eq 3
       end
 
-      it "return 1 when coverage_enrolled" do
+      it "return 4 when coverage_enrolled" do
         hbx_enrollment.aasm_state = "coverage_enrolled"
         expect(hbx_enrollment.status_step).to eq 4
       end
 
-      it "return 1 when coverage_canceled" do
+      it "return 5 when coverage_canceled" do
         hbx_enrollment.aasm_state = "coverage_canceled"
         expect(hbx_enrollment.status_step).to eq 5
       end
 
-      it "return 1 when coverage_terminated" do
+      it "return 5 when coverage_terminated" do
         hbx_enrollment.aasm_state = "coverage_terminated"
         expect(hbx_enrollment.status_step).to eq 5
       end

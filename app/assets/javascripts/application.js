@@ -52,9 +52,13 @@ function applyMultiLanguateSelect() {
 
 };
 
-$(document).on('page:update', function() {
-    applyFloatLabels();
-    applySelectric();
+function dchbx_enroll_date_of_record() {
+  return new Date($('#dchbx_enroll_date_of_record').text());
+};
+
+$(document).on('page:update', function(){
+  applyFloatLabels();
+  applySelectric();
 });
 
 
@@ -265,6 +269,7 @@ $(document).ready(function() {
             var url = $(this).attr('href');
             $(this).attr('href', url + "&start_on=" + start_on);
         });
+<<<<<<< HEAD
 
     });
 
@@ -339,6 +344,40 @@ $(document).ready(function() {
                     $(this).trigger('change');
                 }
             });
+=======
+      }
+      $('.benefit-group-fields').each(function() {
+        calcOfferedPlanContributions($('a#calc_offered_plan_contributions_link').data('href'), $(this).attr('id'));
+      });
+
+
+
+  } else {
+      $('.nav-tabs li input[type=radio]').prop('checked', false);
+      $('#choose-coverage > * select').val("");
+  }
+  // check that dob entered is not a future date
+  $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
+    var entered_dob = $(this).val();
+    var entered_year = entered_dob.substring(entered_dob.length -4);
+    var entered_month = entered_dob.substring(0, 2);
+    var entered_day = entered_dob.substring(3, 5);
+    var todays_date = dchbx_enroll_date_of_record();
+    var todays_year = todays_date.getFullYear();
+    var todays_month = todays_date.getMonth() + 1;
+    var todays_day = todays_date.getDate();
+    if (entered_year > todays_year) {
+      alert("Please enter a birthdate that does not take place in the future.");
+      $(this).val("");
+      $(this).focus();
+    }
+    else if (entered_year == todays_year) {
+      if (entered_month == todays_month) {
+        if (entered_day > todays_day) {
+          alert("Please enter a birthdate that does not take place in the future.");
+          $(this).val("");
+          $(this).focus();
+>>>>>>> 5fcc8ae72651168d378d0f4a52f3923bc0e684cf
         } else {
             $(this).datepicker({
                 changeMonth: true,
@@ -399,6 +438,7 @@ $(document).ready(function() {
         $("img.arrow_active").remove();
     });
 
+<<<<<<< HEAD
     // Progress Bar
     // $(document).on('click', '#btn-continue', function() {
     //   console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
@@ -475,6 +515,86 @@ $(document).ready(function() {
         if (personal_entry) {
             start_progress = 10;
             $("a.one, a.two").css("color", "#00b420");
+=======
+  // mimic jquery toggle function
+  $.fn.toggleClick=function(){
+    var functions=arguments, iteration=0
+    return this.click(function(){
+      functions[iteration].apply(this,arguments)
+      iteration= (iteration+1) %functions.length
+    })
+  }
+  //employees table table functions
+  $('.table-functions i.fa-trash-o').on('click', function() {
+    $(this).closest("tr").next().show();
+    $(this).closest("tr").hide();
+  });
+  $('a.terminate.cancel').on('click', function() {
+    $(this).closest('tr').prev().show();
+    $(this).closest('tr').hide();
+  });
+  // details toggler
+  $('.details').toggleClick(function () {
+    $(this).closest('.referenceplan').find('.plan-details').slideDown();
+    $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+  }, function () {
+    $(this).closest('.referenceplan').find('.plan-details').slideUp();
+    $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
+
+
+  });
+
+
+
+
+  // toggle filter options in employees list
+  $(document).on('click', '.filter-options label', function()  {
+    $('.filter-options').hide();
+  });
+  $(document).on('mouseleave', '.filter-options', function()  {
+    $('.filter-options').hide();
+  });
+
+
+
+  $('[data-toggle="tooltip"]').tooltip();
+  $("[data-toggle=popover]").popover();
+
+  $('a.back').click(function(){
+    parent.history.back();
+    return false;
+  });
+
+  semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
+
+  $(document).on("focus", "[class~='date-picker']", function(e){
+    dateMin = $(this).attr("data-date-min");
+    dateMax = $(this).attr("data-date-max");
+
+    if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
+      $(this).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy',
+        maxDate: "+0d",
+        yearRange: dchbx_enroll_date_of_record().getFullYear()-110 + ":" + dchbx_enroll_date_of_record().getFullYear(),
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+        }
+      });
+    }else{
+      $(this).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy',
+        minDate: dateMin,
+        maxDate: dateMax,
+        yearRange: dchbx_enroll_date_of_record().getFullYear()-110 + ":" + (dchbx_enroll_date_of_record().getFullYear() + 10),
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+>>>>>>> 5fcc8ae72651168d378d0f4a52f3923bc0e684cf
         }
 
         if (address_entry) {

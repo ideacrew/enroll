@@ -109,6 +109,11 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def unblock
+    @family = Family.find(params[:id])
+    @family.set(status: "aptc_unblock")
+  end
+
   private
   def init_qualifying_life_events
     @qualifying_life_events = []

@@ -24,6 +24,7 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     @notice.primary_identifier = employer_profile.organization.hbx_id
     @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
     @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
+    @notice.coverage_start_on = employer_profile.plan_years.sort_by{|start_on| start_on}.last.start_on
 
     if @employer.person.mailing_address.present?
       append_primary_address(@employer.person.mailing_address)
