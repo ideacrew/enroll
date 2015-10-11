@@ -63,7 +63,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   end
 
-  describe "GET match" do
+  describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:found_person){ [] }
@@ -74,7 +74,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       sign_in(user)
       allow(mock_consumer_candidate).to receive(:match_person).and_return(found_person)
       allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
-      get :match, :person => person_parameters
+      post :match, :person => person_parameters
     end
 
     context "given invalid parameters" do
