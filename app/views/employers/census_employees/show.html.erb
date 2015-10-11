@@ -52,10 +52,12 @@
             <p>HIRED: <%= employee_role.try(:hired_on) %></p>
             <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
           <% end %>
-          <% if @plan.present? and @hbx_enrollment.present? %>
+
           <% end %>
-          <% end %>
+
         </div>
+        <% if @plan.present? and @hbx_enrollment.present? %>
+
         <div class="table-border table-responsive">
           <table class="table table-striped">
             <thead>
@@ -92,6 +94,7 @@
               </tbody>
             </table>
           </div>
+          <% end %>
       </div>
       <div class="col-xs-6">
         <h4>Dependents</h4>
