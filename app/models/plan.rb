@@ -202,8 +202,7 @@ class Plan
       where(
           active_year: active_year,
           market: "individual",
-          coverage_kind: "dental",
-          hios_id: /-01$/
+          coverage_kind: "dental"
         )
     }
 

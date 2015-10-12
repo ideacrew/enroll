@@ -34,11 +34,11 @@ describe Subscribers::FamilyApplicationCompleted do
         it "log both No person and Failed to find primary family errors" do
           expect(subject).to receive(:log) do |arg1, arg2|
             expect(arg1).to match(/No person found for user/)
-            expect(arg2).to eq({:severity => 'error'})
+            expect(arg2).to eq({:severity => 'critical'})
           end
           expect(subject).to receive(:log) do |arg1, arg2|
             expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'error'})
+            expect(arg2).to eq({:severity => 'critical'})
           end
           subject.call(nil, nil, nil, nil, message)
         end
@@ -54,7 +54,7 @@ describe Subscribers::FamilyApplicationCompleted do
         it "logs the failed to find primary family error" do
           expect(subject).to receive(:log) do |arg1, arg2|
             expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'error'})
+            expect(arg2).to eq({:severity => 'critical'})
           end
           subject.call(nil, nil, nil, nil, message)
         end
