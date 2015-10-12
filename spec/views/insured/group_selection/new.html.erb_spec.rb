@@ -23,6 +23,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+
 
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
@@ -203,12 +205,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :coverage_household, coverage_household
       assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
       assign :hbx_enrollment, hbx_enrollment
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
+
     end
 
     it "should display family members" do
       family_members.each do |member|
         expect(rendered).to match(/#{member.full_name}/m)
+
       end
     end
   end

@@ -13,8 +13,11 @@
     <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
     <%= render partial: 'shop_for_plans_widget' %>
     <%= render partial: 'apply_for_medicaid_widget' %>
+
     <% if @waived && @employee_role.present? %>
+      <div class="waived-coverage">
       <%= render partial: 'waived_coverage_widget' %>
+      </div>
     <% end %>
 
   </div>
