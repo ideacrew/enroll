@@ -4,6 +4,17 @@ class EligibilityDetermination
 
   embedded_in :tax_household
 
+  # CSR subsidies reduce out-of-pocket expenses by raising the plan actuarial value 
+  #   (the average out-of-pocket costs an insurer pays on a plan) 
+  #   csr_0:   "02", # Native Americans
+  #   limited: "03", # limited?
+  CSR_PERCENT_TO_PLAN_VARIANT_MAP = {
+      csr_100: "01",
+      csr_73:  "04",
+      csr_87:  "05",
+      csr_94:  "06"
+    }
+
   field :e_pdc_id, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
 
