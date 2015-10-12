@@ -62,7 +62,7 @@ module Subscribers
           log("ERROR: Integrated case id does not match existing family for xml: #{xml}", {:severity => "error"})
         end
       else
-        log("ERROR: Failed to find primary family for users person in xml: #{xml}", {:severity => "error"})
+        log("ERROR: Failed to find primary family for users person in xml: #{xml}", {:severity => "critical"})
       end
     end
 
@@ -130,7 +130,7 @@ module Subscribers
     def find_existing_family(verified_dependents_member, person, xml)
       family = nil
       unless person.present?
-        log("ERROR: No person found for user in xml: #{xml}", {:severity => "error"})
+        log("ERROR: No person found for user in xml: #{xml}", {:severity => "critical"})
       else
         family = person.primary_family
       end
