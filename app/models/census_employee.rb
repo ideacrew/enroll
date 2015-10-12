@@ -305,6 +305,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def self.roster_import_fallback_match(f_name, l_name, dob, bg_id)
+    fname_exp = Regexp.compile(Regexp.escape(f_name), true)
+    lname_exp = Regexp.compile(Regexp.escape(l_name), true)
+    self.where({
+      first_name: fname_exp,
+      last_name: lname_exp,
+      dob: dob 
+    }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
+  end
+
 private
   def set_autocomplete_slug
     return unless (first_name.present? && last_name.present?)
