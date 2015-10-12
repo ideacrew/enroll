@@ -41,8 +41,8 @@ RSpec.describe "insured/families/find_sep.html.erb" do
 
   it "should have outside open enrollment modal" do
     expect(rendered).to have_selector('div.modal#outside-open-enrollment')
-    expect(rendered).to match /Since you’ve not had a recent Qualifying Life Event, you must wait until the next open enrollment period to purchase coverage, which begins/
-    expect(rendered).to match /In the meantime, you are may browse benefits and plans, but will not be able enroll/
+    expect(rendered).to match /Open enrollment starts on/
+    expect(rendered).to match /To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until/
     expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
   end
 end
