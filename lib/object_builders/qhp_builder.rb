@@ -53,6 +53,13 @@ class QhpBuilder
     show_qhp_stats
     mark_2015_dental_plans_as_individual
     mark_2015_catastrophic_plans_as_individual
+    mark_one_2015_plan_as_shop
+  end
+
+  def mark_one_2015_plan_as_shop
+    Plan.where(active_year: 2015, hios_id: /94506DC0350012/).each do |plan|
+      plan.update_attribute(:market, "shop")
+    end
   end
 
   def mark_2015_catastrophic_plans_as_individual
