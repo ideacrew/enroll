@@ -544,6 +544,44 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "update_hbx_enrollment_effective_on_by_hired_on" do
+    include_context "BradyWorkAfterAll"
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+    let(:person) {double}
+    let(:family) {double(active_household: double(hbx_enrollments: double(active: double(open_enrollments: [@enrollment]))))}
+    let(:benefit_group) {double}
+    before :all do
+      create_brady_census_families
+      @household = mikes_family.households.first
+      @coverage_household = @household.coverage_households.first
+      @enrollment = @household.create_hbx_enrollment_from(
+        employee_role: mikes_employee_role,
+        coverage_household: @coverage_household,
+        benefit_group: mikes_benefit_group
+      )
+      @enrollment.save
+    end
+
+    it "should update employee_role hired_on" do
+      census_employee.update(hired_on: TimeKeeper.date_of_record + 10.days)
+      employee_role.reload
+      expect(employee_role.hired_on).to eq TimeKeeper.date_of_record + 10.days
+    end
+
+    it "should update hbx_enrollment effective_on" do
+      allow(census_employee).to receive(:employee_role).and_return(employee_role)
+      allow(employee_role).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(@enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record - 10.days)
+      allow(@enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(benefit_group).to receive(:effective_on_for).and_return(TimeKeeper.date_of_record + 20.days)
+
+      census_employee.update(hired_on: TimeKeeper.date_of_record + 10.days)
+      expect(@enrollment.read_attribute(:effective_on)).to eq TimeKeeper.date_of_record + 20.days
+    end
+  end
+
 
   context "and " do
   end

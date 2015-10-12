@@ -11,8 +11,10 @@
           <% if @person %>
             <div>
                 <br/>
+                <% unless @person.csr_role || @person.assister_role %>
                 <h4>Your secure mailbox contains a link to the account for <%=@person.first_name%> <%=@person.last_name %>. </h4>
                 <br/>
+                <% end %>
             </div>
           <% end %>
         </div>
