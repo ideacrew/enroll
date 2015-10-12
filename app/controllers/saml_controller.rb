@@ -7,7 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
-    response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse])
+    response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
     sign_out current_user if current_user.present?
