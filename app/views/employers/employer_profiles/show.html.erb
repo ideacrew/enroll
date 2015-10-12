@@ -67,7 +67,7 @@
     <article class="col-xs-12">
       <h4>Premium Billing Report
         <% if @employer_profile.published_plan_year.present? %>
-          <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
+          <%= Date.today.beginning_of_month %> - <%= Date.today.end_of_month %></h4>
         <% end %>
         <table>
           <tr>

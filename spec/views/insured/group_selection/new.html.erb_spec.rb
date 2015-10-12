@@ -207,7 +207,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
-
+      
     end
 
     it "should display family members" do
