@@ -15,7 +15,7 @@
     <tr>
       <td><%= staff.first_name%></td>
       <td><%= staff.last_name %></td>
-      <td><%= staff.user.email %></td>
+      <td><%= staff.user.try(:email) %></td>
       <td><%= staff.assister_role.try(:organization) || staff.csr_role.try(:organization) %>
       <td><%= staff.csr_role.try(:shift) %></td>
       <td><%= if staff.csr_role 
