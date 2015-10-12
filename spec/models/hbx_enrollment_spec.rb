@@ -455,6 +455,33 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.status_step).to eq 5
       end
     end
+
+    context "enrollment_kind" do
+      let(:hbx_enrollment) { HbxEnrollment.new }
+      it "should fail validation when blank" do
+        hbx_enrollment.enrollment_kind = ""
+        expect(hbx_enrollment.valid?).to eq false
+        expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+      end
+
+      it "should fail validation when not in ENROLLMENT_KINDS" do
+        hbx_enrollment.enrollment_kind = "test"
+        expect(hbx_enrollment.valid?).to eq false
+        expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+      end
+
+      it "is_open_enrollment?" do
+        hbx_enrollment.enrollment_kind = "open_enrollment"
+        expect(hbx_enrollment.is_open_enrollment?).to eq true
+        expect(hbx_enrollment.is_special_enrollment?).to eq false
+      end
+
+      it "is_special_enrollment?" do
+        hbx_enrollment.enrollment_kind = "special_enrollment"
+        expect(hbx_enrollment.is_open_enrollment?).to eq false
+        expect(hbx_enrollment.is_special_enrollment?).to eq true
+      end
+    end
   end
 end
 

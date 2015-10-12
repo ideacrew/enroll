@@ -33,11 +33,13 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $('.benefit-group-fields:last input:first').focus()
   $('.remove_fields:last').css('display', 'inline-block')
 
-  start_on = $('#plan_year_start_on').val().substr(0, 4)
+  start_on = $('#plan_year_start_on').val()
+  if start_on
+    start_on = start_on.substr(0, 4)
 
-  $('.plan-options a').each ->
-    url = $(this).attr('href')
-    $(this).attr 'href', url + '&start_on=' + start_on
+    $('.plan-options a').each ->
+      url = $(this).attr('href')
+      $(this).attr 'href', url + '&start_on=' + start_on
   return
 
 

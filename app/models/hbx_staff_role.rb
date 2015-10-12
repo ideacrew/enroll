@@ -18,6 +18,12 @@ class HbxStaffRole
 
   alias_method :is_active?, :is_active
 
+  def self.find(id)
+    return nil if id.blank?
+    people = Person.where("hbx_staff_role._id" => BSON::ObjectId.from_string(id))
+    people.any? ? people[0].hbx_staff_role : nil
+  end
+
   # belongs_to Hbx
   def hbx_profile=(new_hbx_profile)
     raise ArgumentError.new("expected HbxProfile") unless new_hbx_profile.is_a? HbxProfile
@@ -28,6 +34,10 @@ class HbxStaffRole
   def hbx_profile
     return @hbx_profile if defined? @hbx_profile
     @hbx_profile = HbxProfile.find(self.hbx_profile_id)
+  end
+
+  def parent
+    person
   end
 
 end
