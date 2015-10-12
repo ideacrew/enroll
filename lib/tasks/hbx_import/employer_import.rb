@@ -178,7 +178,7 @@ module HbxImport
       employer.broker_last_name            = row["AGENT_LAST_NAME"]
       employer.broker_email                = row["AGENT_EMAIL"]
       employer.broker_external_id          = row["AGENT_EXTERNAL_ID"].to_i
-      employer.broker_npn                  = row["AGENT_LICENSE_ID"].to_i
+      employer.broker_npn                  = row["AGENT_LICENSE_ID"]
       employer.assign_enter_date           = row["ASSIGN_ENTER_DATE"].to_date_safe
       employer.assign_end_date             = row["ASSIGN_END_DATE"].to_date_safe
 
@@ -244,6 +244,19 @@ module HbxImport
       self.employer_profile = organization.build_employer_profile
       employer_profile.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
       # employer_profile.aasm_state = "binder_paid"
+      if !broker_npn.blank?
+        if broker_npn.to_s != "0"
+          found_broker = BrokerRole.by_npn(broker_npn).first
+          if found_broker.nil?
+            puts "COULD NOT FIND BROKER FOR #{legal_name}, #{fein}, #{broker_npn}"
+          else
+            ba = employer_profile.broker_agency_accounts.build
+            ba.writing_agent_id = found_broker.id
+            ba.broker_agency_profile_id = found_broker.broker_agency_profile_id
+            ba.start_on = open_enrollment_start
+          end
+        end
+      end
     end
 
     def build_plan_year
@@ -295,6 +308,7 @@ module HbxImport
       build_benefit_group_plans(employer, plan_year)
       benefit_group.relationship_benefits =
         benefit_group.simple_benefit_list(employee_contribution, dependent_contribution, 0)
+      benefit_group.relationship_benefits = benefit_group.simple_benefit_list(employee_contribution, dependent_contribution, 0)
       benefit_group
     end
 
