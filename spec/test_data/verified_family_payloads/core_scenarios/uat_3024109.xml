@@ -78,7 +78,7 @@
                <ns0:birth_date>19620323</ns0:birth_date>
                <ns0:is_incarcerated>false</ns0:is_incarcerated>
                <ns0:citizen_status>urn:openhbx:terms:v1:citizen_status#us_citizen</ns0:citizen_status>
-               <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+               <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
             </ns0:person_demographics>
             <ns0:is_primary_applicant>true</ns0:is_primary_applicant>
@@ -99,7 +99,7 @@
                         <ns0:submitted_date>2015-10-03T17:39:57Z</ns0:submitted_date>
                      </ns0:income>
                   </ns0:incomes>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                   <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
                </ns0:financial_statement>
             </ns0:financial_statements>
@@ -111,7 +111,7 @@
                <ns0:residency_verification_results>urn:openhbx:terms:v1:address_verification#ADDRESS_IN_AREA</ns0:residency_verification_results>
             </ns0:verifications>
             <ns0:is_active>true</ns0:is_active>
-            <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+            <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
             <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
          </ns0:family_member>
          <ns0:family_member>
@@ -161,7 +161,7 @@
                <ns0:birth_date>19750423</ns0:birth_date>
                <ns0:is_incarcerated>false</ns0:is_incarcerated>
                <ns0:citizen_status>urn:openhbx:terms:v1:citizen_status#us_citizen</ns0:citizen_status>
-               <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+               <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
             </ns0:person_demographics>
             <ns0:is_primary_applicant>false</ns0:is_primary_applicant>
@@ -182,7 +182,7 @@
                         <ns0:submitted_date>2015-10-03T17:39:57Z</ns0:submitted_date>
                      </ns0:income>
                   </ns0:incomes>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                   <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
                </ns0:financial_statement>
             </ns0:financial_statements>
@@ -194,7 +194,7 @@
                <ns0:residency_verification_results>urn:openhbx:terms:v1:address_verification#ADDRESS_IN_AREA</ns0:residency_verification_results>
             </ns0:verifications>
             <ns0:is_active>true</ns0:is_active>
-            <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+            <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
             <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
          </ns0:family_member>
          <ns0:family_member>
@@ -244,7 +244,7 @@
                <ns0:birth_date>20080726</ns0:birth_date>
                <ns0:is_incarcerated>false</ns0:is_incarcerated>
                <ns0:citizen_status>urn:openhbx:terms:v1:citizen_status#us_citizen</ns0:citizen_status>
-               <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+               <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
             </ns0:person_demographics>
             <ns0:is_primary_applicant>false</ns0:is_primary_applicant>
@@ -255,7 +255,7 @@
                <ns0:financial_statement>
                   <ns0:tax_filing_status>urn:openhbx:terms:v1:tax_filer#dependent</ns0:tax_filing_status>
                   <ns0:is_tax_filing_together>false</ns0:is_tax_filing_together>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                   <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
                </ns0:financial_statement>
             </ns0:financial_statements>
@@ -267,7 +267,7 @@
                <ns0:residency_verification_results>urn:openhbx:terms:v1:address_verification#ADDRESS_IN_AREA</ns0:residency_verification_results>
             </ns0:verifications>
             <ns0:is_active>true</ns0:is_active>
-            <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+            <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
             <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
          </ns0:family_member>
       </ns0:family_members>
@@ -319,9 +319,9 @@
                   <ns0:primary_member_id>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#8141666467314663424</ns0:id>
                   </ns0:primary_member_id>
-                  <ns0:submitted_at>2015-10-11T03:25:23.000000</ns0:submitted_at>
+                  <ns0:submitted_at>2015-10-12T16:07:05.000000</ns0:submitted_at>
                   <ns0:is_active>true</ns0:is_active>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                </ns0:coverage_household>
                <ns0:coverage_household>
                   <ns0:id>
@@ -360,9 +360,9 @@
                   <ns0:primary_member_id>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#8141666467314663424</ns0:id>
                   </ns0:primary_member_id>
-                  <ns0:submitted_at>2015-10-11T03:25:23.000000</ns0:submitted_at>
+                  <ns0:submitted_at>2015-10-12T16:07:05.000000</ns0:submitted_at>
                   <ns0:is_active>true</ns0:is_active>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                </ns0:coverage_household>
             </ns0:coverage_households>
             <ns0:tax_households>
@@ -435,14 +435,14 @@
                         <ns0:maximum_aptc>65.0</ns0:maximum_aptc>
                         <ns0:csr_percent>0.0</ns0:csr_percent>
                         <ns0:determination_date>20151003</ns0:determination_date>
-                        <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                        <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                         <ns0:modified_at>1900-01-01T00:00:00.000000</ns0:modified_at>
                      </ns0:eligibility_determination>
                   </ns0:eligibility_determinations>
                   <ns0:start_date>20151003</ns0:start_date>
-                  <ns0:submitted_at>2015-10-11T03:25:23.000000</ns0:submitted_at>
+                  <ns0:submitted_at>2015-10-12T16:07:05.000000</ns0:submitted_at>
                   <ns0:is_active>true</ns0:is_active>
-                  <ns0:created_at>2015-10-11T03:25:23.000000</ns0:created_at>
+                  <ns0:created_at>2015-10-12T16:07:05.000000</ns0:created_at>
                </ns0:tax_household>
             </ns0:tax_households>
             <ns0:submitted_at>2015-10-03T17:39:57.000000</ns0:submitted_at>
