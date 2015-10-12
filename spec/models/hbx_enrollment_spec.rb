@@ -435,24 +435,51 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.status_step).to eq 2
       end
 
-      it "return 1 when enrolled_contingent" do
+      it "return 3 when enrolled_contingent" do
         hbx_enrollment.aasm_state = "enrolled_contingent"
         expect(hbx_enrollment.status_step).to eq 3
       end
 
-      it "return 1 when coverage_enrolled" do
+      it "return 4 when coverage_enrolled" do
         hbx_enrollment.aasm_state = "coverage_enrolled"
         expect(hbx_enrollment.status_step).to eq 4
       end
 
-      it "return 1 when coverage_canceled" do
+      it "return 5 when coverage_canceled" do
         hbx_enrollment.aasm_state = "coverage_canceled"
         expect(hbx_enrollment.status_step).to eq 5
       end
 
-      it "return 1 when coverage_terminated" do
+      it "return 5 when coverage_terminated" do
         hbx_enrollment.aasm_state = "coverage_terminated"
         expect(hbx_enrollment.status_step).to eq 5
+      end
+    end
+
+    context "enrollment_kind" do
+      let(:hbx_enrollment) { HbxEnrollment.new }
+      it "should fail validation when blank" do
+        hbx_enrollment.enrollment_kind = ""
+        expect(hbx_enrollment.valid?).to eq false
+        expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+      end
+
+      it "should fail validation when not in ENROLLMENT_KINDS" do
+        hbx_enrollment.enrollment_kind = "test"
+        expect(hbx_enrollment.valid?).to eq false
+        expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+      end
+
+      it "is_open_enrollment?" do
+        hbx_enrollment.enrollment_kind = "open_enrollment"
+        expect(hbx_enrollment.is_open_enrollment?).to eq true
+        expect(hbx_enrollment.is_special_enrollment?).to eq false
+      end
+
+      it "is_special_enrollment?" do
+        hbx_enrollment.enrollment_kind = "special_enrollment"
+        expect(hbx_enrollment.is_open_enrollment?).to eq false
+        expect(hbx_enrollment.is_special_enrollment?).to eq true
       end
     end
   end

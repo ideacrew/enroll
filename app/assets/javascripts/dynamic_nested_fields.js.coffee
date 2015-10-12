@@ -14,6 +14,14 @@ $(document).on 'click', 'form .add_fields', (event) ->
   update_delete_buttons()
   applyJQDatePickers()
 
+
+  if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
+    $('.benefit-group-fields:last .edit-offering, .benefit-group-fields:last .reference-steps .cancel-plan-change').remove()
+    $('.benefit-group-fields:last .reference-steps h1').html '<h1>Select Your Plan Offering</h1>'
+    $('.benefit-group-fields:last .reference-steps .currently-offering').html 'Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.'
+  else
+
+
   $('.benefit-group-fields:last').find('.benefits-fields .slider').bootstrapSlider
     formatter: (value) ->
       return 'Contribution Percentage: ' + value + '%'
@@ -25,12 +33,17 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $('.benefit-group-fields:last input:first').focus()
   $('.remove_fields:last').css('display', 'inline-block')
 
-  start_on = $('#plan_year_start_on').val().substr(0, 4)
+  start_on = $('#plan_year_start_on').val()
+  if start_on
+    start_on = start_on.substr(0, 4)
 
-  $('.plan-options a').each ->
-    url = $(this).attr('href')
-    $(this).attr 'href', url + '&start_on=' + start_on
+    $('.plan-options a').each ->
+      url = $(this).attr('href')
+      $(this).attr 'href', url + '&start_on=' + start_on
   return
+
+
+
 
 
 $(document).on 'click', 'form .remove_fields', (event) ->

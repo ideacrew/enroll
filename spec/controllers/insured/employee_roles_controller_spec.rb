@@ -191,7 +191,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
   end
 
-  describe "GET match" do
+  describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
     let(:census_employee) { instance_double("CensusEmployee")}
@@ -205,7 +205,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, census_employee).and_return(employment_relationships)
-      get :match, :person => person_parameters
+      post :match, :person => person_parameters
     end
 
     context "given invalid parameters" do

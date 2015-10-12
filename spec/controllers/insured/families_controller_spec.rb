@@ -331,5 +331,18 @@ RSpec.describe Insured::FamiliesController do
         end
       end
     end
+
+    context "post unblock" do
+      let(:family) {FactoryGirl.build(:family)}
+      before :each do
+        allow(Family).to receive(:find).and_return family
+      end
+
+      it "should be a success" do
+        xhr :post, :unblock, id: family.id, format: :js
+        expect(response).to have_http_status(:success)
+        expect(assigns(:family).status).to eq "aptc_unblock"
+      end
+    end
   end
 end

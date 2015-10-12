@@ -86,6 +86,9 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+      member do
+        post 'unblock'
+      end
 
       collection do
         get 'home'
@@ -111,7 +114,7 @@ Rails.application.routes.draw do
     resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
       get :search, on: :collection
       get :privacy, on: :collection
-      get :match, on: :collection
+      post :match, on: :collection
       get :ridp_agreement, on: :collection
       ##get :privacy, on: :collection
     end
@@ -120,7 +123,7 @@ Rails.application.routes.draw do
       collection do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
-        get :match
+        post :match
         get 'welcome'
         get 'search'
       end

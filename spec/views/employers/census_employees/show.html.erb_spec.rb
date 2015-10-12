@@ -1,14 +1,17 @@
 require "rails_helper"
 
-RSpec.describe "employers/census_employees/_details.html.erb" do
+RSpec.describe "employers/census_employees/show.html.erb" do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:benefit_group_assignment) { double(benefit_group: benefit_group) }
   let(:benefit_group) {double(title: "plan name")}
   let(:hbx_enrollment) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [])}
   let(:plan) {double(total_premium: 10, total_employer_contribution: 20, total_employee_cost:30)}
+  let(:user) { FactoryGirl.create(:user) }
 
   before(:each) do
+    sign_in user
+    assign(:employer_profile, employer_profile)
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
     assign(:hbx_enrollment, hbx_enrollment)
@@ -21,7 +24,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Plan/
     expect(rendered).to have_selector('p', text: 'Benefit Group: plan name')
   end
@@ -30,7 +33,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Coverage Waived/
   end
 
@@ -38,7 +41,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Waiver Reason: this is reason/
   end
 
@@ -47,7 +50,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Plan Name: hbx enrollment plan name/
   end
 
@@ -56,7 +59,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     assign(:plan, plan)
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Employer Contribution/
     expect(rendered).to match /You Pay/
   end
@@ -66,7 +69,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(census_employee).to receive(:employee_role).and_return(double(hired_on: Date.new, effective_on: Date.new))
 
-    render template: "employers/census_employees/_details.html.erb"
+    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /ELIGIBLE FOR COVERAGE/
   end
 
@@ -79,25 +82,25 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     end
 
     it "should get dependents title" do
-      render template: "employers/census_employees/_details.html.erb"
+      render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /Dependents/
     end
 
     it "should get child relationship when child_under_26" do
       allow(census_employee).to receive(:census_dependents).and_return([census_dependent1])
-      render template: "employers/census_employees/_details.html.erb"
+      render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /child/
       expect(rendered).not_to match /child_under_26/
     end
 
     it "should get child_26_and_over relationship" do
       allow(census_employee).to receive(:census_dependents).and_return([census_dependent2])
-      render template: "employers/census_employees/_details.html.erb"
+      render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /child_26_and_over/
     end
 
     it "should get the Owner info" do
-      render template: "employers/census_employees/_details.html.erb"
+      render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /Owner:/
     end
 

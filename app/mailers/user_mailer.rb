@@ -13,8 +13,15 @@ class UserMailer < ApplicationMailer
   end
 
   def invitation_email(email, person_name, invitation)
+
     mail({to: email, subject: "DCHealthLink Invitation "}) do |format|
       format.html { render "invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
+    end
+  end
+
+  def agent_invitation_email(email, person_name, invitation)
+    mail({to: email, subject: "DCHealthLink Support Invitation "}) do |format|
+      format.html { render "agent_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
   end
 

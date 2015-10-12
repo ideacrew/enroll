@@ -7,7 +7,10 @@ class Invitation
     "census_employee" => "employee_role",
     "broker_role" => "broker_role",
     "broker_agency_staff_role" => "broker_agency_staff_role",
-    "employer_staff_role" => "employer_staff_role"
+    "employer_staff_role" => "employer_staff_role",
+    "assister_role" => "assister_role",
+    "csr_role" => "csr_role",
+    "hbx_staff_role" => "hbx_staff_role"
   }
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
@@ -53,6 +56,12 @@ class Invitation
       claim_broker_agency_staff_role(user_obj, redirection_obj)
     when "employer_staff_role"
       claim_employer_staff_role(user_obj, redirection_obj)
+    when "assister_role"
+      claim_assister_role(user_obj, redirection_obj)
+    when "csr_role"
+      claim_csr_role(user_obj, redirection_obj)
+    when "hbx_staff_role"
+      claim_hbx_staff_role(user_obj, redirection_obj)
     else
       raise "Unrecognized role: #{self.role}"
     end
@@ -103,6 +112,42 @@ class Invitation
     end
   end
 
+  def claim_assister_role(user_obj, redirection_obj)
+    staff_role = AssisterRole.find(source_id)
+    person = staff_role.person
+    redirection_obj.create_sso_account(user_obj, person, 15, "assister") do
+      person.user = user_obj
+      person.save!
+      user_obj.roles << "assister" unless user_obj.roles.include?("assister")
+      user_obj.save!
+      redirection_obj.redirect_to_hbx_portal
+    end
+  end
+
+  def claim_csr_role(user_obj, redirection_obj)
+    staff_role = CsrRole.find(source_id)
+    person = staff_role.person
+    redirection_obj.create_sso_account(user_obj, person, 15, "cac") do
+      person.user = user_obj
+      person.save!
+      user_obj.roles << "csr" unless user_obj.roles.include?("csr")
+      user_obj.save!
+      redirection_obj.redirect_to_hbx_portal
+    end
+  end
+
+  def claim_hbx_staff_role(user_obj, redirection_obj)
+    staff_role = HbxStaffRole.find(source_id)
+    person = staff_role.person
+    redirection_obj.create_sso_account(user_obj, person, 15, "hbx_staff") do
+      person.user = user_obj
+      person.save!
+      user_obj.roles << "hbx_staff" unless user_obj.roles.include?("hbx_staff")
+      user_obj.save!
+      redirection_obj.redirect_to_hbx_portal
+    end
+  end
+
   def allowed_invite_types
     result_type = INVITE_TYPES[self.source_kind]
     check_role = result_type.blank? ? nil : result_type.downcase
@@ -114,6 +159,10 @@ class Invitation
 
   def send_invitation!(invitee_name)
     UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
+  end
+
+  def send_agent_invitation!(invitee_name)
+    UserMailer.agent_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
   def self.invite_employee!(census_employee)
@@ -150,6 +199,36 @@ class Invitation
       )
       invitation.send_invitation!(broker_role.parent.full_name)
     end
+  end
+
+  def self.invite_assister!(assister_role, email)
+      invitation = self.create(
+        :role => "assister_role",
+        :source_kind => "assister_role",
+        :source_id => assister_role.id,
+        :invitation_email => email
+      )
+      invitation.send_agent_invitation!(assister_role.parent.full_name)
+  end
+
+  def self.invite_csr!(csr_role, email)
+      invitation = self.create(
+        :role => "csr_role",
+        :source_kind => "csr_role",
+        :source_id => csr_role.id,
+        :invitation_email => email
+      )
+      invitation.send_agent_invitation!(csr_role.parent.full_name)
+  end
+
+  def self.invite_hbx_staff!(hbx_staff_role, email)
+      invitation = self.create(
+        :role => "hbx_staff_role",
+        :source_kind => "hbx_staff_role",
+        :source_id => hbx_staff_role.id,
+        :invitation_email => email
+      )
+      invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
   end
 
 end

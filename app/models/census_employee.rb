@@ -33,6 +33,7 @@ class CensusEmployee < CensusMember
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
   validate :no_duplicate_census_dependent_ssns
+  after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -86,6 +87,19 @@ class CensusEmployee < CensusMember
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
+  end
+
+  def update_hbx_enrollment_effective_on_by_hired_on
+    if employee_role.present? and hired_on != employee_role.hired_on
+      employee_role.set(hired_on: hired_on)
+      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
+      enrollments.each do |enrollment|
+        if hired_on > enrollment.effective_on
+          effective_on = enrollment.benefit_group.effective_on_for(hired_on)
+          enrollment.update_current(effective_on: effective_on)
+        end
+      end
+    end
   end
 
   # def first_name=(new_first_name)
@@ -289,6 +303,16 @@ class CensusEmployee < CensusMember
     event :terminate_employee_role do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
     end
+  end
+
+  def self.roster_import_fallback_match(f_name, l_name, dob, bg_id)
+    fname_exp = Regexp.compile(Regexp.escape(f_name), true)
+    lname_exp = Regexp.compile(Regexp.escape(l_name), true)
+    self.where({
+      first_name: fname_exp,
+      last_name: lname_exp,
+      dob: dob 
+    }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
 private

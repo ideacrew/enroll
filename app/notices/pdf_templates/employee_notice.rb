@@ -9,6 +9,7 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
+    attribute :email, String
 
     def shop?
       return true

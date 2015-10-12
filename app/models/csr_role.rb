@@ -19,8 +19,8 @@ class CsrRole
     
     def find(id)
       return nil if id.blank?
-      people = Person.where("assister_role._id" => BSON::ObjectId.from_string(id))
-      people.any? ? people[0].assister_role : nil
+      people = Person.where("csr_role._id" => BSON::ObjectId.from_string(id))
+      people.any? ? people[0].csr_role : nil
     end
 
     def list_csrs(person_list)
