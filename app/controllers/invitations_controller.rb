@@ -24,6 +24,10 @@ class InvitationsController < ApplicationController
     redirect_to employers_employer_profile_path(employer_profile)
   end
 
+  def redirect_to_hbx_portal
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
   def require_login_and_allow_new_account
     if current_user.nil?
       session[:portal] = url_for(params)
