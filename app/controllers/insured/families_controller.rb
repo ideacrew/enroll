@@ -5,7 +5,7 @@ class Insured::FamiliesController < FamiliesController
 
   def home
     set_bookmark_url
-    
+
     @hbx_enrollments = @family.enrolled_hbx_enrollments.active || []
     @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
