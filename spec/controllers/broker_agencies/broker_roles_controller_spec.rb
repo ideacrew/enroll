@@ -130,7 +130,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       context "when valid" do
         before :each do
-          allow(controller).to receive(:verify_recaptcha).and_return(true)
+          # allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
           allow(organization).to receive(:save).and_return(true)
           post :create, :organization => organization_params
@@ -162,22 +162,22 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "when recaptcha fails" do
-        before :each do
-          allow(controller).to receive(:verify_recaptcha).and_return(false)
-          allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
-          allow(organization).to receive(:save).and_return(true)
-          post :create, :organization => organization_params
-        end
-
-        it "should be a redirect" do
-          expect(response).to render_template('new')
-        end
-
-        it "should assign variables" do
-          expect(assigns(:agency_type)).to eq "new"
-        end
-      end
+      # context "when recaptcha fails" do
+      #   before :each do
+      #     allow(controller).to receive(:verify_recaptcha).and_return(false)
+      #     allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
+      #     allow(organization).to receive(:save).and_return(true)
+      #     post :create, :organization => organization_params
+      #   end
+      #
+      #   it "should be a redirect" do
+      #     expect(response).to render_template('new')
+      #   end
+      #
+      #   it "should assign variables" do
+      #     expect(assigns(:agency_type)).to eq "new"
+      #   end
+      # end
     end
 
     context "with broker for existing agency" do
@@ -196,7 +196,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       context "when valid" do
         before :each do
-          allow(controller).to receive(:verify_recaptcha).and_return(true)
+          # allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(true)
           post :create, :person => person_params
@@ -227,22 +227,22 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "when recaptcha fails" do
-        before :each do
-          allow(controller).to receive(:verify_recaptcha).and_return(false)
-          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
-          allow(person).to receive(:save).and_return(true)
-          post :create, :person => person_params
-        end
-
-        it "should be a redirect" do
-          expect(response).to render_template('new')
-        end
-
-        it "should assign variables" do
-          expect(assigns(:filter)).to eq "broker"
-        end
-      end
+      # context "when recaptcha fails" do
+      #   before :each do
+      #     # allow(controller).to receive(:verify_recaptcha).and_return(false)
+      #     allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+      #     allow(person).to receive(:save).and_return(true)
+      #     post :create, :person => person_params
+      #   end
+      #
+      #   it "should be a redirect" do
+      #     expect(response).to render_template('new')
+      #   end
+      #
+      #   it "should assign variables" do
+      #     expect(assigns(:filter)).to eq "broker"
+      #   end
+      # end
     end
 
     context "with staff member for existing agency" do
