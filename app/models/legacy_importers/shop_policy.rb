@@ -71,7 +71,7 @@ module LegacyImporters
       CensusEmployee.roster_import_fallback_match(person.first_name, person.last_name, person.dob, bg.id).first.tap do |er|
         throw :missing_object, "Could not match employee for FEIN #{employer.fein}, SSN #{person.ssn}" if er.nil?
         if !person.ssn.blank?
-          er.update_attributes!(:ssn => person.ssn)
+          er.update_attributes!(:ssn => person.ssn, :aasm_state => "eligible")
         end
       end
     end
