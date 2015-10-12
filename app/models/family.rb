@@ -96,6 +96,24 @@ class Family
     # persisted_household.sort_by(&:submitted_at).last
   end
 
+  def active_household
+    households.detect { |household| household.is_active? }
+  end
+
+  def enrolled_benefits
+    # latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def terminated_benefits
+  end
+
+  def renewal_benefits
+  end
+
+  def enrolled_hbx_enrollments
+    latest_household.try(:enrolled_hbx_enrollments)
+  end
+
   def primary_family_member
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
@@ -270,10 +288,6 @@ class Family
     find_family_member_by_person(person).present?
   end
 
-  def active_household
-    households.detect { |household| household.is_active? }
-  end
-
   def dependents
     family_members.reject(&:is_primary_applicant)
   end
@@ -377,10 +391,6 @@ class Family
     return if person.consumer_role.present?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
     person.save!
-  end
-
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def update_aptc_block_status
