@@ -466,4 +466,38 @@ describe BenefitGroup, type: :model do
       end
     end
   end
+
+  describe BenefitGroup, dbclean: :after_each do
+
+    context "contribution amount calculations" do
+
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+      let(:start_plan_year) { TimeKeeper.date_of_record.end_of_month + 1.day }
+
+      let!(:census_employees) do
+        [1,2].collect do
+          FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+        end.sort_by(&:id)
+      end
+
+      context "and a plan year exists" do
+
+        let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
+
+        context "when benefit_group not persisted in the database" do
+          let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          it "should calculate contributions for all employees of the employer" do
+            expect(benefit_group.targeted_census_employees.size).to eq 2
+          end
+        end
+
+        context "when benefit_group saved" do
+          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          it "should calculate contributions for employees assigned to benefit group" do
+            expect(benefit_group.targeted_census_employees.size).to eq 0
+          end
+        end
+      end
+    end
+  end
 end
