@@ -66,8 +66,13 @@ module LegacyImporters
     end
 
     def find_roster_entry(employer, person, bg)
-      CensusEmployee.by_benefit_group_ids([bg.id]).by_ssn(person.ssn).first.tap do |er|
+      first_pass = CensusEmployee.by_benefit_group_ids([bg.id]).by_ssn(person.ssn).first
+      return first_pass if !first_pass.nil?
+      CensusEmployee.roster_import_fallback_match(person.first_name, person.last_name, person.dob, bg.id).first.tap do |er|
         throw :missing_object, "Could not match employee for FEIN #{employer.fein}, SSN #{person.ssn}" if er.nil?
+        if !person.ssn.blank?
+          er.update_attributes!(:ssn => person.ssn)
+        end
       end
     end
 

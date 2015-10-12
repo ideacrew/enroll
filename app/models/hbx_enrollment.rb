@@ -24,11 +24,13 @@ class HbxEnrollment
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
   ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+  ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   embedded_in :household
 
   field :coverage_household_id, type: String
   field :kind, type: String
+  field :enrollment_kind, type: String, default: 'open_enrollment'
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
@@ -69,6 +71,8 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
+  scope :open_enrollments, ->{ where(enrollment_kind: "open_enrollment") }
+  scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
@@ -84,6 +88,13 @@ class HbxEnrollment
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
+
+  validates :enrollment_kind,
+    allow_blank: false,
+    inclusion: {
+      in: ENROLLMENT_KINDS,
+      message: "%{value} is not a valid enrollment kind"
+    }
 
   aasm do
     state :shopping, initial: true
@@ -370,8 +381,10 @@ class HbxEnrollment
       enrollment.employee_role = employee_role
       if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.enrollment_kind = "special_enrollment"
       else
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+        enrollment.enrollment_kind = "open_enrollment"
       end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
@@ -389,8 +402,10 @@ class HbxEnrollment
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.enrollment_kind = "special_enrollment"
       else
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
+        enrollment.enrollment_kind = "open_enrollment"
       end
 
       # end
@@ -416,6 +431,14 @@ class HbxEnrollment
     )
     enrollment.save
     enrollment
+  end
+
+  def is_open_enrollment?
+    enrollment_kind == "open_enrollment"
+  end
+
+  def is_special_enrollment?
+    enrollment_kind == "special_enrollment"
   end
 
   def covered_members_first_names
