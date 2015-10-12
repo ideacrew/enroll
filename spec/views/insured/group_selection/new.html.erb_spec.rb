@@ -23,6 +23,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+
 
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
