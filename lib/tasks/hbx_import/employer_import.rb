@@ -258,8 +258,9 @@ module HbxImport
     end
 
     def build_benefit_groups
-      locations.each do |location|
-        build_benefit_group(location, plan_year)
+      p_location = locations.compact.first
+      if p_location
+        build_benefit_group(p_location, plan_year)
       end
     end
 
