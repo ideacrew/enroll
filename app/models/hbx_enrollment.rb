@@ -385,7 +385,7 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      
+
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
