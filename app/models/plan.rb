@@ -16,10 +16,8 @@ class Plan
   field :coverage_kind, type: String
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
-  field :hios_id, type: String
-  field :hios_base_id, type: String
-  field :csr_variant_id, type: String
 
+  field :hios_id, type: String
   field :hios_base_id, type: String
   field :csr_variant_id, type: String
 
@@ -36,18 +34,20 @@ class Plan
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
+
+  # TODO deprecate after migrating SBCs for years prior to 2016
   field :sbc_file, type: String
   embeds_one :sbc_document, :class_name => "Document", as: :documentable
 
   embeds_many :premium_tables
-  accepts_nested_attributes_for :premium_tables
+  accepts_nested_attributes_for :premium_tables, :sbc_document
 
   # More Attributes from qhp
   field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
+
   field :nationwide, type: Boolean # Nationwide
-  field :dc_in_network, type: Boolean # DC In-Network or not
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -130,11 +130,9 @@ class Plan
   scope :hmo_plan, ->{ where(plan_type: "hmo") }
   scope :epo_plan, ->{ where(plan_type: "epo") }
 
-  # Nationwide ?
-  scope :nationwide, ->{ where(nationwide: "true") }
-
-  # DC In-Network ?
-  scope :dc_in_network, ->{ where(dc_in_network: "true") }
+  # Plan offers local or national in-network benefits
+  scope :national_network,  ->{ where(nationwide: "true") }
+  scope :local_network,     ->{ where(nationwide: "false") }
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
@@ -178,8 +176,7 @@ class Plan
       where(
           active_year: active_year,
           market: "shop",
-          coverage_kind: "health",
-          hios_id: /-01$/
+          coverage_kind: "health"
         )
     }
 
@@ -187,8 +184,7 @@ class Plan
       where(
           active_year: active_year,
           market: "shop",
-          coverage_kind: "dental",
-          hios_id: /-01$/
+          coverage_kind: "dental"
         )
     }
 
