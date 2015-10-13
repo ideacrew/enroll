@@ -18,7 +18,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       get_aptc_info_from_session
       if @elected_aptc_pct > 0 and @max_aptc > 0
-        tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
+        tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
       else
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
