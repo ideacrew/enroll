@@ -18,7 +18,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       get_aptc_info_from_session
       if @elected_aptc_pct > 0 and @max_aptc > 0
-        tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
+        tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
       else
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
@@ -144,9 +144,10 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
-    if @person.has_active_consumer_role? and session["individual_assistance_path"].present?
-      @tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
-      if @tax_household.present?
+    if @person.has_active_consumer_role? # and session["individual_assistance_path"].present?
+      shopping_tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
+      if shopping_tax_household.present?
+        @tax_household = shopping_tax_household
         @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
         session[:max_aptc] = @max_aptc
         @selected_aptc_pct = session[:selected_aptc_pct] = 0.85

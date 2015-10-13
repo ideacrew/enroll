@@ -204,7 +204,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage! if benefit_group_assignment
+    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
   end
 
   def propogate_selection
