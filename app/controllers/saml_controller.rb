@@ -7,6 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
+    relay_state = params["RelayState"]
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
@@ -38,7 +39,11 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, new_user)
-        redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        if relay_state.blank?
+          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        else
+          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+        end
       end
     else
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})

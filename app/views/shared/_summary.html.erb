@@ -65,7 +65,7 @@
         <td>
           <% if @plan.sbc_document.present? %>
               <% key, bucket = get_key_and_bucket(@plan.sbc_document.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{@plan.name}.pdf", class: "download") do %>
+              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{@plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
                   <i class="glyphicon glyphicon-download-alt"></i> Download
               <% end %>
           <% else %>

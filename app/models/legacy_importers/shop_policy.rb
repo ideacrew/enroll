@@ -27,9 +27,11 @@ module LegacyImporters
         @census_record = find_roster_entry(@employer, @person, @benefit_group)
         @member_properties = construct_member_properties(d_hash, @applicant_lookup, @person)
         props_hash = enrollment_properties_hash(@benefit_group, @census_record, @plan, @coverage_household, @member_properties)
-        true
         enrollment = @household.hbx_enrollments.create!(props_hash)
-        enrollment.select_coverage!
+        enrollment_to_update = HbxEnrollment.find(enrollment.id)
+        enrollment_to_update.select_coverage
+        enrollment_to_update.household.save!
+        true
       end
       sc.call(@data_hash)
     end
@@ -37,13 +39,13 @@ module LegacyImporters
     def enrollment_properties_hash(bg, ce, plan, ch, member_props)
       e_on = member_props.map { |mp| mp[:coverage_start_on] }.min
       {
-           :hbx_id => @hbx_id,
-           :hbx_enrollment_members_attributes => member_props,
-           :kind => "employer_sponsored",
-           :benefit_group_id => bg.id,
-           :benefit_group_assignment_id => ce.active_benefit_group_assignment.id,
-           :plan_id => plan.id,
-           :effective_on => e_on
+        :hbx_id => @hbx_id,
+        :hbx_enrollment_members_attributes => member_props,
+        :kind => "employer_sponsored",
+        :benefit_group_id => bg.id,
+        :benefit_group_assignment_id => ce.active_benefit_group_assignment.id,
+        :plan_id => plan.id,
+        :effective_on => e_on
       }
     end
 

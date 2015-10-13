@@ -59,7 +59,7 @@
         <div class="col-xs-4 fa-icon-link">
           <% if plan.sbc_document.present? %>
               <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{plan.name}.pdf", class: "download") do %>
+              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
                   <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
                   <div class="fa-icon-label">Summary of Benefits and Coverage</div>
               <% end %>

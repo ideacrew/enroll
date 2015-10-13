@@ -30,6 +30,8 @@ class Insured::FamiliesController < FamiliesController
     @employee_role_id = params[:employee_role_id]
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
+    @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
+
     render :layout => 'application'
   end
 
