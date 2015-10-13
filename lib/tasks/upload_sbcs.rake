@@ -15,6 +15,7 @@ namespace :sbc do
   # This will export a map of plan and sbc pdfs in S3 to plans-sbcs.csv
   # A CSV with plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title
   task :export => :environment do
+    counter = 0
     file_path = "plans-sbcs.csv"
     plans = Plan.all
     csv = CSV.open(file_path, "w") do |csv|
@@ -22,8 +23,10 @@ namespace :sbc do
         next unless plan.sbc_document
         next unless plan.sbc_document.identifier
         csv << [plan.name, plan.hios_id, plan.active_year, plan.sbc_document.identifier.split('#').last, plan.sbc_document.title]
+        counter += 1
       end
     end
+    puts "Total #{counter} plans exported"
     puts "CSV written #{file_path} with schema plan.name, plan.hios_id, plan.active_year, plan.sbc_document.identifier key, plan.sbc_document.title"
   end
 
@@ -37,7 +40,6 @@ namespace :sbc do
     end
 
     file_path = Rails.root.join("db", "seedfiles", "plans-sbcs.csv").to_s
-    counter = 0
     aws_env = ENV['AWS_ENV'] || 'local'
     CSV.foreach(file_path) do |row|
       plan_find_regex = Regexp.compile("^" + row[1].to_s.split("-").first)
@@ -47,20 +49,9 @@ namespace :sbc do
         plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
         plan.sbc_document.save!
         plan.save!
-        counter += 1
       end
-=begin
-      plan = Plan.where(hios_base_id: row[1]).and(active_year: row[2]).first
-      next unless plan
-      bucket_name = "dchbx-enroll-sbc-#{aws_env}"
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
-      plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
-      plan.sbc_document.save!
-      plan.save!
-      counter += 1
-=end
     end
-    puts "Total #{counter} plans updated with sbc_documents"
+    puts "#{Plan.all.select do |p| p.sbc_document.present? end.count} plans updated with sbc document"
   end
 
   namespace :'2015' do
