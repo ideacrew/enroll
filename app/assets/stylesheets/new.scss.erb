@@ -363,7 +363,34 @@
   }
 
   .benefits-tab, .home-tab {
+    .benefit-package {
+      position: relative;
+      .col-xs-1 {
 
+        .make-default {
+          color: #cccccc;
+          position: relative;
+          padding-top: 80%;
+          margin: 0;
+          display: block;
+          &.active {
+            color: #FFD700;
+          }
+          &:hover {
+            color: #FFD700;
+            cursor: pointer;
+          }
+
+        }
+
+      }
+      &:hover {
+        .make-default {
+          display: block;
+
+        }
+      }
+    }
     .plan-details {
       display: none;
       .col-xs-4 {

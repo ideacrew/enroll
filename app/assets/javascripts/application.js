@@ -26,6 +26,7 @@
 //= require jq_datepicker
 //= require date
 //= require qle
+//= require benefits
 //= require print
 //= require browser_issues
 //= require consumer_role
