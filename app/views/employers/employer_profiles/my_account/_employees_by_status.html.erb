@@ -13,6 +13,7 @@
           <th>SSN</th>
           <th>DOB</th>
           <th>Hire Date</th>
+          <th>Benefit Package</th>
           <% if ['terminated', 'all'].include?(status) %>
           <th>Termination Date</th>
           <% end %>
@@ -38,6 +39,11 @@
           <td><%= format_date census_employee.dob %>
           </td>
           <td><%= format_date census_employee.hired_on %>
+          </td>
+          <td>
+          <% if census_employee.published_benefit_group.present? %>
+            <%= census_employee.published_benefit_group.title.capitalize %>
+          <% end %>
           </td>
           <% if ['terminated', 'all'].include?(status) %>
           <td><%= format_date census_employee.employment_terminated_on %>
@@ -65,7 +71,7 @@
         <% if census_employee.employment_terminated? %>
 
         <tr class="unbrd  rehire_<%= census_employee.id %>" style="display: none;">
-          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="9" id="enter-date">
+          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="10" id="enter-date">
             <div class="confirm-terminate">
               <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text"><br/>
               <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
@@ -79,7 +85,7 @@
         <% else %>
 
         <tr class="unbrd  remove_<%= census_employee.id %>" style="display: none;">
-          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="8" id="enter-date">
+          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="9" id="enter-date">
             <div class="confirm-terminate">
 
 
