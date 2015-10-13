@@ -28,11 +28,7 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, user_with_email)
-        if relay_state.blank?
-          redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
-        else
-          redirect_to relay_state
-        end
+        redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
       else
         new_password = User.generate_valid_password
         new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: email)
