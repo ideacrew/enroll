@@ -47,6 +47,10 @@ class Insured::ConsumerRolesController < ApplicationController
         else
           found_person = @consumer_candidate.match_person
           if found_person.present?
+            if found_person.try(:consumer_role)
+               session[:already_has_consumer_role] = true
+               session[:person_id] = found_person.id
+             end
             format.html { render 'match' }
           else
             format.html { render 'no_match' }
@@ -59,8 +63,14 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
-    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-    @person = @consumer_role.person
+    if !session[:already_has_consumer_role] == true
+      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @person = @consumer_role.person
+    else
+      @person= Person.find(session[:person_id])
+      @person.user = current_user
+      @person.save
+    end
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
@@ -70,7 +80,11 @@ class Insured::ConsumerRolesController < ApplicationController
             @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
             redirect_to SamlInformation.curam_landing_page_url
           else
-            redirect_to :action => "edit", :id => @consumer_role.id
+            if session[:already_has_consumer_role] == true
+              redirect_to family_account_path
+            else
+              redirect_to :action => "edit", :id => @consumer_role.id
+            end
           end
         }
       end
