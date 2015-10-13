@@ -35,7 +35,7 @@ RSpec.describe SamlController do
       let(:attributes_double) { { 'mail' => user.email} }
 
       before do
-        allow(OneLogin::RubySaml::Response).to receive(:new).and_return( valid_saml_response )
+        allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
       end
 
       describe "with an existing user" do

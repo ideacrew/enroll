@@ -1,7 +1,7 @@
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
   <% if @qualifying_life_events %>
     <!-- Wrapper for slides -->
-    <div class="carousel-inner" role="listbox" style='min-height: 180px;'>
+    <div class="carousel-inner" role="listbox" style='min-height: 180px; overflow: visible;'>
       <% count = 0 %>
       <% @qualifying_life_events.each_slice(5) do |qles| %>
         <div class="item <%= 'active' if count == 0 %>">
