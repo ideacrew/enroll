@@ -139,7 +139,6 @@ class CensusEmployeeImport
         end
 
         record_slice = record.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
-        record_slice = record.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
         if census_dependent
           census_dependent.update_attributes(record_slice)
         else
@@ -159,7 +158,7 @@ class CensusEmployeeImport
     member.last_name = record[:last_name].to_s if record[:last_name]
     member.middle_name = record[:middle_name].to_s if record[:middle_name]
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
-    member.dob = record[:dob].to_s if record[:dob]
+    member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
     if ["0", "false"].include? record[:is_business_owner].to_s
       member.is_business_owner = false
