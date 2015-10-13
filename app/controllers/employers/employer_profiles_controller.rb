@@ -153,7 +153,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization = Organization.find(params[:id])
 
     #save duplicate office locations as json in case we need to refresh
-    @organization_dup = @organization.office_locations.as_json.dup
+    @organization_dup = @organization.office_locations.as_json
 
     @employer_profile = @organization.employer_profile
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
