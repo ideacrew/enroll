@@ -20,13 +20,14 @@ module LegacyImporters
         @plan = find_plan(d_hash)
         @applicant_lookup = construct_applicant_lookup(@family)
         @household = @family.households.first
-        @coverage_houselhold = @household.coverage_households.first
+        @coverage_household = @household.coverage_households.first
         @member_properties = construct_member_properties(d_hash, @applicant_lookup, @person)
         @consumer_role = create_consumer_role(@person)
         props_hash = enrollment_properties_hash(@consumer_role, @plan, @coverage_household, @member_properties)
         enrollment = @household.hbx_enrollments.create!(props_hash)
         enrollment_to_update = HbxEnrollment.find(enrollment.id)
-        enrollment_to_update.select_coverage!
+        enrollment_to_update.select_coverage
+        enrollment_to_update.household.save!
         true
       end
       sc.call(@data_hash)
