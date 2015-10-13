@@ -16,6 +16,7 @@ class Insured::GroupSelectionController < ApplicationController
       pkgs = bc_period.benefit_packages
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
       @benefit = benefit_package.first
+      @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
   end
 

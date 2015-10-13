@@ -1,5 +1,15 @@
 <div class="container">
   <div class="row">
+    <% if @aptc_blocked.present? and @aptc_blocked %>
+      <br />
+      <div class="alert alert-danger" role="alert">
+        <p>
+          We need a bit of additional information to redetermine your eligibility. Please call us at 1-855-532-5465.
+        </p>
+        <br>
+        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
+      </div>
+    <% else %>
     <%= form_tag(:insured_group_selections) do %>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
         <h3>Choose Benefits: Covered Family Members</h3>
@@ -137,6 +147,7 @@
           <% end %>
         </div>
       </div>
+    <% end %>
     <% end %>
   </div>
 </div>
