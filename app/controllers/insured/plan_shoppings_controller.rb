@@ -145,7 +145,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
     if @person.has_active_consumer_role? # and session["individual_assistance_path"].present?
-      shopping_tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
+      shopping_tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
       if shopping_tax_household.present?
         @tax_household = shopping_tax_household
         @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
