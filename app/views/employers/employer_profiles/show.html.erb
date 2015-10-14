@@ -49,7 +49,7 @@
     <article class="col-xs-12">
       <h4>Premium Billing Report
         <% if @employer_profile.published_plan_year.present? %>
-          <%= Date.today.beginning_of_month %> - <%= Date.today.end_of_month %></h4>
+          <%= TimeKeeper.date_of_record.today.beginning_of_month %> - <%= TimeKeeper.date_of_record.today.end_of_month %></h4>
         <% end %>
         <table>
           <tr>
