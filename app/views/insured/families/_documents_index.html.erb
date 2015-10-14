@@ -1,27 +1,33 @@
 <table class="table table-bordered">
   <thead>
-    <tr>
-      <th>Document Title</th>
-      <th>Document Type</th>
-      <th>Date</th>
-    </tr>
+  <tr>
+    <th>Document Title</th>
+    <th>Document Type</th>
+    <th>Date</th>
+  </tr>
   </thead>
 
   <tbody>
-    <% unless @person.has_consumer_role? %>
+  <% unless @person.has_consumer_role? %>
       <tr>
         <td>N/A</td>
         <td>N/A</td>
         <td>N/A</td>
       </tr>
-    <% else %>
-        <% @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
+  <% else %>
+      <% @person.consumer_role.vlp_documents.select do |doc|
+        doc.identifier.present?
+      end.each do |doc| %>
           <tr>
-            <td><%= doc.title %></td>
-            <td><%= doc.subject %></td>
-            <td><%= doc.created_at.try(:to_date) %></td>
-          </tr>
-        <% end %>
-    <% end %>
+            <td>
+              <% key, bucket = get_key_and_bucket(doc.identifier) %>
+              <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
+                  <%= doc.title %></td>
+              <% end %>
+              <td><%= doc.subject %></td>
+              <td><%= doc.created_at.try(:to_date) %></td>
+              </tr>
+      <% end %>
+  <% end %>
   </tbody>
 </table>
