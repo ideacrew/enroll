@@ -55,25 +55,6 @@
           </div>
         </div>
       </article>
-
-      <article class="col-xs-12" style="display: none;">
-        <div class="row">
-          <div class="col-xs-4">
-            <figure>
-              <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
-            </figure>
-          </div>
-          <div class="col-xs-8">
-            <h3>Until your first payment is due to DC Health Link</h3>
-            <span>On September 2, 2015</span>
-          </div>
-          <div class="col-xs-4">
-          </div>
-          <div class="col-xs-8">
-            <a href="#" class="btn">Learn More</a>
-          </div>
-        </div>
-      </article>
     </section>
   <% end %>
 
@@ -81,7 +62,7 @@
     <article class="col-xs-12">
       <h3>Premium Billing Report</h3>
         <% if @employer_profile.published_plan_year.present? %>
-          <span><%= Date.today.beginning_of_month %> - <%= Date.today.end_of_month %></span>
+          <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
         <% end %>
         <br/>
         <br/>
