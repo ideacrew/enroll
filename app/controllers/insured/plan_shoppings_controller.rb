@@ -11,6 +11,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
+    hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
+    session.delete(:pre_hbx_enrollment_id)
 
     if hbx_enrollment.employee_role.present?
       benefit_group = hbx_enrollment.benefit_group

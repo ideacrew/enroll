@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:person) {FactoryGirl.create(:person)}
   let(:user) { instance_double("User", :person => person) }
-  #let(:consumer_role) {FactoryGirl.create(:consumer_role, :person => person)}
+  let(:consumer_role) {FactoryGirl.create(:consumer_role)}
   let(:employee_role) {FactoryGirl.create(:employee_role)}
   let(:household) {double(:immediate_family_coverage_household=> coverage_household, :hbx_enrollments => hbx_enrollments)}
   let(:coverage_household) {double}

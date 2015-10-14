@@ -26,6 +26,9 @@ RSpec.describe HbxProfile, :type => :model do
     context "with all required data", dbclean: :before do
       let(:params)        { valid_params }
       let(:hbx_profile)   { HbxProfile.new(**params) }
+      before :all do
+        @hp_count = HbxProfile.all.size
+      end
 
       it "should save" do
         expect(hbx_profile.save).to be_truthy
@@ -39,7 +42,7 @@ RSpec.describe HbxProfile, :type => :model do
         end
 
         it "should return all HBX instances" do
-          expect(HbxProfile.all.size).to eq 2
+          expect(HbxProfile.all.size).to eq @hp_count + 2
         end
 
         it "should be findable by ID" do
