@@ -33,12 +33,21 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
       allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive_pre_hbx).and_return true
     end
 
     it "returns http success" do
       sign_in
       post :checkout, id: "hbx_id", plan_id: "plan_id"
       expect(response).to have_http_status(:redirect)
+    end
+
+    it "should delete pre_hbx_enrollment_id session" do
+      session[:pre_hbx_enrollment_id] = "123"
+      sign_in
+      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      expect(response).to have_http_status(:redirect)
+      expect(session[:pre_hbx_enrollment_id]).to eq nil
     end
 
     context "employee hire_on date greater than enrollment date" do

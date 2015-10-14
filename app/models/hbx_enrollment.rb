@@ -364,6 +364,14 @@ class HbxEnrollment
     household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
   end
 
+  def inactive_pre_hbx(pre_hbx_id)
+    return if pre_hbx_id.blank?
+    pre_hbx = HbxEnrollment.find(pre_hbx_id)
+    if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
+      pre_hbx.update_current(is_active: false)
+    end
+  end
+
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
   #       This should probably be done by comparing the hired_on date with todays date.
   #       Also needs to ignore any that were already terminated before a certain date.
