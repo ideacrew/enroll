@@ -32,7 +32,7 @@ After "@watir" do
   @take_screens = false if @take_screens
 end
 
-def people 
+def people
   return @a if defined?(@a)
   @a = {
     "Soren White" => {
@@ -194,7 +194,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   input_field.click
   input_field.li(text: /C Corporation/).click
   step "I enter office location for #{default_office_location}"
-  scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
+  scroll_then_click(@browser.button(class: "interaction-click-control-confirm"))
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|

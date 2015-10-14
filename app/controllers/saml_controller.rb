@@ -42,7 +42,7 @@ class SamlController < ApplicationController
         if relay_state.blank?
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         else
-          redirect_to relay_state
+          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
         end
       end
     else
