@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         get 'manage_family'
         get 'personal'
         get 'inbox'
+        get 'brokers'
         get 'documents_index'
         get 'document_upload'
         get 'find_sep'

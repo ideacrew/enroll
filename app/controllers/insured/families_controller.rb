@@ -23,6 +23,9 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
+  def brokers
+    #@broker_agency_accounts = @employer_profile.broker_agency_accounts
+  end
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
