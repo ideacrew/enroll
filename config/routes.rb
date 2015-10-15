@@ -74,7 +74,7 @@ Rails.application.routes.draw do
         get 'receipt'
         get 'print_waiver'
         post 'checkout'
-        post 'thankyou'
+        get 'thankyou'
         post 'waive'
         post 'terminate'
         post 'set_elected_pct'
