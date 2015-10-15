@@ -235,7 +235,7 @@ end
 And(/I click to see my Secure Purchase Confirmation/) do
   wait_and_confirm_text /Messages/
   @browser.link(text: /Messages/).click
-  wait_and_confirm_text /Your Secure Purchase Confirmation/
+  wait_and_confirm_text /Your Secure Enrollment Confirmation/
 end
 
 Then(/Second user creates an individual account$/) do
