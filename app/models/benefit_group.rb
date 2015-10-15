@@ -20,6 +20,7 @@ class BenefitGroup
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :plan_option_kind, type: String
+  field :default, type: Boolean, default: false
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
@@ -38,7 +39,7 @@ class BenefitGroup
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
-  
+
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
@@ -98,7 +99,7 @@ class BenefitGroup
     else
       if plan_option_kind == "single_carrier"
         plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
-      else  
+      else
         plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
       end
     end
@@ -131,7 +132,7 @@ class BenefitGroup
       self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
     end
 
-    set_bounding_cost_plans 
+    set_bounding_cost_plans
     @elected_plans = new_plans
   end
 
