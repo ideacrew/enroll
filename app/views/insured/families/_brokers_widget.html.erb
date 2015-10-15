@@ -1,16 +1,20 @@
 
-  <aside >
-    <%= link_to "Brokers", brokers_insured_families_path %>
+<% if @employee_role.employer_profile.active_broker_agency_account.present? %>
 
-<section style="margin: 0;">
-  <article>
-    <figure>
-      <%= image_tag('images/didyouknow_288.png') %>
-    </figure>
-    <figcaption>
-      <h5>Did you know?</h5>
-      You can always get help from a broker <strong>at no cost</strong> to you.
-    </figcaption>
-  </article>
-</section>
-</aside>
+<% else %>
+  <%= link_to brokers_insured_families_path do %>
+    <aside>
+    <section style="margin: 0;">
+      <article>
+        <figure>
+          <%= image_tag('images/didyouknow_288.png') %>
+        </figure>
+        <figcaption>
+          <h5>Did you know?</h5>
+          You can always get help from a broker <strong>at no cost</strong> to you.
+        </figcaption>
+      </article>
+    </section>
+    </aside>
+  <% end %>
+<% end %>
