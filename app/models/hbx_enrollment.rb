@@ -395,6 +395,7 @@ class HbxEnrollment
       end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
+      census_employee = employee_role.census_employee
       #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change
       #it will be better to create a new benefit_group_assignment
       benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
