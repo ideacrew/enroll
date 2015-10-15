@@ -52,6 +52,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def find_email(agent, role)
+    if role == 'Broker'
+      agent.try(:broker_role).try(:email).try(:address)
+    else
+      agent.try(:user).try(:email)
+    end
+  end
+
   def request_help
     role = nil
     if params[:type]
@@ -73,9 +81,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     if role
       status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
-      if agent.try(:user).try(:email)
+      if find_email(agent, role)
         agent_assistance_messages(params,agent,role)
       else
+
         status_text = "Agent has no email.   Please select another"
       end
     else
@@ -258,7 +267,7 @@ private
       }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(agent.user.email, first_name, name, role, insured_email, params[:person].present?)
+    result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
     puts result.to_s if Rails.env.development?
    end  
 

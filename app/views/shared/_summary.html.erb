@@ -52,7 +52,7 @@
       <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
           <% if @hbx_enrollment.shopping?%>
-            <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right", :method => :post}) %>
+            <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
             <% end %>
         </div>
       </div>
@@ -106,7 +106,7 @@
           <td></td>
           <td colspan="3" class="text-center">
             <% if @hbx_enrollment.shopping?%>
-              <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right", :method => :post}) %>
+              <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
             <% else %>
               <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
             <% end %>

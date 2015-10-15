@@ -175,6 +175,13 @@ class HbxEnrollment
     end
   end
 
+  def census_employee
+    if employee_role.present?
+      employee_role.census_employee 
+    else
+      benefit_group_assignment.census_employee
+    end
+  end
 
   def benefit_sponsored?
     benefit_group.present?
@@ -362,6 +369,14 @@ class HbxEnrollment
       []
     end
     household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
+  end
+
+  def inactive_pre_hbx(pre_hbx_id)
+    return if pre_hbx_id.blank?
+    pre_hbx = HbxEnrollment.find(pre_hbx_id)
+    if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
+      pre_hbx.update_current(is_active: false)
+    end
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
