@@ -10,9 +10,9 @@ CSV.open("invited_brokers.csv", "w") do |csv|
   ]
   broker_people.each do |bp|
     broker_role = bp.broker_role
-    invitation = Invitation.create(
-      :role => "broker_agency_staff_role",
-      :source_kind => "broker_agency_staff_role",
+    invitation = Invitation.create!(
+      :role => "broker_role",
+      :source_kind => "broker_role",
       :source_id => broker_role.id,
       :invitation_email => broker_role.email_address
     )
