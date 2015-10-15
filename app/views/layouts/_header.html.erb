@@ -8,7 +8,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></a>
+      <a class="navbar-brand" style="padding-left: 0; margin-right: 10px;" href="<%= root_url %>"><%= image_tag 'logo.png' %></a>
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav nav-info navbar-left brd-left hidden-xs hidden-sm">
@@ -18,7 +18,7 @@
       </ul>
       <div class="right-menu navbar-right">
         <% if signed_in? %>
-        <ul class="navbar-nav top-menu">
+        <ul class="navbar-nav top-menu pull-right">
           <%= render partial: "shared/my_portal_links"%>
           <li><a href="#"><%= HbxProfile::CallCenterPhoneNumber %></a></li>
           <li class="hidden-xs">|</li>
