@@ -24,7 +24,10 @@ class Insured::FamiliesController < FamiliesController
     end
   end
   def brokers
-    #@broker_agency_accounts = @employer_profile.broker_agency_accounts
+    if @person.employee_roles.present?
+      @employee_role = @person.employee_roles.try(:first)
+    end
+
   end
 
   def find_sep

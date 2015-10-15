@@ -1,20 +1,66 @@
-
 <% if @employee_role.employer_profile.active_broker_agency_account.present? %>
+<aside class="panel panel-default">
+  <section class="row">
+    <article class="col-xs-12">
+      <div>
+        <div class="col-xs-4">
+          <figure>
+            <figcaption>
+              <h2 style="text-align: center;">
+                <i class="fa fa-user fa-2x"></i>
+              </h2>
+              <span style="display: block; text-align: center;">
+                <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+                <br/><br/>
+
+              </span>
+            </figcaption>
+          </span>
+        </figure>
+      </div>
+      <div class="col-xs-8">
+        <div class="row">
+          <h4>
+            <strong>
+              Your Broker
+            </strong>
+          </h4>
+        </strong>
+        <span>
+          <small>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %><br>
+          </small>
+          <small>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.phones.first %>
+            <br/><br/>
+          </small>
+        </span>
+      </div>
+    </div>
+  </div>
+</article>
+
+</section>
+</aside>
 
 <% else %>
-  <%= link_to brokers_insured_families_path do %>
-    <aside>
-    <section style="margin: 0;">
-      <article>
-        <figure>
-          <%= image_tag('images/didyouknow_288.png') %>
-        </figure>
-        <figcaption>
-          <h5>Did you know?</h5>
-          You can always get help from a broker <strong>at no cost</strong> to you.
-        </figcaption>
-      </article>
-    </section>
-    </aside>
-  <% end %>
+<%= link_to brokers_insured_families_path do %>
+<aside>
+<section style="margin: 0;">
+<article>
+  <figure>
+    <%= image_tag('images/didyouknow_288.png') %>
+  </figure>
+  <figcaption>
+    <h5>Did you know?</h5>
+    You can always get help from a broker
+    <strong>at no cost</strong>
+    to you.
+  </figcaption>
+</article>
+</section>
+</aside>
+<% end %>
 <% end %>
