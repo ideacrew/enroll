@@ -100,7 +100,11 @@ class Employers::EmployerProfilesController < ApplicationController
     if @tab == 'employees'
       paginate_employees
     end
+    if @tab == 'employees'
+      paginate_employees
+    end
   end
+
 
   def show_profile
     @tab ||= params[:tab]

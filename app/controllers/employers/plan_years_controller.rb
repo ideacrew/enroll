@@ -14,21 +14,19 @@ class Employers::PlanYearsController < ApplicationController
 
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
-
-
     @plans = if params[:plan_option_kind] == "single_carrier"
-      @carrier_id = params[:carrier_id]
-      @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
-    elsif params[:plan_option_kind] == "metal_level"
-      @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
-    elsif params[:plan_option_kind] == "single_plan"
-      @single_plan = params[:single_plan]
-      @carrier_id = params[:carrier_id]
-      @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
-    end
+    @carrier_id = params[:carrier_id]
+    @carrier_profile = CarrierProfile.find(params[:carrier_id])
+    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+  elsif params[:plan_option_kind] == "metal_level"
+    @metal_level = params[:metal_level]
+    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
+  elsif params[:plan_option_kind] == "single_plan"
+    @single_plan = params[:single_plan]
+    @carrier_id = params[:carrier_id]
+    @carrier_profile = CarrierProfile.find(params[:carrier_id])
+    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+  end
     respond_to do |format|
       format.js
     end
@@ -36,9 +34,6 @@ class Employers::PlanYearsController < ApplicationController
 
   def plan_details
     @plan = Plan.find(params[:reference_plan_id])
-
-
-
     respond_to do |format|
       format.js
     end
