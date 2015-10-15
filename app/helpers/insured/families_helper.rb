@@ -1,4 +1,8 @@
 module Insured::FamiliesHelper
+  
+  def current_premium hbx_enrollment
+    hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+  end
 
   def render_plan_type_details(plan)
     plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
