@@ -3,16 +3,15 @@
   <h2>Upload Employee Roster</h2>
   <h4>If you completed your employee roster offline using our Microsift Excel template, find the file on your computer and upload it here.</h4>
   <%= link_to(document_download_path(env_bucket_name("templates"), "b4c0e3e6-cf9b-4b00-8194-403b110b4e01") + "?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
-    <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
+  <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
         Download it now.
-    </h4>
-  <% end %>
-
-  <a class="select btn btn-primary btn-br">Select File To Upload</a>
+    <% end %>
+        </h4>
   <div class="upload-preview">
   </div>
 <%= form_for @employer_profile, :url => url_for(:controller => 'employer_profiles', :action => 'bulk_employee_upload'), method: 'post', :html => { :multipart => true } do |f| %>
 <%= file_field_tag :file %>
+<%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary btn-br' %>
 <%= f.submit 'Upload', class: 'btn btn-primary btn-br' %>
 <% end %>
 </div>
