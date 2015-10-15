@@ -9,12 +9,18 @@ CSV.open("invited_brokers.csv", "w") do |csv|
     "Invitation ID"
   ]
   broker_people.each do |bp|
-    invitation = Invitation.invite_broker!(bp.broker_role)
+    broker_role = bp.broker_role
+    invitation = Invitation.create!(
+      :role => "broker_role",
+      :source_kind => "broker_role",
+      :source_id => broker_role.id,
+      :invitation_email => broker_role.email_address
+    )
     csv << [
       bp.full_name,
-      bp.broker_role.npn,
+      broker_role.npn,
       invitation.invitation_email,
-      "https://enroll.dchealthlink.com/invitations/claim/#{invitation.id.to_s}",
+      "https://enroll.dchealthlink.com/invitations/#{invitation.id.to_s}/claim",
       invitation.id.to_s
     ]
   end

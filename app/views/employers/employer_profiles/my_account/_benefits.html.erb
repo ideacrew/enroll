@@ -112,7 +112,7 @@
       <tr>
         <td>
           <p>
-            <%= (bg.reference_plan.plan_type || "").upcase %>
+            <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
           </p>
         </td>
         <td>
