@@ -175,6 +175,7 @@ class Invitation
         :invitation_email => census_employee.email_address
       )
       invitation.send_invitation!(census_employee.full_name)
+      invitation
     end
   end
 
@@ -187,6 +188,7 @@ class Invitation
         :invitation_email => broker_role.email_address
       )
       invitation.send_invitation!(broker_role.parent.full_name)
+      invitation
     end
   end
 
@@ -199,6 +201,7 @@ class Invitation
         :invitation_email => broker_role.email_address
       )
       invitation.send_invitation!(broker_role.parent.full_name)
+      invitation
     end
   end
 
@@ -210,6 +213,7 @@ class Invitation
         :invitation_email => email
       )
       invitation.send_agent_invitation!(assister_role.parent.full_name)
+      invitation
   end
 
   def self.invite_csr!(csr_role, email)
@@ -220,6 +224,7 @@ class Invitation
         :invitation_email => email
       )
       invitation.send_agent_invitation!(csr_role.parent.full_name)
+      invitation
   end
 
   def self.invite_hbx_staff!(hbx_staff_role, email)
@@ -230,6 +235,7 @@ class Invitation
         :invitation_email => email
       )
       invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
+      invitation
   end
 
 end
