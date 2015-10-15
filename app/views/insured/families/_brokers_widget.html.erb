@@ -1,5 +1,5 @@
 
-<%= if @employee_role.employer_profile.active_broker_agency_account.present? %>
+<% if @employee_role.employer_profile.active_broker_agency_account.present? %>
 
 <% else %>
   <%= link_to brokers_insured_families_path do %>
