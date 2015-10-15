@@ -175,6 +175,13 @@ class HbxEnrollment
     end
   end
 
+  def census_employee
+    if employee_role.present?
+      employee_role.census_employee 
+    else
+      benefit_group_assignment.census_employee
+    end
+  end
 
   def benefit_sponsored?
     benefit_group.present?
