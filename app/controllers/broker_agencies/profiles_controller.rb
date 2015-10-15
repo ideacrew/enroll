@@ -75,7 +75,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employers
-    if current_user.has_broker_agency_staff_role?
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       profile = BrokerAgencyProfile.find(params[:id])
       @orgs = Organization.by_broker_agency_profile(profile._id)
     else

@@ -14,210 +14,210 @@
       </li>
     </ul>
   </div>
-  -->
-  <% end %>
-  <div class="col-md-8">
-    <div class="row">
-      <% if @current_plan_year.present? %>
-      <div class="panel panel-default alert" id="panelOne">
-        <div class="panel-heading">
-          <h3>Employee Enrollments and Waivers <i class="fa fa-question-circle"></i>
-          </h3>
+-->
+<% end %>
+<div class="col-md-8">
+  <div class="row">
+    <% if @current_plan_year.present? %>
+    <div class="panel panel-default alert" id="panelOne">
+      <div class="panel-heading">
+        <h3>Employee Enrollments and Waivers <i class="fa fa-question-circle"></i>
+        </h3>
 
-          <div class="progress">
+        <div class="progress">
             <!-- OLD PROGRESS BAR
             <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="45" class="progress-bar progress-bar-danger progress-bar-striped active" role="progressbar" style="width: 45%">
               <span class="sr-only">45% Complete</span>
             </div>
-            -->
-            <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
+          -->
+          <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
 
-          </div>
-
-          <div class="information">
-            <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>
-            <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
-          </div>
         </div>
+
+        <div class="information">
+          <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>
+          <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+        </div>
+      </div>
         <!--
         <p class="panel-body alert-warning" role="alert">
           <i class="fa fa-flag"></i> A Basic Panel
           <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
         </p>
-        -->
+      -->
+    </div>
+    <div class="panel panel-default myplanyear col-xs-12">
+
+      <div class="panel-heading">
+        <h5>Plan Year</h5>
       </div>
-      <div class="panel panel-default myplanyear col-xs-12">
+      <table>
+        <tr>
+          <td>
+            <header>Coverage Year</header>
+          </td>
+          <td>
+            <p>
+              <%= @current_plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
+            </p>
+          </td>
+          <td>
+            <h3>
+              Status
+            </h3>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <header>Enrollment Period</header>
+          </td>
+          <td>
+            <p>
+              <%= @current_plan_year.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %>
+            </p>
+          </td>
+          <td>
+            <h3>
+              <%= @current_plan_year.aasm_state.capitalize %>
+            </h3>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <% @current_plan_year.benefit_groups.each do |bg| %>
 
-                  <div class="panel-heading">
-                    <h5>Plan Year</h5>
-                  </div>
-                  <table>
-                    <tr>
-                      <td>
-                        <header>Coverage Year</header>
-                      </td>
-                      <td>
-                        <p>
-                          <%= @current_plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
-                        </p>
-                      </td>
-                      <td>
-                        <h3>
-                          Status
-                        </h3>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <header>Enrollment Period</header>
-                      </td>
-                      <td>
-                        <p>
-                          <%= @current_plan_year.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %>
-                        </p>
-                      </td>
-                      <td>
-                        <h3>
-                          <%= @current_plan_year.aasm_state.capitalize %>
-                        </h3>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-                <% @current_plan_year.benefit_groups.each do |bg| %>
+    <div class="panel benefitgroup col-xs-12">
+      <section class="col-xs-6">
+        <header class="row">
+          <h5 class="bg-title">Benefit Group: <span><%= bg.title.capitalize %></span></h5>
+        </header>
+      </section>
+      <section class="col-xs-6">
+        <header class="row">
+          <a class="details" onclick="$(this).closest('.benefitgroup').next().slideToggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
+        </header>
+      </section>
+      <table>
+        <tr>
+          <td>
+            <header>Eligibility</header>
+          </td>
+          <td>
+            <p><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <header>Plans by</header>
+          </td>
+          <td>
+            <p>
+              <% if bg.plan_option_kind == "single_carrier" %>
+              All plans from a single carrier
+              <% elsif bg.plan_option_kind == "metal_level" %>
+              All Plans from a given metal level
+              <% elsif bg.plan_option_kind == "single_plan" %>
+              A single plan
+              <% end %>
+            </p>
+          </td>
+        </tr>
 
-                <div class="panel benefitgroup col-xs-12">
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <h5 class="bg-title">Benefit Group: <span><%= bg.title.capitalize %></span></h5>
-                    </header>
-                  </section>
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <a class="details" onclick="$(this).closest('.benefitgroup').next().slideToggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
-                    </header>
-                  </section>
-                  <table>
-                    <tr>
-                      <td>
-                        <header>Eligibility</header>
-                      </td>
-                      <td>
-                        <p><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <header>Plans by</header>
-                      </td>
-                      <td>
-                        <p>
-                          <% if bg.plan_option_kind == "single_carrier" %>
-                          All plans from a single carrier
-                          <% elsif bg.plan_option_kind == "metal_level" %>
-                          All Plans from a given metal level
-                          <% elsif bg.plan_option_kind == "single_plan" %>
-                          A single plan
-                          <% end %>
-                        </p>
-                      </td>
-                    </tr>
+      </table>
+    </div>
 
-                  </table>
-                </div>
+    <div class="col-xs-12 package-offering plan-details">
+      <table>
+        <tr>
+          <th>Offered</th>
+          <th>Employer contribution</th>
+        </tr>
+        <% bg.relationship_benefits.each do |rb| %>
+        <tr>
+          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+          <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
 
-                <div class="col-xs-12 package-offering plan-details">
-                  <table>
-                    <tr>
-                      <th>Offered</th>
-                      <th>Employer contribution</th>
-                    </tr>
-                    <% bg.relationship_benefits.each do |rb| %>
-                    <tr>
-                      <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                      <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
-                    </tr>
-                    <% end %>
-                  </table>
-                </div>
-
-                <div class="panel benefitgroup col-xs-12 referenceplan">
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <h5 class="bg-title">Reference Plan: <span><%= bg.reference_plan.name %></span></h5>
-                    </header>
-                  </section>
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
-                    </header>
-                  </section>
-                  <table>
-                    <tr>
-                      <th>
-                        <header>Type</header>
-                      </th>
-                      <th>
-                        <header>Metallic Level</header>
-                      </th>
-                      <th>
-                        <header>Carrier</header>
-                      </th>
-                      <th>
-                        <header>ID</header>
-                      </th>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p>
-                          <%= (bg.reference_plan.plan_type || "").upcase %>
-                        </p>
-                      </td>
-                      <td>
-                        <p>
-                          <%= bg.reference_plan.metal_level.titleize %>
-                        </p>
-                      </td>
-                      <td>
-                        <p>
-                          <%= bg.reference_plan.carrier_profile.legal_name %>
-                        </p>
-                      </td>
-                      <td>
-                        <p><%= bg.reference_plan_id %>
-                        </p>
-                      </td>
-                    </tr>
-                  </table>
-                  <div class="plan-details">
-                    <hr>
-                    <div class="col-xs-4">
-                      <span>Employer Estimated Maximum Monthly Cost</span>
-                      <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
-                    </div>
-                    <div class="col-xs-8">
-                      <table>
-                        <tr>
-                          <th colspan="2"></th>
-                          <th>Min</th>
-                          <th>Max</th>
-                        </tr>
-                        <tr>
-                          <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                          <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
-                          <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-                        </tr>
+    <div class="panel benefitgroup col-xs-12 referenceplan">
+      <section class="col-xs-6">
+        <header class="row">
+          <h5 class="bg-title">Reference Plan: <span><%= bg.reference_plan.name %></span></h5>
+        </header>
+      </section>
+      <section class="col-xs-6">
+        <header class="row">
+          <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
+        </header>
+      </section>
+      <table>
+        <tr>
+          <th>
+            <header>Type</header>
+          </th>
+          <th>
+            <header>Metallic Level</header>
+          </th>
+          <th>
+            <header>Carrier</header>
+          </th>
+          <th>
+            <header>ID</header>
+          </th>
+        </tr>
+        <tr>
+          <td>
+            <p>
+              <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
+            </p>
+          </td>
+          <td>
+            <p>
+              <%= bg.reference_plan.metal_level.titleize %>
+            </p>
+          </td>
+          <td>
+            <p>
+              <%= bg.reference_plan.carrier_profile.legal_name %>
+            </p>
+          </td>
+          <td>
+            <p><%= bg.reference_plan_id %>
+            </p>
+          </td>
+        </tr>
+      </table>
+      <div class="plan-details">
+        <hr>
+        <div class="col-xs-4">
+          <span>Employer Estimated Maximum Monthly Cost</span>
+          <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
+        </div>
+        <div class="col-xs-8">
+          <table>
+            <tr>
+              <th colspan="2"></th>
+              <th>Min</th>
+              <th>Max</th>
+            </tr>
+            <tr>
+              <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+              <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
+              <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
+            </tr>
 
 
 
-                      </table>
-                    </div>
-                  </div>
-                </div>
+          </table>
+        </div>
+      </div>
+    </div>
 
-                <% end %>
-                <% else %>
-                <h4>You have not yet published a plan year. Once you do, it will display here. To make your first plan year now, <%= link_to "click here", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits') %>.</h4>
-                <% end %>
+    <% end %>
+    <% else %>
+    <h4>You have not yet published a plan year. Once you do, it will display here. To make your first plan year now, <%= link_to "click here", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits') %>.</h4>
+    <% end %>
   </div>
 </div>

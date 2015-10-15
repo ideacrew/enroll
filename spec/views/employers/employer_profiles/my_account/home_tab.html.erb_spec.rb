@@ -65,6 +65,76 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         )
     end
 
+    def carrier_profile
+      random_value = rand(999_999_999)
+      double(
+        "CarrierProfile",
+        legal_name: "legal_name#{random_value}"
+        )
+    end
+
+    def reference_plan_1
+      double(
+        "Plan",
+        name: "name_1",
+        plan_type: "ppo",
+        metal_level: "metal_level_1",
+        carrier_profile: carrier_profile,
+        )
+    end
+
+    def reference_plan_2
+      double(
+        "Plan",
+        name: "name_2",
+        plan_type: "",
+        metal_level: "metal_level_2",
+        carrier_profile: carrier_profile,
+        )
+    end
+
+    def benefit_group_1
+      double(
+        "BenefitGroup",
+        title: "title_1",
+        effective_on_kind: "first_of_month",
+        effective_on_offset: "30",
+        plan_option_kind: "plan_option_kind_1",
+        relationship_benefits: [relationship_benefits],
+        reference_plan: reference_plan_1,
+        reference_plan_id: double("id"),
+        monthly_employer_contribution_amount: "monthly_employer_contribution_amount_1",
+        monthly_min_employee_cost: "monthly_min_employee_cost_1",
+        monthly_max_employee_cost: "monthly_max_employee_cost_1",
+        )
+    end
+
+    def benefit_group_2
+      double(
+        "BenefitGroup",
+        title: "title_2",
+        effective_on_kind: "date_of_hire",
+        effective_on_offset: "0",
+        plan_option_kind: "plan_option_kind_2",
+        relationship_benefits: [relationship_benefits],
+        reference_plan: reference_plan_2,
+        reference_plan_id: double("id"),
+        monthly_employer_contribution_amount: "monthly_employer_contribution_amount_2",
+        monthly_min_employee_cost: "monthly_min_employee_cost_2",
+        monthly_max_employee_cost: "monthly_max_employee_cost_2",
+        )
+    end
+
+    def relationship_benefits
+      random_value = rand(999_999_999)
+      double(
+        "RelationshipBenefit",
+        offered: "offered;#{random_value}",
+        relationship: "relationship;#{random_value}",
+        premium_pct: "premium_pct;#{random_value}"
+        )
+    end
+
     def plan_year
       instance_double(
         "PlanYear",
@@ -80,7 +150,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         non_business_owner_enrollment_count: 10,
         hbx_enrollments: [hbx_enrollment],
         additional_required_participants_count: 5,
-        benefit_groups: [],
+        benefit_groups: benefit_groups,
         aasm_state: 'draft'
         )
     end
@@ -121,6 +191,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
 
     let(:new_office_locations){[office_location,office_location]}
     let(:current_plan_year){employer_profile.published_plan_year}
+    let(:benefit_groups){ [benefit_group_1, benefit_group_2] }
 
     before :each do
       assign :employer_profile, employer_profile
@@ -134,6 +205,13 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
 
     it "should display title" do
       expect(rendered).to have_selector("h1", text: "My Health Benefits Program")
+    end
+
+    it "should display benefit groups" do
+      current_plan_year.benefit_groups.each do |bg|
+        expect(rendered).to match(/.*#{bg.title}.*/mi)
+        expect(rendered).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
+      end
     end
   end
 end
