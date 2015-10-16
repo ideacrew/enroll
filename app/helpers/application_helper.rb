@@ -4,6 +4,16 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
+  def current_cost plan_cost
+    if session['elected_aptc_pct'] and session['max_aptc']
+      aptc_amount = session['max_aptc'] * session['elected_aptc_pct']
+      plan_cost >= aptc_amount ? plan_cost - aptc_amount : 0
+    else
+      plan_cost
+    end
+
+  end
+
   def datepicker_control(f, field_name, options = {}, value = "")
     sanitized_field_name = field_name.to_s.sub(/\?$/,"")
     opts = options.dup

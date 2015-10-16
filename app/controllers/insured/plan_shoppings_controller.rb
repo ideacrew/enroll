@@ -195,7 +195,7 @@ class Insured::PlanShoppingsController < ApplicationController
       from: from_provider.try(:legal_name),
       to: @person.full_name,
       body: body,
-      subject: 'Your Secure Purchase Confirmation'
+      subject: 'Your Secure Enrollment Confirmation'
     }
     create_secure_message(message_params, @person, :inbox)
   end
