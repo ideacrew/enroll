@@ -23,7 +23,17 @@ class HbxEnrollment
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
-  ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+  ENROLLED_STATUSES = [
+      "coverage_selected", 
+      "enrollment_transmitted_to_carrier", 
+      "coverage_enrolled", 
+      "coverage_renewed",
+      "enrolled_contingent",
+      "unverified"
+    ]
+
+  TERMINATED_STATUSES = ["coverage_terminated", "coverage_canceled", "unverified"]
+
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   embedded_in :household
