@@ -11,7 +11,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     before :each do
       sign_in user
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
-      allow(person).to receive(:has_active_consumer_role?).and_return true 
+      allow(person).to receive(:has_active_consumer_role?).and_return true
       assign :person, person
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -32,7 +32,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     it "should have no_ssn input" do
       expect(rendered).to have_selector('input#dependent_no_ssn')
     end
-    
+
     it "should have no_ssn label" do
       expect(rendered).to have_selector('span.no_ssn')
       expect(rendered).to match /NO SSN/

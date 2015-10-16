@@ -88,8 +88,10 @@
       </div>
     <% end%>
   </div>
+
 </div>
-<% if f.object.addresses.count > 1 %>
+
+<% if f.object.addresses[1].present? %>
 <% else %>
 <span class="form-action btn btn-trans">Add Mailing Address</span>
 

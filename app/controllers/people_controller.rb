@@ -205,7 +205,6 @@ class PeopleController < ApplicationController
   end
 
   def update
-    debugger
     sanitize_person_params
     @person = Person.find(params[:id])
 
