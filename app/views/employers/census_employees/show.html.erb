@@ -102,9 +102,9 @@
           <% if dependents.present? %>
           <table style='width:100%;'>
 
-            <% dependents.each do |dependent| %>
+            <% dependents.each do |dependent|
               relationship = dependent.try(:relationship) || dependent.try(:employee_relationship)
-            <% if relationship == "self"%>
+              if relationship == "self"%>
             <% else %>
               <tr>
                 <th>Name</th>
