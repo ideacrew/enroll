@@ -1,5 +1,6 @@
-<% document = find_document(c.object, "Other (With I-94)") %>
-<%= c.fields_for 'vlp_documents', document do |v| %>
+<div id="immigration_other_with_i94_fields_container">
+  <% document = find_document(c.object, "Other (With I-94)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
     <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
@@ -7,4 +8,5 @@
     <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
     <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
     <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
-<% end %>
+  <% end %>
+</div>

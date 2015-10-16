@@ -99,6 +99,19 @@ function applyListeners() {
     });
 
     function showOnly(selected) {
+      $(".immigration_document_area").html("<span>waiting...</span>");
+      var target_id = $('input#immigration_document_target_id').val();
+      var target_type = $('input#immigration_document_target_type').val();
+      $.ajax({
+        type: "get",
+        url: "/insured/consumer_role/immigration_document_options",
+        dataType: 'script',
+        data: {
+          'target_id': target_id,
+          'target_type': target_type,
+          'vlp_doc_target': selected
+        },
+      });
         var doc_types = ["immigration_citizenship_cert_container", "immigration_naturalization_cert_container",
             "immigration_i_327_fields_container", "immigration_i_551_fields_container", "immigration_i_571_fields_container",
             "immigration_i_766_fields_container", "immigration_i_566_fields_container",

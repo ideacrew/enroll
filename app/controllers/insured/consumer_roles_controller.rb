@@ -91,6 +91,19 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def immigration_document_options
+    if params[:target_type] == "Person"
+      @target = Person.find(params[:target_id])
+    elsif params[:target_type] == "Forms::FamilyMember"
+      if params[:target_id].present?
+        @target = Forms::FamilyMember.find(params[:target_id])
+      else
+        @target = Forms::FamilyMember.new
+      end
+    end
+    @vlp_doc_target = params[:vlp_doc_target]
+  end
+
   def edit
     #authorize @consumer_role, :edit?
     set_consumer_bookmark_url

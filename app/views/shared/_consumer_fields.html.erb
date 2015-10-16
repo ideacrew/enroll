@@ -72,8 +72,8 @@
 
   <% if f.object.is_a? Person %>
     <%= f.fields_for :consumer_role do |c| %>
-       <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: <%= (f.object.eligible_immigration_status.present? and f.object.eligible_immigration_status) ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+      <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: <%= (f.object.eligible_immigration_status.present? and f.object.eligible_immigration_status) ? 'block' : 'none' %>">
+        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f} %>
       </div>
     <% end %>
   <% else %>
@@ -84,7 +84,7 @@
     <% end %>
     <%= f.fields_for dependent_consumer_role do |c| %>
       <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: none">
-        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f} %>
       </div>
     <% end %>
   <% end %>
