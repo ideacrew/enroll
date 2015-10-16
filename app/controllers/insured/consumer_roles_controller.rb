@@ -130,7 +130,7 @@ class Insured::ConsumerRolesController < ApplicationController
       set_current_person
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       return
-    else 
+    else
       set_consumer_bookmark_url
     end
   end

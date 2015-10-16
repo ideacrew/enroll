@@ -7,8 +7,9 @@
 
       <% style = "" %>
       <% div_class = kind+"-div" %>
-      <% if kind != 'home' %>
+      <% if kind == 'work' %>
         <% style="display:none;" %>
+
       <% end %>
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
         <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
@@ -66,7 +67,7 @@
         </div>
       </div>
 
-      <% if kind != 'home' or f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+      <% if kind == 'work' or f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
         <% style="display:none;" %>
       <% end %>
       <div style="<%= style %>" class="row no-buffer address-row <%= div_class %> no-dc-address-reasons">
@@ -88,7 +89,11 @@
     <% end%>
   </div>
 </div>
+<% if f.object.addresses.count > 1 %>
+<% else %>
 <span class="form-action btn btn-trans">Add Mailing Address</span>
+
+<% end %>
 <script>
 $(document).ready(function () {
   $('#state_id').change(function(){
