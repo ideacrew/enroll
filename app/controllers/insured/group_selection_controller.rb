@@ -3,6 +3,11 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars 
+
+    if params[:employee_role_id].present?
+      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == params["employee_role_id"].to_s }
+    end
+
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
     elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
@@ -11,11 +16,13 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
+      session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id] if params[:hbx_enrollment_id].present?
       hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
       @benefit = benefit_package.first
+      @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
   end
 
@@ -48,7 +55,7 @@ class Insured::GroupSelectionController < ApplicationController
       if keep_existing_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       elsif @change_plan.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?

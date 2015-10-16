@@ -5,23 +5,8 @@
 Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 </p>
 <p>
-<% if @market_kind == 'individual' %>
-The following have successfully been enrolled in
-<% else %>
-You and the following dependents have successfully enrolled in
-<% end %>
- <%= @plan.name %>.
+You're successfully enrolled in <%= @plan.name %>.
 </p>
-<table >
-	<tr><td> Name </td> <td> Premium </td> </tr>
-   <% @enrollment.hbx_enrollment_members.each do |member| %>
-      <tr style='line-height: 130%'>
-          <td style='border: 1px solid black; width: 75%; '><%= member.person.first_name + ' ' + member.person.last_name%></td>
-          <td style='border: 1px solid black; width: 22%'><%= ActionView::Base.new.number_to_currency(@plan.premium_for(member))%> </td>
-      </tr>
-   <% end %>
-   </table>
-<br>
 
 <% if @market_kind != 'individual' %>
 <p>
@@ -34,7 +19,11 @@ You and the following dependents have successfully enrolled in
 </p>
 <% else %>
 <p>
-  Your monthly total family premium is <b><%= ActionView::Base.new.number_to_currency @plan.total_premium%>.</b>
+  <% if @enrollment.applied_aptc_amount.to_f > 0 %>
+  Your monthly total family premium is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f) %>.</b><br>
+  Your Advanced Premium Tax Credit is <b><%= ActionView::Base.new.number_to_currency(@enrollment.applied_aptc_amount.to_f) %>.</b><br>
+  <% end %>
+  Your monthly cost is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f - @enrollment.applied_aptc_amount.to_f) %>.</b><br>
 </p>
 <p> Your coverage start date is:
   <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>

@@ -363,7 +363,36 @@
   }
 
   .benefits-tab, .home-tab {
+    .benefit-package {
+      position: relative;
+      .panel {
+        border: none;
+      }
+      .col-xs-1 {
 
+        .make-default {
+          color: #cccccc;
+          position: relative;
+          padding-top: 120%;
+          margin: 0;
+          display: block;
+          &.active {
+            color: #FFD700;
+          }
+          &:hover {
+            cursor: pointer;
+          }
+
+        }
+
+      }
+      &:hover {
+        .make-default {
+          display: block;
+
+        }
+      }
+    }
     .plan-details {
       display: none;
       .col-xs-4 {
@@ -379,6 +408,14 @@
     .details {
       cursor: pointer;
       margin-right:20px;
+    }
+    .benefit-details {
+      cursor: pointer;
+      &:hover {
+        >* {
+          color: #23527c;
+        }
+      }
     }
     .package-offering {
       border: solid 1px #b7b7b7;
@@ -423,7 +460,12 @@
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
       padding-bottom: 30px;
+      padding-top: 0;
       margin-bottom: 35px;
+      border-top: none;
+      border-bottom: solid 1px #b7b7b7;
+      border-left: solid 1px #b7b7b7;
+      border-right: solid 1px #b7b7b7;
       &>h2 {
         font-size: 16px;
       }
@@ -474,6 +516,31 @@
 
           }
         }
+      }
+      .package-offering {
+        border: none;
+        background-color: #ffffff;
+        padding: 10px 0 20px;
+        margin-top: 20px;
+        table {
+          &:first-of-type {
+            th {
+            }
+            tr {
+              td {
+                &:first-of-type {
+                  i {
+                    padding-right: 10px;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+      .est-month {
+        padding: 20px inherit 30px;
       }
     }
   }
@@ -1060,8 +1127,7 @@
           padding-top: 20px;
           margin-bottom: 0;
           &:last-of-type {
-            border-bottom: solid 1px #b7b7b7;
-            margin-bottom: 40px;
+            //border-bottom: solid 1px #b7b7b7;
           }
           section {
             &:last-of-type {
@@ -1382,7 +1448,9 @@
       input[type=file], input[type=submit] {
         display: none;
         margin-top: 30px;
+        visibility: hidden;
       }
+
       .btn-primary {
         text-transform: uppercase;
         padding: 10px 20px;
@@ -1404,6 +1472,9 @@
         position: relative;
         overflow: hidden;
         white-space: nowrap;
+      }
+      label {
+        margin: 0;
       }
     }
     .fa {

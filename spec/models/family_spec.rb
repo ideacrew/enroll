@@ -959,43 +959,43 @@ describe Family, "is_blocked_by_qle_and_assistance" do
 
   it "return true when status is aptc_block" do
     family.status = "aptc_block"
-    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
+    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq true
   end
 
   it "return false when status is aptc_block" do
     family.status = "aptc_unblock"
-    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq false
   end
 
-  context "when max_aptc greater than 0" do
-    before :each do
-      allow(family).to receive(:latest_household).and_return household
-      allow(eligibility_determination).to receive(:max_aptc).and_return 100
-    end
+  #context "when max_aptc greater than 0" do
+  #  before :each do
+  #    allow(family).to receive(:latest_household).and_return household
+  #    allow(eligibility_determination).to receive(:max_aptc).and_return 100
+  #  end
 
-    it "return false when qle is not individual" do
-      allow(qle).to receive(:individual?).and_return false
-      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-    end
+  #  it "return false when qle is not individual" do
+  #    allow(qle).to receive(:individual?).and_return false
+  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  #  end
 
-    it "return false when qle is not family_structure_changed" do
-      allow(qle).to receive(:individual?).and_return true
-      allow(qle).to receive(:family_structure_changed?).and_return false
-      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-    end
+  #  it "return false when qle is not family_structure_changed" do
+  #    allow(qle).to receive(:individual?).and_return true
+  #    allow(qle).to receive(:family_structure_changed?).and_return false
+  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  #  end
 
-    it "return true" do
-      allow(qle).to receive(:individual?).and_return true
-      allow(qle).to receive(:family_structure_changed?).and_return true
-      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
-    end
-  end
+  #  it "return true" do
+  #    allow(qle).to receive(:individual?).and_return true
+  #    allow(qle).to receive(:family_structure_changed?).and_return true
+  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
+  #  end
+  #end
 
-  it "return false when max_aptc is 0" do
-    allow(family).to receive(:latest_household).and_return household
-    allow(eligibility_determination).to receive(:max_aptc).and_return 0
-    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  end
+  #it "return false when max_aptc is 0" do
+  #  allow(family).to receive(:latest_household).and_return household
+  #  allow(eligibility_determination).to receive(:max_aptc).and_return 0
+  #  expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  #end
 end
 
 describe Family, "aptc_blocked?" do
@@ -1011,21 +1011,43 @@ describe Family, "aptc_blocked?" do
   end
 end
 
-describe Family, "update_aptc_block_status?" do
+describe Family, "update_aptc_block_status" do
   let(:family) {Family.new}
-  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
   let(:eligibility_determination) {double(max_aptc: 0)}
+  #let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
+  let(:household) { double(latest_active_tax_household: double(eligibility_determinations: [eligibility_determination])) }
 
-  it "set aptc_block when max_aptc more than 0" do
+  it "set aptc_block" do
     allow(family).to receive(:latest_household).and_return household
-    allow(eligibility_determination).to receive(:max_aptc).and_return 100
-    allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+    #allow(eligibility_determination).to receive(:max_aptc).and_return 100
+    #allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+    allow(family).to receive(:has_aptc_hbx_enrollment?).and_return true
     family.update_aptc_block_status
     expect(family.status).to eq "aptc_block"
   end
+end
 
-  it "set status with blank" do
-    family.update_aptc_block_status
-    expect(family.status).to eq ""
+describe Family, 'coverage_waived?' do
+  let(:family) {Family.new}
+  let(:household) {double}
+  let(:hbx_enrollment) {HbxEnrollment.new}
+  before :each do
+    allow(family).to receive(:latest_household).and_return household
+  end
+
+  it "return false without hbx_enrollments" do
+    allow(household).to receive(:hbx_enrollments).and_return []
+    expect(family.coverage_waived?).to eq false
+  end
+
+  it "return false with hbx_enrollments" do
+    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
+    expect(family.coverage_waived?).to eq false
+  end
+
+  it "return true" do
+    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
+    allow(hbx_enrollment).to receive(:aasm_state).and_return "inactive"
+    expect(family.coverage_waived?).to eq true
   end
 end

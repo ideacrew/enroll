@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:person) {FactoryGirl.create(:person)}
   let(:user) { instance_double("User", :person => person) }
-  #let(:consumer_role) {FactoryGirl.create(:consumer_role, :person => person)}
+  let(:consumer_role) {FactoryGirl.create(:consumer_role)}
   let(:employee_role) {FactoryGirl.create(:employee_role)}
   let(:household) {double(:immediate_family_coverage_household=> coverage_household, :hbx_enrollments => hbx_enrollments)}
   let(:coverage_household) {double}
@@ -51,6 +51,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
+    end
+
+    context "individual" do
+      let(:hbx_profile) {double(benefit_sponsorship: benefit_sponsorship)}
+      let(:benefit_sponsorship) {double(benefit_coverage_periods: [benefit_coverage_period])}
+      let(:benefit_coverage_period) {FactoryGirl.build(:benefit_coverage_period)}
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
+        allow(benefit_coverage_period).to receive(:start_on).and_return double(year: 2015)
+        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:has_active_employee_role?).and_return false
+      end
+
+      it "should set session" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
+        expect(session[:pre_hbx_enrollment_id]).to eq "123"
+      end
     end
   end
 
@@ -129,7 +148,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_plan_shopping_path(id: hbx_enrollment.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'shop'))
+      expect(response).to redirect_to(insured_plan_shopping_path(id: hbx_enrollment.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "when keep_existing_plan" do

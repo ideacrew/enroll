@@ -482,6 +482,38 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.is_special_enrollment?).to eq true
       end
     end
+
+    context "inactive_pre_hbx" do
+      let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+      let(:benefit_package) {FactoryGirl.create(:benefit_package)}
+      let(:benefit_coverage_period) {FactoryGirl.build(:benefit_coverage_period)}
+      let(:hbx_profile) {double}
+      let(:benefit_sponsorship) {double}
+      let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return benefit_coverage_period
+        allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
+        @enrollment = household.create_hbx_enrollment_from(
+          consumer_role: consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package
+        )
+        @enrollment.save
+      end
+
+      it "should have an assigned hbx_id" do
+        hbx.inactive_pre_hbx(@enrollment.id)
+        expect(@enrollment.hbx_id).not_to eq nil
+      end
+
+      it "should update pre_hbx status" do
+        hbx.inactive_pre_hbx(@enrollment.id)
+        @enrollment.reload
+        expect(@enrollment.is_active).to eq false
+      end
+    end
   end
 end
 

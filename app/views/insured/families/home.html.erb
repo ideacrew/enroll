@@ -4,7 +4,7 @@
 
 <div id="plan-summary" class="row">
 </div>
-<div class="row" id='account-detail'>
+<div class="row content-bottom" id='account-detail'>
   <div class="my-account-page col-md-12">
     <h1>My DC Health Link</h1>
   </div>
@@ -13,7 +13,6 @@
     <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
     <%= render partial: 'shop_for_plans_widget' %>
     <%= render partial: 'apply_for_medicaid_widget' %>
-
     <% if @waived && @employee_role.present? %>
       <div class="waived-coverage">
       <%= render partial: 'waived_coverage_widget' %>
@@ -21,7 +20,7 @@
     <% end %>
 
   </div>
-  <div class="col-md-4">
+  <div class="col-md-4 right-column">
     <%= render 'right_column' %>
   </div>
 </div>

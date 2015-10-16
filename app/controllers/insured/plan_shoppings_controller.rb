@@ -1,7 +1,7 @@
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
   include Acapi::Notifiers
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans]
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
@@ -10,6 +10,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
+    hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
+    session.delete(:pre_hbx_enrollment_id)
 
     if hbx_enrollment.employee_role.present?
       benefit_group = hbx_enrollment.benefit_group
@@ -18,7 +20,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       get_aptc_info_from_session
       if @elected_aptc_pct > 0 and @max_aptc > 0
-        tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
+        tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
       else
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
@@ -65,6 +67,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
+    set_elected_aptc_pct_by_params(params[:elected_pct]) if params[:elected_pct].present?
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
@@ -145,8 +148,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
     if @person.has_active_consumer_role? and session["individual_assistance_path"].present?
-      @tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household rescue nil
-      if @tax_household.present?
+      shopping_tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
+      if shopping_tax_household.present?
+        @tax_household = shopping_tax_household
         @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
         session[:max_aptc] = @max_aptc
         @selected_aptc_pct = session[:selected_aptc_pct] = 0.85
@@ -191,7 +195,7 @@ class Insured::PlanShoppingsController < ApplicationController
       from: from_provider.try(:legal_name),
       to: @person.full_name,
       body: body,
-      subject: 'Your Secure Purchase Confirmation'
+      subject: 'Your Secure Enrollment Confirmation'
     }
     create_secure_message(message_params, @person, :inbox)
   end
@@ -229,6 +233,12 @@ class Insured::PlanShoppingsController < ApplicationController
       @max_aptc = session[:max_aptc].to_f rescue 0
       elected_aptc_pct = session[:elected_aptc_pct]
       @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
+    end
+  end
+
+  def set_elected_aptc_pct_by_params(elected_pct)
+    if session[:elected_aptc_pct].try(:to_f) != elected_pct.to_f
+      session[:elected_aptc_pct] = elected_pct.to_f
     end
   end
 end
