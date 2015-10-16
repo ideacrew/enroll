@@ -3,45 +3,62 @@
 <% end %>
 
 <div class="row">
-  <div class="my-broker col-md-12">
-    <h1>Your Brokers</h1>
+  <div class="col-md-12 my-broker">
+    <h1>Your Broker</h1>
     <div class="panel benefitgroup col-xs-12">
       <section class="col-xs-6">
         <header class="row">
-          <h5 class="bg-title">Benefit Group: <span>sadasda</span></h5>
+          <h5 class="bg-title">Your Broker:<span>
+<%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+</span></h5>
         </header>
       </section>
       <section class="col-xs-6">
         <header class="row">
-          <a class="details" onclick="$(this).closest('.benefitgroup').next().slideToggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
         </header>
       </section>
       <table>
         <tr>
           <td>
-            <header>Eligibility</header>
+            <header>Your Broker</header>
           </td>
           <td>
-            <p>asdasdasds</p>
+            <p><%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
+               <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %></p>
           </td>
         </tr>
         <tr>
           <td>
-            <header>Plans by</header>
+            <header>Phone Number</header>
           </td>
           <td>
             <p>
-asdasdsd
+
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <header>Email Address</header>
+          </td>
+          <td>
+            <p>
+              <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>
             </p>
           </td>
         </tr>
 
+
       </table>
     </div>
+    <div class="col-xs-12">
+      <div class="row">
+      <br/>
+
+      <%= link_to "Back", :back, class: 'btn btn-trans' %>
+    </div>
+    </div>
+
   </div>
 
-
-  <div class="col-md-10 col-sm-12">
-asdas
-  </div>
 </div>
