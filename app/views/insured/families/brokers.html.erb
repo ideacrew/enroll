@@ -27,6 +27,7 @@
                <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %></p>
           </td>
         </tr>
+        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone.present? %>
         <tr>
           <td>
             <header>Phone Number</header>
@@ -37,6 +38,8 @@
             </p>
           </td>
         </tr>
+        <% end %>
+        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address.present? %>
         <tr>
           <td>
             <header>Email Address</header>
@@ -47,6 +50,7 @@
             </p>
           </td>
         </tr>
+        <% end %>
 
 
       </table>
