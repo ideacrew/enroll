@@ -9,6 +9,7 @@ module Forms
 
         def us_citizen=(val)
           @us_citizen = (val.to_s == "true")
+          @naturalized_citizen = false if val.to_s == "false"
         end
 
         def naturalized_citizen=(val)

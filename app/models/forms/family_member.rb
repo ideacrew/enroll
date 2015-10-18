@@ -56,6 +56,10 @@ module Forms
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
     end
 
+    def consumer_role=(val)
+      true
+    end
+
     def save
       assign_citizen_status
       return false unless valid?

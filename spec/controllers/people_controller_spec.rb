@@ -40,8 +40,7 @@ RSpec.describe PeopleController do
       
       post :update, id: person.id, person: person_attributes
       expect(response).to redirect_to(personal_insured_families_path)
-      expect(assigns(:consumer_role)).not_to be_nil
-      expect(assigns(:vlp_doc_subject)).not_to be_nil
+      expect(assigns(:person)).not_to be_nil
       expect(flash[:notice]).to eq 'Person was successfully updated.'
     end
 
