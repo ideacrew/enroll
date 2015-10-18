@@ -20,7 +20,7 @@ CSV.open("invited_brokers.csv", "w") do |csv|
       bp.full_name,
       broker_role.npn,
       invitation.invitation_email,
-      "https://enroll.dchealthlink.com/invitations/claim/#{invitation.id.to_s}",
+      "https://enroll.dchealthlink.com/invitations/#{invitation.id.to_s}/claim",
       invitation.id.to_s
     ]
   end
