@@ -2,18 +2,19 @@ require "rails_helper"
 
 RSpec.describe "insured/consumer_roles/edit.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
-  let(:consumer_role) { double("ConsumerRole", id: "test", person: person)}
+  let(:consumer_role) { FactoryGirl.create(:consumer_role) }
   let(:current_user) {FactoryGirl.create(:user)}
   before :each do
     assign(:person, person)
     assign(:consumer_role, consumer_role)
-    allow(person).to receive(:consumer_role).and_return(consumer_role)
+    allow(consumer_role).to receive(:person).and_return person
+    allow(person).to receive(:consumer_role).and_return consumer_role
     allow(consumer_role).to receive(:citizen_status)
     allow(consumer_role ).to receive(:persisted?)
     allow(consumer_role ).to receive(:vlp_document_id)
     allow_any_instance_of(ApplicationHelper).to receive(:find_document).with(anything, anything)
     sign_in current_user
-    render template: "insured/consumer_roles/edit.html.erb"
+    render file: "insured/consumer_roles/edit.html.erb"
   end
 
   it "should display the page info" do

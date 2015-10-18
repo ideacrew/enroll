@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe "people/landing_pages/_personal.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
+  let(:consumer_role) { FactoryGirl.build(:consumer_role) }
 
   before(:each) do
     assign(:person, person)
@@ -18,6 +19,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
   context "with consumer_role" do
     before :each do
       allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:consumer_role).and_return consumer_role
       render :template => "people/landing_pages/_personal.html.erb"
     end
 

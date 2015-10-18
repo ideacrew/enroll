@@ -1,6 +1,7 @@
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
+  include VlpDoc
   before_action :check_consumer_role, only: [:search]
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
@@ -115,8 +116,7 @@ class Insured::ConsumerRolesController < ApplicationController
     #authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
 
-    params_clean_vlp_documents
-    if update_vlp_documents and @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+    if update_vlp_documents(@consumer_role, 'person') and @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
@@ -181,41 +181,6 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
-  end
-
-  def params_clean_vlp_documents
-    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
-
-    if params[:person][:us_citizen].eql? 'true'
-      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
-        params[:naturalization_doc_type] != doc[:subject]
-      end
-    elsif params[:person][:eligible_immigration_status].eql? 'true'
-      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
-        params[:immigration_doc_type] != doc[:subject]
-      end
-    end
-  end
-
-  def update_vlp_documents
-    if (params[:person][:us_citizen] == 'true' and params[:person][:naturalized_citizen] == 'false') or (params[:person][:us_citizen] == 'false' and params[:person][:eligible_immigration_status] == 'false')
-      return true
-    end
-
-    if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
-      add_document_errors_to_consumer_role(@consumer_role, ["document type", "cannot be blank"])
-      return false
-    end
-    doc_params = params.require(:person).permit({:consumer_role_attributes =>
-                                                 [:vlp_documents_attributes =>
-                                                  [:subject, :citizenship_number, :naturalization_number,
-                                                   :alien_number, :passport_number, :sevis_id, :visa_number,
-                                                   :receipt_number, :expiration_date, :card_number, :i94_number, :country_of_citizenship]]})
-    @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
-    document = find_document(@consumer_role, @vlp_doc_subject)
-    document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
-    add_document_errors_to_consumer_role(@consumer_role, document)
-    return document.errors.blank?
   end
 
   def check_consumer_role
