@@ -45,4 +45,29 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to match(/immigration_i_766_fields_container/)
     expect(rendered).to match(/immigration_unexpired_foreign_passport_fields_container/)
   end
+
+  it "should display the consumer_fields" do
+    expect(rendered).to have_selector('#consumer_fields')
+  end
+
+  it "should display the naturalized_citizen_container" do
+    expect(rendered).to have_selector('#naturalized_citizen_container')
+  end
+
+  it "should display the immigration_status_container" do
+    expect(rendered).to have_selector("#immigration_status_container")
+  end
+
+  it "should display the indian_tribe_area" do
+    expect(rendered).to have_selector("#indian_tribe_area")
+  end
+
+  it "should display the vlp document area" do
+    expect(rendered).to have_selector('#vlp_documents_container')
+    expect(rendered).to have_selector('#immigration_doc_type')
+    expect(rendered).to have_selector('#naturalization_doc_type')
+    expect(rendered).to have_selector('input#vlp_doc_target_id')
+    expect(rendered).to have_selector('input#vlp_doc_target_type')
+    expect(rendered).to have_selector('.vlp_doc_area')
+  end
 end

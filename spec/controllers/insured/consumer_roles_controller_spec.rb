@@ -189,4 +189,34 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(person.errors.full_messages).to include "Document type cannot be blank"
     end
   end
+
+  context "GET immigration_document_options" do
+    let(:family_member) {FamilyMember.new}
+    before :each do
+      sign_in user
+    end
+
+    it "should get person" do
+      allow(Person).to receive(:find).and_return person
+      xhr :get, 'immigration_document_options', {target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", format: :js}
+      expect(response).to have_http_status(:success)
+      expect(assigns(:target)).to eq person
+      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+    end
+
+    it "should get FamilyMember" do
+      allow(Forms::FamilyMember).to receive(:find).and_return family_member
+      xhr :get, 'immigration_document_options', {target_type: 'Forms::FamilyMember', target_id: "id", vlp_doc_target: "vlp doc", format: :js}
+      expect(response).to have_http_status(:success)
+      expect(assigns(:target)).to eq family_member
+      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+    end
+
+    it "should get FamilyMember" do
+      xhr :get, 'immigration_document_options', {target_type: 'Forms::FamilyMember', vlp_doc_target: "vlp doc", format: :js}
+      expect(response).to have_http_status(:success)
+      expect(assigns(:target).class).to eq Forms::FamilyMember
+      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+    end
+  end
 end
