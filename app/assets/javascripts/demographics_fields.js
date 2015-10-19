@@ -108,7 +108,7 @@ function applyListeners() {
 }
 
 function validationForIndianTribeMember() {
-  if ($('.indian_tribe_area').length == 0){
+  if ($('#indian_tribe_area').length == 0){
     return false;
   };
   $('.close').click(function(){$('#tribal_id_alert').hide()});
