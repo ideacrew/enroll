@@ -55,7 +55,7 @@ RSpec.describe "insured/show" do
     sign_in consumer_user
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to_not match(/I'm a Broker/)
-    expect(rendered).to match(/I'm an Insured/i)
+    expect(rendered).to match(/Individual and Family/i)
   end
 
   it "should get the plans-count" do
