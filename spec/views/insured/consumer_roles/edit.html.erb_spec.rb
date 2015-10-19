@@ -27,4 +27,20 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to have_selector('h3', text: 'Enroll - let\'s get you signed up for healthcare')
   end
 
+  it "shouldn't display the docs fields" do
+    expect(rendered).not_to match(/immigration_i_327_fields_container/)
+    expect(rendered).not_to match(/immigration_i_766_fields_container/)
+    expect(rendered).not_to match(/immigration_i_571_fields_container/)
+    expect(rendered).not_to match(/immigration_i_94_fields_container/)
+    expect(rendered).not_to match(/immigration_i_94_2_fields_container/)
+    expect(rendered).not_to match(/machine_readable_immigrant_visa_fields_container/)
+    expect(rendered).not_to match(/immigration_i_551_fields_container/)
+    expect(rendered).not_to match(/immigration_temporary_i_551_stamp_fields_container/)
+    expect(rendered).not_to match(/immigration_i_94_2_fields_container/)
+    expect(rendered).not_to match(/immigration_other_with_i94_fields_container/)
+    expect(rendered).not_to match(/immigration_other_with_alien_number_fields_container/)
+    expect(rendered).not_to match(/immigration_i_766_fields_container/)
+    expect(rendered).not_to match(/immigration_unexpired_foreign_passport_fields_container/)
+  end
+
 end
