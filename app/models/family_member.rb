@@ -1,5 +1,6 @@
 class FamilyMember
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
 
