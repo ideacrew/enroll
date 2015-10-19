@@ -39,6 +39,23 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def make_default_benefit_group
+    @employer_profile.plan_years.each do |py|
+      py.benefit_groups.each do |bg|
+        if bg.id == params[:benefit_group_id]
+          bg.default = true
+        else
+          bg.default = false
+        end
+        bg.save
+      end
+    end
+
+    respond_to do |format|
+      format.js { render :layout => false }
+    end
+  end
+
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|

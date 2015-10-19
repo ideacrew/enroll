@@ -29,31 +29,44 @@ $('.benefit-package').mouseenter(function() {
 
 // TOGGLE CLICK FUNCTION FOR MAKING A BENEFIT GROUP DEFAULT
 $('.benefit-package .make-default').toggleClick(function () {
-    $(this).addClass('active');
     $(this).removeAttr('data-toggle');
     $(this).removeAttr('data-original-title');
     $(this).show();
   }, function () {
-    $(this).removeClass('active');
   });
+
+// this toggles default benefit group star between gold and grey but doesn't add class active
+// $('.benefit-package .make-default').hover(function () {
+//   if ( $(this).hasClass('active') ) {
+//   }
+//   else {
+//     $(this).css('color', '#FFD700')
+//   }
+// }), (function () {
+//     if ( $(this).hasClass('active') ) {
+//       } else {
+//         $(this).css('color', '#cccccc')
+//       }
+//     });
 
 // call makeDefaultBenefitGroup from click
 
 $('.benefit-package .make-default').on('click', function() {
-  if ( $(this).find('.make-default').hasClass('active') ) {
-  makeDefaultBenefitGroup();
+  if ( $(this).hasClass('active') ) {
+    alert('this is already your default benefit group');
+
   } else {
+    $(this).addClass('active');
+
     $.ajax({
       type: "POST",
-      url: $('a#search_reference_plan_link').data('href'),
+      url: $('a#make_default_benefit_group_link').data('href'),
       dataType: 'script',
       data: {
-        "start_on": $("#plan_year_start_on").val(),
-        "reference_plan_id": reference_plan_id,
-        "location_id": location_id
+        "benefit_group_id": $(this).closest('.benefit-package').find('a#make_default_benefit_group_link').data('benefit-group-id'),
+        "plan_year_id": $(this).closest('.benefit-package').find('a#make_default_benefit_group_link').data('plan-year-id')
       }
     }).done(function() {
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
     });
 
   }
@@ -68,10 +81,6 @@ $('.benefit-package .make-default').on('click', function() {
     $(this).closest('.benefit-package').next().find('.plan-details').hide();
     $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
   });
-
-  function makeDefaultBenefitGroup() {
-    alert(123);
-  }
 
 };
 
