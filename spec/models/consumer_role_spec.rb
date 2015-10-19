@@ -305,7 +305,6 @@ describe ConsumerRole, "in the verifications_pending state" do
 end
 
 describe ConsumerRole, "in the verifications_outstanding state" do
-
   subject { ConsumerRole.new(:aasm_state => :verifications_outstanding, :lawful_presence_determination => lawful_presence_determination, :is_state_resident => state_resident_value) }
 
   before(:each) do
@@ -380,6 +379,26 @@ describe ConsumerRole, "in the verifications_outstanding state" do
       end
 
     end
+  end
+end
 
+describe "#find_document" do
+  let(:consumer_role) {ConsumerRole.new}
+  context "consumer role does not have any vlp_documents" do
+    it "it creates and returns an empty document of given subject" do
+      doc = consumer_role.find_document("Certificate of Citizenship")
+      expect(doc).to be_a_kind_of(VlpDocument)
+      expect(doc.subject).to eq("Certificate of Citizenship")
+    end
+  end
+
+  context "consumer role has a vlp_document" do
+    it "it returns the document" do
+      document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
+      found_document = consumer_role.find_document("Certificate of Citizenship")
+      expect(found_document).to be_a_kind_of(VlpDocument)
+      expect(found_document).to eq(document)
+      expect(found_document.subject).to eq("Certificate of Citizenship")
+    end
   end
 end

@@ -436,42 +436,12 @@ module ApplicationHelper
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def ethnicity_collection
-    [
-      ["White", "Black or African American", "Asian Indian", "Chinese" ],
-      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
-      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
-      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
-
-    ].inject([]){ |sets, ethnicities|
-      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
-  end
-
-  def latino_collection
-    [
-      ["Mexican", "Mexican American"],
-      ["Chicano/a", "Puerto Rican"],
-      ["Cuban", "Other"]
-    ].inject([]){ |sets, ethnicities|
-      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
-  end
-
   def is_under_open_enrollment?
     HbxProfile.current_hbx.under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
     HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
-  end
-
-  def find_document(consumer_role, subject)
-    subject_doc = consumer_role.vlp_documents.detect do |documents|
-      documents.subject.eql?(subject)
-    end
-
-    subject_doc || consumer_role.vlp_documents.build({subject:subject})
   end
 
   def parse_ethnicity(value)

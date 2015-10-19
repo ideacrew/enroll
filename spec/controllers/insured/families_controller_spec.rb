@@ -4,7 +4,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "") }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
   let(:family) { double("Family") }
   let(:household) { double("HouseHold") }
   let(:family_members){[double("FamilyMember")]}
@@ -114,6 +114,7 @@ RSpec.describe Insured::FamiliesController do
   describe "GET personal" do
     before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
+      sign_in user
       get :personal
     end
 

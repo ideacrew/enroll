@@ -97,8 +97,8 @@ Then (/Individual fixes a VLP error message/) do
   @browser.p(text: /Select document type/i).click
   click_when_present(@browser.li(text: "Certificate of Citizenship", class: "interaction-choice-control-state-id-1"))
   click_when_present(@browser.button(class: "interaction-click-control-continue"))
-  wait_and_confirm_text(/errors/)
-  wait_and_confirm_text(/alien_number value is required/)
+  wait_and_confirm_text(/error/)
+  #wait_and_confirm_text(/Document type cannot be blank/)
   #@browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
 end

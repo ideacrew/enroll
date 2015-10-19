@@ -1,5 +1,6 @@
-<% document = find_document(c.object, "Unexpired Foreign Passport") %>
-<%= c.fields_for 'vlp_documents', document do |v| %>
+<div id="immigration_unexpired_foreign_passport_fields_container">
+  <% document = c.object.find_document("Unexpired Foreign Passport") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
     <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
@@ -7,4 +8,5 @@
     <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
     <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
     <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
-<% end %>
+  <% end %>
+</div>

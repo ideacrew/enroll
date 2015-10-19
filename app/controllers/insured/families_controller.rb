@@ -1,4 +1,5 @@
 class Insured::FamiliesController < FamiliesController
+  include VlpDoc
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep]
@@ -61,6 +62,7 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @family_members = @family.active_family_members
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     respond_to do |format|
       format.html
     end

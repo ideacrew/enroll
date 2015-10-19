@@ -1,6 +1,7 @@
 class PeopleController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
+  include VlpDoc
 
   def new
     @person = Person.new
@@ -206,15 +207,14 @@ class PeopleController < ApplicationController
 
   def update
     sanitize_person_params
-    @person = Person.find(params[:id])
+    @person = find_person(params[:id])
 
     make_new_person_params @person
 
     @person.updated_by = current_user.email unless current_user.nil?
 
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
-      params_clean_vlp_documents
-      update_vlp_documents
+      update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
@@ -225,7 +225,10 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
-        bubble_consumer_role_errors_by_person(@person)
+        if @person.has_active_consumer_role?
+          bubble_consumer_role_errors_by_person(@person)
+          @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
+        end
         build_nested_models
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
 
@@ -416,36 +419,6 @@ private
       :no_dc_address,
       :no_dc_address_reason
     ]
-  end
-
-  def params_clean_vlp_documents
-    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
-
-    if params[:person][:us_citizen].eql? 'true'
-      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
-        params[:naturalization_doc_type] != doc[:subject]
-      end
-    elsif params[:person][:eligible_immigration_status].eql? 'true'
-      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
-        params[:immigration_doc_type] != doc[:subject]
-      end
-    end
-  end
-
-  def update_vlp_documents
-    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
-    doc_params = params.require(:person).permit({:consumer_role_attributes =>
-                                                 [:vlp_documents_attributes =>
-                                                  [:subject, :citizenship_number, :naturalization_number,
-                                                   :alien_number, :passport_number, :sevis_id, :visa_number,
-                                                   :receipt_number, :expiration_date, :card_number, :i94_number]]})
-    @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
-    @consumer_role =  Person.where(:id => params[:id]).first.consumer_role
-    if @consumer_role && @vlp_doc_subject
-      document = find_document(@consumer_role, @vlp_doc_subject)
-      document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
-      document.save
-    end
   end
 
   def dependent_params

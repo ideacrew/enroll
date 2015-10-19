@@ -1,50 +1,26 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 
-      <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg">
-        <%= select_tag :immigration_doc_type, options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: 'Select document type'} %>
-      </div>
-      <div id="immigration_naturalization_cert_container" style="display: <%= vlp_doc_subject == 'Naturalization Certificate' ? 'block' : 'none' %>">
-        <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_citizenship_cert_container" style="display: <%= vlp_doc_subject == 'Certificate of Citizenship' ? 'block' : 'none' %>">
-        <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_327_fields_container" style="display: <%= vlp_doc_subject == 'I-327 (Reentry Permit)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_327_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_766_fields_container" style="display: <%= vlp_doc_subject == 'I-766 (Employment Authorization Card)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_766_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_571_fields_container" style="display: <%= vlp_doc_subject == 'I-571 (Refugee Travel Document)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_571_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_94_fields_container" style="display: <%= vlp_doc_subject == 'I-94 (Arrival/Departure Record)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_94_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_94_2_fields_container" style="display: <%= vlp_doc_subject == 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_94_2_fields", locals: {c: c} %>
-      </div>
-      <div id="machine_readable_immigrant_visa_fields_container" style="display: <%= vlp_doc_subject == 'Machine Readable Immigrant Visa (with Temporary I-551 Language)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/machine_readable_immigrant_visa_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_i_551_fields_container" style="display: <%= vlp_doc_subject == 'I-551 (Permanent Resident Card)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_551_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_temporary_i_551_stamp_fields_container" style="display: <%= vlp_doc_subject == 'Temporary I-551 Stamp (on passport or I-94)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/temporary_i_551_stamp_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_temporary_i_20_stamp_fields_container" style="display: <%= vlp_doc_subject == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' ? 'display' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/i_20_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_other_with_alien_number_fields_container" style="display: <%= vlp_doc_subject == 'Other (With Alien Number)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/other_with_alien_number_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_other_with_i94_fields_container" style="display: <%= vlp_doc_subject == 'Other (With I-94 Number)' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/other_with_i94_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_unexpired_foreign_passport_fields_container" style="display: <%= vlp_doc_subject == 'Unexpired Foreign Passport' ? 'block' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/unexpired_foreign_passport_fields", locals: {c: c} %>
-      </div>
-      <div id="immigration_DS_2019_fields_container" style="display: <%= vlp_doc_subject == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' ? 'display' : 'none' %>">
-        <%= render :partial => "insured/consumer_roles/ds_2019_fields", locals: {c: c} %>
-      </div>
+<div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_vlp_documents_container(f.object) %>" id="vlp_documents_container">
+  <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
+    <%= select_tag :immigration_doc_type, options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: 'Select document type'} %>
+    </script>
+  </div>
+
+  <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
+    <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types, selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: 'Select document type'} %>
+  </div>
+
+  <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
+  <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
+
+  <div class="vlp_doc_area">
+  </div>
+</div>
+
+<% if vlp_doc_subject.present? %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      showOnly("<%= vlp_doc_subject %>");
+    });
+  </script>
+<% end %>
