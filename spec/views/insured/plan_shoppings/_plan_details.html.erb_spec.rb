@@ -63,10 +63,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     end
 
     it "presents a download sbc link with filename and extension" do
-      file_name = "filename=My Plan.pdf"
-
+      file_param = "filename=My Plan.pdf"
       expect(rendered).to have_selector('a', text:'Summary of Benefits and Coverage')
-      expect(rendered).to match(/#{file_name}/)
+      expect(rendered).to match(/#{file_param}/)
     end
   end
 
