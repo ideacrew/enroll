@@ -1,5 +1,5 @@
 <div id="immigration_i_551_fields_container">
-  <% document = find_document(c.object, "I-551 (Permanent Resident Card)") %>
+  <% document = c.object.find_document("I-551 (Permanent Resident Card)") %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>

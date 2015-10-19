@@ -1,5 +1,5 @@
 <div id="machine_readable_immigrant_visa_fields_container">
-  <% document = find_document(c.object, "Machine Readable Immigrant Visa (with Temporary I-551 Language)") %>
+  <% document = c.object.find_document("Machine Readable Immigrant Visa (with Temporary I-551 Language)") %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>

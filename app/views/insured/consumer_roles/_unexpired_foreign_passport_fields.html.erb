@@ -1,5 +1,5 @@
 <div id="immigration_unexpired_foreign_passport_fields_container">
-  <% document = find_document(c.object, "Unexpired Foreign Passport") %>
+  <% document = c.object.find_document("Unexpired Foreign Passport") %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
