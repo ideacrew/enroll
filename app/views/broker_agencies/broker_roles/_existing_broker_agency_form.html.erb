@@ -9,7 +9,7 @@
     <% if @filter != 'staff' %>
       <div class="row">
         <div class="col-md-9 col-sm-9 col-xs-12">
-          <div class="row no-buffer row-form-wrapper">
+          <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
             <%= render "shared/broker_agency_profile_fields", f: f%>
           </div>
         </div>
@@ -41,7 +41,7 @@
       </div>
     </div>
     <br>
-    <div class="row no-buffer row-form-wrapper">
+    <div class="row no-buffer row-form-wrapper no-border">
       <!-- recaptcha_tags -->
     </div><br>
     <div class="row">
