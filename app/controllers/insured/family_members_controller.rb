@@ -1,6 +1,4 @@
 class Insured::FamilyMembersController < ApplicationController
-  include ApplicationHelper
-  include ErrorBubble
   include VlpDoc
 
   before_action :set_current_person, :set_family
@@ -45,7 +43,10 @@ class Insured::FamilyMembersController < ApplicationController
         format.js { render 'show' }
       end
     else
-      update_vlp_documents(consumer_role, 'dependent', @dependent)
+      if consumer_role.present?
+        update_vlp_documents(consumer_role, 'dependent', @dependent)
+        @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role)
+      end
       init_address_for_dependent
       respond_to do |format|
         format.html { render 'new' }
@@ -75,9 +76,8 @@ class Insured::FamilyMembersController < ApplicationController
 
   def edit
     @dependent = Forms::FamilyMember.find(params.require(:id))
-    if @dependent.try(:naturalized_citizen) or @dependent.try(:eligible_immigration_status)
-      @vlp_doc_subject = @dependent.family_member.person.consumer_role.try(:vlp_documents).try(:last).try(:subject)
-    end
+    consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
 
     respond_to do |format|
       format.html
@@ -95,6 +95,7 @@ class Insured::FamilyMembersController < ApplicationController
         format.js { render 'show' }
       end
     else
+      @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
       init_address_for_dependent
       respond_to do |format|
         format.html { render 'edit' }

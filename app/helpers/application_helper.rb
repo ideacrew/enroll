@@ -444,14 +444,6 @@ module ApplicationHelper
     HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
   end
 
-  def find_document(consumer_role, subject)
-    subject_doc = consumer_role.vlp_documents.detect do |documents|
-      documents.subject.eql?(subject)
-    end
-
-    subject_doc || consumer_role.vlp_documents.build({subject:subject})
-  end
-
   def parse_ethnicity(value)
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?

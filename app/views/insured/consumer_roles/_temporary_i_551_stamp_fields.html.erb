@@ -1,5 +1,5 @@
 <div id="immigration_temporary_i_551_stamp_fields_container">
-  <% document = find_document(c.object, "Temporary I-551 Stamp (on passport or I-94)") %>
+  <% document = c.object.find_document("Temporary I-551 Stamp (on passport or I-94)") %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>

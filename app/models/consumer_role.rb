@@ -342,6 +342,14 @@ class ConsumerRole
     end
   end
 
+  def find_document(subject)
+    subject_doc = vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+
+    subject_doc || vlp_documents.build({subject:subject})
+  end
+
 private
   def notify_of_eligibility_change
     CoverageHousehold.update_individual_eligibilities_for(self)

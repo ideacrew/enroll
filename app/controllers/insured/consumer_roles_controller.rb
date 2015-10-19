@@ -1,6 +1,5 @@
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
-  include ErrorBubble
   include VlpDoc
   before_action :check_consumer_role, only: [:search]
   before_action :find_consumer_role, only: [:edit, :update]
@@ -109,7 +108,7 @@ class Insured::ConsumerRolesController < ApplicationController
     #authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
-    init_vlp_doc_subject
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
   end
 
   def update
@@ -131,6 +130,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
       else
         @consumer_role.build_nested_models_for_person
+        @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
         respond_to do |format|
           format.html { render "edit" }
         end
@@ -191,12 +191,6 @@ class Insured::ConsumerRolesController < ApplicationController
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
       # render 'privacy'
-    end
-  end
-
-  def init_vlp_doc_subject
-    if @consumer_role.person.try(:naturalized_citizen) or @consumer_role.person.try(:eligible_immigration_status)
-      @vlp_doc_subject = @consumer_role.try(:vlp_documents).try(:last).try(:subject)
     end
   end
 end

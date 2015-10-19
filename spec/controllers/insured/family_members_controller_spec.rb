@@ -146,7 +146,7 @@ RSpec.describe Insured::FamilyMembersController do
   end
 
   describe "GET edit" do
-    let(:dependent) { double }
+    let(:dependent) { double(family_member: double) }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do

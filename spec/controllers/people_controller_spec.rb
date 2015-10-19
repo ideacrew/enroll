@@ -31,7 +31,7 @@ RSpec.describe PeopleController do
     it "when individual" do
       allow(request).to receive(:referer).and_return("insured/families/personal")
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
-      allow(controller).to receive(:find_document).and_return(vlp_document)
+      allow(consumer_role).to receive(:find_document).and_return(vlp_document)
       allow(vlp_document).to receive(:save).and_return(true)
       allow(vlp_document).to receive(:update_attributes).and_return(true)
       

@@ -55,6 +55,27 @@ function applyListenersFor(target) {
 }
 
 function showOnly(selected) {
+  if (selected == '' || selected == undefined){
+    return false;
+  }
+  var vlp_doc_map = {
+    "Certificate of Citizenship": "citizenship_cert_container",
+    "Naturalization Certificate": "naturalization_cert_container",
+    "I-327 (Reentry Permit)": "immigration_i_327_fields_container",
+    "I-551 (Permanent Resident Card)": "immigration_i_551_fields_container",
+    "I-571 (Refugee Travel Document)": "immigration_i_571_fields_container",
+    "I-766 (Employment Authorization Card)": "immigration_i_766_fields_container",
+    "Machine Readable Immigrant Visa (with Temporary I-551 Language)": "machine_readable_immigrant_visa_fields_container",
+    "Temporary I-551 Stamp (on passport or I-94)": "immigration_temporary_i_551_stamp_fields_container",
+    "I-94 (Arrival/Departure Record)": "immigration_i_94_fields_container",
+    "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": "immigration_i_94_2_fields_container",
+    "Unexpired Foreign Passport": "immigration_unexpired_foreign_passport_fields_container",
+    "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": "immigration_temporary_i_20_stamp_fields_container",
+    "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": "immigration_DS_2019_fields_container",
+    "Other (With Alien Number)": "immigration_other_with_alien_number_fields_container",
+    "Other (With I-94 Number)": "immigration_other_with_i94_fields_container"
+  };
+  var vlp_doc_target = vlp_doc_map[selected];
   $(".vlp_doc_area").html("<span>waiting...</span>");
   var target_id = $('input#vlp_doc_target_id').val();
   var target_type = $('input#vlp_doc_target_type').val();
@@ -65,7 +86,7 @@ function showOnly(selected) {
     data: {
       'target_id': target_id,
       'target_type': target_type,
-      'vlp_doc_target': selected
+      'vlp_doc_target': vlp_doc_target
     },
   });
 }
@@ -78,64 +99,11 @@ function applyListeners() {
   }
 
   $("#naturalization_doc_type").change(function () {
-    switch ($(this).val()) {
-      case "Certificate of Citizenship":
-        showOnly("citizenship_cert_container");
-        break;
-      case "Naturalization Certificate":
-        showOnly("naturalization_cert_container");
-        break;
-    }
+    showOnly($(this).val());
   });
 
   $("#immigration_doc_type").change(function () {
-    switch ($(this).val()) {
-      case "I-327 (Reentry Permit)":
-        showOnly("immigration_i_327_fields_container");
-      break;
-      case "I-551 (Permanent Resident Card)":
-        showOnly("immigration_i_551_fields_container");
-      break;
-      case "I-571 (Refugee Travel Document)":
-        showOnly("immigration_i_571_fields_container");
-      break;
-      case "I-766 (Employment Authorization Card)":
-        showOnly("immigration_i_766_fields_container");
-      break;
-      case "Certificate of Citizenship":
-        showOnly("immigration_citizenship_cert_container");
-      break;
-      case "Naturalization Certificate":
-        showOnly("immigration_naturalization_cert_container");
-      break;
-      case "Machine Readable Immigrant Visa (with Temporary I-551 Language)":
-        showOnly("machine_readable_immigrant_visa_fields_container");
-      break;
-      case "Temporary I-551 Stamp (on passport or I-94)":
-        showOnly("immigration_temporary_i_551_stamp_fields_container");
-      break;
-      case "I-94 (Arrival/Departure Record)":
-        showOnly("immigration_i_94_fields_container");
-      break;
-      case "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport":
-        showOnly("immigration_i_94_2_fields_container");
-      break;
-      case "Unexpired Foreign Passport":
-        showOnly("immigration_unexpired_foreign_passport_fields_container");
-      break;
-      case "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)":
-        showOnly("immigration_temporary_i_20_stamp_fields_container");
-      break;
-      case "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)":
-        showOnly("immigration_DS_2019_fields_container");
-      break;
-      case "Other (With Alien Number)":
-        showOnly("immigration_other_with_alien_number_fields_container");
-      break;
-      case "Other (With I-94 Number)":
-        showOnly("immigration_other_with_i94_fields_container");
-      break;
-    }
+    showOnly($(this).val());
   });
 }
 

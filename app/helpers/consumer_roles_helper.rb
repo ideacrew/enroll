@@ -1,4 +1,4 @@
-module ConsumerProfilesHelper
+module ConsumerRolesHelper
   def ethnicity_collection
     [
       ["White", "Black or African American", "Asian Indian", "Chinese" ],
@@ -32,23 +32,23 @@ module ConsumerProfilesHelper
   end
 
   def show_naturalized_citizen_container(obj)
-    !obj.us_citizen.nil? and obj.us_citizen
+    obj.try(:us_citizen)
   end
 
   def show_immigration_status_container(obj)
-    !obj.us_citizen.nil? and !obj.us_citizen
+    obj.try(:us_citizen) == false
   end
 
   def show_tribal_container(obj)
-    !obj.indian_tribe_member.nil? and obj.indian_tribe_member
+    obj.try(:indian_tribe_member)
   end
 
   def show_naturalization_doc_type(obj)
-    !obj.us_citizen.nil? and obj.us_citizen and !obj.naturalized_citizen.nil? and obj.naturalized_citizen
+    show_naturalized_citizen_container(obj) and obj.try(:naturalized_citizen)
   end
 
   def show_immigration_doc_type(obj)
-    !obj.us_citizen.nil? and !obj.us_citizen and !obj.eligible_immigration_status.nil? and obj.eligible_immigration_status
+    show_immigration_status_container(obj) and obj.try(:eligible_immigration_status)
   end
 
   def show_vlp_documents_container(obj)

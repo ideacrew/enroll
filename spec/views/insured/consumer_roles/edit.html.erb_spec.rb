@@ -10,9 +10,9 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(consumer_role).to receive(:person).and_return person
     allow(person).to receive(:consumer_role).and_return consumer_role
     allow(consumer_role).to receive(:citizen_status)
-    allow(consumer_role ).to receive(:persisted?)
-    allow(consumer_role ).to receive(:vlp_document_id)
-    allow_any_instance_of(ApplicationHelper).to receive(:find_document).with(anything, anything)
+    allow(consumer_role).to receive(:persisted?)
+    allow(consumer_role).to receive(:vlp_document_id)
+    allow(consumer_role).to receive(:find_document)
     sign_in current_user
     render file: "insured/consumer_roles/edit.html.erb"
   end

@@ -225,7 +225,10 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
-        bubble_consumer_role_errors_by_person(@person)
+        if @person.has_active_consumer_role?
+          bubble_consumer_role_errors_by_person(@person)
+          @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
+        end
         build_nested_models
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
 
