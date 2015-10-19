@@ -24,7 +24,7 @@ RSpec.describe "layouts/_header.html.erb" do
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/I'm Shopping for Employee Health Insurance/)
+    expect(rendered).to match(/I'm an Employer/)
   end
 
   it 'identifies Customer Service Staff' do
