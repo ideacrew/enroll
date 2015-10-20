@@ -172,6 +172,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def clear_current_user
+    User.current_user = nil
+    SAVEUSER[:current_user_id] = nil
+  end
+
+  append_after_action :clear_current_user
+
   def actual_user
     if current_user.try(:person).try(:agent?)
       real_user = nil
