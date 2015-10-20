@@ -240,7 +240,7 @@ class HbxEnrollment
 
   def is_shop_sep?
     return false if consumer_role.present?
-    true
+    !("open_enrollment" == self.enrollment_kind)
   end
 
   def transmit_shop_enrollment!
