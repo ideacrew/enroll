@@ -153,6 +153,7 @@ class ApplicationController < ActionController::Base
 
     def set_current_user
       User.current_user = current_user
+      SAVEUSER[:current_user_id] = current_user.id
     end
 
     def set_current_person
