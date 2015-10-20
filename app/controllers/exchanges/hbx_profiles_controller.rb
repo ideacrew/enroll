@@ -63,12 +63,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   def request_help
     role = nil
     if params[:type]
-      cac = params[:type] == 'CAC'
-      staff = Person.where(:'csr_role.cac' => cac)
-      match = staff.where(:$and => [{first_name: params[:firstname].strip},{last_name: params[:lastname].strip}])
+      cac_flag = params[:type] == 'CAC'
+      match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
       if match.count > 0
         agent = match.first
-        role = cac ? 'Certified Applicant Counselor' : 'Customer Service Representative'
+        role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
       end
     else
       if params[:broker] && params[:broker] != ''
@@ -88,7 +87,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         status_text = "Agent has no email.   Please select another"
       end
     else
-      status_text = call_customer_service params[:firstname], params[:lastname]
+      status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
     render :text => status_text.html_safe, layout: false
   end
