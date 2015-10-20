@@ -109,14 +109,13 @@ class TaxHousehold
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
       #given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
-      ehb = plan.ehb > 0 ? plan.ehb : 1
-      ehb_premium = decorated_plan.premium_for(enrollment_member) * ehb
+      ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
       given_aptc_amount = aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
         #aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * [elected_pct, ehb].min, ehb_premium].min.round(2)
+        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * elected_pct, ehb_premium].min.round(2)
       end
     end
     aptc_available_amount_hash_for_enrollment

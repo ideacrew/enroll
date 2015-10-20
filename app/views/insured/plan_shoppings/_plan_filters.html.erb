@@ -164,7 +164,7 @@
         <%= hidden_field_tag :max_aptc, @max_aptc %>
         <%= hidden_field_tag :set_elected_pct_url, set_elected_pct_insured_plan_shopping_path(id: @hbx_enrollment.id) %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
-          <input name='elected_pct' type="range" min='0' max='1' value="<%= @selected_aptc_pct %>" step='0.05'/>
+          <input name='elected_pct' type="range" min='0' max='1' value="<%= @selected_aptc_pct %>" step='0.01'/>
           <span><output name="pct"><%= (@selected_aptc_pct * 100).to_i %></output>%</span>
         </form>
       </div>
