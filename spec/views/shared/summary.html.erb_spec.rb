@@ -15,6 +15,7 @@ describe "shared/_summary.html.erb" do
       :total_premium => 0,
       :total_employer_contribution => 0,
       :total_employee_cost => 0,
+      :ehb => 0.988,
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",

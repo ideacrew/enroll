@@ -121,6 +121,16 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    describe "when update_vlp_documents failed" do
+      before :each do
+        allow(controller).to receive(:update_vlp_documents).and_return false
+      end
+
+      it "should render the new template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("new")
+      end
+    end
   end
 
   describe "DELETE destroy" do
