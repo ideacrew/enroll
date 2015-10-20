@@ -17,7 +17,12 @@ class CsrRole
   end
 
   class << self
-    
+
+    def find_by_name(first_name, last_name, cac_flag)
+      staff = Person.where(:'csr_role.cac' => cac_flag)
+      staff.where(:$and => [{first_name: /^#{first_name}$/i},{last_name: /^#{last_name}$/i}])
+    end
+
     def find(id)
       return nil if id.blank?
       people = Person.where("csr_role._id" => BSON::ObjectId.from_string(id))
