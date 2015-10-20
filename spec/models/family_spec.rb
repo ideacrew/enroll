@@ -1026,3 +1026,28 @@ describe Family, "update_aptc_block_status" do
     expect(family.status).to eq "aptc_block"
   end
 end
+
+describe Family, 'coverage_waived?' do
+  let(:family) {Family.new}
+  let(:household) {double}
+  let(:hbx_enrollment) {HbxEnrollment.new}
+  before :each do
+    allow(family).to receive(:latest_household).and_return household
+  end
+
+  it "return false without hbx_enrollments" do
+    allow(household).to receive(:hbx_enrollments).and_return []
+    expect(family.coverage_waived?).to eq false
+  end
+
+  it "return false with hbx_enrollments" do
+    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
+    expect(family.coverage_waived?).to eq false
+  end
+
+  it "return true" do
+    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
+    allow(hbx_enrollment).to receive(:aasm_state).and_return "inactive"
+    expect(family.coverage_waived?).to eq true
+  end
+end

@@ -3,6 +3,11 @@
     <li>
       <%= link_to "My DC Health Link",  family_account_path %>
     </li>
+    <% if @employer_profile.present? || @person.has_active_employee_role? %>
+      <li>
+        <%= link_to "Brokers", brokers_insured_families_path %>
+      </li>
+    <% end %>
     <li>
       <%= link_to "Documents",  documents_index_insured_families_path %>
     </li>

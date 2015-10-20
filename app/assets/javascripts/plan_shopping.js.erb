@@ -220,9 +220,10 @@ $(function() {
     applyPlanSort($(this).data('sort-by'));
   });
 
-  $(document).on('click', "#plans .plan-select.btn-select", function(){
+  $(document).on('click', "#plans .plan-select.btn-select", function(e){
     if ($('.aptc').length > 0){
       var elected_pct = $("input[name='elected_pct']").val()
+      e.preventDefault();
 
       $.ajax({
         type: "POST",
@@ -230,6 +231,9 @@ $(function() {
         dataType: 'script',
         data: {
           'elected_pct': elected_pct
+        },
+        success: function(data){
+          $(this).unbind('click').trigger('click');
         }
       });
     };

@@ -83,7 +83,7 @@ class Family
   end
 
   def coverage_waived?
-    enrolled_hbx_enrollments.any? and enrolled_hbx_enrollments.all?{|e| e.aasm_state == 'inactive'}
+    latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.last.aasm_state == "inactive"
   end
 
   def remove_family_search_record

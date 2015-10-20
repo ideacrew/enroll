@@ -1,4 +1,6 @@
 <div>
   <%= render 'qles_panel' %>
+  <% if @employer_profile.present? || @person.has_active_employee_role? %>
+    <%= render 'brokers_widget' %>
+  <% end %>
 </div>
-

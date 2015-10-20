@@ -151,16 +151,29 @@ class Employers::EmployerProfilesController < ApplicationController
     sanitize_employer_profile_params
     params.permit!
     @organization = Organization.find(params[:id])
+
+    #save duplicate office locations as json in case we need to refresh
+    @organization_dup = @organization.office_locations.as_json
+
     @employer_profile = @organization.employer_profile
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
       @organization.assign_attributes(organization_profile_params)
+
+      #clear office_locations, don't worry, we will recreate
+      @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
+
+
       if @organization.update_attributes(employer_profile_params)
 
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
-        @organization.reload
+
+        #in case there was an error, reload from saved json
+        @organization.assign_attributes(:office_locations => @organization_dup)
+        @organization.save(validate: false)
+        #@organization.reload
         flash[:notice] = 'Employer information not saved.'
         redirect_to edit_employers_employer_profile_path(@organization)
       end

@@ -38,10 +38,10 @@ describe Forms::BrokerCandidate do
   context 'when email address invalid' do 
 
     it 'should have error on email' do 
-      broker = Forms::BrokerCandidate.new(attributes.merge({email: ""}))
+      broker = Forms::BrokerCandidate.new(attributes.merge({email: "test@email"}))
       broker.valid?
       expect(broker).to have_errors_on(:email)
-      expect(broker.errors[:email]).to eq(["can't be blank", "is not valid"])
+      expect(broker.errors[:email]).to eq(["test@email is not valid"])
     end
   end
 
