@@ -11,6 +11,8 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(person).to receive(:consumer_role).and_return consumer_role
     allow(consumer_role).to receive(:citizen_status)
     allow(consumer_role).to receive(:persisted?)
+    allow(consumer_role ).to receive(:contact_method)
+    allow(consumer_role ).to receive(:language_preference)
     allow(consumer_role).to receive(:vlp_document_id)
     allow(consumer_role).to receive(:find_document)
     sign_in current_user
@@ -22,10 +24,13 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to match(/#{person.last_name}/)
     expect(rendered).to match(/#{person.dob}/)
     expect(rendered).to match(/#{person.ssn}/)
+    expect(rendered).to match(/#{person.consumer_role.contact_method}/)
+    expect(rendered).to match(/#{person.consumer_role.language_preference}/)
     expect(rendered).to match(/#{person.gender}/)
     expect(rendered).to match(/#{person.emails.last.address}/mi)
     expect(rendered).to match(/Let’s begin by entering your personal information. This will take approximately 10 minutes. When you finish, select CONTINUE./)
     expect(rendered).to have_selector('h3', text: 'Enroll - let\'s get you signed up for healthcare')
+    expect(rendered).to have_selector('h5', text: 'Please indicate preferred method to receive notices (OPTIONAL)')
   end
 
   it "shouldn't display the docs fields" do
