@@ -139,13 +139,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "env_bucket_name" do
-    it "should return bucket name with system name prepended and environment name appended" do
-      bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
-    end
-  end
-
   describe "current_cost" do
     it "should return cost without session" do
       expect(helper.current_cost(100, 0.9)).to eq 100
@@ -153,7 +146,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     context "with session" do
       before :each do
-        session['elected_aptc'] = 100
+
+        session['elected_aptc_pct'] = 0.5
         session['max_aptc'] = 200
       end
 
@@ -166,7 +160,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
 
       it "should return 0" do
-        session['elected_aptc'] = 160
+
+        session['elected_aptc_pct'] = 0.8
         expect(helper.current_cost(100, 1.2)).to eq 0
       end
     end
@@ -174,7 +169,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "with hbx_enrollment" do
       let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100)}
       it "should return cost from hbx_enrollment" do
-        expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
+        expect(helper.current_cost(100, 0.8, hbx_enrollment)).to eq 90
       end
     end
   end

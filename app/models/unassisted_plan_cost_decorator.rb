@@ -23,63 +23,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select(){|member| relationship_for(member) == "child_under_26" && age_of(member) < 21} unless defined?(@children)
-    @children.index(member) || -1
-  end
-
-  def benefit_relationship(person_relationship)
-    PlanCostDecorator.benefit_relationship(person_relationship)
-  end
-
-  def self.benefit_relationship(person_relationship)
-    {
-      "head of household" => nil,
-      "spouse" => "spouse",
-      "ex-spouse" => "spouse",
-      "cousin" => nil,
-      "ward" => "child_under_26",
-      "trustee" => "child_under_26",
-      "annuitant" => nil,
-      "other relationship" => nil,
-      "other relative" => nil,
-      "self" => "employee",
-      "parent" => nil,
-      "grandparent" => nil,
-      "aunt_or_uncle" => nil,
-      "nephew_or_niece" => nil,
-      "father_or_mother_in_law" => nil,
-      "daughter_or_son_in_law" => nil,
-      "brother_or_sister_in_law" => nil,
-      "adopted_child" => "child_under_26",
-      "stepparent" => nil,
-      "foster_child" => "child_under_26",
-      "sibling" => nil,
-      "stepchild" => "child_under_26",
-      "sponsored_dependent" => "child_under_26",
-      "dependent_of_a_minor_dependent" => nil,
-      "guardian" => nil,
-      "court_appointed_guardian" => nil,
-      "collateral_dependent" => "child_under_26",
-      "life_partner" => "domestic_partner",
-      "child" => "child_under_26",
-      "grandchild" => nil,
-      "unrelated" => nil,
-      "great_grandparent" => nil,
-      "great_grandchild" => nil,
-    }[person_relationship]
-  end
-
-  def relationship_for(member)
-    case member.class
-    when HbxEnrollmentMember
-      if member.is_subscriber?
-        "employee"
-      else
-        benefit_relationship(member.primary_relationship)
-      end
-    else
-      member.employee_relationship
-    end
+    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
+    @children.index(member)
   end
 
   def large_family_factor(member)
@@ -104,7 +49,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def aptc_amount(member)
     if @tax_household.present?
-      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_aptc)
+      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_pct)
       (aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0) * large_family_factor(member)
     else
       0

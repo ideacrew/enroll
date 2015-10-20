@@ -337,7 +337,6 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   sleep(3)
   plans_tab.labels.last.fire_event('onclick')
   sleep(3)
-
   # @browser.a(class: /add_fields/).fire_event('onclick')
   # sleep(3)
   # benefit_groups = @browser.fieldsets(class: /benefit-group-fields/)

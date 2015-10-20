@@ -24,7 +24,17 @@ class HbxEnrollment
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
-  ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+  ENROLLED_STATUSES = [
+      "coverage_selected",
+      "enrollment_transmitted_to_carrier",
+      "coverage_enrolled",
+      "coverage_renewed",
+      "enrolled_contingent",
+      "unverified"
+    ]
+
+  TERMINATED_STATUSES = ["coverage_terminated", "coverage_canceled", "unverified"]
+
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   embedded_in :household
@@ -184,7 +194,7 @@ class HbxEnrollment
 
   def census_employee
     if employee_role.present?
-      employee_role.census_employee 
+      employee_role.census_employee
     else
       benefit_group_assignment.census_employee
     end
@@ -218,7 +228,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage! if benefit_group_assignment
+    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
   end
 
   def propogate_selection
@@ -382,7 +392,7 @@ class HbxEnrollment
     return if pre_hbx_id.blank?
     pre_hbx = HbxEnrollment.find(pre_hbx_id)
     if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
-      pre_hbx.update_current(is_active: false, changing: false)
+      pre_hbx.update_current(is_active: false)
     end
   end
 

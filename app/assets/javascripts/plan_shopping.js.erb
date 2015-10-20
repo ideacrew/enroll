@@ -223,8 +223,9 @@ $(function() {
   $(document).on('click', "#plans .plan-select.btn-select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
-      var elected_aptc = $("input#elected_aptc").val();
-      url = url + "&elected_aptc=" + elected_aptc;
+
+      var elected_pct = $("input[name='elected_pct']").val();
+      url = url + "&elected_pct=" + elected_pct;
     };
     window.location.href= url;
   });

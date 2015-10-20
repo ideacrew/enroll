@@ -44,7 +44,7 @@
 
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="pull-right">
-            <h3><strong><%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source), precision: 2) %></strong></h3><small><strong>your cost</strong></small><br><br>
+            <h3><strong><%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment), precision: 2) %></strong></h3><small><strong>your cost</strong></small><br><br>
           </div>
         </div>
       </div><br><br>

@@ -87,7 +87,7 @@ class Family
   end
 
   def coverage_waived?
-    enrolled_hbx_enrollments.any? and enrolled_hbx_enrollments.all?{|e| e.aasm_state == 'inactive'}
+    latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.last.aasm_state == "inactive"
   end
 
   def remove_family_search_record
@@ -99,6 +99,24 @@ class Family
     households.order_by(:'submitted_at'.desc).limit(1).only(:households).first
     # persisted_household = households.select(&:persisted?) - [nil] #remove any nils
     # persisted_household.sort_by(&:submitted_at).last
+  end
+
+  def active_household
+    households.detect { |household| household.is_active? }
+  end
+
+  def enrolled_benefits
+    # latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def terminated_benefits
+  end
+
+  def renewal_benefits
+  end
+
+  def enrolled_hbx_enrollments
+    latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def primary_family_member
@@ -273,10 +291,6 @@ class Family
 
   def person_is_family_member?(person)
     find_family_member_by_person(person).present?
-  end
-
-  def active_household
-    households.detect { |household| household.is_active? }
   end
 
   def dependents

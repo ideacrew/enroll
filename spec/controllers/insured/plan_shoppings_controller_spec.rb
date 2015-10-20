@@ -162,8 +162,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       it "should update session" do
         sign_in(user)
-        get :thankyou, id: "id", plan_id: "plan_id", elected_aptc: "50"
-        expect(session[:elected_aptc]).to eq 50
+        get :thankyou, id: "id", plan_id: "plan_id", elected_pct: "0.5"
+        expect(session[:elected_aptc_pct]).to eq 0.5
       end
     end
   end

@@ -421,6 +421,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
+      allow(organization).to receive(:office_locations).and_return(true)
+
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
       allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
@@ -431,6 +433,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
+
       put :update, id: organization.id
       expect(response).to be_redirect
     end

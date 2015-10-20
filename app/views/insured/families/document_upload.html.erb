@@ -13,9 +13,9 @@
 
       <%= form_for @person, :url => insured_verification_documents_upload_path, html: { multipart: true }, method: :post do |f| %>
           <%= fields_for @person.consumer_role do |c| %>
-            <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
-              <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f, document_upload: true} %>
-            </div>
+              <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
+                <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f} %>
+              </div>
           <% end %>
           <br/>
           <div class="col-md-6 col-xs-6 col-sm-6">

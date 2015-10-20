@@ -20,6 +20,8 @@ module Forms
       :if => Proc.new {|p| p.broker_applicant_type != 'staff'}
 
     validates :email, :email => true, :allow_blank => false
+    
+    validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid"
 
     def initialize(*attributes)
       @addresses ||= []

@@ -23,7 +23,7 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
-  def latest_eligibility_determination 
+  def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
@@ -113,7 +113,8 @@ class TaxHousehold
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
+        #aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
+        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * elected_pct, ehb_premium].min.round(2)
       end
     end
     aptc_available_amount_hash_for_enrollment

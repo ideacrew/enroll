@@ -1,7 +1,6 @@
 <div>
   <% if @person.has_active_employee_role? || @person.has_consumer_role? %>
     <%= render 'help_signup' %>
-
   <% end %>
   <%= render 'qles_panel' %>
   <% if @employer_profile.present? || @person.has_active_employee_role? %>
@@ -9,5 +8,4 @@
       <%= render 'brokers_widget' %>
     </div>
   <% end %>
-  <%= render 'qles_panel' %>
 </div>

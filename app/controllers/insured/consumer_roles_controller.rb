@@ -143,7 +143,7 @@ class Insured::ConsumerRolesController < ApplicationController
       set_current_person
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       return
-    else 
+    else
       set_consumer_bookmark_url
     end
   end
@@ -187,12 +187,11 @@ class Insured::ConsumerRolesController < ApplicationController
     set_current_person
     if @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
-    end
-# No more wrecking my relay state!
-#    else
-#      current_user.last_portal_visited = search_insured_consumer_role_index_path
-#      current_user.save!
+
+    else
+      current_user.last_portal_visited = search_insured_consumer_role_index_path
+      current_user.save!
       # render 'privacy'
-#    end
+    end
   end
 end

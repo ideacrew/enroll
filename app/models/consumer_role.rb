@@ -164,6 +164,11 @@ class ConsumerRole
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
 
+  def self.all
+    Person.all_consumer_roles
+  end
+
+
   def is_active?
     self.is_active
   end

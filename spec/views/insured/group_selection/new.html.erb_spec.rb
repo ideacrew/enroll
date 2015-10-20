@@ -299,15 +299,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         render file: "insured/group_selection/new.html.erb"
       end
 
-      it "should have title" do
-        expect(rendered).to match /Market Kind/
-      end
-
-      it "should have options" do
-        Plan::MARKET_KINDS.each do |kind|
-          expect(rendered).to have_selector("input[value='#{kind}']")
-        end
-      end
+      # it "should have title" do
+      #   expect(rendered).to match /Market Kind/
+      # end
+      # 
+      # it "should have options" do
+      #   Plan::MARKET_KINDS.each do |kind|
+      #     expect(rendered).to have_selector("input[value='#{kind}']")
+      #   end
+      # end
     end
   end
 end

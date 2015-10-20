@@ -4,14 +4,13 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil)
-    # source is account or shopping
-    if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
+  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil)
+    if hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
       return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
     end
 
-    if session['elected_aptc'].present? and session['max_aptc'].present?
-      aptc_amount = session['elected_aptc'].to_f
+    if session['elected_aptc_pct'].present? and session['max_aptc'].present?
+      aptc_amount = session['max_aptc'] * session['elected_aptc_pct']
       ehb_premium = plan_cost * ehb
       cost = plan_cost - [ehb_premium, aptc_amount].min
       cost > 0 ? cost : 0

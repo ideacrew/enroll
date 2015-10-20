@@ -283,7 +283,7 @@ class Plan
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
+      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost.round(2)
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end

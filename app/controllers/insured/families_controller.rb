@@ -25,6 +25,12 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
+  def brokers
+    if @person.employee_roles.present?
+      @employee_role = @person.employee_roles.try(:first)
+    end
+
+  end
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
