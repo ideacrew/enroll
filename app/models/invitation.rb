@@ -130,11 +130,12 @@ class Invitation
 
   def claim_csr_role(user_obj, redirection_obj)
     staff_role = CsrRole.find(source_id)
+    role = staff_role.cac ? 'cac' : 'csr'
     person = staff_role.person
-    redirection_obj.create_sso_account(user_obj, person, 15, "cac") do
+    redirection_obj.create_sso_account(user_obj, person, 15, role) do
       person.user = user_obj
       person.save!
-      user_obj.roles << "csr" unless user_obj.roles.include?("csr")
+      user_obj.roles << 'csr' unless user_obj.roles.include?('csr')
       user_obj.save!
       redirection_obj.redirect_to_hbx_portal
     end
@@ -143,7 +144,7 @@ class Invitation
   def claim_hbx_staff_role(user_obj, redirection_obj)
     staff_role = HbxStaffRole.find(source_id)
     person = staff_role.person
-    redirection_obj.create_sso_account(user_obj, person, 15, "hbx_staff") do
+    redirection_obj.create_sso_account(user_obj, person, 15, "hbxstaff") do
       person.user = user_obj
       person.save!
       user_obj.roles << "hbx_staff" unless user_obj.roles.include?("hbx_staff")
