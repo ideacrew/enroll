@@ -342,11 +342,8 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   # sleep(3)
   # benefit_groups = @browser.fieldsets(class: /benefit-group-fields/)
   # benefit_groups.last.text_fields.first.set("Gold HMO")
-  # debugger
-  # @browser.find('.benefit-group-fields:last .benefits-fields .premium-storage-input').set('65')
-  #
-  #
-  # sleep(3)
+  # @browser.text_fields(name: /relationship_benefits_attributes/).set(55)
+
   @browser.button(class: /interaction-click-control-create-plan-year/).click
 end
 
