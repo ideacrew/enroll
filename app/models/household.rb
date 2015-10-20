@@ -219,7 +219,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -227,17 +227,19 @@ class Household
       benefit_group: benefit_group,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
-      qle: qle
+      qle: qle,
+      submitted_at: TimeKeeper.datetime_of_record
     )
   end
 
-  def create_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil)
+  def create_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, submitted_at: nil)
     enrollment = new_hbx_enrollment_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
+      submitted_at: TimeKeeper.datetime_of_record
     )
     enrollment.save
     enrollment
@@ -250,7 +252,7 @@ class Household
   end
 
   def enrolled_hbx_enrollments
-    hbx_enrollments.my_enrolled_plans
+    hbx_enrollments.enrolled
   end
 
   def current_year_hbx_enrollments
