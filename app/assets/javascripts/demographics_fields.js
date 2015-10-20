@@ -129,8 +129,7 @@ function validationForIndianTribeMember() {
   });
 }
 
-$(document).on('page:update', function(){
+$(document).ready(function(){
   applyListeners();
   validationForIndianTribeMember();
-  //demographicsNew.init();
 });

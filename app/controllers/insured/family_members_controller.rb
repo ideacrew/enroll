@@ -34,19 +34,14 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
-    consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-    if @dependent.save
-      update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @dependent.save and update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
       end
     else
-      if consumer_role.present?
-        update_vlp_documents(consumer_role, 'dependent', @dependent)
-        @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role)
-      end
+      @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@dependent.family_member.try(:person).try(:consumer_role))
       init_address_for_dependent
       respond_to do |format|
         format.html { render 'new' }
