@@ -28,11 +28,11 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, user_with_email)
-        if !user_with_email.last_portal_visited.blank?
-          redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
-        elsif !relay_state.blank?
+        if !relay_state.blank?
           user_with_email.update_attributes!(last_portal_visited: relay_state)
           redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+        elsif !user_with_email.last_portal_visited.blank?
+          redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
         else
           user_with_email.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
