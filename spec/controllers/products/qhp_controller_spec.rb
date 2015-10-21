@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
-  let(:person) { double("Person", primary_family: family)}
+  let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
   let(:hbx_enrollment){double("HbxEnrollment", kind: "shop")}
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
