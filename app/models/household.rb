@@ -1,5 +1,6 @@
 class Household
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
 

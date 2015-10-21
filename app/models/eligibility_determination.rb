@@ -1,5 +1,6 @@
 class EligibilityDetermination
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
 
   embedded_in :tax_household

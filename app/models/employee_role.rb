@@ -1,5 +1,6 @@
 class EmployeeRole
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
