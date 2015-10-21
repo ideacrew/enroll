@@ -2,6 +2,7 @@ require 'ostruct'
 
 class HbxEnrollment
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
   include AASM

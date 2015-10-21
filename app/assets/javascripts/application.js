@@ -44,13 +44,15 @@ function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
 
-function applyMultiLanguateSelect() {
+function applyMultiLanguageSelect() {
   $('#broker_agency_language_select').multiselect({
     nonSelectedText: 'Select Language',
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
-
+  $('#broker_agency_language_select').on('selectric-init', function(element){
+    $('.language_multi_select .selectric-interaction-field-control-broker-agency-languages-spoken').hide();
+  });
 };
 
 function dchbx_enroll_date_of_record() {
