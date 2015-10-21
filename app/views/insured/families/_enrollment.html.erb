@@ -85,7 +85,7 @@
             <div class="row">
             <div class="col-xs-6">
               <div class="row">
-          <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), {class: 'btn btn-primary btn-sm pull-right', remote: true} %>
+          <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year), source: 'account'}), {class: 'btn btn-primary btn-sm pull-right', remote: true} %>
         </div>
         </div>
         <div class="col-xs-6">

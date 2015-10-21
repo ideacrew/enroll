@@ -77,7 +77,7 @@ Rails.application.routes.draw do
         get 'thankyou'
         post 'waive'
         post 'terminate'
-        post 'set_elected_pct'
+        post 'set_elected_aptc'
       end
     end
 
