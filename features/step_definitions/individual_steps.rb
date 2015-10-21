@@ -171,7 +171,6 @@ And(/Individual again clicks on add member button/) do
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
 end
 
 

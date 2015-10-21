@@ -28,7 +28,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to have_selector('h3', text: 'Enroll - let\'s get you signed up for healthcare')
   end
 
-  it "should contain immigration documents fields" do
+  xit "should contain immigration documents fields" do
     expect(rendered).to match(/immigration_naturalization_cert_container/)
     expect(rendered).to match(/immigration_citizenship_cert_container/)
     expect(rendered).to match(/immigration_i_327_fields_container/)
