@@ -171,4 +171,11 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
     end
   end
+
+  describe "env_bucket_name" do
+    it "should return bucket name with system name prepended and environment name appended" do
+      bucket_name = "sample-bucket"
+      expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
+    end
+  end
 end
