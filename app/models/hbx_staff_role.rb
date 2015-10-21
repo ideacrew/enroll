@@ -1,5 +1,6 @@
 class HbxStaffRole
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
 
   embedded_in :person

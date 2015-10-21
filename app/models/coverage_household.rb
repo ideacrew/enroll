@@ -1,5 +1,6 @@
 class CoverageHousehold
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
   include HasFamilyMembers

@@ -1,5 +1,6 @@
 class BrokerAgencyProfile
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
 
