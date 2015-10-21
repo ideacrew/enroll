@@ -3,6 +3,7 @@ class Insured::FamiliesController < FamiliesController
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep]
+  before_action :check_employee_role
 
   def home
     set_bookmark_url
@@ -126,6 +127,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+  def check_employee_role
+    @employee_role = @person.employee_roles.try(:first)
+  end
+  
   def init_qualifying_life_events
     @qualifying_life_events = []
     if @person.employee_roles.present?
