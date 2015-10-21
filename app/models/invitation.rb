@@ -91,13 +91,17 @@ class Invitation
       person.user = user_obj
       person.save!
       broker_agency_profile = broker_role.broker_agency_profile
-      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({ 
-        :broker_agency_profile => broker_agency_profile, 
-        :aasm_state => 'active'
-      })
+      if broker_role.is_primary_broker?
+        person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({ 
+          :broker_agency_profile => broker_agency_profile, 
+          :aasm_state => 'active'
+        })
+      end
       person.save!
       user_obj.roles << "broker" unless user_obj.roles.include?("broker")
-      user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
+      if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
+        user_obj.roles << "broker_agency_staff"
+      end
       user_obj.save!
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
