@@ -1,5 +1,6 @@
 
-$(document).on('ready', function() {
+var plan_year_selection_loader;
+ready = function() {
 
 
 
@@ -209,4 +210,6 @@ $(document).on('click', '.reference-plan input + label', function() {
   $(document).on("click", ".reference_plan_info h4 span", function() {
     $(this).parents(".reference_plan_info").find('.content').toggle();
   });
-});
+};
+$(document).ready(ready);
+$(document).on('page:load', plan_year_selection_loader);
