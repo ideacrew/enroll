@@ -156,6 +156,13 @@ class ApplicationController < ActionController::Base
       SAVEUSER[:current_user_id] = current_user.try(:id)
     end
 
+    def clear_current_user
+      User.current_user = nil
+      SAVEUSER[:current_user_id] = nil
+    end
+
+    append_after_action :clear_current_user
+
     def set_current_person
       if current_user.try(:person).try(:agent?)
         @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
@@ -172,13 +179,6 @@ class ApplicationController < ActionController::Base
       end
       real_user
     end
-
-    def clear_current_user
-      User.current_user = nil
-      SAVEUSER[:current_user_id] = nil
-    end
-
-    append_after_action :clear_current_user
 
     def market_kind_is_employee?
       /employee/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'shop' && !(/consumer/.match(current_user.try(:last_portal_visited))))
