@@ -2,10 +2,13 @@ $('#plans').html("<%= escape_javascript(render partial: "insured/plan_shoppings/
 
 $(document).ready(function(){
   if ($('.aptc').length > 0){
-    var elected_pct = $("input[name='elected_pct']").val();
-    if ($("output[name='pct']").text()/100 != elected_pct){
-      $("output[name='pct']").text(elected_pct*100);
-      updatePlanCost(elected_pct);
+    var elected_aptc = $("input#elected_aptc").val();
+    var max_aptc = $("input#max_aptc").val();
+    elected_pct = parseFloat(elected_aptc) / parseFloat(max_aptc);
+    if (parseFloat($("input[name='elected_pct']").val()) != elected_pct){
+      $("output[name='pct']").text((elected_pct*100).toFixed(0));
+      $("input[name='elected_pct']").val(elected_pct);
+      updatePlanCost(elected_aptc);
     };
   }
 });

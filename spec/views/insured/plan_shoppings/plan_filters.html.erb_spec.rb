@@ -86,6 +86,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:tax_household, true)
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
+      assign(:elected_aptc, 280.50)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
@@ -93,13 +94,13 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     it "should have aptc area" do
       expect(rendered).to have_selector('div.aptc')
       expect(rendered).to have_selector('input#max_aptc')
-      expect(rendered).to have_selector('input#set_elected_pct_url')
+      expect(rendered).to have_selector('input#set_elected_aptc_url')
       expect(rendered).to have_selector("input[name='elected_pct']")
     end
 
     it "should have Aptc used" do
       expect(rendered).to match /Used/
-      expect(rendered).to have_selector("input#aptc-used")
+      expect(rendered).to have_selector("input#elected_aptc")
     end
 
     it "should have aptc available" do
@@ -110,7 +111,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
     it "should have selected aptc pct amount" do
       expect(rendered).to match /85/
-      expect(rendered).to have_selector("input#aptc-used[value='280.50']")
+      expect(rendered).to have_selector("input#elected_aptc[value='280.50']")
     end
   end
 

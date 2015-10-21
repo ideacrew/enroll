@@ -22,7 +22,7 @@
       </div>
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
-          <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb)) %></h2>
+          <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb, 'shopping')) %></h2>
           <small>/Month</small>
         </div>
       </div>
