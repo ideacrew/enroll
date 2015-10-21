@@ -2,6 +2,7 @@ class ConsumerRole
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AASM

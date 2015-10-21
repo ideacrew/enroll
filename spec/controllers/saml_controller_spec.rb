@@ -50,9 +50,9 @@ RSpec.describe SamlController do
         context "with relay state" do
           let(:relay_state_url) { "/employers/employer_profiles/new" }
 
-          it "should redirect back to their last portal" do
+          it "should redirect back to their the relay state" do
             post :login, :SAMLResponse => sample_xml, :RelayState => relay_state_url
-            expect(response).to redirect_to(user.last_portal_visited)
+            expect(response).to redirect_to(relay_state_url)
             expect(flash[:notice]).to eq "Signed in Successfully."
             expect(User.where(email: user.email).first.oim_id).to eq name_id
             expect(User.where(email: user.email).first.idp_verified).to be_truthy

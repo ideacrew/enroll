@@ -1,5 +1,6 @@
 class BrokerAgencyStaffRole
   include Mongoid::Document
+  include SetCurrentUser
   include MongoidSupport::AssociationProxies
   include AASM
 
