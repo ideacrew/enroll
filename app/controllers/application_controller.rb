@@ -180,13 +180,6 @@ class ApplicationController < ActionController::Base
       real_user
     end
 
-    def clear_current_user
-      User.current_user = nil
-      SAVEUSER[:current_user_id] = nil
-    end
-
-    append_after_action :clear_current_user
-
     def market_kind_is_employee?
       /employee/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'shop' && !(/consumer/.match(current_user.try(:last_portal_visited))))
     end
