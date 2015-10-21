@@ -49,7 +49,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def aptc_amount(member)
     if @tax_household.present?
-      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_pct)
+      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_aptc)
       (aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0) * large_family_factor(member)
     else
       0

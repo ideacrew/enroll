@@ -16,8 +16,11 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
-
-      session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id] if params[:hbx_enrollment_id].present?
+      if params[:hbx_enrollment_id].present?
+        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
+        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
+        pre_hbx.update_current(changing: true) if pre_hbx.present?
+      end
       hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages

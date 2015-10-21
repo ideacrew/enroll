@@ -3,7 +3,9 @@ class Notice
   attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name, :notice
 
   def initialize(args = {})
-    @notice_path = Rails.root.join('pdfs', 'notice.pdf')
+    random_str = rand(10**10).to_s
+    @notice_path = Rails.root.join("tmp", "notice_#{random_str}.pdf")
+    @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @layout = 'pdf_notice'
   end
 
@@ -53,6 +55,15 @@ class Notice
      File.open(@notice_path, 'wb') do |file|
       file << self.pdf
     end
+  end
+
+  def upload
+    result = Aws::S3Storage.save(@notice_path, 'notices')
+  end
+
+  def clear_tmp
+    File.delete(@envelope_path)
+    File.delete(@notice_path)
   end
 end
 

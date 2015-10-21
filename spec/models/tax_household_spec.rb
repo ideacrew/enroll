@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TaxHousehold, type: :model do
   let(:family)  { FactoryGirl.create(:family) }
-  
+
 
 
 # describe TaxHousehold do
@@ -189,14 +189,6 @@ RSpec.describe TaxHousehold, type: :model do
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
     end
 
-    it "when ehb_premium > aptc_amount" do
-      allow(decorated_plan).to receive(:premium_for).and_return(10)
-      allow(plan).to receive(:coverage_kind).and_return 'individual'
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash
-      result = {'member1'=>9, 'member2'=>9}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
-    end
-
     it "can return result when plan is dental" do
       allow(plan).to receive(:coverage_kind).and_return 'dental'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
@@ -205,12 +197,12 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
-  context "current_max_aptc" do 
+  context "current_max_aptc" do
     before :each do
-      @tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record) 
+      @tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
     end
 
-    it "return max aptc when in the same year" do 
+    it "return max aptc when in the same year" do
       allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record, max_aptc: 100))
       expect(@tax_household.current_max_aptc).to eq 100
     end

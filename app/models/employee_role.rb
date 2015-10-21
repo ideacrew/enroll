@@ -15,6 +15,8 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
+  field :contact_method, type: String, default: "Only Paper communication"
+  field :language_preference, type: String, default: "English"
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true

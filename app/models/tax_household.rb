@@ -113,8 +113,7 @@ class TaxHousehold
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
-        #aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * elected_pct, ehb_premium].min.round(2)
+        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
       end
     end
     aptc_available_amount_hash_for_enrollment

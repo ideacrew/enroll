@@ -154,6 +154,7 @@ class Insured::ConsumerRolesController < ApplicationController
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
       { :emails_attributes => [:kind, :address] },
+      { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,
       :middle_name,

@@ -1,6 +1,7 @@
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
   include Acapi::Notifiers
+  include Aptc
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -66,8 +67,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
-
-    set_elected_aptc_pct_by_params(params[:elected_pct]) if params[:elected_pct].present?
+    set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
@@ -145,17 +145,12 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
-    if @person.has_active_consumer_role? and session["individual_assistance_path"].present?
-      shopping_tax_household = @person.primary_family.latest_household.latest_active_tax_household rescue nil
-      if shopping_tax_household.present?
-        @tax_household = shopping_tax_household
-        @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
-        session[:max_aptc] = @max_aptc
-        @selected_aptc_pct = session[:selected_aptc_pct] = 0.85
-      else
-        @max_aptc = session[:max_aptc] = 0
-        @selected_aptc_pct = session[:selected_aptc_pct] = 0
-      end
+    shopping_tax_household = get_shopping_tax_household_from_person(@person)
+    if shopping_tax_household.present?
+      @tax_household = shopping_tax_household
+      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      session[:max_aptc] = @max_aptc
+      @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     end
   end
 
@@ -230,12 +225,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_elected_aptc_by_params(elected_aptc)
     if session[:elected_aptc].to_f != elected_aptc.to_f
       session[:elected_aptc] = elected_aptc.to_f
-    end
-  end
 
-  def set_elected_aptc_pct_by_params(elected_pct)
-    if session[:elected_aptc_pct].try(:to_f) != elected_pct.to_f
-      session[:elected_aptc_pct] = elected_pct.to_f
     end
   end
 end
