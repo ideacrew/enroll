@@ -11,23 +11,25 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
     let!(:benefit_group)   {default_benefit_group}
     let!(:reference_plan)  {default_plan}
     let!(:member_provider) {double("member_provider", class: HbxEnrollment, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
-    let!(:father)          {double("father", dob: 55.years.ago, age_on: 55, employee_relationship: "self")}
-    let!(:mother)          {double("mother", dob: 45.years.ago, age_on: 45, employee_relationship: "spouse")}
-    let!(:one)             {double("one"   , dob: 20.years.ago, age_on: 20, employee_relationship: "child")}
-    let!(:two)             {double("two"   , dob: 18.years.ago, age_on: 18, employee_relationship: "child")}
-    let!(:three)           {double("three" , dob: 13.years.ago, age_on: 13, employee_relationship: "child")}
-    let!(:four)            {double("four"  , dob: 11.years.ago, age_on: 11, employee_relationship: "child")}
-    let!(:five)            {double("five"  , dob: 4.years.ago , age_on: 4 , employee_relationship: "child")}
-    let!(:relationship_benefit_for) do
-      {
-        "self"   => double("self", :offered? => true),
-        "spouse" => double("spouse", :offered? => true),
-        "child"  => double("child", :offered? => true)
+    let!(:father)          {double("father", class: HbxEnrollmentMember, age_on_effective_date: 19, is_subscriber?: true , primary_relationship: "self")}
+    let!(:mother)          {double("mother", class: HbxEnrollmentMember, age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "spouse")}
+    let!(:one)             {double("one"   , class: HbxEnrollmentMember, age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "child")}
+    let!(:two)             {double("two"   , class: HbxEnrollmentMember, age_on_effective_date: 18, is_subscriber?: false, primary_relationship: "child")}
+    let!(:three)           {double("three" , class: HbxEnrollmentMember, age_on_effective_date: 13, is_subscriber?: false, primary_relationship: "child")}
+    let!(:four)            {double("four"  , class: HbxEnrollmentMember, age_on_effective_date: 11, is_subscriber?: false, primary_relationship: "child")}
+    let!(:five)            {double("five"  , class: HbxEnrollmentMember, age_on_effective_date: 4 , is_subscriber?: false, primary_relationship: "child")}
+    def relationship_benefit_for(relationship)
+      relationship_benefits = {
+        "employee"   => double("employee_relationship_benefit", :offered? => true),
+        "spouse" => double("spouse_relationship_benefit", :offered? => true),
+        "child_under_26"  => double("child_relationship_benefit", :offered? => true)
       }
+      raise "relationship_benefit_for(\"#{relationship}\") is not defined" unless relationship_benefits.keys.include?(relationship)
+      relationship_benefits[relationship]
     end
 
     before do
-      allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
+      allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for(rel)}
       allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
     end
 
@@ -36,23 +38,23 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
     end
 
     it "should have a premium for father" do
-      expect(plan_cost_decorator.premium_for(father)).to eq 55.0
+      expect(plan_cost_decorator.premium_for(father)).to eq father.age_on_effective_date
     end
 
     it "should have a premium for mother" do
-      expect(plan_cost_decorator.premium_for(mother)).to eq 45.0
+      expect(plan_cost_decorator.premium_for(mother)).to eq mother.age_on_effective_date
     end
 
     it "should have a premium for one" do
-      expect(plan_cost_decorator.premium_for(one)).to eq 20.0
+      expect(plan_cost_decorator.premium_for(one)).to eq one.age_on_effective_date
     end
 
     it "should have a premium for two" do
-      expect(plan_cost_decorator.premium_for(two)).to eq 18.0
+      expect(plan_cost_decorator.premium_for(two)).to eq two.age_on_effective_date
     end
 
     it "should have a premium for three" do
-      expect(plan_cost_decorator.premium_for(three)).to eq 13.0
+      expect(plan_cost_decorator.premium_for(three)).to eq three.age_on_effective_date
     end
 
     it "should have no premium for four" do
@@ -64,7 +66,71 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
     end
 
     it "should have the right total premium" do
-      expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13].sum
+      expect(plan_cost_decorator.total_premium).to eq [father, mother, one, two, three].collect(&:age_on_effective_date).sum
+    end
+  end
+
+  context "rating a census employee with many dependents" do
+    let!(:plan)            {default_plan}
+    let!(:benefit_group)   {default_benefit_group}
+    let!(:reference_plan)  {default_plan}
+    let!(:member_provider) {father}
+    let!(:father)          {double("father", class: CensusEmployee , age_on: 19, employee_relationship: "employee", census_dependents: [mother, one, two, three, four, five])}
+    let!(:mother)          {double("mother", class: CensusDependent, age_on: 20, employee_relationship: "spouse")}
+    let!(:one)             {double("one"   , class: CensusDependent, age_on: 20, employee_relationship: "child_under_26")}
+    let!(:two)             {double("two"   , class: CensusDependent, age_on: 18, employee_relationship: "child_under_26")}
+    let!(:three)           {double("three" , class: CensusDependent, age_on: 13, employee_relationship: "child_under_26")}
+    let!(:four)            {double("four"  , class: CensusDependent, age_on: 11, employee_relationship: "child_under_26")}
+    let!(:five)            {double("five"  , class: CensusDependent, age_on: 4 , employee_relationship: "child_under_26")}
+    def relationship_benefit_for(relationship)
+      relationship_benefits = {
+        "employee"   => double("employee_relationship_benefit", :offered? => true),
+        "spouse" => double("spouse_relationship_benefit", :offered? => true),
+        "child_under_26"  => double("child_relationship_benefit", :offered? => true)
+      }
+      raise "relationship_benefit_for(\"#{relationship}\") is not defined" unless relationship_benefits.keys.include?(relationship)
+      relationship_benefits[relationship]
+    end
+
+    before do
+      allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for(rel)}
+      allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+    end
+
+    it "should be possible to construct a new plan cost decorator" do
+      expect(plan_cost_decorator.class).to be PlanCostDecorator
+    end
+
+    it "should have a premium for father" do
+      expect(plan_cost_decorator.premium_for(father)).to eq father.age_on
+    end
+
+    it "should have a premium for mother" do
+      expect(plan_cost_decorator.premium_for(mother)).to eq mother.age_on
+    end
+
+    it "should have a premium for one" do
+      expect(plan_cost_decorator.premium_for(one)).to eq one.age_on
+    end
+
+    it "should have a premium for two" do
+      expect(plan_cost_decorator.premium_for(two)).to eq two.age_on
+    end
+
+    it "should have a premium for three" do
+      expect(plan_cost_decorator.premium_for(three)).to eq three.age_on
+    end
+
+    it "should have no premium for four" do
+      expect(plan_cost_decorator.premium_for(four)).to eq 0.0
+    end
+
+    it "should have no premium for five" do
+      expect(plan_cost_decorator.premium_for(five)).to eq 0.0
+    end
+
+    it "should have the right total premium" do
+      expect(plan_cost_decorator.total_premium).to eq [father, mother, one, two, three].collect(&:age_on).sum
     end
   end
 end

@@ -6,13 +6,13 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   context "rating a large family" do
     let!(:plan)            {default_plan}
     let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
-    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self")}
-    let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse")}
-    let!(:one)             {double("one"   , dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child")}
-    let!(:two)             {double("two"   , dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child")}
-    let!(:three)           {double("three" , dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child")}
-    let!(:four)            {double("four"  , dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child")}
-    let!(:five)            {double("five"  , dob: 4.years.ago , age_on_effective_date: 4 , employee_relationship: "child")}
+    let!(:father)          {double("father", class: HbxEnrollmentMember, age_on_effective_date: 19, is_subscriber?: true , primary_relationship: "self")}
+    let!(:mother)          {double("mother", class: HbxEnrollmentMember, age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "spouse")}
+    let!(:one)             {double("one"   , class: HbxEnrollmentMember, age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "child")}
+    let!(:two)             {double("two"   , class: HbxEnrollmentMember, age_on_effective_date: 18, is_subscriber?: false, primary_relationship: "child")}
+    let!(:three)           {double("three" , class: HbxEnrollmentMember, age_on_effective_date: 13, is_subscriber?: false, primary_relationship: "child")}
+    let!(:four)            {double("four"  , class: HbxEnrollmentMember, age_on_effective_date: 11, is_subscriber?: false, primary_relationship: "child")}
+    let!(:five)            {double("five"  , class: HbxEnrollmentMember, age_on_effective_date: 4 , is_subscriber?: false, primary_relationship: "child")}
     let!(:relationship_benefit_for) do
       {
         "self"   => double("self", :offered? => true),
@@ -30,23 +30,23 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     it "should have a premium for father" do
-      expect(plan_cost_decorator.premium_for(father)).to eq 55.0
+      expect(plan_cost_decorator.premium_for(father)).to eq father.age_on_effective_date
     end
 
     it "should have a premium for mother" do
-      expect(plan_cost_decorator.premium_for(mother)).to eq 45.0
+      expect(plan_cost_decorator.premium_for(mother)).to eq mother.age_on_effective_date
     end
 
     it "should have a premium for one" do
-      expect(plan_cost_decorator.premium_for(one)).to eq 20.0
+      expect(plan_cost_decorator.premium_for(one)).to eq one.age_on_effective_date
     end
 
     it "should have a premium for two" do
-      expect(plan_cost_decorator.premium_for(two)).to eq 18.0
+      expect(plan_cost_decorator.premium_for(two)).to eq two.age_on_effective_date
     end
 
     it "should have a premium for three" do
-      expect(plan_cost_decorator.premium_for(three)).to eq 13.0
+      expect(plan_cost_decorator.premium_for(three)).to eq three.age_on_effective_date
     end
 
     it "should have no premium for four" do
@@ -58,7 +58,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     it "should have the right total premium" do
-      expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13].sum
+      expect(plan_cost_decorator.total_premium).to eq [father, mother, one, two, three].collect(&:age_on_effective_date).sum
     end
   end
 end
