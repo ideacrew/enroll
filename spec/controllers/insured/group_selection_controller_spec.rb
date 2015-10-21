@@ -52,6 +52,26 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
     end
+
+    context "individual" do
+      let(:hbx_profile) {double(benefit_sponsorship: benefit_sponsorship)}
+      let(:benefit_sponsorship) {double(benefit_coverage_periods: [benefit_coverage_period])}
+      let(:benefit_coverage_period) {FactoryGirl.build(:benefit_coverage_period)}
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
+        allow(benefit_coverage_period).to receive(:start_on).and_return double(year: 2015)
+        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:has_active_employee_role?).and_return false
+        allow(HbxEnrollment).to receive(:find).and_return nil
+      end
+
+      it "should set session" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
+        expect(session[:pre_hbx_enrollment_id]).to eq "123"
+      end
+    end
   end
 
   context "GET terminate_selection" do

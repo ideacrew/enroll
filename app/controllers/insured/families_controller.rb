@@ -8,6 +8,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
 
     @hbx_enrollments = @family.enrolled_hbx_enrollments.active || []
+    update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
     respond_to do |format|
@@ -131,6 +132,13 @@ class Insured::FamiliesController < FamiliesController
   def check_for_address_info
     if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
       redirect_to edit_insured_consumer_role_path(@person.consumer_role)
+    end
+  end
+
+  def update_changing_hbxs(hbxs)
+    if hbxs.present?
+      changing_hbxs = hbxs.changing
+      changing_hbxs.update_all(changing: false) if changing_hbxs.present?
     end
   end
 end
