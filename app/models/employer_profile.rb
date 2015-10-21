@@ -3,6 +3,7 @@ class EmployerProfile
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers

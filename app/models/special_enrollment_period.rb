@@ -1,5 +1,6 @@
 class SpecialEnrollmentPeriod
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
 
   embedded_in :family
