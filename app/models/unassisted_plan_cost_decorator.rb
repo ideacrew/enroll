@@ -22,8 +22,25 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     member.age_on_effective_date
   end
 
+  def child_index(member)
+    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
+    @children.index(member)
+  end
+
+  def large_family_factor(member)
+    if age_of(member) > 20
+      1.0
+    else
+      if child_index(member) > 2
+        0.0
+      else
+        1.0
+      end
+    end
+  end
+
   def premium_for(member)
-    Caches::PlanDetails.lookup_rate(__getobj__.id, schedule_date, age_of(member))
+    Caches::PlanDetails.lookup_rate(__getobj__.id, schedule_date, age_of(member)) * large_family_factor(member)
   end
 
   def employer_contribution_for(member)
@@ -33,7 +50,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def aptc_amount(member)
     if @tax_household.present?
       aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_pct)
-      aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0
+      (aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0) * large_family_factor(member)
     else
       0
     end
@@ -42,7 +59,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def employee_cost_for(member)
     cost = premium_for(member) - aptc_amount(member)
     cost = 0 if cost < 0
-    cost
+    cost * large_family_factor(member)
   end
 
   def total_premium

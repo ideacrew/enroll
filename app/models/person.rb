@@ -148,6 +148,20 @@ class Person
   # PersonRelationship child model indexes
   index({"person_relationship.relative_id" =>  1})
 
+  index({"hbx_employer_staff_role._id" => 1})
+  index({"hbx_responsible_party_role._id" => 1})
+  index({"hbx_csr_role._id" => 1})
+  index({"hbx_assister._id" => 1})
+
+  scope :all_consumer_roles,          -> { exists(consumer_role: true) }
+  scope :all_employee_roles,          -> { exists(employee_roles: true) }
+  scope :all_employer_staff_roles,    -> { exists(employer_staff_role: true) }
+  scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
+  scope :all_broker_roles,            -> { exists(broker_role: true) }
+  scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
+  scope :all_csr_roles,               -> { exists(csr_role: true) }
+  scope :all_assister_roles,          -> { exists(assister_role: true) }
+
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
   scope :active,   ->{ where(is_active: true) }
@@ -498,7 +512,7 @@ class Person
   end
 
   def indian_tribe_member=(val)
-    @indian_tribe_member = (val.to_s == "1")
+    @indian_tribe_member = (val.to_s == "true")
   end
 
   def eligible_immigration_status=(val)

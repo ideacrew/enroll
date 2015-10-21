@@ -23,7 +23,17 @@ class HbxEnrollment
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
-  ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+  ENROLLED_STATUSES = [
+      "coverage_selected", 
+      "enrollment_transmitted_to_carrier", 
+      "coverage_enrolled", 
+      "coverage_renewed",
+      "enrolled_contingent",
+      "unverified"
+    ]
+
+  TERMINATED_STATUSES = ["coverage_terminated", "coverage_canceled", "unverified"]
+
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   embedded_in :household
@@ -175,6 +185,13 @@ class HbxEnrollment
     end
   end
 
+  def census_employee
+    if employee_role.present?
+      employee_role.census_employee 
+    else
+      benefit_group_assignment.census_employee
+    end
+  end
 
   def benefit_sponsored?
     benefit_group.present?
@@ -204,7 +221,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage! if benefit_group_assignment
+    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
   end
 
   def propogate_selection
@@ -233,7 +250,7 @@ class HbxEnrollment
 
   def is_shop_sep?
     return false if consumer_role.present?
-    true
+    !("open_enrollment" == self.enrollment_kind)
   end
 
   def transmit_shop_enrollment!
@@ -362,6 +379,14 @@ class HbxEnrollment
       []
     end
     household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
+  end
+
+  def inactive_pre_hbx(pre_hbx_id)
+    return if pre_hbx_id.blank?
+    pre_hbx = HbxEnrollment.find(pre_hbx_id)
+    if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
+      pre_hbx.update_current(is_active: false)
+    end
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

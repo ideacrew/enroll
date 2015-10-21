@@ -46,6 +46,18 @@ RSpec.describe SamlController do
           expect(User.where(email: user.email).first.oim_id).to eq name_id
           expect(User.where(email: user.email).first.idp_verified).to be_truthy
         end
+
+        context "with relay state" do
+          let(:relay_state_url) { "/employers/employer_profiles/new" }
+
+          it "should redirect back to their the relay state" do
+            post :login, :SAMLResponse => sample_xml, :RelayState => relay_state_url
+            expect(response).to redirect_to(relay_state_url)
+            expect(flash[:notice]).to eq "Signed in Successfully."
+            expect(User.where(email: user.email).first.oim_id).to eq name_id
+            expect(User.where(email: user.email).first.idp_verified).to be_truthy
+          end
+        end
       end
 
       describe "with a new user" do
@@ -58,6 +70,19 @@ RSpec.describe SamlController do
           expect(flash[:notice]).to eq "Signed in Successfully."
           expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
           expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
+        end
+
+        context "with relay state" do
+          let(:attributes_double) { { 'mail' => "another_new@user.com"} }
+          let(:relay_state_url) { "/insured/employee/search" }
+
+          it "should redirect back to the relay state url" do
+            post :login, :SAMLResponse => sample_xml, :RelayState => relay_state_url
+            expect(response).to redirect_to(relay_state_url)
+            expect(flash[:notice]).to eq "Signed in Successfully."
+            expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
+            expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
+          end
         end
       end
     end

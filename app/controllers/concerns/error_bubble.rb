@@ -1,7 +1,7 @@
 module ErrorBubble
   def add_document_errors_to_dependent(dependent, document)
     if document.is_a? Array
-      consumer_role.person.errors.add(document.first, document.last)
+      dependent.errors.add(document.first, document.last)
     else
       document.errors.each do |k, v|
         dependent.errors.add(k, v)

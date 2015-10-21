@@ -2,7 +2,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -75,9 +75,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employers
-    if current_user.has_broker_agency_staff_role?
-      profile = BrokerAgencyProfile.find(params[:id])
-      @orgs = Organization.by_broker_agency_profile(profile._id)
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
     else
       broker_role_id = current_user.person.broker_role._id
       @orgs = Organization.where({'employer_profile.broker_agency_accounts.writing_agent_id' => broker_role_id})

@@ -1,4 +1,5 @@
 class Insured::FamiliesController < FamiliesController
+  include VlpDoc
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep]
@@ -23,12 +24,20 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
+  def brokers
+    if @person.employee_roles.present?
+      @employee_role = @person.employee_roles.try(:first)
+    end
+
+  end
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
+
+    @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
 
     render :layout => 'application'
   end
@@ -53,6 +62,7 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @family_members = @family.active_family_members
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     respond_to do |format|
       format.html
     end

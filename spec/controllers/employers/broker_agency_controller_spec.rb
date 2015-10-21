@@ -62,7 +62,7 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:notice]).to eq("Successfully associated broker with your account.")
-        expect(response).to redirect_to(employers_employer_profile_path(@employer_profile))
+        expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
       end
     end
   end
@@ -90,7 +90,7 @@ RSpec.describe Employers::BrokerAgencyController do
   end
 
   describe ".terminate" do
-    
+
     context 'with out search string' do
       before(:each) do
         sign_in(@user)
@@ -104,7 +104,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
     end
 
-    context 'when direct terminate' do 
+    context 'when direct terminate' do
       before(:each) do
         sign_in(@user)
       end
@@ -114,7 +114,7 @@ RSpec.describe Employers::BrokerAgencyController do
 
         expect(flash[:notice]).to eq("Broker terminated successfully.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
-      end 
+      end
     end
   end
 end

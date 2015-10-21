@@ -161,7 +161,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
       person = Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob).first
       expect(person).to be_truthy
       expect(person.broker_role).to be_truthy
-      expect(person.broker_agency_staff_roles.empty?).to be_falsey
+      expect(person.broker_agency_staff_roles.empty?).to be_truthy
 
       organization = Organization.where(fein: subject.fein).first
       expect(organization).to be_truthy
@@ -197,10 +197,10 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
   context 'when email address invalid' do 
 
     it 'should have error on email' do 
-      broker_agency = Forms::BrokerAgencyProfile.new(attributes.merge({email: ""}))
+      broker_agency = Forms::BrokerAgencyProfile.new(attributes.merge({email: "test@email"}))
       broker_agency.valid?
       expect(broker_agency).to have_errors_on(:email)
-      expect(broker_agency.errors[:email]).to eq(["is not valid"])
+      expect(broker_agency.errors[:email]).to eq(["test@email is not valid"])
     end
   end
 

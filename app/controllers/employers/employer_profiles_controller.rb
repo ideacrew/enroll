@@ -9,14 +9,13 @@ class Employers::EmployerProfilesController < ApplicationController
   layout "two_column", except: [:new]
 
   def index
-    @q = params.permit(:q)[:q]
-    @orgs = Organization.search(@q).exists(employer_profile: true)
-
-    if current_user.person.try(:broker_role)
-      broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
-      profile = BrokerAgencyProfile.find(broker_id)
-      @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
+    if params[:broker_agency_id].blank?
+      @q = params.permit(:q)[:q]
+      @orgs = Organization.search(@q).exists(employer_profile: true)
+    else
+      @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
     end
+
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
@@ -155,16 +154,29 @@ class Employers::EmployerProfilesController < ApplicationController
     sanitize_employer_profile_params
     params.permit!
     @organization = Organization.find(params[:id])
+
+    #save duplicate office locations as json in case we need to refresh
+    @organization_dup = @organization.office_locations.as_json
+
     @employer_profile = @organization.employer_profile
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
       @organization.assign_attributes(organization_profile_params)
+
+      #clear office_locations, don't worry, we will recreate
+      @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
+
+
       if @organization.update_attributes(employer_profile_params)
 
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
-        @organization.reload
+
+        #in case there was an error, reload from saved json
+        @organization.assign_attributes(:office_locations => @organization_dup)
+        @organization.save(validate: false)
+        #@organization.reload
         flash[:notice] = 'Employer information not saved.'
         redirect_to edit_employers_employer_profile_path(@organization)
       end

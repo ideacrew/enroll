@@ -1,5 +1,15 @@
 <div class="container">
   <div class="row">
+    <% if @aptc_blocked.present? and @aptc_blocked %>
+      <br />
+      <div class="alert alert-danger" role="alert">
+        <p>
+          We need a bit of additional information to redetermine your eligibility. Please call us at 1-855-532-5465.
+        </p>
+        <br>
+        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
+      </div>
+    <% else %>
     <%= form_tag(:insured_group_selections) do %>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
         <h3>Choose Benefits: Covered Family Members</h3>
@@ -125,11 +135,15 @@
               <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
             <% end %>
           <% elsif @change_plan.blank? %>
+            <% if @employee_role.present? && !@employee_role.is_under_open_enrollment? %>
+            <%= render  partial: 'shared/sep_shop_progress', locals: {step: '5'} %>
+            <% else %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+            <% end %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>
-            <% if @market_kind == "individual" && !is_under_open_enrollment? %>
+            <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
             <% else %>
               <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
@@ -137,6 +151,7 @@
           <% end %>
         </div>
       </div>
+    <% end %>
     <% end %>
   </div>
 </div>

@@ -48,7 +48,7 @@ class Employers::BrokerAgencyController < ApplicationController
 
     flash[:notice] = "Successfully associated broker with your account."
     send_broker_successfully_associated_email broker_role_id
-    redirect_to employers_employer_profile_path(@employer_profile)
+    redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
   end
 
 

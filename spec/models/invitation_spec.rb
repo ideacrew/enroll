@@ -62,7 +62,10 @@ describe Invitation do
       {
         "census_employee" => "employee_role",
         "broker_role" => "broker_role",
-        "employer_staff_role" => "employer_staff_role"
+        "employer_staff_role" => "employer_staff_role",
+        "csr_role" => "csr_role",
+        "assister_role" => "assister_role",
+        "hbx_staff_role" => "hbx_staf_role",
       }
     end
 
@@ -89,6 +92,7 @@ describe Invitation do
      [1,0],
      [1,2],
      [2,0],
+     [4,2],
      [2,1]].each do |idx|
        include_examples "an invitation with invalid source kind and role", source_kinds[idx.first], role_kinds[idx.last]
      end

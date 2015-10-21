@@ -97,8 +97,8 @@ Then (/Individual fixes a VLP error message/) do
   @browser.p(text: /Select document type/i).click
   click_when_present(@browser.li(text: "Certificate of Citizenship", class: "interaction-choice-control-state-id-1"))
   click_when_present(@browser.button(class: "interaction-click-control-continue"))
-  wait_and_confirm_text(/errors/)
-  wait_and_confirm_text(/alien_number value is required/)
+  wait_and_confirm_text(/error/)
+  #wait_and_confirm_text(/Document type cannot be blank/)
   #@browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
 end
@@ -164,8 +164,8 @@ And(/Individual again clicks on add member button/) do
   input_field.li(text: /Child/).click
   @browser.radio(id: /radio_male/).fire_event("onclick")
   @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
-  @browser.radio(id: /dependent_eligible_immigration_status_true/).wait_while_present
-  @browser.radio(id: /dependent_eligible_immigration_status_true/).fire_event("onclick")
+  @browser.radio(id: /dependent_eligible_immigration_status_false/).wait_while_present
+  @browser.radio(id: /dependent_eligible_immigration_status_false/).fire_event("onclick")
   @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
@@ -235,7 +235,7 @@ end
 And(/I click to see my Secure Purchase Confirmation/) do
   wait_and_confirm_text /Messages/
   @browser.link(text: /Messages/).click
-  wait_and_confirm_text /Your Secure Purchase Confirmation/
+  wait_and_confirm_text /Your Secure Enrollment Confirmation/
 end
 
 Then(/Second user creates an individual account$/) do

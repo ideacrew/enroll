@@ -45,13 +45,15 @@ function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
 
-function applyMultiLanguateSelect() {
+function applyMultiLanguageSelect() {
   $('#broker_agency_language_select').multiselect({
     nonSelectedText: 'Select Language',
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
-
+  $('#broker_agency_language_select').on('selectric-init', function(element){
+    $('.language_multi_select .selectric-interaction-field-control-broker-agency-languages-spoken').hide();
+  });
 };
 
 function dchbx_enroll_date_of_record() {
@@ -73,13 +75,12 @@ function getCarrierPlans(ep, ci) {
   })
 };
 // modal input type file clicks
-$(document).on('click', '#modal-wrapper div .select', function(){
-  $(this).closest('div').find('input[type=file]').trigger('click');
+$(document).on('click', '#modal-wrapper div label', function(){
   $(this).closest('div').find('input[type=file]').on('change', function() {
     var filename = $(this).closest('div').find('input[type=file]').val()
     $(this).closest('div').find('.select').hide();
     $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
-    $(this).closest('div').find('input[type=submit]').show();
+    $(this).closest('div').find('input[type=submit]').css({"visibility": "visible", "display": "inline-block"});
   });
 });
 $(document).on('click', '.upload-preview .fa', function(){

@@ -2,6 +2,45 @@ require 'rails_helper'
 
 RSpec.describe Employers::EmployerProfilesController do
 
+  describe "GET index" do
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:employer_profile1) { FactoryGirl.create(:employer_profile) }
+    let(:employer_profile2) { FactoryGirl.create(:employer_profile) }
+
+    context 'when broker agency id present' do 
+      it 'should return employers for the broker agency', dbclean: :after_each do 
+        allow(user).to receive(:person).and_return(person)
+        allow(controller).to receive(:find_mailbox_provider).and_return(true)
+        sign_in(user)
+        employer_profile1 = FactoryGirl.create(:employer_profile)
+        employer_profile2 = FactoryGirl.create(:employer_profile)
+        organization = FactoryGirl.create(:organization)
+        broker_agency_profile = FactoryGirl.build(:broker_agency_profile, organization: organization)
+        broker_agency_account = FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile)
+        employer_profile1.broker_agency_accounts << broker_agency_account
+        employer_profile1.save!
+        get :index, broker_agency_id: broker_agency_account.broker_agency_profile_id
+        expect(response).to have_http_status(:success)
+        expect(assigns(:orgs).count).to eq(1)
+        expect(assigns(:orgs).first).to eq(employer_profile1.organization)
+      end
+    end
+
+    context 'when broker agency id not present' do 
+      it 'should return all the employers in the system', dbclean: :after_each do 
+        allow(user).to receive(:person).and_return(person)
+        allow(controller).to receive(:find_mailbox_provider).and_return(true)
+        sign_in(user)
+        employer_profile1 = FactoryGirl.create(:employer_profile)
+        employer_profile2 = FactoryGirl.create(:employer_profile)
+        get :index
+        expect(response).to have_http_status(:success)
+        expect(assigns(:orgs).count).to eq(2)
+      end
+    end
+  end
+
   describe "GET new" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
@@ -387,6 +426,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
+      allow(organization).to receive(:office_locations).and_return(true)
+
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
       allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
@@ -397,6 +438,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
+
       put :update, id: organization.id
       expect(response).to be_redirect
     end
@@ -419,9 +461,6 @@ RSpec.describe Employers::EmployerProfilesController do
       end
 
     end
-
-
-
   end
 
   #describe "DELETE destroy" do

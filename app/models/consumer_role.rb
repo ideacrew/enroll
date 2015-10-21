@@ -163,6 +163,11 @@ class ConsumerRole
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
 
+  def self.all
+    Person.all_consumer_roles
+  end
+
+
   def is_active?
     self.is_active
   end
@@ -335,6 +340,14 @@ class ConsumerRole
     Email::KINDS.each do |kind|
       person.emails.build(kind: kind) if person.emails.select { |email| email.kind == kind }.blank?
     end
+  end
+
+  def find_document(subject)
+    subject_doc = vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+
+    subject_doc || vlp_documents.build({subject:subject})
   end
 
 private

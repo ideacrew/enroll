@@ -138,11 +138,11 @@ function updatePlanCost(elected_pct) {
   var plans = $('.plan-row');
   for(var i=0; i<plans.length; i++){
     var plan = plans[i];
-    premium = parseFloat($(plan).data('plan-metal-premium'));
-    if (elected_amount >= premium) {
-      var premium_resp_amt = 0;
-    } else {
-      var premium_resp_amt = premium - elected_amount;
+    var premium = parseFloat($(plan).data('plan-metal-premium'));
+    var ehb_premium = premium * parseFloat($(plan).data('plan-ehb'));
+    var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]);
+    if (premium_resp_amt < 0) {
+      premium_resp_amt = 0;
     }
     premium_resp_amt = premium_resp_amt.toFixed(2);
     $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
@@ -220,19 +220,13 @@ $(function() {
     applyPlanSort($(this).data('sort-by'));
   });
 
-  $(document).on('click', "#plans .plan-select.btn-select", function(){
+  $(document).on('click', "#plans .plan-select.btn-select", function(e){
+    var url = $(this).data('url');
     if ($('.aptc').length > 0){
-      var elected_pct = $("input[name='elected_pct']").val()
-
-      $.ajax({
-        type: "POST",
-        url: $('#set_elected_pct_url').val(),
-        dataType: 'script',
-        data: {
-          'elected_pct': elected_pct
-        }
-      });
+      var elected_pct = $("input[name='elected_pct']").val();
+      url = url + "&elected_pct=" + elected_pct;
     };
+    window.location.href= url;
   });
 });
 

@@ -32,7 +32,7 @@ After "@watir" do
   @take_screens = false if @take_screens
 end
 
-def people 
+def people
   return @a if defined?(@a)
   @a = {
     "Soren White" => {
@@ -194,7 +194,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   input_field.click
   input_field.li(text: /C Corporation/).click
   step "I enter office location for #{default_office_location}"
-  scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
+  scroll_then_click(@browser.button(class: "interaction-click-control-confirm"))
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
@@ -538,6 +538,19 @@ end
 When(/^.+ should see a published success message$/) do
   @browser.element(text: /plan year successfully published/i).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
+end
+
+When(/^.+ goes to to home tab$/) do
+  @browser.element(class: /interaction-click-control-my-dc-health-link/).fire_event('onclick')
+end
+
+Then(/^.+ should see the current plan year$/) do
+  @browser.element(text: /My Health Benefits Program/i).wait_until_present
+  expect(@browser.h5(text: /Plan Year/i).visible?).to be_truthy
+end
+
+And(/^.+ should see the premium billings report$/) do
+  expect(@browser.h4(text: /Premium Billing Report/i).visible?).to be_truthy
 end
 
 When(/^.+ should see a published success message without employee$/) do

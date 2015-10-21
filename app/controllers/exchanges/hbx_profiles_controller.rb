@@ -52,15 +52,22 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def find_email(agent, role)
+    if role == 'Broker'
+      agent.try(:broker_role).try(:email).try(:address)
+    else
+      agent.try(:user).try(:email)
+    end
+  end
+
   def request_help
     role = nil
     if params[:type]
-      cac = params[:type] == 'CAC'
-      staff = Person.where(:'csr_role.cac' => cac)
-      match = staff.where(:$and => [{first_name: params[:firstname].strip},{last_name: params[:lastname].strip}])
+      cac_flag = params[:type] == 'CAC'
+      match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
       if match.count > 0
         agent = match.first
-        role = cac ? 'Certified Applicant Counselor' : 'Customer Service Representative'
+        role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
       end
     else
       if params[:broker] && params[:broker] != ''
@@ -73,13 +80,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     if role
       status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
-      if agent.try(:user).try(:email)
+      if find_email(agent, role)
         agent_assistance_messages(params,agent,role)
       else
+
         status_text = "Agent has no email.   Please select another"
       end
     else
-      status_text = call_customer_service params[:firstname], params[:lastname]
+      status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
     render :text => status_text.html_safe, layout: false
   end
@@ -258,7 +266,7 @@ private
       }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(agent.user.email, first_name, name, role, insured_email, params[:person].present?)
+    result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
     puts result.to_s if Rails.env.development?
    end  
 

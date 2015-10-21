@@ -7,6 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
+    relay_state = params["RelayState"]
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
@@ -27,7 +28,15 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, user_with_email)
-        redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
+        if !relay_state.blank?
+          user_with_email.update_attributes!(last_portal_visited: relay_state)
+          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+        elsif !user_with_email.last_portal_visited.blank?
+          redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
+        else
+          user_with_email.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
+          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        end
       else
         new_password = User.generate_valid_password
         new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: email)
@@ -38,7 +47,13 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, new_user)
-        redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        if relay_state.blank?
+          new_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
+          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        else
+          new_user.update_attributes!(last_portal_visited: relay_state)
+          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+        end
       end
     else
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})

@@ -2,24 +2,15 @@
   <%= render 'navigation' %>
 <% end %>
 
-<div class="row">
-  <div class="my-account-page col-md-8">
-    <h1>Documents</h1>
+<div class="col-xs-12 documents-tab">
+  <div class="row">
+    <div class="col-xs-8">
+      <h1>Documents</h1>
+    </div>
+    <div class="col-xs-4">
+        <%= link_to "Upload Document", document_upload_insured_families_path , class: "btn btn-primary btn-br pull-right" if @person.try(:consumer_role).present? %>
+    </div>
   </div>
-  <div class="col-md-4" style="margin-top: 5px;">
-    <%= link_to "Upload Document", document_upload_insured_families_path , class: "btn btn-primary" if @person.try(:consumer_role).present? %>
-  </div>
-  <div class="col-md-12">
-     The process of enrollment for health care may require validations based on:
-      <ul>
-        <li>citizenship</li>
-        <li>residency</li>
-        <li>immigration status</li>
-      </ul>
-     On this page there will be a discussion of various kinds of documents you need.
-     Please see the list of documents below to see the status of your outstanding documents or click the upload button to add new document.
-  </div>
-  <div class="col-md-12">
-    <%= render partial: "documents_index" %>
-  </div>
+  <h4 class="starter">We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
+  <%= render partial: "documents_index" %>
 </div>

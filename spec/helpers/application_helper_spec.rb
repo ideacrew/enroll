@@ -130,33 +130,45 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#find_document" do
-    context "consumer role does not have any vlp_documents" do
-      it "it creates and returns an empty document of given subject" do
-        doc = find_document(ConsumerRole.new, "Certificate of Citizenship")
-        expect(doc).to be_a_kind_of(VlpDocument)
-        expect(doc.subject).to eq("Certificate of Citizenship")
-      end
-    end
-
-    context "consumer role has a vlp_document" do
-      it "it returns the document" do
-        consumer_role = ConsumerRole.new
-        document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
-        found_document = find_document(consumer_role, "Certificate of Citizenship")
-        expect(found_document).to be_a_kind_of(VlpDocument)
-        expect(found_document).to eq(document)
-        expect(found_document.subject).to eq("Certificate of Citizenship")
-      end
-    end
-  end
-
   describe "get_key_and_bucket" do
     it "should return array with key and bucket" do
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
       key, bucket = get_key_and_bucket(uri)
       expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
       expect(bucket).to eq("dchbx-sbc")
+    end
+  end
+
+  describe "current_cost" do
+    it "should return cost without session" do
+      expect(helper.current_cost(100, 0.9)).to eq 100
+    end
+
+    context "with session" do
+      before :each do
+        session['elected_aptc_pct'] = 0.5
+        session['max_aptc'] = 200
+      end
+
+      it "when ehb_premium > aptc_amount" do
+        expect(helper.current_cost(200, 0.9)).to eq (200 - 0.5*200)
+      end
+
+      it "when ehb_premium < aptc_amount" do
+        expect(helper.current_cost(100, 0.9)).to eq (100 - 0.9*100)
+      end
+
+      it "should return 0" do
+        session['elected_aptc_pct'] = 0.8
+        expect(helper.current_cost(100, 1.2)).to eq 0
+      end
+    end
+
+    context "with hbx_enrollment" do
+      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100)}
+      it "should return cost from hbx_enrollment" do
+        expect(helper.current_cost(100, 0.8, hbx_enrollment)).to eq 90
+      end
     end
   end
 end

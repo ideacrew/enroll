@@ -180,6 +180,14 @@ RSpec.describe TaxHousehold, type: :model do
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
     end
 
+    it "when ehb_premium > aptc_amount" do
+      allow(decorated_plan).to receive(:premium_for).and_return(10)
+      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash
+      result = {'member1'=>9, 'member2'=>9}
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
+    end
+
     it "can return result when plan is dental" do
       allow(plan).to receive(:coverage_kind).and_return 'dental'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash

@@ -82,7 +82,7 @@ class Family
   end
 
   def coverage_waived?
-    enrolled_hbx_enrollments.any? and enrolled_hbx_enrollments.all?{|e| e.aasm_state == 'inactive'}
+    latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.last.aasm_state == "inactive"
   end
 
   def remove_family_search_record
@@ -94,6 +94,24 @@ class Family
     households.order_by(:'submitted_at'.desc).limit(1).only(:households).first
     # persisted_household = households.select(&:persisted?) - [nil] #remove any nils
     # persisted_household.sort_by(&:submitted_at).last
+  end
+
+  def active_household
+    households.detect { |household| household.is_active? }
+  end
+
+  def enrolled_benefits
+    # latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def terminated_benefits
+  end
+
+  def renewal_benefits
+  end
+
+  def enrolled_hbx_enrollments
+    latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def primary_family_member
@@ -270,10 +288,6 @@ class Family
     find_family_member_by_person(person).present?
   end
 
-  def active_household
-    households.detect { |household| household.is_active? }
-  end
-
   def dependents
     family_members.reject(&:is_primary_applicant)
   end
@@ -383,13 +397,17 @@ class Family
     latest_household.try(:enrolled_hbx_enrollments)
   end
 
-  def update_aptc_block_status
-    max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+  def has_aptc_hbx_enrollment?
+    enrollments = latest_household.hbx_enrollments.active rescue []
+    enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
+  end
 
-    if is_under_special_enrollment_period? and max_aptc > 0
+  def update_aptc_block_status
+    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+    eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
+
+    if eligibility_determinations.present? and has_aptc_hbx_enrollment?
       self.set(status: "aptc_block")
-    else
-      self.set(status: "")
     end
   end
 
@@ -398,17 +416,17 @@ class Family
   end
 
   def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
-    return false if assistance.blank? or qle.blank?
+    return false if qle.present?
+    return false if assistance.blank? #or qle.blank?
     return false if status == "aptc_unblock"
     return true if status == "aptc_block"
 
-    max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-
-    if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
-      true
-    else
-      false
-    end
+    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+    #if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
+    #  true
+    #else
+    #  false
+    #end
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)

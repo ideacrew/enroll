@@ -9,6 +9,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       hios_id: "hios id", carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
       total_employer_contribution: 200,
+      ehb: 0.9881,
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     )
@@ -51,6 +52,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       expect(rendered).to match(/#{plan.plan_type}/)
       expect(rendered).to match(/#{plan.metal_level}/)
       expect(rendered).to match(/#{plan.hios_id}/)
+      expect(rendered).to match(/#{plan.ehb}/)
     end
 
     it "should match css selector for standard plan" do
@@ -71,13 +73,12 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
-      assign(:max_aptc, 80)
-      assign(:selected_aptc_pct, 0.6)
+      allow(view).to receive(:current_cost).and_return(52)
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
     it "should display the premium" do
-      expect(rendered).to have_selector('h2.plan-premium', text: "68")
+      expect(rendered).to have_selector('h2.plan-premium', text: "$52.00")
     end
 
     it "should display plan details" do
