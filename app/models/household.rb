@@ -254,6 +254,6 @@ class Household
   end
 
   def current_year_hbx_enrollments
-    hbx_enrollments.active.current_year
+    hbx_enrollments.active.current_year.where(changing: false)
   end
 end

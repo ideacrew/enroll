@@ -47,6 +47,7 @@ class HbxEnrollment
   # TODO need to understand these two fields
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
+  field :changing, type: Boolean, default: false
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -85,6 +86,7 @@ class HbxEnrollment
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :changing, ->{ where(changing: true) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -384,7 +386,7 @@ class HbxEnrollment
     return if pre_hbx_id.blank?
     pre_hbx = HbxEnrollment.find(pre_hbx_id)
     if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
-      pre_hbx.update_current(is_active: false)
+      pre_hbx.update_current(is_active: false, changing: false)
     end
   end
 
