@@ -1,14 +1,17 @@
 require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
+  let(:benefit_group){ double("BenefitGroup") }
   context "without consumer_role" do
     let(:person) {double(has_active_consumer_role?: false)}
 
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
+      assign(:benefit_group, benefit_group)
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
@@ -29,6 +32,46 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
   end
 
+  context "with employee role in employee flow" do
+    let(:person){ double("Person") }
+    let(:metal_levels){ Plan::METAL_LEVEL_KINDS[0..4] }
+    before(:each) do
+      assign(:person, person)
+      assign(:carriers, Array.new)
+      assign(:benefit_group, benefit_group)
+      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(true)
+    end
+
+    it "should display metal level filters if plan_option_kind is single_carrier" do
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+      metal_levels.each do |metal_level|
+        expect(rendered).to have_selector("input[id='plan-metal-level-#{metal_level}']")
+      end
+      expect(rendered).to match(/Metal Level/m)
+    end
+
+    it "should not display metal level filters if plan_option_kind is single_plan" do
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+      metal_levels.each do |metal_level|
+        expect(rendered).not_to have_selector("input[id='plan-metal-level-#{metal_level}']")
+      end
+      expect(rendered).not_to match(/Metal Level/m)
+    end
+
+    it "should not display metal level filters if plan_option_kind is metal_level" do
+      allow(benefit_group).to receive(:plan_option_kind).and_return("metal_level")
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+      metal_levels.each do |metal_level|
+        expect(rendered).not_to have_selector("input[id='plan-metal-level-#{metal_level}']")
+      end
+      expect(rendered).not_to match(/Metal Level/m)
+    end
+
+  end
+
   context "with consumer_role and tax_household" do
     let(:person) {double(has_active_consumer_role?: true)}
     let(:hbx_enrollment) {double(id: '123')}
@@ -41,7 +84,9 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_aptc, 330)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:tax_household, true)
+      assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
@@ -78,7 +123,9 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:carriers, Array.new)
       assign(:max_total_employee_cost, 1000)
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:benefit_group, benefit_group)
       assign(:tax_household, nil)
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
