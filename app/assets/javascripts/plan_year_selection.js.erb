@@ -1,14 +1,7 @@
-
 var plan_year_selection_loader;
 ready = function() {
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-
-    // give slider a starting place based on persisted form
-    var slider_starting_values = $('.benefits-fields input.hidden-param').each(function() {
-      $(this).closest('.form-group').find('.slider').attr('data-slider-value', $(this).val());
-      $(this).closest('.form-group').find('.slide-label').html($(this).val()+"%");
-    });
 
     //alert('edit');
     $('.add_fields').remove();
@@ -22,7 +15,7 @@ ready = function() {
       original_ref = $(this).closest('.benefit-group-fields').find('.ref-plan').val();
     });
     $('.cancel-plan-change').on('click', function() {
-
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li label').css({borderBottom: "solid 3px #003260", borderBottomLeftRadius: "6px", borderBottomRightRadius: "6px" });
       $(this).closest('.benefit-group-fields').find('.edit-offering').show();
       $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
       $(this).closest('.benefit-group-fields').find('.selected-plan').hide();
@@ -123,6 +116,11 @@ ready = function() {
       $('#choose-coverage > * select').val("");
   }
 
+  // give slider a starting place based on persisted form
+  var slider_starting_values = $('.benefits-fields input.hidden-param').each(function() {
+    $(this).closest('.form-group').find('.slider').attr('data-slider-value', $(this).val());
+    $(this).closest('.form-group').find('.slide-label').html($(this).val()+"%");
+  });
 
   // init slider
   $('.benefits-fields .slider').bootstrapSlider({
@@ -178,6 +176,9 @@ ready = function() {
       $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', false);
       $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
       $(this).closest('li').addClass('active');
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li.active label').attr('style', '');
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
+
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
         $(this).find('input[type=radio]').prop('checked', true );
