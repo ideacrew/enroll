@@ -4848,6 +4848,23 @@ table.table.table-no-sytle td {
 .carousel-control {
   width: 10%;
 }
+.carousel-control .fa-angle-right,
+.carousel-control .fa-angle-left {
+  position: absolute;
+  top: 35%;
+  z-index: 5;
+  display: inline-block;
+}
+.carousel-control .icon-prev,
+.carousel-control .fa-angle-left {
+  left: 50%;
+  margin-left: -5px;
+}
+.carousel-control .icon-next,
+.carousel-control .fa-angle-right {
+  right: 50%;
+  margin-right: -5px;
+}
 
 .carousel-inner .item {
   margin: 0;
@@ -4954,7 +4971,7 @@ position: absolute;
   font-size: 12px;
 }
 ul.list-qle {
-  padding: 5px 30px;
+  padding: 5px 40px;
   overflow: visible;
 }
 
