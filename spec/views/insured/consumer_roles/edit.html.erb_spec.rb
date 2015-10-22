@@ -72,6 +72,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to have_selector('input#vlp_doc_target_id')
     expect(rendered).to have_selector('input#vlp_doc_target_type')
     expect(rendered).to have_selector('.vlp_doc_area')
+  end
 
   xit "should contain immigration documents fields" do
     expect(rendered).to match(/immigration_naturalization_cert_container/)
