@@ -54,19 +54,18 @@ $('.benefit-package .make-default').toggleClick(function () {
 $('.benefit-package .make-default').on('click', function() {
   if ( $(this).hasClass('active') ) {
     alert('this is already your default benefit group');
-
   } else {
-    $(this).addClass('active');
 
     $.ajax({
       type: "POST",
-      url: $('a#make_default_benefit_group_link').data('href'),
+      url: $(this).closest('.benefit-package').find('a.make_default_benefit_group_link').data('href'),
       dataType: 'script',
       data: {
-        "benefit_group_id": $(this).closest('.benefit-package').find('a#make_default_benefit_group_link').data('benefit-group-id'),
-        "plan_year_id": $(this).closest('.benefit-package').find('a#make_default_benefit_group_link').data('plan-year-id')
+        "benefit_group_id": $(this).closest('.benefit-package').find('a.make_default_benefit_group_link').data('benefit-group-id'),
+        "plan_year_id": $(this).closest('.benefit-package').find('a.make_default_benefit_group_link').data('plan-year-id')
       }
     }).done(function() {
+      $(this).addClass('active');
     });
 
   }

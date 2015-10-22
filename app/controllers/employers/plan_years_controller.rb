@@ -40,16 +40,28 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def make_default_benefit_group
-    @employer_profile.plan_years.each do |py|
-      py.benefit_groups.each do |bg|
-        if bg.id == params[:benefit_group_id]
-          bg.default = true
-        else
-          bg.default = false
-        end
-        bg.save
-      end
+
+    @employer_profile.plan_years.each do |plan_year|
+    plan_year.benefit_groups.where(default: true).each do |bg|
+      bg.default = false
     end
+  end
+  
+    plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
+    benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
+    benefit_group.default = true
+    @employer_profile.save!
+    #
+    # @employer_profile.plan_years.each do |py|
+    #   py.benefit_groups.each do |bg|
+    #     if bg.id == params[:benefit_group_id]
+    #       bg.default = true
+    #     else
+    #       bg.default = false
+    #     end
+    #     bg.save
+    #   end
+    # end
 
     respond_to do |format|
       format.js { render :layout => false }
