@@ -23,7 +23,7 @@
         <% end %>
       </div>
       </div>
-      <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left hidden-xs hidden-sm">
+      <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
         <li class="header-text">
           <% if current_user.try(:has_employee_role?) || current_user.try(:has_consumer_role?) %>
           <a href="<%= family_account_path %>">
@@ -43,7 +43,8 @@
 
       <div class="col-xs-12">
         <div class="row">
-          <div class="col-xs-5 ccs">
+
+          <div class="<% if current_page?('/') || controller.controller_name == 'registrations' %>col-xs-12 ccs<% else %>col-xs-5 ccs<% end %>"">
               <div class="pull-right">
             <span class="g14">Call Customer Service</span><br/>
             <i class="fa fa-phone fa-lg"></i>
@@ -61,12 +62,14 @@
                 <li><a class="g14" href="https://dchealthlink.com/help" target="_blank">Help</a></li>
                 <li class="hidden-xs">|</li>
                 <li><%= link_to "LOGOUT", destroy_user_session_path, method: "delete", class: "g14" %></li><br/>
-                  <li class="">
-                    <% unless current_user.try(:person).try(:hbx_id).nil? %>
-                      <span class="dark-grey">My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %>&nbsp;&nbsp;</span>
-                    <% end %>
-                  </li>
-                  <h4><%= user_full_name.titleize %></h4>
+                <div class="bottom-row">
+                    <li class="">
+                      <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                        <span class="dark-grey">My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %>&nbsp;&nbsp;</span>
+                      <% end %>
+                    </li>
+                    <h4><%= user_full_name.titleize %></h4>
+                </div>
 
               </ul>
 
