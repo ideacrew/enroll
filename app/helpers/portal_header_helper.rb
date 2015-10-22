@@ -10,12 +10,9 @@ module PortalHeaderHelper
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       agent_header
     elsif current_user.try(:has_employee_role?)
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm Shopping for Employee Health Insurance".html_safe
-
-    elsif (controller_path.include?("insured") && current_user.try(:has_insured_role?)) ||
-      (["employee_roles", "consumer_roles"].include?(controller))
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; Individual and Family".html_safe
-
+        "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm Shopping for Employee Health Insurance".html_safe
+    elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
+        "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe
     elsif current_user.try(:has_broker_agency_staff_role?)
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)
