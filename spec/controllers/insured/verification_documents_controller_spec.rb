@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.build(:person) }
+  let(:person) { double }
   let(:consumer_role) { {consumer_role: ''} }
   let(:consumer_wrapper) { double }
 
@@ -16,16 +16,6 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       post :upload, consumer_role: consumer_role
       expect(flash[:error]).to be_present
     end
-
-    it "should error with error doc_params" do
-      request.env["HTTP_REFERER"] = "/home"
-      allow(user).to receive(:person).and_return person
-      sign_in user
-      post :upload, {consumer_role: ""}
-      expect(flash[:notice]).not_to be_present
-      expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to eq "File not uploaded. Document type and/or document fields not provided "
-    end
   end
 
   context "Successful Save" do
@@ -34,11 +24,12 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       let(:file) { double }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: ''}, file: file} }
+      let(:params) { {consumer_role: '', file: file} }
       let(:bucket_name) { 'id-verification'}
       let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key"}
       let(:file_path) {File.dirname(__FILE__)} # a sample file path
-      let(:cleaned_params) {{"0"=>{"subject"=>"I-327 (Reentry Permit)", "id"=>"55e7fef5536167bb822e0000", "alien_number"=>"999999999"}}}
+      let(:cleaned_params) {{"2"=>{"subject"=>"I-327 (Reentry Permit)", "id"=>"55e7fef5536167bb822e0000", "alien_number"=>"999999999"}}}
+
 
       it "redirects" do
         allow(file).to receive(:original_filename).and_return("some-filename")
