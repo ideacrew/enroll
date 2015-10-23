@@ -25,9 +25,9 @@ class HbxEnrollment
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
   ENROLLED_STATUSES = [
-      "coverage_selected", 
-      "enrollment_transmitted_to_carrier", 
-      "coverage_enrolled", 
+      "coverage_selected",
+      "enrollment_transmitted_to_carrier",
+      "coverage_enrolled",
       "coverage_renewed",
       "enrolled_contingent",
       "unverified"
@@ -88,7 +88,6 @@ class HbxEnrollment
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :changing, ->{ where(changing: true) }
-
   scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
   embeds_many :hbx_enrollment_members
@@ -191,7 +190,7 @@ class HbxEnrollment
 
   def census_employee
     if employee_role.present?
-      employee_role.census_employee 
+      employee_role.census_employee
     else
       benefit_group_assignment.census_employee
     end
