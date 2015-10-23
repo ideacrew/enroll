@@ -4,6 +4,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_ra
 require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
 
 namespace :seed do
+  UNUSED_DENTEGRA_HIOS_IDS = ["96156DC0020006", "96156DC0020001", "96156DC0020004"] # These plans are not present in master sheet. having these plans is causing comparion page show empty data.
   desc "Load the plan data"
   task :plans => :environment do
     Plan.delete_all
@@ -12,7 +13,7 @@ namespace :seed do
     plan_file.close
     plan_data = JSON.load(data)
     plan_data.each do |pd|
-      Plan.create!(pd)
+      Plan.create!(pd) unless UNUSED_DENTEGRA_HIOS_IDS.include?(pd["hios_id"])
     end
   end
 end
