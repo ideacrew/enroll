@@ -209,6 +209,7 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = find_person(params[:id])
 
+
     make_new_person_params @person
 
     @person.updated_by = current_user.email unless current_user.nil?
@@ -218,6 +219,18 @@ class PeopleController < ApplicationController
       redirect_path = personal_insured_families_path
       @person.update_attributes({:emails => [], :addresses => []})
     else
+
+      #Only personal_insured_families_path Email if Employee
+
+      #find associated  census employee record
+      @census_employee = get_census_employee(@person.employee_roles[0].census_employee_id)
+
+      #Build Email Object
+      @email = Email.new(person_params[:emails_attributes].values.map(&:symbolize_keys).first);
+
+      #Propagate New Email address to Census Employee so data is in Synch
+      @census_employee.update_attributes(:email => @email)
+
       redirect_path = family_account_path
     end
 
@@ -239,6 +252,11 @@ class PeopleController < ApplicationController
       end
     end
   end
+
+  def get_census_employee(id)
+     CensusEmployee.find(id)
+  end
+
 
   def create
     sanitize_person_params
