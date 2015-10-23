@@ -78,7 +78,7 @@ class Insured::ConsumerRolesController < ApplicationController
         format.html {
           if is_assisted
             @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
-            redirect_to SamlInformation.curam_landing_page_url
+            redirect_to navigate_to_assistance_saml_index_path
           else
             if session[:already_has_consumer_role] == true
               redirect_to family_account_path
