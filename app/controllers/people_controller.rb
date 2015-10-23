@@ -299,7 +299,7 @@ class PeopleController < ApplicationController
 
 private
   def safe_find(klass, id)
-    puts "finding #{klass} #{id}"
+    # puts "finding #{klass} #{id}"
     begin
       klass.find(id)
     rescue

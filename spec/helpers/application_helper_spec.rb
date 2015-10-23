@@ -146,9 +146,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     context "with session" do
       before :each do
-<<<<<<< HEAD
-
-        session['elected_aptc_pct'] = 0.5
         session['elected_aptc'] = 100
         session['max_aptc'] = 200
       end

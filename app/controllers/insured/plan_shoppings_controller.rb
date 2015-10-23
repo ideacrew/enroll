@@ -225,7 +225,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_elected_aptc_by_params(elected_aptc)
     if session[:elected_aptc].to_f != elected_aptc.to_f
       session[:elected_aptc] = elected_aptc.to_f
-
     end
   end
 end
