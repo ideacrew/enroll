@@ -417,8 +417,16 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("user")}
     let(:employer_profile) { double("EmployerProfile") }
     let(:organization) { double("Organization", id: "test") }
-    let(:person) { double("Person") }
-    let(:staff_roles){ [double("StaffRole")] }
+    let(:person) { FactoryGirl.build(:person) }
+    let(:staff_roles){ [person] }
+    let(:organization_params) {
+      {
+          :entity_kind => "an entity kind",
+          :dba => "a dba",
+          :fein => "123456789",
+          :legal_name => "a legal name",
+      }
+    }
 
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
@@ -427,10 +435,15 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
       allow(organization).to receive(:office_locations).and_return(true)
+      allow(organization).to receive(:assign_attributes).and_return(true)
+      allow(organization).to receive(:save).and_return(true)
+      allow(organization).to receive(:update_attributes).and_return(true)
 
+      allow(controller).to receive(:organization_profile_params).and_return({})
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
       allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
+      allow(employer_profile).to receive(:match_employer).and_return person
     end
 
     it "should redirect" do
@@ -459,7 +472,16 @@ RSpec.describe Employers::EmployerProfilesController do
         put :update, id: organization.id
         expect(response).to be_redirect
       end
+    end
 
+    it "should update person info" do
+      allow(user).to receive(:save).and_return(true)
+      sign_in(user)
+      expect(Organization).to receive(:find)
+
+      put :update, id: organization.id, first_name: "test", organization: organization_params
+      expect(person.first_name).to eq "test"
+      expect(response).to be_redirect
     end
   end
 
