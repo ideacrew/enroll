@@ -41,7 +41,7 @@ module IdentityVerification
       IdentityVerification::InteractiveVerificationResponse.parse(body, :single => true)
     end
 
-    def check_override(payload) 
+    def check_override(payload)
       code, body = invoke_request("identity_verification.interactive_verification.override", payload, 5)
       return nil if code == "503"
       IdentityVerification::InteractiveVerificationOverrideResponse.parse(body, :single => true)
@@ -55,7 +55,7 @@ module IdentityVerification
         result_code = result_hash["return_status"]
         case result_code.to_s
         when "503"
-          ["503", nil] 
+          ["503", nil]
         else
           [result_code.to_s, result_hash["body"]]
         end
