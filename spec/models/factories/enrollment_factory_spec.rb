@@ -162,8 +162,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     end
 
     context "and a prior person exists but is not associated with the user" do
-
-      before do
+      before(:each) do
         @user = FactoryGirl.create(:user)
         census_dependent = FactoryGirl.build(:census_dependent)
         benefit_group = FactoryGirl.create(:benefit_group)
@@ -200,6 +199,66 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
       it "should add the employee role to the user" do
         expect(@user.roles).to include "employee"
+      end
+
+      it "should link the employee role" do
+        expect(@employee_role.census_employee.employee_role_linked?).to be_truthy
+      end
+    end
+
+    context "and a prior person exists with an existing policy but is not associated with a user" do
+      before(:each) do
+        @user = FactoryGirl.create(:user)
+        benefit_group = FactoryGirl.create(:benefit_group)
+        plan_year = benefit_group.plan_year
+        employer_profile = plan_year.employer_profile
+        benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)
+        census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment])
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+          gender: census_employee.gender,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
+        params = valid_params
+        @person = FactoryGirl.create(:person,
+                                     valid_person_params.except(:user).merge(dob: census_employee.dob,
+                                                                             ssn: census_employee.ssn))
+
+        @family = Family.new.build_from_person(@person)
+        @family.person_id = @person.id
+        @hbx_enrollment = FactoryGirl.create(:hbx_enrollment, household: @family.active_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment)
+        plan_year.publish!
+        benefit_group_assignment.hbx_enrollment = @hbx_enrollment
+        benefit_group_assignment.select_coverage!
+        @employee_role, @family2 = Factories::EnrollmentFactory.add_employee_role(**params)
+      end
+
+      it "should link the user to the person" do
+        expect(@employee_role.person.user).to eq @user
+      end
+
+      it "should link the person to the user" do
+        expect(@user.person).to eq @person
+      end
+
+      it "should add the employee role to the user" do
+        expect(@user.roles).to include "employee"
+      end
+
+      it "should link the employee role" do
+        expect(@employee_role.census_employee.employee_role_linked?).to be_truthy
+      end
+
+      it "should have a valid census employee on the employee role" do
+        expect(@employee_role.census_employee.valid?).to be_truthy
       end
     end
 

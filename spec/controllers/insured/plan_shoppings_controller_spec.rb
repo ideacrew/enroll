@@ -33,17 +33,29 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
       allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive_pre_hbx).and_return true
+      sign_in user
+    end
+
+    it "should get person" do
+      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      expect(assigns(:person)).to eq person
     end
 
     it "returns http success" do
-      sign_in
       post :checkout, id: "hbx_id", plan_id: "plan_id"
       expect(response).to have_http_status(:redirect)
     end
 
+    it "should delete pre_hbx_enrollment_id session" do
+      session[:pre_hbx_enrollment_id] = "123"
+      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      expect(response).to have_http_status(:redirect)
+      expect(session[:pre_hbx_enrollment_id]).to eq nil
+    end
+
     context "employee hire_on date greater than enrollment date" do
       it "fails" do
-        sign_in
         post :checkout, id: "hbx_id", plan_id: "plan_id"
         expect(flash[:error]).to include("You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance")
       end
@@ -77,7 +89,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
-  context "POST thankyou" do
+  context "GET thankyou" do
 
     let(:enrollment) { double("HbxEnrollment") }
     let(:plan) { double("Plan") }
@@ -103,19 +115,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "returns http success" do
       sign_in(user)
-      post :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, id: "id", plan_id: "plan_id"
       expect(response).to have_http_status(:success)
     end
 
     it "should be enrollable" do
       sign_in(user)
-      post :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:enrollable)).to be_truthy
     end
 
     it "should be waivable" do
       sign_in(user)
-      post :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:waivable)).to be_truthy
     end
 
@@ -127,7 +139,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
       allow(session).to receive(:[]).and_return(person.id.to_s)
       sign_in(current_broker_user)
-      post :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, id: "id", plan_id: "plan_id"
       expect(response).to have_http_status(:success)
     end
 
@@ -138,14 +150,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       it "should not be enrollable" do
         sign_in(user)
-        post :thankyou, id: "id", plan_id: "plan_id"
+        get :thankyou, id: "id", plan_id: "plan_id"
         expect(assigns(:enrollable)).to be_falsey
       end
 
       it "should not be waivable" do
         sign_in(user)
-        post :thankyou, id: "id", plan_id: "plan_id"
+        get :thankyou, id: "id", plan_id: "plan_id"
         expect(assigns(:waivable)).to be_falsey
+      end
+
+      it "should update session" do
+        sign_in(user)
+        get :thankyou, id: "id", plan_id: "plan_id", elected_aptc: "50"
+        expect(session[:elected_aptc]).to eq 50
       end
     end
   end
@@ -310,7 +328,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       context "with tax_household" do
         before :each do
-          session[:individual_assistance_path] = "assistance"
           allow(household).to receive(:latest_active_tax_household).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -322,27 +339,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         end
 
         it "should get default selected_aptc_pct" do
-          expect(assigns(:selected_aptc_pct)).to eq 0.85
-          expect(session[:selected_aptc_pct]).to eq 0.85
+          expect(assigns(:elected_aptc)).to eq 111*0.85
         end
       end
 
       context "without tax_household" do
         before :each do
-          session[:individual_assistance_path] = "assistance"
           allow(household).to receive(:latest_active_tax_household).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           get :show, id: "hbx_id"
         end
 
         it "should get max_aptc" do
-          expect(assigns(:max_aptc)).to eq 0
-          expect(session[:max_aptc]).to eq 0
+          expect(session[:max_aptc]).to eq nil
         end
 
-        it "should get default selected_aptc_pct" do
-          expect(assigns(:selected_aptc_pct)).to eq 0
-          expect(session[:selected_aptc_pct]).to eq 0
+        it "should get default selected_aptc" do
+          expect(session[:selected_aptc]).to eq nil
         end
       end
     end

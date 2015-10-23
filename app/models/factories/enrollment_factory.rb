@@ -140,6 +140,12 @@ module Factories
     def self.link_census_employee(census_employee, employee_role, employer_profile)
       census_employee.employer_profile = employer_profile
       employee_role.employer_profile = employer_profile
+      census_employee.benefit_group_assignments.each do |bga|
+        if bga.coverage_selected? && bga.hbx_enrollment.present? && !bga.hbx_enrollment.inactive?
+          bga.hbx_enrollment.employee_role_id = employee_role.id
+          bga.hbx_enrollment.save
+        end
+      end
       census_employee.employee_role = employee_role
       employee_role.new_census_employee = census_employee
       employee_role.hired_on = census_employee.hired_on

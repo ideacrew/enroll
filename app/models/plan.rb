@@ -294,6 +294,11 @@ class Plan
     self.coverage_kind.downcase == "dental"
   end
 
+  def ehb
+    percent = read_attribute(:ehb)
+    percent > 0 ? percent : 1
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

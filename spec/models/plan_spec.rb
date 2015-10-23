@@ -257,6 +257,19 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
   end
+
+  describe ".ehb" do
+    let(:plan1) {FactoryGirl.create(:plan, ehb: 0.9)}
+    let(:plan2) {FactoryGirl.create(:plan, ehb: 1)}
+
+    it "should get ehb from db when ehb more than 0" do
+      expect(plan1.ehb).to eq 0.9
+    end
+
+    it "should return 1 when ehb equal 0" do
+      expect(plan2.ehb).to eq 1
+    end
+  end
 end
 
 RSpec.describe Plan, dbclean: :after_each do

@@ -169,22 +169,31 @@ RSpec.describe TaxHousehold, type: :model do
       @tax_household = TaxHousehold.new()
       allow(plan).to receive(:ehb).and_return 0.9
       allow(@tax_household).to receive(:aptc_available_amount_by_member).and_return aptc_available_amount_by_member
+      allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 100
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(decorated_plan)
       allow(decorated_plan).to receive(:premium_for).and_return(100)
     end
 
     it "can return result when plan is individual" do
       allow(plan).to receive(:coverage_kind).and_return 'individual'
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>30, 'member2'=>20}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
+    end
+
+    it "when ehb_premium > aptc_amount" do
+      allow(decorated_plan).to receive(:premium_for).and_return(10)
+      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
+      result = {'member1'=>9, 'member2'=>9}
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
     end
 
     it "can return result when plan is dental" do
       allow(plan).to receive(:coverage_kind).and_return 'dental'
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
     end
   end
 
