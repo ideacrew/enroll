@@ -101,21 +101,19 @@ class TaxHousehold
   end
 
   # Pass a list of tax_household_members and get amount of APTC available
-  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_pct)
-    # APTC may be used only for Health
-    #return 0 if plan.coverage_kind == "dental"
+  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc)
+    # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
     aptc_available_amount_hash_for_enrollment = {}
 
+    elected_pct = elected_aptc.to_f / total_aptc_available_amount_for_enrollment(hbx_enrollment).to_f
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
-      #given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
+      given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
       ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
-      given_aptc_amount = aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
-        #aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * [elected_pct, plan.ehb].min, ehb_premium].min.round(2)
+        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
       end
     end
     aptc_available_amount_hash_for_enrollment
@@ -125,10 +123,8 @@ class TaxHousehold
     # max_aptc = as_dollars(premium_total * plan.ehb)
     # correct_aptc = (given_aptc > max_aptc) ? max_aptc : given_aptc
     # policy.applied_aptc = correct_aptc
-
     # $70
   end
-
 
   # Income sum of all tax filers in this Household for specified year
   def total_incomes_by_year

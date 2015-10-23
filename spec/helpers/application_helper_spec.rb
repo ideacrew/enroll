@@ -145,4 +145,37 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
     end
   end
+
+  describe "current_cost" do
+    it "should return cost without session" do
+      expect(helper.current_cost(100, 0.9)).to eq 100
+    end
+
+    context "with session" do
+      before :each do
+        session['elected_aptc'] = 100
+        session['max_aptc'] = 200
+      end
+
+      it "when ehb_premium > aptc_amount" do
+        expect(helper.current_cost(200, 0.9)).to eq (200 - 0.5*200)
+      end
+
+      it "when ehb_premium < aptc_amount" do
+        expect(helper.current_cost(100, 0.9)).to eq (100 - 0.9*100)
+      end
+
+      it "should return 0" do
+        session['elected_aptc'] = 160
+        expect(helper.current_cost(100, 1.2)).to eq 0
+      end
+    end
+
+    context "with hbx_enrollment" do
+      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100)}
+      it "should return cost from hbx_enrollment" do
+        expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
+      end
+    end
+  end
 end
