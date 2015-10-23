@@ -51,6 +51,8 @@ class Family
   index({"households.hbx_enrollments.broker_agency_profile_id" => 1}, {sparse: true})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
+  index({"households.hbx_enrollments.benefit_group_id" => 1})
+
   index({"households.hbx_enrollments.aasm_state" => 1})
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
