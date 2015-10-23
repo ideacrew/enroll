@@ -132,7 +132,7 @@
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
-              <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
+              <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
             <% end %>
           <% elsif @change_plan.blank? %>
             <% if @employee_role.present? && !@employee_role.is_under_open_enrollment? %>
