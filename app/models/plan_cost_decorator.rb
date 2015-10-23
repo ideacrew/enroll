@@ -36,6 +36,11 @@ class PlanCostDecorator < SimpleDelegator
     end
   end
 
+  def child_index(member)
+    @children = members.select(){|member| relationship_for(member) == "child_under_26" && age_of(member) < 21} unless defined?(@children)
+    @children.index(member) || -1
+  end
+
   def benefit_relationship(person_relationship)
     PlanCostDecorator.benefit_relationship(person_relationship)
   end
@@ -78,23 +83,33 @@ class PlanCostDecorator < SimpleDelegator
     }[person_relationship]
   end
 
-  def relationship(member)
-    if member.is_subscriber?
-      "employee"
-    else
-      benefit_relationship(member.primary_relationship)
-    end
-  end
-
-
-  def relationship_benefit_for(member)
-    relationship =
+  def relationship_for(member)
     case member.class
     when HbxEnrollmentMember
-      (relationship(member))
+      if member.is_subscriber?
+        "employee"
+      else
+        benefit_relationship(member.primary_relationship)
+      end
     else
       member.employee_relationship
     end
+  end
+
+  def large_family_factor(member)
+    if age_of(member) > 20
+      1.0
+    else
+      if child_index(member) > 2
+        0.0
+      else
+        1.0
+      end
+    end
+  end
+
+  def relationship_benefit_for(member)
+    relationship = relationship_for(member)
     benefit_group.relationship_benefit_for(relationship)
   end
 
@@ -108,7 +123,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def reference_premium_for(member)
-    reference_plan.premium_for(plan_year_start_on, age_of(member))
+    reference_plan.premium_for(plan_year_start_on, age_of(member)) * large_family_factor(member)
   rescue
     0
   end
@@ -116,7 +131,7 @@ class PlanCostDecorator < SimpleDelegator
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
-      Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member))
+      Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)
     else
       0.0
     end
@@ -124,11 +139,11 @@ class PlanCostDecorator < SimpleDelegator
 
   def max_employer_contribution(member)
     return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.has_key?(member._id)
-    @max_contribution_cache[member._id] = (reference_premium_for(member) * employer_contribution_percent(member)) / 100.00
+    @max_contribution_cache[member._id] = (large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00
   end
 
   def employer_contribution_for(member)
-    [max_employer_contribution(member), premium_for(member)].min
+    [max_employer_contribution(member), premium_for(member)].min * large_family_factor(member)
   end
 
   def employee_cost_for(member)
@@ -136,7 +151,7 @@ class PlanCostDecorator < SimpleDelegator
       premium_for(member) - employer_contribution_for(member)
     else
       __getobj__.premium_for(plan_year_start_on, age_of(member))
-    end
+    end * large_family_factor(member)
   end
 
   def total_premium

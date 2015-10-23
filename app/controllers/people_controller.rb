@@ -216,6 +216,7 @@ class PeopleController < ApplicationController
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
+      @person.update_attributes({:emails => [], :addresses => []})
     else
       redirect_path = family_account_path
     end
