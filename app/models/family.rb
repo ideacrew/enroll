@@ -1,5 +1,6 @@
 class Family
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
   include Sortable

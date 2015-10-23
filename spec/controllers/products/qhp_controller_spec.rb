@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
-  let(:person) { double("Person", primary_family: family)}
+  let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
   let(:hbx_enrollment){double("HbxEnrollment", kind: "shop")}
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
@@ -37,22 +37,46 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(Products::Qhp).to receive(:by_hios_id_and_active_year).and_return(qhp)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
-    it "should return summary of a plan for shop" do
+    it "should return summary of a plan for shop and coverage_kind as health" do
       allow(hbx_enrollment).to receive(:kind).and_return("shop")
       sign_in(user)
-      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop"
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "health"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "employer_sponsored"
+      expect(assigns(:coverage_kind)).to eq "health"
       expect(assigns(:benefit_group)).to be_truthy
       expect(assigns(:reference_plan)).to be_truthy
     end
 
-    it "should return summary of a plan for ivl" do
+    it "should return summary of a plan for shop and coverage_kind as dental" do
+      allow(hbx_enrollment).to receive(:kind).and_return("shop")
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "dental"
+      expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "employer_sponsored"
+      expect(assigns(:coverage_kind)).to eq "dental"
+      expect(assigns(:benefit_group)).to be_truthy
+      expect(assigns(:reference_plan)).to be_truthy
+    end
+
+    it "should return summary of a plan for ivl and coverage_kind: health" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
       sign_in(user)
-      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual"
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "health"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "individual"
+      expect(assigns(:coverage_kind)).to eq "health"
+      expect(assigns(:benefit_group)).to be_falsey
+      expect(assigns(:reference_plan)).to be_falsey
+    end
+
+    it "should return summary of a plan for ivl and coverage_kind: dental" do
+      allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
+      expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "individual"
+      expect(assigns(:coverage_kind)).to eq "dental"
       expect(assigns(:benefit_group)).to be_falsey
       expect(assigns(:reference_plan)).to be_falsey
     end

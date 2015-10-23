@@ -46,7 +46,7 @@ html {
     font-family: 'Open Sans', sans-serif;
 }
 body {
-    background-color: #F8F8F8;
+    background-color: #f2f2f2;
     min-height: 100%;
     position: relative;
     padding-top: 73px;
@@ -68,7 +68,14 @@ h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
 }
 
 #navbar .header-text {float: left;}
-#navbar .header-text a {display: table-cell;height: 70px;vertical-align: middle;}
+#navbar .header-text a {
+  display: table-cell;
+  height: 70px;
+  vertical-align: middle;
+  font-weight: 600;
+  font-size: 18px;
+  color: #5C5C5C;
+}
 
 .nav-info {
     font-size: 16px;
@@ -5058,4 +5065,16 @@ input:required:valid {
 
 .family-plan-selection ul.list-unstyled li {
   padding-left: 0px;
+}
+
+.doc_fields {
+  padding: 10px;
+  margin-bottom: 5px;
+}
+
+.select_tag {
+  padding: 0;
+  border: 1px solid #F0E4EA;
+  // height: 15px;
+  width: 150px;
 }

@@ -1,5 +1,6 @@
 class BrokerAgencyAccount
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
 
   embedded_in :employer_profile

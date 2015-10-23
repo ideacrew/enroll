@@ -20,7 +20,8 @@
         <%= render '/employers/employer_profiles/index_table'%>
 
       </table>
-      <%= render 'shared/alph_paginate_remote', url: employers_employer_profiles_path, alphs: @page_alphabets %>
+
+      <%= render 'shared/alph_paginate_remote', url: employers_employer_profiles_path, alphs: @page_alphabets, url_params: {broker_agency_id: @broker_agency_profile.try(:id)} %>
     </div>
   </div>
 </div>

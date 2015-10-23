@@ -77,7 +77,7 @@ Rails.application.routes.draw do
         get 'thankyou'
         post 'waive'
         post 'terminate'
-        post 'set_elected_pct'
+        post 'set_elected_aptc'
       end
     end
 
@@ -117,6 +117,7 @@ Rails.application.routes.draw do
       get :privacy, on: :collection
       post :match, on: :collection
       get :ridp_agreement, on: :collection
+      get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
 

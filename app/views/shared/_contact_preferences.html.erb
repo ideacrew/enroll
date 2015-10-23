@@ -1,0 +1,18 @@
+<div class="row no-buffer no-border-top">
+  <div class="col-xs-12 form-group form-group-lg">
+    <h5>Please indicate preferred method to receive notices (OPTIONAL)</h5>
+  </div>
+  <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
+    <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
+    <%= person_role.hidden_field :id if role == :employee_roles %>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-6 col-sm-6 no-pd">
+        <%= person_role.select :contact_method, options_for_select(["Only Paper communication", "Only Electronic communications", "Paper and Electronic communications"], selected: "Only Paper communication"), {prompt: 'Select communications preference'} %>
+      </div>
+      <div class="col-md-6 col-sm-6 no-pd">
+        <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: "English"), {prompt: 'Select communications language'} %>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</div>

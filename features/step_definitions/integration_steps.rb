@@ -540,6 +540,19 @@ When(/^.+ should see a published success message$/) do
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
 
+When(/^.+ goes to to home tab$/) do
+  @browser.element(class: /interaction-click-control-my-dc-health-link/).fire_event('onclick')
+end
+
+Then(/^.+ should see the current plan year$/) do
+  @browser.element(text: /My Health Benefits Program/i).wait_until_present
+  expect(@browser.h5(text: /Plan Year/i).visible?).to be_truthy
+end
+
+And(/^.+ should see the premium billings report$/) do
+  expect(@browser.h4(text: /Premium Billing Report/i).visible?).to be_truthy
+end
+
 When(/^.+ should see a published success message without employee$/) do
   @browser.element(text: /You have 0 non-owner employees on your roster/).wait_until_present
   expect(@browser.element(text: /You have 0 non-owner employees on your roster/).visible?).to be_truthy

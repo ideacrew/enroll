@@ -31,7 +31,7 @@ RSpec.describe PeopleController do
     it "when individual" do
       allow(request).to receive(:referer).and_return("insured/families/personal")
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
-      allow(controller).to receive(:find_document).and_return(vlp_document)
+      allow(consumer_role).to receive(:find_document).and_return(vlp_document)
       allow(vlp_document).to receive(:save).and_return(true)
       allow(vlp_document).to receive(:update_attributes).and_return(true)
       
@@ -40,8 +40,7 @@ RSpec.describe PeopleController do
       
       post :update, id: person.id, person: person_attributes
       expect(response).to redirect_to(personal_insured_families_path)
-      expect(assigns(:consumer_role)).not_to be_nil
-      expect(assigns(:vlp_doc_subject)).not_to be_nil
+      expect(assigns(:person)).not_to be_nil
       expect(flash[:notice]).to eq 'Person was successfully updated.'
     end
 

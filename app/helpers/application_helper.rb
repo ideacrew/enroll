@@ -4,14 +4,20 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost plan_cost
-    if session['elected_aptc_pct'] and session['max_aptc']
-      aptc_amount = session['max_aptc'] * session['elected_aptc_pct']
-      plan_cost >= aptc_amount ? plan_cost - aptc_amount : 0
+  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil)
+    # source is account or shopping
+    if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
+      return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+    end
+
+    if session['elected_aptc'].present? and session['max_aptc'].present?
+      aptc_amount = session['elected_aptc'].to_f
+      ehb_premium = plan_cost * ehb
+      cost = plan_cost - [ehb_premium, aptc_amount].min
+      cost > 0 ? cost : 0
     else
       plan_cost
     end
-
   end
 
   def datepicker_control(f, field_name, options = {}, value = "")
@@ -436,42 +442,12 @@ module ApplicationHelper
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def ethnicity_collection
-    [
-      ["White", "Black or African American", "Asian Indian", "Chinese" ],
-      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
-      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
-      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
-
-    ].inject([]){ |sets, ethnicities|
-      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
-  end
-
-  def latino_collection
-    [
-      ["Mexican", "Mexican American"],
-      ["Chicano/a", "Puerto Rican"],
-      ["Cuban", "Other"]
-    ].inject([]){ |sets, ethnicities|
-      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
-  end
-
   def is_under_open_enrollment?
     HbxProfile.current_hbx.under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
     HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
-  end
-
-  def find_document(consumer_role, subject)
-    subject_doc = consumer_role.vlp_documents.detect do |documents|
-      documents.subject.eql?(subject)
-    end
-
-    subject_doc || consumer_role.vlp_documents.build({subject:subject})
   end
 
   def parse_ethnicity(value)

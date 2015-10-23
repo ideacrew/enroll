@@ -162,8 +162,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       it "should update session" do
         sign_in(user)
-        get :thankyou, id: "id", plan_id: "plan_id", elected_pct: "0.5"
-        expect(session[:elected_aptc_pct]).to eq 0.5
+        get :thankyou, id: "id", plan_id: "plan_id", elected_aptc: "50"
+        expect(session[:elected_aptc]).to eq 50
       end
     end
   end
@@ -328,7 +328,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       context "with tax_household" do
         before :each do
-          session[:individual_assistance_path] = "assistance"
           allow(household).to receive(:latest_active_tax_household).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -340,27 +339,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         end
 
         it "should get default selected_aptc_pct" do
-          expect(assigns(:selected_aptc_pct)).to eq 0.85
-          expect(session[:selected_aptc_pct]).to eq 0.85
+          expect(assigns(:elected_aptc)).to eq 111*0.85
         end
       end
 
       context "without tax_household" do
         before :each do
-          session[:individual_assistance_path] = "assistance"
           allow(household).to receive(:latest_active_tax_household).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           get :show, id: "hbx_id"
         end
 
         it "should get max_aptc" do
-          expect(assigns(:max_aptc)).to eq 0
-          expect(session[:max_aptc]).to eq 0
+          expect(session[:max_aptc]).to eq nil
         end
 
-        it "should get default selected_aptc_pct" do
-          expect(assigns(:selected_aptc_pct)).to eq 0
-          expect(session[:selected_aptc_pct]).to eq 0
+        it "should get default selected_aptc" do
+          expect(session[:selected_aptc]).to eq nil
         end
       end
     end

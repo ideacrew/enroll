@@ -1,5 +1,6 @@
 class Person
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
@@ -512,7 +513,7 @@ class Person
   end
 
   def indian_tribe_member=(val)
-    @indian_tribe_member = (val.to_s == "1")
+    @indian_tribe_member = (val.to_s == "true")
   end
 
   def eligible_immigration_status=(val)

@@ -161,7 +161,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
       person = Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob).first
       expect(person).to be_truthy
       expect(person.broker_role).to be_truthy
-      expect(person.broker_agency_staff_roles.empty?).to be_falsey
+      expect(person.broker_agency_staff_roles.empty?).to be_truthy
 
       organization = Organization.where(fein: subject.fein).first
       expect(organization).to be_truthy

@@ -39,7 +39,7 @@ RSpec.describe "layouts/_header.html.erb" do
     current_user.roles=['csr']
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to match(/I'm a Certified Applicant Counselor/)
-  end 
+  end
 
   it 'identifies Assisters' do
     current_user.roles=['assister']
