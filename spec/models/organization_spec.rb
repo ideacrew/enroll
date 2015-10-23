@@ -147,31 +147,34 @@ RSpec.describe Organization, dbclean: :after_each do
       @agency2 = FactoryGirl.create(:broker_agency, legal_name: "DC Health Inc")
     end
 
-    context ".active_broker_agencies" do
-      context 'when there is no active broker agency' do
-        it 'should return empty set' do 
-          agencies = Organization.active_broker_agencies
-          expect(agencies.count).to eq(0)
+    context ".scopes" do 
+      context 'approved_broker_agencies' do 
+        before do 
+          @agency1.broker_agency_profile.approve!
         end
+
+        it 'should return apporved broker agencies' do
+          expect(Organization.approved_broker_agencies.count).to eq(1)
+          expect(Organization.approved_broker_agencies[0]).to eq(@agency1)
+        end 
       end
-
-      context 'when there is active broker agency' do
-        before do
-          @agency2.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency2.broker_agency_profile.id) 
-          @agency2.broker_agency_profile.primary_broker_role.approve!
+   
+      context 'broker_agencies_by_market_kind' do 
+        it 'should return individual market agencies' do
+          expect(Organization.broker_agencies_by_market_kind(['individual', 'both']).count).to eq(2)
         end
 
-        it 'should return empty set' do 
-          agencies = Organization.active_broker_agencies
-          expect(agencies.count).to eq(1)
-          expect(agencies.first.legal_name).to eq(@agency2.legal_name)
-        end
+        it 'should return shop market agencies' do
+          expect(Organization.broker_agencies_by_market_kind(['shop', 'both']).count).to eq(2)
+        end 
       end
     end
 
     context 'with advanced options' do 
 
       before do 
+        @agency1.broker_agency_profile.approve!
+        @agency2.broker_agency_profile.approve!
         @agency1.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency1.broker_agency_profile.id)
         @agency1.broker_agency_profile.update_attributes(languages_spoken: ['en', 'fr', 'de'])
         @agency1.broker_agency_profile.primary_broker_role.approve!

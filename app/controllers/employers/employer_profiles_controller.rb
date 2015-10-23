@@ -15,13 +15,17 @@ class Employers::EmployerProfilesController < ApplicationController
     else
       @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
     end
-
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    
+    if @q.blank?
+      @page_alphabets = page_alphabets(@orgs, "legal_name")
+      page_no = cur_page_no(@page_alphabets.first)
+      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+      @employer_profiles = @organizations.map {|o| o.employer_profile}
+    else
+      @employer_profiles = @orgs.map {|o| o.employer_profile}
+    end
 
     @profile = find_mailbox_provider
-    @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
   def welcome
@@ -76,28 +80,35 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-
    @tab = params['tab']
    if params[:q] || params[:page] || params[:commit] || params[:status]
      paginate_employees
    else
-      @current_plan_year = @employer_profile.published_plan_year
-      if @current_plan_year.present?
-        @additional_required_participants_count = @current_plan_year.additional_required_participants_count
+      case @tab
+      when 'benefits'
+        @current_plan_year = @employer_profile.published_plan_year
+        @plan_years = @employer_profile.plan_years.order(id: :desc)
+      when 'documents'
+      when 'employees'
+        paginate_employees
+      when 'brokers'
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
+      when 'inbox'
+      else
+        @current_plan_year = @employer_profile.published_plan_year
+        if @current_plan_year.present?
+          @additional_required_participants_count = @current_plan_year.additional_required_participants_count
+        end
+        if @current_plan_year.present?
+          #FIXME commeted out for performance test
+          enrollments = @current_plan_year.hbx_enrollments
+          if enrollments.size < 100
+            @premium_amt_total = enrollments.map(&:total_premium).sum
+            @employee_cost_total = enrollments.map(&:total_employee_cost).sum
+            @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+          end
+        end
       end
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
-
-      @broker_agency_accounts = @employer_profile.broker_agency_accounts
-      if @current_plan_year.present?
-        #FIXME commeted out for performance test
-        enrollments = @current_plan_year.hbx_enrollments
-        @premium_amt_total = enrollments.map(&:total_premium).sum
-        @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-        @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      end
-    end
-    if @tab == 'employees'
-      paginate_employees
     end
   end
 

@@ -95,7 +95,6 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should get plan years" do
       get :show, id: employer_profile.id
-      expect(assigns(:plan_years)).to eq employer_profile.plan_years.order(id: :desc)
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
@@ -215,9 +214,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "GET index search" do
     let(:organization_search_criteria) { double }
-    let(:organization_employer_criteria) { double }
-    let(:found_organization) { double(:employer_profile => employer) }
-    let(:criteria_page_results) { [found_organization] }
+    let(:criteria_page_results) { [double(:employer_profile => employer)] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -231,9 +228,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       allow(Organization).to receive(:search).with("A Name").and_return(organization_search_criteria)
-      allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
-      allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)
-      allow(controller).to receive(:page_alphabets).and_return(["A", "B"])
+      allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(criteria_page_results)
       get :index, q: "A Name", page: "A"
     end
 
