@@ -43,14 +43,14 @@
           <th colspan="2">In Network</th>
         <% end %>
       </tr>
-      <% Products::Qhp::VISIT_TYPES.each do |visit_type| %>
+      <% @visit_types.each do |visit_type| %>
         <tr>
           <td><%= visit_type %></td>
           <% qhps.each do |qhp|%>
             <% matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type } %>
             <% if matching_benefit %>
               <% deductible = matching_benefit.find_deductible %>
-              <td  colspan="2"><%= deductible.copay_in_network_tier_1 %></td>
+              <td  colspan="2"><%= deductible.present? ? deductible.copay_in_network_tier_1 : "None" %></td>
             <% end %>
           <% end %>
         </tr>

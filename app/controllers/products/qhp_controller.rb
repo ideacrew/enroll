@@ -10,8 +10,7 @@ class Products::QhpController < ApplicationController
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
-
-    if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
+    if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.each do |qhp|
@@ -53,7 +52,7 @@ class Products::QhpController < ApplicationController
   def summary
     sc_id = @new_params[:standard_component_id][0..13]
     @qhp = Products::Qhp.by_hios_id_and_active_year(sc_id, params[:active_year]).first
-    if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
+    if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental")
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
@@ -72,7 +71,8 @@ class Products::QhpController < ApplicationController
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "shop") ? "employer_sponsored" : "individual"
-    @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
+    @coverage_kind = (params[:coverage_kind] == "health" ? "health" : "dental")
+    @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
   end
 
 end

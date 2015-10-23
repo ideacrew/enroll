@@ -130,6 +130,18 @@ class Products::Qhp
     "Specialty Drugs"
   ]
 
+  DENTAL_VISIT_TYPES = [
+    "Routine Dental Services (Adult)",
+    "Dental Check-Up for Children",
+    "Basic Dental Care - Child",
+    "Orthodontia - Child",
+    "Major Dental Care - Child",
+    "Basic Dental Care - Adult",
+    "Orthodontia - Adult",
+    "Major Dental Care - Adult",
+    "Accidental Dental"
+  ]
+
 
   def self.plan_hsa_status_map(plan_ids:)
     plan_hsa_status = {}
