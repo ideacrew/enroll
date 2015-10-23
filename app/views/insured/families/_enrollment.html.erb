@@ -3,9 +3,7 @@
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
-      <h4><%= plan.active_year %>
-        <%= plan.coverage_kind %>
-        Coverage
+      <h4><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
         <span class="separator"><%= hbx_enrollment.employee_role.blank? ? 'DCHL' : hbx_enrollment.employer_profile.legal_name %></span>
       </h4>
       <hr>

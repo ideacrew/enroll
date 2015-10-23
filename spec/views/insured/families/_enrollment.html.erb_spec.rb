@@ -12,7 +12,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan.active_year} health Coverage/
+      expect(rendered).to match /#{plan.active_year} #{plan.coverage_kind} Coverage/
       expect(rendered).to match /DCHL/
     end
 
