@@ -78,6 +78,10 @@ class EmployerProfile
     Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
   end
 
+  def match_employer(current_user)
+    staff_roles.detect {|staff| staff.id == current_user.person_id}
+  end
+
   def today=(new_date)
     raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
     @today = new_date

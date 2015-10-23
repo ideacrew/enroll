@@ -24,25 +24,26 @@ describe "shared/_comparison.html.erb" do
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "plan name")}
   let(:mock_qhps) {[mock_qhp]}
-  
+
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
+    assign(:visit_types, [])
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
     render "shared/comparison", :qhps => mock_qhps
   end
 
-  it "should have a link to download the sbc pdf" do    
+  it "should have a link to download the sbc pdf" do
     expect(rendered).to have_selector("a[href='#{root_path + "sbc/THE SBC FILE.PDF"}']")
   end
-  
+
   it "should contain some readable text" do
     ["$30.00", "Plan Name", "Nationwide", "ACME Agency"].each do |t|
       expect(rendered).to have_content(t)
     end
   end
-  
+
   it "should have print area" do
     expect(rendered).to have_selector('div#printArea')
   end
@@ -50,11 +51,11 @@ describe "shared/_comparison.html.erb" do
   it "should have download link" do
     expect(rendered).to have_selector('a', text: 'Download')
   end
-  
+
   it "should not have Out of Network text" do
     expect(rendered).to_not have_selector('th', text: 'Out of Network')
   end
-  
+
 
   it "should have print link" do
     expect(rendered).to have_selector('button', text: 'Print')

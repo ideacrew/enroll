@@ -312,6 +312,18 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
   end
 
+  describe "match_employer" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    let(:person) { FactoryGirl.build(:person) }
+    let(:user) { FactoryGirl.build(:user) }
+
+    it "should get employer form staff_roles" do
+      allow(user).to receive(:person).and_return person
+      allow(employer_profile).to receive(:staff_roles).and_return [person]
+      expect(employer_profile.match_employer(user)).to eq person
+    end
+  end
+
   describe ".find_census_employee_by_person" do
     context "with person not matching ssn" do
       let(:params) do

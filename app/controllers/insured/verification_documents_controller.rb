@@ -7,7 +7,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     @doc_errors = []
     doc_params = params_clean_vlp_documents
 
-    if doc_params.empty?
+    if doc_params.blank?
       flash[:error] = "File not uploaded. Document type and/or document fields not provided "
       redirect_to(:back)
       return
@@ -51,11 +51,9 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def params_clean_vlp_documents
-    return if params[:consumer_role].nil? or params[:consumer_role][:vlp_documents_attributes].nil?
+    return nil if params[:person].nil? or params[:person][:consumer_role].nil? or params[:person][:consumer_role][:vlp_documents_attributes].nil?
 
-    params[:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
-      params[:immigration_doc_type] != doc[:subject]
-    end
+    params[:person][:consumer_role][:vlp_documents_attributes]
   end
 
   def update_vlp_documents(doc_params, title, file_uri)

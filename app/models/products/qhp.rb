@@ -130,6 +130,18 @@ class Products::Qhp
     "Specialty Drugs"
   ]
 
+  DENTAL_VISIT_TYPES = [
+    "Routine Dental Services (Adult)",
+    "Dental Check-Up for Children",
+    "Basic Dental Care - Child",
+    "Orthodontia - Child",
+    "Major Dental Care - Child",
+    "Basic Dental Care - Adult",
+    "Orthodontia - Adult",
+    "Major Dental Care - Adult",
+    "Accidental Dental"
+  ]
+
 
   def self.plan_hsa_status_map(plan_ids:)
     plan_hsa_status = {}
@@ -138,29 +150,29 @@ class Products::Qhp
     plan_hsa_status
   end
 
-  def self.csv_for(qhps)
-    (output = "").tap do 
+  def self.csv_for(qhps, visit_types)
+    (output = "").tap do
       CSV.generate(output) do |csv|
         csv_ary = []
-        csv_ary << ["Carrier", "Plan Name", "Your Cost", "Provider NetWork", "Plan Benefits"] + Products::Qhp::VISIT_TYPES
+        csv_ary << ["Carrier", "Plan Name", "Your Cost", "Provider NetWork", "Plan Benefits"] + visit_types
         qhps.each do |qhp|
           arry1 = [
             qhp.plan.carrier_profile.organization.legal_name,
-            qhp.plan_marketing_name, 
-            "$#{qhp[:total_employee_cost].round(2)}", 
+            qhp.plan_marketing_name,
+            "$#{qhp[:total_employee_cost].round(2)}",
             qhp.plan.nationwide ? "Nationwide" : "DC Area Network",
             "In Network"
           ]
           arry2 = [
             "","","","","Out of Network"
           ]
-          Products::Qhp::VISIT_TYPES.each do |visit_type|
-            matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type } 
-            if matching_benefit 
-              deductible = matching_benefit.find_deductible 
-              arry1 << deductible.copay_in_network_tier_1 
-              arry2 << deductible.copay_out_of_network
-            end 
+          visit_types.each do |visit_type|
+            matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type }
+            if matching_benefit
+              deductible = matching_benefit.find_deductible
+              arry1 << (deductible.present? ? deductible.copay_in_network_tier_1 : "None")
+              arry2 << (deductible.present? ? deductible.copay_out_of_network : "None")
+            end
           end
           csv_ary << arry1
           csv_ary << arry2
@@ -172,5 +184,5 @@ class Products::Qhp
         end
       end
     end
-  end 
+  end
 end

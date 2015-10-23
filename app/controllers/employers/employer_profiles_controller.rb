@@ -130,7 +130,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def edit
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-
+    @employer = @employer_profile.match_employer(current_user)
   end
 
   def create
@@ -155,6 +155,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization_dup = @organization.office_locations.as_json
 
     @employer_profile = @organization.employer_profile
+    @employer = @employer_profile.match_employer(current_user)
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
       @organization.assign_attributes(organization_profile_params)
 
@@ -162,9 +163,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
 
-
-      if @organization.update_attributes(employer_profile_params)
-
+      if @organization.update_attributes(employer_profile_params) and @employer.update_attributes(employer_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -270,7 +269,7 @@ class Employers::EmployerProfilesController < ApplicationController
    end
 
     def check_admin_staff_role
-      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role?
+      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role? || current_user.has_broker_role?
       elsif current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
       else
@@ -327,4 +326,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization
     end
 
+    def employer_params
+      params.permit(:first_name, :last_name, :dob)
+    end
 end
