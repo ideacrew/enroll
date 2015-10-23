@@ -95,7 +95,6 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should get plan years" do
       get :show, id: employer_profile.id
-      expect(assigns(:plan_years)).to eq employer_profile.plan_years.order(id: :desc)
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
@@ -215,9 +214,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "GET index search" do
     let(:organization_search_criteria) { double }
-    let(:organization_employer_criteria) { double }
-    let(:found_organization) { double(:employer_profile => employer) }
-    let(:criteria_page_results) { [found_organization] }
+    let(:criteria_page_results) { [double(:employer_profile => employer)] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -231,9 +228,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       allow(Organization).to receive(:search).with("A Name").and_return(organization_search_criteria)
-      allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
-      allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)
-      allow(controller).to receive(:page_alphabets).and_return(["A", "B"])
+      allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(criteria_page_results)
       get :index, q: "A Name", page: "A"
     end
 
@@ -417,8 +412,16 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("user")}
     let(:employer_profile) { double("EmployerProfile") }
     let(:organization) { double("Organization", id: "test") }
-    let(:person) { double("Person") }
-    let(:staff_roles){ [double("StaffRole")] }
+    let(:person) { FactoryGirl.build(:person) }
+    let(:staff_roles){ [person] }
+    let(:organization_params) {
+      {
+          :entity_kind => "an entity kind",
+          :dba => "a dba",
+          :fein => "123456789",
+          :legal_name => "a legal name",
+      }
+    }
 
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
@@ -427,10 +430,15 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
       allow(organization).to receive(:office_locations).and_return(true)
+      allow(organization).to receive(:assign_attributes).and_return(true)
+      allow(organization).to receive(:save).and_return(true)
+      allow(organization).to receive(:update_attributes).and_return(true)
 
+      allow(controller).to receive(:organization_profile_params).and_return({})
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
       allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
+      allow(employer_profile).to receive(:match_employer).and_return person
     end
 
     it "should redirect" do
@@ -459,7 +467,16 @@ RSpec.describe Employers::EmployerProfilesController do
         put :update, id: organization.id
         expect(response).to be_redirect
       end
+    end
 
+    it "should update person info" do
+      allow(user).to receive(:save).and_return(true)
+      sign_in(user)
+      expect(Organization).to receive(:find)
+
+      put :update, id: organization.id, first_name: "test", organization: organization_params
+      expect(person.first_name).to eq "test"
+      expect(response).to be_redirect
     end
   end
 

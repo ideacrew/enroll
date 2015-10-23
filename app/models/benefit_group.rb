@@ -225,6 +225,7 @@ class BenefitGroup
 
 
   def monthly_employer_contribution_amount(plan = reference_plan)
+    return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
       pcd.total_employer_contribution
@@ -232,6 +233,7 @@ class BenefitGroup
   end
 
   def monthly_min_employee_cost
+    return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
       pcd.total_employee_cost
@@ -239,6 +241,7 @@ class BenefitGroup
   end
 
   def monthly_max_employee_cost
+    return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
       pcd.total_employee_cost
@@ -267,6 +270,17 @@ class BenefitGroup
       Plan.valid_shop_health_plans("carrier", self.carrier_for_elected_plan, self.start_on.year)
     when "metal_level"
       Plan.valid_shop_health_plans("metal_level", self.metal_level_for_elected_plan, self.start_on.year)
+    end
+  end
+
+  def effective_title_by_offset
+    case effective_on_offset
+    when 0
+      "First of the month following or coinciding with date of hire"
+    when 30
+      "First of the month following 30 days"
+    when 60
+      "First of the month following 60 days"
     end
   end
 
