@@ -43,7 +43,7 @@ class Products::QhpController < ApplicationController
       format.html
       format.js
       format.csv do
-        send_data(Products::Qhp.csv_for(@qhps), type: csv_content_type, filename: "comparsion_plans.csv")
+        send_data(Products::Qhp.csv_for(@qhps, @visit_types), type: csv_content_type, filename: "comparsion_plans.csv")
       end
     end
   end
