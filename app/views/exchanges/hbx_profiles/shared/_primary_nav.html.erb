@@ -42,6 +42,12 @@
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Products"></span>
        <% end %>
       </li>
+      <li role="presentation"<%= menu_tab_class(active_tab, "users-orphans-tab") %>>
+       <%= link_to(users_orphans_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users_orphans", "role" => "tab" ) do  %>
+          <span class="hidden-xs">Orphan Accounts</span>
+          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Orphan Accounts"></span>
+       <% end %>
+      </li>
       <li role="presentation"<%= menu_tab_class(active_tab, "configuration-tab") %> class="tab-second">
        <%= link_to(configuration_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "configuration", "role" => "tab" ) do  %>
           <span class="hidden-xs">Configuration</span>

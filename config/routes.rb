@@ -2,6 +2,10 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations" }
 
+  namespace :users do
+    resources :orphans, only: [:index, :show, :destroy]
+  end
+
   resources :saml, only: :index do
     collection do
       post :login
