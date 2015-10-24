@@ -11,8 +11,8 @@
       </div>
     <% else %>
     <%= form_tag(:insured_group_selections) do %>
-      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
-        <h3>Choose Benefits: Covered Family Members</h3>
+      <div class="col-xs-8">
+        <h1>Choose Benefits: Covered Family Members</h1>
         <h4><strong>Who would you like to cover?</strong></h4>
 
           <%= hidden_field_tag(:person_id, @person.id) %>
@@ -110,24 +110,25 @@
 
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
-            <h4><strong>What do you like to do?</strong></h4>
+            <br/>
+            <h4><strong>What would you like to do?</strong></h4>
             <% if @hbx_enrollment.present? and @hbx_enrollment.try(:coverage_selected?) %>
-              <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
-              &nbsp;
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-lg btn-primary' %>
+              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' %>
+
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary' %>
             <% end %>
             <% if @employee_role.try(:benefit_group).try(:plan_option_kind) != "single_plan" %>
-              &nbsp;
-              <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>
+
+              <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% end %>
           <% else %>
             <h3>Select a plan</h3>
             <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
           <% end %>
-          <%= link_to "Back to my account", family_account_path, class: 'btn btn-lg btn-primary' %>
+          <%= link_to "Back to my account", family_account_path, class: 'btn btn-primary btn-br' %>
         </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+        <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank?  && @market_kind == "individual" %>
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
