@@ -33,6 +33,11 @@ class HbxEnrollment
   field :kind, type: String
   field :enrollment_kind, type: String, default: 'open_enrollment'
 
+  # FIXME: This unblocks people with legacy data where this field exists,
+  #        preventing user registration as in #3394.  This is NOT a correct
+  #        fix to that issue and it still needs to be addressed.
+  field :elected_amount, type: Money, default: 0.0
+
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
   # TODO need to understand these two fields
