@@ -3,7 +3,7 @@
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
-      <h4><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
+      <h4 class="bg-title"><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
         <span class="separator"><%= hbx_enrollment.employee_role.blank? ? 'Individual & Family' : hbx_enrollment.employer_profile.legal_name %></span>
       </h4>
       <hr>
@@ -12,52 +12,90 @@
     <div class="panel-body">
       <div class="row">
         <div class="col-xs-12">
-          <br/>
+          <div class="row">
+            <div class="col-xs-9" style="padding-right: 0;">
           <div><%= display_carrier_logo(plan.try(:carrier_profile).try(:legal_name), {width: 110}) %></div>
           <h4>
-            <strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %></strong>
+            <%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %>
           </h4>
 
-          <div>
-            <p><%= render_plan_type_details(plan) %></p>
+          <table style="table-layout: fixed; width: 100%; margin-top: 5%;">
+            <tr>
+              <td><div class="enrollment-type info">
+                <p><%= render_plan_type_details(plan) %></p>
+              </div></td>
+              <td><div class="enrollment-premium info">
+                <p>
+                  <label>Premium:</label>
+                  <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
+                </p>
+              </div>
+            </td>
+            </tr>
+            <tr>
+              <td><div class="enrollment-type info">
+                <p>
+                  <label class="bullet-separator">My DC Health Link ID:</label>
+                  <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id).truncate(8, omission: "").upcase %></strong>
+                </p>
+              </div>
+            </td>
+              <td>
+                <div class="enrollment-effective info">
+                <label>Effective date:
+                </label>
+                <strong><%= hbx_enrollment.effective_on %></strong>
+              </div>
+            </td>
+            </tr>
+            <% if hbx_enrollment.consumer_role.present? and hbx_enrollment.try(:applied_aptc_amount) > 0 %>
+
+            <tr>
+              <td>
+                <div>
+                  <p>
+                    <label>APTC amount:</label>
+                    <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
+                  </p>
+                </div>
+            </td>
+            </tr>
+
+            <% end %>
+
+          </table>
+
+                      <% names = hbx_enrollment.covered_members_first_names %>
+                      <div class="family-members info">
+                        <p>
+                          <label>Covered:</label>
+                          <a href="#"><%= names.delete_at(0).camelcase %></a>
+                          <% names.each do |name| %>
+                          <span class="separator">
+                            <a href="#"><%= name.camelcase %></a>
+                          </span>
+                          <% end %>
+                        </p>
+                      </div>
+
+
+
+
+
+
+        </div>
+        <div class="col-xs-3">
+          <div class="family-plan-selection">
+            <div class="status">
+              <%= render partial: "enrollment_progress", locals: {step: 2, hbx_enrollment: hbx_enrollment} %>
+            </div>
           </div>
-          <div>
-            <p>
-              <label>Premium:</label>
-              <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
-              <label class="bullet-separator">&nbsp;DCHL ID:</label>
-              <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
-            </p>
-          </div>
-          <% if hbx_enrollment.consumer_role.present? and hbx_enrollment.try(:applied_aptc_amount) > 0 %>
-          <div>
-            <p>
-              <label>APTC amount:</label>
-              <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
-            </p>
-          </div>
-          <% end %>
-          <% names = hbx_enrollment.covered_members_first_names %>
-          <div class="family-members">
-            <p>
-              <label>Covered:</label>
-              <a href="#"><%= names.delete_at(0).camelcase %></a>
-              <% names.each do |name| %>
-              <span class="separator">
-                <a href="#"><%= name.camelcase %></a>
-              </span>
-              <% end %>
-            </p>
-          </div>
-          <div>
-            <label>Effective date:
-            </label>
-            <strong><%= hbx_enrollment.effective_on %></strong>
-          </div>
+        </div>
+        </div>
         </div>
       </div>
 
-      <div class="row">
+      <div class="row" style="padding: 0 0 5px;">
         <div class="col-xs-4 fa-icon-link">
           <% if plan.sbc_document.present? %>
           <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
@@ -71,12 +109,13 @@
           <div class="fa-icon-label">Summary of Benefits and Coverage</div>
           <% end %>
         </div>
-        <div class="col-xs-3">
+        <div class="col-xs-3 fa-icon-link">
 
-          <i class="fa fa-phone fa-2x pull-left"></i>
-          <span data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
+
+          <a data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
+            <i class="fa fa-phone fa-2x pull-left"></i>
             <div class="fa-icon-label">Carrier Contact Info</div>
-          </span>
+          </a>
           <div class="modal fade carrier-contact" id="<%= plan.coverage_kind %>-<%= plan.id %>" role="dialog">
             <div class="modal-dialog">
 
@@ -191,28 +230,25 @@
 
         </div>
         <div class="col-xs-5">
-          <div class="row">
-            <div class="col-xs-12">
+
               <div class="row">
-                <div class="col-xs-6">
-                  <div class="row">
-                    <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year), source: 'account'}), {class: 'btn btn-primary btn-sm pull-right', remote: true} %>
-                  </div>
+                <div class="col-xs-12 btn-stack">
+
+                    <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year), source: 'account'}), {class: 'btn btn-primary btn-br pull-right', remote: true} %>
+
                 </div>
-                <div class="col-xs-6">
-                  <div class="row">
+                <div class="col-xs-12 btn-stack">
 
                     <% if hbx_enrollment.can_complete_shopping? %>
-                    <%= link_to "Change Plan", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-primary btn-sm pull-right", style: 'margin-right: 20px;' %>
+                    <%= link_to "Change Plan", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-trans pull-right" %>
                     <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
-                    <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-sm pull-right', style: 'margin-right: 20px;'} %>
+                    <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-trans pull-right' } %>
                     <% end %>
-                  </div>
+
 
                 </div>
               </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

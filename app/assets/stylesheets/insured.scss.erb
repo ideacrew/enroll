@@ -62,9 +62,84 @@
   text-align: center;
 
 }
-.fa-icon-link, .fa-icon-label, .fa-phone {
+.fa-icon-link {
+  padding-top: 4.45%;
+}
+.fa-icon-link, .fa-icon-label, a {
   color: #007bc4;
+  cursor: pointer;
+  &:hover {
+    color: #23527c;
+  }
 }
 .fa-icon-label {
   cursor: pointer;
+  color: #595959;
+  font-size: 12px;
 }
+
+  .benefits-tab, .home-tab, .hbx-enrollment-panel {
+    .fa {
+      color: #007bc4;
+      margin: 0 10px 0 5px;
+      &.published, &.enrolling {
+        color: #FFD700;
+      }
+    }
+    .bg-title {
+      margin-bottom: 10px;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 18px;
+    }
+  }
+  .hbx-enrollment-panel {
+    .alert {
+      padding: 15px 40px 15px 15px;
+    }
+    .btn-primary {
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      margin-top: 5px;
+      &.mtz {
+        margin-top: 0;
+      }
+    }
+    .btn.pull-right {
+      width: 100%;
+      max-width: 75%;
+    }
+        .bg-title {
+          font-weight: bold;
+        }
+        .panel-body {
+          .col-xs-12 {
+            padding-top: 15px;
+            &.btn-stack {
+              padding-top: 0;
+              a {
+                margin-top: 0;
+              }
+            }
+            &.btn-stack:last-of-type {
+              padding-top: 5px;
+            }
+          }
+        }
+        .panel-body {
+          h4 {
+            margin-top: 5px;
+            font-weight: 400;
+            font-size: 18px;
+          }
+          .info p {
+            margin: 0;
+          }
+        }
+  }
