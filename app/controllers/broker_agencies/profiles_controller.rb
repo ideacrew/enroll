@@ -29,6 +29,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     session[:person_id] = nil
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
+     @id=params[:id]
   end
 
   def edit
@@ -102,9 +103,18 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @q = params.permit(:q)[:q]
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    total_families = Family.by_writing_agent_id(current_user.id)
+    id = params.permit([:id])[:id]
+    if current_user.has_broker_role?
+      broker_agent_id = current_user.person.try(:broker_role).try(:id)
+    else
+      bap = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+      broker_agent_id = bap.try(:writing_agents).try(:first).try(:id) || bap.primary_broker_role_id
+    end
+    total_families = (broker_agent_id != nil) ? Family.by_writing_agent_id(broker_agent_id) : []
     @total = total_families.count
     @families = total_families.page page_no
+    @family_count = 0
+    @families.each{|f| @family_count +=1}
     respond_to do |format|
       format.html { render "insured/families/index" }
       format.js {}

@@ -42,7 +42,7 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
           expect(person.consumer_role.aasm_state).to eq('fully_verified')
-          expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('vlp')
+          expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
         end
@@ -54,7 +54,7 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
           expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
-          expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('vlp')
+          expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
         end
@@ -68,7 +68,7 @@ describe Subscribers::LawfulPresence do
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
         expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
-        expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('vlp')
+        expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
       end

@@ -27,7 +27,7 @@
           <%= link_to 'paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper'), class: 'btn btn-normal'%>
           <%= link_to 'phone', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone'), class: 'btn btn-normal'%>
         </td>
-        <td><%= number_to_obscured_ssn(pp.ssn) %></td>
+        <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
         <td><%= format_date(pp.dob) %></td>
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>

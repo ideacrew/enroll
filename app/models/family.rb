@@ -88,11 +88,13 @@ class Family
   }
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
-  scope :by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
 
   scope :all_current_households,  -> { exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,      -> { exists("households.tax_households": true) }
   scope :all_enrollments,         -> { where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :all_enrollments_by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
+
+  scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
 
 
   def update_family_search_collection
