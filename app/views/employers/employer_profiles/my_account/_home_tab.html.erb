@@ -39,12 +39,15 @@
           <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
         </div>
       </div>
-        <!--
+      <% if @current_plan_year.total_enrolled_count != @current_plan_year.eligible_to_enroll_count %>
         <p class="panel-body alert-warning" role="alert">
-          <i class="fa fa-flag"></i> A Basic Panel
-          <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
+          <i class="fa fa-flag"></i>
+          <span>
+            <strong>Important: </strong>You have until <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> for your employees to sign up, or waive coverage.
+          </span>
+          <!-- <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a> -->
         </p>
-      -->
+        <% end %>
     </div>
     <div class="panel panel-default myplanyear col-xs-12">
 
