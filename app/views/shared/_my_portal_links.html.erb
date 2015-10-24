@@ -4,7 +4,7 @@
 <li>
       <% if current_user.try(:has_consumer_role?) %>
 
-          <%= link_to "My Insured Portal", family_account_path, class: 'g14' %>
+          <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %>
 
       <% end %>
       <% if current_user.try(:has_employer_staff_role?) %>
