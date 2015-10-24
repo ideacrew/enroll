@@ -31,8 +31,16 @@
         <th>SBC Link</th>
         <% qhps.each do |qhp|%>
           <th colspan="2">
-            <%= link_to(root_path + "sbc/#{qhp.try(:plan).try(:sbc_file)}", class: "download") do %>
-              <i class="glyphicon glyphicon-download-alt"> <%= qhp.try(:plan).try(:sbc_file) %></i>
+            <% if qhp.plan.sbc_document.present? %>
+              <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
+                <div>
+                  <%= link_to("  Summary of Benefits and Coverage", document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "glyphicon glyphicon-download-alt") %>
+                </div>
+            <% else %>
+              <div>
+                <i class="fa fa-file-pdf-o fa-1x" style="position: relative; top: 7px;"></i>
+                <div class="fa-icon-label" style="display: inline; font-size: 8px; position: relative; top: 5px;">Summary of Benefits and Coverage</div>
+              </div>
             <% end %>
           </th>
         <% end %>

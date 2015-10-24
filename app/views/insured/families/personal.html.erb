@@ -1,16 +1,14 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+<%= render 'navigation' %>
 <% end %>
 
-<div class="row">
-  <div class="my-account-page col-md-12">
-    <h1>Manage Family</h1>
-  </div>
+<div class="my-account-page col-md-12">
+  <h1>Manage Family</h1>
+</div>
 
-  <div class="col-md-10 col-sm-12">
-    <%= render "profile_submenu", :active_subtab => "personal-tab" %>
-    <div id="profile-content">
-      <%= render 'personal' %>
-    </div>
+<div class="col-md-10 col-sm-12">
+  <%= render "profile_submenu", :active_subtab => "personal-tab" %>
+  <div id="profile-content">
+    <%= render 'personal' %>
   </div>
 </div>
