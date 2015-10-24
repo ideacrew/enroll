@@ -3,10 +3,17 @@ require 'rails_helper'
 RSpec.describe PeopleController do
   let(:census_employee_id) { "abcdefg" }
   let(:user) { FactoryGirl.build(:user) }
-  let(:person) { FactoryGirl.build(:person) }
-  let(:census_employee) {FactoryGirl.build(:census_employee)}
+  let(:email) {FactoryGirl.build(:email)}
+
   let(:consumer_role){FactoryGirl.build(:consumer_role)}
+
+  let(:census_employee){FactoryGirl.build(:census_employee)}
+  let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+  let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+
+
   let(:vlp_document){FactoryGirl.build(:vlp_document)}
+
 
   it "GET new" do
     sign_in(user)
@@ -18,9 +25,7 @@ RSpec.describe PeopleController do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
     let(:consumer_role_attributes) { consumer_role.attributes.to_hash}
     let(:person_attributes) { person.attributes.to_hash}
-    let(:employee_roles) { person.employee_roles }
-    let(:census_employee_id) {employee_roles[0].census_employee_id}
-
+    let(:email_attributes) { {"0"=>{"kind"=>"home", "address"=>"test@example.com"}}}
 
     before :each do
       allow(Person).to receive(:find).and_return(person)
@@ -51,14 +56,16 @@ RSpec.describe PeopleController do
     end
 
     it "when employee" do
-      #allow(employee_roles).to receive(:census_employee_id)
-      #allow(person).to receive(:employee_roles).and_return(employee_roles)
+
+      person_attributes[:emails_attributes] = email_attributes
 
       allow(controller).to receive(:get_census_employee).and_return(census_employee)
       allow(person).to receive(:has_active_consumer_role?).and_return(false)
-      #post :update, id: person.id, person: person_attributes
-      #expect(response).to redirect_to(family_account_path)
-      #expect(flash[:notice]).to eq 'Person was successfully updated.'
+      allow(person).to receive(:update_attributes).and_return(true)
+
+      post :update, id: person.id, person: person_attributes
+      expect(response).to redirect_to(family_account_path)
+      expect(flash[:notice]).to eq 'Person was successfully updated.'
     end
   end
 end

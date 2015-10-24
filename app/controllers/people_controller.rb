@@ -220,13 +220,11 @@ class PeopleController < ApplicationController
       @person.update_attributes({:emails => [], :addresses => []})
     else
 
-      #Only personal_insured_families_path Email if Employee
-
       #find associated  census employee record
       @census_employee = get_census_employee(@person.employee_roles[0].census_employee_id)
 
-      #Build Email Object
-      @email = Email.new(person_params[:emails_attributes].values.map(&:symbolize_keys).first);
+      #@email = Email.new(person_params[:emails_attributes].values.map(&:symbolize_keys).first);
+      @email = Email.new(person_params[:emails_attributes].values.first);
 
       #Propagate New Email address to Census Employee so data is in Synch
       @census_employee.update_attributes(:email => @email)
