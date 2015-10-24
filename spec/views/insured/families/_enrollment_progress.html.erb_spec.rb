@@ -6,7 +6,7 @@ RSpec.describe "insured/families/_enrollment_progress.html.erb" do
   end
 
   it "should display step name" do
-    ["Submitted", "Transmitted", "Acknowledged", "Enrolled", "Canceled/Terminated"].each do |step|
+    ["Applied", "Sent to Carrier", "Enrolled"].each do |step|
       expect(rendered).to match /#{step}/
     end
   end

@@ -36,7 +36,7 @@
               <td><div class="enrollment-type info">
                 <p>
                   <label class="bullet-separator">DC Healthlink ID:</label>
-                  <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id).truncate(8, omission: "").upcase %></strong>
+                  <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id).try(:truncate, 8, omission: "").try(:upcase) %></strong>
                 </p>
               </div>
             </td>
