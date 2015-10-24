@@ -46,7 +46,7 @@ class Employers::PlanYearsController < ApplicationController
       bg.default = false
     end
   end
-  
+
     plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
     benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
     benefit_group.default = true
@@ -63,9 +63,7 @@ class Employers::PlanYearsController < ApplicationController
     #   end
     # end
 
-    respond_to do |format|
-      format.js { render :layout => false }
-    end
+
   end
 
   def create
