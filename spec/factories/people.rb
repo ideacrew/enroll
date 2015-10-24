@@ -8,10 +8,13 @@ FactoryGirl.define do
     dob "1972-04-04".to_date
     is_active true
 
+    #association :employee_role, strategy: :build
+
     after(:create) do |p, evaluator|
       create_list(:address, 2, person: p)
       create_list(:phone, 2, person: p)
       create_list(:email, 2, person: p)
+      #create_list(:employee_role, 1, person: p)
     end
 
     trait :without_first_name do
@@ -30,6 +33,12 @@ FactoryGirl.define do
 
     trait :female do
       gender "female"
+    end
+
+    trait :with_employee_role do
+        after(:create) do |p, evaluator|
+          create_list(:employee_role, 1, person: p)
+        end
     end
 
     factory :male, traits: [:male]
