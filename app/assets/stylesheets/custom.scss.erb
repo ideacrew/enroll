@@ -3913,6 +3913,16 @@ ul.list-right-section li a img {
   background-image: none;
   padding-bottom: 0;
   border-bottom: 0;
+  background-color: transparent;
+  h4 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  small {
+    padding-top: 5px;
+    line-height: 135%;
+    display: block;
+  }
 }
 
 .hbx-enrollment-panel .panel-heading hr, .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
@@ -3921,7 +3931,6 @@ ul.list-right-section li a img {
 }
 
 .seps-panel ul{
-  margin-left: 25px;
 }
 #qle-details .hbx-enrollment-panel .panel-heading h4{
   color: #468847;
@@ -3932,7 +3941,7 @@ ul.list-right-section li a img {
 }
 
 .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
-  margin-top: 10px;
+  margin: 15px 0;
 }
 
 
@@ -4836,6 +4845,28 @@ table.table.table-no-sytle td {
    height: 80px;
    padding-right: 10px;
 }
+.right-column {
+  .list-qle {
+    padding: 5px 15%;
+  }
+  .carousel-indicators {
+    margin-bottom: 0;
+    padding-top: 20px;
+  }
+  #qle-menu h5 {
+    margin:0;
+    padding-left: 15%;
+    font-weight: 400;
+    padding-bottom: 8px;
+    color: #7b7b7b;
+
+  }
+
+}
+.carousel-indicators {
+  position: relative;
+  padding-top: 10px;
+}
 
 .carousel-indicators li {
   border-color: #337ab7;
@@ -4848,11 +4879,30 @@ table.table.table-no-sytle td {
 .carousel-control {
   width: 10%;
 }
+.carousel-control .fa-angle-right,
+.carousel-control .fa-angle-left {
+  position: absolute;
+  top: 25%;
+  z-index: 5;
+  display: inline-block;
+}
+.carousel-control .icon-prev,
+.carousel-control .fa-angle-left {
+  left: 50%;
+}
+.carousel-control .icon-next,
+.carousel-control .fa-angle-right {
+  right: 50%;
+}
 
 .carousel-inner .item {
   margin: 0;
   padding: 0;
   border: none;
+}
+.carousel-inner {
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 #qle-header .info-wrapper {
@@ -4866,8 +4916,12 @@ table.table.table-no-sytle td {
 }
 
 #qle-menu h5 {
-  text-align: center;
   margin:0;
+  padding-left: 10%;
+  font-weight: 400;
+  padding-bottom: 8px;
+  color: #7b7b7b;
+
 }
 
 #carousel-qles a.qle-menu-item {
@@ -4954,7 +5008,7 @@ position: absolute;
   font-size: 12px;
 }
 ul.list-qle {
-  padding: 5px 30px;
+  padding: 5px 10%;
   overflow: visible;
 }
 

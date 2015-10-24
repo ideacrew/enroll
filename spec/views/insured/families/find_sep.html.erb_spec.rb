@@ -16,7 +16,7 @@ RSpec.describe "insured/families/find_sep.html.erb" do
   it "should have carousel with qle events for individual market" do
     expect(rendered).to have_selector('div#carousel-qles')
     QualifyingLifeEventKind.individual_market_events.each do |qle|
-      expect(rendered).to have_selector( "a", text: qle.title) 
+      expect(rendered).to have_selector( "a", text: qle.title)
     end
   end
 
@@ -27,7 +27,7 @@ RSpec.describe "insured/families/find_sep.html.erb" do
   end
 
   it "should have rail road with sepcial enrollment period" do
-    expect(rendered).to have_selector('div.right-section') 
+    expect(rendered).to have_selector('div.right-section')
     expect(rendered).to have_css("li.active", text: 'Special Enrollment Period')
   end
 

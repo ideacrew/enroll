@@ -8,7 +8,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
 
     if @filter_criteria.empty?
-      @orgs = Organization.active_broker_agencies
+      @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?

@@ -51,6 +51,8 @@ class Family
   index({"households.hbx_enrollments.broker_agency_profile_id" => 1}, {sparse: true})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
+  index({"households.hbx_enrollments.benefit_group_id" => 1})
+
   index({"households.hbx_enrollments.aasm_state" => 1})
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
@@ -76,8 +78,7 @@ class Family
   }
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
-  scope :by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
-
+  scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
