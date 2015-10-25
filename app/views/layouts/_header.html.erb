@@ -27,11 +27,23 @@
           <a href="<%= family_account_path %>" <% if current_user.try(:has_employee_role?) %>style="padding: 7px 10px 0 10px;"<% end %>>
             <%= portal_display_name(controller_name) %>
           </a>
-          <% elsif current_user.try(:has_broker_agency_staff_role?) || current_user.try(:has_hbx_staff_role?) %>
+          <% elsif current_user.try(:has_broker_agency_staff_role?) %>
+            <a href="<%= broker_agencies_root_path %>">
             <%= portal_display_name(controller_name) %>
-          <% else %>
-            <a href="#"><%= portal_display_name(controller_name) %></a>
+            </a>
+            <% elsif current_user.try(:has_hbx_staff_role?) %>
+              <a href="<%= exchanges_hbx_profiles_root_path %>">
+              <%= portal_display_name(controller_name) %>
+              </a>
 
+                <% elsif current_user.try(:has_csr_role?) %>
+                  <a href="<%= home_exchanges_agents_path %>">
+                  <%= portal_display_name(controller_name) %>
+                  </a>
+              <% else %>
+              <a href="#">
+              <%= portal_display_name(controller_name) %>
+            </a>
           <% end %>
         </li>
       </ul>
