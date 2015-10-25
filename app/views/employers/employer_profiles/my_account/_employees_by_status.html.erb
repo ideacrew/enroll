@@ -19,7 +19,6 @@
           <% end %>
 
           <th>Status</th>
-          <th>Linked?</th>
 
           <th>Enrollment Status</th>
 
@@ -51,7 +50,6 @@
           <% end %>
 
           <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
-          <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
           <td><%= enrollment_state(census_employee) %></td>
 
           <td class="table-functions">

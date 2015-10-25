@@ -24,7 +24,7 @@
       <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
         <li class="header-text">
           <% if current_user.try(:has_employee_role?) || current_user.try(:has_consumer_role?) %>
-          <a href="<%= family_account_path %>">
+          <a href="<%= family_account_path %>" <% if current_user.try(:has_employee_role?) %>style="padding: 7px 10px 0 10px;"<% end %>>
             <%= portal_display_name(controller_name) %>
           </a>
           <% elsif current_user.try(:has_broker_agency_staff_role?) || current_user.try(:has_hbx_staff_role?) %>
