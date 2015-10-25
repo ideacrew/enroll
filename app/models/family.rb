@@ -3,6 +3,7 @@ class Family
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Sortable
 
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
@@ -53,14 +54,23 @@ class Family
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
   index({"households.hbx_enrollments.benefit_group_id" => 1})
 
-  index({"households.hbx_enrollments.aasm_state" => 1})
+  index({"households.hbx_enrollments.aasm_state" => 1, 
+         "households.hbx_enrollments.created_at" => 1}, 
+         {name: "state_and_created"})
+
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
+  index({"households.hbx_enrollments.submitted_at" => 1})
+  index({"households.hbx_enrollments.applied_aptc_amount" => 1})
 
+  index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
+  index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.hbx_assigned_id" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"irs_groups.hbx_assigned_id" => 1})
+
+  # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -78,7 +88,15 @@ class Family
   }
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
+
+  scope :all_current_households,  -> { exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
+  scope :all_tax_households,      -> { exists("households.tax_households": true) }
+  scope :all_enrollments,         -> { where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :all_enrollments_by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
+
   scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
+
+
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
@@ -103,15 +121,18 @@ class Family
   end
 
   def enrolled_benefits
-    # latest_household.try(:enrolled_hbx_enrollments)
+    latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def terminated_benefits
+    latest_household.try(:terminated_hbx_enrollments)
   end
 
-  def renewal_benefits
+  def renewing_benefits
+    latest_household.try(:renewal_hbx_enrollments)
   end
 
+  # remove
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end

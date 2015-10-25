@@ -404,14 +404,18 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     enrollment = HbxEnrollment.new
+
+    enrollment.household = coverage_household.household
+    enrollment.submitted_at = submitted_at 
+
     case
     when employee_role.present?
       raise unless benefit_group.present?
-      enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
+
       if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
@@ -419,6 +423,7 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
+
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -426,10 +431,10 @@ class HbxEnrollment
       #it will be better to create a new benefit_group_assignment
       benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+
     when consumer_role.present?
-      enrollment.household = coverage_household.household
-      enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
+      enrollment.kind = "individual"
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -441,10 +446,10 @@ class HbxEnrollment
         enrollment.enrollment_kind = "open_enrollment"
       end
 
-      # end
     else
       raise "either employee_role or consumer_role is required"
     end
+
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
