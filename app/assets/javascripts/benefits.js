@@ -1,5 +1,6 @@
 var benefits_tab_js;
 ready = function() {
+  // open published years
 
   // mimic jquery toggle function
   $.fn.toggleClick = function() {
@@ -30,9 +31,7 @@ ready = function() {
   // call makeDefaultBenefitGroup from click
 
   $('.benefit-package .make-default').on('click', function() {
-    if ($(this).hasClass('active')) {
-      alert('this is already your default benefit group');
-    } else {
+    if ($(this).hasClass('active')) {} else {
 
       $.ajax({
         context: this,
@@ -46,6 +45,8 @@ ready = function() {
       }).done(function() {
         $('.make-default').removeClass('active');
         $(this).addClass('active');
+        $(this).closest('.benefitgroup').find('.tooltip-inner').text('This is your default benefit group');
+        $(this).attr('data-original-title', 'This is your default benefit group');
       });
 
     }

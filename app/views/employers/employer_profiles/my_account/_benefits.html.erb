@@ -15,7 +15,7 @@
   <br/>
 
   <% @plan_years.each do |plan_year| %>
-  <div class="row no-buffer">
+  <div class="row no-buffer plan-year">
     <h3 class="title-inline">
       <% if plan_year.aasm_state == 'draft' %>
       <i class="fa fa-file"></i>
@@ -26,7 +26,7 @@
       <% end %>
       <%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
 
-    </div>
+
 
     <% plan_year.benefit_groups.each do |bg| %>
     <% if bg.default == true %>
@@ -205,6 +205,7 @@
 
 
     <% end %>
+        </div>
     <div class="pull-left bottom-mgn-xs">
 
       <% if plan_year.draft? && @current_plan_year.nil? %>
