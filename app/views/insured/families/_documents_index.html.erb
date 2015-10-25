@@ -17,7 +17,7 @@
                 <td><%= doc.type %></td>
                 <td>
                   <% key, bucket = get_key_and_bucket(doc.identifier) %>
-                  <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
+                  <%= link_to(document_download_path(bucket, key) + "?content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\.]/i, '')}", class: "download") do %>
                       <%= doc.title %>
                   <% end %>
                 </td>
