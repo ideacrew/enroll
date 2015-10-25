@@ -354,8 +354,7 @@ end
 When(/^.+ enters filter in plan selection page$/) do
   @browser.element(text: /Filter Results/).wait_until_present
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
-  @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
-  @browser.element(class: /apply-btn/, text: /Apply/).click
+  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
 end
 
 When(/^.+ enters? hsa_compatible filter in plan selection page$/) do

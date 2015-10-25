@@ -44,14 +44,18 @@ module PortalHeaderHelper
   end
 
   def hbx_staff_header
-    header_text = "<div style='display:inline-block'>&nbsp; I'm HBX Staff<br/>&nbsp; #{enrollment_name}</div>"
-    link_to "#{image_tag 'icons/icon-exchange-admin.png'} #{header_text}".html_safe,
-      exchanges_hbx_profiles_root_path
+    if enrollment_name.present?
+    header_text = "<div style='display:inline-block; white-space: nowrap;'>&nbsp; I'm HBX Staff<br/>&nbsp; #{enrollment_name.try(:titleize)}</div>"
+  else
+    header_text = "<div style='display:inline-block; white-space: nowrap; position: relative; top: -5px;'>&nbsp; I'm HBX Staff</div>"
+
+  end
+    link_to "#{image_tag 'icons/icon-exchange-admin.png', style: 'position: relative; top: -8px; left: 10px; margin-right: 5px;'} #{header_text}".html_safe, exchanges_hbx_profiles_root_path, style: 'padding: 16px 20px 0 0;'
   end
 
   def broker_header
-    header_text = "<div style='display:inline-block'>&nbsp; I'm a Broker<br/>&nbsp; #{enrollment_name}</div>"
+    header_text = "<div style='display:inline-block position: relative; top: 10px;'>&nbsp; I'm a Broker<br/>&nbsp; #{enrollment_name}</div>"
     link_to "#{image_tag 'icons/icon-expert.png'} #{header_text}".html_safe,
-      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), style: 'padding: 15px 0 0 0;'
   end
 end
