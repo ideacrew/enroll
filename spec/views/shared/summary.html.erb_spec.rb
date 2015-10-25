@@ -31,7 +31,7 @@ describe "shared/_summary.html.erb" do
   end
 
   it "should have a link to download the sbc pdf" do
-    expect(rendered).to include("<a class=\"download\" href=\"/document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?contenttype=application/pdf&amp;filename=A Plan Name.pdf\">")
+    expect(rendered).to include("<a class=\"download\" href=\"/document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&amp;filename=APlanName.pdf\">")
   end
 
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
