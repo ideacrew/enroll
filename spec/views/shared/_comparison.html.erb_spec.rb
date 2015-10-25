@@ -20,15 +20,15 @@ describe "shared/_comparison.html.erb" do
       :total_employer_contribution => 20,
       :total_employee_cost => 30,
       :id => "1234234234",
-      :sbc_file => "THE SBC FILE.PDF"
+      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
+                      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "plan name")}
   let(:mock_qhps) {[mock_qhp]}
-  let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
-    allow(mock_plan).to receive(:sbc_document).and_return(sbc_document)
+    allow(mock_plan).to receive(:sbc_document).and_return(mock_plan.sbc_document)
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
     assign(:visit_types, [])
     assign :plan, mock_plan
@@ -37,7 +37,7 @@ describe "shared/_comparison.html.erb" do
   end
 
   it "should have a link to download the sbc pdf" do
-    expect(rendered).to have_selector("a", text: /Summary of Benefits and Coverage/)
+    expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
   end
 
   it "should contain some readable text" do

@@ -21,8 +21,8 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.send_invite!
         flash[:notice] = "Census Employee is successfully created."
       else
-        flash[:notice] = "Census Employee is successfully created. "
-        flash[:notice] += "Note: an employee must be assigned to a benefit group before they can enroll for benefits"
+        flash[:notice] = "Your employee was successfully added to your roster."
+        #flash[:notice] += "Note: an employee must be assigned to a benefit group before they can enroll for benefits"
       end
       redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else

@@ -4,7 +4,13 @@
   <% else %>
   <div id="brokers-empty">
     <h1>Brokers</h1>
-    <h4 class="starter">You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you.</h4>
+    <h4 class="starter">
+      You have no active Broker. A Broker is your personal advocate and trusted adviser who at no cost to you, can help you set up and administer your Health Benefits Program. You can get help from a Broker at any time.
+      <br/><br/>
+      To learn more about what a Broker can do for you, Download DC Health Link’s <%= link_to 'Guidance for Business Owners', "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf", {:target => 'pdfWindow'} %>.
+      <br/><br/>
+      Select 'Browse Brokers' to continue.
+    </h4>
     <br/>
     <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", onclick: '$("#brokers-empty").hide();' %>
   </div>

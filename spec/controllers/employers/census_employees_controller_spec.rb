@@ -72,7 +72,7 @@ RSpec.describe Employers::CensusEmployeesController do
         allow(census_employee).to receive(:save).and_return(true)
         allow(controller).to receive(:benefit_group_id).and_return(nil)
         post :create, :employer_profile_id => employer_profile_id, census_employee: {}
-        expect(flash[:notice]).to eq "Census Employee is successfully created. Note: an employee must be assigned to a benefit group before they can enroll for benefits"
+        expect(flash[:notice]).to eq "Your employee was successfully added to your roster."
       end
     end
 

@@ -302,7 +302,7 @@ Then(/CSR opens the most recent Please Contact Message/) do
   wait_and_confirm_text /Please contact/
   sleep 1
   tr=@browser.trs(text: /Please contact/).last
-  scroll_then_click(tr.a(text: /show/))
+  scroll_then_click(tr.a(text: /show/i))
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
@@ -311,8 +311,8 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Assisting/
-  @browser.a(text: /I'm a Customer Service/i).click
+  wait_and_confirm_text /Trained/
+  @browser.a(text: /I'm a Trained Expert/i).click
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
