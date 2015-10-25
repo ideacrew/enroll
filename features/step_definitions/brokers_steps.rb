@@ -127,7 +127,7 @@ end
 
 Then(/^.+ should see no active broker$/) do
   @browser.element(class: /interaction-click-control-browse-brokers/).wait_until_present
-  expect(@browser.element(text: /You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you./).visible?).to be_truthy
+  expect(@browser.element(text: /You have no active Broker/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Browse Brokers button$/) do
