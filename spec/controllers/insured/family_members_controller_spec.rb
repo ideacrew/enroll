@@ -12,6 +12,7 @@ RSpec.describe Insured::FamilyMembersController do
     context 'normal' do
       before(:each) do
         allow(person).to receive(:employee_role).and_return(employee_role)
+        allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
         allow(employee_role).to receive(:save!).and_return(true)
         sign_in(user)
@@ -35,6 +36,7 @@ RSpec.describe Insured::FamilyMembersController do
     it "with qle_id" do
       allow(person).to receive(:employee_role).and_return(employee_role)
       allow(person).to receive(:primary_family).and_return(fm)
+      allow(person).to receive(:broker_role).and_return(nil)
       allow(employee_role).to receive(:save!).and_return(true)
       sign_in user
       expect{
