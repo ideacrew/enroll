@@ -1,6 +1,7 @@
   <div class="col-xs-12">
     <div class="col-xs-12 employee-add-tab">
-      <h1>Employee Roster</h1>
+      <% page_title = @census_employee.persisted? ? "Update "+@census_employee.full_name.titleize : 'Add New Employee' %>
+      <h1><%= page_title %></h1>
       <% if @census_employee.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -29,8 +30,11 @@
       <% end %>
       <% page_title = @census_employee.persisted? ? "Update "+@census_employee.full_name.titleize : 'Add New Employee' %>
 
-        <h4 class="pull-left"><%= page_title %></h4>
-
+        <% unless @census_employee.persisted? %>
+        <h4 class="pull-left">
+          Enter employee information. You'll select a benefit group later. Select 'Add Family Member' if applicable. When you’re finished, select 'Create Employee' to continue. 
+        </h4>
+        <% end %>
 
           <%= render 'member_fields', f: f %>
           <%= render 'shared/census_employee_fields', {f: f} %>

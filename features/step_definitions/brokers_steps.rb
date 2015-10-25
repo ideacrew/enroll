@@ -118,8 +118,8 @@ When(/^.+ registers? with valid information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  @browser.element(text: /Welcome! Your account has been created./).wait_until_present
-  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
+  @browser.element(text: /Welcome to DC Health Link. Your account has been created./).wait_until_present
+  expect(@browser.element(text: /Welcome to DC Health Link. Your account has been created./).visible?).to be_truthy
 
   @browser.h3(text: /Broker Agency \: Logistics Inc/).wait_until_present
   expect(@browser.h3(text: /Broker Agency \: Logistics Inc/).visible?).to be_truthy
