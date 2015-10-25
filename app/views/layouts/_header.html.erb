@@ -15,11 +15,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <% if controller.controller_name == 'registrations' && controller.action_name == 'new' %>
-          <a class="navbar-brand"><%= image_tag 'logo.png' %></a>
-        <% else %>
-          <a class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></a>
-        <% end %>
+
+          <span class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></span>
+
       </div>
       </div>
       <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
@@ -28,8 +26,11 @@
           <a href="<%= family_account_path %>">
             <%= portal_display_name(controller_name) %>
           </a>
+          <% elsif current_user.try(:has_broker_agency_staff_role?) || current_user.try(:has_hbx_staff_role?) %>
+            <%= portal_display_name(controller_name) %>
           <% else %>
             <a href="#"><%= portal_display_name(controller_name) %></a>
+
           <% end %>
         </li>
       </ul>
@@ -46,7 +47,7 @@
           <% if current_user %>
           col-xs-5 ccs
 
-          <% elsif current_page?('/') || controller.controller_name == 'registrations' || controller.controller_name == 'broker_roles' %>
+          <% elsif current_page?('/') || controller.controller_name == 'registrations' || controller.controller_name == 'broker_roles' || controller.controller_name == 'sessions' %>
           col-xs-12 ccs
           <% else %>
           col-xs-5 ccs
