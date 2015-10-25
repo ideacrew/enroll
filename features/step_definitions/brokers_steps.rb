@@ -118,8 +118,8 @@ When(/^.+ registers? with valid information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  @browser.element(text: /Welcome! Your account has been created./).wait_until_present
-  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
+  @browser.element(text: /Welcome to DC Health Link. Your account has been created./).wait_until_present
+  expect(@browser.element(text: /Welcome to DC Health Link. Your account has been created./).visible?).to be_truthy
 
   @browser.h3(text: /Broker Agency \: Logistics Inc/).wait_until_present
   expect(@browser.h3(text: /Broker Agency \: Logistics Inc/).visible?).to be_truthy
@@ -127,7 +127,7 @@ end
 
 Then(/^.+ should see no active broker$/) do
   @browser.element(class: /interaction-click-control-browse-brokers/).wait_until_present
-  expect(@browser.element(text: /You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you./).visible?).to be_truthy
+  expect(@browser.element(text: /You have no active Broker/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Browse Brokers button$/) do

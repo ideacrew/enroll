@@ -34,7 +34,7 @@
             <% if qhp.plan.sbc_document.present? %>
               <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
                 <div>
-                  <%= link_to("  Summary of Benefits and Coverage", document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "glyphicon glyphicon-download-alt") %>
+                  <%= link_to("  Summary of Benefits and Coverage", document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "glyphicon glyphicon-download-alt", :target => "_blank") %>
                 </div>
             <% else %>
               <div>
