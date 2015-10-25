@@ -79,6 +79,9 @@ class Family
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
   scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
+
+  scope :all_enrollments,         -> { where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
