@@ -354,7 +354,8 @@ end
 When(/^.+ enters filter in plan selection page$/) do
   @browser.element(text: /Filter Results/).wait_until_present
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
-  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
+  @browser.element(class: /apply-btn/, text: /Apply/i).wait_until_present
+  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/i))
 end
 
 When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
@@ -367,7 +368,7 @@ When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
   scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
-  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
+  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/i))
 end
 
 When(/^.+ enters? combined filter in plan selection page$/) do
@@ -391,7 +392,7 @@ When(/^.+ enters? combined filter in plan selection page$/) do
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
   @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
-  @browser.element(class: /apply-btn/, text: /Apply/).click
+  @browser.element(class: /apply-btn/, text: /Apply/i).click
 end
 
 Then(/^.+ should see the hsa_compatible filter results$/) do

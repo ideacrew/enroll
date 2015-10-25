@@ -302,7 +302,7 @@ Then(/CSR opens the most recent Please Contact Message/) do
   wait_and_confirm_text /Please contact/
   sleep 1
   tr=@browser.trs(text: /Please contact/).last
-  scroll_then_click(tr.a(text: /show/))
+  scroll_then_click(tr.a(text: /show/i))
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
