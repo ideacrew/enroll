@@ -39,7 +39,7 @@ QualifyingLifeEventKind.create!(
   ordinal_position: 12,
   reason: "lost_access_to_mec",
   edi_code: "33-LOST ACCESS TO MEC", 
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,

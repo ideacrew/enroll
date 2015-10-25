@@ -182,7 +182,13 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
       context "and 'effective on kind' is 'first of month' and date is 16th of month or later" do
         let(:fifteenth_of_month_rule_date)  { qle_on_date.next_month.end_of_month + 1.day }
-        before { ivl_qle_sep.effective_on_kind = "first_of_month" }
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
+          ivl_qle_sep.effective_on_kind = "first_of_month"
+        end
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
 
         it "the effective date is first of next month following QLE date" do
           expect(ivl_qle_sep.effective_on).to eq fifteenth_of_month_rule_date
@@ -190,11 +196,15 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       end
 
       context "and 'effective on kind' is 'first of month' and date is 15th of month or ealier" do
-        let(:qle_on_date)                   { Date.new(today.year, today.month, 1) }
-        let(:fifteenth_of_month_rule_date)  { qle_on_date.end_of_month + 1.day }
+        let(:qle_on_date)                   { Date.new(today.year, (today.month+1), 1) }
+        let(:fifteenth_of_month_rule_date)  { [today, qle_on_date].max.end_of_month + 1.day }
         before do 
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,5))
           ivl_qle_sep.effective_on_kind = "first_of_month"
           ivl_qle_sep.qle_on = qle_on_date
+        end
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
         it "the effective date is first of next month following QLE date" do
@@ -242,12 +252,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         end
       end
 
-      context "and QLE is effective on first of following month" do
-        it "should set effective date to date of event" do
-          expect(sep_first_of_month.effective_on).to eq first_of_following_month
-        end
-      end
-
       context "and qle is first_of_next_month" do
         it "when is_dependent_loss_of_coverage" do
           sep.effective_on_kind = "first_of_next_month"
@@ -290,6 +294,13 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
           sep.qle_on = TimeKeeper.date_of_record + 40.days
+          expect(sep.effective_on).to eq ((TimeKeeper.date_of_record+40.days).end_of_month + 1.day)
+        end
+
+        it "should set effective date to current date" do
+          sep.qualifying_life_event_kind = qle
+          sep.effective_on_kind = "first_of_next_month"
+          sep.qle_on = TimeKeeper.date_of_record - 4.days
           expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month + 1.day)
         end
       end
@@ -314,9 +325,38 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           sep.effective_on_kind = "first_of_month"
         end
 
-        it "should the first of month" do
-          sep.qle_on = event_date
-          expect(sep.effective_on).to eq [event_date, TimeKeeper.date_of_record].max.end_of_month + 1.day
+        context "current date is 15th of month or earlier" do
+          before {TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,5))}
+          after {TimeKeeper.set_date_of_record_unprotected!(Date.today)}
+            
+          it "should the first of month following qle date" do
+            event_date = TimeKeeper.date_of_record + 10.days
+            sep.qle_on = event_date
+            expect(sep.effective_on).to eq event_date.end_of_month + 1.day
+          end
+
+          it "should the first of month following current date" do
+            event_date = TimeKeeper.date_of_record - 8.days
+            sep.qle_on = event_date
+            expect(sep.effective_on).to eq TimeKeeper.date_of_record.end_of_month + 1.day
+          end
+        end
+
+        context "current date is 16th of month or later" do
+          before {TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,25))}
+          after {TimeKeeper.set_date_of_record_unprotected!(Date.today)}
+            
+          it "should the first of next month following qle date" do
+            event_date = TimeKeeper.date_of_record + 10.days
+            sep.qle_on = event_date
+            expect(sep.effective_on).to eq event_date.next_month.end_of_month + 1.day
+          end
+            
+          it "should the first of next month following current date" do
+            event_date = TimeKeeper.date_of_record - 28.days
+            sep.qle_on = event_date
+            expect(sep.effective_on).to eq TimeKeeper.date_of_record.next_month.end_of_month + 1.day
+          end
         end
       end
     end
