@@ -55,6 +55,14 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       it "should save" do
         expect(eligibility_determination.save).to be_truthy
       end
+
+      context "and it is saved" do
+        before { eligibility_determination.save }
+
+        it "should be findable by ID" do
+          expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
+        end
+      end
     end
 
   end
