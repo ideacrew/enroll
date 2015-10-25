@@ -12,7 +12,7 @@ RSpec.describe "layouts/_header.html.erb" do
     current_user.roles=['hbx_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/I'm HBX Staff/)
+    expect(rendered).to match(/I'm an Admin/)
   end
   it 'identifies Brokers' do
     current_user.roles=['broker_agency_staff']
@@ -31,21 +31,21 @@ RSpec.describe "layouts/_header.html.erb" do
     person_user.csr_role = FactoryGirl.build(:csr_role, cac: false)
     current_user.roles=['csr']
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/I'm a Customer Service Representative/)
+    expect(rendered).to match(/I'm a Trained Expert/)
   end
 
   it 'identifies Certified Applicant Counselor' do
     person_user.csr_role = FactoryGirl.build(:csr_role, cac: true)
     current_user.roles=['csr']
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/I'm a Certified Applicant Counselor/)
+    expect(rendered).to match(/I'm a Trained Expert/)
   end
 
   it 'identifies Assisters' do
     current_user.roles=['assister']
     current_user.person.assister_role = FactoryGirl.build(:assister_role)
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/I'm an In Person Assister/)
+    expect(rendered).to match(/I'm a Trained Expert/)
   end
 
   it 'identifies default controller' do
