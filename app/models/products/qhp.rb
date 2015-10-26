@@ -160,7 +160,7 @@ class Products::Qhp
             qhp.plan.carrier_profile.organization.legal_name,
             qhp.plan_marketing_name,
             "$#{qhp[:total_employee_cost].round(2)}",
-            qhp.plan.nationwide ? "Nationwide" : "DC Area Network",
+            qhp.plan.nationwide ? "Nationwide" : "DC-Metro",
             "In Network"
           ]
           arry2 = [

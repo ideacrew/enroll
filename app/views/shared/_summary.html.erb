@@ -16,7 +16,7 @@
         <% plan_level = @plan.metal_level.humanize %>
         <li class="<%= plan_level.downcase %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
         <li><small>Type</small><br><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></li>
-        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
+        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC-Metro" %></strong></li>
         <li>
             <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
               <small>Family Deductible</small><br>
