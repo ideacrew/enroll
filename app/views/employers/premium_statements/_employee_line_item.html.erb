@@ -1,9 +1,23 @@
 <tr>
-  <td <%= "rowspan=1" %>><a href="#"><strong><%= census_employee.full_name %></strong></a></td>
-  <td <%= "rowspan=1" %>><%= number_to_obscured_ssn census_employee.ssn %></td>
-  <td <%= "rowspan=1" %>><%= format_date census_employee.dob %></td>
-  <td <%= "rowspan=1" %>><%= format_date census_employee.hired_on %></td>
-  <td <%= "rowspan=1" %>><%= census_employee.published_benefit_group.title %></td>
+  <td>
+    <span class="name">
+      <%= census_employee.full_name.try(:titleize) %>
+    </span>
+    <br>
+    <span>
+      DOB: <%= format_date census_employee.dob %> SSN: <%= (number_to_obscured_ssn census_employee.ssn)[5..10] %>
+    </span>
+    <br>
+    <span>
+      HIRED: <%= format_date census_employee.hired_on %>
+    </span>
+    <br>
+  </td>
+  <td>
+    <span class="benefit-group">
+      <%= census_employee.published_benefit_group.title.try(:titleize) %>
+    </span>
+  </td>
 
   <%= render "benefit_line_item_detail", census_employee: census_employee, benefit_group: census_employee.published_benefit_group, enrollment: enrollment %>
 
