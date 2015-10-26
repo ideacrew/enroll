@@ -183,8 +183,8 @@ And (/^.+ should see broker active for the employer$/) do
 end
 
 When(/^.+ terminates broker$/) do
-  @browser.a(text: /Terminate/).wait_until_present
-  @browser.a(text: /Terminate/).click
+  @browser.a(text: /CHOOSE A NEW BROKER/).wait_until_present
+  @browser.a(text: /CHOOSE A NEW BROKER/).click
 
   #according to 2096 remove terminate in future
   #@browser.text_field(class: "date-picker").wait_until_present
