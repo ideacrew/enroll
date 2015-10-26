@@ -275,7 +275,7 @@ And(/^.+ clicks? the continue button$/i) do
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
-  wait_and_confirm_text(/Verify Identity: Consent/)
+  wait_and_confirm_text(/Verify Identity/)
 end
 
 When(/^CSR accesses the HBX portal$/) do
