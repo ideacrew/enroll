@@ -138,20 +138,19 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
-    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-
-    @carriers = @carrier_names_map.values
-    @waivable = @hbx_enrollment.can_complete_shopping?
-    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
-    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
-
     shopping_tax_household = get_shopping_tax_household_from_person(@person)
+    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     if shopping_tax_household.present?
       @tax_household = shopping_tax_household
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     end
+
+    @carriers = @carrier_names_map.values
+    @waivable = @hbx_enrollment.can_complete_shopping?
+    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
+    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
 
   def set_elected_aptc
