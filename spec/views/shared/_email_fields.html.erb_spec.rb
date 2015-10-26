@@ -24,6 +24,6 @@ describe "shared/_email_fields.html.erb" do
   end
 
   it "should have a required input field with asterisk" do
-    expect(rendered).to have_selector('input[placeholder="HOME Email Address *"]')
+    expect(rendered).to have_selector('input[placeholder="Home Email Address *"]')
   end
 end
