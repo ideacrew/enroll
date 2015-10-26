@@ -30,8 +30,11 @@ describe "shared/_comparison.html.erb" do
     Caches::MongoidCache.release(CarrierProfile)
     allow(mock_plan).to receive(:sbc_document).and_return(sbc_document)
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
+    allow(mock_hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
     assign(:visit_types, [])
     assign :plan, mock_plan
+    assign :person, mock_person
+    assign :plans, [mock_plan]
     assign :hbx_enrollment, mock_hbx_enrollment
     render "shared/comparison", :qhps => mock_qhps
   end

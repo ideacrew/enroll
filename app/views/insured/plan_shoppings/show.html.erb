@@ -8,15 +8,7 @@
         <div class="ct-1">
           <h3>Choose a healthcare plan.</h3>
           <div class="row no-buffer">
-            <p class="pull-left">
-              Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
-              Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-              <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
-              Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
-              <% end %>
-              Plans: <strong id='plans-count'><%= @plans.count %></strong>
-            </p>
-
+            <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
               <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 COMPARE PLANS
