@@ -23,7 +23,7 @@ describe "shared/_comparison.html.erb" do
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
                       :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
       ) }
-  let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "plan name")}
+  let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "A Plan Name")}
   let(:mock_qhps) {[mock_qhp]}
   let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
 
@@ -42,7 +42,7 @@ describe "shared/_comparison.html.erb" do
   end
 
   it "should contain some readable text" do
-    ["$30.00", "Plan Name", "Nationwide", "ACME Agency"].each do |t|
+    ["$30.00", "Nationwide", "A Plan Name", "A PLAN TYPE"].each do |t|
       expect(rendered).to have_content(t)
     end
   end
@@ -63,6 +63,17 @@ describe "shared/_comparison.html.erb" do
     expect(rendered).to_not have_selector('th', text: 'Out of Network')
   end
 
+  it "should have coinsurance text" do
+    expect(rendered).to have_selector('th', text: 'COINSURANCE')
+  end
+
+  it "should have copay text" do
+    expect(rendered).to have_selector('th', text: 'CO-PAY')
+  end
+
+  it "should have plan data" do
+    expect(rendered).to match(/#{mock_plan.name}/)
+  end
 
   it "should have print link" do
     expect(rendered).to have_selector('button', text: 'Print')
