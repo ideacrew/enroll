@@ -78,9 +78,6 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
         expect(eligibility_determination.premium_credit_strategy_kind).to eq premium_credit_strategy_kind
       end
 
-      context "and " do
-      end
-
       context "and it is saved" do
         before { eligibility_determination.save }
 
