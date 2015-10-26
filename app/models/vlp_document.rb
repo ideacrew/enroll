@@ -83,10 +83,10 @@ class VlpDocument < Document
         allow_blank: false
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
-  validates :citizenship_number, length: { within: 7..9 }, :allow_blank => true
+  validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true
   validates :i94_number, length: { is: 11 }, :allow_blank => true
-  validates :naturalization_number, length: { within: 7..12 }, :allow_blank => true
-  validates :passport_number, length: { within: 6..12 }, :allow_blank => true
+  validates :naturalization_number, length: { in: 6..12 }, :allow_blank => true
+  validates :passport_number, length: { in: 6..12 }, :allow_blank => true
   validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
