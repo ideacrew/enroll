@@ -137,9 +137,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
     let(:c2) {FactoryGirl.create(:consumer_role)}
     let(:member1) {double(person: double(consumer_role: c1))}
     let(:member2) {double(person: double(consumer_role: c2))}
-    let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
-    let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
-    let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
+    let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+    let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
+    let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
     let(:plan4) { FactoryGirl.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
