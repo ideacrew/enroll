@@ -32,7 +32,7 @@
 
     <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="row">
-        <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+        <% if @market_kind == "employer_sponsored" and @coverage_kind == 'health' %>
           <div class="col-md-4 col-sm-4 col-xs-12">
             <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
           </div>
@@ -65,7 +65,7 @@
         <td>
           <% if @plan.sbc_document.present? %>
               <% key, bucket = get_key_and_bucket(@plan.sbc_document.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{@plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
+              <%= link_to(document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{@plan.name.gsub(/[^0-9a-z]/i,'')}.pdf", class: "download") do %>
                   <i class="glyphicon glyphicon-download-alt"></i> Download
               <% end %>
           <% else %>
