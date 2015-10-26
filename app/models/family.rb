@@ -64,6 +64,7 @@ class Family
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.applied_aptc_amount" => 1})
 
+  index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.hbx_assigned_id" => 1})
@@ -95,6 +96,21 @@ class Family
   scope :all_enrollments_by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
 
   scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
+
+
+  scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
+  scope :all_assistance_applying,       ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
+  scope :all_assistance_receiving,      ->{ where(:"households.tax_households.eligibility_determinations.max_aptc".gt => 0) }
+
+  scope :by_enrollment_market,          ->(market){ where(:"households.hbx_enrollments.enrollment.kind" => market) }
+  scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
+                                                        :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
+                                                        :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
+                                                      )
+                                                    }
+
+  scope :by_datetime_range,             ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
+
 
 
   def update_family_search_collection
