@@ -8,7 +8,7 @@
         <% end %>
 
       <%= f.hidden_field :kind %>
-      <%= f.email_field :address, placeholder: "NAME@#{kind}.COM #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+      <%= f.email_field :address, placeholder: "#{kind} Email Address #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
     </div>
   </div>
 </div>
