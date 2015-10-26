@@ -80,4 +80,10 @@ describe "shared/_comparison.html.erb" do
   it "should have print link" do
     expect(rendered).to have_selector('button', text: 'Print')
   end
+
+  it "should have title and other text" do
+    expect(rendered).to have_selector('h3', text: /Choose Plan - Compare Selected Plans/ )
+    expect(rendered).to have_selector('h5', text: /Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget./ )
+    expect(rendered).to have_selector('h4', text: /Important: Please review SBC for any coinsurance costs./ )
+  end
 end
