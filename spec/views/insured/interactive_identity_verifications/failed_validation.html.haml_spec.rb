@@ -15,7 +15,7 @@ describe "insured/interactive_identity_verifications/failed_validation" do
   it "should show a link to invoke fars" do
     assign :verification_response, mock_response
     render :template => "insured/interactive_identity_verifications/failed_validation.html.haml"
-    expect(rendered).to include("Please click here once you have contacted the exchange and been told to proceed.")
+    expect(rendered).to include("Please click here once you have contacted the exchange and have been told to proceed.")
     expect(rendered).to include("href=\"/insured/interactive_identity_verifications/the_transaction_id\"")
   end
 end

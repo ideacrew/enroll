@@ -500,4 +500,25 @@ describe BenefitGroup, type: :model do
       end
     end
   end
+
+  describe BenefitGroup, dbclean: :after_each do
+    context "effective_title_by_offset" do
+      let(:benefit_group) { BenefitGroup.new }
+
+      it "when effective_on_offset is 0" do
+        benefit_group.effective_on_offset = 0
+        expect(benefit_group.effective_title_by_offset).to eq "First of the month following or coinciding with date of hire"
+      end
+
+      it "when effective_on_offset is 30" do
+        benefit_group.effective_on_offset = 30
+        expect(benefit_group.effective_title_by_offset).to eq "First of the month following 30 days"
+      end
+
+      it "when effective_on_offset is 60" do
+        benefit_group.effective_on_offset = 60
+        expect(benefit_group.effective_title_by_offset).to eq "First of the month following 60 days"
+      end
+    end
+  end
 end

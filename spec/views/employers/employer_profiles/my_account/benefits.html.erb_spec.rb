@@ -9,6 +9,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
   before :each do
     allow(benefit_group).to receive(:reference_plan).and_return(plan)
     allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
+    allow(benefit_group).to receive(:effective_on_offset).and_return 30
     assign(:plan_years, [plan_year])
     assign(:employer_profile, employer_profile)
   end
@@ -19,5 +20,10 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     plan_year.benefit_groups.first.relationship_benefits.map(&:premium_pct).each do |pct|
       expect(rendered).to have_selector("td", text: "#{pct.to_i}%")
     end
+  end
+  
+  it "should display title by effective_on_offset" do
+    render "employers/employer_profiles/my_account/benefits"
+    expect(rendered).to match /First of the month following 30 days/
   end
 end

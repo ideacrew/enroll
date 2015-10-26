@@ -273,6 +273,17 @@ class BenefitGroup
     end
   end
 
+  def effective_title_by_offset
+    case effective_on_offset
+    when 0
+      "First of the month following or coinciding with date of hire"
+    when 30
+      "First of the month following 30 days"
+    when 60
+      "First of the month following 60 days"
+    end
+  end
+
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
