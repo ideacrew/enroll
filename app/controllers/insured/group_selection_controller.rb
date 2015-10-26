@@ -48,7 +48,8 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
-    
+
+    @family.hire_broker_agency(current_user.person.broker_role.try(:id))
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role

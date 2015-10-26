@@ -97,7 +97,6 @@ class Family
 
   scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
 
-
   scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
   scope :all_assistance_applying,       ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
   scope :all_assistance_receiving,      ->{ where(:"households.tax_households.eligibility_determinations.max_aptc".gt => 0) }
@@ -110,7 +109,6 @@ class Family
                                                     }
 
   scope :by_datetime_range,             ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
-
 
 
   def update_family_search_collection
@@ -359,6 +357,26 @@ class Family
           (search_dob == mem_dob)
       end
     end
+  end
+
+  def hire_broker_agency(broker_role_id)
+    return unless broker_role_id
+    existing_agency = broker_agency_accounts.detect { |account| account.is_active? }
+    broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
+    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id  
+    fire_broker_agency(existing_agency) if different_agency
+    if !existing_agency || different_agency
+      start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
+      broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
+      broker_agency_accounts << broker_agency_account
+      self.save
+    end  
+  end
+
+  def fire_broker_agency(existing_agency)
+    existing_agency.end_on = (TimeKeeper.date_of_record.to_date - 1.day).end_of_day
+    existing_agency.is_active = false
+    self.save
   end
 
   class << self

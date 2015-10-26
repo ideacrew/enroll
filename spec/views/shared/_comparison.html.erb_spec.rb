@@ -25,6 +25,7 @@ describe "shared/_comparison.html.erb" do
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "plan name")}
   let(:mock_qhps) {[mock_qhp]}
+  let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)

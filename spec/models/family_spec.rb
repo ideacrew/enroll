@@ -214,6 +214,32 @@ describe Family, type: :model, dbclean: :after_each do
         expect(covered_bradys).to contain_exactly(*bradys.collect(&:full_name))
       end
     end
+
+    context "when a broker account is created for the Family" do
+      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+      let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+      let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
+      let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+      it "adds a broker agency account" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        expect(carols_family.broker_agency_accounts.length).to eq(1)
+      end
+      it "adding twice only gives one broker agency account" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.hire_broker_agency(writing_agent.id)
+        expect(carols_family.broker_agency_accounts.length).to eq(1)
+      end
+      it "new broker adds a broker_agency_account" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.hire_broker_agency(writing_agent2.id)
+        expect(carols_family.broker_agency_accounts.length).to eq(2)
+        expect(carols_family.broker_agency_accounts[0].is_active).to be_falsey
+        expect(carols_family.broker_agency_accounts[1].is_active).to be_truthy
+        expect(carols_family.broker_agency_accounts[1].writing_agent_id).to eq(writing_agent2.id)
+      end
+
+    end
+
   end
 
   ## TODO: Add method

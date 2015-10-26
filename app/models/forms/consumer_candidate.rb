@@ -17,7 +17,7 @@ module Forms
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
-              length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
+              length: {minimum: 9, maximum: 9, message: " must be 9 digits"},
               allow_blank: true,
               numericality: true
     validate :dob_not_in_future
@@ -65,7 +65,8 @@ module Forms
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
       if same_ssn.present? && same_ssn.first.try(:user)
         errors.add(:base,
-                  "This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
+                  #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
+                  "The social security number you entered is affiliated with another account.")
       end
     end
 
