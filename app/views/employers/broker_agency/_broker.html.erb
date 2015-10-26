@@ -16,8 +16,7 @@
         <div class="modal-body">
           <%= hidden_field_tag(:broker_agency_id, broker_agency.id) %>
           <%= hidden_field_tag(:broker_role_id, broker.id) %>
-          <p>Select 'Confirm' to hire the selected Broker. Warning: if you already have an existing Broker,</p>
-          <p>they will be terminated effective immediately.</p>
+          <p>Select 'Confirm' to hire the selected Broker. Warning: if you already have an existing Broker, they will be terminated effective immediately.</p>
         </div>
         <div class="modal-footer">
           <%= submit_tag "Confirm", class: 'btn btn-primary' %>

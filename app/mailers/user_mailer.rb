@@ -14,7 +14,7 @@ class UserMailer < ApplicationMailer
 
   def invitation_email(email, person_name, invitation)
 
-    mail({to: email, subject: "DCHealthLink Invitation "}) do |format|
+    mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at DC Health Link "}) do |format|
       format.html { render "invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
   end
