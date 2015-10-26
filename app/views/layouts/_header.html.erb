@@ -8,11 +8,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <% if controller.controller_name == 'registrations' && controller.action_name == 'new' %>
+
         <a class="navbar-brand"><%= image_tag 'logo.png' %></a>
-      <% else %>
-        <a class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></a>
-      <% end %>
+
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav nav-info navbar-left brd-left hidden-xs hidden-sm">
