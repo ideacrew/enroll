@@ -234,14 +234,33 @@
   }
   .premium-reports-table, .documents-table {
     table tr th {
-      font-size: 11px;
+      font-size: 14px;
       width: auto;
-      text-align: center;
-      padding: 10px 0;
+      padding: 10px 15px;
     }
     table tr td {
-      padding: 0;
-      text-align: center;
+      vertical-align: top;
+
+      span {
+        &.name {
+          color: #007bc4;
+          font-size: 14px;
+        }
+        &.benefit-group {
+          font-size: 14px;
+        }
+        &.coverage-kind {
+          text-transform: uppercase;
+        }
+      }
+      padding: 10px 15px;
+      text-align: left;
+      &:first-of-type {
+        font-size: 13px;
+      }
+      &:hover {
+        color: #333;
+      }
     }
 
 
