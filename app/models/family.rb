@@ -96,7 +96,6 @@ class Family
 
   scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
 
-
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
@@ -343,6 +342,26 @@ class Family
           (search_dob == mem_dob)
       end
     end
+  end
+
+  def hire_broker_agency(broker_role_id)
+    return unless broker_role_id
+    existing_agency = broker_agency_accounts.detect { |account| account.is_active? }
+    broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
+    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id  
+    fire_broker_agency(existing_agency) if different_agency
+    if !existing_agency || different_agency
+      start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
+      broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
+      broker_agency_accounts << broker_agency_account
+      self.save
+    end  
+  end
+
+  def fire_broker_agency(existing_agency)
+    existing_agency.end_on = (TimeKeeper.date_of_record.to_date - 1.day).end_of_day
+    existing_agency.is_active = false
+    self.save
   end
 
   class << self
