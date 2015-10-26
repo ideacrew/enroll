@@ -44,7 +44,9 @@
 
     </div>
     <div class="panel-body">
-      <div>My Employees: <span class="fte-count"><%= @employer_profile.census_employees.count %></span></div>
+      <%= link_to employers_employer_profile_path(@employer_profile.id, :tab=>'employees') do %>
+      <div>My Employees: <span><%= @employer_profile.census_employees.count %></span></div>
+      <% end %>
     </div>
   </div>
 </nav>
