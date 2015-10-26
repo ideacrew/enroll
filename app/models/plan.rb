@@ -60,6 +60,7 @@ class Plan
   index({ active_year: 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
   index({ renewal_plan_id: 1, name: 1 })
   index({ name: 1 })
+  index({ csr_variant_id: 1}, {sparse: true})
 
   # 2015, "94506DC0390006-01"
   index(
@@ -75,6 +76,9 @@ class Plan
 
   # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
   index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age_deprecated"})
+
+  # 2015, individual, health, silver, 04
+  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, csr_variant_id: 1 })
 
   # 2015, individual, health, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
@@ -125,6 +129,14 @@ class Plan
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
 
+
+  scope :metal_sans_silver_level,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
+  scope :silver_level_by_csr_kind, ->(csr_kind){ where(
+                                          metal_level: "silver").and(
+                                          csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
+                                        )
+                                      }
+ 
   # Plan Type
   scope :ppo_plan, ->{ where(plan_type: "ppo") }
   scope :pos_plan, ->{ where(plan_type: "pos") }
@@ -190,6 +202,15 @@ class Plan
     }
 
   scope :individual_health_by_active_year, ->(active_year) {
+      where(
+          active_year: active_year,
+          market: "individual",
+          coverage_kind: "health",
+          hios_id: /-01$/
+        )
+    }
+
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind) {
       where(
           active_year: active_year,
           market: "individual",
