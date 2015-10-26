@@ -454,6 +454,7 @@ When(/^.+ clicks? continue on the plan shopping welcome page$/) do
   scroll_then_click(@browser.a(text: "Continue"))
 end
 
+
 Then(/^.+ should see the list of plans$/) do
   @browser.a(text: /Select/).wait_until_present
   screenshot("plan_shopping")
@@ -579,8 +580,8 @@ When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
-  @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
-  expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
+  @browser.element(text: /Choose Plan for your Household/i).wait_until_present
+  expect(@browser.element(text: /Choose Plan for your Household/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
 end
 
