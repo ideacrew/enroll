@@ -511,7 +511,7 @@ class PlanYear
 
     # Admin ability to reset application
     event :revert_application, :after => :record_transition do
-      transitions from: [:ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
     end
   end
 
