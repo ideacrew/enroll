@@ -6,16 +6,17 @@ class EligibilityDetermination
 
   embedded_in :tax_household
 
-  COST_SHARING_REDUCTION_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
+  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
 
-  CSR_PERCENT_TO_PLAN_VARIANT_MAP = {
-      "csr_100": "01",
-      "csr_94":  "06",
-      "csr_87":  "05",
-      "csr_73":  "04",
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
+  CSR_KIND_TO_PLAN_VARIANT_MAP = {
+      "csr_100" => "01",
+      "csr_94"  => "06",
+      "csr_87"  => "05",
+      "csr_73"  => "04",
     }
+  CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
 
   field :e_pdc_id, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
@@ -33,6 +34,8 @@ class EligibilityDetermination
 
   field :determined_on, type: DateTime
 
+  before_validation :set_premium_credit_strategy
+
   validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
 
   validates :premium_credit_strategy_kind,
@@ -45,7 +48,7 @@ class EligibilityDetermination
   validates :csr_eligibility_kind,
     allow_blank: false,
     inclusion: {
-      in: COST_SHARING_REDUCTION_KINDS,
+      in: CSR_KINDS,
       message: "%{value} is not a valid cost sharing eligibility kind"
     }
 
@@ -87,6 +90,24 @@ class EligibilityDetermination
 
   def csr_percent
     (Rational(csr_percent_as_integer) / Rational(100)).to_f
+  end
+
+  def self.find(id)
+    family = Family.where(:"households.tax_households.eligibility_determinations._id" => id).first
+# binding.pry
+    if family.present?
+      ed = family.households.flat_map() do |household|
+        household.tax_households.flat_map() do |tax_household|
+          tax_household.eligibility_determinations.detect { |ed| ed.id == id }
+        end
+      end
+      ed.first unless ed.blank?
+    end
+  end
+
+private
+  def set_premium_credit_strategy
+    premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
   end
 
 end
