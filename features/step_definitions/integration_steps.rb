@@ -456,7 +456,7 @@ end
 
 
 Then(/^.+ should see the list of plans$/) do
-  @browser.a(text: /Choose/).wait_until_present
+  @browser.a(text: /Select/).wait_until_present
   screenshot("plan_shopping")
 end
 
