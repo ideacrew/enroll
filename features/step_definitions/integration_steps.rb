@@ -454,11 +454,11 @@ When(/^.+ clicks? continue on the plan shopping welcome page$/) do
   scroll_then_click(@browser.a(text: "Continue"))
 end
 
-#no longer applicable
-#Then(/^.+ should see the list of plans$/) do
-#  @browser.a(text: /Select/).wait_until_present
-#  screenshot("plan_shopping")
-#end
+
+Then(/^.+ should see the list of plans$/) do
+  @browser.a(text: /Choose/).wait_until_present
+  screenshot("plan_shopping")
+end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
   @browser.execute_script(
