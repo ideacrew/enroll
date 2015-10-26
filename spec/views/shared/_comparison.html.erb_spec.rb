@@ -51,6 +51,10 @@ describe "shared/_comparison.html.erb" do
     expect(rendered).to have_selector('div#printArea')
   end
 
+  it "should not have plan details text" do
+    expect(rendered).not_to match(/Plan Details/)
+  end
+
   it "should have download link" do
     expect(rendered).to have_selector('a', text: 'Download')
   end
