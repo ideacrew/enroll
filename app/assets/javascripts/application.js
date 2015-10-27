@@ -851,3 +851,11 @@ $(document).on('keyup', ".new_dependent #dependent_ssn", function(){
 $(document).on('change', ".new_dependent #dependent_no_ssn", function(){
   if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change')  }
 })
+
+$(document).on('click', '.interaction-click-control-cancel, .interaction-click-control-confirm-member, .fa-times', function(){
+  $('.fa-pencil').show();
+})
+
+$(document).on('click', '.fa-pencil', function(){
+  $('.fa-pencil').hide();
+})

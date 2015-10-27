@@ -70,7 +70,7 @@
         <% elsif @type == "employee" %>
           <%= render  partial: 'shared/signup_progress', locals: {
             step: '4',
-            url: (@employee_role.present? && !@employee_role.is_under_open_enrollment? ? find_sep_url : group_selection_url)
+            url: group_selection_url
           } %>
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {

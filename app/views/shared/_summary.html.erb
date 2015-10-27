@@ -16,7 +16,7 @@
         <% plan_level = @plan.metal_level.humanize %>
         <li class="<%= plan_level.downcase %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
         <li><small>Type</small><br><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></li>
-        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
+        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC-Metro" %></strong></li>
         <li>
             <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
               <small>Family Deductible</small><br>
@@ -52,8 +52,8 @@
       <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
           <% if @hbx_enrollment.shopping?%>
-            <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
-            <% end %>
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+          <% end %>
         </div>
       </div>
     </div>
@@ -111,7 +111,7 @@
           <td></td>
           <td colspan="3" class="text-center">
             <% if @hbx_enrollment.shopping?%>
-              <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
+              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
             <% else %>
               <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
             <% end %>
