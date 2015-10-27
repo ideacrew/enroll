@@ -94,6 +94,12 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
+  // js that updates benefit group id field in census employee edit
+  $('#census_employee_benefit_group_assignments_attributes_0_benefit_group_id').on('change', function() {
+    var benefit_group_id = $('#census_employee_benefit_group_assignments_attributes_0_benefit_group_id').val();
+    $('#census_employee_benefit_group_assignments_attributes_0_id').attr('value', benefit_group_id );
+    $('#census_employee_benefit_group_assignments_attributes_0_benefit_group_id').attr('value', $('#census_employee_benefit_group_assignments_attributes_0_id').val());
+  });
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
