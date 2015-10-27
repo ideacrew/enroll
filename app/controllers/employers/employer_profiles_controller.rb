@@ -17,9 +17,14 @@ class Employers::EmployerProfilesController < ApplicationController
 
     end
 
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    if @q.blank?
+      @page_alphabets = page_alphabets(@orgs, "legal_name")
+      page_no = cur_page_no(@page_alphabets.first)
+      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+      @employer_profiles = @organizations.map {|o| o.employer_profile}
+    else
+      @employer_profiles = @orgs.map {|o| o.employer_profile}
+    end
 
     @profile = find_mailbox_provider
   end
