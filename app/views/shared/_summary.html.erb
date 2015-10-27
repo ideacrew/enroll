@@ -77,14 +77,14 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th width="35%">Services You May Need</th>
-          <th>Your cost </th>
-          <th>Limitations & Exceptions</th>
+          <th width="30%">SERVICES YOU MAY NEED</th>
+          <th width="40%">YOUR COST AT PARTICIPATING PROVIDER </th>
+          <th width="30%">(IN-NETWORK)</th>
         </tr>
         <tr>
           <th>&nbsp;</th>
-          <th>Participating Provider</th>
-          <th>&nbsp;</th>
+          <th>CO-PAY</th>
+          <th>COINSURANCE</th>
         </tr>
       </thead>
 
@@ -96,7 +96,7 @@
             <tr>
               <td><%= benefit.benefit_type_code %></td>
               <td><%= deductible.copay_in_network_tier_1 %></td>
-              <td><%= benefit.explanation.present? ? benefit.explanation : "None" %></td>
+              <td><%= deductible.co_insurance_in_network_tier_1.present? ? deductible.co_insurance_in_network_tier_1 : "N/A" %></td>
             </tr>
           <% end %>
         <% end %>
