@@ -8,7 +8,7 @@ module Events
       policy_id = headers.stringify_keys["policy_id"]
       policy = HbxEnrollment.by_hbx_id(policy_id).first
       if !policy.nil?
-        response_payload = render_to_string "events/hbx_enrollments/policy", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
+        response_payload = render_to_string "events/hbx_enrollment/policy", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
         with_response_exchange(connection) do |ex|
           ex.publish(
             response_payload,
