@@ -89,7 +89,12 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       allow(benefit_package).to receive(:residency_status).and_return ["any", "other"]
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_residency_status_satisfied?).to eq true
+    end
 
+    it "return false when consumer_role is nil" do
+      allow(benefit_package).to receive(:residency_status).and_return ["other"]
+      rule = InsuredEligibleForBenefitRule.new(nil, benefit_package)
+      expect(rule.is_residency_status_satisfied?).to eq false
     end
 
     describe "include state_resident" do 
