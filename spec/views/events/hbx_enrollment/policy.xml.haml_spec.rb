@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "events/hbx_emrollment/policy.haml.erb" do
+RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
 
   let(:plan) { FactoryGirl.create(:plan) }
   let(:employee_role) { FactoryGirl.create(:employee_role) }
