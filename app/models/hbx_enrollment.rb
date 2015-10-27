@@ -530,6 +530,8 @@ class HbxEnrollment
       raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
+  rescue
+    nil
   end
 
   def self.find_by_benefit_groups(benefit_groups = [])

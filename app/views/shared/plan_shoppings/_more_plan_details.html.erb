@@ -1,6 +1,6 @@
 <p class="pull-left">
   Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
-  Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
+  Dependents: <strong><%= @hbx_enrollment.try(:humanized_dependent_summary) %></strong> &nbsp;&nbsp;
   <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
   Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
   <% end %>

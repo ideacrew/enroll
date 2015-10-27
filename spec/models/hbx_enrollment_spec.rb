@@ -517,6 +517,14 @@ describe HbxEnrollment, dbclean: :after_all do
   end
 end
 
+describe HbxProfile, "class methods", type: :model do
+  context "#find" do
+    it "should return nil with invalid id" do
+      expect(HbxEnrollment.find("text")).to eq nil
+    end
+  end
+end
+
 # describe HbxEnrollment, "#save", type: :model do
 #
 #   context "SHOP market validations" do
