@@ -11,6 +11,16 @@ class VitalSign
     @end_at = end_at
   end
 
+  def families_to_eligibility_determinations(family_list)
+    family_list.flat_map() do |family|
+      family.households.flat_map() do |household|
+        household.tax_households.flat_map() do |tax_household|
+          tax_household.eligibility_determinations
+        end
+      end
+    end          
+  end
+
   def accounts_created
     User.gte(created_at: @start_at).lte(created_at: @end_at)
   end
@@ -41,13 +51,22 @@ class VitalSign
         {:"households.tax_households.eligibility_determinations.determined_on".lte => @end_at}
       )
 
-    families.flat_map() do |family|
+    @all_individual_eligibility_determinations = families.flat_map() do |family|
       family.households.flat_map() do |household|
         household.tax_households.flat_map() do |tax_household|
-          tax_household.eligibility_determinations
+          tax_household.eligibility_determinations.gte(determined_on: @start_at).lte(determined_on: @end_at)
         end
       end
     end      
+  end
+
+  def all_active_individual_eligibility_determinations
+    all_individual_eligibility_determinations unless defined? @all_individual_eligibility_determinations
+    @all_individual_eligibility_determinations.select { |determination| determination.tax_household.effective_ending_on.blank? }
+  end
+
+  def all_active_assistance_eligible_individual_eligibility_determinations
+    all_active_individual_eligibility_determinations.select { |determination| determination.max_aptc > 0 }
   end
 
   def enrollment_counts_by_family

@@ -5,6 +5,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryGirl.build(:plan)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
+                                 enroll_step: 2,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employee_role: nil, status_step: 2, applied_aptc_amount: 23.00)}
 
     before :each do
@@ -30,6 +31,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryGirl.build(:plan)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
+                                 enroll_step: 1,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2)}
 
     before :each do
