@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
-  let(:hbx_enrollment){double("HbxEnrollment", kind: "shop")}
+  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan)}
+  let(:plan) { double(coverage_kind: '') }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
@@ -14,8 +15,10 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
     end
+
     it "should return comparison of multiple plans" do
       sign_in(user)
       get :comparison, standard_component_ids: ["11111111111111"]
@@ -24,7 +27,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id")) }
+    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan) }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp) { [double("Qhp", plan: double("Plan"))] }
@@ -101,6 +104,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:decorated_elected_plans).with("dental")
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(Products::Qhp).to receive(:where).and_return([qhp1, qhp2])
       allow(qhp1).to receive(:plan).and_return plan1
@@ -108,11 +112,12 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(qhp3).to receive(:plan).and_return plan3
       allow(qhp4).to receive(:plan).and_return plan4
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_employee_cost: 100))
+      allow(hbx_enrollment).to receive(:plan).and_return(plan)
     end
 
     it "should return comparison of a plan" do
       sign_in(user)
-      get :comparison, standard_component_ids: ["11111100001111-01"], hbx_enrollment_id: hbx_enrollment.id, coverage_kind: 'individual'
+      get :comparison, standard_component_ids: ["11111100001111-01"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'
       expect(response).to have_http_status(:success)
       expect(assigns(:qhps).count).to eq 1
     end
@@ -123,17 +128,17 @@ RSpec.describe Products::QhpController, :type => :controller do
         sign_in(user)
       end
 
-      it "should return uniq plans when same plan" do 
-        get :comparison, standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, coverage_kind: 'individual' 
+      it "should return uniq plans when same plan" do
+        get :comparison, standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'
         expect(response).to be_success
         expect(assigns(:qhps).count).to eq 1
-      end 
+      end
 
-      it "should return uniq plans when 2" do 
-        get :comparison, standard_component_ids: ["11111100001111-01", "11111100001112"], hbx_enrollment_id: hbx_enrollment.id, coverage_kind: 'individual' 
+      it "should return uniq plans when 2" do
+        get :comparison, standard_component_ids: ["11111100001111-01", "11111100001112"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'
         expect(response).to be_success
         expect(assigns(:qhps).count).to eq 2
-      end 
+      end
     end
   end
 end

@@ -1,0 +1,8 @@
+<% if plan.sbc_document.present? %>
+  <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
+  <%= link_to(document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") do %>
+    <i class="fa fa-file-pdf-o fa-1x"></i> Summary of Benefits and Coverage
+  <% end %>
+<% else %>
+  <i class="fa fa-file-pdf-o fa-1x"></i> Summary of Benefits and Coverage
+<% end %>
