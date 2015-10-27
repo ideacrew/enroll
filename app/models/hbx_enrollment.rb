@@ -245,6 +245,10 @@ class HbxEnrollment
     !self.published_to_bus_at.blank?
   end
 
+  def is_shop?
+    !consumer_role.present?
+  end
+
   def is_shop_sep?
     return false if consumer_role.present?
     !("open_enrollment" == self.enrollment_kind)
