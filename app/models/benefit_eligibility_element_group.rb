@@ -38,6 +38,7 @@ class BenefitEligibilityElementGroup
   field :citizenship_status,    type: Array, default: ["any"]   # %w[any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident],
   field :residency_status,      type: Array, default: ["any"]   # %w[any state_resident],
   field :ethnicity,             type: Array, default: ["any"]   # %w[any indian_tribe_member],
+  field :cost_sharing,          type: String, default: ""
 
 
   # validates :eligible_relationship_categories,
