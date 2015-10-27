@@ -85,7 +85,7 @@ class InsuredEligibleForBenefitRule
   def is_residency_status_satisfied?
     return true if @benefit_package.residency_status.include?("any")
 
-    if @benefit_package.residency_status.include?("state_resident")
+    if @benefit_package.residency_status.include?("state_resident") and @role.present?
       person = @role.person
       return true if person.is_dc_resident?
 
