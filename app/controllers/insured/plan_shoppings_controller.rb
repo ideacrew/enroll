@@ -148,7 +148,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     @carriers = @carrier_names_map.values
-    @waivable = @hbx_enrollment.can_complete_shopping?
+    @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
@@ -189,11 +189,15 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    if @market_kind == 'shop'
-      @benefit_group = @hbx_enrollment.benefit_group
-      @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
-    elsif @market_kind == 'individual'
-      @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+    if @hbx_enrollment.blank?
+      @plans = [] 
+    else
+      if @market_kind == 'shop'
+        @benefit_group = @hbx_enrollment.benefit_group
+        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+      elsif @market_kind == 'individual'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      end
     end
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
