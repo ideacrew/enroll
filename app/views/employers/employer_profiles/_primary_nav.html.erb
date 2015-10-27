@@ -1,7 +1,7 @@
 <nav class="row">
   <ul>
     <li <%= menu_tab_class(active_tab, "home") %>>
-      <%= link_to 'MY DC Health Link', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
+      <%= link_to 'My DC Health Link', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
     </li>
     <li <%= menu_tab_class(active_tab, "employees") %>>
       <%= link_to 'Employees', employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), "aria-expanded" => "true" %>
@@ -44,7 +44,9 @@
 
     </div>
     <div class="panel-body">
-      <div>My Employees: <span class="fte-count"><%= @employer_profile.census_employees.count %></span></div>
+      <%= link_to employers_employer_profile_path(@employer_profile.id, :tab=>'employees') do %>
+      <div>My Employees: <span><%= @employer_profile.census_employees.count %></span></div>
+      <% end %>
     </div>
   </div>
 </nav>

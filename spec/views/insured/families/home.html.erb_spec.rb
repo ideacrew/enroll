@@ -8,6 +8,8 @@ RSpec.describe "insured/families/home.html.erb" do
     stub_template "insured/families/_navigation.html.erb" => ''
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
+    stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
+
     render file: "insured/families/home.html.erb"
   end
 

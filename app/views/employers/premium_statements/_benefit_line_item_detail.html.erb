@@ -1,7 +1,21 @@
-<td><%= mixed_case "Health" %></td>
-<td><%= enrollment.plan.name %></td>
-<td><%= enrollment.plan.carrier_profile.legal_name %></td>
-<td><%= enrollment.humanized_dependent_summary %></td>
-<td><%= number_to_currency enrollment.total_employer_contribution %></td>
-<td><%= number_to_currency enrollment.total_employee_cost %></td>
-<td><%= number_to_currency enrollment.total_premium %></td>
+<td>
+  <span>
+    <span class="coverage-kind"><%= mixed_case "Health" %></span> | # Covered: <%= enrollment.humanized_dependent_summary %>
+  </span>
+  <br/>
+  <span>
+    <%= enrollment.plan.carrier_profile.legal_name %> -- <%= enrollment.plan.name %>
+  </span>
+  <br/>
+</td>
+<td>
+  <span>
+    Employer Contribution: <%= number_to_currency enrollment.total_employer_contribution %>
+  </span>
+  <br/>
+  <span>
+    Employee Premium: <%= number_to_currency enrollment.total_employee_cost %>
+  </span>
+  <br/>
+  <strong>Total:</strong> <%= number_to_currency enrollment.total_premium %></td>
+</td>

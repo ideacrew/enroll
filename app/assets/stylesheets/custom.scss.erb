@@ -46,7 +46,7 @@ html {
     font-family: 'Open Sans', sans-serif;
 }
 body {
-    background-color: #F8F8F8;
+    background-color: #f2f2f2;
     min-height: 100%;
     position: relative;
     padding-top: 73px;
@@ -68,7 +68,14 @@ h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
 }
 
 #navbar .header-text {float: left;}
-#navbar .header-text a {display: table-cell;height: 70px;vertical-align: middle;}
+#navbar .header-text a {
+  display: table-cell;
+  height: 70px;
+  vertical-align: middle;
+  font-weight: 600;
+  font-size: 18px;
+  color: #5C5C5C;
+}
 
 .nav-info {
     font-size: 16px;
@@ -3823,10 +3830,9 @@ ul.list-right-section li a img {
 }
 
 .family-plan-selection ul.progress-wrapper {
-    margin: 10px 5px 30px;
-    padding-right: 10px;
+    margin: 5px 5px 25px;
+    padding-right: 15px;
     width: 140px;
-    height: 100px;
     float: right;
 }
 
@@ -3840,18 +3846,18 @@ ul.list-right-section li a img {
 }
 
 .family-plan-selection ul.progress-wrapper li.complete {
-    color: #468847;
+    color: #69A30D;
 }
 
 .family-plan-selection ul.progress-wrapper li.active {
-    color: #468847;
+    color: #69A30D;
 }
 
 .family-plan-selection ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #468847;
+    background-color: #69A30D;
 }
 .family-plan-selection ul.progress-wrapper li.active span.circle-progress {
-    border: 2px solid #468847;
+    border: 2px solid #69A30D;
 }
 
 .family-plan-selection .vertical-line-progress {
@@ -3879,6 +3885,9 @@ ul.list-right-section li a img {
 .family-plan-selection .status{
     text-align: right;
     padding-right: 11px;
+    label {
+
+    }
 }
 
 .family-plan-selection .status label{
@@ -3886,10 +3895,10 @@ ul.list-right-section li a img {
     padding-right: 0;
     margin-bottom: 0;
 }
-
-.family-plan-selection .status h4{
+.hbx-enrollment-panel .panel-body .family-plan-selection .status h4{
     margin-bottom: 0;
-    color: #468847;
+    color: #69A30D;
+    font-size: 22px;
     font-weight: 600 !important;
 }
 
@@ -3906,6 +3915,16 @@ ul.list-right-section li a img {
   background-image: none;
   padding-bottom: 0;
   border-bottom: 0;
+  background-color: transparent;
+  h4 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  small {
+    padding-top: 5px;
+    line-height: 135%;
+    display: block;
+  }
 }
 
 .hbx-enrollment-panel .panel-heading hr, .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
@@ -3914,10 +3933,9 @@ ul.list-right-section li a img {
 }
 
 .seps-panel ul{
-  margin-left: 25px;
 }
 #qle-details .hbx-enrollment-panel .panel-heading h4{
-  color: #468847;
+  color: #69A30D;
 }
 
 .qles-panel .panel-body, .seps-panel .panel-body{
@@ -3925,7 +3943,7 @@ ul.list-right-section li a img {
 }
 
 .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
-  margin-top: 10px;
+  margin: 15px 0;
 }
 
 
@@ -3948,10 +3966,8 @@ ul.list-right-section li a img {
 
 .my-account-page h1{
     color: #003260;
-    font-family: Open Sans;
-    font-size: 23pt;
-    font-weight: lighter !important;
-    margin-bottom: 0;
+    font-size: 36px;
+    margin-bottom: 10px;
     margin-top: 0;
 }
 
@@ -3974,13 +3990,12 @@ ul.list-right-section li a img {
     color: #7b7b7b;
     font-family: Open Sans;
     font-size: 13pt;
-    font-weight: 600 !important;
 }
 
 .hbx-enrollment-panel .panel-heading h4{
     font-variant: super;
-    margin-bottom: 0;
     margin-top: 0;
+    font-weight: bold;
     text-transform: uppercase;
 }
 
@@ -4505,11 +4520,8 @@ span.text_style {color: #616161 !important;}
 .btn-br {border-bottom-width: medium;}
 .btn-lg {border-radius: 3px;}
 .btn-waive {
-    border-color: #888 !important;
-    border-radius: 6px;
-    color: #888 !important;
-    margin: 0 52px;
-    width: 60%;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .btn-primary {
@@ -4829,6 +4841,28 @@ table.table.table-no-sytle td {
    height: 80px;
    padding-right: 10px;
 }
+.right-column {
+  .list-qle {
+    padding: 5px 15%;
+  }
+  .carousel-indicators {
+    margin-bottom: 0;
+    padding-top: 20px;
+  }
+  #qle-menu h5 {
+    margin:0;
+    padding-left: 15%;
+    font-weight: 400;
+    padding-bottom: 8px;
+    color: #7b7b7b;
+
+  }
+
+}
+.carousel-indicators {
+  position: relative;
+  padding-top: 10px;
+}
 
 .carousel-indicators li {
   border-color: #337ab7;
@@ -4841,11 +4875,30 @@ table.table.table-no-sytle td {
 .carousel-control {
   width: 10%;
 }
+.carousel-control .fa-angle-right,
+.carousel-control .fa-angle-left {
+  position: absolute;
+  top: 25%;
+  z-index: 5;
+  display: inline-block;
+}
+.carousel-control .icon-prev,
+.carousel-control .fa-angle-left {
+  left: 50%;
+}
+.carousel-control .icon-next,
+.carousel-control .fa-angle-right {
+  right: 50%;
+}
 
 .carousel-inner .item {
   margin: 0;
   padding: 0;
   border: none;
+}
+.carousel-inner {
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 #qle-header .info-wrapper {
@@ -4859,8 +4912,12 @@ table.table.table-no-sytle td {
 }
 
 #qle-menu h5 {
-  text-align: center;
   margin:0;
+  padding-left: 10%;
+  font-weight: 400;
+  padding-bottom: 8px;
+  color: #7b7b7b;
+
 }
 
 #carousel-qles a.qle-menu-item {
@@ -4947,7 +5004,7 @@ position: absolute;
   font-size: 12px;
 }
 ul.list-qle {
-  padding: 5px 30px;
+  padding: 5px 10%;
   overflow: visible;
 }
 

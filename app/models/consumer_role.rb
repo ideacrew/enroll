@@ -55,6 +55,8 @@ class ConsumerRole
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
+  field :contact_method, type: String, default: "Only Paper communication"
+  field :language_preference, type: String, default: "English"
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -163,6 +165,11 @@ class ConsumerRole
     consumer_role_id = BSON::ObjectId.from_string(consumer_role_id) if consumer_role_id.is_a? String
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
+
+  def self.all
+    Person.all_consumer_roles
+  end
+
 
   def is_active?
     self.is_active

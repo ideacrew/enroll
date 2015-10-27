@@ -171,6 +171,7 @@ And(/Individual again clicks on add member button/) do
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   scroll_then_click(@browser.button(text: /Confirm Member/))
+  @browser.button(text: /Confirm Member/).wait_while_present
 end
 
 
@@ -274,7 +275,7 @@ And(/^.+ clicks? the continue button$/i) do
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
-  wait_and_confirm_text(/Verify Identity: Consent/)
+  wait_and_confirm_text(/Verify Identity/)
 end
 
 When(/^CSR accesses the HBX portal$/) do
@@ -301,7 +302,7 @@ Then(/CSR opens the most recent Please Contact Message/) do
   wait_and_confirm_text /Please contact/
   sleep 1
   tr=@browser.trs(text: /Please contact/).last
-  scroll_then_click(tr.a(text: /show/))
+  scroll_then_click(tr.a(text: /show/i))
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
@@ -310,8 +311,8 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Assisting/
-  @browser.a(text: /I'm a Customer Service/i).click
+  wait_and_confirm_text /Trained/
+  @browser.a(text: /I'm a Trained Expert/i).click
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do

@@ -1,7 +1,6 @@
-
 <div class="col-xs-12 employer-edit-tab">
 <h1>Business Info</h1>
-    <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
+    <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(id: @organization.id), method: :put} do |f| %>
 
       <%#= render "shared/error_messages", object: f.object %>
       <% if @organization.errors.any? %>
@@ -29,6 +28,20 @@
           </ul>
         </div>
       <% end %>
+      <div>
+        <h4>Personal Information</h4>
+        <div class="row no-buffer row-form-wrapper">
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+            <%= text_field_tag :first_name, @employer.try(:first_name), class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+            <%= text_field_tag :last_name, @employer.try(:last_name), class: "floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+            <%= text_field_tag :dob, @employer.try(:dob), class: "date-picker floatlabel form-control", required: true, placeholder: 'DATE OF BIRTH *' %>
+          </div>
+        </div>
+      </div>
       <div class="">
         <h4> Employer Information</h4>
         <div class="row no-buffer row-form-wrapper">
@@ -43,7 +56,7 @@
         <br/>
         <div class="form-inputs">
           <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-trans pull-left' %>
-          <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile, tab: 'home'), class:'btn btn-trans pull-left' %>
+          <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-trans pull-left' %>
 
         </div>
 

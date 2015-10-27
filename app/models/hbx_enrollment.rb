@@ -24,7 +24,17 @@ class HbxEnrollment
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
-  ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+  ENROLLED_STATUSES = [
+      "coverage_selected",
+      "enrollment_transmitted_to_carrier",
+      "coverage_enrolled",
+      "coverage_renewed",
+      "enrolled_contingent",
+      "unverified"
+    ]
+
+  TERMINATED_STATUSES = ["coverage_terminated", "coverage_canceled", "unverified"]
+
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   embedded_in :household
@@ -83,6 +93,9 @@ class HbxEnrollment
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :changing, ->{ where(changing: true) }
+
+
+  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -184,7 +197,7 @@ class HbxEnrollment
 
   def census_employee
     if employee_role.present?
-      employee_role.census_employee 
+      employee_role.census_employee
     else
       benefit_group_assignment.census_employee
     end
@@ -218,7 +231,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage! if benefit_group_assignment
+    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
   end
 
   def propogate_selection

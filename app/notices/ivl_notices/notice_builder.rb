@@ -28,9 +28,13 @@ class IvlNotices::NoticeBuilder
   end
 
   def append_enrollments(hbx_enrollments)
-    @notice.enrollments << build_enrollment(@hbx_enrollment)
-    other_enrollments = hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id.to_s == @hbx_enrollment_id}
-    other_enrollments.each do |hbx_enrollment|
+    # @notice.enrollments << build_enrollment(@hbx_enrollment)
+    # other_enrollments = hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id.to_s == @hbx_enrollment_id}
+    # other_enrollments.each do |hbx_enrollment|
+    #   @notice.enrollments << build_enrollment(hbx_enrollment)
+    # end
+
+    hbx_enrollments.each do |hbx_enrollment|
       @notice.enrollments << build_enrollment(hbx_enrollment)
     end
   end
@@ -77,5 +81,13 @@ class IvlNotices::NoticeBuilder
     ivl_notice.notice = @notice
     ivl_notice.template = @template
     ivl_notice.create
+    ivl_notice.upload
+  end
+
+  def generate_html
+    ivl_notice = IvlPdfNotice.new
+    ivl_notice.notice = @notice
+    ivl_notice.template = @template
+    ivl_notice.save_html
   end
 end

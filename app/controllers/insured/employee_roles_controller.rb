@@ -71,7 +71,7 @@ class Insured::EmployeeRolesController < ApplicationController
         else
           @person..emails =[Email.new(kind: 'home', address: new_employee_email)]
         end
-      end   
+      end
       @family = @person.primary_family
       build_nested_models
     end
@@ -148,6 +148,7 @@ class Insured::EmployeeRolesController < ApplicationController
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
       { :email_attributes => [:kind, :address] },
+      { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
       :first_name,
       :last_name,
       :middle_name,
