@@ -20,6 +20,7 @@ function printElement(elem, append, delimiter) {
   }
 
   else if (append === true) {
+    $printSection.innerHTML = "";
     if (typeof(delimiter) === "string") {
       $printSection.innerHTML += delimiter;
     }
