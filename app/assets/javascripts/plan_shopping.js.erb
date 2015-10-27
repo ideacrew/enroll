@@ -223,19 +223,8 @@ $(function() {
   $(document).on('click', "#plans .plan-select.btn-select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-      var elected_pct = $("input[name='elected_pct']").val();
-      url = url + "&elected_pct=" + elected_pct;
-=======
       var elected_aptc = $("input#elected_aptc").val();
       url = url + "&elected_aptc=" + elected_aptc;
->>>>>>> bd6d51e... Merge branch 'release-1.0' into development
-=======
-      var elected_aptc = $("input#elected_aptc").val();
-      url = url + "&elected_aptc=" + elected_aptc;
->>>>>>> e19472d... fix merge conflict in app/models/unassisted_plan_cost_decorator.rb
     };
     window.location.href= url;
   });
