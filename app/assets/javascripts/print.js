@@ -1,5 +1,7 @@
 $(document).on('click', '#btnPrint', function(){
-  printElement(document.getElementById("printArea"));
+  var payment_text = document.getElementById("how_to_pay");
+  var payment_text_val = (payment_text == null) ? : "" : payment_text.innerHTML;
+  printElement(document.getElementById("printArea"), true, payment_text_val);
   window.print();
 });
 
