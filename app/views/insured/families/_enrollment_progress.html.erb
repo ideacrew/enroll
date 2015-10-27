@@ -1,6 +1,9 @@
-<% step = (defined? step) ? step.to_i : 1 %>
-<% percent_complete = 0 %>
-<% percent_complete = (step == 1) ? 20 : ((step == 2) ? 40 : ((step == 3) ? 60 : ((step == 4) ? 80 : ((step == 5) ? 100 : 0)))) %>
+<% step = (defined? step) ? step.to_i : 0 %>
+<%
+percent_complete = 0
+percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
+%>
+
 
 <h4>
   Status
