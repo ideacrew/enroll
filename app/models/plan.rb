@@ -324,6 +324,10 @@ class Plan
     (percent && percent > 0) ? percent : 1
   end
 
+  def is_csr?
+    (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

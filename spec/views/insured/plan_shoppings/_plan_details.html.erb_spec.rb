@@ -34,6 +34,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
+      allow(plan).to receive(:is_csr?).and_return false
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -79,6 +80,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
+      allow(plan).to receive(:is_csr?).and_return false
       allow(view).to receive(:current_cost).and_return(52)
       render "insured/plan_shoppings/plan_details", plan: plan
     end
