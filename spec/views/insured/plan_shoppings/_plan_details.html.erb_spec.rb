@@ -80,7 +80,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
-      allow(plan).to receive(:is_csr?).and_return false
+      allow(plan).to receive(:is_csr?).and_return true
       allow(view).to receive(:current_cost).and_return(52)
       render "insured/plan_shoppings/plan_details", plan: plan
     end
@@ -105,6 +105,10 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     it "should match css selector for standard plan" do
       expect(rendered).to have_css("i.fa-bookmark", text: /standard plan/i)
       expect(rendered).to have_css("h5.bg-title", text: /your current #{plan.active_year} plan/i)
+    end
+
+    it "should match fa-check-square for csr" do
+      expect(rendered).to have_css("i.fa-check-square-o")
     end
   end
 end
