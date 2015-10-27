@@ -3,7 +3,7 @@ class Products::QhpController < ApplicationController
   include Aptc
 
   before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
-  before_action :set_current_person, only: [:comparison]
+  before_action :set_current_person, only: [:comparison, :summary]
 
   def comparison
     params.permit("standard_component_ids", :hbx_enrollment_id)
