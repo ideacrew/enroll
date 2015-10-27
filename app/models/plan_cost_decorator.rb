@@ -37,8 +37,8 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select(){|member| relationship_for(member) == "child_under_26" && age_of(member) < 21} unless defined?(@children)
-    @children.index(member) || -1
+    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
+    @children.index(member)
   end
 
   def benefit_relationship(person_relationship)
@@ -99,6 +99,20 @@ class PlanCostDecorator < SimpleDelegator
   def large_family_factor(member)
     if age_of(member) > 20
       1.0
+    else
+      if child_index(member) > 2
+        0.0
+      else
+        1.0
+      end
+    end
+  end
+
+  def relationship_benefit_for(member)
+    relationship =
+    case member.class
+    when HbxEnrollmentMember
+      (relationship(member))
     else
       if child_index(member) > 2
         0.0

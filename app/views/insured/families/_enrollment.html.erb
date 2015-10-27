@@ -3,115 +3,266 @@
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
-      <h4><%= plan.active_year %> <%= plan.coverage_kind %> Coverage <span class="separator"><%= hbx_enrollment.employee_role.blank? ? 'DCHL' : hbx_enrollment.employer_profile.legal_name %></span></h4>
+      <h4 class="bg-title"><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
+        <span class="separator"><%= hbx_enrollment.employee_role.blank? ? 'Individual & Family' : hbx_enrollment.employer_profile.legal_name %></span>
+      </h4>
       <hr>
     </div>
 
     <div class="panel-body">
       <div class="row">
         <div class="col-xs-12">
-          <br/>
-          <div><%= display_carrier_logo(plan.try(:carrier_profile).try(:legal_name), {width: 110}) %></div>
-          <h4>
-            <strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %></strong>
-          </h4>
+          <div class="row">
+            <div class="col-xs-9" style="padding-right: 0;">
+              <div><%= display_carrier_logo(plan.try(:carrier_profile).try(:legal_name), {width: 110}) %></div>
+              <h4>
+                <%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %>
+              </h4>
 
-          <div><p><%= render_plan_type_details(plan) %></p></div>
-          <div>
-            <p>
-              <label>Premium:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
-              <label class="bullet-separator">&nbsp;DCHL ID:</label>
-              <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
-            </p>
-          </div>
-          <% if hbx_enrollment.consumer_role.present? and hbx_enrollment.try(:applied_aptc_amount) > 0 %>
-              <div>
+              <table style="table-layout: fixed; width: 100%; margin-top: 5%;">
+                <tr>
+                  <td>
+                    <div class="enrollment-type info">
+                      <p><%= render_plan_type_details(plan) %></p>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="enrollment-premium info">
+                      <p>
+                        <label>Premium:</label>
+                        <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="enrollment-type info">
+                      <p>
+                        <label class="bullet-separator">DC Healthlink ID:</label>
+                        <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id).try(:truncate, 8, omission: "").try(:upcase) %></strong>
+                      </p>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="enrollment-effective info">
+                      <label>Effective date:
+                      </label>
+                      <strong><%= hbx_enrollment.effective_on %></strong>
+                    </div>
+                  </td>
+                </tr>
+                <% if hbx_enrollment.consumer_role.present? and hbx_enrollment.try(:applied_aptc_amount) > 0 %>
+
+                <tr>
+                  <td>
+                    <div>
+                      <p>
+                        <label>APTC amount:</label>
+                        <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+
+                <% end %>
+
+              </table>
+
+              <% names = hbx_enrollment.covered_members_first_names %>
+              <div class="family-members info">
                 <p>
-                  <label>APTC amount:</label>
-                  <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
+                  <label>Covered:</label>
+                  <a href="#"><%= names.delete_at(0).camelcase %></a>
+                  <% names.each do |name| %>
+                  <span class="separator">
+                    <a href="#"><%= name.camelcase %></a>
+                  </span>
+                  <% end %>
                 </p>
               </div>
-          <% end %>
-          <% names = hbx_enrollment.covered_members_first_names %>
-          <div class="family-members">
-            <p>
-              <label>Covered:</label>
-              <a href="#"><%= names.delete_at(0).camelcase %></a>
-              <% names.each do |name| %>
-                  <span class="separator"><a href="#"><%= name.camelcase %></a></span>
-              <% end %>
-            </p>
-          </div>
-          <div>
-            <label>Effective date: </label>
-            <strong><%= hbx_enrollment.effective_on %></strong>
-          </div>
-        </div>
-        <!--
-        <div class="col-xs-4">
-          <div class="family-plan-selection">
-            <div class="status">
-              <%#= render partial: "enrollment_progress", locals: {step: hbx_enrollment.status_step} %>
+
+            </div>
+            <div class="col-xs-3">
+              <div class="family-plan-selection">
+                <div class="status">
+                  <%= render partial: "enrollment_progress", locals: {step: 2, hbx_enrollment: hbx_enrollment} %>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        -->
       </div>
 
-      <div class="row">
+      <div class="row" style="padding: 0 0 5px;">
         <div class="col-xs-4 fa-icon-link">
           <% if plan.sbc_document.present? %>
-              <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
-                  <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
-                  <div class="fa-icon-label">Summary of Benefits and Coverage</div>
-              <% end %>
+          <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
+          <%= link_to(document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z]/i,'')}.pdf", class: "download") do %>
+          <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
+          <div class="fa-icon-label">Summary of Benefits and Coverage</div>
+          <% end %>
           <% else %>
-              <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
+          <div data-toggle="tooltip" title="No summary is currently offered for this plan.">
+          <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
 
-              <div class="fa-icon-label">Summary of Benefits and Coverage</div>
+          <div class="fa-icon-label">Summary of Benefits and Coverage</div>
+        </div>
           <% end %>
         </div>
-        <div class="col-xs-3">
-          <a href="#">
-            <i class="fa fa-phone fa-2x pull-left"></i>
+        <div class="col-xs-3 fa-icon-link">
 
+          <a data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
+            <i class="fa fa-phone fa-2x pull-left"></i>
             <div class="fa-icon-label">Carrier Contact Info</div>
           </a>
-        </div>
-        <div class="col-xs-5">
-          <div class="row">
-          <div class="col-xs-12">
-            <div class="row">
-            <div class="col-xs-6">
-              <div class="row">
-          <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year), source: 'account'}), {class: 'btn btn-primary btn-sm pull-right', remote: true} %>
-        </div>
-        </div>
-        <div class="col-xs-6">
-          <div class="row">
+          <div class="modal fade carrier-contact" id="<%= plan.coverage_kind %>-<%= plan.id %>" role="dialog">
+            <div class="modal-dialog">
 
-          <% if hbx_enrollment.can_complete_shopping? %>
-              <%= link_to "Change Plan", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-primary btn-sm pull-right", style: 'margin-right: 20px;' %>
-          <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
-              <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-sm pull-right', style: 'margin-right: 20px;'} %>
-          <% end %>
-        </div>
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button class="close" data-dismiss="modal" type="button">&times;</button>
+                  <h4 class="modal-title"><%= plan.try(:carrier_profile).try(:legal_name)%>
+                    Customer Service Line</h4>
+                </div>
+                <div class="modal-body">
+                  <i class="fa fa-phone fa-3x"></i>
+                  <% if plan.coverage_kind == 'health' %>
+                  <div class="carrier-numbers">
+                    <% if plan.carrier_profile.legal_name == "CareFirst" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18554443119">1-855-444-3119</a>
+                      </strong>
 
-        </div>
-      </div>
+                    </div>
+                    <% elsif plan.carrier_profile.legal_name == "Aetna" %>
+                    <div>
+                      <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
+                      Call:
+                      <strong>
+                        <a href="tel:+18555866959">1-855-586-6959</a>
+                      </strong><br/>
+                      from 8am-6pm EST, Monday - Friday
+                      <br/>
+                      <br/>
+                      <strong>For Brokers and Employers</strong><br/>
+                      Call:
+                      <strong>
+                        <a href="tel:+18884222128">1-888-422-2128</a>
+                      </strong><br/>
+                      from 8am-5pm EST, Monday - Friday
+                      <br/>
+                      <br/>
+
+                      <strong>For Small Business Employees</strong><br/>
+                      Call:
+                      <strong>
+                        <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
+                      </strong><br/>
+                      from 8am-6pm EST, Monday - Friday
+                      <br/>
+
+                    </div>
+
+                    <% elsif plan.carrier_profile.legal_name == "Kaiser" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18007777902">1-800-777-7902</a>
+                      </strong>
+
+                    </div>
+                    <% elsif plan.carrier_profile.legal_name == "UnitedHealthcare" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18778562430">1-877-856-2430</a>
+                      </strong><br/>
+                    </div>
+                    <% end %>
+                  </div>
+                  <% else %>
+                  <div class="carrier-numbers">
+                    <% if plan.carrier_profile.legal_name == "CareFirst" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18554443119">1-855-444-3119</a>
+                      </strong><br/>
+                    </div>
+                    <% elsif plan.carrier_profile.legal_name == "Delta Dental" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18004710236">1-800-471-0236</a>
+                      </strong>
+                      or
+                      <strong>
+                        <a href="tel:+18004710275">1-800-471-0275</a>
+                      </strong>
+                      <br/>
+                    </div>
+
+                    <% elsif plan.carrier_profile.legal_name == "Dentegra" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18004710284">1-800-471-0284</a>
+                      </strong><br/>
+                    </div>
+                    <% elsif plan.carrier_profile.legal_name == "Dominion" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18552243016">1-855-224-3016</a>
+                      </strong><br/>
+                    </div>
+                    <% elsif @plan.carrier_profile.legal_name == "BestLife" %>
+                    <div><br/>
+                      Call: <strong><a href="tel:+18004330088">1-800-433-0088</a></strong><br/>
+                    </div>
+                    <% end %>
+                  </div>
+                  <% end %>
+                </div>
+              </div>
+
             </div>
           </div>
+
+        </div>
+        <div class="col-xs-5">
+
+          <div class="row">
+            <div class="col-xs-12 btn-stack">
+
+              <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year), source: 'account'}), {class: 'btn btn-primary btn-br pull-right mz', remote: true} %>
+
+            </div>
+            <div class="col-xs-12 btn-stack">
+
+              <% if hbx_enrollment.can_complete_shopping? %>
+              <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-trans pull-right" %>
+              <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
+              <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-trans pull-right' } %>
+              <% end %>
+
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
 
     <% if hbx_enrollment.kind == "individual" %>
     <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button aria-label="Close" class="close" data-dismiss="alert" type="button">
         <span aria-hidden="true">&times;</span>
       </button>
-      <strong>Important:</strong> Your enrollment application requires information that needs to be verified.
+      <strong>Important:</strong>
+      Your enrollment application requires information that needs to be verified.
       <%= link_to "Learn more", documents_index_insured_families_path %>
     </div>
     <% end %>

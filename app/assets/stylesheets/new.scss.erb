@@ -164,7 +164,7 @@
 
     }
   }
-  .employees-table, .premium-reports-table {
+  .employees-table, .premium-reports-table, .documents-table{
       margin-top: 20px;
       .table-responsive {
         border: solid 1px #d5d5d5;
@@ -232,16 +232,35 @@
       }
     }
   }
-  .premium-reports-table {
+  .premium-reports-table, .documents-table {
     table tr th {
-      font-size: 11px;
+      font-size: 14px;
       width: auto;
-      text-align: center;
-      padding: 10px 0;
+      padding: 10px 15px;
     }
     table tr td {
-      padding: 0;
-      text-align: center;
+      vertical-align: top;
+
+      span {
+        &.name {
+          color: #007bc4;
+          font-size: 14px;
+        }
+        &.benefit-group {
+          font-size: 14px;
+        }
+        &.coverage-kind {
+          text-transform: uppercase;
+        }
+      }
+      padding: 10px 15px;
+      text-align: left;
+      &:first-of-type {
+        font-size: 13px;
+      }
+      &:hover {
+        color: #333;
+      }
     }
 
 
@@ -337,12 +356,21 @@
 
     }
   }
+
   .benefits-tab, .home-tab {
     .fa {
       color: #007bc4;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
+      }
+    }
+    .alert-warning {
+      .fa {
+        color: inherit;
+      }
+      span {
+        color: #464646;
       }
     }
     .bg-title {
@@ -352,6 +380,7 @@
       font-size: 18px;
     }
   }
+
   #choose-coverage {
     .selectric {
       p.label {
@@ -362,8 +391,37 @@
     }
   }
 
-  .benefits-tab, .home-tab {
+  .benefits-tab, .home-tab, .my-broker {
+    .benefit-package {
+      position: relative;
+      .panel {
+        border: none;
+      }
+      .col-xs-1 {
 
+        .make-default {
+          color: #cccccc;
+          position: relative;
+          padding-top: 120%;
+          margin: 0;
+          display: block;
+          &.active {
+            color: #FFD700;
+          }
+          &:hover {
+            cursor: pointer;
+          }
+
+        }
+
+      }
+      &:hover {
+        .make-default {
+          display: block;
+
+        }
+      }
+    }
     .plan-details {
       display: none;
       .col-xs-4 {
@@ -379,6 +437,14 @@
     .details {
       cursor: pointer;
       margin-right:20px;
+    }
+    .benefit-details {
+      cursor: pointer;
+      &:hover {
+        >* {
+          color: #23527c;
+        }
+      }
     }
     .package-offering {
       border: solid 1px #b7b7b7;
@@ -423,7 +489,12 @@
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
       padding-bottom: 30px;
+      padding-top: 0;
       margin-bottom: 35px;
+      border-top: none;
+      border-bottom: solid 1px #b7b7b7;
+      border-left: solid 1px #b7b7b7;
+      border-right: solid 1px #b7b7b7;
       &>h2 {
         font-size: 16px;
       }
@@ -474,6 +545,32 @@
 
           }
         }
+      }
+      .package-offering {
+        border: none;
+        background-color: #ffffff;
+        padding: 10px 0 20px;
+        margin-top: 20px;
+        table {
+          &:first-of-type {
+            th {
+            }
+            tr {
+              td {
+                &:first-of-type {
+                  i {
+                    padding-right: 10px;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+      .est-month {
+        padding: 20px inherit 30px;
+        padding-bottom: 40px;
       }
     }
   }
@@ -934,7 +1031,7 @@
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
    .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab,
-   .premium-reports-tab, .waived-coverage {
+   .premium-reports-tab, .waived-coverage, .my-broker {
     .btn-primary {
       text-transform: uppercase;
       padding: 10px 20px;
@@ -1060,8 +1157,7 @@
           padding-top: 20px;
           margin-bottom: 0;
           &:last-of-type {
-            border-bottom: solid 1px #b7b7b7;
-            margin-bottom: 40px;
+            //border-bottom: solid 1px #b7b7b7;
           }
           section {
             &:last-of-type {
@@ -1178,7 +1274,7 @@
               margin-top: 0;
               padding-bottom: 10px;
               &:last-of-type {
-                border-top: solid 1px #b7b7b7;
+                //border-top: solid 1px #b7b7b7;
                 figure {
                   padding: 0;
                 }
@@ -1238,7 +1334,6 @@
           }
           &:last-of-type {
             article {
-              border-bottom: solid 1px #b7b7b7;
               padding-top: 0;
               cursor: pointer;
 

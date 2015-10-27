@@ -2,6 +2,7 @@
   .row
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
       %h3 Verify Identity
+      %h4 Please answer the following security questions. When you’re finished click "Submit".
       = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
         = f.hidden_field :session_id
         = f.hidden_field :transaction_id
@@ -19,7 +20,7 @@
                   = qf.radio_button :response_id, r.response_id
                   %span= r.response_text
         %br
-        = f.submit "Submit", class: 'btn btn-lg btn-primary'
+        = f.submit "Submit", class: 'btn btn-lg btn-primary btn-br'
     .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
       = render  partial: 'shared/individual_progress', locals: {step: '2'}
       .btn.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}

@@ -8,8 +8,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:employer_profile1) { FactoryGirl.create(:employer_profile) }
     let(:employer_profile2) { FactoryGirl.create(:employer_profile) }
 
-    context 'when broker agency id present' do 
-      it 'should return employers for the broker agency', dbclean: :after_each do 
+    context 'when broker agency id present' do
+      it 'should return employers for the broker agency', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
         sign_in(user)
@@ -27,8 +27,8 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context 'when broker agency id not present' do 
-      it 'should return all the employers in the system', dbclean: :after_each do 
+    context 'when broker agency id not present' do
+      it 'should return all the employers in the system', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
         sign_in(user)
@@ -412,8 +412,16 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("user")}
     let(:employer_profile) { double("EmployerProfile") }
     let(:organization) { double("Organization", id: "test") }
-    let(:person) { double("Person") }
-    let(:staff_roles){ [double("StaffRole")] }
+    let(:person) { FactoryGirl.build(:person) }
+    let(:staff_roles){ [person] }
+    let(:organization_params) {
+      {
+          :entity_kind => "an entity kind",
+          :dba => "a dba",
+          :fein => "123456789",
+          :legal_name => "a legal name",
+      }
+    }
 
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
@@ -421,9 +429,17 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
+      allow(organization).to receive(:office_locations).and_return(true)
+
+      allow(organization).to receive(:assign_attributes).and_return(true)
+      allow(organization).to receive(:save).and_return(true)
+      allow(organization).to receive(:update_attributes).and_return(true)
+
+      allow(controller).to receive(:organization_profile_params).and_return({})
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
       allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
+      allow(employer_profile).to receive(:match_employer).and_return person
     end
 
     it "should redirect" do
@@ -431,6 +447,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
+
       put :update, id: organization.id
       expect(response).to be_redirect
     end
@@ -451,7 +468,16 @@ RSpec.describe Employers::EmployerProfilesController do
         put :update, id: organization.id
         expect(response).to be_redirect
       end
+    end
 
+    it "should update person info" do
+      allow(user).to receive(:save).and_return(true)
+      sign_in(user)
+      expect(Organization).to receive(:find)
+
+      put :update, id: organization.id, first_name: "test", organization: organization_params
+      expect(person.first_name).to eq "test"
+      expect(response).to be_redirect
     end
   end
 

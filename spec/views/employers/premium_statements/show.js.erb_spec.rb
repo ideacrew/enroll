@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "employers/premium_statements/show.js.erb" do
   let(:start_on){ TimeKeeper.date_of_record.beginning_of_month }
-  
+
   def new_hbx_enrollment
     random_value = rand(999_999_999)
     instance_double(
@@ -28,7 +28,7 @@ describe "employers/premium_statements/show.js.erb" do
   def new_census_employee
     instance_double(
       "CensusEmployee",
-      full_name: "my funny name",
+      full_name: "My Funny Name",
       ssn: "my funny ssn",
       dob: "my funny dob",
       hired_on: "my funny hired_on",
@@ -39,7 +39,7 @@ describe "employers/premium_statements/show.js.erb" do
   def new_benefit_group
     instance_double(
       "BenefitGroup",
-      title: "my benefit group"
+      title: "My Benefit Group"
     )
   end
 

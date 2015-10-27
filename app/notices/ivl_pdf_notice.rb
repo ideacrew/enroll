@@ -12,11 +12,10 @@ class IvlPdfNotice < Notice
   end
 
   def prepend_envelope
-    envelope_path = Rails.root.join('pdfs', 'envelope.pdf')
     envelope = Envelope.new
     envelope.fill_envelope(@notice)
-    envelope.render_file(envelope_path)
-    join_pdfs [envelope_path, @notice_path]
+    envelope.render_file(@envelope_path)
+    join_pdfs [@envelope_path, @notice_path]
   end
 
   def attach_dchl_rights
@@ -24,7 +23,7 @@ class IvlPdfNotice < Notice
   end
 
   def attach_blank_page
-    blank_page = Rails.root.join('lib/pdf_pages', 'blank.pdf')
+    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
 
     page_count = Prawn::Document.new(:template => @notice_path).page_count
     if (page_count % 2) == 1

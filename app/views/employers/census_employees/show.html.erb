@@ -102,8 +102,9 @@
           <% if dependents.present? %>
           <table style='width:100%;'>
 
-            <% dependents.each do |dependent| %>
-            <% if dependent.relationship == "self"%>
+            <% dependents.each do |dependent|
+              relationship = dependent.try(:relationship) || dependent.try(:employee_relationship)
+              if relationship == "self"%>
             <% else %>
               <tr>
                 <th>Name</th>
@@ -119,7 +120,6 @@
                 <%= format_date dependent.dob %>
               </td>
               <td>
-                <% relationship = dependent.try(:relationship) || dependent.try(:employee_relationship) %>
                 <%= relationship == "child_under_26" ? "child" : relationship %>
               </td>
               <td>

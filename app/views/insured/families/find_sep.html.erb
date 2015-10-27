@@ -5,7 +5,7 @@
       <div class="seps-panel panel panel-default">
         <div class="panel-heading" style="margin-bottom: 10px;">
           <div class="row">
-            <div class="col-sm-12 col-xs-12 info-wrapper">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
               <h4><strong>Have you or anyone in your household recently experienced any of the following events?</strong></h4>
             </div>
           </div>
@@ -19,14 +19,14 @@
             </div>
           </div>
         </div>
-      </div>
+      </div
 
       <%#= form_tag(:insured_plan_shopping) do %>
       <%= hidden_field_tag 'id', @hbx_enrollment_id %>
       <%= hidden_field_tag 'market_kind', @market_kind %>
       <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
       <div style="text-align: center; margin-bottom: 15px;">
-        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> I’ve not had a recent Qualifying Life Event.
+        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> None of the situations listed above apply.
       </div>
       <%# end %>
 
@@ -38,7 +38,7 @@
         <% if @market_kind == 'shop' %>
         <%= render  partial: 'shared/sep_shop_progress', locals: {step: '4'} %>
         <% else %>
-        <%= render  partial: 'shared/sep_progress', locals: {step: '3'} %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: true, button_continue: false} %>
         <% end %>
       <% else %>
         <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>

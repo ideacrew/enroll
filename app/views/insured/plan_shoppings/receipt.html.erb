@@ -53,8 +53,11 @@
                 <div class="carrier-numbers">
                   <% if @plan.carrier_profile.legal_name == "CareFirst" %>
                   <div>
-                    Call: <strong><a href="tel:+18554443119">1-855-444-3119</a></strong><br/>
+                    Call: <strong><a href="tel:+18554443119">1-855-444-3119</a></strong>
+                    <!-- comment out congressional phone numbers
+                    <br/>
                     For Congressional Employees: <strong><a href="tel:+18557922587">1-855-792-2587</a></strong>
+                    -->
                   </div>
                   <% elsif @plan.carrier_profile.legal_name == "Aetna" %>
                   <div>
@@ -73,18 +76,24 @@
                     Call: <strong><a href="tel:+1-855-885-3289">Call 1-855-885-3289</a></strong><br/>
                     from 8am-6pm EST, Monday - Friday
                     <br/>
+                    <!-- comment out congressional phone numbers
+
                     <br/>
 
                     <strong>For Congressional Employees</strong><br/>
                     Call: <strong><a href="tel:+1-800-544-0526">1-800-544-0526</a></strong><br/>
                     from 8am-8pm EST, Monday - Friday
                     <br/>
+                    -->
                   </div>
 
                   <% elsif @plan.carrier_profile.legal_name == "Kaiser" %>
                   <div>
-                    Call: <strong><a href="tel:+18007777902">1-800-777-7902</a></strong><br/>
+                    Call: <strong><a href="tel:+18007777902">1-800-777-7902</a></strong>
+                    <!-- comment out congressional phone numbers
+                    <br/>
                     For Congressional Employees: <strong><a href="tel:+18552513209">1-855-251-3209</a></strong>
+                  -->
                   </div>
                   <% elsif @plan.carrier_profile.legal_name == "UnitedHealthcare" %>
                   <div>
@@ -116,9 +125,7 @@
                   </div>
                   <% elsif @plan.carrier_profile.legal_name == "Delta Dental" %>
                   <div><br/>
-                    Call: <strong><a href="tel:+18004710236">1-800-471-0236</a></strong><br/>
-                    For Customer Service: <strong><a href="tel:+18004710275">1-800-471-0275</a></strong>
-
+                    Call: <strong><a href="tel:+18004710236">1-800-471-0236</a></strong> or <strong><a href="tel:+18004710275">1-800-471-0275</a></strong>
                     <br/>
                   </div>
 
@@ -129,6 +136,10 @@
                   <% elsif @plan.carrier_profile.legal_name == "Dominion" %>
                   <div><br/>
                     Call: <strong><a href="tel:+18552243016">1-855-224-3016</a></strong><br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "BestLife" %>
+                  <div><br/>
+                    Call: <strong><a href="tel:+18004330088">1-800-433-0088</a></strong><br/>
                   </div>
                   <% end %>
                 </div>
