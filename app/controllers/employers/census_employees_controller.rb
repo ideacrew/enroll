@@ -47,7 +47,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-    binding.pry
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
