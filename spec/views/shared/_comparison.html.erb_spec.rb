@@ -7,7 +7,7 @@ describe "shared/_comparison.html.erb" do
   let(:mock_member){ instance_double("HbxEnrollmentMember",primary_relationship: "self:#{random_value}", person: mock_person)}
   let(:mock_organization){ instance_double("Oganization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
-  let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [mock_member, mock_member], :id => "3241251524") }
+  let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [mock_member, mock_member], :id => "3241251524", plan: mock_plan) }
   let(:mock_plan) { double("Plan",
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
@@ -25,12 +25,15 @@ describe "shared/_comparison.html.erb" do
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "A Plan Name")}
   let(:mock_qhps) {[mock_qhp]}
   let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
+  let(:mock_family){ double("Family") }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
     allow(mock_plan).to receive(:sbc_document).and_return(sbc_document)
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
     allow(mock_hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
+    allow(mock_person).to receive(:primary_family).and_return(mock_family)
+    allow(mock_family).to receive(:enrolled_hbx_enrollments).and_return([mock_hbx_enrollment])
     assign(:visit_types, [])
     assign :plan, mock_plan
     assign :person, mock_person
