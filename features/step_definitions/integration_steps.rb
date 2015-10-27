@@ -644,8 +644,8 @@ And(/I select three plans to compare/) do
     compare_options[1].click
     compare_options[2].click
     click_when_present(@browser.a(text: "COMPARE PLANS"))
-    @browser.h3(text: /Plan Comparison/).wait_until_present
-    expect(@browser.elements(:class => "glyphicon-download-alt").size).to eq 3
+    @browser.h3(text: /Choose Plan - Compare Selected Plans/).wait_until_present
+    expect(@browser.elements(:class => "sbc_link").size).to eq 3
     @browser.button(text: 'Close').click
   end
 end

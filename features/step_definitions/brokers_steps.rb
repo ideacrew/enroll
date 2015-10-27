@@ -87,7 +87,7 @@ end
 And(/^.+ should receive an invitation email$/) do
   open_email("ricky.martin@example.com")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
-  #current_email.should have_subject('DCHealthLink Invitation ') # To Follow up. What kind of email should this broker receive?
+  #current_email.should have_subject('Invitation from your Employer to Sign up for Health Insurance at DC Health Link ')
 end
 
 When(/^.+ visits? invitation url in email$/) do

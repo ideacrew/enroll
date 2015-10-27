@@ -2,7 +2,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
-    initialize_common_vars 
+    initialize_common_vars
 
     if params[:employee_role_id].present?
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == params["employee_role_id"].to_s }
@@ -17,7 +17,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
     if @market_kind == 'individual'
       if params[:hbx_enrollment_id].present?
-        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id] 
+        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end

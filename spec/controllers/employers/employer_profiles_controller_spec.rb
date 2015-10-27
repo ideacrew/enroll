@@ -8,8 +8,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:employer_profile1) { FactoryGirl.create(:employer_profile) }
     let(:employer_profile2) { FactoryGirl.create(:employer_profile) }
 
-    context 'when broker agency id present' do 
-      it 'should return employers for the broker agency', dbclean: :after_each do 
+    context 'when broker agency id present' do
+      it 'should return employers for the broker agency', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
         sign_in(user)
@@ -27,8 +27,8 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context 'when broker agency id not present' do 
-      it 'should return all the employers in the system', dbclean: :after_each do 
+    context 'when broker agency id not present' do
+      it 'should return all the employers in the system', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
         sign_in(user)
@@ -468,12 +468,10 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to be_redirect
       end
     end
-
     it "should update person info" do
       allow(user).to receive(:save).and_return(true)
       sign_in(user)
       expect(Organization).to receive(:find)
-
       put :update, id: organization.id, first_name: "test", organization: organization_params
       expect(person.first_name).to eq "test"
       expect(response).to be_redirect

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TaxHousehold, type: :model do
   let(:family)  { FactoryGirl.create(:family) }
-  
+
 
 
 # describe TaxHousehold do
@@ -197,12 +197,12 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
-  context "current_max_aptc" do 
+  context "current_max_aptc" do
     before :each do
-      @tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record) 
+      @tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
     end
 
-    it "return max aptc when in the same year" do 
+    it "return max aptc when in the same year" do
       allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record, max_aptc: 100))
       expect(@tax_household.current_max_aptc).to eq 100
     end

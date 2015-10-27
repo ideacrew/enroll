@@ -139,11 +139,7 @@
               <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
             <% end %>
           <% elsif @change_plan.blank? %>
-            <% if @employee_role.present? && !@employee_role.is_under_open_enrollment? %>
-            <%= render  partial: 'shared/sep_shop_progress', locals: {step: '5'} %>
-            <% else %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
-            <% end %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>

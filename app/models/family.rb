@@ -54,8 +54,8 @@ class Family
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
   index({"households.hbx_enrollments.benefit_group_id" => 1})
 
-  index({"households.hbx_enrollments.aasm_state" => 1, 
-         "households.hbx_enrollments.created_at" => 1}, 
+  index({"households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.created_at" => 1},
          {name: "state_and_created"})
 
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
@@ -147,18 +147,15 @@ class Family
   end
 
   def enrolled_benefits
-    latest_household.try(:enrolled_hbx_enrollments)
+    # latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def terminated_benefits
-    latest_household.try(:terminated_hbx_enrollments)
   end
 
-  def renewing_benefits
-    latest_household.try(:renewal_hbx_enrollments)
+  def renewal_benefits
   end
 
-  # remove
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -375,14 +372,14 @@ class Family
     return unless broker_role_id
     existing_agency = broker_agency_accounts.detect { |account| account.is_active? }
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
-    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id  
+    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id
     fire_broker_agency(existing_agency) if different_agency
     if !existing_agency || different_agency
       start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
       broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
       broker_agency_accounts << broker_agency_account
       self.save
-    end  
+    end
   end
 
   def fire_broker_agency(existing_agency)
