@@ -36,11 +36,11 @@ describe "shared/_summary.html.erb" do
   end
 
   it "should have a link to download the sbc pdf" do
-    expect(rendered).to include("<a class=\"download\" href=\"/document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&amp;filename=APlanName.pdf\">")
+    expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
   end
 
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
-    expect(rendered).to include('Summary of Benefits and Coverage (SBC)')
+    expect(rendered).to include('Summary of Benefits and Coverage')
   end
 
   it "should not have 'having a baby'" do
