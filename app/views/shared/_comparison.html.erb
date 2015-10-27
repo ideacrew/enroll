@@ -1,34 +1,38 @@
 <div class="modal-body">
   <div id="printArea">
-    <h3> Plan Comparison </h3>
-    <h4 class="emphasize">PLEASE REVIEW SBC FOR ANY COINSURANCE COSTS.</h4>
+    <h3> Choose Plan - Compare Selected Plans </h3>
+    <h5> Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget. </h5>
+    <h4 class="emphasize">Important: Please review SBC for any coinsurance costs.</h4>
+    <%= render "shared/plan_shoppings/more_plan_details" %>
     <table class="table bordered", border = "1", style="font-size:11px;" >
       <tr>
-        <th>Carrier</th>
+        <th>Plans</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2"><%= qhp.plan.carrier_profile.organization.legal_name %></th>
+          <th colspan="2"><%= display_carrier_logo(qhp.plan.carrier_profile.organization.legal_name, {width: 80}) %></th>
         <% end %>
       </tr>
       <tr>
-        <th>Plan Name</th>
+        <th></th>
         <% qhps.each do |qhp|%>
           <th colspan="2"><%= qhp.plan_marketing_name %></th>
         <% end %>
       </tr>
       <tr>
-        <th>Your Cost</th>
+        <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2"><%=number_to_currency(qhp[:total_employee_cost])%></th>
+          <th colspan="2"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= qhp.plan.metal_level.humanize %></span> &nbsp;&#149;&nbsp;
+          <%= qhp.plan.plan_type.upcase %>
+          </th>
         <% end %>
       </tr>
       <tr>
-        <th>Provider Network</th>
+        <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC Area Network" %></th>
+          <th colspan="2"><%=number_to_currency(qhp[:total_employee_cost]) + " / month" %></th>
         <% end %>
       </tr>
       <tr>
-        <th>SBC Link</th>
+        <th></th>
         <% qhps.each do |qhp|%>
           <th colspan="2">
             <% if qhp.plan.sbc_document.present? %>
@@ -42,13 +46,21 @@
                 <div class="fa-icon-label" style="display: inline; font-size: 8px; position: relative; top: 5px;">Summary of Benefits and Coverage</div>
               </div>
             <% end %>
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
           </th>
         <% end %>
       </tr>
       <tr>
-        <th>Plan Benefits</th>
+        <th>Provider Network</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2">In Network</th>
+          <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+        <% end %>
+      </tr>
+      <tr>
+        <th>PLAN BENEFITS <br> (In Network)</th>
+        <% qhps.each do |qhp|%>
+          <th colspan="1"> CO-PAY </th>
+          <th colspan="1"> COINSURANCE </th>
         <% end %>
       </tr>
       <% @visit_types.each do |visit_type| %>
@@ -58,11 +70,30 @@
             <% matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type } %>
             <% if matching_benefit %>
               <% deductible = matching_benefit.find_deductible %>
-              <td  colspan="2"><%= deductible.present? ? deductible.copay_in_network_tier_1 : "None" %></td>
+              <td  colspan="1"><%= deductible.present? ? deductible.copay_in_network_tier_1 : "N/A" %></td>
+              <td  colspan="1"><%= deductible.present? ? deductible.co_insurance_in_network_tier_1 : "N/A" %></td>
             <% end %>
           <% end %>
         </tr>
       <%end%>
+      <tr>
+        <th></th>
+        <% qhps.each do |qhp|%>
+          <th colspan="2">
+            <div>
+              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.plan } %>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+      <tr>
+        <th></th>
+        <% qhps.each do |qhp|%>
+          <th colspan="2">
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
+          </th>
+        <% end %>
+      </tr>
     </table>
   </div>
 </div>

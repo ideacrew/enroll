@@ -23,7 +23,7 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
-  def latest_eligibility_determination 
+  def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 

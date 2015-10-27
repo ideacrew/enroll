@@ -14,8 +14,9 @@ class Employers::EmployerProfilesController < ApplicationController
       @orgs = Organization.search(@q).exists(employer_profile: true)
     else
       @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
+
     end
-    
+
     if @q.blank?
       @page_alphabets = page_alphabets(@orgs, "legal_name")
       page_no = cur_page_no(@page_alphabets.first)

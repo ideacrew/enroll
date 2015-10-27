@@ -95,6 +95,9 @@ class HbxEnrollment
   scope :changing, ->{ where(changing: true) }
   scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
+
+  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
 

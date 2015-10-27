@@ -296,7 +296,7 @@ class Plan
 
   def ehb
     percent = read_attribute(:ehb)
-    percent > 0 ? percent : 1
+    (percent && percent > 0) ? percent : 1
   end
 
   class << self
