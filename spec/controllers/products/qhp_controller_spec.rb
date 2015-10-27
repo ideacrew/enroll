@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
-  let(:hbx_enrollment){double("HbxEnrollment", kind: "shop")}
+  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan)}
+  let(:plan) { double(coverage_kind: '') }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
@@ -16,6 +17,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
     end
+
     it "should return comparison of multiple plans" do
       sign_in(user)
       get :comparison, standard_component_ids: ["11111111111111"]
@@ -24,7 +26,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id")) }
+    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan) }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp) { [double("Qhp", plan: double("Plan"))] }
@@ -108,6 +110,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(qhp3).to receive(:plan).and_return plan3
       allow(qhp4).to receive(:plan).and_return plan4
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_employee_cost: 100))
+      allow(hbx_enrollment).to receive(:plan).and_return(plan)
     end
 
     it "should return comparison of a plan" do
