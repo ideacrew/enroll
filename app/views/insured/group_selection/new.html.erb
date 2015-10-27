@@ -12,8 +12,9 @@
     <% else %>
     <%= form_tag(:insured_group_selections) do %>
       <div class="col-xs-8">
-        <h1>Choose Benefits: Covered Family Members</h1>
-        <h4><strong>Who would you like to cover?</strong></h4>
+        <h1>Choose Plan for your Household</h1>
+        <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
+        <h4><strong>Who needs coverage?</strong></h4>
 
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
@@ -122,9 +123,11 @@
               <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% end %>
           <% else %>
-            <h3>Select a plan</h3>
-            <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
+            <!--<h3>Select a plan</h3>-->
+            <!--<p class="text-justify"><%= t('welcome.employee.select_plan') %></p>-->
           <% end %>
+          <br/>
+          <br/>
           <%= link_to "Back to my account", family_account_path, class: 'btn btn-primary btn-br' %>
         </div>
 
