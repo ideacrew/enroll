@@ -91,14 +91,14 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.employee_role.present? %>
+<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.try(:employee_role).present? %>
 
 <%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
 
 <script type="text/javascript">
   window.onload = function() {
     $.ajax({
-      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) %>",
+      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
       type: "GET"
     });
   };

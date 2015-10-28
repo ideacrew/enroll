@@ -211,7 +211,7 @@ class Plan
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze)}, 
+                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"}, 
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -232,7 +232,7 @@ class Plan
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze)}, 
+                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"}, 
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -334,6 +334,10 @@ class Plan
     (percent && percent > 0) ? percent : 1
   end
 
+  def is_csr?
+    (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
@@ -359,8 +363,18 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:)
-      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables
+    def individual_plans(coverage_kind:, active_year:, tax_household:)
+      case coverage_kind
+      when 'dental'
+        Plan.individual_dental_by_active_year(active_year).with_premium_tables
+      when 'health'
+        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        if csr_kind.present?
+          Plan.individual_health_by_active_year_and_csr_kind(active_year, csr_kind).with_premium_tables
+        else
+          Plan.individual_health_by_active_year_and_csr_kind(active_year).with_premium_tables
+        end
+      end
     end
   end
 end

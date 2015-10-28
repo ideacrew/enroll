@@ -8,6 +8,7 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
@@ -263,6 +264,10 @@ class HbxEnrollment
     !self.published_to_bus_at.blank?
   end
 
+  def is_shop?
+    !consumer_role.present?
+  end
+
   def is_shop_sep?
     return false if consumer_role.present?
     !("open_enrollment" == self.enrollment_kind)
@@ -295,7 +300,13 @@ class HbxEnrollment
   end
 
   def employer_profile
-    self.try(:employee_role).employer_profile
+    if self.employee_role.present?
+      self.employee_role.employer_profile
+    elsif !self.benefit_group_id.blank?
+      self.benefit_group.employer_profile
+    else
+      nil
+    end
   end
 
   def enroll_step
@@ -379,7 +390,8 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    tax_household = household.latest_active_tax_household rescue nil
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -529,6 +541,9 @@ class HbxEnrollment
       raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
+  rescue
+    log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
+    nil
   end
 
   def self.find_by_benefit_groups(benefit_groups = [])

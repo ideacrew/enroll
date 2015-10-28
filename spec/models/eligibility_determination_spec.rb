@@ -85,9 +85,6 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
           expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
         end
       end
-
     end
   end
-
-
 end
