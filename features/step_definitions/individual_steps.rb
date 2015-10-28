@@ -477,7 +477,7 @@ Then(/Aptc user should see aptc amount and click on confirm button on thanyou pa
 end
 
 Then(/Aptc user should see aptc amount on receipt page/) do
-  @browser.h3(text: /Purchase confirmation/).wait_until_present
+  @browser.h1(text: /Enrollment Submitted/).wait_until_present
   expect(@browser.td(text: "$20.00").visible?).to be_truthy
 end
 
