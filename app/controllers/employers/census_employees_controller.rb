@@ -128,6 +128,7 @@ class Employers::CensusEmployeesController < ApplicationController
         new_census_employee.hired_on = @rehiring_date
         if new_census_employee.valid? and @census_employee.valid?
           @census_employee.save
+          new_census_employee.save
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?

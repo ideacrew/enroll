@@ -281,6 +281,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
         it "rehire success" do
           allow(new_census_employee).to receive(:valid?).and_return(true)
+          allow(new_census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
@@ -291,6 +292,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
         it "when success should return new_census_employee" do
           allow(new_census_employee).to receive(:valid?).and_return(true)
+          allow(new_census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
