@@ -64,21 +64,8 @@
       </div>
       <div class="col-xs-4">
         <div class="row">
-        <% if plan.sbc_document.present? %>
-            <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
-            <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
-                <div>
-                  <i class="fa fa-file-pdf-o fa-1x" style="position: relative; top: 7px;"></i>
-                  <div class="fa-icon-label" style="display: inline; font-size: 8px; position: relative; top: 5px;">Summary of Benefits and Coverage</div>
-            <% end %>
-            </div>
-        <% else %>
-            <div>
-              <i class="fa fa-file-pdf-o fa-1x" style="position: relative; top: 7px;"></i>
-              <div class="fa-icon-label" style="display: inline; font-size: 8px; position: relative; top: 5px;">Summary of Benefits and Coverage</div>
-            </div>
-        <% end %>
-      </div></div>
+          <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan, custom_css: true } %>
+        </div></div>
       <% if !@enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
           <div class="col-md-5 col-sm-5 col-xs-5 text-right">
             <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-select pull-right btn-right plan-select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %> &nbsp;
