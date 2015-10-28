@@ -294,7 +294,12 @@ class HbxEnrollment
   end
 
   def employer_profile
-    self.try(:employee_role).employer_profile
+    if self.employee_role.present?
+    elsif !self.benefit_group_id.blank?
+      self.benefit_group.employer_profile
+    else
+      nil
+    end
   end
 
   def plan=(new_plan)

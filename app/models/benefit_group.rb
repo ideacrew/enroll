@@ -38,6 +38,7 @@ class BenefitGroup
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
+  delegate :employer_profile, to: :plan_year, allow_nil: true
   
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
