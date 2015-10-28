@@ -76,7 +76,7 @@ class Products::QhpController < ApplicationController
 
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "employer_sponsored") ? "employer_sponsored" : "individual"
-    @coverage_kind = (params[:coverage_kind] == "health" || @hbx_enrollment.plan.coverage_kind == "health") ? "health" : "dental"
+    @coverage_kind = (params[:coverage_kind] == "health" || @hbx_enrollment.coverage_kind == "health") ? "health" : "dental"
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
