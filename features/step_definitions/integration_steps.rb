@@ -586,8 +586,8 @@ When(/^I click on "(.*?)" button on household info page$/) do |select_action|
 end
 
 When(/^I click on continue on qle confirmation page$/) do
-  @browser.element(text: /Purchase confirmation/i).wait_until_present
-  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  @browser.element(text: /Enrollment Submitted/i).wait_until_present
+  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
   screenshot("qle_confirm")
   click_when_present(@browser.a(text: /go to my account/i))
 end
