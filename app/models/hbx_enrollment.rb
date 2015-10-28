@@ -394,7 +394,8 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    tax_household = household.latest_active_tax_household rescue nil
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -539,6 +540,9 @@ class HbxEnrollment
       raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
+  rescue
+    log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
+    nil
   end
 
   def self.find_by_benefit_groups(benefit_groups = [])
