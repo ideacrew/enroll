@@ -33,7 +33,7 @@ class Products::QhpController < ApplicationController
           true
         else
           false
-        end 
+        end
       end
 
       @qhps = @qhps.each do |qhp|

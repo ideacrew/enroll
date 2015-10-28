@@ -12,7 +12,7 @@ RSpec.describe "insured/families/_enrollment_progress.html.erb" do
   end
 
   it "should display percent_complete" do
-    expect(rendered).to have_selector("label", text:"40% Complete")
+    expect(rendered).to have_selector("label", text:"66% Complete")
   end
 
   it "should display title" do

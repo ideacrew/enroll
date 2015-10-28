@@ -483,7 +483,7 @@ end
 Then(/^.+ should see the receipt page$/) do
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   screenshot("receipt_page")
-  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).click
 end
 
@@ -586,8 +586,8 @@ When(/^I click on "(.*?)" button on household info page$/) do |select_action|
 end
 
 When(/^I click on continue on qle confirmation page$/) do
-  @browser.element(text: /Purchase confirmation/i).wait_until_present
-  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  @browser.element(text: /Enrollment Submitted/i).wait_until_present
+  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
   screenshot("qle_confirm")
   click_when_present(@browser.a(text: /go to my account/i))
 end
@@ -645,7 +645,7 @@ And(/I select three plans to compare/) do
     compare_options[2].click
     click_when_present(@browser.a(text: "COMPARE PLANS"))
     @browser.h3(text: /Choose Plan - Compare Selected Plans/).wait_until_present
-    expect(@browser.elements(:class => "sbc_link").size).to eq 3
+    expect(@browser.elements(:class => "plan_comparison").size).to eq 3
     @browser.button(text: 'Close').click
   end
 end

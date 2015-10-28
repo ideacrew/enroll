@@ -54,8 +54,8 @@ class Family
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
   index({"households.hbx_enrollments.benefit_group_id" => 1})
 
-  index({"households.hbx_enrollments.aasm_state" => 1, 
-         "households.hbx_enrollments.created_at" => 1}, 
+  index({"households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.created_at" => 1},
          {name: "state_and_created"})
 
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
@@ -64,11 +64,17 @@ class Family
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.applied_aptc_amount" => 1})
 
+  index({"households.tax_households.hbx_assigned_id" => 1})
+  index({"households.tax_households.effective_starting_on" => 1})
+  index({"households.tax_households.effective_ending_on" => 1})
+  index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
+
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
-  index({"households.tax_households.hbx_assigned_id" => 1})
-  index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
+  index({"households.tax_households.eligibility_determinations.determined_at" => 1})
+  index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
+
   index({"irs_groups.hbx_assigned_id" => 1})
 
   # index("households.tax_households_id")
@@ -85,23 +91,29 @@ class Family
   after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
-    where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
-  }
-  scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
-  scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
+      where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
+    }
 
-  scope :all_current_households,  -> { exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
-  scope :all_tax_households,      -> { exists("households.tax_households": true) }
-  scope :all_enrollments,         -> { where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
-  scope :all_enrollments_by_writing_agent_id, -> (broker_id){where("households.hbx_enrollments.writing_agent_id" => broker_id)}
+  scope :all_with_single_family_member,       ->{ exists({:'family_members.1' => false}) }
+  scope :all_with_multiple_family_members,    ->{ exists({:'family_members.1' => true})  }
 
-  scope :by_writing_agent_id, -> (broker_id){where("broker_agency_accounts.writing_agent_id" => broker_id)}
+  scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
+  scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
+  scope :all_enrollments,                     ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
 
+  scope :all_enrollments_by_writing_agent_id, ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
+  scope :by_writing_agent_id,                 ->(broker_id){ where(:"broker_agency_accounts.writing_agent_id" => broker_id) }
+
+  scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
+                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
+
+  scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
+                                                  :"households.tax_households.eligibility_determinations.determined_at".desc) }
+  scope :active_assistance_receiving,   ->{ all_assistance_receiving.exists(:"households.tax_households.effective_ending_on" => false) }
   scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
-  scope :all_assistance_applying,       ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
-  scope :all_assistance_receiving,      ->{ where(:"households.tax_households.eligibility_determinations.max_aptc".gt => 0) }
 
   scope :by_enrollment_market,          ->(market){ where(:"households.hbx_enrollments.enrollment.kind" => market) }
+
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
                                                         :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
                                                         :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
@@ -135,18 +147,15 @@ class Family
   end
 
   def enrolled_benefits
-    latest_household.try(:enrolled_hbx_enrollments)
+    # latest_household.try(:enrolled_hbx_enrollments)
   end
 
   def terminated_benefits
-    latest_household.try(:terminated_hbx_enrollments)
   end
 
-  def renewing_benefits
-    latest_household.try(:renewal_hbx_enrollments)
+  def renewal_benefits
   end
 
-  # remove
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -363,14 +372,14 @@ class Family
     return unless broker_role_id
     existing_agency = broker_agency_accounts.detect { |account| account.is_active? }
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
-    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id  
+    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id
     fire_broker_agency(existing_agency) if different_agency
     if !existing_agency || different_agency
       start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
       broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
       broker_agency_accounts << broker_agency_account
       self.save
-    end  
+    end
   end
 
   def fire_broker_agency(existing_agency)

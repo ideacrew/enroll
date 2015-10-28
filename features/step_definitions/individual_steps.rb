@@ -433,7 +433,7 @@ Then(/^Aptc user create consumer role account$/) do
   @browser.text_field(class: /interaction-field-control-user-email/).set("aptc@dclink.com")
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
   @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
-  screenshot("create_account")
+  screenshot("aptc_create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
@@ -442,11 +442,14 @@ Then(/^Aptc user goes to register as individual/) do
   step "user goes to register as an individual"
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Aptc")
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn3)
+  screenshot("aptc_register")
+
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
   step "Individual should see a form to enter personal information"
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("aptc@dclink.com")
+  screenshot("aptc_personal")
 end
 
 Then(/^Prepare taxhousehold info for aptc user$/) do
@@ -458,12 +461,16 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
     household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
   end
+  screenshot("aptc_householdinfo")
+
 end
 
 And(/Aptc user set elected amount and select plan/) do
   @browser.text_field(id: /elected_aptc/).wait_until_present
   @browser.text_field(id: "elected_aptc").set("20")
   click_when_present(@browser.a(text: /Select Plan/))
+  screenshot("aptc_setamount")
+
 end
 
 Then(/Aptc user should see aptc amount and click on confirm button on thanyou page/) do
@@ -472,17 +479,21 @@ Then(/Aptc user should see aptc amount and click on confirm button on thanyou pa
   @browser.checkbox(id: "terms_check_thank_you").set(true)
   @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Aptc")
   @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(@u.find :last_name1)
-  screenshot("purchase")
+  screenshot("aptc_purchase")
   click_when_present(@browser.a(text: /confirm/i))
 end
 
 Then(/Aptc user should see aptc amount on receipt page/) do
-  @browser.h3(text: /Purchase confirmation/).wait_until_present
+  @browser.h1(text: /Enrollment Submitted/).wait_until_present
   expect(@browser.td(text: "$20.00").visible?).to be_truthy
+  screenshot("aptc_receipt")
+
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
   @browser.h1(text: /My DC Health Link/).wait_until_present
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
+  screenshot("aptc_ivl_home")
+
 end

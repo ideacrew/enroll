@@ -32,9 +32,12 @@ class EligibilityDetermination
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: "csr_100"
 
+  field :determined_at, type: DateTime
+
+  # DEPRECATED - use determined_at
   field :determined_on, type: DateTime
 
-  before_validation :set_premium_credit_strategy
+  before_validation :set_premium_credit_strategy, :set_determined_at
 
   validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
 
@@ -107,7 +110,13 @@ class EligibilityDetermination
 
 private
   def set_premium_credit_strategy
-    premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
+    self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
+  end
+
+  def set_determined_at
+    if tax_household && tax_household.submitted_at.present?
+      self.determined_at ||= tax_household.submitted_at
+    end
   end
 
 end

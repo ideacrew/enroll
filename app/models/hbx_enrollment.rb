@@ -37,6 +37,10 @@ class HbxEnrollment
 
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
+  ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "enrollment_transmitted_to_carrier" => 2, "coverage_enrolled" => 3}
+  ENROLLMENT_TRAIN_STOPS_STEPS.default = 0
+
+
   embedded_in :household
 
   field :coverage_household_id, type: String
@@ -93,6 +97,9 @@ class HbxEnrollment
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :changing, ->{ where(changing: true) }
+  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+
+
   scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
   embeds_many :hbx_enrollment_members
@@ -291,6 +298,10 @@ class HbxEnrollment
     self.try(:employee_role).employer_profile
   end
 
+  def enroll_step
+    ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
+  end
+
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
     self.plan_id = new_plan._id
@@ -408,7 +419,7 @@ class HbxEnrollment
     enrollment = HbxEnrollment.new
 
     enrollment.household = coverage_household.household
-    enrollment.submitted_at = submitted_at 
+    enrollment.submitted_at = submitted_at
 
     case
     when employee_role.present?

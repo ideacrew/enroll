@@ -30,6 +30,7 @@ class FamilyMember
 
   delegate :id, to: :family, prefix: true
 
+  delegate :hbx_id, to: :person, allow_nil: true
   delegate :first_name, to: :person, allow_nil: true
   delegate :last_name, to: :person, allow_nil: true
   delegate :middle_name, to: :person, allow_nil: true
