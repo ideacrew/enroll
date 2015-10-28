@@ -37,11 +37,14 @@ class HbxEnrollment
 
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
+  COVERAGE_KINDS = %w[health dental]
+
   embedded_in :household
 
   field :coverage_household_id, type: String
   field :kind, type: String
   field :enrollment_kind, type: String, default: 'open_enrollment'
+  field :coverage_kind, type: String, default: 'health'
 
   # FIXME: This unblocks people with legacy data where this field exists,
   #        preventing user registration as in #3394.  This is NOT a correct
@@ -114,6 +117,13 @@ class HbxEnrollment
     inclusion: {
       in: ENROLLMENT_KINDS,
       message: "%{value} is not a valid enrollment kind"
+    }
+
+  validates :coverage_kind,
+    allow_blank: false,
+    inclusion: {
+      in: COVERAGE_KINDS,
+      message: "%{value} is not a valid coverage kind"
     }
 
   aasm do
