@@ -43,7 +43,7 @@ describe "shared/_comparison.html.erb" do
     render "shared/comparison", :qhps => mock_qhps
   end
 
-  it "should have a link to download the sbc pdf" do
+  it "should have a link to open the sbc pdf" do
     expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
   end
 
