@@ -8,6 +8,7 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
