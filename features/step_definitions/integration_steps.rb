@@ -483,7 +483,7 @@ end
 Then(/^.+ should see the receipt page$/) do
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   screenshot("receipt_page")
-  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).click
 end
 
