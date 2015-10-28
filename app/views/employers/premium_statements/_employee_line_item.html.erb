@@ -5,7 +5,11 @@
     </span>
     <br>
     <span>
-      DOB: <%= format_date census_employee.dob %> SSN: <%= (number_to_obscured_ssn census_employee.ssn).try([5..10]) %>
+      DOB: <%= format_date census_employee.dob %>
+    </span>
+    <br>
+    <span>
+      SSN: <%= (number_to_obscured_ssn census_employee.ssn) %>
     </span>
     <br>
     <span>
