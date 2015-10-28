@@ -200,6 +200,10 @@ class HbxEnrollment
     end
   end
 
+  def coverage_kind
+    read_attribute(:coverage_kind) || self.plan.coverage_kind
+  end
+
   def census_employee
     if employee_role.present?
       employee_role.census_employee
