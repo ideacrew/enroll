@@ -584,23 +584,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
 
   context "Employee is migrated into Enroll database without an EmployeeRole" do
-    let(:person)
-    let(:family)
-    let(:employer_profile)
-    let(:plan_year)
-    let(:hbx_enrollment)
-    let(:benefit_group_assignment)
+    let(:person) {}
+    let(:family) {}
+    let(:employer_profile) {}
+    let(:plan_year) {}
+    let(:hbx_enrollment) {}
+    let(:benefit_group_assignment) {}
 
     context "and the employee links to roster" do
-      
-      it "should create an employee_role" do
-      end
+
+      it "should create an employee_role" 
     end
 
     context "and the employee is terminated" do
 
-      it "should create an employee_role" do
-      end
+      it "should create an employee_role" 
     end
 
   end
