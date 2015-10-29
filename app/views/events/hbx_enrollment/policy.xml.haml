@@ -5,7 +5,7 @@
   - if hbx_enrollment.broker_agency_profile
     = render :partial => "events/shared/broker", :object => hbx_enrollment.broker_agency_profile, as: :broker_agency_profile
   %enrollees
-    = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member
+    = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment }
   %enrollment
     = render :partial => "events/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
     - if hbx_enrollment.is_shop?
