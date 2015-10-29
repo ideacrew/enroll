@@ -211,6 +211,19 @@ class Plan
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
           {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"}, 
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+      )
+    }
+
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") { 
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+          {"$or" => [
                       {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"}, 
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
@@ -232,7 +245,7 @@ class Plan
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"}, 
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"}, 
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -370,9 +383,9 @@ class Plan
       when 'health'
         csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
         if csr_kind.present?
-          Plan.individual_health_by_active_year_and_csr_kind(active_year, csr_kind).with_premium_tables
+          Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else
-          Plan.individual_health_by_active_year_and_csr_kind(active_year).with_premium_tables
+          Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year).with_premium_tables
         end
       end
     end
