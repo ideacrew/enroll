@@ -21,7 +21,7 @@
           <div class="row no-buffer">
             <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
-              <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-trans compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 COMPARE PLANS
               </a>
             </p>
@@ -34,7 +34,7 @@
             <div id="all-plans" class="all-filters-row">
               <%= render 'plan_filters' %>
 
-              <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
+              <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12" style="padding-right: 0;">
                 <div class="sort-area" style='margin:10px 0;'>
                   <span><strong>Sort By</strong></span>
                   <div class="btn-group" role="group" id='sort_by'>
@@ -54,7 +54,7 @@
 
           <div class="row no-buffer">
             <p class="pull-right">
-              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-trans compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 COMPARE PLANS
               </a>
             </p>
