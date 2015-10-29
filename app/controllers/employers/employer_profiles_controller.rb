@@ -111,7 +111,6 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
-
   def show_profile
     @tab ||= params[:tab]
     if @tab == 'benefits'
@@ -119,20 +118,17 @@ class Employers::EmployerProfilesController < ApplicationController
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
       paginate_employees
-
     elsif @tab == 'families'
-     #families defined as employee_roles.each { |ee| ee.person.primary_family }
-     paginate_families
-   elsif @tab == "inbox"
-     @folder = params[:folder] || 'Inbox'
-     @sent_box = false
-     respond_to do |format|
-       format.js { render 'employers/employer_profiles/inbox' }
-     end
-   end
-
+      #families defined as employee_roles.each { |ee| ee.person.primary_family }
+      paginate_families
+    elsif @tab == "inbox"
+      @folder = params[:folder] || 'Inbox'
+      @sent_box = false
+      respond_to do |format|
+        format.js { render 'employers/employer_profiles/inbox' }
+      end
     end
-
+  end
 
   def new
     @organization = Forms::EmployerProfile.new

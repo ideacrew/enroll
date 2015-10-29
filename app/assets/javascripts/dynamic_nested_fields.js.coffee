@@ -33,6 +33,13 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $('.benefit-group-fields:last input:first').focus()
   $('.remove_fields:last').css('display', 'inline-block')
 
+  $('.benefit-group-fields:last .contribution_slide_handler').each ->
+    $(this).on 'slideStop', (slideEvt) ->
+      location_id = $(this).parents('.benefit-group-fields').attr('id')
+      calcEmployerContributions $('a#calc_employer_contributions_link').data('href'), location_id
+      return
+    return
+
   start_on = $('#plan_year_start_on').val()
   if start_on
     start_on = start_on.substr(0, 4)
@@ -42,8 +49,55 @@ $(document).on 'click', 'form .add_fields', (event) ->
       $(this).attr 'href', url + '&start_on=' + start_on
   return
 
-
-
+calcEmployerContributions = (url, location) ->
+  reference_plan_id = $('#' + location + ' .reference-plan input[type=radio]:checked').val()
+  plan_option_kind = $('#' + location + ' .nav-tabs input[type=radio]:checked').val()
+  location_id = location
+  console.log reference_plan_id
+  console.log location_id
+  if reference_plan_id == '' or reference_plan_id == undefined
+    return
+  start_date = $('#plan_year_start_on').val()
+  if start_date == ''
+    return
+  premium_pcts = $('#' + location + ' .benefits-fields input.hidden-param').map(->
+    $(this).val()
+  ).get()
+  is_offered = $('#' + location + ' .benefits-fields .checkbox label > input[type=checkbox]').map(->
+    $(this).is ':checked'
+  ).get()
+  relation_benefits = 
+    '0':
+      'relationship': 'employee'
+      'premium_pct': premium_pcts[0]
+      'offered': is_offered[0]
+    '1':
+      'relationship': 'spouse'
+      'premium_pct': premium_pcts[1]
+      'offered': is_offered[1]
+    '2':
+      'relationship': 'domestic_partner'
+      'premium_pct': premium_pcts[2]
+      'offered': is_offered[2]
+    '3':
+      'relationship': 'child_under_26'
+      'premium_pct': premium_pcts[3]
+      'offered': is_offered[3]
+    '4':
+      'relationship': 'child_26_and_over'
+      'premium_pct': 0
+      'offered': false
+  $.ajax(
+    type: 'GET'
+    url: url
+    dataType: 'script'
+    data:
+      'start_on': $('#plan_year_start_on').val()
+      'reference_plan_id': reference_plan_id
+      'plan_option_kind': plan_option_kind
+      'relation_benefits': relation_benefits
+      'location_id': location_id).done ->
+  return
 
 
 $(document).on 'click', 'form .remove_fields', (event) ->
