@@ -17,19 +17,19 @@
       <tr>
         <th class="row-title">Plans</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(qhp.plan.carrier_profile.organization.legal_name, {width: 80}) %></th>
+          <th colspan="2" style="border: none; padding: 0;"><%= display_carrier_logo(qhp.plan.carrier_profile.organization.legal_name, {width: 80}) %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan_marketing_name %></th>
+          <th colspan="2" style="border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan_marketing_name %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= qhp.plan.metal_level.humanize %></span> &nbsp;&#149;&nbsp;
+          <th class="fourteen lg" colspan="2" style="border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= qhp.plan.metal_level.humanize %></span> &nbsp;&#149;&nbsp;
           <%= qhp.plan.plan_type.upcase %>
           </th>
         <% end %>
@@ -37,13 +37,13 @@
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" class="row-title" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%=number_to_currency(qhp[:total_employee_cost]) + " / month" %></th>
+          <th colspan="2" class="row-title" style="border: none; padding: 0;"><%=number_to_currency(qhp[:total_employee_cost]) + " / month" %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; verticle-align: center; border: none; padding: 15px 0 25px;">
+          <th colspan="2" style="border: none; padding: 15px 0 25px;">
             <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
           </th>
         <% end %>
