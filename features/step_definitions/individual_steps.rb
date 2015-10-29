@@ -104,13 +104,13 @@ Then (/Individual fixes a VLP error message/) do
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
-  @browser.radio(class: /interaction-choice-control-value-agreement-agree/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-agreement-agree/).click
+  @browser.label(for: /agreement_agree/).wait_until_present
+  @browser.label(for: /agreement_agree/).click
   @browser.a(class: /interaction-click-control-continue/).wait_until_present
   @browser.a(class: /interaction-click-control-continue/).click
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).set
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-1-response-id-c/).set
+  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).wait_until_present
+  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).fire_event("onclick")
+  @browser.label(for: /interactive_verification_questions_attributes_1_response_id_c/).fire_event("onclick")
   @browser.button(class: /interaction-click-control-submit/).wait_until_present
   @browser.button(class: /interaction-click-control-submit/).click
   screenshot("identify_verification")
@@ -146,13 +146,13 @@ And(/Individual clicks on add member button/) do
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   screenshot("add_member")
-  scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  scroll_then_click(@browser.button(text: /Confirm Member/i))
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 And(/Individual again clicks on add member button/) do
-  @browser.a(text: /Add Member/).wait_until_present
-  @browser.a(text: /Add Member/).click
+  @browser.a(text: /Add Member/i).wait_until_present
+  @browser.a(text: /Add Member/i).click
   @browser.text_field(id: /dependent_first_name/).wait_until_present
   @browser.text_field(id: /dependent_first_name/).set("Robert")
   @browser.text_field(id: /dependent_middle_name/).set("K")
@@ -170,8 +170,8 @@ And(/Individual again clicks on add member button/) do
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
-  scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  scroll_then_click(@browser.button(text: /Confirm Member/i))
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 

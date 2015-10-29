@@ -15,7 +15,7 @@
         %race= hbx_enrollment_member.person.race
   %is_subscriber= hbx_enrollment_member.is_subscriber
   %benefit
-    %premium_amount= hbx_enrollment_member.premium_amount || 0.0
+    %premium_amount= (hbx_enrollment.premium_for(hbx_enrollment_member).round(2))
     %begin_date= simple_date_for(hbx_enrollment_member.coverage_start_on)
     - if !hbx_enrollment_member.coverage_end_on.blank?
       %end_date= simple_date_for(hbx_enrollment_member.coverage_end_on)

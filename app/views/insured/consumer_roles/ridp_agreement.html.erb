@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-      <h3>Verify Identity</h3>
+      <h1 class="darkblue">Verify Identity</h1>
       <p>For your security, we need to verify your identity before you can proceed. If you agree, you are providing consent to Experian to access your personal information to conduct identity verification on behalf of the Centers for Medicare and Medicaid Services (CMS) - part of the U.S. Department of Health and Human Services (HHS). Below are a few items to keep in mind.</p>
       <ul>
         <li>
@@ -15,14 +15,23 @@
         </li>
       </ul>
       <p>
+        <br/>
         Please select one of the following options to continue:
       </p>
       <div class="disagree_placeholder_text" style="display: none">
         <%= "Please contact #{HbxProfile::CallCenterName}: #{HbxProfile::CallCenterPhoneNumber} for more information" %>
       </div>
-      <div>
-        <%= radio_button_tag :agreement, "agree" %> I Agree <br>
-        <%= radio_button_tag :agreement, "disagree" %> I Disagree
+      <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= radio_button_tag :agreement, "agree", class: "required floatlabel"  %>
+          <label for="agreement_agree"><span style="white-space: nowrap;">I agree</span></label>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= radio_button_tag :agreement, "disagree", class: "required floatlabel"  %>
+          <label for="agreement_disagree"><span style="white-space: nowrap;">I Disagree</span></label>
+        </div>
       </div>
     </div>
 
