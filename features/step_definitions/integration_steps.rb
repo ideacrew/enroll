@@ -387,14 +387,14 @@ When(/^.+ clicks? edit on baby Soren$/) do
 end
 
 Then(/^.+ should see the edit dependent form$/) do
-  @browser.button(:text => /Confirm Member/).wait_until_present
+  @browser.button(:text => /Confirm Member/i).wait_until_present
 end
 
 When(/^.+ clicks? delete on baby Soren$/) do
   scroll_then_click(@browser.form(id: 'edit_dependent').a())
   @browser.div(id: 'remove_confirm').wait_until_present
   scroll_then_click(@browser.a(class: /confirm/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 Then(/^.+ should see (.*) dependents*$/) do |n|
@@ -405,11 +405,11 @@ end
 
 When(/^.+ clicks? Add Member$/) do
   scroll_then_click(@browser.a(text: /Add Member/))
-  @browser.button(text: /Confirm Member/).wait_until_present
+  @browser.button(text: /Confirm Member/i).wait_until_present
 end
 
 Then(/^.+ should see the new dependent form$/) do
-  expect(@browser.button(text: /Confirm Member/).visible?).to be_truthy
+  expect(@browser.button(text: /Confirm Member/i).visible?).to be_truthy
 end
 
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
@@ -423,8 +423,8 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
 end
 
 When(/^.+ clicks? confirm member$/) do
-  scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  scroll_then_click(@browser.button(text: /Confirm Member/i))
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
