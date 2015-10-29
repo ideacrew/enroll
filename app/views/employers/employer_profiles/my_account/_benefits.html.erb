@@ -209,7 +209,7 @@
 
     <% end %>
         </div>
-    <div class="pull-left bottom-mgn-xs">
+    <div class="bottom-mgn-xs">
 
       <% if plan_year.draft? && @current_plan_year.nil? %>
       <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
