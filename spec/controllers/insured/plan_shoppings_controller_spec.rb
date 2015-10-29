@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
-  let(:plan) { double("Plan", id: "plan_id") }
+  let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
