@@ -179,12 +179,12 @@ end
 And (/^.+ should see broker active for the employer$/) do
   @browser.element(text: /Logistics Inc/i).wait_until_present
   expect(@browser.element(text: /Logistics Inc/).visible?).to be_truthy
-  expect(@browser.element(text: /Ricky Martin/).visible?).to be_truthy
+  expect(@browser.element(text: /Ricky Martin/i).visible?).to be_truthy
 end
 
 When(/^.+ terminates broker$/) do
-  @browser.a(text: /Terminate/).wait_until_present
-  @browser.a(text: /Terminate/).click
+  @browser.a(text: /Change Broker/i).wait_until_present
+  @browser.a(text: /Change Broker/i).click
 
   #according to 2096 remove terminate in future
   #@browser.text_field(class: "date-picker").wait_until_present
@@ -283,7 +283,7 @@ Then(/^.+ sees covered family members$/) do
 end
 
 Then(/^.+ choses a healthcare plan$/) do
-  wait_and_confirm_text(/Choose a healthcare plan/)
+  wait_and_confirm_text(/Choose Healthcare/i)
   wait_and_confirm_text(/Apply/)
   plan = @browser.a(class: 'interaction-click-control-select-plan')
   plan.click
