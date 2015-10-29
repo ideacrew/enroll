@@ -62,6 +62,16 @@ RSpec.describe Products::QhpController, :type => :controller do
       expect(assigns(:reference_plan)).to be_truthy
     end
 
+    it "should return dental plan if hbx_enrollment does not have plan object" do
+      allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(hbx_enrollment).to receive(:plan).and_return(nil)
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
+      expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "individual"
+      expect(assigns(:coverage_kind)).to eq "dental"
+    end
+
     it "should return summary of a plan for ivl and coverage_kind: health" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
       sign_in(user)

@@ -68,11 +68,11 @@ class Products::QhpController < ApplicationController
   end
 
   private
-  
+
   def set_kind_for_market_and_coverage
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)    
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
 
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "employer_sponsored") ? "employer_sponsored" : "individual"
