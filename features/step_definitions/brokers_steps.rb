@@ -172,8 +172,8 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
-  @browser.element(text: /Successfully associated broker with your account./).wait_until_present
-  expect(@browser.element(text: /Successfully associated broker with your account./).visible?).to be_truthy
+  @browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).wait_until_present
+  expect(@browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).visible?).to be_truthy
 end
 
 And (/^.+ should see broker active for the employer$/) do
