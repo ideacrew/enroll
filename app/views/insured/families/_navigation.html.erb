@@ -34,9 +34,11 @@
 
         <% @person.families.last.family_members.each do |f| %>
         <span class="twelve ttc blue">
-          <%= f.first_name %><%= f.last_name %><br/>
+          <%= f.first_name %> <%= f.last_name %><br/>
         </span>
         <% end %>
+        <% else %>
+        <br/>
         <% end %>
       <br/>
       <%= link_to "Manage Family", manage_family_insured_families_path(tab: 'family'), class: 'btn btn-trans', style: 'padding: 10px 5%;' %>
