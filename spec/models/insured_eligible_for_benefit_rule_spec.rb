@@ -47,6 +47,40 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+  context "is_cost_sharing_satisfied?" do
+    let(:consumer_role) {double(person: person)}
+    let(:benefit_package) {double}
+    let(:person) {double(primary_family: double(latest_household: double(latest_active_tax_household: double(latest_eligibility_determination: eligibility))))}
+    let(:eligibility) {double}
+
+    it "should return true when csr_kind is blank" do
+      allow(eligibility).to receive(:csr_eligibility_kind).and_return ""
+      allow(benefit_package).to receive(:cost_sharing).and_return "csr_100"
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_cost_sharing_satisfied?).to eq true
+    end
+
+    it "should return true when cost_sharing is blank" do
+      allow(benefit_package).to receive(:cost_sharing).and_return ""
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_cost_sharing_satisfied?).to eq true
+    end
+
+    it "should return true when cost_sharing is equal to csr_kind" do
+      allow(benefit_package).to receive(:cost_sharing).and_return "csr_94"
+      allow(eligibility).to receive(:csr_eligibility_kind).and_return "csr_94"
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_cost_sharing_satisfied?).to eq true
+    end
+
+    it "should return false when cost_sharing is not equal to csr_kind" do
+      allow(benefit_package).to receive(:cost_sharing).and_return "csr_100"
+      allow(eligibility).to receive(:csr_eligibility_kind).and_return "csr_94"
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_cost_sharing_satisfied?).to eq false
+    end
+  end
+
   context "is_residency_status_satisfied?" do
     let(:consumer_role) {double}
     let(:benefit_package) {double}
@@ -55,7 +89,12 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       allow(benefit_package).to receive(:residency_status).and_return ["any", "other"]
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_residency_status_satisfied?).to eq true
+    end
 
+    it "return false when consumer_role is nil" do
+      allow(benefit_package).to receive(:residency_status).and_return ["other"]
+      rule = InsuredEligibleForBenefitRule.new(nil, benefit_package)
+      expect(rule.is_residency_status_satisfied?).to eq false
     end
 
     describe "include state_resident" do 

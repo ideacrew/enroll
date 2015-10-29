@@ -11,22 +11,6 @@ geographic_rating_area = GeographicRatingArea.new(
     us_counties: UsCounty.where(county_fips_code: "11001").to_a
   )
 
-# qhp_base_plans = Plan.where(active_year: 2015).and(market: "individual")
-# catastrophic_plans = Plan.where(active_year: 2015).and(market: "individual")
-
-# native_american_qhp_2015_benefit_package  = BenefitPackage.new(
-#     eligible_relationship_categories: %w(self spouse domestic_partner children_under_26 disabled_children_26_and_over),
-#     benefit_begin_after_event_offsets: [0],
-#     benefit_effective_dates: %w(date_of_event first_of_month),
-#     benefit_termination_dates: %w(date_of_event end_of_month),
-#     elected_premium_credit_strategy: "unassisted",
-#     benefit_ids: Plan.health_base
-#   )
-
-# under_age_thirty_benefit_package = BenefitPackage.new()
-
-
-
 organization = Organization.new(
       dba: "DCHL",
       legal_name: "DC Health Link",

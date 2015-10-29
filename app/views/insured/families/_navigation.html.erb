@@ -1,18 +1,49 @@
-<div>
-  <ul class="nav nav-pills nav-stacked">
-    <li>
-      <%= link_to "My DC Health Link",  family_account_path %>
+<nav class="row">
+  <ul>
+    <li <%= menu_tab_class(@tab, 'home') %>>
+      <%= link_to "My DC Health Link", family_account_path(tab: 'home') %>
     </li>
-    <li>
-      <%= link_to "Documents",  documents_index_insured_families_path %>
+    <% if @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present? %>
+    <li <%= menu_tab_class(@tab, 'broker') %>>
+        <%= link_to "My Broker", brokers_insured_families_path(tab: 'broker') %>
+      </li>
+    <% end %>
+    <li <%= menu_tab_class(@tab, 'documents') %>>
+      <%= link_to "Documents",  documents_index_insured_families_path(tab: 'documents') %>
     </li>
-    <li>
-      <%= link_to(inbox_insured_families_path) do  %>
+    <li <%= menu_tab_class(@tab, 'messages') %>>
+      <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
       Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>
       <% end %>
     </li>
-    <li>
-      <%= link_to "Manage Family", manage_family_insured_families_path %>
-    </li>
   </ul>
-</div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>My Account</h4>
+    </div>
+    <div class="panel-body" style="padding: 0;">
+      <span class="dg ttc">
+        <%= @person.first_name.try(:humanize) %> <%= @person.last_name.try(:humanize) %>
+      </span>
+      <% if @person.families.last.family_members.try(:count) > 1 %>
+
+      <br/><br/>
+      <span class="lg ttu">
+        Your Household of <%= @person.families.last.family_members.try(:count) %>
+      </span>
+
+        <% @person.families.last.family_members.each do |f| %>
+        <span class="twelve ttc blue">
+          <%= f.first_name %> <%= f.last_name %><br/>
+        </span>
+        <% end %>
+        <% else %>
+        <br/>
+        <% end %>
+      <br/>
+      <%= link_to "Manage Family", manage_family_insured_families_path(tab: 'family'), class: 'btn btn-trans ttc', style: 'padding: 10px 5%;' %>
+      <br/>
+      <br/>
+    </div>
+  </div>
+</nav>

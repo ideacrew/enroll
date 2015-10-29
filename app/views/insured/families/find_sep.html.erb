@@ -1,11 +1,11 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
-      <h3>Special Enrollment Period</h3>
+      <h1 class="darkblue">Special Enrollment Period</h1>
       <div class="seps-panel panel panel-default">
         <div class="panel-heading" style="margin-bottom: 10px;">
           <div class="row">
-            <div class="col-sm-12 col-xs-12 info-wrapper">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
               <h4><strong>Have you or anyone in your household recently experienced any of the following events?</strong></h4>
             </div>
           </div>
@@ -19,14 +19,14 @@
             </div>
           </div>
         </div>
-      </div>
+      </div
 
       <%#= form_tag(:insured_plan_shopping) do %>
       <%= hidden_field_tag 'id', @hbx_enrollment_id %>
       <%= hidden_field_tag 'market_kind', @market_kind %>
       <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
       <div style="text-align: center; margin-bottom: 15px;">
-        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> I’ve not had a recent Qualifying Life Event.
+        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> None of the situations listed above apply.
       </div>
       <%# end %>
 

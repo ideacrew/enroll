@@ -21,6 +21,9 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         Then Soren White creates a new employer profile
         When Employer publishes a plan year
         Then Employer should see a published success message
+        When Employer goes to to home tab
+        Then Employer should see the current plan year
+        And Employer should see the premium billings report
         Then Employer logs out
 
     When Soren White logs on to the Employee Portal

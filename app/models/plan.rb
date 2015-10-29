@@ -60,6 +60,7 @@ class Plan
   index({ active_year: 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
   index({ renewal_plan_id: 1, name: 1 })
   index({ name: 1 })
+  index({ csr_variant_id: 1}, {sparse: true})
 
   # 2015, "94506DC0390006-01"
   index(
@@ -75,6 +76,9 @@ class Plan
 
   # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
   index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age_deprecated"})
+
+  # 2015, individual, health, silver, 04
+  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, csr_variant_id: 1 })
 
   # 2015, individual, health, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
@@ -125,6 +129,16 @@ class Plan
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
 
+
+  scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
+
+  # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
+  scope :silver_level_by_csr_kind, ->(csr_kind = "csr_100"){ where(
+                                          metal_level: "silver").and(
+                                          csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
+                                        )
+                                      }
+
   # Plan Type
   scope :ppo_plan, ->{ where(plan_type: "ppo") }
   scope :pos_plan, ->{ where(plan_type: "pos") }
@@ -146,10 +160,13 @@ class Plan
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
   # DEPRECATED - 2015-09-23 - By Sean Carley
-  # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
-  # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
-  scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
-  scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+    # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+    # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
+    scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
+    scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+
+  ## DEPRECATED - 2015-10-26 - By Dan Thomas - Use: individual_health_by_active_year_and_csr_kind
+    scope :individual_health_by_active_year, ->(active_year) {where(active_year: active_year, market: "individual", coverage_kind: "health", hios_id: /-01$/ ) }
   # END DEPRECATED
 
   scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {
@@ -189,13 +206,30 @@ class Plan
         )
     }
 
-  scope :individual_health_by_active_year, ->(active_year) {
-      where(
-          active_year: active_year,
-          market: "individual",
-          coverage_kind: "health",
-          hios_id: /-01$/
-        )
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+      )
+    }
+
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+      )
     }
 
   scope :individual_dental_by_active_year, ->(active_year) {
@@ -206,12 +240,26 @@ class Plan
         )
     }
 
+  scope :individual_health_by_active_year_carrier_profile_csr_kind, ->(active_year, carrier_profile_id, csr_kind) {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+    )
+  }
+
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
   scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+
 
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
@@ -283,7 +331,7 @@ class Plan
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
+      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost.round(2)
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end
@@ -297,6 +345,10 @@ class Plan
   def ehb
     percent = read_attribute(:ehb)
     (percent && percent > 0) ? percent : 1
+  end
+
+  def is_csr?
+    (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
   class << self
@@ -324,8 +376,18 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:)
-      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables
+    def individual_plans(coverage_kind:, active_year:, tax_household:)
+      case coverage_kind
+      when 'dental'
+        Plan.individual_dental_by_active_year(active_year).with_premium_tables
+      when 'health'
+        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        if csr_kind.present?
+          Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
+        else
+          Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year).with_premium_tables
+        end
+      end
     end
   end
 end

@@ -63,9 +63,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   it "should match the data on the confirmation receipt" do
-    expect(rendered).to have_selector('p', text: "Your purchase of #{@plan.name} was completed on #{enrollment.updated_at}")
-    expect(rendered).to have_selector('p', text: "Please print this page for your records.")
-    expect(rendered).to have_selector('p', text: "A copy of this confirmation has also been emailed to you.")
+    #expect(rendered).to have_selector('p', text: "Your enrollment has been submitted as of #{enrollment.updated_at}.")
+    expect(rendered).to have_selector('p', text: /Your enrollment has been submitted as/)
+    expect(rendered).to have_selector('p', text: /Please print this page for your records. A copy of this confirmation/)
+    expect(rendered).to have_selector('p', text: /When you’re finished, select GO TO MY ACCOUNT to view the status of your enrollment/)
   end
 
   it "should match the enrollment memebers" do

@@ -17,7 +17,7 @@ describe "insured/family_members/index.html.erb" do
 
   it "should have title" do
     render template: "insured/family_members/index.html.erb"
-    expect(rendered).to have_selector("h3", text: 'Family Members')
+    expect(rendered).to have_selector("h1", text: 'Family Members')
   end
 
   it "should have memo to indicate required fields" do
@@ -29,13 +29,11 @@ describe "insured/family_members/index.html.erb" do
     before :each do
       assign :type, "employee"
       assign :employee_role, employee_role
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return false
       render template: "insured/family_members/index.html.erb"
     end
 
     it "should call signup_progress" do
       expect(rendered).to match /Employer/
-      expect(rendered).to have_selector("a[href='/insured/families/find_sep?employee_role_id=#{employee_role.id}']", text: 'Continue')
     end
   end
 

@@ -27,21 +27,21 @@
                     <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
                       <%= office_location.address.to_html %>
                     <% end %>
-                  
+
                 </td>
-              </tr> 
+              </tr>
               <tr>
-                <th>History</th> 
+                <th>History</th>
                 <td>
                     <% broker_or_staff_role.workflow_state_transitions.each do |transition| %>
                       <%= transition.to_html %>
                     <% end %>
                 </td>
-              </tr> 
+              </tr>
               <tr>
                 <th>Application Status:</th>
                 <td><%= broker_or_staff_role.current_state %></td>
-              </tr> 
+              </tr>
               <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>
               <%= f.fields_for :broker_role do |broker_role_fields| %>
               <tr>

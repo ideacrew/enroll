@@ -16,7 +16,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   end
 
   it "should have title" do
-    expect(rendered).to match /Enroll - let's get you signed up for healthcare/
+    expect(rendered).to match /Personal Information/
   end
 
   it "should display hint for asterisks" do

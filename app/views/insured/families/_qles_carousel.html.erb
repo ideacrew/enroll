@@ -1,7 +1,9 @@
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
+  <h5>TOP LIFE CHANGES</h5>
+
   <% if @qualifying_life_events %>
     <!-- Wrapper for slides -->
-    <div class="carousel-inner" role="listbox" style='min-height: 180px; overflow: visible;'>
+    <div class="carousel-inner" role="listbox" style='min-height: 180px;'>
       <% count = 0 %>
       <% @qualifying_life_events.each_slice(5) do |qles| %>
         <div class="item <%= 'active' if count == 0 %>">
@@ -16,7 +18,7 @@
     </div>
 
     <!-- Indicators -->
-    <ol class="carousel-indicators" style='bottom: -20px;'>
+    <ol class="carousel-indicators">
       <% (0..(count-1)).each do |index| %>
         <li data-target="#carousel-qles" data-slide-to="<%= index %>" class="<%= 'active' if index == 0 %>"></li>
       <% end %>
@@ -24,10 +26,10 @@
 
     <!-- Controls -->
     <a class="left carousel-control" href="#carousel-qles" role="button" data-slide="prev" style='background-image: none;color:#007bc4;'>
-      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <i class="fa fa-angle-left fa-2x"></i>
     </a>
     <a class="right carousel-control" href="#carousel-qles" role="button" data-slide="next" style='background-image: none;color:#007bc4;'>
-      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <i class="fa fa-angle-right fa-2x"></i>
     </a>
   <% end %>
 </div>

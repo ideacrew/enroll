@@ -1,6 +1,6 @@
 <div class="col-lg-3 col-md-3 co-sm-3 col-xs-12 filter-sidebar input-no-pd">
   <h3 class="header-title">Filter Results</h3>
-  <% if @market_kind == "individual" || @benefit_group.plan_option_kind == "single_carrier" %>
+  <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
     <h5><strong>Metal Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
@@ -101,8 +101,8 @@
           <li>
             <div class="checkbox">
               <label>
-                <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc area network">
-                <label for="checkbox-14" class="checkbox-custom-label">DC in-Network</label>
+                <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc metro">
+                <label for="checkbox-14" class="checkbox-custom-label">DC-Metro</label>
               </label>
             </div>
           </li>
@@ -162,7 +162,7 @@
           </div>
         </div>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
-        <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.id) %>
+        <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
           <input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'/>
           <span><output name="pct">85</output>%</span>
@@ -171,8 +171,8 @@
       <% end %>
       <div class="checkbox-filter-wrapper">
         <div class="form-inline search-apply-wrapper">
-          <a href="javascript:void(0);" class="btn btn-primary apply-btn">Apply</a>
-          <a href="javascript:void(0);" class="btn btn-transparent btn-sm reset-btn">Reset</a>
+          <a href="javascript:void(0);" class="btn btn-primary apply-btn btn-br mz">Apply</a>
+          <a href="javascript:void(0);" class="btn btn-trans reset-btn">Reset</a>
         </div>
       </div>
       <div class="checkbox-filter-wrapper">

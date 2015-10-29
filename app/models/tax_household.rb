@@ -23,7 +23,7 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
-  def latest_eligibility_determination 
+  def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
@@ -76,6 +76,7 @@ class TaxHousehold
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
+    return 0 if hbx_enrollment.blank?
     hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
       sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
     end

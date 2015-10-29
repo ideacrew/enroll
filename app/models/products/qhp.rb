@@ -159,19 +159,19 @@ class Products::Qhp
           arry1 = [
             qhp.plan.carrier_profile.organization.legal_name,
             qhp.plan_marketing_name,
-            "$#{qhp[:total_employee_cost].round(2)}",
-            qhp.plan.nationwide ? "Nationwide" : "DC Area Network",
-            "In Network"
+            "$#{qhp[:total_employee_cost].round(2)} / month",
+            qhp.plan.nationwide ? "Nationwide" : "DC-Metro",
+            "Co-Pay"
           ]
           arry2 = [
-            "","","","","Out of Network"
+            "","","","","Coinsurance"
           ]
           visit_types.each do |visit_type|
             matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type }
             if matching_benefit
               deductible = matching_benefit.find_deductible
-              arry1 << (deductible.present? ? deductible.copay_in_network_tier_1 : "None")
-              arry2 << (deductible.present? ? deductible.copay_out_of_network : "None")
+              arry1 << (deductible.present? ? deductible.copay_in_network_tier_1 : "N/A")
+              arry2 << (deductible.present? ? deductible.co_insurance_in_network_tier_1 : "N/A")
             end
           end
           csv_ary << arry1

@@ -79,7 +79,7 @@ class BenefitCoveragePeriod
     [effective_date, start_on].max
   end
 
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil)
     ivl_bgs = []
     benefit_packages.each do |bg|
       satisfied = true
@@ -92,7 +92,7 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    Plan.individual_plans(coverage_kind: coverage_kind, active_year: earliest_effective_date.year).by_plan_ids(elected_plan_ids).to_a
+    Plan.individual_plans(coverage_kind: coverage_kind, active_year: earliest_effective_date.year, tax_household: tax_household).by_plan_ids(elected_plan_ids).entries
   end
 
   ## Class methods

@@ -1,33 +1,31 @@
-<table class="table table-bordered">
-  <thead>
-  <tr>
-    <th>Document Title</th>
-    <th>Document Type</th>
-    <th>Date</th>
-  </tr>
-  </thead>
-
-  <tbody>
-  <% unless @person.has_consumer_role? %>
-      <tr>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-      </tr>
-  <% else %>
-      <% @person.consumer_role.vlp_documents.select do |doc|
-        doc.identifier.present?
-      end.each do |doc| %>
+<div class="documents-table">
+  <div class="table-responsive">
+    <% unless @person.has_consumer_role? %>
+        <h4>No results found</h4>
+    <% else %>
+        <table>
           <tr>
-            <td>
-              <% key, bucket = get_key_and_bucket(doc.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
-                  <%= doc.title %></td>
-              <% end %>
-              <td><%= doc.subject %></td>
-              <td><%= doc.created_at.try(:to_date) %></td>
+            <th>Member</th>
+            <th>Type</th>
+            <th>Due Date</th>
+            <th>Date Submitted</th>
+            <th>Status</th>
+          </tr>
+          <% @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
+              <tr>
+                <td><%= doc.creator %></td>
+                <td><%= doc.type %></td>
+                <td>
+                  <% key, bucket = get_key_and_bucket(doc.identifier) %>
+                  <%= link_to(document_download_path(bucket, key) + "?content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\.]/i, '')}", class: "download") do %>
+                      <%= doc.title %>
+                  <% end %>
+                </td>
+                <td><%= doc.subject %></td>
+                <td><%= doc.created_at.try(:to_date) %></td>
               </tr>
-      <% end %>
-  <% end %>
-  </tbody>
-</table>
+          <% end %>
+    <% end %>
+    </table>
+  </div>
+</div>

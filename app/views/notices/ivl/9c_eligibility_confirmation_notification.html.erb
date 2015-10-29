@@ -20,20 +20,20 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Congratulations!</strong>  Based on the health insurance application you submitted and we processed on #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following person(s) qualify for health coverage through DC Health Link."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>")} %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.enrollments[0].enrollees } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following individual(s) selected the #{notice.enrollments[0].plan_name} health insurance plan."], heading: 'Your Health Plan Selection', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>")} %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.enrollments[0].enrollees } %>
 
 <% notice.other_enrollments.each do |enrollment| %>
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Additionally, the following individual(s) selected the #{enrollment.plan_name} health insurance plan."} %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: enrollment.enrollees.join("<br>")} %>
+  <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: enrollment.enrollees } %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You will get your new insurance ID card and other information about your benefit card shortly from your health plan(s) (if you have not received it already). For any questions about your health plan’s covered services and providers, you need to contact:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments.inject([]){|plans, enrollment| plans << "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;#{enrollment.plan_name} at [plan 1 main phone number]"}.join("<br>")} %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.enrollments.inject([]){|plans, enrollment| plans << "#{enrollment.plan_name} at [plan 1 main phone number]"} } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<div style='text-decoration: underline;'>#{notice.enrollments[0].plan_name}</div>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
 

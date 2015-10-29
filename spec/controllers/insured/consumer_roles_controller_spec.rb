@@ -145,6 +145,29 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  describe "GET immigration_document_options" do
+
+    it "render javascript template" do
+      sign_in
+      xhr :get, :immigration_document_options, format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:immigration_document_options)
+    end
+
+    context "when object type Person" do
+      let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+      before(:each) do
+        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
+        allow(consumer_role).to receive(:person).and_return(person)
+      end
+      it "object has correct class" do
+        post :create, person: person_params
+        type = person.class.to_s
+        expect(type).to eq("Person")
+      end
+    end
+  end
+
   context "PUT update" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.build(:person) }

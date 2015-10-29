@@ -8,7 +8,7 @@ RSpec.describe "insured/families/_qles_panel.html.erb" do
   end
 
   it "should display the title" do
-    expect(rendered).to have_selector('h4 strong', text: 'Have Life Changes?')
+    expect(rendered).to have_selector('h4', text: 'Have Life Changes?')
     expect(rendered).to have_selector('small', text: 'See how it may affect your health insurance.')
     expect(rendered).to have_selector('h5', text: 'TOP LIFE CHANGES')
   end

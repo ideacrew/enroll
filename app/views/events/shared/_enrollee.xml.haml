@@ -11,9 +11,11 @@
         %is_incarcerated= "false"
       - else
         %is_incarcerated= hbx_enrollment_member.person.is_incarcerated.to_s
-      %race= hbx_enrollment_member.person.race
+      - if !hbx_enrollment_member.person.race.blank?
+        %race= hbx_enrollment_member.person.race
   %is_subscriber= hbx_enrollment_member.is_subscriber
   %benefit
-    %premium_amount= hbx_enrollment_member.premium_amount || 0.0
+    %premium_amount= (hbx_enrollment.premium_for(hbx_enrollment_member).round(2))
     %begin_date= simple_date_for(hbx_enrollment_member.coverage_start_on)
-    %end_date= simple_date_for(hbx_enrollment_member.coverage_end_on) if hbx_enrollment_member.coverage_end_on
+    - if !hbx_enrollment_member.coverage_end_on.blank?
+      %end_date= simple_date_for(hbx_enrollment_member.coverage_end_on)

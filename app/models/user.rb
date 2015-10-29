@@ -75,6 +75,7 @@ class User
   index({roles: 1},  {sparse: true}) # MongoDB multikey index
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
+  index({created_at: 1 })
 
   before_save :strip_empty_fields
 

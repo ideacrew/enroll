@@ -4,7 +4,7 @@ RSpec.describe "insured/consumer_roles/search.html.haml" do
 
   let(:person) { FactoryGirl.create(:person) }
   let(:current_user) { FactoryGirl.create(:user, person: person) }
-  
+
   before :each do
     sign_in current_user
     assign(:person, Forms::ConsumerCandidate.new)
@@ -13,7 +13,7 @@ RSpec.describe "insured/consumer_roles/search.html.haml" do
   end
 
   it "should display the title" do
-    expect(rendered).to have_selector('h3', text: 'Personal Information')
+    expect(rendered).to have_selector('h1', text: 'Personal Information')
   end
 
   it "should have memo to indicate required fields" do

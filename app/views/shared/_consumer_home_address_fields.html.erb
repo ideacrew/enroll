@@ -7,8 +7,9 @@
 
       <% style = "" %>
       <% div_class = kind+"-div" %>
-      <% if kind != 'home' %>
+      <% if kind == 'work' %>
         <% style="display:none;" %>
+
       <% end %>
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
         <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
@@ -36,7 +37,7 @@
           <%= f.label :no_dc_address do %>
             <span class='no_dc_address'>&nbsp;NO DC ADDRESS</span>
           <% end %>
-          <span><i class='fa fa-question-circle'></i></span>
+          <span><i class='fa fa-question-circle' data-toggle="tooltip" title="Check this box if you’re homeless, stay in a shelter, have no fixed address or are temporarily living outside the District but consider yourself a District resident and intend to return."></i></span>
         </div>
       </div>
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
@@ -66,7 +67,7 @@
         </div>
       </div>
 
-      <% if kind != 'home' or f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+      <% if kind == 'work' or f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
         <% style="display:none;" %>
       <% end %>
       <div style="<%= style %>" class="row no-buffer address-row <%= div_class %> no-dc-address-reasons">
@@ -87,8 +88,14 @@
       </div>
     <% end%>
   </div>
+
 </div>
+
+<% if f.object.addresses[1].present? %>
+<% else %>
 <span class="form-action btn btn-trans">Add Mailing Address</span>
+
+<% end %>
 <script>
 $(document).ready(function () {
   $('#state_id').change(function(){

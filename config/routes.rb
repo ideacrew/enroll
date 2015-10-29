@@ -99,6 +99,7 @@ Rails.application.routes.draw do
         get 'manage_family'
         get 'personal'
         get 'inbox'
+        get 'brokers'
         get 'documents_index'
         get 'document_upload'
         get 'find_sep'
@@ -133,7 +134,8 @@ Rails.application.routes.draw do
         get 'search'
       end
     end
-    root 'employee_roles#show'
+    
+    root 'families#home'
 
     resources :family_members
     resources :group_selections, controller: "group_selection", only: [:new, :create] do

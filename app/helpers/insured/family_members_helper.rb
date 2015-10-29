@@ -1,6 +1,6 @@
 module Insured::FamilyMembersHelper
   def employee_dependent_form_id(model)
-    if model.persisted?
+    if model.try(:persisted?)
       "add_member_list_#{model.id}"
     else
       "new_employee_dependent_form"
