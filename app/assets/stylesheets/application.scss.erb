@@ -21,14 +21,18 @@
  *= require selectric
  *= require responsive
  *= require new
-#= require brokers
- #= require insured
+ *= require text_styles
+ *= require brokers
+ *= require insured
  *= require sprites
  *= require bootstrap-slider
  *= require_self
  */
 .clear {
   clear: both;
+}
+.dn {
+  display: none;
 }
  .starter {
    max-width: 660px;
@@ -75,6 +79,21 @@
        color: #fff;
      }
 
+   }
+ }
+ .panel-border {
+   border: solid 1px #d5d5d5;
+ }
+ .empty-box {
+   padding: 10px 10px;
+   border: solid 1px #d5d5d5;
+   .fa {
+     &.fa-flag {
+       color: #F9BB33;
+       border: solid 2px #F9BB33;
+       border-radius: 200%;
+       padding: 5px;
+     }
    }
  }
  .content-bottom {
@@ -205,3 +224,11 @@
     text-align:left;
     text-transform: none;
  }
+.consumer_roles {
+  .fa {
+    color: #007bc4;
+  }
+}
+.fa-question-circle {
+    color: #007bc4;
+}

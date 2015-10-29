@@ -446,7 +446,7 @@ Then(/^.+ should see the plan shopping welcome page$/) do
   @browser.element(text: /Filter Results/i).wait_until_present
   # @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
-  expect(@browser.element(text: /Choose a healthcare plan/i).visible?).to be_truthy
+  expect(@browser.element(text: /Choose Healthcare/i).visible?).to be_truthy
   # expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
 end
 
@@ -463,7 +463,7 @@ end
 When(/^.+ selects? a plan on the plan shopping page$/) do
   @browser.execute_script(
     'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose a healthcare plan/)
+    @browser.element(:text => /Choose Healthcare/)
   )
   scroll_then_click(@browser.a(text: /Select/))
 end
@@ -627,8 +627,8 @@ Then(/^I should see the dependents and group selection page$/) do
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
-  @browser.element(text: /Choose a healthcare plan/i).wait_until_present
-  expect(@browser.element(text: /Choose a healthcare plan/i).visible?).to be_truthy
+  @browser.element(text: /Choose Healthcare/i).wait_until_present
+  expect(@browser.element(text: /Choose Healthcare/i).visible?).to be_truthy
   @browser.execute_script("$('.interaction-click-control-select-plan')[1].click()")
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
@@ -644,7 +644,7 @@ And(/I select three plans to compare/) do
     compare_options[1].click
     compare_options[2].click
     click_when_present(@browser.a(text: "COMPARE PLANS"))
-    @browser.h3(text: /Choose Plan - Compare Selected Plans/).wait_until_present
+    @browser.h1(text: /Choose Plan - Compare Selected Plans/).wait_until_present
     expect(@browser.elements(:class => "plan_comparison").size).to eq 3
     @browser.button(text: 'Close').click
   end
