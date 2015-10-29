@@ -45,9 +45,9 @@ namespace :xml do
         last_row = sheet == "IVL HIOS Plan Crosswalk" ? sheet_data.last_row : 59
         (2..last_row).each do |row_number| # update renewal plan_ids
           carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
-          new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016).first
+          new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016, :csr_variant_id.in => ["","01"]).first
           if new_plan
-            Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).each do |pln|
+            Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015, :csr_variant_id.in => ["","01"]).each do |pln|
               pln.update(renewal_plan_id: new_plan._id)
               puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
               updated_hios_ids_list << pln.hios_id
@@ -67,21 +67,22 @@ namespace :xml do
       sheet_data = result.sheet("Aetna Transition Out IVL")
       (3..8).each do |row_number|
         old_carrier, old_hios_id, old_plan_name, new_carrier, new_hios_id, new_plan_name = sheet_data.row(row_number)
-        new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016).first
-        Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).each do |pln|
-          pln.update(renewal_plan_id: new_plan._id)
-          puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
-          updated_hios_ids_list << pln.hios_id
-        end
+        rejected_hios_ids_list << old_hios_id
+        # new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016, :csr_variant_id.in => ["","01"]).first
+        # Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015, :csr_variant_id.in => ["","01"]).each do |pln|
+        #   pln.update(renewal_plan_id: new_plan._id)
+        #   puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
+        #   updated_hios_ids_list << pln.hios_id
+        # end
       end
       old_plan_hios_ids = old_plan_hios_ids.map { |str| str[0..13] }.uniq
       updated_hios_ids_list = updated_hios_ids_list.map { |str| str[0..13] }.uniq
       no_change_in_hios_ids = old_plan_hios_ids - (updated_hios_ids_list + rejected_hios_ids_list)
       no_change_in_hios_ids = no_change_in_hios_ids.uniq
       no_change_in_hios_ids.each do |hios_id|
-        new_plan = Plan.where(active_year: 2016, hios_id: /#{hios_id}/).first
+        new_plan = Plan.where(active_year: 2016, hios_id: /#{hios_id}/, :csr_variant_id.in => ["","01"]).first
         if new_plan.present?
-          Plan.where(active_year: 2015, hios_id: /#{hios_id}/).each do |old_plan|
+          Plan.where(active_year: 2015, hios_id: /#{hios_id}/, :csr_variant_id.in => ["","01"]).each do |old_plan|
           old_plan.update(renewal_plan_id: new_plan.id)
             puts "Old plan hios_id #{old_plan.hios_id} carry overed with New plan hios_id: #{new_plan.hios_id}"
           end
