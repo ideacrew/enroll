@@ -92,6 +92,7 @@ class HbxEnrollment
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
+  delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :open_enrollments, ->{ where(enrollment_kind: "open_enrollment") }

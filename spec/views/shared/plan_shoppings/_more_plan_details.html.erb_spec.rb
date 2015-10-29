@@ -34,11 +34,11 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
   end
 
   it "should match person full name" do
-    expect(rendered).to match /Individual.*#{person.full_name}.*/m
+    expect(rendered).to match /Coverage For.*#{person.full_name}.*/m
   end
 
   it "should match dependent count" do
-    expect(rendered).to match /Dependents.*#{hbx_enrollment.humanized_dependent_summary}.*/m
+    expect(rendered).to match /.*#{hbx_enrollment.humanized_dependent_summary} dependent*/m
   end
 
   it "should match plan count" do
