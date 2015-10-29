@@ -75,6 +75,7 @@ class User
   index({roles: 1},  {sparse: true}) # MongoDB multikey index
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
+  index({created_at: 1 })
 
   before_save :strip_empty_fields
 
@@ -222,6 +223,14 @@ class User
   def instantiate_person
     self.person = Person.new
   end
+
+  # Instances without a matching Person model
+  # This suboptimal query approach is necessary, as the belongs_to side of the association holds the 
+  #   ID in a has_one association
+  def self.orphans
+    all.order(:"email".asc).select() {|u| u.person.blank?}
+  end
+
 
   def self.send_reset_password_instructions(attributes={})
     recoverable = find_or_initialize_with_errors(reset_password_keys, attributes, :not_found)

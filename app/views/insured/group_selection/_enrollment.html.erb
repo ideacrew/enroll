@@ -46,9 +46,7 @@
 
         <div class="row">
           <div class="col-xs-4 fa-icon-link">
-            <%= link_to(root_path + "sbc/#{plan.try(:sbc_file)}", class: "download") do %>
-               <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i><div class="fa-icon-label">Summary of Benefits and Coverage</div>
-            <% end %>
+            <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan } %>
           </div>
           <div class="col-xs-4">
             <a href="#">
@@ -76,5 +74,3 @@
       </div>
     </div>
 </div>
-
-

@@ -13,7 +13,12 @@
     <table>
       <thead>
         <tr>
-          <th>Employee</th>
+          <th>Employee Profile</th>
+          <th>Benefit Package</th>
+          <th>Insurance Coverage</th>
+          <th>Cost</th>
+
+          <!-- <th>Employee</th>
           <th>SSN</th>
           <th>DOB</th>
           <th>Hired</th>
@@ -24,7 +29,7 @@
           <th>Covered Ct</th>
           <th>Employer Contribution</th>
           <th>Employee Premium</th>
-          <th>Total Premium</th>
+          <th>Total Premium</th> -->
         </tr>
       </thead>
       <tbody>
@@ -39,6 +44,6 @@
     </table>
   </div>
 </div><br>
-  <%= button_to 'Output to CSV', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, class: 'btn btn-trans' %>
+  <%= button_to 'Download CSV', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, class: 'btn btn-trans' %>
   <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-trans' %>
 </div>

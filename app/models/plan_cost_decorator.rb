@@ -83,11 +83,16 @@ class PlanCostDecorator < SimpleDelegator
     }[person_relationship]
   end
 
-  def relationship(member)
-    if member.is_subscriber?
-      "employee"
+  def relationship_for(member)
+    case member.class
+    when HbxEnrollmentMember
+      if member.is_subscriber?
+        "employee"
+      else
+        benefit_relationship(member.primary_relationship)
+      end
     else
-      benefit_relationship(member.primary_relationship)
+      member.employee_relationship
     end
   end
 
@@ -109,8 +114,16 @@ class PlanCostDecorator < SimpleDelegator
     when HbxEnrollmentMember
       (relationship(member))
     else
-      member.employee_relationship
+      if child_index(member) > 2
+        0.0
+      else
+        1.0
+      end
     end
+  end
+
+  def relationship_benefit_for(member)
+    relationship = relationship_for(member)
     benefit_group.relationship_benefit_for(relationship)
   end
 

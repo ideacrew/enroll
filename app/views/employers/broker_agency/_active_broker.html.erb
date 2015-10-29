@@ -1,61 +1,135 @@
 <div class="no-buffer" id="active_broker_tab">
-  <div class="col-xs-12 row">
+  <div class="col-xs-12">
+    <div class="row">
+
+
   <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
   <% active_broker = @broker_agency_accounts[0].writing_agent %>
-  <h4>Active Broker</h4>
-  <div class="form-border">
-    <dl class="dl-horizontal no-buffer">
-      <dt>Agency Name</dt>
-      <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
-      <dt>Broker Name</dt>
-      <dd><%= active_broker.person.full_name %></dd>
-      <dt>Selected On</dt>
-      <dd><%= format_date @broker_agency_account.try(:start_on) %></dd>
-      <dt>Email</dt>
-      <dd>
-      <a href="mailto:<%= active_broker.person.emails.first.address %>">
-        <%= active_broker.person.emails.first.address %>
-      </a>
-      </dd>
-      <% if active_broker.person.phones.any? %>
-      <dt>Phone</dt>
-      <dd>
-        <%= active_broker.person.phones[0].to_s %>
-      </dd>
-      <% end %>
-    </dl>
+  <h1>Active Broker</h1>
 
-    <% if (defined?(direct_terminate) ? direct_terminate : false) %>
-      <% if @broker_agency_accounts.first.start_on == TimeKeeper.date_of_record %>
-        <% date = TimeKeeper.date_of_record %>
-      <% else %>
-        <% date = TimeKeeper.date_of_record - 1.day %>
-      <% end %>
-      <div class="bottom-pd">
-        <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-danger pull-right" %>
+  <div class="panel benefitgroup col-xs-12">
+        <section class="col-xs-6">
+          <header class="row">
+            <h5 class="bg-title" style="margin-bottom: 0;"><%= active_broker.person.full_name %></h5>
+            <span class="tt-u"><%= @employer_profile.broker_agency_profile.legal_name %><span>
+          </header>
+        </section>
+        <section class="col-xs-6">
+          <header class="row">
+            <% if (defined?(direct_terminate) ? direct_terminate : false) %>
+              <% if @broker_agency_accounts.first.start_on == TimeKeeper.date_of_record %>
+                <% date = TimeKeeper.date_of_record %>
+              <% else %>
+                <% date = TimeKeeper.date_of_record - 1.day %>
+              <% end %>
+              <div class="bottom-pd">
+                <%= link_to 'Change Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-trans" %>
+              </div>
+            <% else %>
+
+            <div class="bottom-pd">
+              <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
+            </div>
+            <table class="table table-wrapper" style="opacity: 1;">
+            <tbody>
+            <tr class="unbrd remove_<%= @employer_profile.broker_agency_profile.id %>">
+              <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= @employer_profile.broker_agency_profile.id %>">
+                <div class="confirm-terminate">
+                  <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+                  <a href="javascript:;" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id) %>" class="delete_confirm" id="remove_<%= @employer_profile.broker_agency_profile.id %>"><strong>Submit</strong></a>
+                  </div>
+                  <%= image_tag "enter_date_termination.png", width: "300", height: "" %>
+                </td>
+              </tr>
+            </tbody>
+            </table>
+            <% end %>
+          </header>
+        </section>
+        <table>
+          <tbody><tr>
+            <td>
+              <header>
+                <% if @employer_profile.broker_agency_profile.organization.office_locations.any? %>
+                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.address_1 %><br/>
+                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.city %>,
+                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.state %>
+                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.zip %>
+
+
+                <% else %>
+                No Address
+                <% end %>
+              </header>
+            </td>
+            <td>
+
+                <% if active_broker.person.phones.any? %>
+                <i class="fa fa-phone"></i>
+                  <%= active_broker.person.phones[0].to_s %>
+                  <% else %>
+                  <i class="fa fa-phone"></i>
+                  No Phone Number
+                <% end %>
+                <br/>
+                <i class="fa fa-at"></i>
+                <a href="mailto:<%= active_broker.person.emails.first.address %>">
+                  <%= active_broker.person.emails.first.address %>
+                </a>
+
+
+            </td>
+          </tr>
+
+
+        </tbody></table>
       </div>
-    <% else %>
-
-    <div class="bottom-pd">
-      <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm pull-right", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
-    </div>
-    <table class="table table-wrapper" style="opacity: 1;">
-    <tbody>
-    <tr class="unbrd remove_<%= @employer_profile.broker_agency_profile.id %>">
-      <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= @employer_profile.broker_agency_profile.id %>">
-        <div class="confirm-terminate">
-          <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
-          <a href="javascript:;" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id) %>" class="delete_confirm" id="remove_<%= @employer_profile.broker_agency_profile.id %>"><strong>Submit</strong></a>
+      <div class="panel benefitgroup col-xs-12">
+        <div class="row">
+          <div class="col-xs-4">
+            <span class="lg ttu twelve">
+              Fein:
+            </span>
+            <span class="dg">
+              <%= @employer_profile.broker_agency_profile.organization.fein %>
+            </span>
+            <br/>
+            <span class="lg ttu twelve">
+              Entity Type:
+            </span>
+            <span class="dg">
+              <%= @employer_profile.broker_agency_profile.entity_kind.try(:humanize).try(:titleize) %>
+            </span>
           </div>
-          <%= image_tag "enter_date_termination.png", width: "300", height: "" %>
-        </td>
-      </tr>
-    </tbody>
-    </table>
-    <% end %>
-  </div>
+          <div class="col-xs-4">
+            <span class="lg ttu twelve">
+              New Clients:
+            </span>
+            <span class="dg">
+              <%= @employer_profile.broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+            </span>
+            <br/>
+            <span class="lg ttu twelve">
+              Weekend/Evening Hours:
+            </span>
+            <span class="dg">
+              <%= @employer_profile.broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+            </span>
+          </div>
+          <div class="col-xs-4">
+            <span class="lg ttu twelve">
+              Language:
+            </span>
+            <span class="dg">
+              <%= @employer_profile.broker_agency_profile.languages %>
+            </span>
+          </div>
+        </div>
+        <br/>
+</div>
     <% else %>
     <% end %>
+</div>
 </div>
 </div>
 

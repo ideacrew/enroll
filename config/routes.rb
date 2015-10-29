@@ -2,6 +2,10 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations" }
 
+  namespace :users do
+    resources :orphans, only: [:index, :show, :destroy]
+  end
+
   resources :saml, only: :index do
     collection do
       post :login
@@ -77,7 +81,7 @@ Rails.application.routes.draw do
         get 'thankyou'
         post 'waive'
         post 'terminate'
-        post 'set_elected_pct'
+        post 'set_elected_aptc'
       end
     end
 
@@ -130,7 +134,8 @@ Rails.application.routes.draw do
         get 'search'
       end
     end
-    root 'employee_roles#show'
+    
+    root 'families#home'
 
     resources :family_members
     resources :group_selections, controller: "group_selection", only: [:new, :create] do

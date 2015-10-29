@@ -74,11 +74,15 @@ function applyPlanFilters() {
 var plansToCompareArray = new Array();
 var hbx;
 var active_year;
+var enrollment_kind;
+var change_plan;
 
 function maybeAddComparisonPlan(cb) {
 	var new_plan = $(cb).attr("data-hios-id");
   hbx =  $(cb).attr("data-hbx-id");
   active_year =  $(cb).attr("data-plan-year");
+  enrollment_kind =  $(cb).attr("data-plan-enrollment-kind");
+  change_plan =  $(cb).attr("data-plan-change-plan");
 	var is_checked = $(cb).prop("checked");
 	if (is_checked) {
 		if (plansToCompareArray.length > 2) {
@@ -113,7 +117,8 @@ function doPlanComparison(action_uri) {
 	url: action_uri,
 	dataType: 'script',
 	data: {
-		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id":hbx, "active_year": active_year
+		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
+    "change_plan": change_plan
 	}
 	});
 }
@@ -133,8 +138,8 @@ function applyPlanSort(sort_by){
   $("#all-plans #plans").empty().append(plandivs);
 };
 
-function updatePlanCost(elected_pct) {
-  var elected_amount = parseFloat($('#max_aptc').val()) * parseFloat(elected_pct);
+function updatePlanCost(elected_aptc) {
+  var elected_amount = parseFloat(elected_aptc);
   var plans = $('.plan-row');
   for(var i=0; i<plans.length; i++){
     var plan = plans[i];
@@ -177,29 +182,29 @@ $(function() {
   $(document).on('change', 'input[name="elected_pct"]', function(){
     var elected_pct = $("input[name='elected_pct']").val();
     var elected_amount = parseFloat($('#max_aptc').val()).toFixed(2) * parseFloat(elected_pct).toFixed(2);
-    $('#aptc-used').val(elected_amount.toFixed(2));
+    $('#elected_aptc').val(elected_amount.toFixed(2));
   });
 
-  $(document).on('change', 'input#aptc-used', function(){
-    var aptc_used = $(this).val();
+  $(document).on('change', 'input#elected_aptc', function(){
+    var elected_aptc = $(this).val();
     var max_aptc = $('input#max_aptc').val();
-    $("input[name='elected_pct']").val(aptc_used/max_aptc);
-    $("output[name='pct']").text((aptc_used/max_aptc*100).toFixed(0));
+    $("input[name='elected_pct']").val(elected_aptc/max_aptc);
+    $("output[name='pct']").text((elected_aptc/max_aptc*100).toFixed(0));
   });
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
 
     if ($('.aptc').length > 0){
-      var elected_pct = $("input[name='elected_pct']").val()
+      var elected_aptc = $("input#elected_aptc").val();
 
-      updatePlanCost(elected_pct);
+      updatePlanCost(elected_aptc);
       $.ajax({
         type: "POST",
-        url: $('#set_elected_pct_url').val(),
+        url: $('#set_elected_aptc_url').val(),
         dataType: 'script',
         data: {
-          'elected_pct': elected_pct
+          'elected_aptc': elected_aptc
         }
       });
     };
@@ -220,11 +225,11 @@ $(function() {
     applyPlanSort($(this).data('sort-by'));
   });
 
-  $(document).on('click', "#plans .plan-select.btn-select", function(e){
+  $(document).on('click', "#plans .plan-select.btn-trans.select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
-      var elected_pct = $("input[name='elected_pct']").val();
-      url = url + "&elected_pct=" + elected_pct;
+      var elected_aptc = $("input#elected_aptc").val();
+      url = url + "&elected_aptc=" + elected_aptc;
     };
     window.location.href= url;
   });

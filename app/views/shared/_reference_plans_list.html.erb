@@ -4,7 +4,7 @@
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
 <% if @plan_year.new_record? %>
   <h1>Select Your Plan Offering</h1>
-  <h4 style="max-width: 660px;">Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.</h4>
+  <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
   <br/>
 <% else %>
 <div class="edit-offering">
@@ -61,8 +61,8 @@
   <div class="col-xs-12 plan-options" style="display: none;">
     <div class="col-xs-12 carriers-tab" style="display: none;">
       <br><br>
-      <h4>Let your plan participants choose any plan they want offered by a single carrier.<br/>It will not cost you more to let them choose.</h4>
-      <br/>
+      <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+      <br/><br/>
       <% @carrier_names.each_pair do |ck, cv| %>
       <div class="col-xs-3" class="carriers">
         <div class="col-xs-12 row">
@@ -88,7 +88,7 @@
     </div>
     <div class="col-xs-12 metals-tab" style="display: none;">
       <br><br>
-      <h4>Let your plan participants choose any plan from a given metal level.<br/>It will not cost you more to let them choose.</h4>
+      <h4>Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.</h4>
       <br/>
       <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
       <div class="col-xs-3" class="metals">
@@ -126,7 +126,7 @@
     </div>
     <div class="col-xs-12 single-plan-tab" style="display: none;">
       <br><br>
-      <h4>Choose a single plan for your plan participants.</h4>
+      <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
       <br/>
       <% @carrier_names.each_pair do |ck, cv| %>
       <div class="col-xs-3" class="carriers">

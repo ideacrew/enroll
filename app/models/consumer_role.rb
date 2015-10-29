@@ -2,6 +2,7 @@ class ConsumerRole
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AASM
@@ -54,6 +55,8 @@ class ConsumerRole
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
+  field :contact_method, type: String, default: "Only Paper communication"
+  field :language_preference, type: String, default: "English"
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true

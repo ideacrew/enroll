@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
-      <h3>Special Enrollment Period</h3>
+      <h1 class="darkblue">Special Enrollment Period</h1>
       <div class="seps-panel panel panel-default">
         <div class="panel-heading" style="margin-bottom: 10px;">
           <div class="row">
@@ -19,7 +19,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div
 
       <%#= form_tag(:insured_plan_shopping) do %>
       <%= hidden_field_tag 'id', @hbx_enrollment_id %>
@@ -35,11 +35,7 @@
 
     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 right-section">
       <% if @change_plan.blank? %>
-        <% if @market_kind == 'shop' %>
-        <%= render  partial: 'shared/sep_shop_progress', locals: {step: '4'} %>
-        <% else %>
-        <%= render  partial: 'shared/sep_progress', locals: {step: '3'} %>
-        <% end %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: true, button_continue: false} %>
       <% else %>
         <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>
       <% end %>

@@ -6,32 +6,35 @@
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
         <div class="ct-1">
-          <h3>Choose a healthcare plan.</h3>
-          <div class="row no-buffer">
-            <p class="pull-left">
-              Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
-              Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-              <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
-              Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
-              <% end %>
-              Plans: <strong id='plans-count'><%= @plans.count %></strong>
-            </p>
+          <h1 class="darkblue">Choose Healthcare</h1>
+          <h4 class="switch-header">Find a quality, affordable health insurance plan that’s right for you, or for you and your family. Use ‘Filter Results’, ‘Compare’ and ‘Details’ features to narrow your choices. When you find the plan you want, ‘Select Plan’.</h4>
+          <div class="empty-box" style="display: none;">
+            <i class="fa fa-flag"></i>
+            <h4 class="emphasize" style="display: inline;">
 
+              <strong>
+                Important:
+              </strong>
+              Please review SBC for any coinsurance costs.
+            </h4>
+          </div>
+          <div class="row no-buffer">
+            <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
-              <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-trans compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 COMPARE PLANS
               </a>
             </p>
-            <br/><br/><br/>
+
           </div>
 
-          <div class="row">
+          <div class="">
             <div id="plan-summary"></div>
 
             <div id="all-plans" class="all-filters-row">
               <%= render 'plan_filters' %>
 
-              <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
+              <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12" style="padding-right: 0;">
                 <div class="sort-area" style='margin:10px 0;'>
                   <span><strong>Sort By</strong></span>
                   <div class="btn-group" role="group" id='sort_by'>
@@ -51,7 +54,7 @@
 
           <div class="row no-buffer">
             <p class="pull-right">
-              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-trans compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 COMPARE PLANS
               </a>
             </p>
@@ -59,7 +62,7 @@
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">  
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>
           <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
@@ -67,11 +70,7 @@
             <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
           <% end %>
         <% elsif @change_plan.blank? %>
-          <% if @enrollment_kind == 'sep' %>
-          <%= render  partial: 'shared/sep_shop_progress', locals: {step: '6'} %>
-          <% else %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
-          <% end %>
         <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
         <% elsif @change_plan == "change_plan" %>
@@ -103,14 +102,14 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.employee_role.present? %>
+<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.try(:employee_role).present? %>
 
 <%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
 
 <script type="text/javascript">
   window.onload = function() {
     $.ajax({
-      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) %>",
+      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
       type: "GET"
     });
   };

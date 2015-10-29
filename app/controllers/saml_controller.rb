@@ -39,10 +39,10 @@ class SamlController < ApplicationController
         end
       else
         new_password = User.generate_valid_password
-        new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: email)
+        new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: response.name_id)
         new_user.save!
         ::IdpAccountManager.update_navigation_flag(
-          email,
+          response.name_id,
           email,
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )

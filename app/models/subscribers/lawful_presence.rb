@@ -25,7 +25,7 @@ module Subscribers
         if "503" == return_status
           args = OpenStruct.new
           args.determined_at = TimeKeeper.datetime_of_record
-          args.vlp_authority = 'vlp'
+          args.vlp_authority = 'dhs'
           consumer_role.deny_lawful_presence!(args)
           consumer_role.save      
           return                          
@@ -49,16 +49,16 @@ module Subscribers
 
       if xml_hash[:lawful_presence_indeterminate].present?
         args.determined_at = TimeKeeper.datetime_of_record
-        args.vlp_authority = 'vlp'
+        args.vlp_authority = 'dhs'
         consumer_role.deny_lawful_presence!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("lawfully_present")
         args.determined_at = TimeKeeper.datetime_of_record
-        args.vlp_authority = 'vlp'
+        args.vlp_authority = 'dhs'
         args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.authorize_lawful_presence!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
         args.determined_at = TimeKeeper.datetime_of_record
-        args.vlp_authority = 'vlp'
+        args.vlp_authority = 'dhs'
         args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.deny_lawful_presence!(args)
       end

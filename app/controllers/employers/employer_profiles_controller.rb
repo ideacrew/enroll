@@ -14,14 +14,19 @@ class Employers::EmployerProfilesController < ApplicationController
       @orgs = Organization.search(@q).exists(employer_profile: true)
     else
       @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
+
     end
 
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    if @q.blank?
+      @page_alphabets = page_alphabets(@orgs, "legal_name")
+      page_no = cur_page_no(@page_alphabets.first)
+      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+      @employer_profiles = @organizations.map {|o| o.employer_profile}
+    else
+      @employer_profiles = @orgs.map {|o| o.employer_profile}
+    end
 
     @profile = find_mailbox_provider
-    @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
   def welcome
@@ -76,31 +81,33 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-
-   @tab = params['tab']
-   if params[:q] || params[:page] || params[:commit] || params[:status]
-     paginate_employees
-   else
-      @current_plan_year = @employer_profile.published_plan_year
-      if @current_plan_year.present?
-        @additional_required_participants_count = @current_plan_year.additional_required_participants_count
-      end
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
-
-      @broker_agency_accounts = @employer_profile.broker_agency_accounts
-      if @current_plan_year.present?
-        #FIXME commeted out for performance test
-        enrollments = @current_plan_year.hbx_enrollments
-        @premium_amt_total = enrollments.map(&:total_premium).sum
-        @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-        @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      end
-    end
-    if @tab == 'employees'
+    @tab = params['tab']
+    if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
-    end
-    if @tab == 'employees'
-      paginate_employees
+    else
+      case @tab
+      when 'benefits'
+        @current_plan_year = @employer_profile.published_plan_year
+        @plan_years = @employer_profile.plan_years.order(id: :desc)
+      when 'documents'
+      when 'employees'
+        paginate_employees
+      when 'brokers'
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
+      when 'inbox'
+      else
+        @current_plan_year = @employer_profile.published_plan_year
+        if @current_plan_year.present?
+          @additional_required_participants_count = @current_plan_year.additional_required_participants_count
+          #FIXME commeted out for performance test
+          enrollments = @current_plan_year.hbx_enrollments
+          if enrollments.size < 100
+            @premium_amt_total = enrollments.map(&:total_premium).sum
+            @employee_cost_total = enrollments.map(&:total_employee_cost).sum
+            @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+          end
+        end
+      end
     end
   end
 
@@ -134,7 +141,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def edit
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-
+    @employer = @employer_profile.match_employer(current_user)
   end
 
   def create
@@ -159,6 +166,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization_dup = @organization.office_locations.as_json
 
     @employer_profile = @organization.employer_profile
+    @employer = @employer_profile.match_employer(current_user)
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
       @organization.assign_attributes(organization_profile_params)
 
@@ -166,9 +174,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
 
-
-      if @organization.update_attributes(employer_profile_params)
-
+      if @organization.update_attributes(employer_profile_params) and @employer.update_attributes(employer_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -274,7 +280,7 @@ class Employers::EmployerProfilesController < ApplicationController
    end
 
     def check_admin_staff_role
-      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role?
+      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role? || current_user.has_broker_role?
       elsif current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
       else
@@ -331,4 +337,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization
     end
 
+    def employer_params
+      params.permit(:first_name, :last_name, :dob)
+    end
 end

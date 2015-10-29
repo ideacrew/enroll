@@ -136,6 +136,10 @@ class QhpBuilder
       nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
           name: @qhp.plan_marketing_name.squish!,
+          hios_id: up_plan.coverage_kind == "dental" ? up_plan.hios_id.split("-").first : up_plan.hios_id,
+          hios_base_id: up_plan.hios_id.split("-").first,
+          # csr_variant_id: up_plan.hios_id.include?("-") ? up_plan.hios_id.split("-").last : "",
+          csr_variant_id: up_plan.coverage_kind == "dental" ? "" : up_plan.hios_id.split("-").last,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,

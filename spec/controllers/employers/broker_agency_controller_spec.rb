@@ -9,11 +9,13 @@ RSpec.describe Employers::BrokerAgencyController do
     @org1 = FactoryGirl.create(:broker_agency, legal_name: "agencyone")
     @org1.broker_agency_profile.update_attributes(primary_broker_role: @broker_role)
     @broker_role.update_attributes(broker_agency_profile_id: @org1.broker_agency_profile.id)
+    @org1.broker_agency_profile.approve!
 
     @broker_role2 = FactoryGirl.create(:broker_role, aasm_state: 'active')
     @org2 = FactoryGirl.create(:broker_agency, legal_name: "agencytwo")
     @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2)
     @broker_role2.update_attributes(broker_agency_profile_id: @org2.broker_agency_profile.id)
+    @org2.broker_agency_profile.approve!
 
     @user = FactoryGirl.create(:user)
   end
@@ -61,7 +63,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should be a success" do
-        expect(flash[:notice]).to eq("Successfully associated broker with your account.")
+        expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
       end
     end

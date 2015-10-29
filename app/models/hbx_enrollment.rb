@@ -2,11 +2,13 @@ require 'ostruct'
 
 class HbxEnrollment
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
   include AASM
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
@@ -24,9 +26,9 @@ class HbxEnrollment
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
   ENROLLED_STATUSES = [
-      "coverage_selected", 
-      "enrollment_transmitted_to_carrier", 
-      "coverage_enrolled", 
+      "coverage_selected",
+      "enrollment_transmitted_to_carrier",
+      "coverage_enrolled",
       "coverage_renewed",
       "enrolled_contingent",
       "unverified"
@@ -36,18 +38,29 @@ class HbxEnrollment
 
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
+  ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "enrollment_transmitted_to_carrier" => 2, "coverage_enrolled" => 3}
+  ENROLLMENT_TRAIN_STOPS_STEPS.default = 0
+
+  COVERAGE_KINDS = %w[health dental]
+
   embedded_in :household
 
   field :coverage_household_id, type: String
   field :kind, type: String
   field :enrollment_kind, type: String, default: 'open_enrollment'
+  field :coverage_kind, type: String, default: 'health'
+
+  # FIXME: This unblocks people with legacy data where this field exists,
+  #        preventing user registration as in #3394.  This is NOT a correct
+  #        fix to that issue and it still needs to be addressed.
+  field :elected_amount, type: Money, default: 0.0
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
   # TODO need to understand these two fields
   field :elected_aptc_pct, type: Float, default: 0.0
-  field :elected_amount, type: Money, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
+  field :changing, type: Boolean, default: false
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -79,6 +92,7 @@ class HbxEnrollment
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
+  delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :open_enrollments, ->{ where(enrollment_kind: "open_enrollment") }
@@ -86,6 +100,11 @@ class HbxEnrollment
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :changing, ->{ where(changing: true) }
+  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+
+
+  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -104,6 +123,13 @@ class HbxEnrollment
     inclusion: {
       in: ENROLLMENT_KINDS,
       message: "%{value} is not a valid enrollment kind"
+    }
+
+  validates :coverage_kind,
+    allow_blank: false,
+    inclusion: {
+      in: COVERAGE_KINDS,
+      message: "%{value} is not a valid coverage kind"
     }
 
   aasm do
@@ -185,9 +211,13 @@ class HbxEnrollment
     end
   end
 
+  def coverage_kind
+    read_attribute(:coverage_kind) || self.plan.coverage_kind
+  end
+
   def census_employee
     if employee_role.present?
-      employee_role.census_employee 
+      employee_role.census_employee
     else
       benefit_group_assignment.census_employee
     end
@@ -248,6 +278,10 @@ class HbxEnrollment
     !self.published_to_bus_at.blank?
   end
 
+  def is_shop?
+    !consumer_role.present?
+  end
+
   def is_shop_sep?
     return false if consumer_role.present?
     !("open_enrollment" == self.enrollment_kind)
@@ -280,7 +314,17 @@ class HbxEnrollment
   end
 
   def employer_profile
-    self.try(:employee_role).employer_profile
+    if self.employee_role.present?
+      self.employee_role.employer_profile
+    elsif !self.benefit_group_id.blank?
+      self.benefit_group.employer_profile
+    else
+      nil
+    end
+  end
+
+  def enroll_step
+    ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
   end
 
   def plan=(new_plan)
@@ -360,7 +404,8 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    tax_household = household.latest_active_tax_household rescue nil
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -385,7 +430,7 @@ class HbxEnrollment
     return if pre_hbx_id.blank?
     pre_hbx = HbxEnrollment.find(pre_hbx_id)
     if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
-      pre_hbx.update_current(is_active: false)
+      pre_hbx.update_current(is_active: false, changing: false)
     end
   end
 
@@ -396,14 +441,18 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     enrollment = HbxEnrollment.new
+
+    enrollment.household = coverage_household.household
+    enrollment.submitted_at = submitted_at
+
     case
     when employee_role.present?
       raise unless benefit_group.present?
-      enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
+
       if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
@@ -411,6 +460,7 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
+
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -418,10 +468,10 @@ class HbxEnrollment
       #it will be better to create a new benefit_group_assignment
       benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+
     when consumer_role.present?
-      enrollment.household = coverage_household.household
-      enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
+      enrollment.kind = "individual"
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -433,10 +483,10 @@ class HbxEnrollment
         enrollment.enrollment_kind = "open_enrollment"
       end
 
-      # end
     else
       raise "either employee_role or consumer_role is required"
     end
+
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
@@ -505,6 +555,9 @@ class HbxEnrollment
       raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
+  rescue
+    log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
+    nil
   end
 
   def self.find_by_benefit_groups(benefit_groups = [])

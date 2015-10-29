@@ -2,7 +2,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
-    initialize_common_vars 
+    initialize_common_vars
 
     if params[:employee_role_id].present?
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == params["employee_role_id"].to_s }
@@ -16,7 +16,11 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
-      session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id] if params[:hbx_enrollment_id].present?
+      if params[:hbx_enrollment_id].present?
+        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
+        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
+        pre_hbx.update_current(changing: true) if pre_hbx.present?
+      end
       hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages
@@ -44,12 +48,14 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
-    
-    hbx_enrollment.writing_agent_id = current_user.id
+
+    @family.hire_broker_agency(current_user.person.broker_role.try(:id))
+    hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
+    hbx_enrollment.coverage_kind = @coverage_kind
+    
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan

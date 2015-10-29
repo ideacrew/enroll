@@ -87,7 +87,7 @@ end
 And(/^.+ should receive an invitation email$/) do
   open_email("ricky.martin@example.com")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
-  current_email.should have_subject('DCHealthLink Invitation ')
+  #current_email.should have_subject('Invitation from your Employer to Sign up for Health Insurance at DC Health Link ')
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -118,8 +118,8 @@ When(/^.+ registers? with valid information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  @browser.element(text: /Welcome! Your account has been created./).wait_until_present
-  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
+  @browser.element(text: /Welcome to DC Health Link. Your account has been created./).wait_until_present
+  expect(@browser.element(text: /Welcome to DC Health Link. Your account has been created./).visible?).to be_truthy
 
   @browser.h3(text: /Broker Agency \: Logistics Inc/).wait_until_present
   expect(@browser.h3(text: /Broker Agency \: Logistics Inc/).visible?).to be_truthy
@@ -127,7 +127,7 @@ end
 
 Then(/^.+ should see no active broker$/) do
   @browser.element(class: /interaction-click-control-browse-brokers/).wait_until_present
-  expect(@browser.element(text: /You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you./).visible?).to be_truthy
+  expect(@browser.element(text: /You have no active Broker/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Browse Brokers button$/) do
@@ -172,19 +172,20 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
-  @browser.element(text: /Successfully associated broker with your account./).wait_until_present
-  expect(@browser.element(text: /Successfully associated broker with your account./).visible?).to be_truthy
+  @browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).wait_until_present
+  expect(@browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).visible?).to be_truthy
 end
 
 And (/^.+ should see broker active for the employer$/) do
   @browser.element(text: /Logistics Inc/i).wait_until_present
   expect(@browser.element(text: /Logistics Inc/).visible?).to be_truthy
-  expect(@browser.element(text: /Ricky Martin/).visible?).to be_truthy
+  expect(@browser.element(text: /Ricky Martin/i).visible?).to be_truthy
 end
 
 When(/^.+ terminates broker$/) do
-  @browser.a(text: /Terminate/).wait_until_present
-  @browser.a(text: /Terminate/).click
+
+  @browser.a(text: /Change Broker/i).wait_until_present
+  @browser.a(text: /Change Broker/i).click
 
   #according to 2096 remove terminate in future
   #@browser.text_field(class: "date-picker").wait_until_present
@@ -283,7 +284,7 @@ Then(/^.+ sees covered family members$/) do
 end
 
 Then(/^.+ choses a healthcare plan$/) do
-  wait_and_confirm_text(/Choose a healthcare plan/)
+  wait_and_confirm_text(/Choose Healthcare/i)
   wait_and_confirm_text(/Apply/)
   plan = @browser.a(class: 'interaction-click-control-select-plan')
   plan.click

@@ -1,26 +1,22 @@
 <!-- only if user has any of these roles then show "my account" dropdown. -->
 <% if current_user.try(:has_insured_role?) || current_user.try(:has_employer_staff_role?) || current_user.try(:has_broker_agency_staff_role?) %>
-  <div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      My Account <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-      <% if current_user.try(:has_insured_role?) %>
-        <li>
-          <%= link_to "My Insured Portal", family_account_path %>
-        </li>
+
+<li>
+      <% if current_user.try(:has_consumer_role?) || current_user.try(:has_employee_role?) %>
+
+          <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %>
+
       <% end %>
       <% if current_user.try(:has_employer_staff_role?) %>
-        <li>
-          <%= link_to "My Employer Portal", new_employers_employer_profile_path %>
-        </li>
+
+          <%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'g14' %>
+
       <% end %>
       <% if current_user.try(:has_broker_agency_staff_role?) %>
-        <li>
-          <%= link_to "My Broker Agency Portal", broker_agencies_root_path %>
-        </li>
+
+          <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'g14' %>
+
       <% end %>
-    </ul>
-  </div>
-  <li class="hidden-xs">|</li>
+</li>
+<li class="hidden-xs">|</li>
 <% end %>

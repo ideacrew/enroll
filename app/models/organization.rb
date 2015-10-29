@@ -1,5 +1,6 @@
 class Organization
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
@@ -45,7 +46,11 @@ class Organization
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
   scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
   scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})} 
-  
+
+  scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
+  scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
+
+
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
@@ -167,12 +172,6 @@ class Organization
 
   class << self
 
-    def active_broker_agencies
-      Organization.exists(broker_agency_profile: true).where({
-        "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers }
-        })
-    end
-
     def build_query_params(search_params)
       query_params = []
 
@@ -195,15 +194,15 @@ class Organization
     def search_agencies_by_criteria(search_params)
       query_params = build_query_params(search_params)
       if query_params.any?
-        self.active_broker_agencies.where({ "$and" => build_query_params(search_params) })
+        self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
       else
-        self.active_broker_agencies
+        self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       end
     end
 
     def broker_agencies_with_matching_agency_or_broker(search_params)
       if search_params[:q].present?
-        orgs2 = self.active_broker_agencies.where({
+        orgs2 = self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
           "broker_agency_profile._id" => {
             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
           }

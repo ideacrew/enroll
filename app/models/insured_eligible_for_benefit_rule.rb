@@ -50,6 +50,14 @@ class InsuredEligibleForBenefitRule
     end
   end
 
+  def is_cost_sharing_satisfied?
+    cost_sharing = @benefit_package.cost_sharing
+    csr_kind = @role.try(:person).try(:primary_family).try(:latest_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+
+    return true if csr_kind.blank? or cost_sharing.blank?
+    csr_kind == cost_sharing
+  end
+
   def is_market_places_satisfied?
     true
   end
@@ -77,7 +85,7 @@ class InsuredEligibleForBenefitRule
   def is_residency_status_satisfied?
     return true if @benefit_package.residency_status.include?("any")
 
-    if @benefit_package.residency_status.include?("state_resident")
+    if @benefit_package.residency_status.include?("state_resident") and @role.present?
       person = @role.person
       return true if person.is_dc_resident?
 

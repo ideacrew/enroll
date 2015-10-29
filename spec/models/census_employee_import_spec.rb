@@ -40,5 +40,10 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.load_imported_census_employees.first.census_dependents.count).to eq(1)
       expect(subject.load_imported_census_employees.last).to be_a CensusDependent
     end
+
+    it "should save the employee with address" do
+      expect(subject.save).to be_truthy
+      expect(subject.load_imported_census_employees.first.address.present?).to be_truthy
+    end
   end
 end

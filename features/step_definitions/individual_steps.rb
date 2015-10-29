@@ -104,13 +104,13 @@ Then (/Individual fixes a VLP error message/) do
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
-  @browser.radio(class: /interaction-choice-control-value-agreement-agree/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-agreement-agree/).click
+  @browser.label(for: /agreement_agree/).wait_until_present
+  @browser.label(for: /agreement_agree/).click
   @browser.a(class: /interaction-click-control-continue/).wait_until_present
   @browser.a(class: /interaction-click-control-continue/).click
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).set
-  @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-1-response-id-c/).set
+  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).wait_until_present
+  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).fire_event("onclick")
+  @browser.label(for: /interactive_verification_questions_attributes_1_response_id_c/).fire_event("onclick")
   @browser.button(class: /interaction-click-control-submit/).wait_until_present
   @browser.button(class: /interaction-click-control-submit/).click
   screenshot("identify_verification")
@@ -146,13 +146,13 @@ And(/Individual clicks on add member button/) do
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   screenshot("add_member")
-  scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  scroll_then_click(@browser.button(text: /Confirm Member/i))
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 And(/Individual again clicks on add member button/) do
-  @browser.a(text: /Add Member/).wait_until_present
-  @browser.a(text: /Add Member/).click
+  @browser.a(text: /Add Member/i).wait_until_present
+  @browser.a(text: /Add Member/i).click
   @browser.text_field(id: /dependent_first_name/).wait_until_present
   @browser.text_field(id: /dependent_first_name/).set("Robert")
   @browser.text_field(id: /dependent_middle_name/).set("K")
@@ -170,8 +170,8 @@ And(/Individual again clicks on add member button/) do
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
   @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
-  scroll_then_click(@browser.button(text: /Confirm Member/))
-  @browser.button(text: /Confirm Member/).wait_while_present
+  scroll_then_click(@browser.button(text: /Confirm Member/i))
+  @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
 
@@ -275,7 +275,7 @@ And(/^.+ clicks? the continue button$/i) do
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
-  wait_and_confirm_text(/Verify Identity: Consent/)
+  wait_and_confirm_text(/Verify Identity/)
 end
 
 When(/^CSR accesses the HBX portal$/) do
@@ -302,7 +302,7 @@ Then(/CSR opens the most recent Please Contact Message/) do
   wait_and_confirm_text /Please contact/
   sleep 1
   tr=@browser.trs(text: /Please contact/).last
-  scroll_then_click(tr.a(text: /show/))
+  scroll_then_click(tr.a(text: /show/i))
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
@@ -311,8 +311,8 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Assisting/
-  @browser.a(text: /I'm a Customer Service/i).click
+  wait_and_confirm_text /Trained/
+  @browser.a(text: /I'm a Trained Expert/i).click
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
@@ -428,29 +428,72 @@ And(/(\w+) clicks on the purchase button on the confirmation page/) do |insured|
 end
 
 
+Then(/^Aptc user create consumer role account$/) do
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set("aptc@dclink.com")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
+  screenshot("aptc_create_account")
+  scroll_then_click(@browser.input(value: "Create account"))
+end
 
+Then(/^Aptc user goes to register as individual/) do
+  step "user should see your information page"
+  step "user goes to register as an individual"
+  @browser.text_field(class: /interaction-field-control-person-first-name/).set("Aptc")
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn3)
+  screenshot("aptc_register")
 
+end
 
+Then(/^Aptc user should see a form to enter personal information$/) do
+  step "Individual should see a form to enter personal information"
+  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("aptc@dclink.com")
+  screenshot("aptc_personal")
+end
 
+Then(/^Prepare taxhousehold info for aptc user$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  household = person.primary_family.latest_household
+  if household.tax_households.blank?
+    household.tax_households.create(is_eligibility_determined: Date.current, allocated_aptc: 100, effective_starting_on: Date.current - 10.days, effective_ending_on: Date.current + 10.days, submitted_at: Date.current)
+    fm_id = person.primary_family.family_members.last.id
+    household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
+    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
+  end
+  screenshot("aptc_householdinfo")
 
+end
 
+And(/Aptc user set elected amount and select plan/) do
+  @browser.text_field(id: /elected_aptc/).wait_until_present
+  @browser.text_field(id: "elected_aptc").set("20")
+  click_when_present(@browser.a(text: /Select Plan/))
+  screenshot("aptc_setamount")
 
+end
 
+Then(/Aptc user should see aptc amount and click on confirm button on thanyou page/) do
+  click_when_present(@browser.checkbox(class: /interaction-choice-control-value-terms-check-thank-you/))
+  expect(@browser.td(text: "$20.00").visible?).to be_truthy
+  @browser.checkbox(id: "terms_check_thank_you").set(true)
+  @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Aptc")
+  @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(@u.find :last_name1)
+  screenshot("aptc_purchase")
+  click_when_present(@browser.a(text: /confirm/i))
+end
 
+Then(/Aptc user should see aptc amount on receipt page/) do
+  @browser.h1(text: /Enrollment Submitted/).wait_until_present
+  expect(@browser.td(text: "$20.00").visible?).to be_truthy
+  screenshot("aptc_receipt")
 
+end
 
+Then(/Aptc user should see aptc amount on individual home page/) do
+  @browser.h1(text: /My DC Health Link/).wait_until_present
+  expect(@browser.strong(text: "$20.00").visible?).to be_truthy
+  expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
+  screenshot("aptc_ivl_home")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+end

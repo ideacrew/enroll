@@ -3,13 +3,16 @@ class Insured::FamiliesController < FamiliesController
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep]
+  before_action :check_employee_role
 
   def home
     set_bookmark_url
 
     @hbx_enrollments = @family.enrolled_hbx_enrollments.active || []
+    update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
+    @tab = params['tab']
     respond_to do |format|
       format.html
     end
@@ -19,12 +22,16 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
+    @tab = params['tab']
+
 
     respond_to do |format|
       format.html
     end
   end
   def brokers
+    @tab = params['tab']
+
     if @person.employee_roles.present?
       @employee_role = @person.employee_roles.try(:first)
     end
@@ -61,6 +68,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def personal
+    @tab = params['tab']
+
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     respond_to do |format|
@@ -69,16 +78,20 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def inbox
+    @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
   end
 
   def documents_index
+    @tab = params['tab']
 
   end
 
   def document_upload
     @consumer_wrapper = Forms::ConsumerRole.new(@person.consumer_role)
+    @tab = params['tab']
+
   end
 
   def check_qle_date
@@ -125,6 +138,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+  def check_employee_role
+    @employee_role = @person.employee_roles.try(:first)
+  end
+
   def init_qualifying_life_events
     @qualifying_life_events = []
     if @person.employee_roles.present?
@@ -137,6 +154,13 @@ class Insured::FamiliesController < FamiliesController
   def check_for_address_info
     if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
       redirect_to edit_insured_consumer_role_path(@person.consumer_role)
+    end
+  end
+
+  def update_changing_hbxs(hbxs)
+    if hbxs.present?
+      changing_hbxs = hbxs.changing
+      changing_hbxs.update_all(changing: false) if changing_hbxs.present?
     end
   end
 end

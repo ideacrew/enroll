@@ -3955,6 +3955,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .navbar-brand > img {
   display: block;
+  max-width: 171px;
+  width: 100%;
 }
 @media (min-width: 768px) {
   .navbar > .container .navbar-brand,
@@ -5936,20 +5938,20 @@ button.close {
 }
 .carousel-control .icon-prev,
 .carousel-control .icon-next,
-.carousel-control .glyphicon-chevron-left,
-.carousel-control .glyphicon-chevron-right {
+.carousel-control .fa-angle-right,
+.carousel-control .fa-angle-left {
   position: absolute;
   top: 50%;
   z-index: 5;
   display: inline-block;
 }
 .carousel-control .icon-prev,
-.carousel-control .glyphicon-chevron-left {
+.carousel-control .fa-angle-left {
   left: 50%;
   margin-left: -10px;
 }
 .carousel-control .icon-next,
-.carousel-control .glyphicon-chevron-right {
+.carousel-control .fa-angle-right {
   right: 50%;
   margin-right: -10px;
 }

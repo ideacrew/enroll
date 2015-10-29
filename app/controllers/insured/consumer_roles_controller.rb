@@ -78,7 +78,7 @@ class Insured::ConsumerRolesController < ApplicationController
         format.html {
           if is_assisted
             @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
-            redirect_to SamlInformation.curam_landing_page_url
+            redirect_to navigate_to_assistance_saml_index_path
           else
             if session[:already_has_consumer_role] == true
               redirect_to family_account_path
@@ -154,6 +154,7 @@ class Insured::ConsumerRolesController < ApplicationController
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
       { :emails_attributes => [:kind, :address] },
+      { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,
       :middle_name,
@@ -187,6 +188,7 @@ class Insured::ConsumerRolesController < ApplicationController
     set_current_person
     if @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
+
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!

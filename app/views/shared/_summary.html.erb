@@ -1,92 +1,142 @@
 <% if @hbx_enrollment.shopping?%>
-  <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-transparent all-plans' %>
 <% else %>
-  <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
+  <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-trans all-plans' %>
+  <br/>
+  <br/>
 <% end %>
 
 
 <% if qhp.present? %>
-  <div class="row plan">
-    <div class="col-md-6 col-sm-6 col-xs-12">
-      <div class="page-header"><h4>Selected Plan</h4></div>
-      <%= display_carrier_logo(@plan.carrier_profile.try(:legal_name), {width: 180}) %>
-      <h3 class="text-blue"><%= @plan.name %></h3>
-      <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).legal_name %></p>
-      <ul class="plan-type">
-        <% plan_level = @plan.metal_level.humanize %>
-        <li class="<%= plan_level.downcase %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
-        <li><small>Type</small><br><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></li>
-        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
-        <li>
-            <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-              <small>Family Deductible</small><br>
-              <strong><%= @plan.family_deductible %></strong>
-            <% else %>
-              <small>Deductible</small><br>
-              <strong><%= @plan.deductible %></strong>
-            <% end %>
-          </strong>
-        </li>
-      </ul>
-    </div>
 
-    <div class="col-md-6 col-sm-6 col-xs-12">
-      <div class="row">
-        <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
-          <div class="col-md-4 col-sm-4 col-xs-12">
-            <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
+  <div class="row plan" style="margin-top: 0;">
+      <div class="col-xs-12">
+        <div class="row">
+
+          <div class="col-xs-6">
+            <span class="pull-left">
+            <%= display_carrier_logo(@plan.carrier_profile.try(:legal_name), {width: 180}) %>
+          </span>
           </div>
+          <div class="col-xs-6">
+            <span class="pull-right">
+              <span style="font-size: 24px;"><%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source), precision: 2) %></span>
+              <br/><span class="lg">per month</span>
+          </span>
 
-          <div class="col-md-4 col-sm-4 col-xs-12">
-            <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
+        </div>
+        <div class="col-xs-12">
+          <h3 class="text-blue"><%= @plan.name %></h3>
+        </div>
+
+        <div class="col-xs-12">
+          <div class="row">
+            <div class="col-xs-7">
+              <table style="width: 100%; table-layout:fixed;">
+                <tr>
+                  <td>
+                    <span class="ttu lg twelve">
+                      Type
+                    </span>
+                    <br/>
+                    <span class="ttu dg fourteen">
+                      <%= @plan.plan_type ? @plan.plan_type.upcase : "" %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="ttu lg twelve">
+                      Metal Level
+                    </span>
+                    <br/>
+                    <span class="ttu dg fourteen">
+                      <%= @plan.metal_level.humanize %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="ttu lg twelve">
+                      Network
+                    </span>
+                    <br/>
+                    <span class="ttu dg fourteen">
+                      <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="ttu lg twelve">
+                      <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+                        Family Deductible
+                      <% else %>
+                        Deductible
+                      <% end %>
+                    </span>
+                    <br/>
+                    <span class="ttu dg fourteen">
+                      <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+
+                      <%= @plan.family_deductible %>
+                      <% else %>
+
+                    <%= @plan.deductible %>
+                      <% end %>
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+            <div class="col-xs-5">
+              <div class="pull-right">
+              <% if @hbx_enrollment.shopping?%>
+                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+              <% end %>
+            </div>
+            </div>
+
           </div>
-        <% end %>
+          <div class="col-xs-12">
+            <div class="row">
+              <hr>
+              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
 
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <div class="pull-right">
-            <h3><strong><%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment), precision: 2) %></strong></h3><small><strong>your cost</strong></small><br><br>
+            </div>
           </div>
         </div>
-      </div><br><br>
 
-      <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <% if @hbx_enrollment.shopping?%>
-            <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
-            <% end %>
-        </div>
       </div>
     </div>
   </div>
 
-    <table class="table table-bordered">
-      <tr>
-        <td>Summary of Benefits and Coverage (SBC) PDF</td>
-        <td>
-          <% if @plan.sbc_document.present? %>
-              <% key, bucket = get_key_and_bucket(@plan.sbc_document.identifier) %>
-              <%= link_to(document_download_path(bucket, key) + "?contenttype=application/pdf&filename=#{@plan.name.gsub(/[^0-9a-z ]/i,'')}.pdf", class: "download") do %>
-                  <i class="glyphicon glyphicon-download-alt"></i> Download
-              <% end %>
-          <% else %>
-              <i class="glyphicon glyphicon-download-alt"></i> Download
-          <% end %>
-        </td>
-      </tr>
-    </table>
+  <div class="col-md-6 col-sm-6 col-xs-12" style="display: none;">
+    <div class="row">
+      <% if @market_kind == "employer_sponsored" and @coverage_kind == 'health' %>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
+        </div>
+
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
+        </div>
+      <% end %>
+    </div><br><br>
+
+    <div class="row">
+      <div class="col-md-12 col-sm-12 col-xs-12">
+
+      </div>
+    </div>
+  </div>
 
   <div class="details">
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th width="35%">Services You May Need</th>
-          <th>Your cost </th>
-          <th>Limitations & Exceptions</th>
+          <th width="30%">SERVICES YOU MAY NEED</th>
+          <th width="40%">YOUR COST AT PARTICIPATING PROVIDER </th>
+          <th width="30%">(IN-NETWORK)</th>
         </tr>
         <tr>
           <th>&nbsp;</th>
-          <th>Participating Provider</th>
-          <th>&nbsp;</th>
+          <th>CO-PAY</th>
+          <th>COINSURANCE</th>
         </tr>
       </thead>
 
@@ -96,9 +146,9 @@
           <% deductible = benefit.find_deductible %>
           <% if deductible.present? %>
             <tr>
-              <td><%= benefit.benefit_type_code %></td>
+              <td style="text-align: left;"><%= benefit.benefit_type_code %></td>
               <td><%= deductible.copay_in_network_tier_1 %></td>
-              <td><%= benefit.explanation.present? ? benefit.explanation : "None" %></td>
+              <td><%= deductible.co_insurance_in_network_tier_1.present? ? deductible.co_insurance_in_network_tier_1 : "N/A" %></td>
             </tr>
           <% end %>
         <% end %>
@@ -106,7 +156,7 @@
           <td></td>
           <td colspan="3" class="text-center">
             <% if @hbx_enrollment.shopping?%>
-              <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind}), {:class => "btn btn-primary btn-lg pull-right"}) %>
+              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
             <% else %>
               <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
             <% end %>
@@ -114,6 +164,11 @@
         </tr>
       </tbody>
     </table>
+    <% if @hbx_enrollment.shopping?%>
+      <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, :back, class: 'btn btn-trans all-plans' %>
+      <br/>
+      <br/>
+    <% end %>
   </div>
 <% else %>
   No Plan found

@@ -3,6 +3,7 @@ class EmployerProfile
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
   include Mongoid::Document
+  include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
@@ -75,6 +76,10 @@ class EmployerProfile
 
   def staff_roles #managing profile staff
     Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
+  end
+
+  def match_employer(current_user)
+    staff_roles.detect {|staff| staff.id == current_user.person_id}
   end
 
   def today=(new_date)

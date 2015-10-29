@@ -29,6 +29,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     session[:person_id] = nil
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
+     @id=params[:id]
   end
 
   def edit
@@ -36,18 +37,55 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update
+    sanitize_broker_profile_params
     params.permit!
-    @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
 
-    if @organization.update_attributes(params[:organization])
+    # lookup by the origanization and not BrokerAgencyProfile
+    #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+
+    @organization = Organization.find(params[:organization][:id])
+
+    @organization_dup = @organization.office_locations.as_json
+
+    #clear office_locations, don't worry, we will recreate
+    @organization.assign_attributes(:office_locations => [])
+    @organization.save(validate: false)
+
+
+
+    if @organization.update_attributes(broker_profile_params)
       flash[:notice] = "Successfully Update Broker Agency Profile"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
     else
+
+      @organization.assign_attributes(:office_locations => @organization_dup)
+      @organization.save(validate: false)
+
       flash[:error] = "Failed to Update Broker Agency Profile"
-      render "edit"
+      #render "edit"
+      redirect_to broker_agencies_profile_path(@broker_agency_profile)
+
     end
   end
- 
+
+  def broker_profile_params
+    params.require(:organization).permit(
+      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def sanitize_broker_profile_params
+    params[:organization][:office_locations_attributes].each do |key, location|
+      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+      location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
+    end
+  end
+
   def staff_index
     @q = params.permit(:q)[:q]
     @staff = Person.where('broker_role.broker_agency_profile_id': {:$exists => true})
@@ -58,16 +96,25 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
       @staff = @staff.where(last_name: @q)
-    end 
+    end
   end
 
   def family_index
     @q = params.permit(:q)[:q]
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    total_families = Family.by_writing_agent_id(current_user.id)
+    id = params.permit([:id])[:id]
+    if current_user.has_broker_role?
+      broker_agent_id = current_user.person.try(:broker_role).try(:id)
+    else
+      bap = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+      broker_agent_id = bap.try(:writing_agents).try(:first).try(:id) || bap.primary_broker_role_id
+    end
+    total_families = (broker_agent_id != nil) ? Family.by_writing_agent_id(broker_agent_id) : []
     @total = total_families.count
     @families = total_families.page page_no
+    @family_count = 0
+    @families.each{|f| @family_count +=1}
     respond_to do |format|
       format.html { render "insured/families/index" }
       format.js {}

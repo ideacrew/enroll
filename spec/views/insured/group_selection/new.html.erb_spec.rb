@@ -38,7 +38,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should show the title of family members" do
 
-      expect(rendered).to match /Family Members/
+      expect(rendered).to match /Choose Plan for your Household/
     end
 
     it "should have three checkbox option" do
@@ -115,7 +115,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should show the title of family members" do
-      expect(rendered).to match /Family Members/
+      expect(rendered).to match /Choose Plan for your Household/
     end
 
     it "should have three checkbox option" do
@@ -237,7 +237,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should display title" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/What do you like to do/)
+      expect(rendered).to match(/What would you like to do/)
     end
 
     it "should show shop for new plan submit" do
@@ -302,7 +302,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       # it "should have title" do
       #   expect(rendered).to match /Market Kind/
       # end
-      # 
+      #
       # it "should have options" do
       #   Plan::MARKET_KINDS.each do |kind|
       #     expect(rendered).to have_selector("input[value='#{kind}']")

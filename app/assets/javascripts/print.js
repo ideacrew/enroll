@@ -1,5 +1,12 @@
 $(document).on('click', '#btnPrint', function(){
-  printElement(document.getElementById("printArea"));
+  var payment_text = document.getElementById("how_to_pay");
+  var payment_text_val;
+  if (payment_text == null) {
+    payment_text_val = "";
+  } else{
+    payment_text_val = payment_text.innerHTML;
+  }
+  printElement(document.getElementById("printArea"), true, payment_text_val);
   window.print();
 });
 
@@ -19,6 +26,7 @@ function printElement(elem, append, delimiter) {
   }
 
   else if (append === true) {
+    $printSection.innerHTML = "";
     if (typeof(delimiter) === "string") {
       $printSection.innerHTML += delimiter;
     }

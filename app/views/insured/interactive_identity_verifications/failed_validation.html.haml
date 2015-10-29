@@ -1,10 +1,13 @@
 .content
   .container
-    %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
+    - if @step == 'start'
+      %h4 To keep your data secure, we are required to verify your identity electronically using the credit reporting agency Experian. Unfortunately, Experian was unable to confirm your identity based on the information you provided. You will need to complete your application at the DC Health Benefit Exchange Authority office at 1225 I St NW. Please call (202) 715-7576 to set up an appointment.
+    - else
+      %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
 
-    %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary interaction-click-control-override-identity-verification")
+    %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary btn-br interaction-click-control-override-identity-verification")
     %br
-    .btn.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+    .btn.btn-trans{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
       Help me sign up
   %br
-    = render partial: 'insured/plan_shoppings/help_with_plan' 
+    = render partial: 'insured/plan_shoppings/help_with_plan'

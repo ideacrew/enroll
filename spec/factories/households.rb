@@ -6,9 +6,9 @@ FactoryGirl.define do
     effective_starting_on {2.months.ago}
     effective_ending_on {2.months.ago}
     submitted_at {2.months.ago}
-    hbx_enrollments
-    tax_households
-    coverage_households
-    comments
+    # hbx_enrollments
+    # tax_households
+    # coverage_households
+    # comments
   end
 end

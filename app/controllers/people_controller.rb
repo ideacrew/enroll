@@ -209,6 +209,7 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = find_person(params[:id])
 
+
     make_new_person_params @person
 
     @person.updated_by = current_user.email unless current_user.nil?
@@ -216,7 +217,18 @@ class PeopleController < ApplicationController
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
+      @person.update_attributes({:emails => [], :addresses => []})
     else
+
+      #find associated  census employee record
+      @census_employee = get_census_employee(@person.employee_roles[0].census_employee_id)
+
+      #@email = Email.new(person_params[:emails_attributes].values.map(&:symbolize_keys).first);
+      @email = Email.new(person_params[:emails_attributes].values.first);
+
+      #Propagate New Email address to Census Employee so data is in Synch
+      @census_employee.update_attributes(:email => @email)
+
       redirect_path = family_account_path
     end
 
@@ -238,6 +250,11 @@ class PeopleController < ApplicationController
       end
     end
   end
+
+  def get_census_employee(id)
+     CensusEmployee.find(id)
+  end
+
 
   def create
     sanitize_person_params
@@ -298,7 +315,7 @@ class PeopleController < ApplicationController
 
 private
   def safe_find(klass, id)
-    puts "finding #{klass} #{id}"
+    # puts "finding #{klass} #{id}"
     begin
       klass.find(id)
     rescue

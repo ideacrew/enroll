@@ -63,6 +63,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         allow(benefit_coverage_period).to receive(:start_on).and_return double(year: 2015)
         allow(person).to receive(:has_active_consumer_role?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
+        allow(HbxEnrollment).to receive(:find).and_return nil
       end
 
       it "should set session" do

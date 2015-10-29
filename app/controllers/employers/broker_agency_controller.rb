@@ -8,7 +8,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
 
     if @filter_criteria.empty?
-      @orgs = Organization.active_broker_agencies
+      @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?
@@ -46,7 +46,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!
     end
 
-    flash[:notice] = "Successfully associated broker with your account."
+    flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
   end

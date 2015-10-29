@@ -257,6 +257,19 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
   end
+
+  describe ".ehb" do
+    let(:plan1) {FactoryGirl.create(:plan, ehb: 0.9)}
+    let(:plan2) {FactoryGirl.create(:plan, ehb: 1)}
+
+    it "should get ehb from db when ehb more than 0" do
+      expect(plan1.ehb).to eq 0.9
+    end
+
+    it "should return 1 when ehb equal 0" do
+      expect(plan2.ehb).to eq 1
+    end
+  end
 end
 
 RSpec.describe Plan, dbclean: :after_each do
@@ -422,6 +435,33 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "for metal_level" do
         expect(Plan.valid_shop_health_plans('metal_level', 'gold')).to eq Plan.valid_shop_by_metal_level('gold').to_a
+      end
+    end
+
+    context "individual_plans" do
+      let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
+      let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
+      let(:plan4) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+      let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
+
+      before :each do
+        Plan.delete_all
+      end
+
+      it "should return dental plans" do
+        plans = [plan4]
+        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to eq plans
+      end
+
+      it "should return health plans without silver" do
+        plans = [plan1, plan3]
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to eq plans
+      end
+
+      it "should return health plans" do
+        plans = [plan2]
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household).to_a).to eq plans
       end
     end
   end

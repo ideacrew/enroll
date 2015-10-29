@@ -4,11 +4,11 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
-          <h3>Confirm Your Plan Selection</h3>
-          <p>Your current plan selection is displayed below. Click the Previous button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
+          <h1 class="darkblue">Confirm Your Plan Selection</h1>
+          <h4>Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.</h4>
           <% if @enrollment.employee_role.present? %>
           <% else %>
-            <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+            <h4><strong>Important:</strong> You must complete these steps to enroll.</h4>
           <% end %>
           <p>
             <% if @employer_profile.present? %>
@@ -39,11 +39,7 @@
             <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
           <% end %>
         <% elsif @change_plan.blank? %>
-          <% if @enrollment_kind == 'sep' %>
-          <%= render  partial: 'shared/sep_shop_progress', locals: {step: '7'} %>
-          <% else %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
-          <% end %>
         <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '3'} %>
         <% elsif @change_plan == "change_plan" %>
