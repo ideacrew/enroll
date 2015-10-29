@@ -4,7 +4,7 @@ ready = function() {
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
     //alert('edit');
-    //$('.add_fields').remove();
+    $('.add_fields').remove();
     $('.reference-steps').hide();
     $('.planyear-add-tab .controls:last').show();
 
@@ -276,7 +276,7 @@ $(document).on('click', '.reference-plan input + label', function() {
       calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
     });
   });
-  
+
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
 });
@@ -288,7 +288,7 @@ function calcEmployerContributions(url, location) {
     var reference_plan_id = $('#'+location+' .reference-plan input[type=radio]:checked').val();
     var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
     var location_id = location;
-   
+
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
     }
@@ -354,6 +354,3 @@ function calcEmployerContributions(url, location) {
 
 $(document).ready(ready);
 $(document).on('page:load', plan_year_selection_loader);
-
-
-
