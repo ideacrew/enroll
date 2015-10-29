@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
-  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan)}
+  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
   let(:plan) { double(coverage_kind: '') }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
@@ -27,7 +27,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan) }
+    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp) { [double("Qhp", plan: double("Plan"))] }
@@ -62,6 +62,16 @@ RSpec.describe Products::QhpController, :type => :controller do
       expect(assigns(:reference_plan)).to be_truthy
     end
 
+    it "should return dental plan if hbx_enrollment does not have plan object" do
+      allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(hbx_enrollment).to receive(:plan).and_return(nil)
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
+      expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "individual"
+      expect(assigns(:coverage_kind)).to eq "dental"
+    end
+
     it "should return summary of a plan for ivl and coverage_kind: health" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
       sign_in(user)
@@ -86,7 +96,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET comparison when get more than one qhp" do
-    let(:hbx_enrollment){ HbxEnrollment.new }
+    let(:hbx_enrollment){ HbxEnrollment.new(coverage_kind: 'dental') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp1) { Products::Qhp.new }
