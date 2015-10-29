@@ -31,6 +31,12 @@
                 </td>
               </tr>
               <tr>
+                <th>Market Kinds: </th>
+                  <td>
+                    <%= broker_or_staff_role.broker_agency_profile.try(:market_kind).try(:capitalize) %>
+                  </td>
+              </tr>
+              <tr>
                 <th>History</th>
                 <td>
                     <% broker_or_staff_role.workflow_state_transitions.each do |transition| %>
