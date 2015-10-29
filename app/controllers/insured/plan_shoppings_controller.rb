@@ -8,7 +8,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def checkout
     plan = Plan.find(params.require(:plan_id))
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.update_current(coverage_kind: plan.coverage_kind)
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
