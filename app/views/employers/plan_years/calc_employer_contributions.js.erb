@@ -4,8 +4,14 @@ $("#<%= @location_id %> .selected-plan .employee-monthly-cost-min").html("<%= nu
 $("#<%= @location_id %> .selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
 
 $(function() {
-  $("#employer_cost_info_btn .btn").click(function(){
-    $('.cost-impact-loader').show();
-    calcEmployerContributions($('a#employee_costs_link').attr('href'));
+
+   $("#employer_cost_info_btn .btn").click(function(){
+    var location_id = $(this).parents('.benefit-group-fields').attr('id');
+    var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
+    if (reference_plan_id == "" || reference_plan_id == undefined) {
+      return
+    }
+    calcEmployerContributions($('a#employee_costs_link').attr('href'), location_id);
   })
+
 })

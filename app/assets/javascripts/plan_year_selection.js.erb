@@ -262,6 +262,27 @@ $(document).on('click', '.reference-plan input + label', function() {
   };
 });
 
+
+  $('.contribution_handler').each(function() {
+    $(this).change(function(){
+      var location_id = $(this).parents('.benefit-group-fields').attr('id');
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
+    });
+  });
+
+  $('.contribution_slide_handler').each(function() {
+    $(this).on("slideStop", function(slideEvt) {
+      var location_id = $(this).parents('.benefit-group-fields').attr('id');
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
+    });
+  });
+  
+$(document).on("click", ".reference_plan_info h4 span", function() {
+  $(this).parents(".reference_plan_info").find('.content').toggle();
+});
+};
+
+
 function calcEmployerContributions(url, location) {
 
     var reference_plan_id = $('#'+location+' .reference-plan input[type=radio]:checked').val();
@@ -330,29 +351,9 @@ function calcEmployerContributions(url, location) {
     });
 }
 
-$(function() {
-
-  $('.contribution_handler').each(function() {
-    $(this).change(function(){
-      var location_id = $(this).parents('.benefit-group-fields').attr('id');
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
-    });
-  });
-
-  $('.contribution_slide_handler').each(function() {
-    $(this).on("slideStop", function(slideEvt) {
-      var location_id = $(this).parents('.benefit-group-fields').attr('id');
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
-    });
-  });
-
-});
-
-  
-$(document).on("click", ".reference_plan_info h4 span", function() {
-  $(this).parents(".reference_plan_info").find('.content').toggle();
-});
-};
 
 $(document).ready(ready);
 $(document).on('page:load', plan_year_selection_loader);
+
+
+
