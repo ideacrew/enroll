@@ -134,7 +134,8 @@ Rails.application.routes.draw do
         get 'search'
       end
     end
-    root 'employee_roles#show'
+    
+    root 'families#home'
 
     resources :family_members
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
