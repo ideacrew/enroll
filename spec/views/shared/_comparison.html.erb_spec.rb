@@ -86,8 +86,8 @@ describe "shared/_comparison.html.erb" do
   end
 
   it "should have title and other text" do
-    expect(rendered).to have_selector('h3', text: /Choose Plan - Compare Selected Plans/ )
-    expect(rendered).to have_selector('h5', text: /Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget./ )
-    expect(rendered).to have_selector('h4', text: /Important: Please review SBC for any coinsurance costs./ )
+    expect(rendered).to have_selector('h1', text: /Choose Plan - Compare Selected Plans/ )
+    expect(rendered).to have_selector('h4', text: /Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget./ )
+    expect(rendered).to have_selector('h4', text: /Please review SBC for any coinsurance costs./ )
   end
 end
