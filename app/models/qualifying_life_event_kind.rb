@@ -23,19 +23,21 @@ class QualifyingLifeEventKind
   # first_of_next_month: not subject to 15th of month effective date rule
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
 
-  Reasons = [
-    "initial_enrollment",
-    "renewal",
-    "open_enrollment",
+  REASON_KINDS = [
     "lost_access_to_mec",
     "adoption",
-    "foster_care",
     "birth",
     "marriage",
+    "domestic_partnership",
     "divorce",
-    "location_change",
+    "death",
+    "child_age_off",
+    "relocate",
+    "new_eligibility_member",
+    "new_eligibility_family",
     "termination_of_benefits",
     "termination_of_employment",
+    "new_employment",
     "employee_gaining_medicare",
     "immigration_status_change",
     "enrollment_error_or_misconduct_hbx",
