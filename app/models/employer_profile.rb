@@ -258,6 +258,12 @@ class EmployerProfile
     plan_year.revert
   end
 
+  def default_benefit_group
+    plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
+    return unless plan_year_with_default
+    plan_year_with_default.benefit_groups.detect{|bg| bg.default }
+  end
+
 ## TODO - anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required

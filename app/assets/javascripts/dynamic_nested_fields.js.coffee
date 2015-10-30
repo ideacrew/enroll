@@ -34,6 +34,13 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $('.benefit-group-fields:last input:first').focus()
   $('.remove_fields:last').css('display', 'inline-block')
 
+  $('.benefit-group-fields:last .contribution_slide_handler').each ->
+    $(this).on 'slideStop', (slideEvt) ->
+      location_id = $(this).parents('.benefit-group-fields').attr('id')
+      calcEmployerContributions $('a#calc_employer_contributions_link').data('href'), location_id
+      return
+    return
+
   start_on = $('#plan_year_start_on').val()
   if start_on
     start_on = start_on.substr(0, 4)
@@ -42,10 +49,6 @@ $(document).on 'click', 'form .add_fields', (event) ->
       url = $(this).attr('href')
       $(this).attr 'href', url + '&start_on=' + start_on
   return
-
-
-
-
 
 $(document).on 'click', 'form .remove_fields', (event) ->
   $(this).closest('fieldset').remove()
