@@ -102,7 +102,7 @@ function validatePlanYear() {
   });
   bgemployeepremiums.each(function() {
 
-    if ( parseInt($(this).val()) >= 50 ) {
+    if ( parseInt($(this).val() ) >= parseInt(50) ) {
       validatedbgemployeepremiums = true
       validated = true;
 
