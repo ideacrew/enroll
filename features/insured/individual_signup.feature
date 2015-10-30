@@ -27,10 +27,10 @@ Feature: Insured Plan Shopping on Individual market
       And I click on purchase button on confirmation page
       And I click on continue button to go to the individual home page
       And I should see the individual home page
-      When I click the "I've married" in qle carousel
+      When I click the "Married" in qle carousel
       And I select a future qle date
       Then I should see not qualify message
-      When I click the "I've married" in qle carousel
+      When I click the "Married" in qle carousel
       And I select a past qle date
       Then I should see confirmation and continue
       When I click on continue button on household info form
