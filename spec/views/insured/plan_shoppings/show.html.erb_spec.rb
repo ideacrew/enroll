@@ -8,11 +8,13 @@ RSpec.describe "insured/show" do
     hbx_enrollment_members: [],
     employee_role: employee_role,
     effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
+  let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
   let(:broker_person){ FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
   let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
   let(:current_broker_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
  		:person => broker_person) }
   let(:consumer_user){FactoryGirl.create(:user, :roles => ['consumer'], :person => person)}
+
   before :each do
     allow(hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
     @person = person
@@ -37,6 +39,8 @@ RSpec.describe "insured/show" do
   end
 
   it 'should be identify Broker control in the header when signed in as Broker' do
+    broker_person.broker_role = broker_role
+    broker_person.save
     sign_in current_broker_user
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to match(/I'm a Broker/)

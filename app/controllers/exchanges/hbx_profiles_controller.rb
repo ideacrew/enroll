@@ -238,13 +238,11 @@ private
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-      text = "<br>Resume Application via "
       body = 
         "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
         "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
         "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
-        "<a href='" + root+"phone'>#{text}phone</a>  <br>" +
-        "<a href='" + root+"paper'>#{text}paper</a>  <br>"
+        "<a href='" + root+"phone'>Assist Customer</a>  <br>" 
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
