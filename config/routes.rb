@@ -306,6 +306,14 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
+  resources :documents, only: [] do
+    collection do
+      get :consumer_role_status
+      get :documents_review
+      put :change_doc_status
+    end
+  end
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 

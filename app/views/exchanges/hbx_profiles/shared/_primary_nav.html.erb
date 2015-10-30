@@ -1,7 +1,7 @@
 <div class="mainmenu">
   <div class="container">
     <ul role="tablist" class="list-unstyled list-inline" id="myTab">
-      <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>> 
+      <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>>
         <%= link_to(exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do  %>
           <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
         <% end %>
@@ -54,8 +54,16 @@
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
        <% end %>
       </li>
+
+      <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second">
+       <%= link_to(consumer_role_status_documents_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
+          <span class="hidden-xs">Docs</span>
+          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
+       <% end %>
+      </li>
+
       <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second">
-       <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "configuration", "role" => "tab" ) do  %>
+       <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
           <span class="hidden-xs">Staff</span>
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Staff"></span>
        <% end %>

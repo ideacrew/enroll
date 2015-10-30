@@ -3,27 +3,40 @@
     <% unless @person.has_consumer_role? %>
         <h4>No results found</h4>
     <% else %>
-        <table>
+        <table class="table table-hover table-striped">
+          <col width="100">
+          <col width="100">
+          <col width="220">
+          <col width="100">
+          <col width="150">
           <tr>
             <th>Member</th>
-            <th>Type</th>
-            <th>Due Date</th>
+            <th>Person Verification Status</th>
+            <th>Document type</th>
             <th>Date Submitted</th>
-            <th>Status</th>
+            <th>Document verification status</th>
           </tr>
-          <% @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
-              <tr>
-                <td><%= doc.creator %></td>
-                <td><%= doc.type %></td>
-                <td>
-                  <% key, bucket = get_key_and_bucket(doc.identifier) %>
-                  <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
-                      <%= doc.title %>
-                  <% end %>
-                </td>
-                <td><%= doc.subject %></td>
-                <td><%= doc.created_at.try(:to_date) %></td>
-              </tr>
+
+          <% @family_members.each do |member|%>
+            <tr>
+              <td><%= member.person.first_name %></td>
+              <td><%= "Pending" if member.person.consumer_role.aasm_state == "verifications_pending" %></td>
+              <td>
+                <% member.person.consumer_role.vlp_documents.each do |doc| %>
+                <%= doc.subject %><br>
+                <% end %>
+              </td>
+              <td>
+                <% member.person.consumer_role.vlp_documents.select{|doc| doc.identifier.present?}.each do |doc|%>
+                <%= doc.created_at.try(:to_date) %>
+                <% end %>
+              </td>
+              <td>
+                <% member.person.consumer_role.vlp_documents.each do |doc| %>
+                <%= doc.status %><br>
+                <% end %>
+              </td>
+            </tr>
           <% end %>
     <% end %>
     </table>
