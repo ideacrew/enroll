@@ -23,34 +23,38 @@ class QualifyingLifeEventKind
   # first_of_next_month: not subject to 15th of month effective date rule
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
 
-  Reasons = [
-    "initial_enrollment",
-    "renewal",
-    "open_enrollment",
+  REASON_KINDS = [
     "lost_access_to_mec",
     "adoption",
-    "foster_care",
     "birth",
     "marriage",
+    "domestic_partnership",
     "divorce",
-    "location_change",
+    "death",
+    "child_age_off",
+    "relocate",
+    "new_eligibility_member",
+    "new_eligibility_family",
     "termination_of_benefits",
     "termination_of_employment",
+    "new_employment",
+    "employer_sponsored_coverage_termination",
     "employee_gaining_medicare",
-    "immigration_status_change",
     "enrollment_error_or_misconduct_hbx",
     "enrollment_error_or_misconduct_issuer",
     "enrollment_error_or_misconduct_non_hbx", 
     "contract_violation",
+    "court_order",
+    "eligibility_change_income",
+    "eligibility_change_immigration_status",
     "eligibility_change_medicaid_ineligible",
-    "eligibility_change_assistance",
     "eligibility_change_employer_ineligible",
+    "lost_hardship_exemption",
     "qualified_native_american",
     "exceptional_circumstances_natural_disaster",
     "exceptional_circumstances_medical_emergency",
     "exceptional_circumstances_system_outage",
     "exceptional_circumstances_domestic_abuse",
-    "exceptional_circumstances_hardship_exemption",
     "exceptional_circumstances_civic_service",
     "exceptional_circumstances"
   ]
@@ -147,11 +151,14 @@ class QualifyingLifeEventKind
   end
 
   def is_dependent_loss_of_coverage?
-    ["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
+    #["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
+    #lost_access_to_mec
+    %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
   end
 
   def is_moved_to_dc?
-    title == "I'm moving to the District of Columbia"
+    #title == "I'm moving to the District of Columbia"
+    reason == 'relocate'
   end
   
   def individual?
@@ -159,7 +166,8 @@ class QualifyingLifeEventKind
   end
 
   def family_structure_changed?
-    ["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
+    #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
+    %w(birth adoption marriage divorce domestic_partnership).include? reason
   end
 
   class << self

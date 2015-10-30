@@ -4,6 +4,7 @@ class Exchanges::AgentsController < ApplicationController
      
      @title = current_user.agent_title
      @assister = current_user.has_assister_role?
+     @cac = current_user.person.csr_role.try(:cac)
      person_id = session[:person_id]
      @person=nil
      @person = Person.find(person_id) if person_id && person_id != ''

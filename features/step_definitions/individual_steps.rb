@@ -182,7 +182,7 @@ end
 And(/I click on continue button on group selection page/) do
   if !HbxProfile.current_hbx.under_open_enrollment?
 
-    click_when_present(@browser.a(text: /I've had a baby/))
+    click_when_present(@browser.a(text: /Had a baby/))
 
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
@@ -306,8 +306,8 @@ Then(/CSR opens the most recent Please Contact Message/) do
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
-  wait_and_confirm_text /Resume Application via phone/
-  @browser.a(text: /Resume Application via phone/).fire_event('onclick')
+  wait_and_confirm_text /Assist Customer/
+  @browser.a(text: /Assist Customer/).fire_event('onclick')
 end
 
 When(/I click on the header link to return to CSR page/) do

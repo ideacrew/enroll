@@ -127,7 +127,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should have coverage_kinds area" do
-      expect(rendered).to match /Coverage Kind/
+      expect(rendered).to match /Coverage Type/
     end
 
     it "should have health radio button" do
