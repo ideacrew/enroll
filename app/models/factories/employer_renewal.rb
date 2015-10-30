@@ -11,7 +11,6 @@ module Factories
       project_renewal_dates
       qualify_application
 
-
     end
 
     def validate_employer_profile
@@ -63,24 +62,26 @@ module Factories
 
     def renew_benefit_groups
       count = 1
-      @active_plan_year.benefit_groups.reduce([]) do |list, active_group|
-        new_year = @active_plan_year.start_on.year + 1
-        new_group = BenefitGroup.new
-        new_group.title = "Benefit Package #{new_year} ##{count} (#{active_group.title})"
-
-        new_group.effective_on_kind = active_group.effective_on_kind
-        new_group.terminate_on_kind = active_group.terminate_on_kind
-        new_group.plan_option_kind = active_group.plan_option_kind
-
-        new_group.reference_plan_id = map_benefit(active_group.reference_plan_id)
-        new_group.lowest_cost_plan_id = map_benefit(active_group.lowest_cost_plan_id)
-        new_group.highest_cost_plan_id = map_benefit(active_group.highest_cost_plan_id)
-
-        new_group.elected_plan_ids = active_group.elected_plan_ids.reduce([]) {|id_list, id| id_list << map_benefit(id) }
-        new_group.relationship_benefits = active_group.relationship_benefits
-        count += 1
-        list << new_group
+      @active_plan_year.benefit_groups.inject([]) do |list, active_group|
+        list << clone_benefit_group(active_group)
       end
+    end
+
+    def clone_benefit_group(active_group)
+      index = @active_plan_year.benefit_groups.index(active_group) + 1
+      new_year = @active_plan_year.start_on.year + 1
+
+      BenefitGroup.new({
+        title: "Benefit Package #{new_year} ##{index} (#{active_group.title})",
+        
+
+      })
+      
+
+     
+
+      elected_plan_ids = active_group.elected_plan_ids.reduce([]) {|id_list, id| id_list << map_benefit(id) }
+      relationship_benefits = active_group.relationship_benefits
     end
 
     def build_benefits_map
