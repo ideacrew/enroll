@@ -129,7 +129,7 @@ class HbxEnrollment
     allow_blank: false,
     inclusion: {
       in: COVERAGE_KINDS,
-      message: "%{value} is not a valid coverage kind"
+      message: "%{value} is not a valid coverage type"
     }
 
   aasm do
