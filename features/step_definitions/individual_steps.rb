@@ -182,7 +182,7 @@ end
 And(/I click on continue button on group selection page/) do
   if !HbxProfile.current_hbx.under_open_enrollment?
 
-    click_when_present(@browser.a(text: /I've had a baby/))
+    click_when_present(@browser.a(text: /Had a baby/))
 
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
