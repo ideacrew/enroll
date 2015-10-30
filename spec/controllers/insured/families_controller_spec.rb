@@ -151,40 +151,6 @@ RSpec.describe Insured::FamiliesController do
   end
 
 
-  describe "GET document_index" do
-    before :each do
-      get :documents_index
-    end
-
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render document index page" do
-      expect(response).to render_template("documents_index")
-    end
-  end
-
-
-  describe "GET document_upload" do
-    before :each do
-      allow(person).to receive(:consumer_role).and_return(consumer_role)
-      get :document_upload
-    end
-
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render document upload page" do
-      expect(response).to render_template("document_upload")
-    end
-
-    it "should assign variables" do
-      expect(assigns(:consumer_wrapper)).to be_an_instance_of(Forms::ConsumerRole)
-    end
-  end
-
   describe "GET find_sep" do
     before :each do
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
