@@ -27,6 +27,8 @@ module Subscribers
         new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
         verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
         import_home_address(primary_person, verified_new_address)
+        primary_person = search_person(verified_primary_family_member) #such mongoid
+        family = find_existing_family(verified_primary_family_member, primary_person, xml) #wow
         family.save!
         if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
