@@ -216,7 +216,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   describe "POST create" do
     let(:save_result) { false }
     let(:plan) {double(:where => [double(:_id => "test")] )}
-    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)))}
+    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)), :default => false)}
     let(:plan_year) { double(:benefit_groups => [benefit_group] ) }
     let(:relationship_benefits_attributes) {
       { "0" => {
@@ -267,9 +267,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   sign_in
   allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
   allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+  allow(employer_profile).to receive(:default_benefit_group).and_return(nil)
   allow(benefit_group).to receive(:elected_plans=).and_return("test")
   allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
   allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+  allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)

@@ -40,11 +40,10 @@ class Employers::PlanYearsController < ApplicationController
   def make_default_benefit_group
     plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
     if plan_year && benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
-
-      @employer_profile.plan_years.each do |plan_year|
-        plan_year.benefit_groups.where(default: true).each do |bg|
-          bg.default = false
-        end
+                 
+      if default_benefit_group = @employer_profile.default_benefit_group
+        return if benefit_group == default_benefit_group
+        default_benefit_group.default = false
       end
 
       benefit_group.default = true
@@ -56,6 +55,10 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+    end
+
+    if @employer_profile.default_benefit_group.blank?
+      @plan_year.benefit_groups[0].default= true
     end
 
     if @plan_year.save
@@ -277,4 +280,5 @@ class Employers::PlanYearsController < ApplicationController
       }
     }
   end
+
 end
