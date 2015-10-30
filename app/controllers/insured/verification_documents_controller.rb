@@ -66,7 +66,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   def update_vlp_documents(doc_params, title, file_uri)
     return unless doc_params.present?
     document = @docs_owner.consumer_role.find_document(doc_params.first.last[:subject])
-    success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title, :status=>"uploaded"}))
+    success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title, :status=>"in review"}))
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end

@@ -311,6 +311,7 @@ Rails.application.routes.draw do
       get :consumer_role_status
       get :documents_review
       put :change_doc_status
+      put :change_person_aasm_state
     end
   end
 

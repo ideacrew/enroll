@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  before_action :set_doc, only: [:change_doc_status]
+  before_action :set_doc, only: [:change_doc_status, :change_person_aasm_state]
 
   def download
     bucket = params[:bucket]
@@ -31,6 +31,14 @@ class DocumentsController < ApplicationController
           format.html {redirect_to documents_review_documents_path(:person_id => @doc_owner.id), notice: "Document Status Updated"}
           end
  end
+
+def change_person_aasm_state
+  @doc_owner.consumer_role.update_attributes(:aasm_state => params[:state])
+  respond_to do |format|
+         format.html {redirect_to exchanges_hbx_profiles_root_path, notice: "Person Verification Status Updated"}
+         end
+
+end
 
  private
 
