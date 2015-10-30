@@ -179,7 +179,7 @@ class Employers::EmployerProfilesController < ApplicationController
         @organization.assign_attributes(:office_locations => @organization_dup)
         @organization.save(validate: false)
         #@organization.reload
-        flash[:notice] = 'Employer information not saved.'
+        flash[:error] = 'Employer information not saved.'
         redirect_to edit_employers_employer_profile_path(@organization)
       end
     else
