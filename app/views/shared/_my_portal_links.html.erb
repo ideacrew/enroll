@@ -2,7 +2,7 @@
 <% if current_user.try(:has_insured_role?) || current_user.try(:has_employer_staff_role?) || current_user.try(:has_broker_agency_staff_role?) %>
 
 <li>
-      <% if current_user.try(:has_consumer_role?) || current_user.try(:has_employee_role?) %>
+      <% if (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) || current_user.try(:has_employee_role?) %>
 
           <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %>
 
