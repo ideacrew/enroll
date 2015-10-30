@@ -32,6 +32,18 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   end
 
+  def download
+    document = get_document(params[:key])
+    if document.present?
+      bucket = env_bucket_name('id-verification')
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket}##{params[:key]}"
+      send_data Aws::S3Storage.find(uri), download_options(document)
+    else
+      flash[:error] = "File does not exist or you are not authorized to access it."
+      redirect_to documents_index_insured_families_path
+    end
+  end
+
   private
   def get_family
     set_current_person
@@ -62,5 +74,16 @@ class Insured::VerificationDocumentsController < ApplicationController
     success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title}))
     @doc_errors = document.errors.full_messages unless success
     @person.save
+  end
+
+  def get_document(key)
+    @person.consumer_role.find_vlp_document_by_key(key)
+  end
+
+  def download_options(document)
+    options = {}
+    options[:content_type] = document.format
+    options[:filename] = document.title
+    options
   end
 end
