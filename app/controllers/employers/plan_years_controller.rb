@@ -6,27 +6,25 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-
-
   end
 
   def reference_plans
-
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
     @plans = if params[:plan_option_kind] == "single_carrier"
-    @carrier_id = params[:carrier_id]
-    @carrier_profile = CarrierProfile.find(params[:carrier_id])
-    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
-  elsif params[:plan_option_kind] == "metal_level"
-    @metal_level = params[:metal_level]
-    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
-  elsif params[:plan_option_kind] == "single_plan"
-    @single_plan = params[:single_plan]
-    @carrier_id = params[:carrier_id]
-    @carrier_profile = CarrierProfile.find(params[:carrier_id])
-    Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
-  end
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+    elsif params[:plan_option_kind] == "metal_level"
+      @metal_level = params[:metal_level]
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
+    elsif params[:plan_option_kind] == "single_plan"
+      @single_plan = params[:single_plan]
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+    end
+
     respond_to do |format|
       format.js
     end
@@ -40,30 +38,18 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def make_default_benefit_group
-
-    @employer_profile.plan_years.each do |plan_year|
-    plan_year.benefit_groups.where(default: true).each do |bg|
-      bg.default = false
-    end
-  end
-
     plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
-    benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
-    benefit_group.default = true
-    @employer_profile.save!
-    #
-    # @employer_profile.plan_years.each do |py|
-    #   py.benefit_groups.each do |bg|
-    #     if bg.id == params[:benefit_group_id]
-    #       bg.default = true
-    #     else
-    #       bg.default = false
-    #     end
-    #     bg.save
-    #   end
-    # end
+    if plan_year && benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
 
+      @employer_profile.plan_years.each do |plan_year|
+        plan_year.benefit_groups.where(default: true).each do |bg|
+          bg.default = false
+        end
+      end
 
+      benefit_group.default = true
+      @employer_profile.save!
+    end
   end
 
   def create
@@ -76,7 +62,6 @@ class Employers::PlanYearsController < ApplicationController
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
     else
-
       render action: "new"
     end
   end
@@ -85,9 +70,7 @@ class Employers::PlanYearsController < ApplicationController
     @kind = params[:kind]
     @key = params[:key]
     @target = params[:target]
-
     plan_year = Date.parse(params["start_date"]).year unless params["start_date"].blank?
-
     @plans = case @kind
             when "carrier"
               Plan.valid_shop_health_plans("carrier", @key, plan_year)
@@ -131,7 +114,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def edit
-
     plan_year = @employer_profile.find_plan_year(params[:id])
     @just_a_warning = false
     if plan_year.publish_pending?
