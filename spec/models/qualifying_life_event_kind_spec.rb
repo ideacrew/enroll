@@ -10,8 +10,9 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
   describe "class methods" do
     let(:valid_params)do
       {
-        title: "I've married",
+        title: "Married",
         market_kind: "shop",
+        reason: "marriage",
         effective_on_kinds: ["first_of_month"],
         pre_event_sep_in_days: 0,
         post_event_sep_in_days: 30
@@ -44,9 +45,9 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
   end
 
   describe "instance methods" do
-    let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Losing Employer-Subsidized Insurance because employee is going on Medicare")}
-    let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "I'm moving to the District of Columbia")}
-    let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "My employer did not pay my premiums on time")}
+    let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Dependent loss of employer-sponsored insurance because employee is enrolling in Medicare ", reason: "employee_gaining_medicare")}
+    let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Moved or moving to the District of Columbia", reason: "relocate")}
+    let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Employer did not pay premiums on time", reason: 'employer_sponsored_coverage_termination')}
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, 15))
@@ -77,8 +78,8 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
 
     context "family_structure_changed?" do
       it "return true" do
-        ["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].each do |title|
-          qle = FactoryGirl.build(:qualifying_life_event_kind, title: title)
+          %w(birth adoption marriage divorce domestic_partnership).each do |reason|
+          qle = FactoryGirl.build(:qualifying_life_event_kind, reason: reason)
           expect(qle.family_structure_changed?).to eq true
         end
       end

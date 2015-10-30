@@ -4,9 +4,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
   let(:family)        { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
-                              title: "I've entered into a legal domestic partnership",
+                              title: "Entered into a legal domestic partnership",
                               action_kind: "add_benefit",
-                              reason: " ",
+                              reason: "domestic_partnership",
                               edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
                               market_kind: "shop", 
                               effective_on_kinds: ["first_of_month"],
@@ -19,12 +19,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                             )
                           }
   let(:ivl_qle)       { QualifyingLifeEventKind.create(
-                              title: "I've had a baby",
+                              title: "Had a baby",
                               tool_tip: "Household adds a member due to birth",
                               action_kind: "add_member",
                               market_kind: "individual",
                               event_kind_label: "Date of birth",
-                              reason: " ",
+                              reason: "birth",
                               edi_code: "02-BIRTH", 
                               ordinal_position: 10,
                               effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
