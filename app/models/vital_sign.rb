@@ -4,7 +4,7 @@ class VitalSign
   attr_reader :start_at, :end_at
 
   # DateTime that DCHL Enroll App went live
-  ZERO_HOUR = DateTime.new(2015,10,13,9,0,0,'+5')
+  ZERO_HOUR = DateTime.new(2015,10,13,9,0,0,'-4')
 
   def initialize(start_at: ZERO_HOUR, end_at: TimeKeeper.datetime_of_record)
     @start_at = start_at
@@ -65,6 +65,7 @@ class VitalSign
     @all_individual_eligibility_determinations.select { |determination| determination.tax_household.effective_ending_on.blank? }
   end
 
+# v.all_active_individual_eligibility_determinations.each { |ed| puts "#{ed.max_aptc}" if ed.max_aptc > 0 }
   def all_active_assistance_eligible_individual_eligibility_determinations
     all_active_individual_eligibility_determinations.select { |determination| determination.max_aptc > 0 }
   end
