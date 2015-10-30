@@ -3,39 +3,10 @@ puts "::: Cleaning QualifyingLifeEventKinds :::"
 QualifyingLifeEventKind.delete_all
 
 QualifyingLifeEventKind.create!(
-    title: "I've married",
+    title: "Had a baby",
+    tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
     action_kind: "add_benefit",
-    reason: " ",
-    edi_code: "32-MARRIAGE", 
-    market_kind: "shop", 
-    effective_on_kinds: ["first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 15,
-    event_kind_label: 'Date of married',
-    tool_tip: "Enroll or add a family member because of marriage"
-  )
-
-QualifyingLifeEventKind.create!(
-    title: "I've entered into a legal domestic partnership",
-    action_kind: "add_benefit",
-    reason: " ",
-    edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
-    market_kind: "shop", 
-    effective_on_kinds: ["first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 20,
-    event_kind_label: 'Date of domestic partnership',
-    tool_tip: "Enroll or add a family member due to a new domestic partnership"
-  )
-
-QualifyingLifeEventKind.create!(
-    title: "I've had a baby",
-    action_kind: "add_benefit",
-    reason: " ",
+    reason: "birth",
     edi_code: "02-BIRTH", 
     market_kind: "shop", 
     effective_on_kinds: ["date_of_event"],
@@ -43,14 +14,13 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 25,
-    event_kind_label: 'Date of birth',
-    tool_tip: "Enroll or add a family member due to birth"
+    event_kind_label: 'Date of birth'
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've adopted a child",
+    title: "Adopted a child",
     action_kind: "add_benefit",
-    reason: " ",
+    reason: "adoption",
     edi_code: "05-ADOPTION", 
     market_kind: "shop", 
     effective_on_kinds: ["date_of_event"],
@@ -63,9 +33,54 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "Myself or a family member has lost other coverage", 
+    title: "Married",
     action_kind: "add_benefit",
-    reason: " ",
+    reason: "marriage",
+    edi_code: "32-MARRIAGE", 
+    market_kind: "shop", 
+    effective_on_kinds: ["first_of_month"],
+    pre_event_sep_in_days: 0,
+    post_event_sep_in_days: 30, 
+    is_self_attested: true, 
+    ordinal_position: 15,
+    event_kind_label: 'Date of married',
+    tool_tip: "Enroll or add a family member because of marriage"
+  )
+
+QualifyingLifeEventKind.create!(
+    title: "Entered into a legal domestic partnership",
+    tool_tip: "Entering a domestic partnership as permitted or recognized by the District of Columbia",
+    action_kind: "add_benefit",
+    reason: "domestic_partnership",
+    edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
+    market_kind: "shop", 
+    effective_on_kinds: ["first_of_month"],
+    pre_event_sep_in_days: 0,
+    post_event_sep_in_days: 30, 
+    is_self_attested: true, 
+    ordinal_position: 20,
+    event_kind_label: 'Date of domestic partnership'
+  )
+
+QualifyingLifeEventKind.create!(
+    title: "Divorced", 
+    tool_tip: "Divorced, ended a domestic partnership, or legally separated",
+    action_kind: "drop_member",
+    reason: "divorce",
+    edi_code: "01-DIVORCE", 
+    market_kind: "shop", 
+    effective_on_kinds: ["first_of_month"],
+    pre_event_sep_in_days: 0,
+    post_event_sep_in_days: 30, 
+    is_self_attested: true, 
+    ordinal_position: 40,
+    event_kind_label: "Divorce or partnership end date"
+  )
+
+QualifyingLifeEventKind.create!(
+    title: "Losing other health insurance", 
+    action_kind: "add_benefit",
+    reason: "lost_access_to_mec",
     edi_code: "33-LOST ACCESS TO MEC", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -74,28 +89,13 @@ QualifyingLifeEventKind.create!(
     is_self_attested: true, 
     ordinal_position: 35,
     event_kind_label: 'Date of losing coverage',
-    tool_tip: "Enroll or add a family member due to loss of eligibility for other coverage"
-  )
-
-QualifyingLifeEventKind.create!(
-    title: "I've divorced", 
-    action_kind: "drop_member",
-    reason: " ",
-    edi_code: "01-DIVORCE", 
-    market_kind: "shop", 
-    effective_on_kinds: ["first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 40,
-    event_kind_label: "Date of divorce",
-    tool_tip: "Remove a family member due to divorce"
+    tool_tip: "Someone in the household is losing other health insurance involuntarily",
   )
 
 QualifyingLifeEventKind.create!(
     title: "A family member has died", 
     action_kind: "drop_member",
-    reason: " ",
+    reason: "death",
     edi_code: "03-DEATH", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -108,7 +108,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "My child has lost coverage due to age", 
+    title: "Child losing or lost coverage due to age", 
     action_kind: "drop_member",
     reason: "child_age_off",
     edi_code: "33-CHILD AGE OFF", 
@@ -118,14 +118,14 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 50,
-    event_kind_label: "Date of losing coverage",
+    event_kind_label: "Date of coverage loss",
     tool_tip: "Remove a child who is no longer eligible due to turning age 26"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "Drop self due to new eligibility", 
+    title: "Drop coverage due to new eligibility", 
     action_kind: "drop_member",
-    reason: "terminate_benefit",
+    reason: "new_eligibility_family",
     edi_code: "07-TERMINATION OF BENEFITS", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -140,7 +140,7 @@ QualifyingLifeEventKind.create!(
 QualifyingLifeEventKind.create!(
     title: "Drop family member due to new eligibility", 
     action_kind: "drop_member",
-    reason: "drop_family_member_due_to_new_eligibility",
+    reason: "new_eligibility_member",
     edi_code: "07-TERMINATION OF BENEFITS", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -153,7 +153,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've moved",
+    title: "Moved or moving",
     action_kind: "administrative",
     reason: "relocate",
     edi_code: "43-CHANGE OF LOCATION", 
@@ -183,7 +183,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "Contract violation", 
+    title: "Health plan contract violation", 
     action_kind: "administrative",
     reason: "contract_violation",
     edi_code: "33-CONTRACT VIOLATION", 
@@ -198,9 +198,9 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've started a new job", 
+    title: "Started a new job", 
     action_kind: "add_benefit",
-    reason: " ",
+    reason: "new_employment",
     edi_code: "28-INITIAL ENROLLMENT", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -211,8 +211,6 @@ QualifyingLifeEventKind.create!(
     event_kind_label: 'Date of start a new job',
     tool_tip: "Enroll due to becoming newly eligibile"
   )
-
-
 
 puts "::: QualifyingLifeEventKinds Complete :::"
 puts "*"*80
