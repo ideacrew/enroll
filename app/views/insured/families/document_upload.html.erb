@@ -10,21 +10,25 @@
       <p>We need the following documentation to verify the information you enetered into your application. You may
         submit documentation now or within <strong>90 days</strong> after you submit your
         application. <%= link_to 'Learn why we need additional documentation', '#' %></p>
+<%= form_for @person, :url => insured_verification_documents_upload_path, html: { multipart: true }, method: :post do |f| %>
+    <%= fields_for @person.consumer_role do |c| %>
+    <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
+      <%= select_tag :family_member, options_for_select(@person_family.all.collect{|mem| [mem.first_name, mem.id]}) %>
+    </div>
+    <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
+      <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f, document_upload: true} %>
+    </div>
 
-      <%= form_for @person, :url => insured_verification_documents_upload_path, html: { multipart: true }, method: :post do |f| %>
-          <%= fields_for @person.consumer_role do |c| %>
-            <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
-              <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f, document_upload: true} %>
-            </div>
-          <% end %>
-          <br/>
-          <div class="col-md-6 col-xs-6 col-sm-6">
-            <%= file_field_tag :file %>
-          </div>
-          <div class="col-md-4 colx-xs-4 col-sm-4">
-            <%= f.submit "Submit Documentation", class: "btn btn-primary" %>
-          </div>
-      <% end %>
+    <% end %>
+    <br/>
+    <div class="col-md-6 col-xs-6 col-sm-6">
+      <%= file_field_tag :file %>
+    </div>
+    <div class="col-md-4 colx-xs-4 col-sm-4">
+      <%= f.submit "Submit Documentation", class: "btn btn-primary" %>
+    </div>
+<% end %>
+
     </div>
   </div>
 </div>

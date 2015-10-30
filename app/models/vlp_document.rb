@@ -1,5 +1,7 @@
 class VlpDocument < Document
 
+  attr_accessor :changing_status
+
   NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"]
 
   VLP_DOCUMENT_IDENTIFICATION_KINDS = [
@@ -31,6 +33,8 @@ class VlpDocument < Document
       "Other (With Alien Number)",
       "Other (With I-94 Number)"
     ]
+
+    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'in review', 'verified', 'rejected']
 
     COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
 		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
@@ -77,6 +81,9 @@ class VlpDocument < Document
 
   # country which issued the document. e.g. passport issuing country
   field :issuing_country, type: String
+
+  # document verification status ::VlpDocument::VLP_DOCUMENT_KINDS
+  field :status, type: String, default: "not submitted"
 
   validates :subject,
         inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
