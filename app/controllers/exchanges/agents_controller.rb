@@ -1,7 +1,6 @@
 class Exchanges::AgentsController < ApplicationController
   before_action :check_agent_role
   def home
-     
      @title = current_user.agent_title
      @assister = current_user.has_assister_role?
      @cac = current_user.person.csr_role.try(:cac)
@@ -68,6 +67,8 @@ class Exchanges::AgentsController < ApplicationController
     unless current_user.has_agent_role? || current_user.has_hbx_staff_role? || current_user.has_broker_role?
       redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" }
     end
+    current_user.last_portal_visited = home_exchanges_agents_path
+    current_user.save!
   end
 
 end
