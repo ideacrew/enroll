@@ -42,10 +42,26 @@ RSpec.describe User, :type => :model do
     end
 
     context 'when password' do
+      let(:params){valid_params.deep_merge!({password: valid_params[:email] + "aA1!"})}
+      it 'contains username' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["password cannot contain username"]
+      end
+    end
+
+    context 'when password' do
       let(:params){valid_params.deep_merge!({password: "1234566746464DDss"})}
       it 'does not contain valid complexity' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"]
+      end
+    end
+
+    context 'when password' do
+      let(:params){valid_params.deep_merge!({password: "12_-66746464DDDss"})}
+      it 'repeats a consecutive character more than once' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["must not repeat consecutive characters more than once"]
       end
     end
 

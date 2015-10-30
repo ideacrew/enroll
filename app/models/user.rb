@@ -15,12 +15,22 @@ class User
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
+    elsif password.present? and password.include? email
+      errors.add :password, "password cannot contain username"
+    elsif password.present? and password.match(/(.)\1\1/)
+      errors.add :password, "must not repeat consecutive characters more than once"
     end
   end
 
   def self.generate_valid_password
     password = Devise.friendly_token.first(16)
     password = password + "aA1!"
+    password = password.squeeze
+    if password.length < 8
+      password = generate_valid_password
+    else
+      password
+    end
   end
 
   def switch_to_idp!
@@ -225,7 +235,7 @@ class User
   end
 
   # Instances without a matching Person model
-  # This suboptimal query approach is necessary, as the belongs_to side of the association holds the 
+  # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
   #   ID in a has_one association
   def self.orphans
     all.order(:"email".asc).select() {|u| u.person.blank?}
