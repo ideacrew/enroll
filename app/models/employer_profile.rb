@@ -139,8 +139,9 @@ class EmployerProfile
 
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
+binding.pry
     plan_year = find_plan_year_by_date(today)
-    @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
+    @active_plan_year = plan_year if (plan_year.present? && plan_year.published)
   end
 
   def latest_plan_year
@@ -167,6 +168,10 @@ class EmployerProfile
 
   def enrolling_plan_year
     published_plan_year
+  end
+
+  def is_primary_office_local?
+    organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
   end
 
   ## Class methods
@@ -225,6 +230,7 @@ class EmployerProfile
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
           org.employer_profile.employer_profile_account.advance_billing_period!
+          Factories::EmployerRenewal(org.employer_profile) if today == org.employer_profile.active_plan_year.end_on - 3.months + 1.day
         end
       end
 

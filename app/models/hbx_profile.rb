@@ -132,6 +132,9 @@ class HbxProfile
   # may terminate an employee and effective date
   ShopRetroactiveTerminationMaximum = 60.days
 
+  # Length of time preceeding next effective date that an employer may renew
+  ShopMaximumRenewalPeriodBeforeStartOn = 3.months
+
   # Number of days preceeding effective date that an employee may submit a plan enrollment
   ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
 

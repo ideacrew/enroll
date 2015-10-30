@@ -6,6 +6,9 @@ class PlanYear
 
   embedded_in :employer_profile
 
+  PUBLISHED = %w(published enrolling enrolled active suspended)
+
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -36,7 +39,7 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
-  scope :published, ->{ any_in(aasm_state: %w(published enrolling enrolled active suspended)) }
+  scope :published,      ->{ any_in(aasm_state: PUBLISHED) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -151,7 +154,7 @@ class PlanYear
   def application_eligibility_warnings
     warnings = application_errors
 
-    unless employer_profile.organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
+    unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Primary office must be located in #{HbxProfile::StateName}"})
     end
 
@@ -427,6 +430,7 @@ class PlanYear
     end
   end
 
+
   aasm do
     state :draft, initial: true
 
@@ -441,6 +445,11 @@ class PlanYear
     state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
 
     state :active         # Published plan year is in-force
+
+    state :renewing       
+    state :renewing_published
+    state :renewing_enrolling
+    state :renewing_enrolled
 
     state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated     # Coverage under this application is terminated
@@ -457,6 +466,10 @@ class PlanYear
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
+
+      transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
+      transitions from: :renewing_enrolled,  to: :active,             :guard  => :is_event_date_valid?
+      transitions from: :renewing_enrolling, to: :renewing_enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
     end
 
     ## Application eligibility determination process
@@ -507,6 +520,14 @@ class PlanYear
     # Coverage termianted due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
+    end
+
+    event :renew, :after => :record_transition do
+      transitions from: :draft, to: :renewing
+    end
+
+    event :renew_publish, :after => :record_transition do
+      transitions from: :renewing, to: :renewing_published
     end
 
     # Admin ability to reset application
