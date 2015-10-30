@@ -27,30 +27,44 @@
 <%- if @tab == 'home' %>
 <% if @current_plan_year.present? %>
 <aside class="col-xs-4">
-  <section class="row">
-    <article class="col-xs-12">
-      <div class="row">
-        <div class="col-xs-4">
-          <figure>
-            <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2><%= (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i %></h2><span>Days</span></figcaption></span>
-          </figure>
+  <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
+    <section class="row">
+      <article class="col-xs-12">
+        <div class="row">
+          <div class="col-xs-4">
+            <figure>
+              <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip">
+                <figcaption>
+                  <h2>
+                    <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
+                      <%= (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i %>
+                      <% else %>
+                      0
+                    <% end %>
+                  </h2>
+                  <span>
+                    Days
+                  </span>
+              </figcaption>
+            </span>
+            </figure>
+          </div>
+          <div class="col-xs-8">
+            <h3>Until Open Enrollment Ends</h3>
+            <span><%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %></span>
+          </div>
         </div>
-        <div class="col-xs-8">
-          <h3>Until Open Enrollment Ends</h3>
-          <span><%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %></span>
-        </div>
-      </div>
-    </article>
-
-  </section>
-
-
+      </article>
+    </section>
+  <% end %>
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
-      <h4>Premium Billing Report
+      <h3>Premium Billing Report</h3>
         <% if @employer_profile.published_plan_year.present? %>
-          <%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></h4>
+          <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
         <% end %>
+        <br/>
+        <br/>
         <table>
           <tr>
             <td style="padding-right: 10px;">Total Premium:</td>

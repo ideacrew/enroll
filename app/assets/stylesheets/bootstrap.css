@@ -2732,6 +2732,8 @@ select[multiple].form-group-lg .form-control {
     padding-top: 7px;
     margin-bottom: 0;
     text-align: right;
+    padding-right: 15px;
+
   }
 }
 .form-horizontal .has-feedback .form-control-feedback {
@@ -3308,6 +3310,7 @@ tbody.collapse.in {
   .navbar-right .dropdown-menu {
     right: 0;
     left: auto;
+
   }
   .navbar-right .dropdown-menu-left {
     right: auto;
@@ -3942,7 +3945,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-brand {
   float: left;
   height: 50px;
-  padding: 15px 15px;
+  padding: 15px 15px 15px 0;
   font-size: 18px;
   line-height: 20px;
 }
@@ -3958,7 +3961,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 @media (min-width: 768px) {
   .navbar > .container .navbar-brand,
   .navbar > .container-fluid .navbar-brand {
-    margin-left: -15px;
   }
 }
 .navbar-toggle {
@@ -4156,6 +4158,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   .navbar-right {
     float: right !important;
     margin-right: -15px;
+
   }
   .navbar-right ~ .navbar-right {
     margin-right: 0;

@@ -22,6 +22,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   context "terminate time" do
     it "set date to current day" do
       allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record)
+
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
 
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record, direct_terminate: true)
@@ -31,6 +32,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
 
     it "set date to the day before current" do
       allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record - 10.days)
+
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
 
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record - 1.day, direct_terminate: true)
