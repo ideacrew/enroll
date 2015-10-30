@@ -65,9 +65,24 @@ $(document).on('page:update', function(){
   //validate plan year create for title, referencce plan, and premium Percentage
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
     $('.interaction-click-control-save-plan-year').removeClass('disabled');
+    validateEditPlanYear()
+    //validate plan year create for title, referencce plan, and premium Percentage
+    $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+      validateEditPlanYear();
+    });
+    $(document).on('change','.reference-plan input', function() {
+      validateEditPlanYear();
+    });
 
   } else {
     validatePlanYear()
+
+    $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+      validatePlanYear();
+    });
+    $(document).on('change','.reference-plan input', function() {
+      validatePlanYear();
+    });
 
 
   }
@@ -83,18 +98,71 @@ function getCarrierPlans(ep, ci) {
   })
 };
 
-if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
-} else {
+  function validateEditPlanYear() {
+    editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+    editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
+    editselectedplan = $('input.ref-plan');
 
+    editbgtitles.each(function() {
 
-    //validate plan year create for title, referencce plan, and premium Percentage
-    $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
-      validatePlanYear();
+      if ( $(this).val().length > 0 ) {
+        editvalidatedbgtitles = true;
+        editvalidated = true;
+      } else {
+        editvalidatedbgtitles = false;
+        editvalidated = false;
+
+        return;
+      }
     });
-    $(document).on('change','.reference-plan input', function() {
-      validatePlanYear();
+    editbgemployeepremiums.each(function() {
+
+      if ( parseInt($(this).val() ) >= parseInt(50) ) {
+        editvalidatedbgemployeepremiums = true
+        editvalidated = true;
+
+      } else {
+        editvalidatedbgemployeepremiums = false;
+        editvalidated = false;
+
+        return;
+      }
     });
+
+    if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
+      editvalidatedreferenceplanselections = true
+      editvalidated = true;
+
+    } else {
+      editselectedplan.each(function() {
+        if ( $(this).val() != 'undefined' ) {
+          editvalidatedreferenceplanselections = true
+          editvalidated = true;
+
+        } else {
+          editvalidatedreferenceplanselections = false
+          editvalidated = false;
+
+          return;
+        }
+      });
+    }
+
+
+    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true ) {
+        $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').removeClass('disabled');
+      } else {
+        $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').addClass('disabled');
+      }
+
+
+
+
+}
+
+
     function validatePlanYear() {
       bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
       bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
@@ -144,7 +212,6 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
           }
         });
       }
-      alert(validated);
 
 
       if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
@@ -154,7 +221,6 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
         }
 
 
-    }
 
 }
 
