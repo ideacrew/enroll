@@ -19,8 +19,11 @@ module Subscribers
       verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
       primary_person = search_person(verified_primary_family_member)
       family = find_existing_family(verified_primary_family_member, primary_person, xml)
-
       if family.present?
+        stupid_family_id = family.id
+        active_household = family.active_household
+        family.save! # In case the tax household does not exist
+        family = Family.find(stupid_family_id) # wow
         active_household = family.active_household
         active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
         active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
@@ -28,7 +31,6 @@ module Subscribers
         verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
         import_home_address(primary_person, verified_new_address)
         primary_person = search_person(verified_primary_family_member) #such mongoid
-        family = find_existing_family(verified_primary_family_member, primary_person, xml) #wow
         family.save!
         if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
