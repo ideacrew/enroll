@@ -1,24 +1,14 @@
 <div class='content'>
    <div class='container top-pd'>
        <h4> <%= @title%> </h4>
-       <%= render 'consumer_application_links' %>
+       <% if current_user.has_csr_role? && !@cac%>
+         <%= render 'consumer_application_links' %>
+       <% end %>
        <br/>
        <div class='col-md-12 col-lg-12'>
          <p> After working on an enrollment return to this page via the person icon in the header </p>
          <br/>
        </div>
-        <div class='col-md-12 col-lg-12'>
-          <% if @person %>
-            <div>
-                <br/>
-                <% unless @person.csr_role || @person.assister_role %>
-                <h4>Your secure mailbox contains a link to the account for <%=@person.first_name%> <%=@person.last_name %>. </h4>
-                <br/>
-                <% end %>
-            </div>
-          <% end %>
-        </div>
-        <div id='sent_email_status'></div>
         <br/>
         <div>
             <div id='inbox'>

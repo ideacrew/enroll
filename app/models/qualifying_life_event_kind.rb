@@ -151,11 +151,14 @@ class QualifyingLifeEventKind
   end
 
   def is_dependent_loss_of_coverage?
-    ["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
+    #["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
+    #lost_access_to_mec
+    %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
   end
 
   def is_moved_to_dc?
-    title == "I'm moving to the District of Columbia"
+    #title == "I'm moving to the District of Columbia"
+    reason == 'relocate'
   end
   
   def individual?
@@ -163,7 +166,8 @@ class QualifyingLifeEventKind
   end
 
   def family_structure_changed?
-    ["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
+    #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
+    %w(birth adoption marriage divorce domestic_partnership).include? reason
   end
 
   class << self
