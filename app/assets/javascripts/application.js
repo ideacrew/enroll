@@ -62,6 +62,8 @@ function dchbx_enroll_date_of_record() {
 $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
+  //validate plan year create for title, referencce plan, and premium Percentage
+  validatePlanYear()
 });
 
 
@@ -73,6 +75,76 @@ function getCarrierPlans(ep, ci) {
     data: params
   })
 };
+
+//validate plan year create for title, referencce plan, and premium Percentage
+$(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+  validatePlanYear();
+});
+$(document).on('change','.reference-plan input', function() {
+  validatePlanYear();
+});
+function validatePlanYear() {
+  bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+  bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+  referenceplanselections = $('.reference-plan input[type=radio]:checked');
+
+  bgtitles.each(function() {
+
+    if ( $(this).val().length > 0 ) {
+      validatedbgtitles = true;
+      validated = true;
+    } else {
+      validatedbgtitles = false;
+      validated = false;
+
+      return;
+    }
+  });
+  bgemployeepremiums.each(function() {
+
+    if ( parseInt($(this).val()) >= 50 ) {
+      validatedbgemployeepremiums = true
+      validated = true;
+
+    } else {
+      validatedbgemployeepremiums = false;
+      validated = false;
+
+      return;
+    }
+  });
+
+  if ( referenceplanselections.length != $('.benefit-group-fields').length ) {
+    validatedreferenceplanselections = false
+    validated = false;
+
+  } else {
+    referenceplanselections.each(function() {
+      if ( $(this).length && $(this).val() != 'undefined' ) {
+        validatedreferenceplanselections = true
+        validated = true;
+
+      } else {
+        validatedreferenceplanselections = false
+        validated = false;
+
+        return;
+      }
+    });
+  }
+  alert(validated);
+
+
+  if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
+      $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').removeClass('disabled');
+    } else {
+      $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').addClass('disabled');
+    }
+
+
+}
+
+
 // modal input type file clicks
 $(document).on('click', '#modal-wrapper div label', function(){
   $(this).closest('div').find('input[type=file]').on('change', function() {
@@ -94,6 +166,8 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
+
+
 
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
