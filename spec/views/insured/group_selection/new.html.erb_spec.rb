@@ -38,7 +38,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should show the title of family members" do
 
-      expect(rendered).to match /Choose Plan for your Household/
+      expect(rendered).to match /Choose Coverage for your Household/
     end
 
     it "should have three checkbox option" do
@@ -115,7 +115,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should show the title of family members" do
-      expect(rendered).to match /Choose Plan for your Household/
+      expect(rendered).to match /Choose Coverage for your Household/
     end
 
     it "should have three checkbox option" do
