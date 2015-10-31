@@ -83,8 +83,13 @@ $(function() {
 })
 
 function setProgressBar(){
-  if($('.form-border .progress-wrapper').length == 0)
-    return;
+
+    // ignore this call by returning if no presense of progress-wrapper and employer-dummy classes
+    if($('.progress-wrapper.employer-dummy').length == 0) {
+      return;
+    }
+
+
 
   maxVal = parseInt($('.progress-val .pull-right').data('value'));
   dividerVal = parseInt($('.divider-progress').data('value'));
