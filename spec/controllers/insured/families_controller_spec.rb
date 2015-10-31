@@ -24,7 +24,7 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET home" do
     before :each do
-      allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
+      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
@@ -151,40 +151,6 @@ RSpec.describe Insured::FamiliesController do
   end
 
 
-  describe "GET document_index" do
-    before :each do
-      get :documents_index
-    end
-
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render document index page" do
-      expect(response).to render_template("documents_index")
-    end
-  end
-
-
-  describe "GET document_upload" do
-    before :each do
-      allow(person).to receive(:consumer_role).and_return(consumer_role)
-      get :document_upload
-    end
-
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render document upload page" do
-      expect(response).to render_template("document_upload")
-    end
-
-    it "should assign variables" do
-      expect(assigns(:consumer_wrapper)).to be_an_instance_of(Forms::ConsumerRole)
-    end
-  end
-
   describe "GET find_sep" do
     before :each do
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
@@ -251,29 +217,27 @@ RSpec.describe Insured::FamiliesController do
     end
 
     it "renders the 'check_qle_date' template" do
-      xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'
+      xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'
       expect(response).to have_http_status(:success)
     end
 
     describe "with valid params" do
       it "returns qualified_date as true" do
-        xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'
+        xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
     end
 
     describe "with invalid params" do
-      context "I've married" do
-        it "returns qualified_date as false for invalid future date" do
-          xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'}
-          expect(assigns['qualified_date']).to eq(false)
-        end
+      it "returns qualified_date as false for invalid future date" do
+        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}
+        expect(assigns['qualified_date']).to eq(false)
+      end
 
-        it "returns qualified_date as false for invalid past date" do
-          xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'}
-          expect(assigns['qualified_date']).to eq(false)
-        end
+      it "returns qualified_date as false for invalid past date" do
+        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}
+        expect(assigns['qualified_date']).to eq(false)
       end
     end
 
@@ -289,7 +253,7 @@ RSpec.describe Insured::FamiliesController do
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, qle_type: "normal qle event", format: :js
+          xhr :get, :check_qle_date, date_val: date, format: :js
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
@@ -297,7 +261,7 @@ RSpec.describe Insured::FamiliesController do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 40.days).strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, qle_type: "normal qle event", format: :js
+          xhr :get, :check_qle_date, date_val: date, format: :js
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end

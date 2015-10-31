@@ -258,6 +258,12 @@ class EmployerProfile
     plan_year.revert
   end
 
+  def default_benefit_group
+    plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
+    return unless plan_year_with_default
+    plan_year_with_default.benefit_groups.detect{|bg| bg.default }
+  end
+
 ## TODO - anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required
@@ -423,8 +429,8 @@ private
   end
 
   def save_inbox
-    welcome_subject = "Welcome to DC HealthLink"
-    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
+    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

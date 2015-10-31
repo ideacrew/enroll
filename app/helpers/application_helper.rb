@@ -395,7 +395,7 @@ module ApplicationHelper
       progress_bar_width = (enrolled * 100)/eligible
     end
 
-    content_tag(:div, class: 'progress-wrapper') do
+    content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
         concat(content_tag(:div, class: "progress-bar #{progress_bar_class}", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
           concat content_tag(:span, '', class: 'sr-only')
@@ -409,6 +409,8 @@ module ApplicationHelper
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;"
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"})
         end
+
+       #binding.pry
 
         concat(content_tag(:div, class: 'progress-val') do
           concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)

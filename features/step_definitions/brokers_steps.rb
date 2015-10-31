@@ -183,6 +183,7 @@ And (/^.+ should see broker active for the employer$/) do
 end
 
 When(/^.+ terminates broker$/) do
+
   @browser.a(text: /Change Broker/i).wait_until_present
   @browser.a(text: /Change Broker/i).click
 

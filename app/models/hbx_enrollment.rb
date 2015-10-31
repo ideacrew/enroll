@@ -103,8 +103,8 @@ class HbxEnrollment
   scope :changing, ->{ where(changing: true) }
   scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
-
-  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+  scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
+  scope :show_enrollments, -> { any_of([enrolled.selector, terminated.selector]) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -129,7 +129,7 @@ class HbxEnrollment
     allow_blank: false,
     inclusion: {
       in: COVERAGE_KINDS,
-      message: "%{value} is not a valid coverage kind"
+      message: "%{value} is not a valid coverage type"
     }
 
   aasm do

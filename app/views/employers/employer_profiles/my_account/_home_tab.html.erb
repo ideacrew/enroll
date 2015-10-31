@@ -24,7 +24,7 @@
         <h3>Employee Enrollments and Waivers <i class="fa fa-question-circle" data-toggle="tooltip" title="At least 66 percent of your eligible employees must enroll or waive coverage during the open enrollment period in order to establish your Health Benefits Program. One of your enrollees must also be a non-owener"></i>
         </h3>
 
-        <div class="progress">
+
             <!-- OLD PROGRESS BAR
             <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="45" class="progress-bar progress-bar-danger progress-bar-striped active" role="progressbar" style="width: 45%">
               <span class="sr-only">45% Complete</span>
@@ -32,7 +32,6 @@
           -->
           <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
 
-        </div>
 
         <div class="information">
           <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>

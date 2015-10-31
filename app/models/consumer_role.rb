@@ -350,7 +350,11 @@ class ConsumerRole
       documents.subject.eql?(subject)
     end
 
-    subject_doc || vlp_documents.build({subject:subject})
+    vlp_documents.build({subject:subject})
+  end
+
+  def find_document_by_id(id)
+
   end
 
 private

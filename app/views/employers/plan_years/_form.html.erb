@@ -33,8 +33,10 @@
           <%= render "shared/plan_year_fields", f: f %>
 </div>
           <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab">
+
           <h1><%= @plan_year.new_record? ? 'Coverage – Set up Employee Benefit Package' : 'Coverage - Edit Employee Benefit Package' %></h1>
           <h4>Let’s start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
+
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
@@ -58,7 +60,7 @@
 
 
               <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
-                <button class="btn btn-primary pull-right btn-br mtz" type="submit">
+                <button class="btn btn-primary pull-right btn-br mtz disabled" type="submit">
                   <%= "#{button_name}".html_safe %>
                 </button> &nbsp;&nbsp;
               <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-trans pull-right' %>

@@ -102,6 +102,7 @@ class HbxProfile
   StateAbbreviation = "DC"
   CallCenterName = "DC Health Link's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
+  ShortName = "DC Health Link"
 
   # FIXME
   IndividualEnrollmentDueDayOfMonth = 15
@@ -192,8 +193,8 @@ class HbxProfile
   end
 
   def save_inbox
-    welcome_subject = "Welcome to DC HealthLink"
-    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
+    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

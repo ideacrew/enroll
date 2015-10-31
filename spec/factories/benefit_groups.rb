@@ -13,6 +13,7 @@ FactoryGirl.define do
     terminate_on_kind "end_of_month"
     plan_option_kind "single_plan"
     effective_on_offset 0
+    default false
     reference_plan_id {FactoryGirl.create(:plan_with_premium_tables)._id}
     elected_plan_ids { [ self.reference_plan_id ]}
     employer_max_amt_in_cents 1000_00

@@ -19,14 +19,18 @@ module Subscribers
       verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
       primary_person = search_person(verified_primary_family_member)
       family = find_existing_family(verified_primary_family_member, primary_person, xml)
-
       if family.present?
+        stupid_family_id = family.id
+        active_household = family.active_household
+        family.save! # In case the tax household does not exist
+        family = Family.find(stupid_family_id) # wow
         active_household = family.active_household
         active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
         active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
         new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
         verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
         import_home_address(primary_person, verified_new_address)
+        primary_person = search_person(verified_primary_family_member) #such mongoid
         family.save!
         if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
@@ -118,6 +122,8 @@ module Subscribers
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
             new_member.save!
+            find_or_build_consumer_role(new_member)
+            update_vlp_for_consumer_role(new_member.consumer_role, verified_family_member)
             verified_new_address = verified_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
             import_home_address(new_member, verified_new_address)
             new_people << [new_member, relationship, [verified_family_member.id]]
@@ -126,6 +132,12 @@ module Subscribers
       end
       new_people
     end
+
+    def find_or_build_consumer_role(person)
+      return person.consumer_role if person.consumer_role.present?
+      person.build_consumer_role(is_applicant: true)
+    end
+
 
     def find_existing_family(verified_dependents_member, person, xml)
       family = nil
