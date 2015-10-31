@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
+  let(:person) { double(id: '31111113') }
+  let(:family) { double(is_eligible_to_enroll?: true) }
+
+  before(:each) do
+    @family = family
+    @person = person
+  end
+
   context "without consumer_role" do
     let(:mock_organization){ instance_double("Oganization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
@@ -25,10 +33,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 enroll_step: 2,
+                                 enroll_step: 2, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employee_role: nil, status_step: 2, applied_aptc_amount: 23.00)}
 
     before :each do
+      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
@@ -53,10 +62,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   context "with consumer_role" do
     let(:plan) {FactoryGirl.build(:plan)}
+   
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 enroll_step: 1,
-                                 subscriber: nil,
+                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2)}
 
     before :each do
