@@ -10,7 +10,7 @@ FactoryGirl.define do
     # broker_agency_id nil
     # writing_agent_id nil
     submitted_at {2.months.ago}
-    aasm_state "coverage_enrolled"
+    aasm_state "coverage_selected"
     aasm_state_date {effective_on}
     updated_by "factory"
     is_active true

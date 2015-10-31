@@ -14,7 +14,7 @@ RSpec.describe UserMailer do
       expect(email.body).to match(/Dear john/)
     end
 
-    it 'should have subject of DC HealthLink' do
+    it 'should have subject of DC Health Link' do
       expect(email.subject).to match(/DC HealthLink/)
     end
 

@@ -131,3 +131,39 @@ $(document).on('change', '#address_info .office_kind_select select', function() 
     $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
   };
 })
+
+function checkPhone(textbox) {
+  var phoneRegex = /^\d{3}-\d{4}$/;
+  if (textbox.value == '') {
+    textbox.setCustomValidity('Please fill out this phone number field.');
+  } else if(!phoneRegex.test(textbox.value)){
+    textbox.setCustomValidity('please enter a valid phone number.');
+  } else {
+    textbox.setCustomValidity('');
+  }
+  return true;
+}
+
+function checkZip(textbox) {
+  var phoneRegex = /^\d{5}$/;
+  if (textbox.value == '') {
+    textbox.setCustomValidity('Please fill out this zipcode field.');
+  } else if(!phoneRegex.test(textbox.value)){
+    textbox.setCustomValidity('please enter a valid zipcode.');
+  } else {
+    textbox.setCustomValidity('');
+  }
+  return true;
+}
+
+function checkAreaCode(textbox) {
+  var phoneRegex = /^\d{3}$/;
+  if (textbox.value == '') {
+    textbox.setCustomValidity('Please fill out this area code field.');
+  } else if(!phoneRegex.test(textbox.value)){
+    textbox.setCustomValidity('please enter a valid area code.');
+  } else {
+    textbox.setCustomValidity('');
+  }
+  return true;
+}

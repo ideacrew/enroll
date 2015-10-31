@@ -62,6 +62,33 @@ function dchbx_enroll_date_of_record() {
 $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
+  //validate plan year create for title, referencce plan, and premium Percentage
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    $('.interaction-click-control-save-plan-year').removeClass('disabled');
+    validateEditPlanYear()
+    //validate plan year create for title, referencce plan, and premium Percentage
+    $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+      validateEditPlanYear();
+    });
+    $(document).on('change','.reference-plan input', function() {
+      validateEditPlanYear();
+    });
+
+
+  } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    validatePlanYear()
+
+    $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+      validatePlanYear();
+    });
+    $(document).on('change','.reference-plan input', function() {
+      validatePlanYear();
+    });
+
+
+  } else {
+
+  }
 });
 
 
@@ -73,6 +100,135 @@ function getCarrierPlans(ep, ci) {
     data: params
   })
 };
+
+
+  function validateEditPlanYear() {
+    editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+    editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
+    editselectedplan = $('input.ref-plan');
+
+    editbgtitles.each(function() {
+
+      if ( $(this).val().length > 0 ) {
+        editvalidatedbgtitles = true;
+        editvalidated = true;
+      } else {
+        editvalidatedbgtitles = false;
+        editvalidated = false;
+
+        return;
+      }
+    });
+    editbgemployeepremiums.each(function() {
+
+      if ( parseInt($(this).val() ) >= parseInt(50) ) {
+        editvalidatedbgemployeepremiums = true
+        editvalidated = true;
+
+      } else {
+        editvalidatedbgemployeepremiums = false;
+        editvalidated = false;
+
+        return;
+      }
+    });
+
+    if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
+      editvalidatedreferenceplanselections = true
+      editvalidated = true;
+
+    } else {
+      editselectedplan.each(function() {
+        if ( $(this).val() != 'undefined' ) {
+          editvalidatedreferenceplanselections = true
+          editvalidated = true;
+
+        } else {
+          editvalidatedreferenceplanselections = false
+          editvalidated = false;
+
+          return;
+        }
+      });
+    }
+
+
+    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true ) {
+        $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').removeClass('disabled');
+      } else {
+        $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').addClass('disabled');
+      }
+
+
+
+
+}
+
+
+    function validatePlanYear() {
+      bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+      bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+      referenceplanselections = $('.reference-plan input[type=radio]:checked');
+
+      bgtitles.each(function() {
+
+        if ( $(this).val().length > 0 ) {
+          validatedbgtitles = true;
+          validated = true;
+        } else {
+          validatedbgtitles = false;
+          validated = false;
+
+          return;
+        }
+      });
+      bgemployeepremiums.each(function() {
+
+        if ( parseInt($(this).val() ) >= parseInt(50) ) {
+          validatedbgemployeepremiums = true
+          validated = true;
+
+        } else {
+          validatedbgemployeepremiums = false;
+          validated = false;
+
+          return;
+        }
+      });
+
+      if ( referenceplanselections.length != $('.benefit-group-fields').length ) {
+        validatedreferenceplanselections = false
+        validated = false;
+
+      } else {
+        referenceplanselections.each(function() {
+          if ( $(this).length && $(this).val() != 'undefined' ) {
+            validatedreferenceplanselections = true
+            validated = true;
+
+          } else {
+            validatedreferenceplanselections = false
+            validated = false;
+
+            return;
+          }
+        });
+      }
+
+
+      if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
+          $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').removeClass('disabled');
+        } else {
+          $('.interaction-click-control-create-plan-year, .interaction-click-control-save-plan-year').addClass('disabled');
+        }
+
+
+
+}
+
+
+
 // modal input type file clicks
 $(document).on('click', '#modal-wrapper div label', function(){
   $(this).closest('div').find('input[type=file]').on('change', function() {
@@ -91,6 +247,7 @@ $(document).on('click', '.upload-preview .fa', function(){
 $(document).on('click', '#modal-wrapper .modal-close', function(){
   $(this).closest('#modal-wrapper').remove();
 });
+
 
 // reveal published plan years benefit groups
 $(document).ready(function () {

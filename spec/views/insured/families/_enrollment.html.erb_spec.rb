@@ -13,6 +13,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :coverage_kind => "health",
       :hios_id => "19393939399",
       :plan_type => "A plan type",
+
       :nationwide => true,
       :deductible => 0,
       :total_premium => 100,
@@ -26,7 +27,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employee_role: nil, status_step: 2, applied_aptc_amount: 23.00)}
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employee_role: nil, status_step: 2, applied_aptc_amount: 23.00, aasm_state: 'coverage_selected')}
 
     before :each do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
@@ -38,7 +39,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the title" do
       expect(rendered).to match /#{plan.active_year} #{plan.coverage_kind} Coverage/
-      expect(rendered).to match /DC Healthlink/
+      expect(rendered).to match /DC Health Link/
     end
 
     it "should display the link of view detail" do
@@ -57,15 +58,15 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1,
                                  subscriber: nil,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2)}
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
 
     before :each do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan.active_year} health Coverage/
-      expect(rendered).to match /DC Healthlink/
+      expect(rendered).to match /#{plan.active_year} health Coverage/i
+      expect(rendered).to match /DC Health Link/
     end
 
     it "should display the aptc amount" do

@@ -115,7 +115,9 @@ module LegacyImporters
     def find_plan(data)
       @hios = data["plan"]["hios_id"]
       @active_year = data["plan"]["active_year"]
-      Plan.where({hios_id: @hios, active_year: @active_year.to_i}).first
+      Plan.where({hios_id: @hios, active_year: @active_year.to_i}).first.tap do |pl|
+        throw :missing_object, "Could not find plan with hios_id #{@hios}, active year #{@active_year}" if pl.nil?
+      end
     end
   end
 end
