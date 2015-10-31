@@ -265,6 +265,7 @@ private
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
+    result.deliver_now
     puts result.to_s if Rails.env.development?
    end  
 
