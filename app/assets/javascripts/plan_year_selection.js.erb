@@ -9,12 +9,14 @@ ready = function() {
     $('.planyear-add-tab .controls:last').show();
 
     $('.change-plan').on('click', function() {
+      $('.interaction-click-control-save-plan-year').addClass('disabled');
       $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
       $(this).closest('.edit-offering').hide();
       $(this).closest('.benefit-group-fields').find('.reference-steps').show();
       original_ref = $(this).closest('.benefit-group-fields').find('.ref-plan').val();
     });
     $('.cancel-plan-change').on('click', function() {
+      validateEditPlanYear();
       $(this).closest('.benefit-group-fields').find('.nav-tabs li label').css({borderBottom: "solid 3px #003260", borderBottomLeftRadius: "6px", borderBottomRightRadius: "6px" });
       $(this).closest('.benefit-group-fields').find('.edit-offering').show();
       $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
@@ -127,11 +129,23 @@ ready = function() {
     formatter: function(value) {
       return 'Contribution Percentage: ' + value + '%';
     }
+
+
+
   });
 
   $(".benefits-fields .slider").on("slide", function(slideEvt) {
     $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
     $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
+
+    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+      validateEditPlanYear();
+
+    } else {
+      validatePlanYear();
+
+    }
+
   });
 
   //hide border bottom

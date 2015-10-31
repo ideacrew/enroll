@@ -13,6 +13,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
 
   update_delete_buttons()
   applyJQDatePickers()
+  validatePlanYear()
 
 
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
