@@ -156,8 +156,9 @@ class Family
   def renewal_benefits
   end
 
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
+  def enrollments
+    return [] if  latest_household.blank?
+    latest_household.hbx_enrollments.show_enrollments
   end
 
   def primary_family_member

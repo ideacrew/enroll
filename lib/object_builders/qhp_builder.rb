@@ -113,7 +113,14 @@ class QhpBuilder
   def validate_and_persist_qhp
     begin
       associate_plan_with_qhp
-      @qhp.save!
+      # binding.pry
+      if @new_record == true
+        @qhp.save!
+      else
+        @qhp.valid? # dont save if the plan is not valid, there is no upsert!(upsert with bang), so using it for validations.
+        @qhp.save!
+      end
+      # @qhp.save!
       @success_plan_counter += 1
       LOGGER.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
@@ -169,8 +176,8 @@ class QhpBuilder
       if cost_share_variance.hios_plan_and_variant_id.split("-").last != "00"
         plan = Plan.where(active_year: @plan_year,
           hios_id: /#{@qhp.standard_component_id.strip}/,
-          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-          csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
+          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/).to_a
+          # csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
         next if plan.present?
         new_plan = Plan.new(
           name: @qhp.plan_marketing_name.squish!,
@@ -206,14 +213,23 @@ class QhpBuilder
   end
 
   def build_qhp
-    @qhp = Products::Qhp.new(qhp_params)
+    @qhp = Products::Qhp.where(active_year: qhp_params[:active_year], standard_component_id: qhp_params[:standard_component_id]).first
+    if @qhp.present?
+      @new_record = false
+      @qhp.attributes = qhp_params
+    else
+      @new_record = true
+      @qhp = Products::Qhp.new(qhp_params)
+    end
   end
 
   def build_benefits
+    @qhp.qhp_benefits = []
     benefits_params.each { |benefit| @qhp.qhp_benefits.build(benefit) }
   end
 
   def build_cost_share_variances_list
+    @qhp.qhp_cost_share_variances = []
     cost_share_variance_list_params.each do |csvp|
       @csvp = csvp
       build_cost_share_variance

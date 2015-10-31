@@ -1,8 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment_progress.html.erb" do
+  let(:hbx_enrollment) {double(aasm_state: 'coverage_selected')}
+
   before :each do
-    render partial: "insured/families/enrollment_progress", locals: {step: 2}
+    #assign(:hbx_enrollment, hbx_enrollment)
+    render partial: "insured/families/enrollment_progress", locals: {step: 2}, collection: [hbx_enrollment], as: :hbx_enrollment
+
   end
 
   it "should display step name" do
@@ -16,6 +20,6 @@ RSpec.describe "insured/families/_enrollment_progress.html.erb" do
   end
 
   it "should display title" do
-    expect(rendered).to have_selector('h4', text: 'Status')
+    expect(rendered).to have_selector('h4', text: /coverage selected/i )
   end
 end
