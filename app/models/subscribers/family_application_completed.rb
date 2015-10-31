@@ -122,6 +122,8 @@ module Subscribers
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
             new_member.save!
+            find_or_build_consumer_role(new_member)
+            update_vlp_for_consumer_role(new_member.consumer_role, verified_family_member)
             verified_new_address = verified_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
             import_home_address(new_member, verified_new_address)
             new_people << [new_member, relationship, [verified_family_member.id]]
@@ -130,6 +132,12 @@ module Subscribers
       end
       new_people
     end
+
+    def find_or_build_consumer_role(person)
+      return person.consumer_role if person.consumer_role.present?
+      person.build_consumer_role(is_applicant: true)
+    end
+
 
     def find_existing_family(verified_dependents_member, person, xml)
       family = nil

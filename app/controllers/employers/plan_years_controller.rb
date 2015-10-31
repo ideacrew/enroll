@@ -14,15 +14,15 @@ class Employers::PlanYearsController < ApplicationController
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "single_plan"
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
 
     respond_to do |format|
@@ -147,11 +147,12 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
+
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."
       redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits")
     else
-      render action: "edit"
+      redirect_to edit_employers_employer_profile_plan_year_path(@employer_profile, plan_year)
     end
   end
 
