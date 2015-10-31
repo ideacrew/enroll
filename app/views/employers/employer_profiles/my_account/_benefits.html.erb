@@ -152,12 +152,12 @@
         <table>
           <tr>
             <th>Offered</th>
-            <th>Employer contribution</th>
+            <th>Employer contribution!</th>
           </tr>
           <% bg.relationship_benefits.each do |rb| %>
           <tr>
             <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-            <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
+            <td><strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong></td>
           </tr>
           <% end %>
         </table>
