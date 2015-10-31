@@ -95,5 +95,19 @@ class Insured::VerificationDocumentsController < ApplicationController
     options[:filename] = document.title
     options
   end
+<<<<<<< HEAD
+>>>>>>> release-1.1
+=======
+
+  def get_document(key)
+    @person.consumer_role.find_vlp_document_by_key(key)
+  end
+
+  def download_options(document)
+    options = {}
+    options[:content_type] = document.format
+    options[:filename] = document.title
+    options
+  end
 >>>>>>> release-1.1
 end

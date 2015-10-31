@@ -351,12 +351,15 @@ class ConsumerRole
     end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     vlp_documents.build({subject:subject})
   end
 
   def find_document_by_id(id)
 
 =======
+=======
+>>>>>>> release-1.1
     subject_doc || vlp_documents.build({subject: subject})
   end
 
@@ -378,6 +381,9 @@ class ConsumerRole
       doc_key = document.identifier.split('#').last
       doc_key == key
     end
+<<<<<<< HEAD
+>>>>>>> release-1.1
+=======
 >>>>>>> release-1.1
   end
 

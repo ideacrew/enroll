@@ -50,7 +50,7 @@
                 <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP' %>
+                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
               </div>
           </div>
         <% end %>
@@ -63,10 +63,10 @@
         <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code", required: true, placeholder: 'AREA CODE' %>
+        <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER' %>
+        <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER', oninvalid:"checkPhone(this);", oninput:"checkPhone(this);" %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
         <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>

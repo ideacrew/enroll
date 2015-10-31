@@ -74,7 +74,8 @@ $(document).on('page:update', function(){
       validateEditPlanYear();
     });
 
-  } else {
+
+  } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
     validatePlanYear()
 
     $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
@@ -84,6 +85,8 @@ $(document).on('page:update', function(){
       validatePlanYear();
     });
 
+
+  } else {
 
   }
 });
