@@ -58,7 +58,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1,
                                  subscriber: nil,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2)}
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
 
     before :each do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
