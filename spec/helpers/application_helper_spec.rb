@@ -14,7 +14,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
 
     it "display progress bar" do
-      expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper">')
+      expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
   end
 
