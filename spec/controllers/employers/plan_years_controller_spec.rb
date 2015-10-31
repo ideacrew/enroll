@@ -178,12 +178,9 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
 
     describe "with an invalid plan year" do
-      it "should be a success" do
-        expect(response).to have_http_status(:success)
-      end
 
       it "should render the new template" do
-        expect(response).to render_template("edit")
+        expect(response).to have_http_status(:redirect)
       end
 
       it "should assign the new plan year" do
