@@ -69,7 +69,7 @@ module LegacyImporters
         m_id = en["hbx_id"]
         applicant = app_lookup[m_id]
         if applicant.nil?
-          throw :missing_object, "Could not find member with hbx_id: #{m_id}" if person.nil?
+          throw :missing_object, "Could not find member with hbx_id: #{m_id}" if applicant.nil?
         end
       end
       data["enrollees"].map do |en|
