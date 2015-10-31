@@ -8,7 +8,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
 
-    @hbx_enrollments = @family.enrolled_hbx_enrollments.active || []
+    @hbx_enrollments = @family.enrollments || []
     update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
