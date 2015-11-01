@@ -288,6 +288,7 @@ class Employers::EmployerProfilesController < ApplicationController
       id_params = params.permit(:id, :employer_profile_id)
       id = id_params[:id] || id_params[:employer_profile_id]
       @employer_profile = EmployerProfile.find(id)
+      render file: 'public/404.html', status: 404 if @employer_profile.blank?
     end
 
     def organization_profile_params
