@@ -368,6 +368,7 @@ class ConsumerRole
     return nil if vlp_documents.nil?
 
     vlp_documents.detect do |document|
+      next if document.identifier.blank?
       doc_key = document.identifier.split('#').last
       doc_key == key
     end
