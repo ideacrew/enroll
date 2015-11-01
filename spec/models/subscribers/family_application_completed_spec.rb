@@ -313,6 +313,7 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:tax_household_db) { family_db.active_household.tax_households.first }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
+      let(:dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
 
       it "should not log any errors" do
         person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
@@ -393,6 +394,15 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
           expect(consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
           expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+        end
+
+        it "updates all consumer role verifications" do
+          expect(dep_consumer_role_db.fully_verified?).to be_truthy
+          expect(dep_consumer_role_db.vlp_authority).to eq "curam"
+          expect(dep_consumer_role_db.residency_determined_at).to eq primary.created_at
+          expect(dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+          expect(dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
         end
 
         it "updates the address for the primary applicant's person" do

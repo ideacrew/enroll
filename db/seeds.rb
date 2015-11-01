@@ -119,6 +119,7 @@ puts "Loading carriers and QLE kinds."
 # require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
+system "bundle exec rake update_seed:qualifying_life_event"
 puts "::: complete :::"
 
 puts "*"*80
