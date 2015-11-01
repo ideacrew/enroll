@@ -62,7 +62,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
-    send_receipt_emails
+    send_receipt_emails if @person.emails.first
   end
 
   def thankyou
@@ -189,7 +189,7 @@ class Insured::PlanShoppingsController < ApplicationController
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @hbx_enrollment.blank?
-      @plans = [] 
+      @plans = []
     else
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
