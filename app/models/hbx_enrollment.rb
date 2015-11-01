@@ -398,7 +398,7 @@ class HbxEnrollment
   def decorated_elected_plans(coverage_kind)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
-    if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
+    if family.is_under_special_enrollment_period?
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
@@ -453,7 +453,7 @@ class HbxEnrollment
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
 
-      if qle and enrollment.family.is_under_special_enrollment_period?
+      if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       else
@@ -475,7 +475,7 @@ class HbxEnrollment
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      if qle and enrollment.family.is_under_special_enrollment_period?
+      if enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       else
