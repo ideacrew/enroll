@@ -61,16 +61,38 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       context "with a valid single person family" do
-        let(:person) { FactoryGirl.create(:person) }
-        let(:family) { Family.new.build_from_person(person) }
-        let(:consumer_role) { FactoryGirl.create(:consumer_role, person: person) }
+
+        let(:message) { { "body" => xml } }
+        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml")) }
+        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml"))).first }
+        let(:user) { FactoryGirl.create(:user) }
+
+        let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+        let(:ua_params) do
+          {
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+              "first_name" => primary.person.name_first.upcase,
+              "last_name" => primary.person.name_last.downcase,
+              "middle_name" => primary.person.name_middle,
+              "name_pfx" => primary.person.name_pfx,
+              "name_sfx" => primary.person.name_sfx,
+              "dob" => primary.person_demographics.birth_date,
+              "ssn" => primary.person_demographics.ssn,
+              "no_ssn" => "1",
+              "gender" => primary.person_demographics.sex.split('#').last
+            }
+          }
+        end
+
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:family) { consumer_role.person.primary_family }
 
         before do
-          family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
+          family.update_attribute(:e_case_id, "curam_landing_for#{consumer_role.person.id}")
           allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(Person).to receive(:where).and_return([person])
-          allow(Organization).to receive(:where).and_return([hbx_profile_organization])
         end
 
         after do
