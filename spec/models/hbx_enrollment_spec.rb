@@ -396,53 +396,29 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:plan) { FactoryGirl.create(:plan) }
       let(:plan2) { FactoryGirl.create(:plan) }
 
-      context "when in open enrollment" do
-        before :each do
-          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-          allow(consumer_role).to receive(:person).and_return(person)
-          allow(family).to receive(:is_under_special_enrollment_period?).and_return false
-          allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
-        end
-
-        it "should return decoratored plans when not in the open enrollment" do
-          allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-          allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
-          expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
-          expect(enrollment.decorated_elected_plans('health').count).to eq 1
-          expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
-        end
-
-        it "should return decoratored plans when in the open enrollment" do
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(renewal_bcp)
-          allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
-          allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
-          expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
-          expect(enrollment.decorated_elected_plans('health').count).to eq 1
-          expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
-        end
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(consumer_role).to receive(:person).and_return(person)
+        allow(family).to receive(:is_under_special_enrollment_period?).and_return false
       end
 
-      context "when in special enrollment" do
-        before :each do
-          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-          allow(consumer_role).to receive(:person).and_return(person)
-          allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-          allow(enrollment).to receive(:enrollment_kind).and_return "special_enrollment"
-        end
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+        allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+      end
 
-        it "should return decoratored plans when not in the open enrollment" do
-          allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).and_return(bcp)
-          allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
-          expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
-          expect(enrollment.decorated_elected_plans('health').count).to eq 1
-          expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
-        end
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(renewal_bcp)
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
+        allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
       end
     end
 
@@ -542,51 +518,9 @@ describe HbxEnrollment, dbclean: :after_all do
 end
 
 describe HbxProfile, "class methods", type: :model do
-  include_context "BradyWorkAfterAll"
-
-  before :all do
-    create_brady_census_families
-  end
-
   context "#find" do
     it "should return nil with invalid id" do
       expect(HbxEnrollment.find("text")).to eq nil
-    end
-  end
-
-  context "new_from" do
-    attr_reader :household, :coverage_household
-    before :all do
-      @household = mikes_family.households.first
-      @coverage_household = household.coverage_households.first
-    end
-    let(:benefit_package) { BenefitPackage.new }
-    let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-    let(:person) { double(primary_family: family)}
-    let(:family) { double(current_sep: double(effective_on:TimeKeeper.date_of_record)) }
-    let(:hbx_profile) {double} 
-    let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
-    let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
-    let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
-
-    before :each do
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-      allow(consumer_role).to receive(:person).and_return(person)
-    end
-
-    it "when qle is false" do
-      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)
-      expect(enrollment.enrollment_kind).to eq "open_enrollment"
-    end
-
-    it "when qle is true" do
-      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      allow(household).to receive(:family).and_return family
-      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: true)
-      expect(enrollment.enrollment_kind).to eq "special_enrollment"
     end
   end
 end

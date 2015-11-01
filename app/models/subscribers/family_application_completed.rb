@@ -34,7 +34,7 @@ module Subscribers
         family.save!
         if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
-            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
+            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
             active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
             update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
             new_dependents.each do |p|
