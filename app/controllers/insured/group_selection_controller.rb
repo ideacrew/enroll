@@ -120,7 +120,11 @@ class Insured::GroupSelectionController < ApplicationController
     @person = Person.find(person_id)
     @family = @person.primary_family
     @coverage_household = @family.active_household.immediate_family_coverage_household
-    @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
+    if params[:hbx_enrollment_id].present?
+      @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    end
+    @hbx_enrollment = @family.latest_household.hbx_enrollments.enrolled[0] if @hbx_enrollment.blank?
+    # @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
     if params[:employee_role_id].present?
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }

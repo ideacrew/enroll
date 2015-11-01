@@ -47,7 +47,7 @@ namespace :xml do
           carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
           new_plans = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016)
           new_plans.each do |new_plan|
-            if new_plan
+            if new_plan.present? && new_plan.csr_variant_id != "00"
               old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015, csr_variant_id: /#{new_plan.csr_variant_id}/ ).first
               if old_plan.present?
                 old_plan.update(renewal_plan_id: new_plan._id)
@@ -85,12 +85,14 @@ namespace :xml do
       no_change_in_hios_ids.each do |hios_id|
         new_plans = Plan.where(hios_id: /#{hios_id}/, active_year: 2016)
         new_plans.each do |new_plan|
-          if new_plan.present?
-            old_plan = Plan.where(active_year: 2015, hios_id: /#{hios_id}/, csr_variant_id: new_plan.csr_variant_id).first
-            old_plan.update(renewal_plan_id: new_plan.id)
+          old_plan = Plan.where(active_year: 2015, hios_id: /#{hios_id}/, csr_variant_id: new_plan.csr_variant_id).first
+          if new_plan.present? && new_plan.csr_variant_id != "00" && old_plan.present?
+            if old_plan.present?
+              old_plan.update(renewal_plan_id: new_plan.id)
+            end
             puts "Old plan hios_id #{old_plan.hios_id} carry overed with New plan hios_id: #{new_plan.hios_id}"
           else
-            puts "plan not present: #{hios_id}"
+            puts "plan not present : #{hios_id}"
           end
         end
       end
