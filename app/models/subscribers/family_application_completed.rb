@@ -23,8 +23,8 @@ module Subscribers
         stupid_family_id = family.id
         active_household = family.active_household
         family.save! # In case the tax household does not exist
-        family = Family.find(stupid_family_id) # wow
-        active_household = family.active_household
+#        family = Family.find(stupid_family_id) # wow
+#        active_household = family.active_household
         active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
         active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
         new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
@@ -34,7 +34,7 @@ module Subscribers
         family.save!
         if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
-            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
+            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
             active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
             update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
             new_dependents.each do |p|

@@ -401,4 +401,40 @@ describe "#find_document" do
       expect(found_document.subject).to eq("Certificate of Citizenship")
     end
   end
+
+  context "has a vlp_document without a file uploaded" do
+    it "" do
+
+    end
+  end
+end
+
+describe "#find_vlp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a vlp_document without a file uploaded" do
+    before do
+      consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_vlp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a vlp_document with a file uploaded" do
+    before do
+      consumer_role.vlp_documents << vlp_document
+    end
+
+    it "returns vlp_document document" do
+      found_document = consumer_role.find_vlp_document_by_key(key)
+      expect(found_document).to eql(vlp_document)
+    end
+  end
+
 end
