@@ -91,9 +91,9 @@ if missing_plan_dumps
     rate_hash.add(rates.to_hash)
     rate_hash
   end
-  puts "::: complete :::"
-
   rate_import_hash.run
+
+  puts "::: complete :::"
   puts "*"*80
   puts "Loading renewal plans"
   system "bundle exec rake xml:renewal_and_standard_plans"
@@ -155,6 +155,13 @@ puts "*"*80
 puts "::: Mapping Plans to SBC pdfs in S3 :::"
 system "bundle exec rake sbc:map"
 puts "::: Mapping Plans to SBC pdfs seed complete :::"
+
+
+puts "*"*80
+puts "updating cost share variance deductibles"
+system "bundle exec rake serff:update_cost_share_variances"
+puts "updating cost share variance deductibles complete"
+puts "*"*80
 
 puts "*"*80
 puts "End of Seed Data"
