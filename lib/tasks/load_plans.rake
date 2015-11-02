@@ -24,10 +24,13 @@ namespace :serff do
     Plan.where(:active_year.in => [2015, 2016]).each do |plan|
       qhp = Products::Qhp.where(active_year: plan.active_year, standard_component_id: plan.hios_base_id).first
       hios_id = plan.coverage_kind == "dental" ? (plan.hios_id + "-01") : plan.hios_id
-      csr = qhp.qhp_cost_share_variances.where(hios_plan_and_variant_id: hios_id).to_a.first
-      plan.deductible = csr.qhp_deductable.in_network_tier_1_individual
-      plan.family_deductible = csr.qhp_deductable.in_network_tier_1_family
-      plan.save
+      if hios_id.split("-").last != "01"
+        csr = qhp.qhp_cost_share_variances.where(hios_plan_and_variant_id: hios_id).to_a.first
+        puts "#{hios_id} ::: #{csr.hios_plan_and_variant_id}"
+        plan.deductible = csr.qhp_deductable.in_network_tier_1_individual
+        plan.family_deductible = csr.qhp_deductable.in_network_tier_1_family
+        plan.save
+      end
     end
   end
 end
