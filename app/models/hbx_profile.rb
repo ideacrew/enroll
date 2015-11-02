@@ -102,6 +102,7 @@ class HbxProfile
   StateAbbreviation = "DC"
   CallCenterName = "DC Health Link's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
+  ShortName = "DC Health Link"
 
   # FIXME
   IndividualEnrollmentDueDayOfMonth = 15
