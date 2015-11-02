@@ -19,7 +19,13 @@
           </div>
           <div class="col-xs-6">
             <span class="pull-right">
-              <span style="font-size: 24px;"><%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source), precision: 2) %></span>
+              <span style="font-size: 24px;">
+                <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.coverage_kind == 'health' %>
+                <%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source)) %>
+                <% else %>
+                <%= number_to_currency(@plan.total_employee_cost) %>
+                <% end %>
+              </span>
               <br/><span class="lg">per month</span>
           </span>
 
