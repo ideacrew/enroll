@@ -157,7 +157,7 @@ class CensusEmployee < CensusMember
     end
 
      bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
-     benefit_group_assignments.insert(bga)
+     benefit_group_assignments << bga
   end
 
   def active_benefit_group_assignment
