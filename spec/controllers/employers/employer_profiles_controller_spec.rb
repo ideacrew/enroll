@@ -450,11 +450,25 @@ RSpec.describe Employers::EmployerProfilesController do
     it "should redirect" do
       allow(user).to receive(:save).and_return(true)
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
+      allow(organization).to receive(:errors).and_return nil
       sign_in(user)
       expect(Organization).to receive(:find)
 
       put :update, id: organization.id
       expect(response).to be_redirect
+    end
+
+    it "should show error msg when save failed" do
+      allow(user).to receive(:save).and_return(true)
+      allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
+      sign_in(user)
+      expect(Organization).to receive(:find)
+      allow(organization).to receive(:update_attributes).and_return false
+      allow(organization).to receive(:errors).and_return double(full_messages: ["Can't have multiple primary addresses"])
+
+      put :update, id: organization.id
+      expect(response).to be_redirect
+      expect(flash[:error]).to match "Can't have multiple primary addresses"
     end
 
     context "given current user is invalid" do
