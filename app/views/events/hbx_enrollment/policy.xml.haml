@@ -1,11 +1,11 @@
 !!! XML
-%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance"}
+%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance" }
   %id
     %id= hbx_enrollment.hbx_id
   - if hbx_enrollment.broker_agency_profile
     = render :partial => "events/shared/broker", :object => hbx_enrollment.broker_agency_profile, as: :broker_agency_profile
   %enrollees
-    = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment }
+    = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
   %enrollment
     = render :partial => "events/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
     - if hbx_enrollment.is_shop?
