@@ -7,8 +7,6 @@ module Factories
     def initialize(employer_profile)
       @employer_profile = employer_profile
       # project_renewal_dates
-      validate_employer_profile
-      renew_employer_profile
     end
 
     def validate_employer_profile
@@ -25,9 +23,10 @@ module Factories
       end
     end
 
-    def renew_employer_profile
-      @active_plan_year = @employer_profile.active_plan_year
+    def build
+      validate_employer_profile
 
+      @active_plan_year = @employer_profile.active_plan_year
       @renew_plan_year = @employer_profile.plan_years.build({
         start_on: @active_plan_year.start_on + 1.year,
         end_on: @active_plan_year.end_on + 1.year,
@@ -45,7 +44,7 @@ module Factories
     end
 
     def renew_benefit_groups
-      @active_plan_year.benefit_groups.inject([]) do |benefit_groups, active_group|
+      @active_plan_year.benefit_groups.each do |benefit_groups, active_group|
         new_group = clone_benefit_group(active_group)
         new_group.save!
         renew_census_employees(active_group, new_group)
@@ -68,13 +67,14 @@ module Factories
     end
 
     def renew_census_employees(active_group, new_group)
-      census_employees = CensusEmployee.by_benefit_group_ids([active_group.id])
+      census_employees = CensusEmployee.by_benefit_group_ids([BSON::ObjectId.from_string(active_group.id.to_s)]).active
       census_employees.each do |census_employee|
         if census_employee.active_benefit_group_assignment && census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
           census_employee.add_renew_benefit_group_assignment(new_group)
           census_employee.save!
         end
       end
+      true
     end
 
     def self.auto_renew_employee_roles(employer_profile)
