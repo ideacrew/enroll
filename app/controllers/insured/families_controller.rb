@@ -83,13 +83,14 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
   end
 
-  def documents_index
-    @family_members = @person.try(:families).first.try(:family_members)
+  def documents_index #changed
+    @time_to = Time.now + 90.days
+    @family_members = @person.primary_family.family_members
 
   end
 
-  def document_upload
-    @person_family = @person.try(:families).first.try(:family_members)
+  def document_upload #changed
+    @person_family = @person.primary_family.family_members
   end
 
   def check_qle_date
