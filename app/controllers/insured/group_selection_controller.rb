@@ -137,5 +137,6 @@ class Insured::GroupSelectionController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
   end
 end
