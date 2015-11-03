@@ -45,5 +45,9 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     it "should have previous option" do
       expect(rendered).to match /PREVIOUS/
     end
+
+    it "should have confirm button disabled" do
+      expect(rendered).to have_selector('#btn-continue.disabled')
+    end
   end
 end

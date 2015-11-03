@@ -39,7 +39,7 @@
                   <td>
                     <div class="enrollment-type info">
                       <p>
-                        <label class="bullet-separator">DC Healthlink ID:</label>
+                        <label class="bullet-separator"><%= HbxProfile::ShortName %> ID:</label>
                         <strong><%= Maybe.new(hbx_enrollment).subscriber.person.hbx_id.truncate(8, omission: "").upcase.extract_value %></strong>
                       </p>
                     </div>

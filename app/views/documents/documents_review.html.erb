@@ -1,0 +1,45 @@
+
+<%= link_to "HBX Admin Page", exchanges_hbx_profiles_root_path, class: "btn btn-primary pull-right" %>
+
+<div class="container">
+  <h2><%= @person.first_name %>  <%= @person.last_name %> Document Verification Page</h2>
+  <%= link_to "Click to Confirm Person is verified", change_person_aasm_state_documents_path(:person_id => @person.id, :state => "fully_verified"), method: :put, class: "btn btn-warning"%><br>
+  <div class="documents-table">
+    <div class="table-responsive">
+
+      <table class="table table-hover table-striped">
+        <col width="150">
+        <col width="150">
+        <col width="100">
+        <col width="140">
+        <tr>
+          <th>Document name</th>
+          <th>Document status</th>
+          <th>Uploaded copy</th>
+          <th>Actions</th>
+        </tr>
+
+        <% @person_documents.each do |doc| %>
+        <tr>
+          <td><%= doc.subject  %></td>
+          <td><%= doc.status%></td>
+          <td>
+            <% if doc.identifier.present? %>
+            <% key, bucket = get_key_and_bucket(doc.identifier) %>
+            <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
+                <%= doc.title %>
+            <% end %>
+            <% end %>
+          </td>
+          <td>
+            <%=  link_to "Accept document", change_doc_status_documents_path(:person_id => @person.id, :doc_id => doc.id, :status => "verified"), method: :put, class: "btn btn-success"%>
+            <%=  link_to "Reject document", change_doc_status_documents_path(:person_id => @person.id, :doc_id => doc.id, :status => "rejected"), method: :put, class: "btn btn-danger"%>
+          </th>
+        </td>
+        <% end %>
+      </table>
+    </div>
+  </div>
+
+
+</div>

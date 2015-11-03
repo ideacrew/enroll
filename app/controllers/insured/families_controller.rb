@@ -84,14 +84,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def documents_index
-    @tab = params['tab']
+    @family_members = @person.try(:families).first.try(:family_members)
 
   end
 
   def document_upload
-    @consumer_wrapper = Forms::ConsumerRole.new(@person.consumer_role)
-    @tab = params['tab']
-
+    @person_family = @person.try(:families).first.try(:family_members)
   end
 
   def check_qle_date

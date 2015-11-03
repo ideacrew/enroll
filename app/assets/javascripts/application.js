@@ -74,6 +74,7 @@ $(document).on('page:update', function(){
       validateEditPlanYear();
     });
 
+
   } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
     validatePlanYear()
 
@@ -86,7 +87,7 @@ $(document).on('page:update', function(){
 
 
   } else {
-    
+
   }
 });
 

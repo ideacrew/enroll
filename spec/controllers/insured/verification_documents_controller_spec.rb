@@ -7,7 +7,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
   let(:consumer_wrapper) { double }
 
   context "Failed Upload" do
-    it "redirects" do
+    xit "redirects" do
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params_clean_vlp_documents).and_return({sample: 'sample'})
@@ -17,7 +17,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       expect(flash[:error]).to be_present
     end
 
-    it "should error with error doc_params" do
+    xit "should error with error doc_params" do
       request.env["HTTP_REFERER"] = "/home"
       allow(user).to receive(:person).and_return person
       sign_in user
@@ -40,7 +40,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       let(:file_path) { File.dirname(__FILE__) } # a sample file path
       let(:cleaned_params) { {"0" => {"subject" => "I-327 (Reentry Permit)", "id" => "55e7fef5536167bb822e0000", "alien_number" => "999999999"}} }
 
-      it "redirects" do
+      xit "redirects" do
         allow(file).to receive(:original_filename).and_return("some-filename")
         allow(file).to receive(:tempfile).and_return(temp_file)
         allow(temp_file).to receive(:path)
