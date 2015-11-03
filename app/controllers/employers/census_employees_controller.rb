@@ -50,14 +50,19 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-      new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
-      if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
+      if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
         @census_employee.add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
       end
     end
 
-    @census_employee.attributes = census_employee_params
+    if renewal_benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
+      if @census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
+        @census_employee.add_renew_benefit_group_assignment(benefit_group)
+      end
+    end
 
+    @census_employee.attributes = census_employee_params
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
 
     authorize @census_employee, :update?
@@ -211,6 +216,10 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group_id
     params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil
+  end
+
+  def renewal_benefit_group_id
+    params[:census_employee][:renewal_benefit_group_assignments][:benefit_group_id] rescue nil
   end
 
   def census_employee_params

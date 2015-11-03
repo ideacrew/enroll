@@ -27,4 +27,14 @@ module Employers::EmployerHelper
       "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
     end
   end
+
+
+  def get_benefit_groups_for_census_employee
+    if @employer_profile.active_plan_year.blank?
+      return [], []
+    end
+    current_benefit_groups = @employer_profile.active_plan_year.benefit_groups
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups
+    return current_benefit_groups, renewing_benefit_groups
+  end
 end

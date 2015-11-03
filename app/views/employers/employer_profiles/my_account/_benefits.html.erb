@@ -65,8 +65,12 @@
                 <header>Eligibility</header>
               </td>
               <td>
-                <p>
-                  <%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %>
+                <p> 
+                  <% if bg.effective_on_offset == 0 %>
+                    First of the month following or coinciding with date of hire 
+                  <% else %>
+                    <%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %>
+                  <% end %>
                 </p>
               </td>
             </tr>
@@ -124,7 +128,7 @@
         <tr>
           <td>
             <p>
-              <%= bg.reference_plan.plan_type.upcase %>
+              <%= bg.reference_plan.plan_type.to_s.upcase %>
             </p>
           </td>
           <td>
@@ -211,12 +215,11 @@
         </div>
     <div class="bottom-mgn-xs">
 
-      <% if plan_year.draft? && @current_plan_year.nil? %>
+      <% if (plan_year.draft? || plan_year.renewing_draft?) && @current_plan_year.nil? %>
       <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
       <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
-      <% elsif plan_year.draft? %>
+      <% elsif (plan_year.draft? || plan_year.renewing_draft?) %>
       <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
-
       <% end %>
     </br></br></br>
   </div>

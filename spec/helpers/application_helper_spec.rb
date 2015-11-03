@@ -164,7 +164,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     context "with hbx_enrollment" do
-      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100)}
+      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
       it "should return cost from hbx_enrollment" do
         expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
       end
