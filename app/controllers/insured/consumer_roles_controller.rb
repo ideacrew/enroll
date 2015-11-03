@@ -1,6 +1,7 @@
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
+
   before_action :check_consumer_role, only: [:search]
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
@@ -65,7 +66,13 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     if !session[:already_has_consumer_role] == true
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-      @person = @consumer_role.person
+      if @consumer_role.present?
+        @person = @consumer_role.person
+      else
+        # not logging error because error was logged in construct_consumer_role
+        render file: 'public/500.html', status: 500
+        return
+      end
     else
       @person= Person.find(session[:person_id])
       @person.user = current_user

@@ -1,5 +1,7 @@
 module Factories
   class EnrollmentFactory
+    extend Acapi::Notifiers
+
     def self.add_consumer_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
 
@@ -42,7 +44,23 @@ module Factories
         person_params["name_sfx"], person_params["ssn"].gsub("-",""),
         person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
         )
-      return nil, nil if person.blank? and person_new.blank?
+
+      if person.blank? and person_new.blank?
+        begin
+          raise
+        rescue => e
+          error_message = {
+            :error => {
+              :message => "unable to construct consumer role",
+              :person_params => person_params.inspect,
+              :user => user.inspect,
+              :backtrace => e.backtrace.join("\n")
+            }
+          }
+          log(JSON.dump(error_message), {:severity => 'error'})
+        end
+        return nil
+      end
       role = build_consumer_role(person, person_new)
     end
 

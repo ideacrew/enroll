@@ -652,43 +652,85 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 end
 
 describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
-  let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml")) }
-  let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml"))).first }
-  let(:user) { FactoryGirl.create(:user) }
+  context "with no errors" do
+    let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml")) }
+    let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml"))).first }
+    let(:user) { FactoryGirl.create(:user) }
 
-  let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
-  let(:person) { consumer_role.person }
-  let(:ua_params) do
-    {
-      addresses: [],
-      phones: [],
-      emails: [],
-      person: {
-        "first_name" => primary.person.name_first,
-        "last_name" => primary.person.name_last,
-        "middle_name" => primary.person.name_middle,
-        "name_pfx" => primary.person.name_pfx,
-        "name_sfx" => primary.person.name_sfx,
-        "dob" => primary.person_demographics.birth_date,
-        "ssn" => primary.person_demographics.ssn,
-        "no_ssn" => "",
-        "gender" => primary.person_demographics.sex.split('#').last
+    let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+    let(:person) { consumer_role.person }
+    let(:ua_params) do
+      {
+        addresses: [],
+        phones: [],
+        emails: [],
+        person: {
+          "first_name" => primary.person.name_first,
+          "last_name" => primary.person.name_last,
+          "middle_name" => primary.person.name_middle,
+          "name_pfx" => primary.person.name_pfx,
+          "name_sfx" => primary.person.name_sfx,
+          "dob" => primary.person_demographics.birth_date,
+          "ssn" => primary.person_demographics.ssn,
+          "no_ssn" => "",
+          "gender" => primary.person_demographics.sex.split('#').last
+        }
       }
-    }
+    end
+
+    after(:all) do
+      DatabaseCleaner.clean
+    end
+
+    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+    let(:family) { consumer_role.person.primary_family }
+    before :each do
+      family.update_attributes!(:e_case_id => parser.integrated_case_id)
+    end
+
+    it "should not crash on updating the e_case_id" do
+      expect {person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")}.not_to raise_error
+    end
   end
 
-  after(:all) do
-    DatabaseCleaner.clean
-  end
+  context "with errors initializing the person" do
+    let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml")) }
+    let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml"))).first }
+    let(:user) { FactoryGirl.create(:user) }
 
-  let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) } 
-  let(:family) { consumer_role.person.primary_family }
-  before :each do
-    family.update_attributes!(:e_case_id => parser.integrated_case_id)
-  end
+    let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+    let(:person) { consumer_role.person }
+    let(:ua_params) do
+      {
+        addresses: [],
+        phones: [],
+        emails: [],
+        person: {
+          "first_name" => primary.person.name_first,
+          "last_name" => primary.person.name_last,
+          "middle_name" => primary.person.name_middle,
+          "name_pfx" => primary.person.name_pfx,
+          "name_sfx" => primary.person.name_sfx,
+          "dob" => primary.person_demographics.birth_date,
+          "ssn" => primary.person_demographics.ssn,
+          "no_ssn" => "",
+          "gender" => primary.person_demographics.sex.split('#').last
+        }
+      }
+    end
 
-  it "should not crash on updating the e_case_id" do
-    person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")
-  end
+    after(:all) do
+      DatabaseCleaner.clean
+    end
 
+    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+    let(:family) { consumer_role.person.primary_family }
+    before :each do
+      allow(Factories::EnrollmentFactory).to receive(:initialize_person).and_return([nil, nil])
+    end
+
+    it "should return nil for the consumer role" do
+      expect(Factories::EnrollmentFactory.construct_consumer_role(ua_params,user)).not_to be
+    end
+  end
 end
