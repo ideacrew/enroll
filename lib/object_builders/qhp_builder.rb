@@ -54,6 +54,12 @@ class QhpBuilder
     mark_2015_dental_plans_as_individual
     mark_2015_catastrophic_plans_as_individual
     mark_one_2015_plan_as_shop
+    remove_2016_metlife_plans
+  end
+
+  def remove_2016_metlife_plans
+    # deleting metlife plans based on carrier profile id
+    Plan.where(active_year: 2016, carrier_profile_id: "53e67210eb899a460300001d").size
   end
 
   def mark_one_2015_plan_as_shop
@@ -80,7 +86,16 @@ class QhpBuilder
     end
   end
 
+  def update_dental_plans
+    Plan.where(:active_year.in => [2015, 2016], coverage_kind: "dental").each do |plan|
+      plan.hios_id = plan.hios_base_id
+      plan.csr_variant_id = ""
+      plan.save
+    end
+  end
+
   def iterate_plans
+    update_dental_plans
     # @qhp_hash[:packages_list][:packages].each do |plans|
     @qhp_array.each do |plans|
       @plans = plans
@@ -113,14 +128,7 @@ class QhpBuilder
   def validate_and_persist_qhp
     begin
       associate_plan_with_qhp
-      # binding.pry
-      if @new_record == true
-        @qhp.save!
-      else
-        @qhp.valid? # dont save if the plan is not valid, there is no upsert!(upsert with bang), so using it for validations.
-        @qhp.save!
-      end
-      # @qhp.save!
+      @qhp.save!
       @success_plan_counter += 1
       LOGGER.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
@@ -174,10 +182,11 @@ class QhpBuilder
   def create_plan_from_serff_data
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
       if cost_share_variance.hios_plan_and_variant_id.split("-").last != "00"
+        csr_variant_id = parse_metal_level == "dental" ? "" : /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/
         plan = Plan.where(active_year: @plan_year,
           hios_id: /#{@qhp.standard_component_id.strip}/,
-          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/).to_a
-          # csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
+          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
+          csr_variant_id: csr_variant_id).to_a
         next if plan.present?
         new_plan = Plan.new(
           name: @qhp.plan_marketing_name.squish!,
@@ -188,7 +197,6 @@ class QhpBuilder
           metal_level: parse_metal_level,
           market: parse_market,
           ehb: @qhp.ehb_percent_premium,
-          # carrier_profile_id: "53e67210eb899a4603000004",
           carrier_profile_id: get_carrier_id(@carrier_name),
           coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
           )
@@ -215,21 +223,19 @@ class QhpBuilder
   def build_qhp
     @qhp = Products::Qhp.where(active_year: qhp_params[:active_year], standard_component_id: qhp_params[:standard_component_id]).first
     if @qhp.present?
-      @new_record = false
       @qhp.attributes = qhp_params
+      @qhp.qhp_benefits = []
+      @qhp.qhp_cost_share_variances = []
     else
-      @new_record = true
       @qhp = Products::Qhp.new(qhp_params)
     end
   end
 
   def build_benefits
-    @qhp.qhp_benefits = []
     benefits_params.each { |benefit| @qhp.qhp_benefits.build(benefit) }
   end
 
   def build_cost_share_variances_list
-    @qhp.qhp_cost_share_variances = []
     cost_share_variance_list_params.each do |csvp|
       @csvp = csvp
       build_cost_share_variance

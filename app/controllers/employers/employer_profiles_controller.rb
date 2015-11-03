@@ -174,12 +174,13 @@ class Employers::EmployerProfilesController < ApplicationController
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
+        org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
 
         #in case there was an error, reload from saved json
         @organization.assign_attributes(:office_locations => @organization_dup)
         @organization.save(validate: false)
         #@organization.reload
-        flash[:error] = 'Employer information not saved.'
+        flash[:error] = "Employer information not saved. #{org_error_msg}."
         redirect_to edit_employers_employer_profile_path(@organization)
       end
     else
@@ -288,6 +289,7 @@ class Employers::EmployerProfilesController < ApplicationController
       id_params = params.permit(:id, :employer_profile_id)
       id = id_params[:id] || id_params[:employer_profile_id]
       @employer_profile = EmployerProfile.find(id)
+      render file: 'public/404.html', status: 404 if @employer_profile.blank?
     end
 
     def organization_profile_params
