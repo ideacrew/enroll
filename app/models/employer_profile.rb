@@ -139,9 +139,8 @@ class EmployerProfile
 
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
-binding.pry
     plan_year = find_plan_year_by_date(today)
-    @active_plan_year = plan_year if (plan_year.present? && plan_year.published)
+    @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
   end
 
   def latest_plan_year

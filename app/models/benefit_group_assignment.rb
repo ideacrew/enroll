@@ -10,7 +10,6 @@ class BenefitGroupAssignment
   # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
 
-
   field :start_on, type: Date
   field :end_on, type: Date
   field :coverage_end_on, type: Date
@@ -70,15 +69,20 @@ class BenefitGroupAssignment
     state :coverage_selected
     state :coverage_waived
     state :coverage_terminated
+    state :coverage_renewing
 
     #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
     #then we will not need from coverage_terminated to coverage_selected
     event :select_coverage do
-      transitions from: [:initialized, :coverage_waived, :coverage_terminated], to: :coverage_selected
+      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
     end
 
     event :waive_coverage do
-      transitions from: [:initialized, :coverage_selected], to: :coverage_waived
+      transitions from: [:initialized, :coverage_selected, :coverage_renewing], to: :coverage_waived
+    end
+
+    event :renew_coverage do 
+      transitions from: :initialized , to: :coverage_renewing
     end
 
     event :terminate_coverage do
