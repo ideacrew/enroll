@@ -3,7 +3,7 @@ module Subscribers
     include Acapi::Notifiers
 
     def self.subscription_details
-        ["acapi.info.events.family.application_completed"]
+      ["acapi.info.events.family.application_completed"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
@@ -44,9 +44,9 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
       throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
-      family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
+      family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
       begin
-      active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+        active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
@@ -81,14 +81,14 @@ module Subscribers
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
       begin
-      verified_verifications = verified_primary_family_member.verifications
-      consumer_role.import
-      consumer_role.vlp_authority = "curam"
-      consumer_role.residency_determined_at = verified_primary_family_member.created_at
-      consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
-      consumer_role.is_state_resident = verified_verifications.is_lawfully_present
-      consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
-      consumer_role.save!
+        verified_verifications = verified_primary_family_member.verifications
+        consumer_role.import
+        consumer_role.vlp_authority = "curam"
+        consumer_role.residency_determined_at = verified_primary_family_member.created_at
+        consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
+        consumer_role.is_state_resident = verified_verifications.is_lawfully_present
+        consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
+        consumer_role.save!
       rescue
         throw(:processing_issue, "Unable to update consumer vlp")
       end
