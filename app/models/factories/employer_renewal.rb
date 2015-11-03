@@ -23,7 +23,7 @@ module Factories
       end
     end
 
-    def build
+    def renew
       validate_employer_profile
 
       @active_plan_year = @employer_profile.active_plan_year
@@ -38,16 +38,23 @@ module Factories
       })
 
       @renew_plan_year.renew
-      @renew_plan_year.save!
 
-      renew_benefit_groups
+      if @renew_plan_year.save
+        renew_benefit_groups
+        @renew_plan_year
+      else
+        raise EmployerRenewalError, "For employer: #{@employer_profile.inspect}, unable to save renewal plan year: #{@renew_plan_year.inspect}"
+      end
     end
 
     def renew_benefit_groups
-      @active_plan_year.benefit_groups.each do |benefit_groups, active_group|
+      @active_plan_year.benefit_groups.each do |active_group|
         new_group = clone_benefit_group(active_group)
-        new_group.save!
-        renew_census_employees(active_group, new_group)
+        if new_group.save
+          renew_census_employees(active_group, new_group)
+        else
+          raise EmployerRenewalError, "For employer: #{@employer_profile.inspect}, unable to save benefit_group: #{new_group.inspect}"
+        end
       end
     end
 
@@ -67,25 +74,20 @@ module Factories
     end
 
     def renew_census_employees(active_group, new_group)
-      census_employees = CensusEmployee.by_benefit_group_ids([BSON::ObjectId.from_string(active_group.id.to_s)]).active
-      census_employees.each do |census_employee|
+      eligible_employees(active_group).each do |census_employee|
         if census_employee.active_benefit_group_assignment && census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
           census_employee.add_renew_benefit_group_assignment(new_group)
-          census_employee.save!
+          
+          unless census_employee.save 
+            raise EmployerRenewalError, "For employer: #{@employer_profile.inspect}, unable to save census_employee: #{census_employee.inspect}"
+          end
         end
       end
       true
     end
 
-    def self.auto_renew_employee_roles(employer_profile)
-    end
-
-    def eligible_employees
-      @active_plan_year.eligible_to_enroll
-    end
-
-    def auto_renew_employee_role_benefits(employee_role)
-
+    def eligible_employees(active_group)
+      CensusEmployee.by_benefit_group_ids([BSON::ObjectId.from_string(active_group.id.to_s)]).active
     end
 
     def generate_employee_role_notices

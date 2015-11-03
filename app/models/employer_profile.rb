@@ -140,15 +140,16 @@ class EmployerProfile
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
     plan_year = find_plan_year_by_date(today)
-    @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
+    # @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
+    @active_plan_year = plan_year if (plan_year.present? && plan_year.is_published?)
   end
 
   def latest_plan_year
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
-  #TODO - this code will not able to support enrolling plan year
-  #there should be one published and one enrolling or enrolled plan year
+  #TODO - this code will not able to support renewing plan year
+  #there should be one published and one renewing or enrolled plan year
   def published_plan_year
     plan_years.published.first
   end
@@ -157,7 +158,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  def find_plan_year_by_date(target_date)
+  def find_plan_year_by_date(target_date)    
     plan_years.to_a.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
   end
 
@@ -165,8 +166,8 @@ class EmployerProfile
     plan_years.where(id: id).first
   end
 
-  def enrolling_plan_year
-    published_plan_year
+  def renewing_plan_year
+    plan_years.renewing.first
   end
 
   def is_primary_office_local?

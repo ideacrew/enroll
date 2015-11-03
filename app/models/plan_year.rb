@@ -7,7 +7,7 @@ class PlanYear
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-
+  RENEWING = %w(renewing renewing_published renewing_enrolling renewing_enrolled)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -38,8 +38,9 @@ class PlanYear
 
   validate :open_enrollment_date_checks
 
-  scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+  # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
   scope :published,      ->{ any_in(aasm_state: PUBLISHED) }
+  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -91,6 +92,10 @@ class PlanYear
   def coverage_period_contains?(date)
     return (start_on <= date) if (end_on.blank?)
     (start_on <= date) && (date <= end_on)
+  end
+
+  def is_published?
+    PUBLISHED.include?(aasm_state)
   end
 
   def minimum_employer_contribution

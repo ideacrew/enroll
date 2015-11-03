@@ -87,7 +87,7 @@ class Employers::EmployerProfilesController < ApplicationController
    else
       case @tab
       when 'benefits'
-        @current_plan_year = @employer_profile.published_plan_year
+        @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.published_plan_year
         @plan_years = @employer_profile.plan_years.order(id: :desc)
       when 'documents'
       when 'employees'
@@ -96,11 +96,11 @@ class Employers::EmployerProfilesController < ApplicationController
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
       when 'inbox'
       else
-        @current_plan_year = @employer_profile.published_plan_year
-        if @current_plan_year.present?
+        @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.published_plan_year
+
+        if @current_plan_year.present? && @current_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
           @additional_required_participants_count = @current_plan_year.additional_required_participants_count
-        end
-        if @current_plan_year.present?
+
           #FIXME commeted out for performance test
           enrollments = @current_plan_year.hbx_enrollments
           if enrollments.size < 100
