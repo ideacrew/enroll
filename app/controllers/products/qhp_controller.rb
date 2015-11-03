@@ -80,6 +80,7 @@ class Products::QhpController < ApplicationController
           :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}",
         },
       }
+      log(JSON.dump(error_message), {:severity => 'critical'})
       render file: 'public/500.html', status: 500
       return
     end
