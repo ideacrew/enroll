@@ -1,17 +1,14 @@
-HIOS/ Standard Component ID,SBC File Name (Updated 1/6/2015)
-95051DC0020003,BESTLife_BESTOne_Dental_Advantage-High_Plan IVL.pdf
-95051DC0020004,BESTLife_BESTOne_Dental_Plus-High_Plan IVL.pdf
-95051DC0020005,BESTLife_BESTOne_Dental_Plus-High_Plan IVL.pdf
-95051DC0020006,BESTLife_BESTOne_Dental_Basic-Low_Plan IVL.pdf
-81334DC0010004,Delta Dental PPO Family Hi_IND.pdf
-81334DC0010006,Delta Dental PPO Family Lo_IND.pdf
-81334DC0030004,DeltaCare USA Family Hi_IND.pdf
-81334DC0030006,DeltaCare USA Family LO_IND.pdf
-96156DC0010004,Dentegra PPO Family Hi_IND.pdf
-96156DC0010006,Dentegra PPO Family Lo_IND.pdf
-92479DC0020004,PPO Elite Basic.pdf
-92479DC0020006,PPO Elite Premium.pdf
-92479DC0010004,Select Plan Basic.pdf
-92479DC0010006,Select Plan Premium (Indiv).pdf
-78079DC0320001,GHMSI_BlueDental Preferred - High Option_IVL.pdf
-78079DC0320002,GHMSI_BlueDental Preferred - Low Option_Dental_IVL.pdf
+HIOS/ Standard Component ID,SBC File Name
+81334DC0020004,PB_DD_DC_G_FAM_PRF_16.pdf
+81334DC0020006,PB_DD_DC_G_FAM_BSC_16.pdf
+81334DC0040004,PB_DCU_DC_G_FAM_PRF_16 .pdf
+81334DC0040006,PB_DCU_DC_G_FAM_BSC_16.pdf
+96156DC0020004,PB_DEN_DC_G_FAM_PRF_16.pdf
+96156DC0020006,PB_DEN_DC_G_FAM_BSC_16.pdf
+92479DC0040004,Access PPO Basic (No Kids).pdf
+92479DC0040005,Access PPO Premium.pdf
+92479DC0030004,Select Plan Premium (SHOP).pdf
+43849DC0080001,Filler for Missing SBCs.pdf
+43849DC0090001,Filler for Missing SBCs.pdf
+78079DC0330001,GHMSI_BlueDental Preferred - High Option_SHOP.pdf
+78079DC0340001,GHMSI_BlueDental Traditional_Dental_SHOP.pdf
