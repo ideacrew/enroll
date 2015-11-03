@@ -22,6 +22,7 @@ module Factories
         msp_count: @active_plan_year.msp_count
       })
 
+
       @renewal_plan_year.renew_plan_year
 
       if @renewal_plan_year.save
@@ -74,7 +75,7 @@ module Factories
 
       @renewal_plan_year.benefit_groups.build({
         title: "Benefit Package #{new_year} ##{index} (#{active_group.title})",
-        effective_on_kind: active_group.effective_on_kind,
+        effective_on_kind: "first_of_month",
         terminate_on_kind: active_group.terminate_on_kind,
         plan_option_kind: active_group.plan_option_kind,
         default: active_group.default,

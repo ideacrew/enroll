@@ -7,7 +7,7 @@ class PlanYear
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING = %w(renewing renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -451,7 +451,7 @@ class PlanYear
 
     state :active         # Published plan year is in-force
 
-    state :renewing       
+    state :renewing_draft   
     state :renewing_published
     state :renewing_enrolling
     state :renewing_enrolled
@@ -485,6 +485,7 @@ class PlanYear
       transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
+      transitions from: :renewing_draft, to: :renewing_published
     end
 
     # Returns plan to draft state for edit
@@ -528,11 +529,11 @@ class PlanYear
     end
 
     event :renew_plan_year, :after => :record_transition do
-      transitions from: :draft, to: :renewing
+      transitions from: :draft, to: :renewing_draft
     end
 
     event :renew_publish, :after => :record_transition do
-      transitions from: :renewing, to: :renewing_published
+      transitions from: :renewing_draft, to: :renewing_published
     end
 
     # Admin ability to reset application

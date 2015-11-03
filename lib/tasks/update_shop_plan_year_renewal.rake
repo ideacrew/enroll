@@ -3,15 +3,16 @@ namespace :update_shop do
   task :plan_year_renewal => :environment do 
 
     employers = {
-      "RehabFocus LLC" => "711024079",
-      "Hooks Solutions LLC" => "331138193",
-      "Don Ciccio & Figli" => "263057381"
-      # "Elevate Interval Fitness LLC" => "463256626"
-      # "Garner & Associates LLC" => "273578793"
+      # "RehabFocus LLC" => "711024079",
+      # "Hooks Solutions LLC" => "331138193",
+      # "Don Ciccio & Figli" => "263057381"
+
+      # "Elevate Interval Fitness LLC" => "463256626",
+      # "Garner & Associates LLC" => "273578793",
       # "Set Sports Physical Therapy PLLC" => "10887598"
       # "ICWA" => "131621044"
       # "Game Change LLC" => "460937444"
-      # "ADW Capital Management, LLC" => "471516657"
+      "ADW Capital Management, LLC" => "471516657"
       # "NSight365 LLC" => "465732698"
       # "The New LeDroit Park Building Company" => "454467977"
       # "Hattie Ruttenberg" => "133712482"
