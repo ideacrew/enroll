@@ -1,6 +1,7 @@
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   include Aptc
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
@@ -62,7 +63,24 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
-    send_receipt_emails if @person.emails.first
+    
+    begin
+      send_receipt_emails
+    rescue => err
+      error_message = {
+        :error => {
+          :message => err.message,
+          :inspected => err.inspect,
+          :backtrace => err.backtrace.join("\n")
+        },
+        :person_emails => @person.emails,
+        :consumer_role => @person.consumer_role,
+        :employee_role => @person.employee_roles,
+        :belongs_to_user => @person.user,
+        :user_email => @person.user.email
+      }
+	  log(JSON.dump(error_message), {:severity => 'critical'})
+    end
   end
 
   def thankyou
