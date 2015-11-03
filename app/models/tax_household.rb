@@ -23,6 +23,9 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
+  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :active_tax_household, ->{ where(effective_ending_on: nil) }
+
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end

@@ -20,7 +20,7 @@ class Products::QhpController < ApplicationController
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
-      tax_household = get_shopping_tax_household_from_person(current_user.person)
+      tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
       @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       # fetch only one of the same hios plan
       uniq_hios_ids = []
