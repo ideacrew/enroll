@@ -12,7 +12,7 @@ module Factories
       validate_employer_profile
 
       @active_plan_year = @employer_profile.active_plan_year
-      @renew_plan_year = @employer_profile.plan_years.build({
+      @renewal_plan_year = @employer_profile.plan_years.build({
         start_on: @active_plan_year.start_on + 1.year,
         end_on: @active_plan_year.end_on + 1.year,
         open_enrollment_start_on: @active_plan_year.open_enrollment_start_on + 1.year,
@@ -22,13 +22,13 @@ module Factories
         msp_count: @active_plan_year.msp_count
       })
 
-      @renew_plan_year.renew_coverage
+      @renewal_plan_year.renew_plan_year
 
-      if @renew_plan_year.save
+      if @renewal_plan_year.save
         renew_benefit_groups
-        @renew_plan_year
+        @renewal_plan_year
       else
-        raise EmployerProfilePlanYearRenewalError, "For employer: #{@employer_profile.inspect}, unable to save renewal plan year: #{@renew_plan_year.inspect}"
+        raise EmployerProfilePlanYearRenewalError, "For employer: #{@employer_profile.inspect}, unable to save renewal plan year: #{@renewal_plan_year.inspect}"
       end
     end
 
@@ -72,7 +72,7 @@ module Factories
         raise EmployerProfilePlanYearRenewalError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
       end
 
-      @renew_plan_year.benefit_groups.build({
+      @renewal_plan_year.benefit_groups.build({
         title: "Benefit Package #{new_year} ##{index} (#{active_group.title})",
         effective_on_kind: active_group.effective_on_kind,
         terminate_on_kind: active_group.terminate_on_kind,
