@@ -16,7 +16,7 @@
       <%= select_tag :family_member, options_for_select(@person_family.all.collect{|mem| [mem.first_name, mem.id]}) %>
     </div>
     <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
-      <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f, document_upload: true} %>
+      <%= select_tag :document, options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS) %>
     </div>
 
     <% end %>

@@ -34,7 +34,7 @@ class VlpDocument < Document
       "Other (With I-94 Number)"
     ]
 
-    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'in review', 'verified', 'rejected']
+    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'in review', 'verified', 'rejected']
 
     COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
 		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
@@ -100,7 +100,7 @@ class VlpDocument < Document
   validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
 
 
-  validate :document_required_fields
+
 
   # hash of doc type and necessary fields
   def required_fields
