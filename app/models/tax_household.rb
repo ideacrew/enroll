@@ -3,6 +3,7 @@ class TaxHousehold
   include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
+  include Acapi::Notifiers
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
@@ -51,11 +52,12 @@ class TaxHousehold
     # child premium cost is $150/each, APTC ratio will be 35% to each adult and
     # 15% to each child
 
-
     # Benchmark Plan: use SLCSP premium rates to determine ratios
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
-    slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
+    #current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
+    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
@@ -75,6 +77,9 @@ class TaxHousehold
     end
 
     ratio_hash
+  rescue => e
+    log(e.message, {:severity => 'critical'})
+    {}
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
@@ -93,6 +98,7 @@ class TaxHousehold
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
 
+    # FIXME should get hbx_enrollments by effective_starting_on
     household.current_year_hbx_enrollments.select {|hbx| hbx.applied_aptc_amount > 0}.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)

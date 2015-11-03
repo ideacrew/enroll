@@ -123,7 +123,9 @@ RSpec.describe TaxHousehold, type: :model do
 
   context "aptc_ratio_by_member" do
     let!(:plan) {FactoryGirl.build(:plan_with_premium_tables)}
-    let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
+    #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
+    let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
+    let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
     let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
     let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
 

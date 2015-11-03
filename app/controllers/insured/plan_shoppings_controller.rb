@@ -215,7 +215,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def get_aptc_info_from_session(hbx_enrollment)
-    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment)
+    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year)
     if @shopping_tax_household.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
