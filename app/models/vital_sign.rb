@@ -18,7 +18,7 @@ class VitalSign
           tax_household.eligibility_determinations
         end
       end
-    end          
+    end
   end
 
   def accounts_created
@@ -56,7 +56,7 @@ class VitalSign
         "$elemMatch" => {
            "created_at" => { "$gte" => @start_at },
            "aasm_state" => { "$nin" => [
-              "shopping", "inactive", "coverage_canceled", "coverage_terminated" 
+              "shopping", "inactive", "coverage_canceled", "coverage_terminated"
            ]}
         }
       }
@@ -96,7 +96,7 @@ class VitalSign
           tax_household.eligibility_determinations.gte(determined_on: @start_at).lte(determined_on: @end_at)
         end
       end
-    end      
+    end
   end
 
   def all_active_individual_eligibility_determinations
@@ -110,7 +110,7 @@ class VitalSign
 
   def enrollment_counts_by_family
     all_enrollments unless defined? @all_enrollments
-    @all_enrollments.reduce(Hash.new(0)) {|counts, hbx_enrollment| counts[hbx_enrollment.household.family._id] += 1; counts }  
+    @all_enrollments.reduce(Hash.new(0)) {|counts, hbx_enrollment| counts[hbx_enrollment.household.family._id] += 1; counts }
   end
 
   def all_shop_enrollments
