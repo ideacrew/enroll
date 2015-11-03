@@ -90,7 +90,7 @@ RSpec.describe Employers::EmployerProfilesController do
       get :show, id: employer_profile.id
       expect(response).to have_http_status(:success)
       expect(response).to render_template("show")
-      expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
+      expect(assigns(:current_plan_year)).to eq employer_profile.active_plan_year
     end
 
     it "should render 404 with invalid id" do
@@ -101,7 +101,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should get plan years" do
       get :show, id: employer_profile.id
-      expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
+      expect(assigns(:current_plan_year)).to eq employer_profile.active_plan_year
     end
 
     it "should get default status" do
