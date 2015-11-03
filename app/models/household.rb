@@ -33,7 +33,6 @@ class Household
 
   # after_build :build_irs_group
 
-
   def add_household_coverage_member(family_member)
     # OPTIMIZE
     if ImmediateFamily.include?(family_member.primary_relationship)
@@ -170,6 +169,19 @@ class Household
   def latest_active_tax_household
     return tax_households.first if tax_households.length == 1
     tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  end
+
+  def latest_active_tax_household_with_year(year)
+    tax_households = self.tax_households.tax_household_with_year(year) 
+    if TimeKeeper.date_of_record.year == year
+      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
+    end
+
+    if tax_households.empty?
+      nil
+    else
+      tax_households.entries.last
+    end
   end
 
   def applicant_ids

@@ -19,7 +19,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      get_aptc_info_from_session
+      get_aptc_info_from_session(hbx_enrollment)
       if @shopping_tax_household.present? and @elected_aptc > 0
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc, @shopping_tax_household)
         hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
@@ -53,7 +53,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @shopping_tax_household = get_shopping_tax_household_from_person(@person)
+      @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
       @market_kind = "individual"
     end
@@ -93,7 +93,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      get_aptc_info_from_session
+      get_aptc_info_from_session(@enrollment)
       if @shopping_tax_household.present? and @elected_aptc > 0
         @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc, @shopping_tax_household)
       else
@@ -154,9 +154,10 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
-    shopping_tax_household = get_shopping_tax_household_from_person(@person)
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    if shopping_tax_household.present?
+    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+
+    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health"
       @tax_household = shopping_tax_household
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
@@ -230,8 +231,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 
-  def get_aptc_info_from_session
-    @shopping_tax_household = get_shopping_tax_household_from_person(@person)
+  def get_aptc_info_from_session(hbx_enrollment)
+    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment)
     if @shopping_tax_household.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f

@@ -162,14 +162,15 @@ class HbxEnrollment
     end
 
     event :move_to_enrolled! do
-      transitions from: :shopping, to: :coverage_enrolled
-      transitions from: :unverified, to: :coverage_enrolled
-      transitions from: :enrolled_contingent, to: :coverage_enrolled
-      transitions from: :coverage_enrolled, to: :coverage_enrolled
+      transitions from: :coverage_selected, to: :coverage_selected
+      transitions from: :unverified, to: :coverage_selected
+      transitions from: :enrolled_contingent, to: :coverage_selected
+      transitions from: :coverage_selected, to: :coverage_selected
     end
 
     event :move_to_contingent! do
       transitions from: :shopping, to: :enrolled_contingent
+      transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
       transitions from: :enrolled_contingent, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
@@ -178,6 +179,7 @@ class HbxEnrollment
     event :move_to_pending! do
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
+      transitions from: :coverage_selected, to: :unverified
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
     end
@@ -225,6 +227,12 @@ class HbxEnrollment
 
   def benefit_sponsored?
     benefit_group.present?
+  end
+
+  def affected_by_verifications_made_today?
+    return false if shopping?
+    return true if terminated_on.blank?
+    terminated_on >= TimeKeeper.date_of_record
   end
 
   def currently_active?
