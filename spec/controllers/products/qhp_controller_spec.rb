@@ -8,7 +8,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
-  let(:household) {double(latest_active_tax_household: tax_household)}
+  let(:household) {double(latest_active_tax_household_with_year: tax_household)}
   let(:family) {double(latest_household: household)}
   context "GET comparison" do
     before do
@@ -137,6 +137,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(qhp4).to receive(:plan).and_return plan4
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_employee_cost: 100))
       allow(hbx_enrollment).to receive(:plan).and_return(plan)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.year)
     end
 
     it "should return comparison of a plan" do

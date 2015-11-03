@@ -3,7 +3,7 @@ module Sortable
 
   included do
     # Sort all models newest to oldest using created_at
-    default_scope   ->{ order(:"created_at".desc) }
+    # default_scope   ->{ order(:"created_at".desc) }
 
     scope :order_recent,  ->{ order(:"created_at".desc).limit(100) }
 

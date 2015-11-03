@@ -5,7 +5,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
   let(:shop_current_enrollment_count) { 1 }
   let(:shop_past_enrollment_count)    { 2 }
   let(:shop_total_enrollment_count)   { shop_current_enrollment_count + shop_past_enrollment_count }
-  
+
 
   let!(:shop_current_enrollments) do
     families = FactoryGirl.create_list(:family, shop_current_enrollment_count, :with_primary_family_member)
@@ -17,7 +17,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
                           created_at: TimeKeeper.datetime_of_record - 1.day
                         )
     end
-  end 
+  end
 
   let!(:shop_past_enrollments) do
     families = FactoryGirl.create_list(:family, shop_past_enrollment_count, :with_primary_family_member)
@@ -25,8 +25,8 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "employer_sponsored",
-                          submitted_at: TimeKeeper.datetime_of_record - 10.days,
-                          created_at: TimeKeeper.datetime_of_record - 10.days
+                          submitted_at: TimeKeeper.datetime_of_record - 5.days,
+                          created_at: TimeKeeper.datetime_of_record - 5.days
                         )
     end
   end
@@ -46,7 +46,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
                           created_at: TimeKeeper.datetime_of_record - 1.day
                         )
     end
-  end 
+  end
 
   let!(:ivl_past_enrollments) do
     families = FactoryGirl.create_list(:family, ivl_past_enrollment_count, :with_primary_family_member)
@@ -54,8 +54,8 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "individual",
-                          submitted_at: TimeKeeper.datetime_of_record - 10.days,
-                          created_at: TimeKeeper.datetime_of_record - 10.days
+                          submitted_at: TimeKeeper.datetime_of_record - 5.days,
+                          created_at: TimeKeeper.datetime_of_record - 5.days
                         )
     end
   end
