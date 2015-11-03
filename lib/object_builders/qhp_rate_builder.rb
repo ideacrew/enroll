@@ -45,7 +45,10 @@ class QhpRateBuilder
       unless INVALID_PLAN_IDS.include?(plan_id)
         @plan = Plan.where(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
         @plan.each do |plan|
+          plan.premium_tables = nil
           plan.premium_tables.create!(premium_tables)
+          plan.minimum_age, plan.maximum_age = plan.premium_tables.map(&:age).minmax
+          plan.save
         end
       end
     end
