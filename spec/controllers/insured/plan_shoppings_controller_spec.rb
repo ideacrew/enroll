@@ -252,6 +252,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(plan3).to receive(:[]).with(:id)
       allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return(plans)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       sign_in user
     end
 
@@ -328,9 +329,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       context "with tax_household" do
         before :each do
-          allow(household).to receive(:latest_active_tax_household).and_return tax_household
+          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           get :show, id: "hbx_id"
         end
 
@@ -345,7 +347,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       context "without tax_household" do
         before :each do
-          allow(household).to receive(:latest_active_tax_household).and_return nil
+          allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           get :show, id: "hbx_id"
         end
