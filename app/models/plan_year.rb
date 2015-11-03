@@ -527,7 +527,7 @@ class PlanYear
       transitions from: [:active, :suspended], to: :terminated
     end
 
-    event :renew_coverage, :after => :record_transition do
+    event :renew_plan_year, :after => :record_transition do
       transitions from: :draft, to: :renewing
     end
 
