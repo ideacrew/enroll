@@ -2,8 +2,11 @@ class Family
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
-  include Mongoid::Versioning
+  # include Mongoid::Versioning
   include Sortable
+
+  field :version, type: Integer, default: 1
+  embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
 
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}

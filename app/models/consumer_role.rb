@@ -353,8 +353,25 @@ class ConsumerRole
     vlp_documents.build({subject:subject})
   end
 
-  def find_document_by_id(id)
+  # collect all vlp documents for person and all dependents.
+  # return the one with matching key
+  def find_vlp_document_by_key(key)
+    candidate_vlp_documents = vlp_documents
+    if person.primary_family.present?
+      person.primary_family.family_members.flat_map(&:person).each do |family_person|
+        next unless family_person.consumer_role.present?
+        candidate_vlp_documents << family_person.consumer_role.vlp_documents
+      end
+      candidate_vlp_documents.uniq!
+    end
 
+    return nil if candidate_vlp_documents.nil?
+
+    candidate_vlp_documents.detect do |document|
+      next if document.identifier.blank?
+      doc_key = document.identifier.split('#').last
+      doc_key == key
+    end
   end
 
 private
