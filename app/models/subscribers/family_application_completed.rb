@@ -9,7 +9,17 @@ module Subscribers
     def call(event_name, e_start, e_end, msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
-      import_from_xml(xml)
+      sc = ShortCircuit.on(:processing_issue) do |err|
+        log(xml, {:severity => "critical", :error_message => err})
+      end
+      sc.and_then do |payload|
+        import_from_xml(payload)
+      end
+      sc.call(xml)
+    end
+
+    def ecase_id_valid?(family, verified_family)
+      !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
     end
 
     def import_from_xml(xml)
@@ -18,59 +28,59 @@ module Subscribers
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
       primary_person = search_person(verified_primary_family_member)
-      family = find_existing_family(verified_primary_family_member, primary_person, xml)
-      if family.present?
-        stupid_family_id = family.id
-        active_household = family.active_household
-        family.save! # In case the tax household does not exist
-#        family = Family.find(stupid_family_id) # wow
-#        active_household = family.active_household
-        active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
-        active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
-        new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
-        verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
-        import_home_address(primary_person, verified_new_address)
-        primary_person = search_person(verified_primary_family_member) #such mongoid
-        family.save!
-        if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
-          begin
-            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
-            active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-            update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
-            new_dependents.each do |p|
-              new_family_member = family.relate_new_member(p[0], p[1])
-              unless new_family_member.is_active?
-                new_family_member.is_active = true
-                new_family_member.save!
-                active_household.add_household_coverage_member(new_family_member)
-              end
-              if active_verified_tax_households.present?
-                active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
-                if active_verified_tax_household.present?
-                  new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-                  active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
-                end
-              end
-            end
-            if active_household.latest_active_tax_household.present?
-              unless active_household.latest_active_tax_household.eligibility_determinations.present?
-                log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-              end
-            end
-          rescue
-            log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
-          end
-          family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
-          family.save!
-        else
-          log("ERROR: Integrated case id does not match existing family for xml: #{xml}", {:severity => "error"})
-        end
-      else
-        log("ERROR: Failed to find primary family for users person in xml: #{xml}", {:severity => "critical"})
+      throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless primary_person.present?
+      family = primary_person.primary_family
+      throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
+      stupid_family_id = family.id
+      active_household = family.active_household
+      family.save! # In case the tax household does not exist
+      #        family = Family.find(stupid_family_id) # wow
+      #        active_household = family.active_household
+      active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
+      active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
+      new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
+      verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
+      import_home_address(primary_person, verified_new_address)
+      primary_person = search_person(verified_primary_family_member) #such mongoid
+      family.save!
+      throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
+      family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
+      begin
+      active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+      rescue
+        throw(:processing_issue, "Failure to update tax household")
       end
+      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
+      begin
+        new_dependents.each do |p|
+          new_family_member = family.relate_new_member(p[0], p[1])
+          unless new_family_member.is_active?
+            new_family_member.is_active = true
+            new_family_member.save!
+            active_household.add_household_coverage_member(new_family_member)
+          end
+          if active_verified_tax_households.present?
+            active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
+            if active_verified_tax_household.present?
+              new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+            end
+          end
+        end
+        if active_household.latest_active_tax_household.present?
+          unless active_household.latest_active_tax_household.eligibility_determinations.present?
+            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
+          end
+        end
+      rescue
+        log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
+      end
+      family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
+      family.save!
     end
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
+      begin
       verified_verifications = verified_primary_family_member.verifications
       consumer_role.import
       consumer_role.vlp_authority = "curam"
@@ -79,6 +89,9 @@ module Subscribers
       consumer_role.is_state_resident = verified_verifications.is_lawfully_present
       consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
       consumer_role.save!
+      rescue
+        throw(:processing_issue, "Unable to update consumer vlp")
+      end
     end
 
     def import_home_address(person, verified_new_address)
@@ -87,15 +100,12 @@ module Subscribers
       new_address = Address.new(
         verified_address_hash
       )
-      if new_address.valid?
-        if person.home_address.present?
-          person.home_address.delete
-        end
-        person.addresses << new_address
-        person.save!
-      else
-        log("ERROR: Failed to load home address from xml: #{xml}", {:severity => "error"})
+      throw(:processing_issue, "ERROR: Failed to load home address from xml") unless new_address.valid?
+      if person.home_address.present?
+        person.home_address.delete
       end
+      person.addresses << new_address
+      person.save!
     end
 
     def find_or_create_new_members(verified_dependents, verified_primary_family_member)
@@ -105,7 +115,7 @@ module Subscribers
           existing_person = search_person(verified_family_member)
           relationship = verified_primary_family_member.person_relationships.select do |pr|
             pr.object_individual_id == verified_family_member.id &&
-            pr.subject_individual_id == verified_primary_family_member.id
+              pr.subject_individual_id == verified_primary_family_member.id
           end.first.relationship_uri.split('#').last
 
           if existing_person.present?
@@ -138,17 +148,6 @@ module Subscribers
       person.build_consumer_role(is_applicant: true)
     end
 
-
-    def find_existing_family(verified_dependents_member, person, xml)
-      family = nil
-      unless person.present?
-        log("ERROR: No person found for user in xml: #{xml}", {:severity => "critical"})
-      else
-        family = person.primary_family
-      end
-      family
-    end
-
     def search_person(verified_family_member)
       ssn = verified_family_member.person_demographics.ssn
       ssn = '' if ssn == "999999999"
@@ -158,14 +157,14 @@ module Subscribers
 
       if !ssn.blank?
         Person.where({
-                       :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first
+          :encrypted_ssn => Person.encrypt_ssn(ssn)
+        }).first
       else
         Person.where({
-                       :dob => dob,
-                       :last_name => last_name_regex,
-                       :first_name => first_name_regex
-                   }).first
+          :dob => dob,
+          :last_name => last_name_regex,
+          :first_name => first_name_regex
+        }).first
       end
     end
   end

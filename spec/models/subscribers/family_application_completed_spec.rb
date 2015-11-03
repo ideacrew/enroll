@@ -33,12 +33,9 @@ describe Subscribers::FamilyApplicationCompleted do
       context "with no person matched to user and no primary family associated with the person" do
         it "log both No person and Failed to find primary family errors" do
           expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/No person found for user/)
-            expect(arg2).to eq({:severity => 'critical'})
-          end
-          expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'critical'})
+            expect(arg1).to eq message["body"]
+            expect(arg2[:error_message]).to match(/ERROR: Failed to find primary person in xml/)
+            expect(arg2[:severity]).to eq "critical"
           end
           subject.call(nil, nil, nil, nil, message)
         end
@@ -53,8 +50,9 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "logs the failed to find primary family error" do
           expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'critical'})
+            expect(arg1).to eq message["body"]
+            expect(arg2[:error_message]).to match(/Failed to find primary family for users person/)
+            expect(arg2[:severity]).to eq("critical")
           end
           subject.call(nil, nil, nil, nil, message)
         end
@@ -109,8 +107,9 @@ describe Subscribers::FamilyApplicationCompleted do
           it "should log an error saying integrated_case_id does not match family " do
             subject.call(nil, nil, nil, nil, message)
             expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to match(/Integrated case id does not match existing family/)
-              expect(arg2).to eq({:severity => 'error'})
+              expect(arg1).to eq(message["body"])
+              expect(arg2[:error_message]).to match(/Integrated case id does not match existing family/)
+              expect(arg2[:severity]).to eq('critical')
             end
             family.update_attribute(:e_case_id, "some_other_id")
             subject.call(nil, nil, nil, nil, message)
