@@ -26,7 +26,7 @@ module Factories
     end
 
     def renew_employer_profile
-      @active_plan_year = @employer_profile.plan_years.first # @employer_profile.active_plan_year
+      @active_plan_year = @employer_profile.active_plan_year
 
       @renew_plan_year = @employer_profile.plan_years.build({
         start_on: @active_plan_year.start_on + 1.year,
