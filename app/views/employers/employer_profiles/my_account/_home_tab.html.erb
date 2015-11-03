@@ -96,7 +96,7 @@
       </section>
       <section class="col-xs-6">
         <header class="row">
-          <a class="details" onclick="$(this).closest('.benefitgroup').next().slideToggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
+          <a class="details" onclick="$(this).closest('.benefitgroup').next().toggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
         </header>
       </section>
       <table>
@@ -110,7 +110,7 @@
         </tr>
         <tr>
           <td>
-            <header>Plans by</header>
+            <header>Plans By</header>
           </td>
           <td>
             <p>
@@ -124,36 +124,21 @@
             </p>
           </td>
         </tr>
+        <tr>
+          <td>
+            <header>Reference Plan</header>
+          </td>
+          <td>
+            <p>
+              <%= bg.reference_plan.name %>
+            </p>
+          </td>
+        </tr>
 
       </table>
-    </div>
+      <br>
+      <div class="panel benefitgroup referenceplan home">
 
-    <div class="col-xs-12 package-offering plan-details">
-      <table>
-        <tr>
-          <th>Offered</th>
-          <th>Employer contribution</th>
-        </tr>
-        <% bg.relationship_benefits.each do |rb| %>
-        <tr>
-          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-          <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
-        </tr>
-        <% end %>
-      </table>
-    </div>
-
-    <div class="panel benefitgroup col-xs-12 referenceplan">
-      <section class="col-xs-6">
-        <header class="row">
-          <h5 class="bg-title">Reference Plan: <span><%= bg.reference_plan.name %></span></h5>
-        </header>
-      </section>
-      <section class="col-xs-6">
-        <header class="row">
-          <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
-        </header>
-      </section>
       <table>
         <tr>
           <th>
@@ -191,8 +176,27 @@
           </td>
         </tr>
       </table>
+    </div>
+    </div>
+    <div class="plan-details" style="display: none;">
+    <div class="col-xs-12 package-offering">
+      <table>
+        <tr>
+          <th>Offered</th>
+          <th>Employer contribution</th>
+        </tr>
+        <% bg.relationship_benefits.each do |rb| %>
+        <tr>
+          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+          <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <div class="panel benefitgroup col-xs-12 referenceplan home est">
+
       <div class="plan-details">
-        <hr>
         <div class="col-xs-4">
           <span>Employer Estimated Maximum Monthly Cost</span>
           <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
@@ -215,6 +219,7 @@
           </table>
         </div>
       </div>
+    </div>
     </div>
 
     <% end %>
