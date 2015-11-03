@@ -19,4 +19,5 @@ RSpec.describe "insured/consumer_roles/search.html.haml" do
   it "should have memo to indicate required fields" do
     expect(rendered).to have_selector('p.memo', text: '* = required field')
   end
+
 end
