@@ -127,7 +127,7 @@ class Invitation
       person.save!
       user_obj.roles << "assister" unless user_obj.roles.include?("assister")
       user_obj.save!
-      redirection_obj.redirect_to_hbx_portal
+      redirection_obj.redirect_to_agents_path
     end
   end
 
@@ -140,7 +140,7 @@ class Invitation
       person.save!
       user_obj.roles << 'csr' unless user_obj.roles.include?('csr')
       user_obj.save!
-      redirection_obj.redirect_to_hbx_portal
+      redirection_obj.redirect_to_agents_path
     end
   end
 

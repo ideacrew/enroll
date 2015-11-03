@@ -7,6 +7,7 @@ class EmployerProfile
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  extend Acapi::Notifiers
 
   embedded_in :organization
 
@@ -195,6 +196,9 @@ class EmployerProfile
     def find(id)
       organizations = Organization.where("employer_profile._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.employer_profile : nil
+    rescue
+      log("Can not find employer_profile with id #{id}", {:severity => "error"})
+      nil
     end
 
     def find_by_fein(fein)
@@ -262,6 +266,12 @@ class EmployerProfile
 
   def revert_plan_year
     plan_year.revert
+  end
+
+  def default_benefit_group
+    plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
+    return unless plan_year_with_default
+    plan_year_with_default.benefit_groups.detect{|bg| bg.default }
   end
 
 ## TODO - anonymous shopping

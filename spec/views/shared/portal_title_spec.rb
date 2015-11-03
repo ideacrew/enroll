@@ -4,6 +4,7 @@ RSpec.describe "layouts/_header.html.erb" do
 
   let(:person_user){Person.new(first_name: 'fred', last_name: 'flintstone')}
   let(:current_user){FactoryGirl.create(:user, :person=>person_user)}
+  let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
   let(:signed_in?){ true }
   before(:each) do
   	sign_in current_user
@@ -16,6 +17,7 @@ RSpec.describe "layouts/_header.html.erb" do
   end
   it 'identifies Brokers' do
     current_user.roles=['broker_agency_staff']
+    person_user.broker_role = broker_role
     current_user.save
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to match(/I'm a Broker/)

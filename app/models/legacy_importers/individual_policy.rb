@@ -65,6 +65,13 @@ module LegacyImporters
     end
 
     def construct_member_properties(data, app_lookup, sub)
+      data["enrollees"].each do |en|
+        m_id = en["hbx_id"]
+        applicant = app_lookup[m_id]
+        if applicant.nil?
+          throw :missing_object, "Could not find member with hbx_id: #{m_id}" if applicant.nil?
+        end
+      end
       data["enrollees"].map do |en|
         m_id = en["hbx_id"]
         is_sub = (m_id == sub.hbx_id)
@@ -115,7 +122,9 @@ module LegacyImporters
     def find_plan(data)
       @hios = data["plan"]["hios_id"]
       @active_year = data["plan"]["active_year"]
-      Plan.where({hios_id: @hios, active_year: @active_year.to_i}).first
+      Plan.where({hios_id: @hios, active_year: @active_year.to_i}).first.tap do |pl|
+        throw :missing_object, "Could not find plan with hios_id #{@hios}, active year #{@active_year}" if pl.nil?
+      end
     end
   end
 end

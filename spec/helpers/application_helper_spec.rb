@@ -14,7 +14,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
 
     it "display progress bar" do
-      expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper">')
+      expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
   end
 
@@ -164,7 +164,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     context "with hbx_enrollment" do
-      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100)}
+      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
       it "should return cost from hbx_enrollment" do
         expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
       end

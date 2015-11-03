@@ -284,7 +284,7 @@ class Person
   end
 
   def primary_family
-    Family.find_by_primary_applicant(self)
+    @primary_family ||= Family.find_by_primary_applicant(self)
   end
 
   def families

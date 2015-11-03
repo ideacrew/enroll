@@ -94,6 +94,10 @@ describe EmployerProfile, dbclean: :after_each do
         it "and should be findable" do
           expect(EmployerProfile.find(saved_employer_profile.id).id.to_s).to eq saved_employer_profile.id.to_s
         end
+
+        it "should return nil with invalid id" do
+          expect(EmployerProfile.find("invalid_id")).to eq nil
+        end
       end
     end
   end

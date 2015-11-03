@@ -45,131 +45,131 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         monthly_max_employee_cost: 500.32
         )] }
 
-    let(:plan){ double("Plan") }
-    it "should calculate employer contributions" do
-      allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
-      allow(Plan).to receive(:find).and_return(reference_plan)
-      allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
-      allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
-      allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
-      sign_in
-      xhr :get, :calc_employer_contributions, employer_profile_id: "id", reference_plan_id: reference_plan.id
-      expect(response).to have_http_status(:success)
-    end
-  end
-
-  describe "GET edit" do
-    let(:plan_year) {FactoryGirl.build(:plan_year)}
-
-    before :each do
-      sign_in
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
-      allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
-    end
-
-    context "when draft state" do
-      before :each do
-        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
-      end
-
-      it "should be a success" do
+      let(:plan){ double("Plan") }
+      it "should calculate employer contributions" do
+        allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
+        allow(Plan).to receive(:find).and_return(reference_plan)
+        allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
+        allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
+        allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
+        sign_in
+        xhr :get, :calc_employer_contributions, employer_profile_id: "id", reference_plan_id: reference_plan.id
         expect(response).to have_http_status(:success)
       end
-
-      it "should render the edit template" do
-        expect(response).to render_template("edit")
-      end
-
-      it "should generate carriers" do
-        expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
-        expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
-      end
     end
 
-
-    context "when publish pending state" do
-      let(:warnings) { { primary_location: "primary location is outside washington dc" } }
+    describe "GET edit" do
+      let(:plan_year) {FactoryGirl.build(:plan_year)}
 
       before :each do
-        allow(plan_year).to receive(:publish_pending?).and_return(true)
-        allow(plan_year).to receive(:withdraw_pending!)
-        allow(plan_year).to receive(:is_application_valid?).and_return(false)
-        allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
-        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+        sign_in
+        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+        allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
+        allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
       end
 
-      it "should set warnings flag" do
-        expect(assigns(:just_a_warning)).to eq(true)
+      context "when draft state" do
+        before :each do
+          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+        end
+
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render the edit template" do
+          expect(response).to render_template("edit")
+        end
+
+        it "should generate carriers" do
+          expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
+          expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
+        end
       end
 
-      it "should set errors" do
-        expect(plan_year.errors[:base]).to eq ["primary location is outside washington dc"]
+
+      context "when publish pending state" do
+        let(:warnings) { { primary_location: "primary location is outside washington dc" } }
+
+        before :each do
+          allow(plan_year).to receive(:publish_pending?).and_return(true)
+          allow(plan_year).to receive(:withdraw_pending!)
+          allow(plan_year).to receive(:is_application_valid?).and_return(false)
+          allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
+          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+        end
+
+        it "should set warnings flag" do
+          expect(assigns(:just_a_warning)).to eq(true)
+        end
+
+        it "should set errors" do
+          expect(plan_year.errors[:base]).to eq ["primary location is outside washington dc"]
+        end
       end
     end
-  end
 
 
-  describe "POST update" do
-    let(:save_result) { false }
-    let(:plan) {double(:where => [double(:_id => "test")] )}
-    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)))}
-    let(:plan_year) { double(:benefit_groups => [benefit_group], id: "id" ) }
-    let(:relationship_benefits_attributes) {
-      { "0" => {
+    describe "POST update" do
+      let(:save_result) { false }
+      let(:plan) {double(:where => [double(:_id => "test")] )}
+      let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)))}
+      let(:plan_year) { double(:benefit_groups => [benefit_group], id: "id" ) }
+      let(:relationship_benefits_attributes) {
+        { "0" => {
          :relationship => "spouse",
          :premium_pct => "0.66",
          :employer_max_amt => "123.45",
          :offered => "false"
-      } }
-    }
-    let(:benefit_groups_attributes) {
-      { "0" => {
+         } }
+       }
+       let(:benefit_groups_attributes) {
+        { "0" => {
          :title => "My benefit group",
          :reference_plan_id => "rp_id",
          :effective_on_offset => "e_on_offset",
          :plan_option_kind => "single_plan",
-        :employer_max_amt_in_cents => "2232",
-        :relationship_benefits_attributes => relationship_benefits_attributes
-      } }
-    }
+         :employer_max_amt_in_cents => "2232",
+         :relationship_benefits_attributes => relationship_benefits_attributes
+         } }
+       }
 
-    let(:plan_year_params) {
+       let(:plan_year_params) {
+        {
+         :start_on => "01/01/2015",
+         :end_on => "12/31/2015",
+         :fte_count => "1",
+         :pte_count => "3",
+         :msp_count => "5",
+         :open_enrollment_start_on => "12/01/2014",
+         :open_enrollment_end_on => "12/15/2014",
+         :benefit_groups_attributes => benefit_groups_attributes
+       }
+     }
+
+     let(:plan_year_request_params) {
       {
-           :start_on => "01/01/2015",
-           :end_on => "12/31/2015",
-           :fte_count => "1",
-           :pte_count => "3",
-           :msp_count => "5",
-           :open_enrollment_start_on => "12/01/2014",
-           :open_enrollment_end_on => "12/15/2014",
-           :benefit_groups_attributes => benefit_groups_attributes
-      }
-    }
+       :start_on => "01/01/2015",
+       :end_on => "12/31/2015",
+       :fte_count => 1,
+       :pte_count => 3,
+       :msp_count => 5,
+       :open_enrollment_start_on => "12/01/2014",
+       :open_enrollment_end_on => "12/15/2014",
+       :benefit_groups_attributes => benefit_groups_attributes
+     }
+   }
+   let(:plan_years) {double}
 
-    let(:plan_year_request_params) {
-      {
-           :start_on => "01/01/2015",
-           :end_on => "12/31/2015",
-           :fte_count => 1,
-           :pte_count => 3,
-           :msp_count => 5,
-           :open_enrollment_start_on => "12/01/2014",
-           :open_enrollment_end_on => "12/15/2014",
-           :benefit_groups_attributes => benefit_groups_attributes
-      }
-    }
-    let(:plan_years) {double}
-
-    before :each do
-      sign_in
-      allow(::Forms::PlanYearForm).to receive(:rebuild).with(plan_year, plan_year_params).and_return(plan_year)
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(employer_profile).to receive(:plan_years).and_return(plan_years)
-      allow(plan_years).to receive(:where).and_return([plan_year])
-      allow(benefit_group).to receive(:elected_plans=).and_return("test")
-      allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
-      allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+   before :each do
+    sign_in
+    allow(::Forms::PlanYearForm).to receive(:rebuild).with(plan_year, plan_year_params).and_return(plan_year)
+    allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+    allow(employer_profile).to receive(:plan_years).and_return(plan_years)
+    allow(plan_years).to receive(:where).and_return([plan_year])
+    allow(benefit_group).to receive(:elected_plans=).and_return("test")
+    allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+    allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -178,12 +178,9 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
 
     describe "with an invalid plan year" do
-      it "should be a success" do
-        expect(response).to have_http_status(:success)
-      end
 
       it "should render the new template" do
-        expect(response).to render_template("edit")
+        expect(response).to have_http_status(:redirect)
       end
 
       it "should assign the new plan year" do
@@ -216,60 +213,62 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   describe "POST create" do
     let(:save_result) { false }
     let(:plan) {double(:where => [double(:_id => "test")] )}
-    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)))}
+    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)), :default => false)}
     let(:plan_year) { double(:benefit_groups => [benefit_group] ) }
     let(:relationship_benefits_attributes) {
       { "0" => {
-         :relationship => "spouse",
-         :premium_pct => "0.66",
-         :employer_max_amt => "123.45",
-         :offered => "false"
-      } }
-    }
-    let(:benefit_groups_attributes) {
+       :relationship => "spouse",
+       :premium_pct => "0.66",
+       :employer_max_amt => "123.45",
+       :offered => "false"
+       } }
+     }
+     let(:benefit_groups_attributes) {
       { "0" => {
-         :title => "My benefit group",
-         :reference_plan_id => "rp_id",
-         :effective_on_offset => "e_on_offset",
-         :plan_option_kind => "single_plan",
-        :employer_max_amt_in_cents => "2232",
-        :relationship_benefits_attributes => relationship_benefits_attributes
-      } }
-    }
+       :title => "My benefit group",
+       :reference_plan_id => "rp_id",
+       :effective_on_offset => "e_on_offset",
+       :plan_option_kind => "single_plan",
+       :employer_max_amt_in_cents => "2232",
+       :relationship_benefits_attributes => relationship_benefits_attributes
+       } }
+     }
 
-    let(:plan_year_params) {
+     let(:plan_year_params) {
       {
-           :start_on => "01/01/2015",
-           :end_on => "12/31/2015",
-           :fte_count => "1",
-           :pte_count => "3",
-           :msp_count => "5",
-           :open_enrollment_start_on => "12/01/2014",
-           :open_enrollment_end_on => "12/15/2014",
-           :benefit_groups_attributes => benefit_groups_attributes
-      }
-    }
+       :start_on => "01/01/2015",
+       :end_on => "12/31/2015",
+       :fte_count => "1",
+       :pte_count => "3",
+       :msp_count => "5",
+       :open_enrollment_start_on => "12/01/2014",
+       :open_enrollment_end_on => "12/15/2014",
+       :benefit_groups_attributes => benefit_groups_attributes
+     }
+   }
 
-    let(:plan_year_request_params) {
-      {
-           :start_on => "01/01/2015",
-           :end_on => "12/31/2015",
-           :fte_count => 1,
-           :pte_count => 3,
-           :msp_count => 5,
-           :open_enrollment_start_on => "12/01/2014",
-           :open_enrollment_end_on => "12/15/2014",
-           :benefit_groups_attributes => benefit_groups_attributes
-      }
-    }
+   let(:plan_year_request_params) {
+    {
+     :start_on => "01/01/2015",
+     :end_on => "12/31/2015",
+     :fte_count => 1,
+     :pte_count => 3,
+     :msp_count => 5,
+     :open_enrollment_start_on => "12/01/2014",
+     :open_enrollment_end_on => "12/15/2014",
+     :benefit_groups_attributes => benefit_groups_attributes
+   }
+ }
 
-    before :each do
-      sign_in
-      allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(benefit_group).to receive(:elected_plans=).and_return("test")
-      allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
-      allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+ before :each do
+  sign_in
+  allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
+  allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+  allow(employer_profile).to receive(:default_benefit_group).and_return(nil)
+  allow(benefit_group).to receive(:elected_plans=).and_return("test")
+  allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+  allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+  allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -497,6 +496,81 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id
 
       expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "POST make_default_benefit_group", dbclean: :after_each do 
+
+    let(:entity_kind)     { "partnership" }
+    let(:bad_entity_kind) { "fraternity" }
+    let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
+
+    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
+
+    let(:office_location) do 
+      OfficeLocation.new(
+        is_primary: true,
+        address: address,
+        phone: phone
+        )
+    end
+
+    let(:organization) { Organization.create(
+      legal_name: "Sail Adventures, Inc",
+      dba: "Sail Away",
+      fein: "001223333",
+      office_locations: [office_location]
+      )
+    }
+
+    let(:valid_params)  do {
+      organization: organization,
+      entity_kind: entity_kind
+      }
+    end
+
+    let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
+    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
+    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+
+    let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
+    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+
+    context 'when same plan year' do
+      before do
+        employer_profile.save(:validate => false)
+      end
+
+      it "should calculate employer contributions" do
+        sign_in
+        xhr :post, :make_default_benefit_group, employer_profile_id: employer_profile.id.to_s, plan_year_id: plan_year.id.to_s, benefit_group_id: benefit_group.id.to_s, format: :js
+        default_benefit_groups = employer_profile.reload.plan_years.first.benefit_groups.select{|bg| bg.default }
+        expect(default_benefit_groups.count).to eq 1
+        expect(default_benefit_groups.first.id).to eq benefit_group.id
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    context 'when multiple plan years present' do
+      before do 
+        employer_profile1.save(:validate => false)
+      end
+
+      it "should calculate employer contributions" do
+        sign_in
+        xhr :post, :make_default_benefit_group, employer_profile_id: employer_profile1.id, plan_year_id: new_plan_year.id, benefit_group_id: new_benefit_group.id.to_s, format: :js
+        employer_profile1.reload
+        plan_year1 = employer_profile1.plan_years.where(id: plan_year.id).first
+        expect(plan_year1.benefit_groups.select{|bg| bg.default}).to be_empty
+
+        plan_year2 = employer_profile1.plan_years.where(id: new_plan_year.id).first
+        expect(plan_year2.benefit_groups.select{|bg| bg.default}.count).to eq(1)
+        expect(response).to have_http_status(:success)
+      end
     end
   end
 end

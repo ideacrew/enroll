@@ -95,6 +95,20 @@ RSpec.describe Products::QhpController, :type => :controller do
     end
   end
 
+  context "GET summary with bad HbxEnrollment" do
+
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).and_return(nil)
+    end
+
+    it "should fail when bad data" do
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: '999', active_year: "2015", market_kind: "shop", coverage_kind: "health"
+      expect(response).to have_http_status(500)
+    end
+  end
+
   context "GET comparison when get more than one qhp" do
     let(:hbx_enrollment){ HbxEnrollment.new(coverage_kind: 'dental') }
     let(:benefit_group){ double("BenefitGroup") }
