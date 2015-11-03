@@ -62,6 +62,16 @@ module Factories
       index = @active_plan_year.benefit_groups.index(active_group) + 1
       new_year = @active_plan_year.start_on.year + 1
 
+      reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
+      if reference_plan_id.blank?
+        raise EmployerProfilePlanYearRenewalError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
+      end
+
+      elected_plan_ids  = Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
+      if elected_plan_ids.blank?
+        raise EmployerProfilePlanYearRenewalError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
+      end
+
       @renew_plan_year.benefit_groups.build({
         title: "Benefit Package #{new_year} ##{index} (#{active_group.title})",
         effective_on_kind: active_group.effective_on_kind,
@@ -69,12 +79,11 @@ module Factories
         plan_option_kind: active_group.plan_option_kind,
         default: active_group.default,
         effective_on_offset: active_group.effective_on_offset,
-
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
+        relationship_benefits: active_group.relationship_benefits,
 
-        reference_plan_id: Plan.find(active_group.reference_plan_id).renewal_plan_id,
-        elected_plan_ids: Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id),
-        relationship_benefits: active_group.relationship_benefits
+        reference_plan_id: reference_plan_id,
+        elected_plan_ids: elected_plan_ids
       })
     end
 
