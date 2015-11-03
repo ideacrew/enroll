@@ -3,6 +3,8 @@ class BenefitGroupAssignment
   include Mongoid::Timestamps
   include AASM
 
+  RENEWING = %w(coverage_renewing)
+
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
@@ -20,6 +22,7 @@ class BenefitGroupAssignment
   validate :date_guards, :model_integrity
 
   scope :by_benefit_group_id, ->(benefit_group_id) {where(benefit_group_id: benefit_group_id)}
+  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
 
   class << self
     def find(id)
