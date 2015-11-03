@@ -472,8 +472,8 @@ class PlanYear
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
 
-      transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolled,  to: :active,             :guard  => :is_event_date_valid?
+      transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling, to: :renewing_enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
     end
 
@@ -527,7 +527,7 @@ class PlanYear
       transitions from: [:active, :suspended], to: :terminated
     end
 
-    event :renew, :after => :record_transition do
+    event :renew_coverage, :after => :record_transition do
       transitions from: :draft, to: :renewing
     end
 
@@ -586,11 +586,11 @@ private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
-    when "published", "draft"
+    when "published", "draft", "renewing_published"
       today >= open_enrollment_start_on
-    when "enrolling"
+    when "enrolling", "renewing_enrolling"
       today.end_of_day >= open_enrollment_end_on
-    when "enrolled"
+    when "enrolled", "renewing_enrolled"
       today >= start_on
     when "active"
       today >= end_on
