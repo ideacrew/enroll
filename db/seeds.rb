@@ -67,34 +67,16 @@ if missing_plan_dumps
 
   puts "*"*80
   puts "Loading SERFF data"
-
   Products::Qhp.delete_all
-  files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
-  qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
-    puts file
-    xml = Nokogiri::XML(File.open(file))
-    plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-    qhp_hash.add(plan.to_hash, file)
-    qhp_hash
-  end
-
-  qhp_import_hash.run
+  system "bundle exec rake xml:plans"
   puts "::: complete :::"
 
   puts "*"*80
   puts "Loading SERFF PLAN RATE data"
-  files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
-  rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
-    puts file
-    xml = Nokogiri::XML(File.open(file))
-    rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
-    rate_hash.add(rates.to_hash)
-    rate_hash
-  end
+  system "bundle exec rake xml:rates"
   puts "::: complete :::"
-
-  rate_import_hash.run
   puts "*"*80
+
   puts "Loading renewal plans"
   system "bundle exec rake xml:renewal_and_standard_plans"
 
@@ -155,6 +137,13 @@ puts "*"*80
 puts "::: Mapping Plans to SBC pdfs in S3 :::"
 system "bundle exec rake sbc:map"
 puts "::: Mapping Plans to SBC pdfs seed complete :::"
+
+
+puts "*"*80
+puts "updating cost share variance deductibles"
+system "bundle exec rake serff:update_cost_share_variances"
+puts "updating cost share variance deductibles complete"
+puts "*"*80
 
 puts "*"*80
 puts "End of Seed Data"

@@ -893,7 +893,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
             it "enrollment should be invalid" do
               expect(workflow_plan_year_with_benefit_group.is_enrollment_valid?).to be_falsey
-              expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
+              # expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
               expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
             end
 

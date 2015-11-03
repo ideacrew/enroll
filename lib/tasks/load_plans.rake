@@ -18,6 +18,23 @@ namespace :seed do
   end
 end
 
+namespace :serff do
+  desc "Update cost share variances for assisted"
+  task :update_cost_share_variances => :environment do
+    Plan.where(:active_year.in => [2015, 2016]).each do |plan|
+      qhp = Products::Qhp.where(active_year: plan.active_year, standard_component_id: plan.hios_base_id).first
+      hios_id = plan.coverage_kind == "dental" ? (plan.hios_id + "-01") : plan.hios_id
+      if hios_id.split("-").last != "01"
+        csr = qhp.qhp_cost_share_variances.where(hios_plan_and_variant_id: hios_id).to_a.first
+        puts "#{hios_id} ::: #{csr.hios_plan_and_variant_id}"
+        plan.deductible = csr.qhp_deductable.in_network_tier_1_individual
+        plan.family_deductible = csr.qhp_deductable.in_network_tier_1_family
+        plan.save
+      end
+    end
+  end
+end
+
 namespace :delete do
   desc "delete fake plans"
   task :fake_plans => :environment do
@@ -108,14 +125,6 @@ end
 namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
-  # files = Dir.glob(File.join(args.dir, "**", "*.xml"))
-  # files.each do |file|
-  # #   puts file
-    # xml = Nokogiri::XML(File.open(args.file))
-    # plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-    # qhp_hash = QhpBuilder.new(plan.to_hash)
-    # qhp_hash.run
-
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
     qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
       puts file
@@ -126,21 +135,21 @@ namespace :xml do
     end
 
     qhp_import_hash.run
-  #   exit
-  # end
   end
 end
 
 namespace :xml do
-  desc "Import all qhp plans from xml files in a directory"
-  task :serff, [:dir] => :environment do |task, args|
-    files = Dir.glob(File.join(args.dir, "**", "*.xml"))
-    files.each do |file|
-      # #   puts file
+  desc "Import qhp rates from xml files"
+  task :rates, [:file] => :environment do |task, args|
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
+    rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+      puts file
       xml = Nokogiri::XML(File.open(file))
-      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-      qhp_hash = QhpBuilder.new(plan.to_hash)
-      qhp_hash.run
+      rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+      rate_hash.add(rates.to_hash)
+      rate_hash
     end
+    rate_import_hash.run
+
   end
 end
