@@ -748,9 +748,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 it "should raise enrollment errors" do
-                  expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 2
+                  if workflow_plan_year_with_benefit_group.start_on.yday == 1
+                    expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 1
+                  else
+                    expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 2
+                    expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
+                  end
                   expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:non_business_owner_enrollment_count)
-                  expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
                 end
 
                 context "and three of the six employees have enrolled" do
@@ -790,8 +794,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   context "and the plan effective date is NOT Jan 1" do
 
                     it "should raise enrollment errors" do
-                      expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 1
-                      expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
+                      if workflow_plan_year_with_benefit_group.start_on.yday != 1
+                        expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 1
+                        expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
+                      end
                     end
                   end
 

@@ -1,9 +1,10 @@
 class Products::QhpController < ApplicationController
   include ContentType
   include Aptc
-
-  before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
   before_action :set_current_person, only: [:comparison, :summary]
+  before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
 
   def comparison
     params.permit("standard_component_ids", :hbx_enrollment_id)
@@ -73,7 +74,16 @@ class Products::QhpController < ApplicationController
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-
+    if @hbx_enrollment.blank?
+      error_message = {
+        :error => {
+          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}",
+        },
+      }
+      log(JSON.dump(error_message), {:severity => 'critical'})
+      render file: 'public/500.html', status: 500
+      return
+    end
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "employer_sponsored") ? "employer_sponsored" : "individual"
     @coverage_kind = (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)

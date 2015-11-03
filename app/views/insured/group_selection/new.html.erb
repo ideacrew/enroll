@@ -12,7 +12,7 @@
     <% else %>
     <%= form_tag(:insured_group_selections) do %>
       <div class="col-xs-8">
-        <h1 class="darkblue">Choose Plan for your Household</h1>
+        <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
         <h4><strong>Who needs coverage?</strong></h4>
 
@@ -59,7 +59,7 @@
 
           <div id="coverage_kinds" class='row no-buffer'>
             <div class="col-md-3 col-lg-3 col-sm-6">
-              <strong>Coverage Kind: </strong>
+              <strong>Coverage Type: </strong>
             </div>
             <div class="col-md-3 col-lg-3 col-sm-6">
               <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>

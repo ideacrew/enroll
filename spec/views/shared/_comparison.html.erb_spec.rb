@@ -34,6 +34,7 @@ describe "shared/_comparison.html.erb" do
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
     allow(mock_hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
     allow(mock_person).to receive(:primary_family).and_return(mock_family)
+    allow(mock_person).to receive(:has_consumer_role?).and_return(false)
     allow(mock_family).to receive(:enrolled_hbx_enrollments).and_return([mock_hbx_enrollment])
     assign(:visit_types, [])
     assign :plan, mock_plan

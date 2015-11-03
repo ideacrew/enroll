@@ -19,10 +19,10 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
     expect(rendered).to have_selector('select#effective_on_kind')
   end
 
-  context "when I've had a baby" do
+  context "when Had a baby" do
     before :each do
       assign :qle_date, TimeKeeper.date_of_record
-      allow(qlk).to receive(:title).and_return("I've had a baby")
+      allow(qlk).to receive(:reason).and_return("birth")
       allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event', 'fixed_first_of_next_month'])
       render "insured/families/effective_on_kind_fields"
     end
@@ -37,10 +37,10 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
     end
   end
 
-  context "when I've adopted a child" do
+  context "when Adopted a child" do
     before :each do
       assign :qle_date, TimeKeeper.date_of_record
-      allow(qlk).to receive(:title).and_return("I've adopted a child")
+      allow(qlk).to receive(:reason).and_return("adoption")
       allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event', 'fixed_first_of_next_month'])
       render "insured/families/effective_on_kind_fields"
     end

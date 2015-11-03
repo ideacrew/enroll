@@ -103,8 +103,8 @@ class HbxEnrollment
   scope :changing, ->{ where(changing: true) }
   scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
 
-
-  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+  scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
+  scope :show_enrollments, -> { any_of([enrolled.selector, terminated.selector]) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -129,7 +129,7 @@ class HbxEnrollment
     allow_blank: false,
     inclusion: {
       in: COVERAGE_KINDS,
-      message: "%{value} is not a valid coverage kind"
+      message: "%{value} is not a valid coverage type"
     }
 
   aasm do
@@ -398,7 +398,7 @@ class HbxEnrollment
   def decorated_elected_plans(coverage_kind)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
-    if family.is_under_special_enrollment_period?
+    if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
@@ -453,7 +453,7 @@ class HbxEnrollment
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
 
-      if enrollment.family.is_under_special_enrollment_period?
+      if qle and enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       else
@@ -475,7 +475,7 @@ class HbxEnrollment
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      if enrollment.family.is_under_special_enrollment_period?
+      if qle and enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       else

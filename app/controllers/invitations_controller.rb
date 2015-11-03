@@ -28,6 +28,10 @@ class InvitationsController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def redirect_to_agents_path
+    redirect_to home_exchanges_agents_path
+  end
+
   def require_login_and_allow_new_account
     if current_user.nil?
       session[:portal] = url_for(params)

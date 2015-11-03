@@ -81,10 +81,10 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-   @tab = params['tab']
-   if params[:q] || params[:page] || params[:commit] || params[:status]
-     paginate_employees
-   else
+    @tab = params['tab']
+    if params[:q] || params[:page] || params[:commit] || params[:status]
+      paginate_employees
+    else
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.published_plan_year
@@ -120,20 +120,17 @@ class Employers::EmployerProfilesController < ApplicationController
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
       paginate_employees
-
     elsif @tab == 'families'
-     #families defined as employee_roles.each { |ee| ee.person.primary_family }
-     paginate_families
-   elsif @tab == "inbox"
-     @folder = params[:folder] || 'Inbox'
-     @sent_box = false
-     respond_to do |format|
-       format.js { render 'employers/employer_profiles/inbox' }
-     end
-   end
-
+      #families defined as employee_roles.each { |ee| ee.person.primary_family }
+      paginate_families
+    elsif @tab == "inbox"
+      @folder = params[:folder] || 'Inbox'
+      @sent_box = false
+      respond_to do |format|
+        format.js { render 'employers/employer_profiles/inbox' }
+      end
     end
-
+  end
 
   def new
     @organization = Forms::EmployerProfile.new
@@ -179,12 +176,13 @@ class Employers::EmployerProfilesController < ApplicationController
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
+        org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
 
         #in case there was an error, reload from saved json
         @organization.assign_attributes(:office_locations => @organization_dup)
         @organization.save(validate: false)
         #@organization.reload
-        flash[:notice] = 'Employer information not saved.'
+        flash[:error] = "Employer information not saved. #{org_error_msg}."
         redirect_to edit_employers_employer_profile_path(@organization)
       end
     else
@@ -293,6 +291,7 @@ class Employers::EmployerProfilesController < ApplicationController
       id_params = params.permit(:id, :employer_profile_id)
       id = id_params[:id] || id_params[:employer_profile_id]
       @employer_profile = EmployerProfile.find(id)
+      render file: 'public/404.html', status: 404 if @employer_profile.blank?
     end
 
     def organization_profile_params

@@ -93,6 +93,12 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
+    it "should render 404 with invalid id" do
+      get :show, id: "invalid_id"
+      expect(response).to have_http_status(404)
+      expect(response).to render_template(:file => "#{Rails.root}/public/404.html")
+    end
+
     it "should get plan years" do
       get :show, id: employer_profile.id
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
@@ -444,11 +450,25 @@ RSpec.describe Employers::EmployerProfilesController do
     it "should redirect" do
       allow(user).to receive(:save).and_return(true)
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
+      allow(organization).to receive(:errors).and_return nil
       sign_in(user)
       expect(Organization).to receive(:find)
 
       put :update, id: organization.id
       expect(response).to be_redirect
+    end
+
+    it "should show error msg when save failed" do
+      allow(user).to receive(:save).and_return(true)
+      allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
+      sign_in(user)
+      expect(Organization).to receive(:find)
+      allow(organization).to receive(:update_attributes).and_return false
+      allow(organization).to receive(:errors).and_return double(full_messages: ["Can't have multiple primary addresses"])
+
+      put :update, id: organization.id
+      expect(response).to be_redirect
+      expect(flash[:error]).to match "Can't have multiple primary addresses"
     end
 
     context "given current user is invalid" do

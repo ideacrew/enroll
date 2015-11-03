@@ -1,2 +1,3 @@
 <% benefit_groups = @employer_profile.plan_years.map(&:benefit_groups).try(:flatten) %>
-<%= f.select :benefit_group_id, benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP" %>
+<% default = @employer_profile.default_benefit_group %>
+<%= f.select :benefit_group_id, options_from_collection_for_select(benefit_groups, 'id', 'title', (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || default.try(:id))), prompt: "SELECT BENEFIT GROUP"  %>

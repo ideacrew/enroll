@@ -18,6 +18,23 @@ namespace :seed do
   end
 end
 
+namespace :serff do
+  desc "Update cost share variances for assisted"
+  task :update_cost_share_variances => :environment do
+    Plan.where(:active_year.in => [2015, 2016]).each do |plan|
+      qhp = Products::Qhp.where(active_year: plan.active_year, standard_component_id: plan.hios_base_id).first
+      hios_id = plan.coverage_kind == "dental" ? (plan.hios_id + "-01") : plan.hios_id
+      if hios_id.split("-").last != "01"
+        csr = qhp.qhp_cost_share_variances.where(hios_plan_and_variant_id: hios_id).to_a.first
+        puts "#{hios_id} ::: #{csr.hios_plan_and_variant_id}"
+        plan.deductible = csr.qhp_deductable.in_network_tier_1_individual
+        plan.family_deductible = csr.qhp_deductable.in_network_tier_1_family
+        plan.save
+      end
+    end
+  end
+end
+
 namespace :delete do
   desc "delete fake plans"
   task :fake_plans => :environment do
@@ -45,15 +62,18 @@ namespace :xml do
         last_row = sheet == "IVL HIOS Plan Crosswalk" ? sheet_data.last_row : 59
         (2..last_row).each do |row_number| # update renewal plan_ids
           carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
-          new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016, :csr_variant_id.in => ["","01"]).first
-          if new_plan
-            Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015, :csr_variant_id.in => ["","01"]).each do |pln|
-              pln.update(renewal_plan_id: new_plan._id)
-              puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
-              updated_hios_ids_list << pln.hios_id
+          new_plans = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016)
+          new_plans.each do |new_plan|
+            if new_plan.present? && new_plan.csr_variant_id != "00"
+              old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015, csr_variant_id: /#{new_plan.csr_variant_id}/ ).first
+              if old_plan.present?
+                old_plan.update(renewal_plan_id: new_plan._id)
+                puts "Old plan hios_id #{old_plan.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
+                updated_hios_ids_list << old_plan.hios_id
+              else
+              puts "No plan found for hios id: '#{new_hios_id}'"
+              end
             end
-          else
-            puts "No plan found for hios id: '#{new_hios_id}'"
           end
         end
         if sheet == "SHOP HIOS Plan Crosswalk"
@@ -80,14 +100,17 @@ namespace :xml do
       no_change_in_hios_ids = old_plan_hios_ids - (updated_hios_ids_list + rejected_hios_ids_list)
       no_change_in_hios_ids = no_change_in_hios_ids.uniq
       no_change_in_hios_ids.each do |hios_id|
-        new_plan = Plan.where(active_year: 2016, hios_id: /#{hios_id}/, :csr_variant_id.in => ["","01"]).first
-        if new_plan.present?
-          Plan.where(active_year: 2015, hios_id: /#{hios_id}/, :csr_variant_id.in => ["","01"]).each do |old_plan|
-          old_plan.update(renewal_plan_id: new_plan.id)
+        new_plans = Plan.where(hios_id: /#{hios_id}/, active_year: 2016)
+        new_plans.each do |new_plan|
+          old_plan = Plan.where(active_year: 2015, hios_id: /#{hios_id}/, csr_variant_id: new_plan.csr_variant_id).first
+          if new_plan.present? && new_plan.csr_variant_id != "00" && old_plan.present?
+            if old_plan.present?
+              old_plan.update(renewal_plan_id: new_plan.id)
+            end
             puts "Old plan hios_id #{old_plan.hios_id} carry overed with New plan hios_id: #{new_plan.hios_id}"
+          else
+            puts "plan not present : #{hios_id}"
           end
-        else
-          puts "plan not present: #{hios_id}"
         end
       end
       standard_hios_ids = ["94506DC0390001-01","94506DC0390005-01","94506DC0390007-01","94506DC0390011-01","86052DC0400001-01","86052DC0400002-01","86052DC0400007-01","86052DC0400008-01","78079DC0210001-01","78079DC0210002-01","78079DC0210003-01","78079DC0210004-01"]
@@ -102,28 +125,31 @@ end
 namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
-  # files = Dir.glob(File.join(args.dir, "**", "*.xml"))
-  # files.each do |file|
-  # #   puts file
-    xml = Nokogiri::XML(File.open(args.file))
-    plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-    qhp_hash = QhpBuilder.new(plan.to_hash)
-    qhp_hash.run
-  #   exit
-  # end
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
+    qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
+      puts file
+      xml = Nokogiri::XML(File.open(file))
+      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+      qhp_hash.add(plan.to_hash, file)
+      qhp_hash
+    end
+
+    qhp_import_hash.run
   end
 end
 
 namespace :xml do
-  desc "Import all qhp plans from xml files in a directory"
-  task :serff, [:dir] => :environment do |task, args|
-    files = Dir.glob(File.join(args.dir, "**", "*.xml"))
-    files.each do |file|
-      # #   puts file
+  desc "Import qhp rates from xml files"
+  task :rates, [:file] => :environment do |task, args|
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
+    rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+      puts file
       xml = Nokogiri::XML(File.open(file))
-      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-      qhp_hash = QhpBuilder.new(plan.to_hash)
-      qhp_hash.run
+      rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+      rate_hash.add(rates.to_hash)
+      rate_hash
     end
+    rate_import_hash.run
+
   end
 end

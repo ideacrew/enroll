@@ -7,7 +7,11 @@ module ApplicationHelper
   def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil)
     # source is account or shopping
     if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+      if hbx_enrollment.coverage_kind == 'health'
+        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+      else
+        return hbx_enrollment.total_premium
+      end
     end
 
     if session['elected_aptc'].present? and session['max_aptc'].present?
@@ -395,7 +399,7 @@ module ApplicationHelper
       progress_bar_width = (enrolled * 100)/eligible
     end
 
-    content_tag(:div, class: 'progress-wrapper') do
+    content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
         concat(content_tag(:div, class: "progress-bar #{progress_bar_class}", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
           concat content_tag(:span, '', class: 'sr-only')
@@ -409,6 +413,8 @@ module ApplicationHelper
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;"
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"})
         end
+
+       #binding.pry
 
         concat(content_tag(:div, class: 'progress-val') do
           concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)

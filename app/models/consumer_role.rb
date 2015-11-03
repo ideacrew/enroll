@@ -85,22 +85,22 @@ class ConsumerRole
     inclusion: { in: VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
 
   validates :citizen_status,
-    allow_blank: true,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+            allow_blank: true,
+            inclusion: {in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status"}
 
-  scope :all_under_age_twenty_six, ->{ gt(:'dob' => (TimeKeeper.date_of_record - 26.years))}
-  scope :all_over_age_twenty_six,  ->{lte(:'dob' => (TimeKeeper.date_of_record - 26.years))}
+  scope :all_under_age_twenty_six, -> { gt(:'dob' => (TimeKeeper.date_of_record - 26.years)) }
+  scope :all_over_age_twenty_six, -> { lte(:'dob' => (TimeKeeper.date_of_record - 26.years)) }
 
   # TODO: Add scope that accepts age range
-  scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (TimeKeeper.date_of_record - age.years))}
-  scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (TimeKeeper.date_of_record - age.years))}
+  scope :all_over_or_equal_age, ->(age) { lte(:'dob' => (TimeKeeper.date_of_record - age.years)) }
+  scope :all_under_or_equal_age, ->(age) { gte(:'dob' => (TimeKeeper.date_of_record - age.years)) }
 
   alias_method :is_state_resident?, :is_state_resident
-  alias_method :is_incarcerated?,   :is_incarcerated
+  alias_method :is_incarcerated?, :is_incarcerated
 
   embeds_one :lawful_presence_determination
 
-  embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_responses, class_name: "EventResponse"
 
   after_initialize :setup_lawful_determination_instance
 
@@ -125,7 +125,7 @@ class ConsumerRole
 
   def is_aca_enrollment_eligible?
     is_hbx_enrollment_eligible? &&
-    Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
+        Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
   end
 
   def is_hbx_enrollment_eligible?
@@ -182,95 +182,95 @@ class ConsumerRole
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state
   # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass
   def alien_number
-    vlp_documents.select{|doc| doc.alien_number.present? }.first.try(:alien_number)
+    vlp_documents.select { |doc| doc.alien_number.present? }.first.try(:alien_number)
   end
 
   def i94_number
-    vlp_documents.select{|doc| doc.i94_number.present? }.first.try(:i94_number)
+    vlp_documents.select { |doc| doc.i94_number.present? }.first.try(:i94_number)
   end
 
   def citizenship_number
-    vlp_documents.select{|doc| doc.citizenship_number.present? }.first.try(:citizenship_number)
+    vlp_documents.select { |doc| doc.citizenship_number.present? }.first.try(:citizenship_number)
   end
 
   def visa_number
-    vlp_documents.select{|doc| doc.visa_number.present? }.first.try(:visa_number)
+    vlp_documents.select { |doc| doc.visa_number.present? }.first.try(:visa_number)
   end
 
   def sevis_id
-    vlp_documents.select{|doc| doc.sevis_id.present? }.first.try(:sevis_id)
+    vlp_documents.select { |doc| doc.sevis_id.present? }.first.try(:sevis_id)
   end
 
   def naturalization_number
-    vlp_documents.select{|doc| doc.naturalization_number.present? }.first.try(:naturalization_number)
+    vlp_documents.select { |doc| doc.naturalization_number.present? }.first.try(:naturalization_number)
   end
 
   def receipt_number
-    vlp_documents.select{|doc| doc.receipt_number.present? }.first.try(:receipt_number)
+    vlp_documents.select { |doc| doc.receipt_number.present? }.first.try(:receipt_number)
   end
 
   def passport_number
-    vlp_documents.select{|doc| doc.passport_number.present? }.first.try(:passport_number)
+    vlp_documents.select { |doc| doc.passport_number.present? }.first.try(:passport_number)
   end
 
   def has_i327?
-    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" }
+    vlp_documents.any? { |doc| doc.subject == "I-327 (Reentry Permit)" }
   end
 
   def has_i571?
-    vlp_documents.any?{|doc| doc.subject == "I-551 (Permanent Resident Card)" }
+    vlp_documents.any? { |doc| doc.subject == "I-551 (Permanent Resident Card)" }
   end
 
   def has_cert_of_citizenship?
-    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" }
+    vlp_documents.any? { |doc| doc.subject == "Certificate of Citizenship" }
   end
 
   def has_cert_of_naturalization?
-    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" }
+    vlp_documents.any? { |doc| doc.subject == "Naturalization Certificate" }
   end
 
   def has_temp_i551?
-    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
+    vlp_documents.any? { |doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
   end
 
   def has_i94?
-    vlp_documents.any?{|doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+    vlp_documents.any? { |doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" }
   end
 
   def has_i20?
-    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+    vlp_documents.any? { |doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
   end
 
   def has_ds2019?
-    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+    vlp_documents.any? { |doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
   end
 
   def i551
-    vlp_documents.select{|doc| doc.subject == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
+    vlp_documents.select { |doc| doc.subject == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
   end
 
   def i766
-    vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select { |doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
   end
 
   def mac_read_i551
-    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select { |doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport_i94
-    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select { |doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport
-    vlp_documents.select{|doc| doc.subject == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select { |doc| doc.subject == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def case1
-    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" }.first
+    vlp_documents.select { |doc| doc.subject == "Other (With Alien Number)" }.first
   end
 
   def case2
-    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
+    vlp_documents.select { |doc| doc.subject == "Other (With I-94 Number)" }.first
   end
 
   ## TODO: Move RIDP to user model
@@ -350,10 +350,31 @@ class ConsumerRole
       documents.subject.eql?(subject)
     end
 
-    subject_doc || vlp_documents.build({subject:subject})
+    subject_doc || vlp_documents.build({subject: subject})
   end
 
-private
+  # collect all vlp documents for person and all dependents.
+  # return the one with matching key
+  def find_vlp_document_by_key(key)
+    candidate_vlp_documents = vlp_documents
+    if person.primary_family.present?
+      person.primary_family.family_members.flat_map(&:person).each do |family_person|
+        next unless family_person.consumer_role.present?
+        candidate_vlp_documents << family_person.consumer_role.vlp_documents
+      end
+      candidate_vlp_documents.uniq!
+    end
+
+    return nil if candidate_vlp_documents.nil?
+
+    candidate_vlp_documents.detect do |document|
+      next if document.identifier.blank?
+      doc_key = document.identifier.split('#').last
+      doc_key == key
+    end
+  end
+
+  private
   def notify_of_eligibility_change
     CoverageHousehold.update_individual_eligibilities_for(self)
   end
@@ -426,8 +447,8 @@ private
 
   def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state
+        from_state: aasm.from_state,
+        to_state: aasm.to_state
     )
   end
 
