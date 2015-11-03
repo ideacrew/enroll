@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerRenewal, type: :model, dbclean: :after_each do
+RSpec.describe Factories::EmployerProfilePlanYearRenewal, type: :model, dbclean: :after_each do
   let(:renewal_start_date)        { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:active_plan_year_start_on) { renewal_start_date + 3.months - 1.year }
   let(:active_benefit_group_one)  { FactoryGirl.build(:benefit_group) }
@@ -26,8 +26,8 @@ RSpec.describe EmployerRenewal, type: :model, dbclean: :after_each do
             employer_profile.plan_years = []
           end
                   
-          it "should raise alien address validation error"
-            expect{Factories::EmployerRenewal(employer_profile)}.to raise_error(EmployerRenewalError, /Renewals require an existing, published Plan Year/)
+          it "should raise alien address validation error" do
+            expect{Factories::EmployerProfilePlanYearRenewal(employer_profile)}.to raise_error(EmployerProfilePlanYearRenewalError, /Renewals require an existing, published Plan Year/)
           end
         end
       end
@@ -47,8 +47,8 @@ RSpec.describe EmployerRenewal, type: :model, dbclean: :after_each do
           employer_profile.office_locations = [alien_address]
         end
 
-        it "should raise alien address validation error"
-          expect{Factories::EmployerRenewal(employer_profile)}.to raise_error(EmployerRenewalError, /Employer primary address must be located in/)
+        it "should raise alien address validation error" do
+          expect{Factories::EmployerProfilePlanYearRenewal(employer_profile)}.to raise_error(EmployerProfilePlanYearRenewalError, /Employer primary address must be located in/)
         end
       end
 
@@ -63,7 +63,7 @@ RSpec.describe EmployerRenewal, type: :model, dbclean: :after_each do
         end
 
         it "should raise renewal time period expired error" do
-          expect{Factories::EmployerRenewal(employer_profile)}.to raise_error(EmployerRenewalError, /Renewal time period has expired/)
+          expect{Factories::EmployerProfilePlanYearRenewal(employer_profile)}.to raise_error(EmployerProfilePlanYearRenewalError, /Renewal time period has expired/)
         end
       end
     end
@@ -120,7 +120,7 @@ RSpec.describe EmployerRenewal, type: :model, dbclean: :after_each do
       end
     end
 
-    contect "and its the first day of open enrollment period" do
+    context "and its the first day of open enrollment period" do
       context "and the employer's premium billing account is in current status" do
       end
 
