@@ -3,7 +3,7 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form]
 
-  before_action :check_admin_staff_role, only: [:index]
+  before_action :check_admin_staff_role, only: [:index, :show]
   before_action :check_employer_staff_role, only: [:new]
 
   layout "two_column", except: [:new]
