@@ -135,6 +135,7 @@ class Employers::PlanYearsController < ApplicationController
         benefit_group.carrier_for_elected_plan = benefit_group.elected_plans.try(:last).try(:carrier_profile_id)
       end
     end
+    
     respond_to do |format|
       format.js { render 'edit' }
       format.html { render 'edit' }
@@ -248,6 +249,7 @@ class Employers::PlanYearsController < ApplicationController
   def build_plan_year
     plan_year = PlanYear.new
     plan_year.benefit_groups.build
+    plan_year.benefit_groups.first.build_relationship_benefits
     ::Forms::PlanYearForm.new(plan_year)
   end
 
