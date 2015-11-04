@@ -185,6 +185,12 @@ class BenefitGroup
     relationship_benefits.where(relationship: relationship).first
   end
 
+  def build_relationship_benefits
+    self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.relationship_benefits.build(relationship: relationship, offered: true)
+    end
+  end
+
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
     [
       RelationshipBenefit.new(benefit_group: self,

@@ -34,7 +34,6 @@
         </div>
       </div>
       <div class="col-xs-12 benefits-fields">
-        <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
         <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
         <%= render "shared/relationship_benefit_fields", f: rb %>
         <% end %>
