@@ -23,6 +23,9 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
+  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :active_tax_household, ->{ where(effective_ending_on: nil) }
+
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
@@ -51,7 +54,7 @@ class TaxHousehold
 
     # Benchmark Plan: use SLCSP premium rates to determine ratios
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    current_benefit_coverage_period = benefit_sponsorship.current_benefit_coverage_period
+    current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
     slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
 
     # Look up premiums for each aptc_member

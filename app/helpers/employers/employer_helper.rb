@@ -25,6 +25,22 @@ module Employers::EmployerHelper
     else
       plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
       "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
+  end
+  end
+
+
+  def get_benefit_groups_for_census_employee
+    # if @employer_profile.active_plan_year.blank?
+    #   return [], []
+    # end
+
+    all_benefit_groups = @employer_profile.plan_years.select{|py| !py.renewing_draft? }.map(&:benefit_groups).try(:flatten)
+    if all_benefit_groups.empty?
+      return [], []
     end
+
+    current_benefit_groups = all_benefit_groups #@employer_profile.active_plan_year.benefit_groups
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
+    return current_benefit_groups, renewing_benefit_groups || []
   end
 end

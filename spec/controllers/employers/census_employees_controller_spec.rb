@@ -132,6 +132,8 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(BenefitGroup).to receive(:find).and_return(benefit_group)
+      allow(benefit_group).to receive(:plan_year).and_return(plan_year)
+      allow(census_employee).to receive(:add_benefit_group_assignment).and_return(true)
       allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return(BenefitGroupAssignment.new)
     end
 

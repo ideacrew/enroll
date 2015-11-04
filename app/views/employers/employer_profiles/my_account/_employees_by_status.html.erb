@@ -14,6 +14,9 @@
           <th>DOB</th>
           <th>Hire Date</th>
           <th>Benefit Package</th>
+          <% if @employer_profile.renewing_plan_year.present? %>
+          <th>Renewal Benefit Package</th>
+          <% end %>
           <% if ['terminated', 'all'].include?(status) %>
           <th>Termination Date</th>
           <% end %>
@@ -44,6 +47,13 @@
             <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>
           <% end %>
           </td>
+          <% if @employer_profile.renewing_plan_year.present? %>
+          <td>
+          <% if census_employee.renewal_benefit_group_assignment.present? %>
+            <%= census_employee.renewal_benefit_group_assignment.benefit_group.title.capitalize %>
+          <% end %>
+          </td>
+          <% end %>
           <% if ['terminated', 'all'].include?(status) %>
           <td><%= format_date census_employee.employment_terminated_on %>
           </td>
