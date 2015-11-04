@@ -174,6 +174,7 @@ class HbxProfile
 
   ShopBinderPaymentDueDayOfMonth = 15
   ShopOpenEnrollmentEndDueDayOfMonth = 10
+  ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
