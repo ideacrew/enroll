@@ -176,7 +176,7 @@ class Employers::PlanYearsController < ApplicationController
         format.js
       end
     else
-      if (@plan_year.published? || @plan_year.enrolling?)
+      if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else

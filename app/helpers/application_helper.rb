@@ -203,6 +203,11 @@ module ApplicationHelper
       new_object.build_phone
     end
 
+    if f.object.send(association).klass == BenefitGroup
+      new_object.build_relationship_benefits
+    end
+
+
     fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end
