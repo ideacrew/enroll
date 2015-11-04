@@ -267,15 +267,6 @@ module ApplicationHelper
     return members_list
   end
 
-  def generate_relationship_benefits(obj)
-    return nil unless obj.class == BenefitGroup
-    if obj.relationship_benefits.present?
-      obj.relationship_benefits
-    else
-      obj.simple_benefit_list(nil, nil, nil)
-    end
-  end
-
   def add_progress_class(element_number, step)
     if element_number < step
       'complete'
