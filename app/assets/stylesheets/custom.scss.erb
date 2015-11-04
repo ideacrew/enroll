@@ -4878,12 +4878,17 @@ table.table.table-no-sytle td {
 .carousel-control {
   width: 10%;
 }
-.carousel-control .fa-angle-right,
-.carousel-control .fa-angle-left {
+.carousel-control img {
   position: absolute;
-  top: 25%;
+  top: 35%;
   z-index: 5;
   display: inline-block;
+  &.left {
+    right: 0;
+  }
+  &.right {
+    left: 0;
+  }
 }
 .carousel-control .icon-prev,
 .carousel-control .fa-angle-left {
