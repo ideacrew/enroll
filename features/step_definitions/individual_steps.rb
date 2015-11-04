@@ -442,14 +442,14 @@ end
 Then(/^Prepare taxhousehold info for aptc user$/) do
   person = User.find_by(email: 'aptc@dclink.com').person
   household = person.primary_family.latest_household
+  enrollment_year = person.primary_family.latest_household.hbx_enrollments[0].effective_on.year
   if household.tax_households.blank?
-    household.tax_households.create(is_eligibility_determined: Date.current, allocated_aptc: 100, effective_starting_on: Date.current - 10.days, effective_ending_on: Date.current + 10.days, submitted_at: Date.current)
+    household.tax_households.create(is_eligibility_determined: Date.current, allocated_aptc: 100, effective_starting_on:  Date.new(enrollment_year).beginning_of_year, effective_ending_on: Date.new(enrollment_year).end_of_year, submitted_at: Date.current)
     fm_id = person.primary_family.family_members.last.id
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
     household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
   end
   screenshot("aptc_householdinfo")
-
 end
 
 And(/Aptc user set elected amount and select plan/) do
@@ -457,7 +457,6 @@ And(/Aptc user set elected amount and select plan/) do
   @browser.text_field(id: "elected_aptc").set("20")
   click_when_present(@browser.a(text: /Select Plan/))
   screenshot("aptc_setamount")
-
 end
 
 Then(/Aptc user should see aptc amount and click on confirm button on thanyou page/) do
