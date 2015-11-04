@@ -33,12 +33,9 @@ describe Subscribers::FamilyApplicationCompleted do
       context "with no person matched to user and no primary family associated with the person" do
         it "log both No person and Failed to find primary family errors" do
           expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/No person found for user/)
-            expect(arg2).to eq({:severity => 'critical'})
-          end
-          expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'critical'})
+            expect(arg1).to eq message["body"]
+            expect(arg2[:error_message]).to match(/ERROR: Failed to find primary person in xml/)
+            expect(arg2[:severity]).to eq "critical"
           end
           subject.call(nil, nil, nil, nil, message)
         end
@@ -53,24 +50,47 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "logs the failed to find primary family error" do
           expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to match(/Failed to find primary family for users person/)
-            expect(arg2).to eq({:severity => 'critical'})
+            expect(arg1).to eq message["body"]
+            expect(arg2[:error_message]).to match(/Failed to find primary family for users person/)
+            expect(arg2[:severity]).to eq("critical")
           end
           subject.call(nil, nil, nil, nil, message)
         end
       end
 
       context "with a valid single person family" do
-        let(:person) { FactoryGirl.create(:person) }
-        let(:family) { Family.new.build_from_person(person) }
-        let(:consumer_role) { FactoryGirl.create(:consumer_role, person: person) }
+
+        let(:message) { { "body" => xml } }
+        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml")) }
+        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml"))).first }
+        let(:user) { FactoryGirl.create(:user) }
+
+        let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+        let(:ua_params) do
+          {
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+              "first_name" => primary.person.name_first.upcase,
+              "last_name" => primary.person.name_last.downcase,
+              "middle_name" => primary.person.name_middle,
+              "name_pfx" => primary.person.name_pfx,
+              "name_sfx" => primary.person.name_sfx,
+              "dob" => primary.person_demographics.birth_date,
+              "ssn" => primary.person_demographics.ssn,
+              "no_ssn" => "1",
+              "gender" => primary.person_demographics.sex.split('#').last
+            }
+          }
+        end
+
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:family) { consumer_role.person.primary_family }
 
         before do
-          family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
+          family.update_attribute(:e_case_id, "curam_landing_for#{consumer_role.person.id}")
           allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(Person).to receive(:where).and_return([person])
-          allow(Organization).to receive(:where).and_return([hbx_profile_organization])
         end
 
         after do
@@ -87,12 +107,58 @@ describe Subscribers::FamilyApplicationCompleted do
           it "should log an error saying integrated_case_id does not match family " do
             subject.call(nil, nil, nil, nil, message)
             expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to match(/Integrated case id does not match existing family/)
-              expect(arg2).to eq({:severity => 'error'})
+              expect(arg1).to eq(message["body"])
+              expect(arg2[:error_message]).to match(/Integrated case id does not match existing family/)
+              expect(arg2[:severity]).to eq('critical')
             end
             family.update_attribute(:e_case_id, "some_other_id")
             subject.call(nil, nil, nil, nil, message)
           end
+        end
+      end
+
+      context "with another valid single person family" do
+
+        let(:message) { { "body" => xml } }
+        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_sample.xml")) }
+        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_sample.xml"))).first }
+        let(:user) { FactoryGirl.create(:user) }
+
+        let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+        let(:ua_params) do
+          {
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+              "first_name" => primary.person.name_first.upcase,
+              "last_name" => primary.person.name_last.downcase,
+              "middle_name" => primary.person.name_middle,
+              "name_pfx" => primary.person.name_pfx,
+              "name_sfx" => primary.person.name_sfx,
+              "dob" => primary.person_demographics.birth_date,
+              "ssn" => primary.person_demographics.ssn,
+              "no_ssn" => "1",
+              "gender" => primary.person_demographics.sex.split('#').last
+            }
+          }
+        end
+
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:family) { consumer_role.person.primary_family }
+
+        before do
+          allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
+        end
+
+        after do
+          Family.delete_all
+        end
+
+        it "shouldn't log any errors the first time" do
+          family.update_attribute(:e_case_id, nil)
+          expect(subject).not_to receive(:log)
+          subject.call(nil, nil, nil, nil, message)
         end
       end
     end
@@ -291,6 +357,7 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:tax_household_db) { family_db.active_household.tax_households.first }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
+      let(:dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
 
       it "should not log any errors" do
         person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
@@ -371,6 +438,15 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
           expect(consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
           expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+        end
+
+        it "updates all consumer role verifications" do
+          expect(dep_consumer_role_db.fully_verified?).to be_truthy
+          expect(dep_consumer_role_db.vlp_authority).to eq "curam"
+          expect(dep_consumer_role_db.residency_determined_at).to eq primary.created_at
+          expect(dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+          expect(dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
         end
 
         it "updates the address for the primary applicant's person" do

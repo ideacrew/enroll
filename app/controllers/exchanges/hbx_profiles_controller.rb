@@ -1,6 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
 
-  before_action :check_hbx_staff_role, except: [:welcome, :show, :request_help, :staff_index, :assister_index]
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
@@ -265,6 +265,7 @@ private
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
+    result.deliver_now
     puts result.to_s if Rails.env.development?
    end  
 

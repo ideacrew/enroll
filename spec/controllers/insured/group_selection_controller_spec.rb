@@ -9,7 +9,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:coverage_household) {double}
   let(:family) {Family.new}
   let(:hbx_enrollment) {HbxEnrollment.create}
-  let(:hbx_enrollments) {double(:active => [hbx_enrollment])}
+  let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment])}
   let(:benefit_package) { FactoryGirl.create(:benefit_package,
       title: "individual_health_benefits_2015",
       elected_premium_credit_strategy: "unassisted",

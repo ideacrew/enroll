@@ -24,6 +24,6 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
   
   it "should display title by effective_on_offset" do
     render "employers/employer_profiles/my_account/benefits"
-    expect(rendered).to match /First of the month following 30 days/
+    expect(rendered).to match /Date of hire after 30 days from date of hire/
   end
 end

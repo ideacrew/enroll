@@ -81,10 +81,10 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-   @tab = params['tab']
-   if params[:q] || params[:page] || params[:commit] || params[:status]
-     paginate_employees
-   else
+    @tab = params['tab']
+    if params[:q] || params[:page] || params[:commit] || params[:status]
+      paginate_employees
+    else
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.published_plan_year
@@ -99,8 +99,6 @@ class Employers::EmployerProfilesController < ApplicationController
         @current_plan_year = @employer_profile.published_plan_year
         if @current_plan_year.present?
           @additional_required_participants_count = @current_plan_year.additional_required_participants_count
-        end
-        if @current_plan_year.present?
           #FIXME commeted out for performance test
           enrollments = @current_plan_year.hbx_enrollments
           if enrollments.size < 100
@@ -120,20 +118,17 @@ class Employers::EmployerProfilesController < ApplicationController
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
       paginate_employees
-
     elsif @tab == 'families'
-     #families defined as employee_roles.each { |ee| ee.person.primary_family }
-     paginate_families
-   elsif @tab == "inbox"
-     @folder = params[:folder] || 'Inbox'
-     @sent_box = false
-     respond_to do |format|
-       format.js { render 'employers/employer_profiles/inbox' }
-     end
-   end
-
+      #families defined as employee_roles.each { |ee| ee.person.primary_family }
+      paginate_families
+    elsif @tab == "inbox"
+      @folder = params[:folder] || 'Inbox'
+      @sent_box = false
+      respond_to do |format|
+        format.js { render 'employers/employer_profiles/inbox' }
+      end
     end
-
+  end
 
   def new
     @organization = Forms::EmployerProfile.new
@@ -184,7 +179,7 @@ class Employers::EmployerProfilesController < ApplicationController
         @organization.assign_attributes(:office_locations => @organization_dup)
         @organization.save(validate: false)
         #@organization.reload
-        flash[:notice] = 'Employer information not saved.'
+        flash[:error] = 'Employer information not saved.'
         redirect_to edit_employers_employer_profile_path(@organization)
       end
     else

@@ -551,7 +551,7 @@ Then(/^.+ should see the current plan year$/) do
 end
 
 And(/^.+ should see the premium billings report$/) do
-  expect(@browser.h4(text: /Premium Billing Report/i).visible?).to be_truthy
+  expect(@browser.h3(text: /Premium Billing Report/i).visible?).to be_truthy
 end
 
 When(/^.+ should see a published success message without employee$/) do
@@ -580,8 +580,8 @@ When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
-  @browser.element(text: /Choose Plan for your Household/i).wait_until_present
-  expect(@browser.element(text: /Choose Plan for your Household/i).visible?).to be_truthy
+  @browser.element(text: /Choose Coverage for your Household/i).wait_until_present
+  expect(@browser.element(text: /Choose Coverage for your Household/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
 end
 

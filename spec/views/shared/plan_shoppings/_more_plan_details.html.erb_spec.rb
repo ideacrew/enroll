@@ -27,6 +27,8 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
 
   before :each do
     allow(hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
+    allow(person).to receive(:has_consumer_role?).and_return(false)
+
     assign :hbx_enrollment, hbx_enrollment
     assign :plans, plan_count
     assign :person, person

@@ -43,6 +43,45 @@ describe Household, "given a coverage household with a dependent" do
       )
     end
   end
+  
+  context "latest_active_tax_household_with_year" do
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryGirl.create(:household, family: family)}
+    let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
+    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+
+    it "return correct tax_household" do
+      household.tax_households << tax_household
+      expect(household.latest_active_tax_household_with_year(hbx1.effective_on.year)).to eq tax_household
+
+    end
+
+    it "return nil while current year is not empty" do
+      household.tax_households << tax_household2
+      expect(household.latest_active_tax_household_with_year(hbx1.effective_on.year)).to be_nil
+    end
+
+    it "return nil for not the same year" do
+      household.tax_households << tax_household
+      expect(household.latest_active_tax_household_with_year((hbx1.effective_on + 1.year).year)).to be_nil
+    end
+
+  end
+
+  context "current_year_hbx_enrollments" do
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: false)}
+    let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
+
+    it "should return right hbx_enrollments" do
+      expect(household.hbx_enrollments.count).to eq 4
+      expect(household.current_year_hbx_enrollments.entries).to eq [hbx1]
+    end
+  end
 
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
