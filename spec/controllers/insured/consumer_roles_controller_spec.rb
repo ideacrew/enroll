@@ -126,6 +126,17 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(response).to have_http_status(:redirect)
     end
   end
+  context "POST create with failed construct_employee_role" do
+    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    before(:each) do
+      allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)
+    end
+    it "should throw a 500 error" do
+      sign_in user
+      post :create, person: person_params
+      expect(response).to have_http_status(500)
+    end
+  end
 
   context "GET edit" do
     before(:each) do
