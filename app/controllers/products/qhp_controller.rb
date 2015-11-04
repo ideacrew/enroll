@@ -17,29 +17,18 @@ class Products::QhpController < ApplicationController
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
       @reference_plan = @benefit_group.reference_plan
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.each do |qhp|
+      @qhps = find_qhp_cost_share_variances.each do |qhp|
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
       tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
       @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
-      # fetch only one of the same hios plan
-      uniq_hios_ids = []
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.select do |qhp|
-        hios_id = qhp.plan.try(:hios_id).try(:to_s)
-        hios_id = hios_id.present? ? hios_id[0..13] : nil
-
-        if found_params.include? hios_id and !uniq_hios_ids.include?(hios_id)
-          uniq_hios_ids << hios_id
-          true
-        else
-          false
-        end
-      end
+      @qhps = find_qhp_cost_share_variances
 
       @qhps = @qhps.each do |qhp|
         qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
       end
+
     end
     respond_to do |format|
       format.html
@@ -52,8 +41,9 @@ class Products::QhpController < ApplicationController
 
 
   def summary
-    sc_id = @new_params[:standard_component_id][0..13]
-    @qhp = Products::Qhp.by_hios_id_and_active_year(sc_id, params[:active_year]).first
+    @standard_component_ids = [] << @new_params[:standard_component_id]
+    @active_year = params[:active_year]
+    @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental")
       @benefit_group = @hbx_enrollment.benefit_group
@@ -90,6 +80,10 @@ class Products::QhpController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+  end
+
+  def find_qhp_cost_share_variances
+    Products::QhpCostShareVariance.find_qhp_cost_share_variances(@standard_component_ids, @active_year.to_i)
   end
 
 end

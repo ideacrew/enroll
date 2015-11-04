@@ -52,4 +52,18 @@ class Products::QhpCostShareVariance
   accepts_nested_attributes_for :qhp_maximum_out_of_pockets, :qhp_service_visits
 
 
+  def self.find_qhp(ids, year)
+    Products::Qhp.by_hios_ids_and_active_year(ids.map { |str| str[0..13] }, year)
+  end
+
+  def self.find_qhp_cost_share_variances(ids, year)
+    csvs = find_qhp(ids, year).map(&:qhp_cost_share_variances).flatten
+    csvs.select{ |a| ids.include?(a.hios_plan_and_variant_id) }
+  end
+
+  def plan
+    Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
+  end
+
+
 end
