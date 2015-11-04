@@ -194,7 +194,7 @@ class Family
   end
 
   # List of SEPs active for this Application Group today, or passed date
-  def active_seps(day = Date.today)
+  def active_seps(day = TimeKeeper.date_of_record)
     special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
   end
 

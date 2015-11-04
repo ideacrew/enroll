@@ -140,7 +140,7 @@ describe Insured::InteractiveIdentityVerificationsController do
       describe "when verification is successful" do
         let(:service_succeeded) { true }
         it "should redirect the user" do
-          allow(Date).to receive(:today).and_return(mock_today)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(mock_today)
           expect(mock_person_user).to receive(:identity_final_decision_code=).with(User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
           expect(mock_person_user).to receive(:identity_response_code=).with(User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
           expect(mock_person_user).to receive(:identity_response_description_text=).with(mock_response_description_text)
@@ -203,7 +203,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     describe "when verification is successful" do
       let(:service_succeeded) { true }
       it "should redirect the user" do
-        allow(Date).to receive(:today).and_return(mock_today)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(mock_today)
         expect(mock_person_user).to receive(:identity_final_decision_code=).with(User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
         expect(mock_person_user).to receive(:identity_response_code=).with(User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
         expect(mock_person_user).to receive(:identity_response_description_text=).with(mock_response_description_text)
