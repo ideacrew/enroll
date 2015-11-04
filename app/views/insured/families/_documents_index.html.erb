@@ -3,7 +3,7 @@
    <% unless @person.has_consumer_role? %>
        <h4>No results found</h4>
    <% else %>
-       <table class="table table-hover table-striped">
+       <table class="table table-hover table-striped" id="doc_table">
          <col width="100">
          <col width="100">
          <col width="170">
@@ -44,8 +44,8 @@
                      </td>
                      <td style="padding-left: 40px;">
                        <% if doc.identifier.present? %>
-                       <% key, bucket = get_key_and_bucket(doc.identifier) %>
-                       <%= link_to(document_download_path(bucket, key) + "?contenttype=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z\. ]/i, '')}", class: "download") do %>
+                       <% key = doc.identifier.split('#').last %>
+                       <%= link_to("/insured/verification_documents/download/#{key}", class: "download") do %>
                        <i class="fa fa-download fa-2x"></i>
                        <% end %>
                        <% end %>

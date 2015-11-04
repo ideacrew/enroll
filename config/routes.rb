@@ -135,7 +135,7 @@ Rails.application.routes.draw do
         get 'search'
       end
     end
-    
+
     root 'families#home'
 
     resources :family_members
@@ -309,12 +309,12 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
-  resources :documents, only: [] do
+  resources :documents, only: [:index, :update] do
     collection do
       get :consumer_role_status
-      get :documents_review
       put :change_doc_status
       put :change_person_aasm_state
+      get :new_comment
     end
   end
 
