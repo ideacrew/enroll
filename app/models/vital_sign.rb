@@ -4,7 +4,7 @@ class VitalSign
   attr_reader :start_at, :end_at
 
   # DateTime that DCHL Enroll App went live
-  ZERO_HOUR = DateTime.new(2015,10,13,9,0,0,'-4')
+  ZERO_HOUR = DateTime.new(2015,10,27,23,43,0,'-4')
 
   def initialize(start_at: ZERO_HOUR, end_at: TimeKeeper.datetime_of_record)
     @start_at = start_at
