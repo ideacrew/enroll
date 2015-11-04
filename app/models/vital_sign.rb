@@ -33,7 +33,7 @@ class VitalSign
   end
 
   def all_shop_non_oe_completed_enrollments
-    all_shop_completed_enrollments do |en|
+    all_shop_completed_enrollments.select do |en|
       en.benefit_group.employer_profile.aasm_state == "binder_paid"
     end
   end
@@ -54,7 +54,7 @@ class VitalSign
     fams = Family.unscoped.where({
       "households.hbx_enrollments" => {
         "$elemMatch" => {
-           "created_at" => { "$gte" => @start_at },
+          "created_at" => { "$gte" => @start_at, "$lte" => @end_at},
            "aasm_state" => { "$nin" => [
               "shopping", "inactive", "coverage_canceled", "coverage_terminated"
            ]}
@@ -66,6 +66,7 @@ class VitalSign
     all_pols.select do |pol|
       (!pol.created_at.blank?) &&
       (pol.created_at >= @start_at) &&
+      (pol.created_at <= @end_at) &&
         (!["shopping", "inactive", "coverage_canceled", "coverage_terminated"].include?(pol.aasm_state.to_s)) &&
       (pol.effective_on < Date.new(2016,1,1))
     end
