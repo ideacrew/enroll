@@ -5,12 +5,13 @@
         <col width="150">
         <col width="150">
         <col width="100">
-        <col width="200">
+        <col width="100">
         <col width="170">
         <tr>
           <th>First name</th>
           <th>Last name</th>
-          <th>Documents</th>
+          <th>All documents</th>
+          <th>New documents uploaded</th>
           <th>Review</th>
         </tr>
 
@@ -18,8 +19,15 @@
         <tr>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
-          <td><%= person.consumer_role.vlp_documents.all.count %></td>
-          <th><%= link_to "Review documents", documents_review_documents_path(:person_id => person.id), class: "btn btn-default" %></th>
+          <td style="text-align:center;"><%= person.consumer_role.vlp_documents.all.count %></td>
+          <td style="text-align:center;">
+            <% if person.consumer_role.vlp_documents.where(status:"in review").count > 0 %>
+              <i class="fa fa-check-square fa-2x" style="color:green"></i>
+            <% else %>
+              <i class="fa fa-minus-square fa-2x"></i>
+            <% end %>
+          </td>
+          <th><%= link_to "Review documents", documents_review_documents_path(:person_id => person.id, :status=>"in review"), class: "btn btn-default" %></th>
         </tr>
         <% end %>
 

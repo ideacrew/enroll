@@ -350,7 +350,7 @@ class ConsumerRole
       documents.subject.eql?(subject)
     end
 
-    vlp_documents.build({subject:subject})
+    subject_doc || vlp_documents.build({subject:subject})
   end
 
   # collect all vlp documents for person and all dependents.
@@ -373,6 +373,18 @@ class ConsumerRole
       doc_key == key
     end
   end
+
+  def find_document_to_download(subject)
+    subject_doc = vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+    if subject_doc && !subject_doc.identifier
+      subject_doc
+    else
+      vlp_documents.build({subject:subject})
+    end
+  end
+
 
 private
   def notify_of_eligibility_change

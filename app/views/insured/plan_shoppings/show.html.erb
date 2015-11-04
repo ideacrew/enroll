@@ -1,5 +1,7 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 2} %>
+<% end %>
 <%= render "insured/plan_shoppings/detail_modal" %>
-
 <div id= 'message_form'></div>
 <div class="container" id="plan_shoppings_show_form">
   <div id="select_plan_wrapper">

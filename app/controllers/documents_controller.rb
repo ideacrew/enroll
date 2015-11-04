@@ -19,7 +19,9 @@ class DocumentsController < ApplicationController
  def documents_review
    @person = Person.find(params[:person_id])
    @person_documents = @person.consumer_role.vlp_documents
+   
  end
+
 
  def change_doc_status
    @document.update_attributes(:status => params[:status])

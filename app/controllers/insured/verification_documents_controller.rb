@@ -6,15 +6,11 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def upload
     @doc_errors = []
-    doc_params = params_clean_vlp_documents
+    doc_params = {:subject => params[:document]}
     @docs_owner = find_docs_owner(params[:family_member])
 
 
-    if doc_params.blank?
-      flash[:error] = "File not uploaded. Document type and/or document fields not provided "
-      redirect_to(:back)
-      return
-    elsif params.permit![:file]
+    if params.permit![:file]
       doc_uri = Aws::S3Storage.save(file_path, 'id-verification')
 
       if doc_uri.present?
@@ -65,20 +61,13 @@ class Insured::VerificationDocumentsController < ApplicationController
     params.permit![:file].original_filename
   end
 
-  def params_clean_vlp_documents
-    return nil if params[:person].nil? or params[:person][:consumer_role].nil? or params[:person][:consumer_role][:vlp_documents_attributes].nil?
-
-    params[:person][:consumer_role][:vlp_documents_attributes]
-  end
-
   def find_docs_owner(id)
-    @person.families.first.family_members.where(id:id).first.person
+    @person.primary_family.family_members.where(id:id).first.person
   end
 
   def update_vlp_documents(doc_params, title, file_uri)
-    return unless doc_params.present?
-    document = @docs_owner.consumer_role.find_document(doc_params.first.last[:subject])
-    success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title, :status=>"in review"}))
+    document = @docs_owner.consumer_role.find_document_to_download(doc_params[:subject])
+    success = document.update_attributes(doc_params.merge({:identifier=>file_uri, :title=>title, :status=>"downloaded"}))
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end

@@ -8,7 +8,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
-  let(:household) {double(latest_active_tax_household: tax_household)}
+  let(:household) {double(latest_active_tax_household_with_year: tax_household)}
   let(:family) {double(latest_household: household)}
   context "GET comparison" do
     before do
@@ -95,6 +95,20 @@ RSpec.describe Products::QhpController, :type => :controller do
     end
   end
 
+  context "GET summary with bad HbxEnrollment" do
+
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).and_return(nil)
+    end
+
+    it "should fail when bad data" do
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: '999', active_year: "2015", market_kind: "shop", coverage_kind: "health"
+      expect(response).to have_http_status(500)
+    end
+  end
+
   context "GET comparison when get more than one qhp" do
     let(:hbx_enrollment){ HbxEnrollment.new(coverage_kind: 'dental') }
     let(:benefit_group){ double("BenefitGroup") }
@@ -123,6 +137,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(qhp4).to receive(:plan).and_return plan4
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_employee_cost: 100))
       allow(hbx_enrollment).to receive(:plan).and_return(plan)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.year)
     end
 
     it "should return comparison of a plan" do
