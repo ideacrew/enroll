@@ -87,6 +87,7 @@ class User
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
 
+
   before_save :strip_empty_fields
 
   ROLES = {
@@ -257,6 +258,11 @@ class User
   end
 
   class << self
+
+    def by_email(email)
+      where(email: /^#{email}$/i).first
+    end
+
     def current_user=(user)
       Thread.current[:current_user] = user
     end
@@ -264,6 +270,7 @@ class User
     def current_user
       Thread.current[:current_user]
     end
+
   end
 
   # def password_digest(plaintext_password)

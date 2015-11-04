@@ -85,6 +85,8 @@ class VlpDocument < Document
   # document verification status ::VlpDocument::VLP_DOCUMENT_KINDS
   field :status, type: String, default: "not submitted"
 
+  field :comment, type: String
+
   validates :subject,
         inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
         allow_blank: false

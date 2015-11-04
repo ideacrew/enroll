@@ -6,6 +6,9 @@ class PlanYear
 
   embedded_in :employer_profile
 
+  PUBLISHED = %w(published enrolling enrolled active suspended)
+  RENEWING = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -35,8 +38,9 @@ class PlanYear
 
   validate :open_enrollment_date_checks
 
-  scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
-  scope :published, ->{ any_in(aasm_state: %w(published enrolling enrolled active suspended)) }
+  # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+  scope :published,      ->{ any_in(aasm_state: PUBLISHED) }
+  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -88,6 +92,10 @@ class PlanYear
   def coverage_period_contains?(date)
     return (start_on <= date) if (end_on.blank?)
     (start_on <= date) && (date <= end_on)
+  end
+
+  def is_published?
+    PUBLISHED.include?(aasm_state)
   end
 
   def minimum_employer_contribution
@@ -151,7 +159,7 @@ class PlanYear
   def application_eligibility_warnings
     warnings = application_errors
 
-    unless employer_profile.organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
+    unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Primary office must be located in #{HbxProfile::StateName}"})
     end
 
@@ -427,6 +435,7 @@ class PlanYear
     end
   end
 
+
   aasm do
     state :draft, initial: true
 
@@ -441,6 +450,11 @@ class PlanYear
     state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
 
     state :active         # Published plan year is in-force
+
+    state :renewing_draft   
+    state :renewing_published
+    state :renewing_enrolling
+    state :renewing_enrolled
 
     state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated     # Coverage under this application is terminated
@@ -457,6 +471,10 @@ class PlanYear
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
+
+      transitions from: :renewing_enrolled,  to: :active,             :guard  => :is_event_date_valid?
+      transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
+      transitions from: :renewing_enrolling, to: :renewing_enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
     end
 
     ## Application eligibility determination process
@@ -467,6 +485,7 @@ class PlanYear
       transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
+      transitions from: :renewing_draft, to: :renewing_published
     end
 
     # Returns plan to draft state for edit
@@ -507,6 +526,14 @@ class PlanYear
     # Coverage termianted due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
+    end
+
+    event :renew_plan_year, :after => :record_transition do
+      transitions from: :draft, to: :renewing_draft
+    end
+
+    event :renew_publish, :after => :record_transition do
+      transitions from: :renewing_draft, to: :renewing_published
     end
 
     # Admin ability to reset application
@@ -560,11 +587,11 @@ private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
-    when "published", "draft"
+    when "published", "draft", "renewing_published"
       today >= open_enrollment_start_on
-    when "enrolling"
+    when "enrolling", "renewing_enrolling"
       today.end_of_day >= open_enrollment_end_on
-    when "enrolled"
+    when "enrolled", "renewing_enrolled"
       today >= start_on
     when "active"
       today >= end_on

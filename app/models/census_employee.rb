@@ -147,6 +147,18 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
   end
 
+  def add_renew_benefit_group_assignment(new_benefit_group)
+    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+
+    benefit_group_assignments.renewing.each do |benefit_group_assignment|
+      benefit_group_assignment.destroy
+    end
+
+    bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
+    bga.renew_coverage
+    benefit_group_assignments << bga
+  end
+
   def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
     raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
 
@@ -160,6 +172,10 @@ class CensusEmployee < CensusMember
 
   def active_benefit_group_assignment
     benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.renewing.first
   end
 
   def inactive_benefit_group_assignments

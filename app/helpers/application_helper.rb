@@ -7,7 +7,11 @@ module ApplicationHelper
   def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil)
     # source is account or shopping
     if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+      if hbx_enrollment.coverage_kind == 'health'
+        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+      else
+        return hbx_enrollment.total_premium
+      end
     end
 
     if session['elected_aptc'].present? and session['max_aptc'].present?

@@ -54,10 +54,10 @@ Feature: Insured Plan Shopping on Individual market
       Then Prepare taxhousehold info for aptc user
       And I click on continue button on group selection page
       And Aptc user set elected amount and select plan
-      Then Aptc user should see aptc amount and click on confirm button on thanyou page
-      Then Aptc user should see aptc amount on receipt page
-      And I click on continue button to go to the individual home page
-      Then Aptc user should see aptc amount on individual home page
+      # Then Aptc user should see aptc amount and click on confirm button on thanyou page
+      # Then Aptc user should see aptc amount on receipt page
+      # And I click on continue button to go to the individual home page
+      # Then Aptc user should see aptc amount on individual home page
       Then Individual logs out
 
       When I visit the Insured portal
