@@ -465,7 +465,8 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
     'arguments[0].scrollIntoView();',
     @browser.element(:text => /Choose Healthcare/)
   )
-  scroll_then_click(@browser.a(text: /Select/))
+  @browser.element(text: /Choose Healthcare/).wait_until_present
+  click_when_present(@browser.a(text: /Select Plan/))
 end
 
 Then(/^.+ should see the coverage summary page$/) do
@@ -636,7 +637,7 @@ Then(/^I should see the dependents and group selection page$/) do
 end
 
 And(/I select three plans to compare/) do
-  sleep 3
+  # sleep 3
   @browser.a(text: /Select Plan/).wait_until_present
   compare_options = @browser.spans(class: 'checkbox-custom-label', text: "Compare")
   if compare_options.count > 3
@@ -646,6 +647,7 @@ And(/I select three plans to compare/) do
     click_when_present(@browser.a(text: "COMPARE PLANS"))
     @browser.h1(text: /Choose Plan - Compare Selected Plans/).wait_until_present
     expect(@browser.elements(:class => "plan_comparison").size).to eq 3
+    @browser.button(text: 'Close').wait_until_present
     @browser.button(text: 'Close').click
   end
 end

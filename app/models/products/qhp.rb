@@ -84,7 +84,7 @@ class Products::Qhp
                         :qhp_or_non_qhp, :emp_contribution_amount_for_hsa_or_hra, :child_only_offering,
                         :plan_effective_date, :out_of_country_coverage, :out_of_service_area_coverage, :national_network
 
-  scope :by_hios_id_and_active_year, -> (sc_id, year) { where(standard_component_id: sc_id, active_year: year ) }
+  scope :by_hios_ids_and_active_year, -> (sc_id, year) { where(:standard_component_id.in => sc_id, active_year: year ) }
 
   embeds_many :qhp_benefits,
     class_name: "Products::QhpBenefit",
@@ -158,7 +158,7 @@ class Products::Qhp
         qhps.each do |qhp|
           arry1 = [
             qhp.plan.carrier_profile.organization.legal_name,
-            qhp.plan_marketing_name,
+            qhp.plan.name,
             "$#{qhp[:total_employee_cost].round(2)} / month",
             qhp.plan.nationwide ? "Nationwide" : "DC-Metro",
             "Co-Pay"
@@ -167,11 +167,10 @@ class Products::Qhp
             "","","","","Coinsurance"
           ]
           visit_types.each do |visit_type|
-            matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type }
-            if matching_benefit
-              deductible = matching_benefit.find_deductible
-              arry1 << (deductible.present? ? deductible.copay_in_network_tier_1 : "N/A")
-              arry2 << (deductible.present? ? deductible.co_insurance_in_network_tier_1 : "N/A")
+            service_visit = qhp.qhp_service_visits.detect{|a| a.visit_type == visit_type}
+            if service_visit
+              arry1 << (service_visit.present? ? service_visit.copay_in_network_tier_1 : "N/A")
+              arry2 << (service_visit.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A")
             end
           end
           csv_ary << arry1

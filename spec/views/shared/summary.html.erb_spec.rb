@@ -23,7 +23,7 @@ describe "shared/_summary.html.erb" do
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
                                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
-  let(:mock_qhp) { instance_double("Products::Qhp", :qhp_benefits => []) }
+  let(:mock_qhp_cost_share_variance) { instance_double("Products::QhpCostShareVariance", :qhp_service_visits => []) }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
@@ -32,7 +32,7 @@ describe "shared/_summary.html.erb" do
     assign :person, person
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
-    render "shared/summary", :qhp => mock_qhp
+    render "shared/summary", :qhp => mock_qhp_cost_share_variance
   end
 
   it "should have a link to download the sbc pdf" do
