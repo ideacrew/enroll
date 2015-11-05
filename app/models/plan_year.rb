@@ -136,6 +136,10 @@ class PlanYear
   def application_errors
     errors = {}
 
+    if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
+      errors.merge!({benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."})
+    end
+
     if benefit_groups.size == 0
       errors.merge!({benefit_groups: "You must create at least one benefit group to publish a plan year"})
     end
