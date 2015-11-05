@@ -82,6 +82,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:save).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_employer_staff_role?)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      allow(user).to receive(:has_broker_role?)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end
