@@ -37,7 +37,7 @@ namespace :update_shop do
         # Set ER to correct state from data migration
         employer.employer_enrolled! if employer.binder_paid?
 
-        renewal_factory = Factories::EmployerProfilePlanYearRenewal.new
+        renewal_factory = Factories::PlanYearRenewalFactory.new
         renewal_factory.employer_profile = employer
         renewal_factory.renew
       rescue => e
