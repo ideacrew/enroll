@@ -3,7 +3,8 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form]
 
-  before_action :check_admin_staff_role, only: [:index, :show]
+  before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
+  before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
   layout "two_column", except: [:new]
@@ -226,121 +227,143 @@ class Employers::EmployerProfilesController < ApplicationController
 
   end
 
+  def redirect_to_new
+    redirect_to new_employers_employer_profile_path
+  end
+
+  def redirect_to_first_allowed
+    redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
+  end
+
+
   private
-    def paginate_employees
-      status_params = params.permit(:id, :status, :search)
-      @status = status_params[:status] || 'active'
-      @search = status_params[:search] || false
-      #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-      #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+  def paginate_employees
+    status_params = params.permit(:id, :status, :search)
+    @status = status_params[:status] || 'active'
+    @search = status_params[:search] || false
+    #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
-      census_employees = case @status
-      when 'terminated'
-        @employer_profile.census_employees.terminated.sorted
-      when 'all'
-        @employer_profile.census_employees.sorted
-      else
-        @employer_profile.census_employees.active.sorted
+    census_employees = case @status
+                       when 'terminated'
+                         @employer_profile.census_employees.terminated.sorted
+                       when 'all'
+                         @employer_profile.census_employees.sorted
+                       else
+                         @employer_profile.census_employees.active.sorted
+                       end
+    census_employees = census_employees.search_by(params.slice(:employee_name))
+    @page_alphabets = page_alphabets(census_employees, "last_name")
+
+    if params[:page].present?
+      page_no = cur_page_no(@page_alphabets.first)
+      @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
+      #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    else
+      @total_census_employees_quantity = census_employees.count
+      @census_employees = census_employees.limit(20).to_a
+      #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    end
+  end
+
+  def paginate_families
+    #FIXME add paginate
+    @employees = @employer_profile.employee_roles.to_a
+  end
+
+  def check_employer_staff_role
+    if current_user.has_employer_staff_role?
+      redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id, :tab => "home")
+    end
+  end
+
+  def find_mailbox_provider
+    hbx_staff = current_user.person.hbx_staff_role
+    if hbx_staff
+      profile = current_user.person.hbx_staff_role.hbx_profile
+    else
+      broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
+      profile = BrokerAgencyProfile.find(broker_id)
+    end
+    return profile
+  end
+
+  def check_show_permissions
+    id_params = params.permit(:id, :employer_profile_id)
+    id = id_params[:id] || id_params[:employer_profile_id]
+    ep = EmployerProfile.find(id)
+    policy = ::AccessPolicies::EmployerProfile.new(current_user)
+    policy.authorize_show(ep, self)
+  end
+
+  def check_index_permissions
+    policy = ::AccessPolicies::EmployerProfile.new(current_user)
+    policy.authorize_index(params[:broker_agency_id], self)
+  end
+
+  def check_admin_staff_role
+    if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role? || current_user.has_broker_role?
+    elsif current_user.has_employer_staff_role?
+      ep_id = current_user.person.employer_staff_roles.first.employer_profile_id
+      if ep_id.to_s != params[:id].to_s
+        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
       end
-      census_employees = census_employees.search_by(params.slice(:employee_name))
-      @page_alphabets = page_alphabets(census_employees, "last_name")
-
-      if params[:page].present?
-        page_no = cur_page_no(@page_alphabets.first)
-        @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
-        #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-      else
-        @total_census_employees_quantity = census_employees.count
-        @census_employees = census_employees.limit(20).to_a
-        #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-      end
+    else
+      redirect_to new_employers_employer_profile_path
     end
+  end
 
-    def paginate_families
-      #FIXME add paginate
-      @employees = @employer_profile.employee_roles.to_a
+  def find_employer
+    id_params = params.permit(:id, :employer_profile_id)
+    id = id_params[:id] || id_params[:employer_profile_id]
+    @employer_profile = EmployerProfile.find(id)
+    render file: 'public/404.html', status: 404 if @employer_profile.blank?
+  end
+
+  def organization_profile_params
+    params.require(:organization).permit(
+      :id,
+      :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
+    )
+  end
+
+  def employer_profile_params
+    params.require(:organization).permit(
+      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def sanitize_employer_profile_params
+    params[:organization][:office_locations_attributes].each do |key, location|
+      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+      location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
     end
+  end
 
-    def check_employer_staff_role
-      if current_user.has_employer_staff_role?
-        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id, :tab => "home")
-      end
-    end
+  def build_organization
+    @organization = Organization.new
+    @employer_profile = @organization.build_employer_profile
+  end
 
-   def find_mailbox_provider
-     hbx_staff = current_user.person.hbx_staff_role
-     if hbx_staff
-       profile = current_user.person.hbx_staff_role.hbx_profile
-     else
-       broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
-       profile = BrokerAgencyProfile.find(broker_id)
-     end
-     return profile
-   end
+  def build_employer_profile_params
+    build_organization
+    build_office_location
+  end
 
-    def check_admin_staff_role
-      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role? || current_user.has_broker_role?
-      elsif current_user.has_employer_staff_role?
-        ep_id = current_user.person.employer_staff_roles.first.employer_profile_id
-        if ep_id.to_s != params[:id].to_s
-          redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
-        end
-      else
-        redirect_to new_employers_employer_profile_path
-      end
-    end
+  def build_office_location
+    @organization.office_locations.build unless @organization.office_locations.present?
+    office_location = @organization.office_locations.first
+    office_location.build_address unless office_location.address.present?
+    office_location.build_phone unless office_location.phone.present?
+    @organization
+  end
 
-    def find_employer
-      id_params = params.permit(:id, :employer_profile_id)
-      id = id_params[:id] || id_params[:employer_profile_id]
-      @employer_profile = EmployerProfile.find(id)
-      render file: 'public/404.html', status: 404 if @employer_profile.blank?
-    end
-
-    def organization_profile_params
-      params.require(:organization).permit(
-        :id,
-        :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
-      )
-    end
-
-    def employer_profile_params
-      params.require(:organization).permit(
-        :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
-        :office_locations_attributes => [
-          :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-          :phone_attributes => [:kind, :area_code, :number, :extension],
-          :email_attributes => [:kind, :address]
-        ]
-      )
-    end
-
-    def sanitize_employer_profile_params
-      params[:organization][:office_locations_attributes].each do |key, location|
-        params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-        location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
-      end
-    end
-
-    def build_organization
-      @organization = Organization.new
-      @employer_profile = @organization.build_employer_profile
-    end
-
-    def build_employer_profile_params
-      build_organization
-      build_office_location
-    end
-
-    def build_office_location
-      @organization.office_locations.build unless @organization.office_locations.present?
-      office_location = @organization.office_locations.first
-      office_location.build_address unless office_location.address.present?
-      office_location.build_phone unless office_location.phone.present?
-      @organization
-    end
-
-    def employer_params
-      params.permit(:first_name, :last_name, :dob)
-    end
+  def employer_params
+    params.permit(:first_name, :last_name, :dob)
+  end
 end
