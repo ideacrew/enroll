@@ -65,10 +65,10 @@ namespace :update_shop do
       "District Restaurant Group" => "274667942",
       "GWHCC" => "223860377",
       "Arab Center Washington DC" => "464736138",
+      "Annie's Ace Hardware" => "272665426",
+      "Arturo Ardila-Gomez" => "451474721",
       "Morales Public Relations" => "462817580",
       "Alter Modus International Corporation" => "260376753",
-      "Annie's Ace Hardware" => "272665426",
-      "Arturo Ardila-Gomez" => "451474721"
     }
 
     employers.each do |name, fein|
@@ -83,9 +83,10 @@ namespace :update_shop do
         families = employer.census_employees.inject([]) do |families, ce|
           person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
           if person.blank?
-            return families
+            families
+          else
+            families << person.primary_family
           end
-          families << person.primary_family
         end
 
         families.each do |family|
