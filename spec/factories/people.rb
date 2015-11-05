@@ -41,6 +41,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :hbx_staff_role do
+      after(:create) do |p, evaluator|
+        create_list(:hbx_staff_role, 1, person: p)
+      end
+    end
+
     factory :male, traits: [:male]
     factory :female, traits: [:female]
   end
