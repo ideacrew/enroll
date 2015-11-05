@@ -9,27 +9,47 @@ module Factories
     def renew
       @employer_profile = employer_profile
 
+
       validate_employer_profile
 
       @active_plan_year = @employer_profile.active_plan_year
+
+      # Set renewal open enrollment period
+      open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
+                                           @active_plan_year.open_enrollment_end_on.month,
+                                           1)
+
+      open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
+                                         @active_plan_year.open_enrollment_end_on.month,
+                                         @active_plan_year.ShopRenewalOpenEnrollmentEndDueDayOfMonth)
+
+
       @renewal_plan_year = @employer_profile.plan_years.build({
         start_on: @active_plan_year.start_on + 1.year,
         end_on: @active_plan_year.end_on + 1.year,
-        open_enrollment_start_on: @active_plan_year.open_enrollment_start_on + 1.year,
-        open_enrollment_end_on: @active_plan_year.open_enrollment_end_on + 1.year,
+        open_enrollment_start_on: open_enrollment_start_on,
+        open_enrollment_end_on: open_enrollment_end_on,
         fte_count: @active_plan_year.fte_count,
         pte_count: @active_plan_year.pte_count,
         msp_count: @active_plan_year.msp_count
       })
 
-
-      @renewal_plan_year.renew_plan_year
+      if @renewal_plan_year.may_renew_plan_year?
+        @renewal_plan_year.renew_plan_year 
+      else
+        raise EmployerProfilePlanYearRenewalError, 
+          "For employer: #{@employer_profile.inspect}, \n"\
+          "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"\
+      end
 
       if @renewal_plan_year.save
         renew_benefit_groups
         @renewal_plan_year
       else
-        raise EmployerProfilePlanYearRenewalError, "For employer: #{@employer_profile.inspect}, unable to save renewal plan year: #{@renewal_plan_year.inspect}"
+        raise EmployerProfilePlanYearRenewalError, 
+          "For employer: #{@employer_profile.inspect}, \n" \
+          "Error(s): \n #{@renewal_plan_year.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n" \
+          "Unable to save renewal plan year: #{@renewal_plan_year.inspect}"
       end
     end
 
