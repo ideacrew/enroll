@@ -196,7 +196,7 @@ class User
   end
 
   def has_hbx_staff_role?
-    has_role?(:hbx_staff)
+    has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
   end
 
   def has_csr_role?
