@@ -27,6 +27,8 @@ class Employers::PlanYearsController < ApplicationController
       Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
 
+    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+
     respond_to do |format|
       format.js
     end

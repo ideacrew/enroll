@@ -22,7 +22,7 @@
         </div>
         <div class="panel-body">
           <span class="plan-label">Type: </span><span><%= p.plan_type %></span><br>
-          <span class="plan-label">Carrier: </span><span><%= p.carrier_profile.legal_name %></span><br>
+          <span class="plan-label">Carrier: </span><span><%= @carriers_cache[p.carrier_profile_id] %></span><br>
           <span class="plan-label">Level: </span><span><%= p.metal_level %></span><br>
           <span class="plan-label">Network: </span><span><%= p.nationwide ? 'Nationwide' : 'DC Metro' %></span>
         </div>
