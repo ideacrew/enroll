@@ -235,34 +235,6 @@ $(function() {
   });
 });
 
-//for plan_year
-$(document).on("change", "select[name='reference_plan']", function() {
-  $("#employer_cost_info_btn .btn").removeClass('disabled');
-  var reference_plan_id = $(this).val();
-  if (reference_plan_id != "" && reference_plan_id != undefined){
-    $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
-
-    //for calculate employer contributions
-    var start_date = $("#plan_year_start_on").val();
-    if (start_date == "") {
-      return
-    }
-    $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
-    $.ajax({
-      type: "GET",
-      url: $('a#search_reference_plan_link').data('href'),
-      dataType: 'script',
-      data: {
-        "start_on": $("#plan_year_start_on").val(),
-        "reference_plan_id": reference_plan_id,
-        "location_id": $(this).parents('fieldset').attr('id')
-      }
-    }).done(function() {
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'));
-    });
-  };
-});
-
 
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
