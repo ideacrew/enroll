@@ -11,6 +11,8 @@ class Employers::PlanYearsController < ApplicationController
   def reference_plans
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
+    @location_id = params[:location_id]
+    
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
