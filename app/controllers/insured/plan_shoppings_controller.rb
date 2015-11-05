@@ -63,23 +63,26 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
-    
-    begin
+
+    if @person.emails.first.nil?
+      begin
+        raise
+      rescue => err
+        error_message = {
+          :error => {
+            :message => "Person does not have email address",
+            :person_emails => @person.emails.inspect,
+            :consumer_role => @person.consumer_role.inspect,
+            :employee_role => @person.employee_roles.inspect,
+            :belongs_to_user => @person.user.inspect,
+            :backtrace => err.backtrace.join("\n")
+          }
+        }
+  	  log(JSON.dump(error_message), {:severity => 'error'})
+      end
+      return nil
+    else
       send_receipt_emails
-    rescue => err
-      error_message = {
-        :error => {
-          :message => err.message,
-          :inspected => err.inspect,
-          :backtrace => err.backtrace.join("\n")
-        },
-        :person_emails => @person.emails,
-        :consumer_role => @person.consumer_role,
-        :employee_role => @person.employee_roles,
-        :belongs_to_user => @person.user,
-        :user_email => @person.user.email
-      }
-	  log(JSON.dump(error_message), {:severity => 'critical'})
     end
   end
 
