@@ -454,8 +454,8 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.status_step).to eq 1
       end
 
-      it "return 2 when enrollment_transmitted_to_carrier" do
-        hbx_enrollment.aasm_state = "enrollment_transmitted_to_carrier"
+      it "return 2 when transmitted_to_carrier" do
+        hbx_enrollment.aasm_state = "transmitted_to_carrier"
         expect(hbx_enrollment.status_step).to eq 2
       end
 
