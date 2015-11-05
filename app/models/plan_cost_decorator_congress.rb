@@ -18,12 +18,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def plan_year_start_on
-    #FIXME only for temp ivl
-    if @benefit_group.present?
-      benefit_group.plan_year.start_on
-    else
-      TimeKeeper.date_of_record.beginning_of_year
-    end
+    benefit_group.plan_year.start_on
   end
 
   def age_of(member)
@@ -36,8 +31,8 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
-    @children.index(member)
+    @children = members.select(){|member| age_of(member) < 21 && relationship_for(member) == "child_under_26"} unless defined?(@children)
+    @children.index(member) || -1
   end
 
   def member_index(member)
