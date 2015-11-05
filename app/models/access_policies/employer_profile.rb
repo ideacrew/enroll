@@ -36,10 +36,10 @@ module AccessPolicies
       return false unless user.has_broker_role? || user.has_broker_agency_staff_role?
       person = user.person
       if user.has_broker_role?
-        employers = EmployerProfile.find_by_writing_agent(person.broker_role)
+        employers = ::EmployerProfile.find_by_writing_agent(person.broker_role)
       else
-        broker_agency_profiles = person.broker_agency_staff_roles.map{|role| BrokerAgencyProfile.find(role.broker_agency_profile_id) }
-        employers = broker_agency_profiles.map{|id| EmployerProfile.find_by_broker_agency_profile(Broker)}.flatten
+        broker_agency_profiles = person.broker_agency_staff_roles.map {|role| ::BrokerAgencyProfile.find(role.broker_agency_profile_id) }
+        employers = broker_agency_profiles.map { |bap| ::EmployerProfile.find_by_broker_agency_profile(bap) }.flatten
       end
       employers.map(&:id).map(&:to_s).include?(employer_id.to_s)
     end  
