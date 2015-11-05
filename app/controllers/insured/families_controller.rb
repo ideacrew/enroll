@@ -8,7 +8,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
 
-    @hbx_enrollments = @family.enrollments.order(coverage_kind: :desc, effective_on: :desc) || []
+    @hbx_enrollments = @family.enrollments.order(effective_on: :desc, coverage_kind: :desc) || []
     update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
@@ -142,7 +142,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def init_qualifying_life_events
-    @qualifying_life_events = []      
+    @qualifying_life_events = []
     if @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
     else

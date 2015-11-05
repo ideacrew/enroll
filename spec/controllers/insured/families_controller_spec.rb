@@ -14,6 +14,7 @@ RSpec.describe Insured::FamiliesController do
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
   before :each do
+    allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
