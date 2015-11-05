@@ -3,8 +3,8 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form]
 
-  before_action :check_admin_staff_role, only: [:index]
-  before_action :check_show_permissions, only: [:show]
+  before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
+  before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
   layout "two_column", except: [:new]
@@ -291,6 +291,11 @@ class Employers::EmployerProfilesController < ApplicationController
     ep = EmployerProfile.find(id)
     policy = ::AccessPolicies::EmployerProfile.new(current_user)
     policy.authorize_show(ep, self)
+  end
+
+  def check_index_permissions
+    policy = ::AccessPolicies::EmployerProfile.new(current_user)
+    policy.authorize_index(params[:broker_agency_id], self)
   end
 
   def check_admin_staff_role

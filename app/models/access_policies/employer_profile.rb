@@ -20,8 +20,14 @@ module AccessPolicies
       controller.redirect_to_new
     end
 
-    def authorize_index(controller)
-
+    def authorize_index(broker_agency_id, controller)
+      return(true) if user.has_hbx_staff_role?
+      if user.has_broker_role? || user.has_broker_agency_staff_role?
+        if !broker_agency_id.blank?
+          return
+        end
+      end
+      controller.redirect_to_new
     end
 
     protected
