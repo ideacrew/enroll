@@ -142,11 +142,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def init_qualifying_life_events
-    @qualifying_life_events = []
-    if @person.employee_roles.present?
-      @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-    elsif @person.consumer_role.present?
+    @qualifying_life_events = []      
+    if @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+    else
+      @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
     end
   end
 
