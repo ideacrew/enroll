@@ -250,6 +250,10 @@ class HbxEnrollment
     !self.published_to_bus_at.blank?
   end
 
+  def is_coverage_waived?
+    inactive?
+  end
+
   def is_shop?
     !consumer_role.present?
   end
@@ -657,7 +661,6 @@ class HbxEnrollment
   end
 
 
-private
 
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
