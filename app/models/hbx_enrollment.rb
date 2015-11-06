@@ -108,6 +108,8 @@ class HbxEnrollment
   scope :waived,              ->{ where(:aasm_state => "inactive" )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
+  scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
+  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
 
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector]) }
