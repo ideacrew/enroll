@@ -44,4 +44,39 @@ namespace :update_data do
       end
     end
   end
+
+  desc "Cleanup plan years with invalid benefit groups"
+  task :bad_plans_cleanup => :environment do 
+    employers = {
+      "Jons Cupcakes" => "123487348",
+      "Native American Finance Officers Association" => "383419567",
+      "Potomac River Capital, LLC" => "208375064"
+    }
+
+    begin
+
+
+    bad_plan_ids = []
+
+    reference_plan_ids = []
+    employers.each do |employer_name, fein|
+      employer = EmployerProfile.find_by_fein(fein)
+      if employer
+        employer.plan_years.each do |plan_year|
+          reference_plan_ids << plan_year.benefit_groups.map(&:reference_plan_id)
+        end
+      end
+    end
+
+    bogus_plan_ids = reference_plan_ids.flatten.uniq.map(&:to_s).reject{|id| Plan.where(:id => id).any? }
+    bogus_plan_ids = bogus_plan_ids.map{|bp| BSON::ObjectId.from_string(bp)}
+ 
+    Organization.where("employer_profile.plan_years.benefit_groups.reference_plan_id" => {"$in" => bogus_plan_ids}).each do |organization|
+      puts organization.legal_name
+    end
+    
+    rescue => e
+      puts e.to_s
+    end
+  end
 end
