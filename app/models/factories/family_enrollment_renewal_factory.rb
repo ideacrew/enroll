@@ -23,6 +23,8 @@ module Factories
 
             renewal_enrollment = renewal_builder.call(active_enrollment)
             renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
+
+            renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
             save_renewal_enrollment(renewal_enrollment, active_enrollment)
           end
         end
@@ -46,7 +48,6 @@ module Factories
       census_employee = CensusEmployee.by_ssn(employee.ssn).active.first
       
       if census_employee.blank?
-binding.pry
         message = "Unable to find census_employee for "\
           "primary family member: #{employee.full_name} "\
           "id: #{employee.id} "\
@@ -64,7 +65,6 @@ binding.pry
       if renewal_enrollment.save
         renewal_enrollment
       else
-binding.pry
         message = "Enrollment: #{active_enrollment.id}, \n" \
         "Unable to save renewal enrollment: #{renewal_enrollment.inspect}, \n" \
           "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
@@ -103,12 +103,9 @@ binding.pry
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
 
-      renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
-      renewal_enrollment.benefit_group_id = active_enrollment.benefit_group_id
+      benefit_group_assignment_id = @census_employee.renewal_benefit_group_assignment.id
 
-      benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
       if benefit_group_assignment.blank?
-binding.pry
         message = "Unable to find benefit_group_assignment for census_employee: \n"\
           "census_employee: #{@census_employee.full_name} "\
           "id: #{@census_employee.id} "\
@@ -118,14 +115,13 @@ binding.pry
         raise FamilyEnrollmentRenewalFactoryError, message
       end
 
-      renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+      renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
 
-      # benefit_group_assignment_id
+      renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group.id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-
       # Set the HbxEnrollment to proper state
       # Renew waiver status
-      if active_enrollment.inactive? 
+      if active_enrollment.is_coverage_waived? 
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
         renewal_enrollment.waive_coverage 
       end
