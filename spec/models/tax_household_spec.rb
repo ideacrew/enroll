@@ -200,6 +200,15 @@ RSpec.describe TaxHousehold, type: :model do
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
     end
+
+    it "can return result when total_aptc_available_amount is 0" do
+      allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 0
+      allow(decorated_plan).to receive(:premium_for).and_return(10)
+      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
+      result = {'member1'=>0, 'member2'=>0}
+      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
+    end
   end
 
   context "current_max_aptc" do

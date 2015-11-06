@@ -117,7 +117,8 @@ class TaxHousehold
     # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
     aptc_available_amount_hash_for_enrollment = {}
 
-    elected_pct = elected_aptc.to_f / total_aptc_available_amount_for_enrollment(hbx_enrollment).to_f
+    total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
+    elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
       given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
