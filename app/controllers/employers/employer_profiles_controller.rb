@@ -173,7 +173,11 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
 
-      if @organization.update_attributes(employer_profile_params) and @employer.update_attributes(employer_params)
+      #Fix issue 3770. Make sure DOB is in correct format
+      employer_attributes = employer_params
+      employer_attributes["dob"] = DateTime.strptime(employer_attributes["dob"], '%m/%d/%Y').try(:to_date)
+
+      if @organization.update_attributes(employer_profile_params) and @employer.update_attributes(employer_attributes)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -327,6 +331,10 @@ class Employers::EmployerProfilesController < ApplicationController
     )
   end
 
+
+
+
+
   def employer_profile_params
     params.require(:organization).permit(
       :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
@@ -362,6 +370,7 @@ class Employers::EmployerProfilesController < ApplicationController
     office_location.build_phone unless office_location.phone.present?
     @organization
   end
+
 
   def employer_params
     params.permit(:first_name, :last_name, :dob)

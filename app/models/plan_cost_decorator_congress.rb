@@ -96,12 +96,12 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def large_family_factor(member)
     if age_of(member) > 20
-      1.0
+      1.00
     else
       if child_index(member) > 2
-        0.0
+        0.00
       else
-        1.0
+        1.00
       end
     end
   end
@@ -115,43 +115,41 @@ class PlanCostDecoratorCongress < SimpleDelegator
     when 0
       0
     when 1
-      benefit_group.employee_max_amt_in_cents
+      benefit_group.employee_max_amt
     when 2
-      benefit_group.first_dependent_max_amt_in_cents
+      benefit_group.first_dependent_max_amt
     else
-      benefit_group.over_one_dependents_max_amt_in_cents
+      benefit_group.over_one_dependents_max_amt
     end
   end
 
   def premium_for(member)
-    Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)
-  end
-
-  def max_employer_contribution(member)
-    premium_for(member) * ( total_max_employer_contribution / total_premium )
+    # Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)
+    (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)).round(2)
   end
 
   def employer_contribution_for(member)
-    premium_for(member) * ( total_employer_contribution / total_premium )
+    (total_employer_contribution * (premium_for(member)/total_premium)).round(2)
+    # premium_for(member) * ( total_employer_contribution / total_premium )
   end
 
   def employee_cost_for(member)
-    premium_for(member) * ( total_employee_cost / total_premium )
+    premium_for(member) - employer_contribution_for(member)
   end
 
   def total_premium
-    members.reduce(0) do |sum, member|
-      sum + premium_for(member)
-    end
+    members.reduce(0.00) do |sum, member|
+      (sum + premium_for(member))
+    end.round(2)
   end
 
   def total_employer_contribution
-    [total_premium * employer_contribution_percent / 100.0, total_max_employer_contribution].min
+    ([total_premium * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
   end
 
   def total_employee_cost
-    members.reduce(0) do |sum, member|
-      sum + premium_for(member)
-    end - total_employer_contribution
+    (members.reduce(0.00) do |sum, member|
+      (sum + premium_for(member)).round(2)
+    end) - total_employer_contribution
   end
 end

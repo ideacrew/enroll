@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
-  let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year) }
+  let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new("97190"), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
   let(:hbx_enrollment)      { double("HbxEnrollment", class: HbxEnrollment, hbx_enrollment_members: hbx_enrollment_members) }
   let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 19, is_subscriber?: true , primary_relationship: "self") }
   let!(:hem_spouse)         { double("HbxEnrollmentMember_Spouse",   class: HbxEnrollmentMember, _id: "b", age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "spouse") }
@@ -15,8 +15,6 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   # let!(:cd_child_1)         { double("CensusDependent_Child_1", class: CensusDependent, age_on: 18, employee_relationship: "child_under_26") }
   # let!(:cd_child_2)         { double("CensusDependent_Child_2", class: CensusDependent, age_on: 13, employee_relationship: "child_under_26") }
   # let!(:cd_child_3)         { double("CensusDependent_Child_3", class: CensusDependent, age_on: 10, employee_relationship: "child_under_26") }
-  let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
-  let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, contribution_pct_as_int: 75, employee_max_amt_in_cents: 100, first_dependent_max_amt_in_cents: 200, over_one_dependents_max_amt_in_cents: 300) }
   let!(:chosen_plan)        { double("ChosenPlan", id: "chosen_plan_id") }
 
   before do
@@ -34,7 +32,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
       end
 
       context "below contribution cap" do
-        let(:premium_constant) { 1.0 }
+        let(:premium_constant) { 1.00 }
         before do
           allow(benefit_group).to receive(:employee_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
           # allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
@@ -47,15 +45,10 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
       end
 
       context "above contribution cap" do
-        let(:premium_constant) { 100.0 }
-        before do
-          allow(benefit_group).to receive(:employee_max_amt_in_cents).and_return(hem_employee.age_on_effective_date )
-          # allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
-          # allow(benefit_group).to receive(:over_one_dependents_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
-        end
+        let(:premium_constant) { 800.0 }
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt_in_cents
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt
         end
       end
     end
@@ -68,20 +61,15 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
       end
 
       context "below contribution cap" do
-        let(:premium_constant) { 1.0 }
-        before do
-          allow(benefit_group).to receive(:employee_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
-          allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hem_spouse.age_on_effective_date * 20)
-          # allow(benefit_group).to receive(:over_one_dependents_max_amt_in_cents).and_return(hem_employee.age_on_effective_date * 10)
-        end
+        let(:premium_constant) { Money.new("1000") }
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq hem_employee.age_on_effective_date * benefit_group.contribution_pct_as_int / 100.0
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq ((plan_cost_decorator.premium_for(hem_employee)/plan_cost_decorator.total_premium)*plan_cost_decorator.total_employer_contribution).round(2)
         end
       end
 
       context "above contribution cap" do
-        let(:premium_constant) { 100.0 }
+        let(:premium_constant) { 100.00 }
         before do
           allow(benefit_group).to receive(:employee_max_amt_in_cents).and_return(hem_employee.age_on_effective_date )
           allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hem_spouse.age_on_effective_date * 2)
@@ -89,7 +77,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have a total employer contribution" do
-          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt_in_cents
+          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt
         end
       end
 
@@ -131,13 +119,10 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
       end
 
       context "below contribution cap" do
-        let(:premium_constant) { 1.0 }
-        let(:premiums) { [19.0, 20.0, 18.0, 13.0, 10.0, 0.0] }
-        let(:premium_sum) { premiums.sum }
-        let(:premium_percents) { premiums.collect(){|premium| premium / premium_sum} }
-        before do
-          allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hbx_enrollment_members.collect(&:age_on_effective_date).sum * 1000)
-        end
+        let(:premium_constant) { 1.00 }
+        let(:premiums) { [19.00, 20.00, 18.00, 13.00, 10.00, 0.00] }
+        let(:premium_sum) { premiums.inject(0.00) { |acc, prem| (acc + prem).round(2) } }
+        let(:premium_percents) { premiums.collect(){|premium| (premium / premium_sum).round(2) } }
 
         it "should have correct list of members" do
           expect(plan_cost_decorator.members).to contain_exactly(*hbx_enrollment_members)
@@ -174,23 +159,19 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have correct total max employer contribution" do
-          expect(plan_cost_decorator.total_max_employer_contribution).to eq benefit_group.over_one_dependents_max_amt_in_cents
+          expect(plan_cost_decorator.total_max_employer_contribution).to eq benefit_group.over_one_dependents_max_amt
         end
 
         it "should have correct premiums" do
-          expect(hbx_enrollment_members.collect(){|member|plan_cost_decorator.premium_for(member)}).to match_array(premiums)
-        end
-
-        it "should have correct max employer contributions" do
-          expect(hbx_enrollment_members.collect(){|member|plan_cost_decorator.max_employer_contribution(member)}).to match_array(premium_percents.collect(){|pct|pct * benefit_group.over_one_dependents_max_amt_in_cents})
+          expect(hbx_enrollment_members.collect(){|member| plan_cost_decorator.premium_for(member).round(2)}).to match_array(premiums)
         end
 
         it "should have correct employer contributions" do
-          expect(hbx_enrollment_members.collect(){|member|plan_cost_decorator.employer_contribution_for(member)}).to match_array(premiums.collect(){|premium|premium * benefit_group.contribution_pct_as_int / 100})
+          expect(hbx_enrollment_members.inject(0.00) {|acc, member| ((acc + plan_cost_decorator.employer_contribution_for(member)).round(2)) }).to eq plan_cost_decorator.total_employer_contribution.round(2)
         end
 
         it "should have correct employee costs" do
-          expect(hbx_enrollment_members.collect(){|member|plan_cost_decorator.employee_cost_for(member)}).to match_array(premiums.collect(){|premium|premium * (100 - benefit_group.contribution_pct_as_int) / 100})
+          expect(hbx_enrollment_members.collect(){ |member| plan_cost_decorator.employee_cost_for(member) }).to match_array(premiums.collect(){ |premium| premium * (100 - benefit_group.contribution_pct_as_int) / 100.0})
         end
 
         it "should have correct total premium" do
@@ -206,12 +187,6 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
       end
 
-      context "above contribution cap" do
-        let(:premium_constant) { 100.0 }
-        before do
-          allow(benefit_group).to receive(:first_dependent_max_amt_in_cents).and_return(hbx_enrollment_members.collect(&:age_on_effective_date).sum / 10)
-        end
-      end
     end
   end
 end
