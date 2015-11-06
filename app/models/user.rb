@@ -168,6 +168,7 @@ class User
   end
 
   def has_role?(role_sym)
+    return false if person_id.blank?
     roles.any? { |r| r == role_sym.to_s }
   end
 
@@ -196,7 +197,7 @@ class User
   end
 
   def has_hbx_staff_role?
-    has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
+    has_role?(:hbx_staff) || self.person.try(:hbx_staff_role)
   end
 
   def has_csr_role?
