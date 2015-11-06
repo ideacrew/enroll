@@ -306,7 +306,7 @@ class HbxEnrollment
   def special_enrollment_period
     return @special_enrollment_period if defined? @special_enrollment_period
     return nil if special_enrollment_period_id.blank?
-    @special_enrollment_period = family.special_enrollment_periods.detect {|sep| sep.id == special_enrollment_period_id} 
+    @special_enrollment_period = family.special_enrollment_periods.detect {|sep| sep.id == special_enrollment_period_id}
   end
 
   def plan=(new_plan)
@@ -579,7 +579,7 @@ class HbxEnrollment
   #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
   # end
 
- 
+
   aasm do
     state :shopping, initial: true
     state :coverage_selected
@@ -664,7 +664,11 @@ class HbxEnrollment
 
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
-      PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+      if benefit_group.is_a? BenefitGroupCongress
+        PlanCostDecoratorCongress.new(plan, self, benefit_group)
+      else
+        PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+      end
     elsif plan.present? && consumer_role.present?
       UnassistedPlanCostDecorator.new(plan, self)
     else
