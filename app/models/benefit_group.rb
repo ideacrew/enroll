@@ -17,7 +17,7 @@ class BenefitGroup
   ]
 
   field :title, type: String, default: ""
-  field :effective_on_kind, type: String, default: "date_of_hire"
+  field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
