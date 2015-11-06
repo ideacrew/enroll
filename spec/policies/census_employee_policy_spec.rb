@@ -5,21 +5,25 @@ describe CensusEmployeePolicy do
   subject { described_class }
   let(:employer_profile){ FactoryGirl.create(:employer_profile)}
   let(:person) { FactoryGirl.create(:person) }
+  let(:admin_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+  let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
 
   permissions :delink? do
     context "already linked" do
       let(:employee) { FactoryGirl.build(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "employee_role_linked") }
 
-      it "grants access when hbx_staff" do
-        expect(subject).to permit(FactoryGirl.create(:user, :hbx_staff), employee)
-      end
+      context "with perosn with appropriate roles" do
+        it "grants access when hbx_staff" do
+          expect(subject).to permit(FactoryGirl.create(:user, :hbx_staff, person: admin_person), employee)
+        end
 
-      it "grants access when broker" do
-        expect(subject).to permit(FactoryGirl.create(:user, :broker), employee)
-      end
+        it "grants access when broker" do
+          expect(subject).to permit(FactoryGirl.create(:user, :broker, person: broker_person), employee)
+        end
 
-      it "grants access when broker_agency_staff" do
-        expect(subject).to permit(FactoryGirl.create(:user, :broker_agency_staff), employee)
+        it "grants access when broker_agency_staff" do
+          expect(subject).to permit(FactoryGirl.create(:user, :broker_agency_staff, person: broker_person), employee)
+        end
       end
 
       it "denies access when normal user" do
@@ -31,19 +35,19 @@ describe CensusEmployeePolicy do
       let(:employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
 
       it "denies access when hbx_staff" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :hbx_staff), employee)
+        expect(subject).not_to permit(FactoryGirl.create(:user, :hbx_staff, person: admin_person), employee)
       end
 
       it "denies access when broker" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :broker), employee)
+        expect(subject).not_to permit(FactoryGirl.create(:user, :broker, person: broker_person), employee)
       end
 
       it "denies access when broker_agency_staff" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :broker_agency_staff), employee)
+        expect(subject).not_to permit(FactoryGirl.create(:user, :broker_agency_staff, person: broker_person), employee)
       end
 
       it "denies access when normal user" do
-        expect(subject).not_to permit(FactoryGirl.create(:user), employee)
+        expect(subject).not_to permit(FactoryGirl.create(:user, person: person), employee)
       end
     end
   end
@@ -52,7 +56,7 @@ describe CensusEmployeePolicy do
     let(:employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
 
     context "when is hbx_staff user" do
-      let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+      let(:user) { FactoryGirl.create(:user, :hbx_staff, person: admin_person) }
 
       it "grants access when change dob" do
         employee.dob = TimeKeeper.date_of_record
