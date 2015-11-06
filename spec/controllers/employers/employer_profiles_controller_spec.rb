@@ -85,7 +85,11 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:employer_profile) { plan_year.employer_profile}
 
+    let(:policy) {double("policy")}
     before(:each) do
+      allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+      allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+      allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
       employer_profile.plan_years = [plan_year]
       sign_in(user)
