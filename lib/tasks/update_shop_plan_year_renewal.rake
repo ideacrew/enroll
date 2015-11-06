@@ -94,7 +94,7 @@ namespace :update_shop do
           factory = Factories::FamilyEnrollmentRenewalFactory.new
           factory.family = family
           factory.renew
-          puts "renewed...#{family.primary_family_member.full_name}"
+          puts "  renewed: #{family.primary_family_member.full_name}"
         end
       rescue => e
         puts e.to_s
