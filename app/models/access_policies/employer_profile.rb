@@ -33,7 +33,7 @@ module AccessPolicies
 
     def is_broker_for_employer?(employer_id)
       person = user.person
-      return false unless person.broker_role || person.broker_agency_staff_role
+      return false unless person.broker_role || person.broker_agency_staff_roles.present?
       if person.broker_role
         employers = ::EmployerProfile.find_by_writing_agent(person.broker_role)
       else
