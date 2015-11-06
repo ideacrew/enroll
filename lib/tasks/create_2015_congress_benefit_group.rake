@@ -3,13 +3,13 @@ namespace :congress do
   task :create_plan_years => :environment do
     gold_2015 = Plan.valid_shop_by_metal_level_and_year("gold", "2015").collect(&:_id)
     gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
-    congress_employer_feins = [536002522, 536002523, 536002558]
+    congress_employer_feins = ["536002522", "536002523","536002558"]
     plan_year_attributes = [
       {
         start_on: Date.new(2015, 1, 1),
         end_on: Date.new(2015, 12, 31),
-        open_enrollment_start_on: Date.new(2015, 11, 9),
-        open_enrollment_end_on: Date.new(2015, 12, 13),
+        open_enrollment_start_on: Date.new(2014, 11, 9),
+        open_enrollment_end_on: Date.new(2014, 12, 10),
         benefit_group_attributes: {
           title: "2015 Benefit Group",
           contribution_pct_as_int: 75,
@@ -19,7 +19,8 @@ namespace :congress do
           reference_plan_id: gold_2015.first,
           elected_plan_ids: gold_2015
         }
-      },
+      }#,
+=begin  
       {
         start_on: Date.new(2016, 1, 1),
         end_on: Date.new(2016, 12, 31),
@@ -35,6 +36,7 @@ namespace :congress do
           elected_plan_ids: gold_2016
         }
       }
+=end
     ]
     relationship_benefit_attributes = [
       {
@@ -49,7 +51,7 @@ namespace :congress do
       },
       {
         relationship: :domestic_partner,
-        premium_pct: 75,
+        premium_pct: 0,
         offered: false
       },
       {
@@ -65,25 +67,27 @@ namespace :congress do
     ]
 
     congress_employer_feins.each do |fein|
-      employer_profile = EmployerProfile.find_by_fein(congress_employer_feins)
+      employer_profile = EmployerProfile.find_by_fein(fein)
+      plan_year = nil
       if employer_profile.nil?
         puts "Unable to find employer profile for fein #{fein}"
       else
         plan_year_attributes.each do |plan_year_attribs|
           plan_year = PlanYear.new(plan_year_attribs.except(:benefit_group_attributes))
-          benefit_group = BenefitGroupCongress.new(plan_year_attribs.benefit_group_attributes.merge(plan_year_id: plan_year._id))
-          plan_year.benefit_groups = [benefit_group]
+          employer_profile.plan_years = [plan_year]
+          benefit_group = BenefitGroupCongress.new(plan_year_attribs[:benefit_group_attributes])
           benefit_group.relationship_benefits =
             relationship_benefit_attributes.collect do |relationship_benefit_attribs|
-              RelationshipBenefit.new(relationship_benefit_attribs.merge(benefit_group_id: benefit_group._id))
+              RelationshipBenefit.new(relationship_benefit_attribs)
             end
-          end
+          plan_year.benefit_groups = [benefit_group]
         end
-        if plan_year.valid? && plan_year.save
-          puts "Successfully created plan year #{plan_year.start_on.year} for employer #{fein}."
-        else
-          puts "Error creating plan year #{plan_year.start_on.year} for employer #{fein}."
-        end
+      end
+      if plan_year.valid? && plan_year.save
+        puts "Successfully created plan year #{plan_year.start_on.year} for employer #{fein}."
+      else
+        puts plan_year.errors.full_messages.inspect
+        puts "Error creating plan year #{plan_year.start_on.year} for employer #{fein}."
       end
     end
   end
