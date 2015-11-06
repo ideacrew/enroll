@@ -18,6 +18,7 @@ class Products::QhpController < ApplicationController
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
       @reference_plan = @benefit_group.reference_plan
       @qhps = find_qhp_cost_share_variances.each do |qhp|
+        qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
@@ -26,6 +27,7 @@ class Products::QhpController < ApplicationController
       @qhps = find_qhp_cost_share_variances
 
       @qhps = @qhps.each do |qhp|
+        qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
         qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
       end
 
@@ -45,6 +47,7 @@ class Products::QhpController < ApplicationController
     @active_year = params[:active_year]
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
+    @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
     if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental")
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
@@ -85,7 +88,7 @@ class Products::QhpController < ApplicationController
   end
 
   def find_qhp_cost_share_variances
-    Products::QhpCostShareVariance.find_qhp_cost_share_variances(@standard_component_ids, @active_year.to_i)
+    Products::QhpCostShareVariance.find_qhp_cost_share_variances(@standard_component_ids, @active_year.to_i, @coverage_kind)
   end
 
 end
