@@ -7,7 +7,7 @@ module AccessPolicies
     end
 
     def authorize_show(employer, controller)
-      return(true) if user.has_hbx_staff_role? || is_broker_for_employer(employer.id) 
+      return(true) if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) 
       person = user.person
 
       if person.employer_staff_roles.length > 0
