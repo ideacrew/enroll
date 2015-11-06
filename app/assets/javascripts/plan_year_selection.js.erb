@@ -4,7 +4,7 @@ ready = function() {
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
     //alert('edit');
-    $('.add_fields').remove();
+    //$('.add_fields').remove();
     $('.reference-steps').hide();
     $('.planyear-add-tab .controls:last').show();
 
@@ -254,6 +254,7 @@ ready = function() {
 $(document).on('click', '.reference-plan input + label', function() {
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
   var location_id = $(this).parents('fieldset').attr('id')
+
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
@@ -261,18 +262,8 @@ $(document).on('click', '.reference-plan input + label', function() {
     }
     $(this).closest('.benefit-group-fields').find('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
     $('.selected-plan').show();
-    $.ajax({
-      type: "GET",
-      url: $('a#search_reference_plan_link').data('href'),
-      dataType: 'script',
-      data: {
-        "start_on": $("#plan_year_start_on").val(),
-        "reference_plan_id": reference_plan_id,
-        "location_id": location_id
-      }
-    }).done(function() {
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
-    });
+
+    calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
   };
 });
 

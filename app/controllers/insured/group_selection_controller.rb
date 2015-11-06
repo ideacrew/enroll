@@ -55,7 +55,7 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
     hbx_enrollment.coverage_kind = @coverage_kind
-    
+
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -137,5 +137,6 @@ class Insured::GroupSelectionController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
   end
 end

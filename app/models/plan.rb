@@ -132,13 +132,13 @@ class Plan
 
   scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
 
-  # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87") 
+  # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
   scope :silver_level_by_csr_kind, ->(csr_kind = "csr_100"){ where(
                                           metal_level: "silver").and(
                                           csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
                                         )
                                       }
- 
+
   # Plan Type
   scope :ppo_plan, ->{ where(plan_type: "ppo") }
   scope :pos_plan, ->{ where(plan_type: "pos") }
@@ -206,12 +206,12 @@ class Plan
         )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") { 
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"}, 
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -219,12 +219,12 @@ class Plan
       )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") { 
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"}, 
+                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"},
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -240,12 +240,12 @@ class Plan
         )
     }
 
-  scope :individual_health_by_active_year_carrier_profile_csr_kind, ->(active_year, carrier_profile_id, csr_kind) { 
+  scope :individual_health_by_active_year_carrier_profile_csr_kind, ->(active_year, carrier_profile_id, csr_kind) {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"}, 
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
                     ]
             }
@@ -305,7 +305,7 @@ class Plan
 
   def renewal_plan
     return @renewal_plan if defined? @renewal_plan
-    @renewal_plan = find(renewal_plan_id) unless renewal_plan_id.blank?
+    @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
   end
 
   def minimum_age

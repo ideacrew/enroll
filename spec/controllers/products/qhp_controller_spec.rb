@@ -30,14 +30,15 @@ RSpec.describe Products::QhpController, :type => :controller do
     let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
-    let(:qhp_cost_share_variance) { [double("QhpCostShareVariance", plan: double("Plan"))] }
+    let(:qhp_cost_share_variance){ double("QhpCostShareVariance", plan: double("Plan"), :hios_plan_and_variant_id => "id") }
+    let(:qhp_cost_share_variances) { [qhp_cost_share_variance] }
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
-      allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variance)
+      allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
     it "should return summary of a plan for shop and coverage_kind as health" do
@@ -53,6 +54,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return summary of a plan for shop and coverage_kind as dental" do
       allow(hbx_enrollment).to receive(:kind).and_return("shop")
+      allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "dental"
       expect(response).to have_http_status(:success)
@@ -64,6 +66,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return dental plan if hbx_enrollment does not have plan object" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       allow(hbx_enrollment).to receive(:plan).and_return(nil)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
@@ -85,6 +88,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return summary of a plan for ivl and coverage_kind: dental" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
       expect(response).to have_http_status(:success)
@@ -113,13 +117,13 @@ RSpec.describe Products::QhpController, :type => :controller do
     let(:hbx_enrollment){ HbxEnrollment.new(coverage_kind: 'dental') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
-    let(:qhp1) { Products::QhpCostShareVariance.new }
-    let(:qhp2) { Products::QhpCostShareVariance.new }
+    let(:qhp1) { Products::QhpCostShareVariance.new(hios_plan_and_variant_id: "11111100001111-01") }
+    let(:qhp2) { Products::QhpCostShareVariance.new(hios_plan_and_variant_id: "11111100001111-02") }
     let(:plan1) { double("Plan", hios_id: "11111100001111-01") }
     let(:plan2) { double("Plan", hios_id: "11111100001111") }
 
-    let(:qhp3) { Products::QhpCostShareVariance.new }
-    let(:qhp4) { Products::QhpCostShareVariance.new }
+    let(:qhp3) { Products::QhpCostShareVariance.new(hios_plan_and_variant_id: "11111100001111-03") }
+    let(:qhp4) { Products::QhpCostShareVariance.new(hios_plan_and_variant_id: "11111100001111-04") }
     let(:plan3) { double("Plan", hios_id: "11111100001111-02") }
     let(:plan4) { double("Plan", hios_id: "11111100001112") }
 
@@ -142,7 +146,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return comparison of a plan" do
       sign_in(user)
-      get :comparison, standard_component_ids: ["11111100001111-01", "11111100001111"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'
+      get :comparison, standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'
       expect(response).to have_http_status(:success)
       expect(assigns(:qhps).count).to eq 2
     end
