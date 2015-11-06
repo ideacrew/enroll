@@ -2,7 +2,7 @@ namespace :congress do
   desc "Create 2016 plan year and benefit groups for congress employers."
   task :create_2016_plan_year => :environment do
     gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
-    congress_employer_feins = ["536002522", "536002523","536002558"]
+    congress_employer_feins = []
     plan_year_attributes = [
       {
         start_on: Date.new(2016, 1, 1),
