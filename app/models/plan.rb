@@ -305,7 +305,7 @@ class Plan
 
   def renewal_plan
     return @renewal_plan if defined? @renewal_plan
-    @renewal_plan = find(renewal_plan_id) unless renewal_plan_id.blank?
+    @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
   end
 
   def minimum_age

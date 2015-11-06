@@ -56,13 +56,15 @@ class Products::QhpCostShareVariance
     Products::Qhp.by_hios_ids_and_active_year(ids.map { |str| str[0..13] }, year)
   end
 
-  def self.find_qhp_cost_share_variances(ids, year)
+  def self.find_qhp_cost_share_variances(ids, year, coverage_kind)
     csvs = find_qhp(ids, year).map(&:qhp_cost_share_variances).flatten
+    ids = ids.map{|a| a+"-01" } if coverage_kind == "dental"
     csvs.select{ |a| ids.include?(a.hios_plan_and_variant_id) }
   end
 
   def plan
-    Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
+    return @qhp_plan if defined? @qhp_plan
+    @qhp_plan = Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
   end
 
 

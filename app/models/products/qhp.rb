@@ -171,6 +171,9 @@ class Products::Qhp
             if service_visit
               arry1 << (service_visit.present? ? service_visit.copay_in_network_tier_1 : "N/A")
               arry2 << (service_visit.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A")
+            else
+              arry1 << "N/A"
+              arry2 << "N/A"
             end
           end
           csv_ary << arry1
