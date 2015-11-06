@@ -132,7 +132,6 @@ class Employers::PlanYearsController < ApplicationController
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
-      benefit_group.build_relationship_benefits if benefit_group.relationship_benefits.empty?
       case benefit_group.plan_option_kind
       when "metal_level"
         benefit_group.metal_level_for_elected_plan = benefit_group.elected_plans.try(:last).try(:metal_level)
