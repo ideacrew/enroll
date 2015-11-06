@@ -36,9 +36,39 @@ FactoryGirl.define do
     end
 
     trait :with_employee_role do
-        after(:create) do |p, evaluator|
-          create_list(:employee_role, 1, person: p)
-        end
+      after(:create) do |p, evaluator|
+        create_list(:employee_role, 1, person: p)
+      end
+    end
+
+    trait :with_hbx_staff_role do
+      after(:create) do |p, evaluator|
+        create_list(:hbx_staff_role, 1, person: p)
+      end
+    end
+
+    trait :with_broker_role do
+      after(:create) do |p, evaluator|
+        create_list(:broker_role, 1, person: p)
+      end
+    end
+
+    trait :with_consumer_role do
+      after(:create) do |p, evaluator|
+        create_list(:consumer_role, 1, person: p)
+      end
+    end
+
+    trait :with_assister_role do
+      after(:create) do |p, evaluator|
+        create_list(:assister_role, 1, person: p)
+      end
+    end
+
+    trait :with_csr_role do
+      after(:create) do |p, evaluator|
+        create_list(:assister_role, 1, person: p)
+      end
     end
 
     factory :male, traits: [:male]
