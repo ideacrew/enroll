@@ -69,9 +69,6 @@
             <% if service_visit %>
               <td  colspan="1"><%= service_visit.present? ? service_visit.copay_in_network_tier_1 : "N/A" %></td>
               <td  colspan="1"><%= service_visit.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
-            <% else %>
-              <td  colspan="1"><%= "N/A" %></td>
-              <td  colspan="1"><%= "N/A" %></td>
             <% end %>
           <% end %>
         </tr>
