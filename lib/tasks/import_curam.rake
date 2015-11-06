@@ -7,10 +7,15 @@ namespace :import_curam do
   task curam_users: :environment do
     counter = 0
     filepath = File.join(Rails.root, 'db', 'seedfiles', 'curam_userlist.csv')
+    CuramUser.where({}).delete
     CSV.foreach(filepath, headers: true) do |row|
       username, firstname, lastname, ssn, dob, *rest = row.fields
       dob_date = (dob.blank? ? nil : Date.strptime(dob, "%Y-%m-%d"))
-      user = CuramUser.create(first_name:firstname, last_name:lastname, ssn:ssn, dob: dob_date)
+      begin
+        user = CuramUser.create(first_name:firstname, last_name:lastname, ssn:ssn, dob: dob_date)
+      rescue
+        puts dob.inspect
+      end
       puts "#{ssn} - #{user.errors.full_messages.join(",")}" if user.errors.any?
       counter += 1 if user.persisted?
     end
