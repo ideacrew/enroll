@@ -163,3 +163,15 @@
     </div>
   </div>
 </div>
+
+<script>
+$(function(){
+
+$('a[data-remote=true]').click( function() {
+   var current_href = $(this).attr('href');
+   var location_id = $(this).closest('.benefit-group-fields').attr('id');
+   $(this).attr('href', current_href + "&location_id=" + location_id);
+});
+
+})
+</script>

@@ -70,18 +70,27 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "GET show" do
-    let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:user) { double(
+      "user",
+      :person => person,
+      :last_portal_visited => "true",
+      :save => true,
+      :has_hbx_staff_role? => false,
+      :has_broker_role? => false,
+      :has_broker_agency_staff_role? => false,
+      :has_employer_staff_role? => true
+    ) }
+    let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
+    let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:employer_profile) { plan_year.employer_profile}
 
+    let(:policy) {double("policy")}
     before(:each) do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+      allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+      allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
-      allow(user).to receive(:last_portal_visited).and_return("true")
-      allow(user).to receive(:save).and_return(true)
-      allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:has_employer_staff_role?)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end

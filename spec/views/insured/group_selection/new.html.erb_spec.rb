@@ -25,7 +25,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
 
-
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
       allow(family_member3).to receive(:person).and_return(person)
@@ -37,7 +36,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should show the title of family members" do
-
       expect(rendered).to match /Choose Coverage for your Household/
     end
 
@@ -255,6 +253,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "when hbx_enrollment not terminated" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
+      expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
+    end
+
+    it "when hbx_enrollment not terminated and not shop_for_plans" do
+      assign(:shop_for_plans, "shop_for_plans")
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 

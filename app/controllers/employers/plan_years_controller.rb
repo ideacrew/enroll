@@ -11,6 +11,8 @@ class Employers::PlanYearsController < ApplicationController
   def reference_plans
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
+    @location_id = params[:location_id]
+    
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
@@ -24,6 +26,8 @@ class Employers::PlanYearsController < ApplicationController
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
+
+    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
 
     respond_to do |format|
       format.js
@@ -128,6 +132,7 @@ class Employers::PlanYearsController < ApplicationController
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
+      benefit_group.build_relationship_benefits if benefit_group.relationship_benefits.empty?
       case benefit_group.plan_option_kind
       when "metal_level"
         benefit_group.metal_level_for_elected_plan = benefit_group.elected_plans.try(:last).try(:metal_level)
@@ -176,7 +181,7 @@ class Employers::PlanYearsController < ApplicationController
         format.js
       end
     else
-      if (@plan_year.published? || @plan_year.enrolling?)
+      if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else

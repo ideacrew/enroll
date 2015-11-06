@@ -16,6 +16,8 @@ $(document).on 'click', 'form .add_fields', (event) ->
   validatePlanYear()
 
 
+  $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
+
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
     $('.benefit-group-fields:last .edit-offering, .benefit-group-fields:last .reference-steps .cancel-plan-change').remove()
     $('.benefit-group-fields:last .reference-steps h1').html '<h1>Select Your Plan Offering</h1>'
