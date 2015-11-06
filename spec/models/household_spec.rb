@@ -72,14 +72,15 @@ describe Household, "given a coverage household with a dependent" do
   context "current_year_hbx_enrollments" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:household) {FactoryGirl.create(:household, family: family)}
-    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
     let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: false)}
     let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
     let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
 
     it "should return right hbx_enrollments" do
+      household.reload
       expect(household.hbx_enrollments.count).to eq 4
-      expect(household.current_year_hbx_enrollments.entries).to eq [hbx1]
+      expect(household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year)).to eq [hbx1]
     end
   end
 

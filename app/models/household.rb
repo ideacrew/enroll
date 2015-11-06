@@ -268,7 +268,7 @@ class Household
     hbx_enrollments.enrolled
   end
 
-  def current_year_hbx_enrollments
-    hbx_enrollments.active.enrolled.current_year.where(changing: false)
+  def hbx_enrollments_with_aptc_by_year(year)
+    hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
   end
 end
