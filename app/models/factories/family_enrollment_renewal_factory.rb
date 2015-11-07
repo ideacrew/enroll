@@ -49,7 +49,6 @@ module Factories
       census_employee = CensusEmployee.by_ssn(employee.ssn).active.first
       
       if census_employee.blank?
-# binding.pry
         message = "Unable to find census_employee for "\
           "primary family member: #{employee.full_name} "\
           "id: #{employee.id} "\
@@ -62,6 +61,14 @@ module Factories
       end
     end
 
+    # def display_premiums(enrollment)
+    #   puts "#{enrollment.aasm_state.humanize} enrollment amounts-------"
+    #   puts enrollment.total_premium
+    #   puts enrollment.total_employer_contribution
+    #   puts enrollment.total_employee_cost
+    #   puts "member premiums #{enrollment.hbx_enrollment_members.map(&:premium_amount)}"
+    #   puts "---------------------------------"
+    # end
 
     def save_renewal_enrollment(renewal_enrollment, active_enrollment)
       if renewal_enrollment.save
@@ -109,7 +116,6 @@ module Factories
 
 
       if benefit_group_assignment.blank?
-# binding.pry
         message = "Unable to find benefit_group_assignment for census_employee: \n"\
           "census_employee: #{@census_employee.full_name} "\
           "id: #{@census_employee.id} "\
@@ -127,7 +133,6 @@ module Factories
       # Set the HbxEnrollment to proper state
       # Renew waiver status
       if active_enrollment.is_coverage_waived? 
-# binding.pry
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
         renewal_enrollment.waive_coverage 
       end

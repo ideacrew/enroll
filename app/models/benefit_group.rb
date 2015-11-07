@@ -21,11 +21,11 @@ class BenefitGroup
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
-  # FIX ME types
-  field :contribution_pct_as_int, type: Integer, default: 75
-  field :employee_max_amt_in_cents, type: Money, default: 0
-  field :first_dependent_max_amt_in_cents, type: Integer, default: 0
-  field :over_one_dependents_max_amt_in_cents, type: Integer, default: 0
+
+  field :contribution_pct_as_int, type: Integer, default: 0
+  field :employee_max_amt, type: Money, default: 0
+  field :first_dependent_max_amt, type: Money, default: 0
+  field :over_one_dependents_max_amt, type: Money, default: 0
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
@@ -179,14 +179,6 @@ class BenefitGroup
     end
   end
 
-  def first_dependent_max_amt_in_cents=(new_first_dependent_max_amt_in_cents)
-    write_attribute(:first_dependent_max_amt_in_cents, dollars_to_cents(new_first_dependent_max_amt_in_cents))
-  end
-
-  def over_one_dependents_max_amt_in_cents=(new_over_one_dependents_max_amt_in_cents)
-    write_attribute(:over_one_dependents_max_amt_in_cents, dollars_to_cents(new_over_one_dependents_max_amt_in_cents))
-  end
-
   def benefit_group_assignments
     BenefitGroupAssignment.by_benefit_group_id(id)
   end
@@ -334,11 +326,11 @@ private
     return true unless is_congress
     self.plan_option_kind = "metal_level"
     self.default = true
-    self.contribution_pct_as_int ||= 75
-    # FIX ME amounts
-    self.employee_max_amt_in_cents ||=  462_30
-    self.first_dependent_max_amt_in_cents ||= 998_88
-    self.over_one_dependents_max_amt_in_cents ||= 1058_42
+
+    self.contribution_pct_as_int   = 75
+    self.employee_max_amt = 462.30 if employee_max_amt == 0
+    self.first_dependent_max_amt = 998.88 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1058.42 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)
