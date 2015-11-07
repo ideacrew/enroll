@@ -189,7 +189,11 @@ $(function() {
     var elected_aptc = $(this).val();
     var max_aptc = $('input#max_aptc').val();
     $("input[name='elected_pct']").val(elected_aptc/max_aptc);
-    $("output[name='pct']").text((elected_aptc/max_aptc*100).toFixed(0));
+    if (max_aptc == "" || parseFloat(max_aptc) == 0){
+      $("output[name='pct']").text("100");
+    } else {
+      $("output[name='pct']").text((elected_aptc/max_aptc*100).toFixed(0));
+    }
   });
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
