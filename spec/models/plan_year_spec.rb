@@ -205,7 +205,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too long" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum + 1 }
+        let(:invalid_length)  { (HbxProfile::ShopOpenEnrollmentPeriodMaximum).months + 1.day }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -1365,8 +1365,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the first of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 13) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1387,7 +1388,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the second of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 2) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 2) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 13) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
@@ -1409,7 +1410,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the third of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 3) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 13) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1432,7 +1433,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the fourth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 4) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 13) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1455,7 +1456,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the fifth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 5) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 13) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1475,10 +1476,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "on the sixth of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 6) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 6) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
+    context "on the eleventh of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 11) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 11) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 13) }
       let(:expected_start_on) { Date.new(2015, 9, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
@@ -1497,10 +1498,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "on the 7th of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 7) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 7) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
+    context "on the twelfth of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 12) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 12) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 13) }
       let(:expected_start_on) { Date.new(2015, 9, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)

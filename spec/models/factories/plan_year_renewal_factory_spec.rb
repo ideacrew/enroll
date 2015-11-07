@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Factories::EmployerProfilePlanYearRenewal, type: :model, dbclean: :after_each do
+RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_each do
   let(:renewal_start_date)        { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:active_plan_year_start_on) { renewal_start_date + 3.months - 1.year }
   let(:active_benefit_group_one)  { FactoryGirl.build(:benefit_group, title: "BG 1") }
@@ -37,7 +37,7 @@ RSpec.describe Factories::EmployerProfilePlanYearRenewal, type: :model, dbclean:
         # end
 
         # it "should raise alien address validation error" do
-        #   expect{Factories::EmployerProfilePlanYearRenewal.new(employer_profile)}.to raise_error(EmployerProfilePlanYearRenewalError, /Employer primary address must be located in/)
+        #   expect{Factories::PlanYearRenewalFactory.new(employer_profile)}.to raise_error(PlanYearRenewalFactoryError, /Employer primary address must be located in/)
         # end
       end
 
@@ -53,7 +53,7 @@ RSpec.describe Factories::EmployerProfilePlanYearRenewal, type: :model, dbclean:
       #   end
 
       #   it "should raise renewal time period expired error" do
-      #     expect{Factories::EmployerProfilePlanYearRenewal.new(employer_profile)}.to raise_error(EmployerProfilePlanYearRenewalError, /Renewal time period has expired/)
+      #     expect{Factories::PlanYearRenewalFactory.new(employer_profile)}.to raise_error(PlanYearRenewalFactoryError, /Renewal time period has expired/)
       #   end
       end
     end

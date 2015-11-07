@@ -94,6 +94,10 @@ class PlanYear
     (start_on <= date) && (date <= end_on)
   end
 
+  def is_renewing?
+    RENEWING.include?(aasm_state)
+  end
+
   def is_published?
     PUBLISHED.include?(aasm_state)
   end
@@ -135,6 +139,10 @@ class PlanYear
   # Check plan year for violations of model integrity relative to publishing
   def application_errors
     errors = {}
+
+    if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
+      errors.merge!({benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."})
+    end
 
     if benefit_groups.size == 0
       errors.merge!({benefit_groups: "You must create at least one benefit group to publish a plan year"})
@@ -684,8 +692,16 @@ private
         "#{(start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).to_date} with #{start_on} effective date")
     end
 
-    if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
-     errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
+    if is_renewing?
+      if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth
+       errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
+      end
+    else
+      if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
+       errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
+      end
     end
+
+
   end
 end

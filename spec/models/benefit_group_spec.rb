@@ -170,7 +170,7 @@ describe BenefitGroup, type: :model do
   let(:terminate_on_kind)       { "end_of_month" }
 
   let(:effective_on_offset_default)   { 0 }
-  let(:effective_on_kind_default)     { "date_of_hire" }
+  let(:effective_on_kind_default)     { "first_of_month" }
   let(:terminate_on_kind_default)     { "end_of_month" }
 
   let(:elected_plans)                 { reference_plan.to_a }
