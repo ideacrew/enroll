@@ -9,6 +9,9 @@ percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0
   <%= hbx_enrollment.aasm_state.titleize %>
 </h4>
 
+<!-- Hide Train stops temporarily (Refs #3725) -->
+<!--
+
 <label><%= percent_complete %>% Complete</label>
 <ul class="list-unstyled progress-wrapper hidden-xs">
   <li class="<%= add_progress_class(1, step) %>">
@@ -26,4 +29,4 @@ percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
   </li>
-</ul>
+</ul>-->

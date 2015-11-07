@@ -452,7 +452,6 @@ RSpec.describe Employers::EmployerProfilesController do
 
       allow(controller).to receive(:employer_params).and_return({"dob"=>"07/16/1980","first_name"=>"test"})
 
-      #allow(controller).to receive(:strptime).and_return({})
       allow(controller).to receive(:organization_profile_params).and_return({})
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
