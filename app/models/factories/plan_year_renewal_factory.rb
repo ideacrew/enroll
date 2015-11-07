@@ -80,12 +80,12 @@ module Factories
       end
     end
 
-    def reference_plans(active_group)
+    def reference_plan_ids(active_group)
       start_on_year = (active_group.start_on + 1.year).year
       if active_group.plan_option_kind == "single_carrier"        
-        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/)
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
       elsif active_group.plan_option_kind == "metal_level"
-        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/)
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
       else
         Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
       end
@@ -100,7 +100,7 @@ module Factories
         raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
       end
 
-      elected_plan_ids = reference_plans(active_group).map(&:id)
+      elected_plan_ids = reference_plan_ids(active_group)
       if elected_plan_ids.blank?
         raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
       end
@@ -116,7 +116,7 @@ module Factories
         relationship_benefits: active_group.relationship_benefits,
         reference_plan_id: reference_plan_id,
         elected_plan_ids: elected_plan_ids,
-        is_congress: is_congress
+        is_congress: is_congress || false
       })
     end
 
