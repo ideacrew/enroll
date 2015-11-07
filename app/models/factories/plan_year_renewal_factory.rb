@@ -1,10 +1,10 @@
 module Factories
-  class EmployerProfilePlanYearRenewal
+  class PlanYearRenewalFactory
     include Mongoid::Document
 
     EARLIEST_RENEWAL_START_ON = HbxProfile::ShopMaximumRenewalPeriodBeforeStartOn
 
-    attr_accessor :employer_profile
+    attr_accessor :employer_profile, :is_congress
 
     def renew
       @employer_profile = employer_profile
@@ -21,7 +21,7 @@ module Factories
 
       open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
                                          @active_plan_year.open_enrollment_end_on.month,
-                                         @active_plan_year.ShopRenewalOpenEnrollmentEndDueDayOfMonth)
+                                         HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
 
 
       @renewal_plan_year = @employer_profile.plan_years.build({
@@ -37,16 +37,16 @@ module Factories
       if @renewal_plan_year.may_renew_plan_year?
         @renewal_plan_year.renew_plan_year 
       else
-        raise EmployerProfilePlanYearRenewalError, 
-          "For employer: #{@employer_profile.inspect}, \n"\
-          "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"\
+        raise PlanYearRenewalFactoryError, 
+          "For employer: #{@employer_profile.inspect}, \n" \
+          "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"
       end
 
       if @renewal_plan_year.save
         renew_benefit_groups
         @renewal_plan_year
       else
-        raise EmployerProfilePlanYearRenewalError, 
+        raise PlanYearRenewalFactoryError, 
           "For employer: #{@employer_profile.inspect}, \n" \
           "Error(s): \n #{@renewal_plan_year.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n" \
           "Unable to save renewal plan year: #{@renewal_plan_year.inspect}"
@@ -56,15 +56,15 @@ module Factories
   private
     def validate_employer_profile
       unless PlanYear::PUBLISHED.include? @employer_profile.active_plan_year.aasm_state
-        raise EmployerProfilePlanYearRenewalError, "Renewals require an existing, published Plan Year"
+        raise PlanYearRenewalFactoryError, "Renewals require an existing, published Plan Year"
       end
 
       unless TimeKeeper.date_of_record <= @employer_profile.active_plan_year.end_on
-        raise EmployerProfilePlanYearRenewalError, "Renewal time period has expired.  You must submit a new application"
+        raise PlanYearRenewalFactoryError, "Renewal time period has expired.  You must submit a new application"
       end
 
       unless @employer_profile.is_primary_office_local?
-        raise EmployerProfilePlanYearRenewalError, "Employer primary address must be located in #{HbxProfile.StateName}"
+        raise PlanYearRenewalFactoryError, "Employer primary address must be located in #{HbxProfile.StateName}"
       end
     end
 
@@ -74,8 +74,20 @@ module Factories
         if new_group.save
           renew_census_employees(active_group, new_group)
         else
-          raise EmployerProfilePlanYearRenewalError, "For employer: #{@employer_profile.inspect}, unable to save benefit_group: #{new_group.inspect}"
+          message = "Error saving benefit_group: #{new_group.id}, for employer: #{@employer_profile.id}"
+          raise PlanYearRenewalFactoryError, message
         end
+      end
+    end
+
+    def reference_plan_ids(active_group)
+      start_on_year = (active_group.start_on + 1.year).year
+      if active_group.plan_option_kind == "single_carrier"        
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
+      elsif active_group.plan_option_kind == "metal_level"
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
+      else
+        Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
       end
     end
 
@@ -85,12 +97,12 @@ module Factories
 
       reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
       if reference_plan_id.blank?
-        raise EmployerProfilePlanYearRenewalError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
+        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
       end
 
-      elected_plan_ids  = Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
+      elected_plan_ids = reference_plan_ids(active_group)
       if elected_plan_ids.blank?
-        raise EmployerProfilePlanYearRenewalError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
+        raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
       end
 
       @renewal_plan_year.benefit_groups.build({
@@ -102,9 +114,9 @@ module Factories
         effective_on_offset: active_group.effective_on_offset,
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
         relationship_benefits: active_group.relationship_benefits,
-
         reference_plan_id: reference_plan_id,
-        elected_plan_ids: elected_plan_ids
+        elected_plan_ids: elected_plan_ids,
+        is_congress: is_congress || false
       })
     end
 
@@ -114,7 +126,7 @@ module Factories
           census_employee.add_renew_benefit_group_assignment(new_group)
           
           unless census_employee.save 
-            raise EmployerProfilePlanYearRenewalError, "For employer: #{@employer_profile.inspect}, unable to save census_employee: #{census_employee.inspect}"
+            raise PlanYearRenewalFactoryError, "For employer: #{@employer_profile.inspect}, unable to save census_employee: #{census_employee.inspect}"
           end
         end
       end
@@ -132,6 +144,7 @@ module Factories
     end
 
   end
+  
+  class PlanYearRenewalFactoryError < StandardError; end
 end
 
-class EmployerProfilePlanYearRenewalError < StandardError; end

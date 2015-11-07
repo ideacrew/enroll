@@ -74,10 +74,12 @@ class HbxEnrollment
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
-  field :original_application_type, type: String
+  field :special_enrollment_period_id, type: BSON::ObjectId
 
   field :consumer_role_id, type: BSON::ObjectId
   field :benefit_package_id, type: BSON::ObjectId
+
+  field :original_application_type, type: String
 
   field :submitted_at, type: DateTime
 
@@ -96,15 +98,18 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
-  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
-  scope :open_enrollments, ->{ where(enrollment_kind: "open_enrollment") }
+  scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) }
+  scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
-  scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
-  scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
-  scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
-  scope :renewing, ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
-  scope :changing, ->{ where(changing: true) }
-  scope :with_in, -> (time_limit){ where(:created_at.gte => time_limit) }
+  scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
+  scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
+  scope :waived,              ->{ where(:aasm_state => "inactive" )}
+  scope :changing,            ->{ where(changing: true) }
+  scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
+  scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
+  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
 
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector]) }
@@ -245,6 +250,10 @@ class HbxEnrollment
     !self.published_to_bus_at.blank?
   end
 
+  def is_coverage_waived?
+    inactive?
+  end
+
   def is_shop?
     !consumer_role.present?
   end
@@ -292,6 +301,12 @@ class HbxEnrollment
 
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
+  end
+
+  def special_enrollment_period
+    return @special_enrollment_period if defined? @special_enrollment_period
+    return nil if special_enrollment_period_id.blank?
+    @special_enrollment_period = family.special_enrollment_periods.detect {|sep| sep.id == special_enrollment_period_id}
   end
 
   def plan=(new_plan)
@@ -366,6 +381,7 @@ class HbxEnrollment
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
+      special_enrollment_id = family.current_special_enrollment_periods.first.id
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
@@ -563,7 +579,7 @@ class HbxEnrollment
   #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
   # end
 
- 
+
   aasm do
     state :shopping, initial: true
     state :coverage_selected
@@ -644,12 +660,13 @@ class HbxEnrollment
     end
   end
 
-
-private
-
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
-      PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+      if benefit_group.is_congress #is_a? BenefitGroupCongress
+        PlanCostDecoratorCongress.new(plan, self, benefit_group)
+      else
+        PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+      end
     elsif plan.present? && consumer_role.present?
       UnassistedPlanCostDecorator.new(plan, self)
     else

@@ -1,6 +1,7 @@
 namespace :update_shop do
   desc "Renewing employer benefit period"
   task :plan_year_renewal => :environment do 
+    changed_count = 0
 
     employers = {
       "RehabFocus LLC" => "711024079",
@@ -27,7 +28,7 @@ namespace :update_shop do
 
     employers.each do |name, fein|
       begin
-        puts "processing #{name}"
+        puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
         if employer.blank?
           puts "  ** employer not found"
@@ -37,13 +38,16 @@ namespace :update_shop do
         # Set ER to correct state from data migration
         employer.employer_enrolled! if employer.binder_paid?
 
-        renewal_factory = Factories::EmployerProfilePlanYearRenewal.new
+        renewal_factory = Factories::PlanYearRenewalFactory.new
         renewal_factory.employer_profile = employer
         renewal_factory.renew
+        changed_count += 1
       rescue => e
         puts e.to_s
       end
     end
+
+    puts "Processed #{employers.count} employers, renewed #{changed_count} employers"
   end
 
   desc "Auto renew employees enrollments"
@@ -65,15 +69,15 @@ namespace :update_shop do
       "District Restaurant Group" => "274667942",
       "GWHCC" => "223860377",
       "Arab Center Washington DC" => "464736138",
+      "Annie's Ace Hardware" => "272665426",
+      "Arturo Ardila-Gomez" => "451474721",
       "Morales Public Relations" => "462817580",
       "Alter Modus International Corporation" => "260376753",
-      "Annie's Ace Hardware" => "272665426",
-      "Arturo Ardila-Gomez" => "451474721"
     }
 
     employers.each do |name, fein|
       begin
-        puts "processing #{name}"
+        puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
         if employer.blank?
           puts "  ** employer not found"
@@ -83,21 +87,33 @@ namespace :update_shop do
         families = employer.census_employees.inject([]) do |families, ce|
           person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
           if person.blank?
-            return families
+            families
+          else
+            families << person.primary_family
           end
-          families << person.primary_family
         end
 
+        changed_count = 0
+
         families.each do |family|
-          next unless family.enrollments.any?
-          factory = Factories::FamilyEnrollmentRenewalFactory.new
-          factory.family = family
-          factory.renew
-          puts "renewed...#{family.primary_family_member.full_name}"
+          if family.enrollments.any?
+            puts "  renewing: #{family.primary_family_member.full_name}"
+            factory = Factories::FamilyEnrollmentRenewalFactory.new
+            factory.family = family
+            factory.renew
+
+            changed_count += 1
+            puts "  renewed: #{family.primary_family_member.full_name}"
+          else
+            puts "  no active enrollments for: #{family.primary_family_member.full_name}"
+          end
         end
       rescue => e
         puts e.to_s
       end
+
+      puts "Processed #{families.count} families, renewed #{changed_count} families"
     end
+
   end
 end
