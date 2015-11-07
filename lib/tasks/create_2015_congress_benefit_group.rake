@@ -3,7 +3,7 @@ namespace :congress do
   task :create_plan_years => :environment do
     gold_2015 = Plan.valid_shop_by_metal_level_and_year("gold", "2015").collect(&:_id)
     gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
-    congress_employer_feins = ["536002522", "536002523","536002558"]
+    congress_employer_feins = []
     plan_year_attributes = [
       {
         start_on: Date.new(2015, 1, 1),

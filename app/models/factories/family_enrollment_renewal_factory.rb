@@ -5,23 +5,19 @@ module Factories
     attr_accessor :family
 
     def renew
-      renewal_builder = lambda do |active_enrollment|
-        renewal_enrollment = @family.active_household.hbx_enrollments.new
-        renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
-        renewal_enrollment.renew_enrollment
-        renewal_enrollment
-      end
+      raise ArgumentError unless defined?(@family)
 
       shop_enrollments = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+
       if shop_enrollments.any?
-        active_enrollment = shop_enrollments.detect{|enrollment| enrollment.currently_active?}
-        @census_employee = get_census_employee(active_enrollment)
+        @census_employee = get_census_employee(shop_enrollments.first)
 
         if @census_employee.present?
           shop_enrollments.each do |active_enrollment|       
             next unless active_enrollment.currently_active?
 
-            renewal_enrollment = renewal_builder.call(active_enrollment)
+            # renewal_enrollment = renewal_builder.call(active_enrollment)
+            renewal_enrollment = renewal_builder(active_enrollment)
             renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
 
             renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
@@ -29,7 +25,6 @@ module Factories
           end
         end
       end
-
 
       # @family.enrollments.individual_market do |active_enrollment|       
       #   next unless active_enrollment.currently_active?
@@ -42,12 +37,19 @@ module Factories
       # enrollment_kind == "special_enrollment" || "open_enrollment"
     end
 
+    def renewal_builder(active_enrollment)
+      renewal_enrollment = @family.active_household.hbx_enrollments.new
+      renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
+      renewal_enrollment.renew_enrollment
+      renewal_enrollment
+    end
 
     def get_census_employee(active_enrollment)
       employee = active_enrollment.household.family.primary_family_member
       census_employee = CensusEmployee.by_ssn(employee.ssn).active.first
       
       if census_employee.blank?
+# binding.pry
         message = "Unable to find census_employee for "\
           "primary family member: #{employee.full_name} "\
           "id: #{employee.id} "\
@@ -103,9 +105,11 @@ module Factories
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
 
-      benefit_group_assignment_id = @census_employee.renewal_benefit_group_assignment.id
+      benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
+
 
       if benefit_group_assignment.blank?
+# binding.pry
         message = "Unable to find benefit_group_assignment for census_employee: \n"\
           "census_employee: #{@census_employee.full_name} "\
           "id: #{@census_employee.id} "\
@@ -115,13 +119,15 @@ module Factories
         raise FamilyEnrollmentRenewalFactoryError, message
       end
 
-      renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
+      renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+      renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
 
-      renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group.id
+      renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
       # Set the HbxEnrollment to proper state
       # Renew waiver status
       if active_enrollment.is_coverage_waived? 
+# binding.pry
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
         renewal_enrollment.waive_coverage 
       end
@@ -147,3 +153,12 @@ module Factories
   
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
+
+      # renewal_builder = lambda do |active_enrollment|
+      #   renewal_enrollment = @family.active_household.hbx_enrollments.new
+      #   renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
+      #   renewal_enrollment.renew_enrollment
+      #   renewal_enrollment
+      # end
+
+
