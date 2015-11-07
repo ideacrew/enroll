@@ -24,7 +24,7 @@ namespace :update_shop do
       # "Alter Modus International Corporation" => "260376753",
       # "Annie's Ace Hardware" => "272665426",
       # "Arturo Ardila-Gomez" => "451474721"
-
+"Member-US House of Rep." => "536002522",
 
     }
 
@@ -52,6 +52,7 @@ namespace :update_shop do
 
         renewal_factory = Factories::PlanYearRenewalFactory.new
         renewal_factory.employer_profile = employer
+        renewal_factory.is_congress = true
         renewal_factory.renew
         changed_count += 1
       rescue => e
@@ -112,7 +113,7 @@ namespace :update_shop do
 
         changed_count = 0
 
-        families.each do |family|
+        families.compact.each do |family|
           if family.enrollments.any?
             puts "  renewing: #{family.primary_family_member.full_name}"
             factory = Factories::FamilyEnrollmentRenewalFactory.new

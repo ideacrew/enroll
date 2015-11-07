@@ -105,7 +105,7 @@ class Insured::GroupSelectionController < ApplicationController
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,
-        benefit_group: @employee_role.benefit_group,
+        benefit_group: @hbx_enrollment.present? ? @hbx_enrollment.benefit_group : @employee_role.benefit_group,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     when 'individual'
       @coverage_household.household.new_hbx_enrollment_from(
@@ -121,9 +121,11 @@ class Insured::GroupSelectionController < ApplicationController
     @person = Person.find(person_id)
     @family = @person.primary_family
     @coverage_household = @family.active_household.immediate_family_coverage_household
+
     if params[:hbx_enrollment_id].present?
       @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     end
+
     @hbx_enrollment = @family.latest_household.hbx_enrollments.enrolled[0] if @hbx_enrollment.blank?
     # @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
     if params[:employee_role_id].present?

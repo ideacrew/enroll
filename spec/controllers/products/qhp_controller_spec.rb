@@ -38,6 +38,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(benefit_group).to receive(:is_congress).and_return(false)
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end

@@ -13,11 +13,16 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
     session.delete(:pre_hbx_enrollment_id)
-
-    if hbx_enrollment.employee_role.present?
+   
+    if hbx_enrollment.is_shop?
       benefit_group = hbx_enrollment.benefit_group
       reference_plan = benefit_group.reference_plan
-      decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
+
+      if benefit_group.is_congress
+        decorated_plan = PlanCostDecoratorCongress.new(plan, hbx_enrollment, benefit_group)
+      else
+        decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
+      end
     else
       get_aptc_info_from_session(hbx_enrollment)
       if @shopping_tax_household.present? and @elected_aptc > 0
@@ -48,10 +53,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
-    if @enrollment.employee_role.present?
+    if @enrollment.is_shop?
       benefit_group = @enrollment.benefit_group
       reference_plan = benefit_group.reference_plan
-      @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+      if benefit_group.is_congress
+        @plan = PlanCostDecoratorCongress.new(plan, @enrollment, benefit_group)
+      else
+        @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+      end
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -92,10 +101,14 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
 
-    if @enrollment.employee_role.present?
+    if @enrollment.is_shop?
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+      if @benefit_group.is_congress
+        @plan = PlanCostDecoratorCongress.new(@plan, @enrollment, @benefit_group)
+      else
+        @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+      end
     else
       get_aptc_info_from_session(@enrollment)
       if @shopping_tax_household.present? and @elected_aptc > 0
