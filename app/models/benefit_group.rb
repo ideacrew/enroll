@@ -21,6 +21,11 @@ class BenefitGroup
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
+  # FIX ME types
+  field :contribution_pct_as_int, type: Integer, default: 75
+  field :employee_max_amt_in_cents, type: Money, default: 0
+  field :first_dependent_max_amt_in_cents, type: Integer, default: 0
+  field :over_one_dependents_max_amt_in_cents, type: Integer, default: 0
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
@@ -31,11 +36,13 @@ class BenefitGroup
   field :lowest_cost_plan_id, type: BSON::ObjectId
   field :highest_cost_plan_id, type: BSON::ObjectId
 
+
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
+  field :is_congress, type: Boolean, default: false
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
@@ -78,6 +85,8 @@ class BenefitGroup
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
 
+  before_save :set_congress_defaults
+
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
   # end
@@ -92,6 +101,20 @@ class BenefitGroup
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
   end
+
+  def set_bounding_cost_plans
+    plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+    if plans.size > 0
+      plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
+
+      self.lowest_cost_plan_id  = plans_by_cost.first.id
+      @lowest_cost_plan = plans_by_cost.first
+
+      self.highest_cost_plan_id = plans_by_cost.last.id
+      @highest_cost_plan = plans_by_cost.last
+    end
+  end
+
 
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
@@ -148,8 +171,20 @@ class BenefitGroup
     elected_plans.collect(){|plan| decorated_plan(plan, member_provider, max_contribution_cache)}
   end
 
-  def decorated_plan(plan, member_provider, max_contribution_cache)
-    PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
+  def decorated_plan(plan, member_provider, max_contribution_cache = {})
+    if is_congress
+      PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
+    else
+      PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
+    end
+  end
+
+  def first_dependent_max_amt_in_cents=(new_first_dependent_max_amt_in_cents)
+    write_attribute(:first_dependent_max_amt_in_cents, dollars_to_cents(new_first_dependent_max_amt_in_cents))
+  end
+
+  def over_one_dependents_max_amt_in_cents=(new_over_one_dependents_max_amt_in_cents)
+    write_attribute(:over_one_dependents_max_amt_in_cents, dollars_to_cents(new_over_one_dependents_max_amt_in_cents))
   end
 
   def benefit_group_assignments
@@ -263,7 +298,7 @@ class BenefitGroup
   end
 
   def employee_cost_for_plan(ce, plan = reference_plan)
-    pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+    pcd = @is_congress ? decorated_plan(plan, ce) : PlanCostDecorator.new(plan, ce, self, reference_plan)
     pcd.total_employee_cost
   end
 
@@ -294,6 +329,18 @@ class BenefitGroup
   end
 
 private
+
+  def set_congress_defaults
+    return true unless is_congress
+    self.plan_option_kind = "metal_level"
+    self.default = true
+    self.contribution_pct_as_int ||= 75
+    # FIX ME amounts
+    self.employee_max_amt_in_cents ||=  462_30
+    self.first_dependent_max_amt_in_cents ||= 998_88
+    self.over_one_dependents_max_amt_in_cents ||= 1058_42
+  end
+
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end

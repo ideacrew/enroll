@@ -4,7 +4,7 @@ module Factories
 
     EARLIEST_RENEWAL_START_ON = HbxProfile::ShopMaximumRenewalPeriodBeforeStartOn
 
-    attr_accessor :employer_profile
+    attr_accessor :employer_profile, :is_congress
 
     def renew
       @employer_profile = employer_profile
@@ -80,6 +80,17 @@ module Factories
       end
     end
 
+    def reference_plans(active_group)
+      start_on_year = (active_group.start_on + 1.year).year
+      if active_group.plan_option_kind == "single_carrier"        
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/)
+      elsif active_group.plan_option_kind == "metal_level"
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/)
+      else
+        Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
+      end
+    end
+
     def clone_benefit_group(active_group)
       index = @active_plan_year.benefit_groups.index(active_group) + 1
       new_year = @active_plan_year.start_on.year + 1
@@ -89,7 +100,7 @@ module Factories
         raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
       end
 
-      elected_plan_ids  = Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
+      elected_plan_ids = reference_plans(active_group).map(&:id)
       if elected_plan_ids.blank?
         raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
       end
@@ -103,9 +114,9 @@ module Factories
         effective_on_offset: active_group.effective_on_offset,
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
         relationship_benefits: active_group.relationship_benefits,
-
         reference_plan_id: reference_plan_id,
-        elected_plan_ids: elected_plan_ids
+        elected_plan_ids: elected_plan_ids,
+        is_congress: is_congress
       })
     end
 
