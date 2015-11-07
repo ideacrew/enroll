@@ -2,7 +2,7 @@ namespace :congress do
   desc "Create 2015 & 2016 plan years and benefit groups for congress employers."
   task :create_plan_years => :environment do
     gold_2015 = Plan.valid_shop_by_metal_level_and_year("gold", "2015").collect(&:_id)
-    gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
+    # gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
     congress_employer_feins = []
     plan_year_attributes = [
       {
@@ -13,11 +13,13 @@ namespace :congress do
         benefit_group_attributes: {
           title: "2015 Benefit Group",
           contribution_pct_as_int: 75,
-          employee_max_amt_in_cents: 437_69,
-          first_dependent_max_amt_in_cents: 971_90,
-          over_one_dependents_max_amt_in_cents: 971_90,
+          employee_max_amt: 437.69,
+          first_dependent_max_amt: 971.90,
+          over_one_dependents_max_amt: 971.90,
           reference_plan_id: gold_2015.first,
-          elected_plan_ids: gold_2015
+          elected_plan_ids: gold_2015,
+          plan_option_kind: "metal_level", 
+          is_congress: true
         }
       }#,
 =begin  
@@ -66,8 +68,34 @@ namespace :congress do
       }
     ]
 
-    congress_employer_feins.each do |fein|
+    # Destroy all HBX Enrollments associated with Renewal
+
+    ["536002522"].each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
+
+      families = Family.all_enrollments_by_benefit_group_id(employer_profile.plan_years.first.benefit_groups.first.id)
+      puts "families found #{families.count}"
+
+      # renewed_families = families.select{|family| family.active_household.hbx_enrollments.size > 1}.count
+      # puts "families with renewal enrollment #{renewed_families}"
+
+      puts "deleting renewed plan year, assingments, enrollments"
+      employer_profile.plan_years.renewing.each do |plan_year|
+        renewing_bg_id = plan_year.benefit_groups.first.id
+
+        families.each do |family|
+          family.active_household.hbx_enrollments.renewing.each{|e| e.destroy}
+        end
+
+        employer_profile.census_employees.by_benefit_group_ids([renewing_bg_id]).each do |census_employee|
+          census_employee.renewal_benefit_group_assignment.destroy
+        end
+
+        plan_year.destroy
+      end
+
+      active_benefit_group_id = employer_profile.plan_years.first.benefit_groups.first.id
+
       plan_year = nil
       if employer_profile.nil?
         puts "Unable to find employer profile for fein #{fein}"
@@ -75,7 +103,7 @@ namespace :congress do
         plan_year_attributes.each do |plan_year_attribs|
           plan_year = PlanYear.new(plan_year_attribs.except(:benefit_group_attributes))
           employer_profile.plan_years = [plan_year]
-          benefit_group = BenefitGroupCongress.new(plan_year_attribs[:benefit_group_attributes])
+          benefit_group = BenefitGroup.new(plan_year_attribs[:benefit_group_attributes])
           benefit_group.relationship_benefits =
             relationship_benefit_attributes.collect do |relationship_benefit_attribs|
               RelationshipBenefit.new(relationship_benefit_attribs)
@@ -83,8 +111,26 @@ namespace :congress do
           plan_year.benefit_groups = [benefit_group]
         end
       end
-      if plan_year.valid? && plan_year.save
+
+
+      if plan_year.save
         puts "Successfully created plan year #{plan_year.start_on.year} for employer #{fein}."
+
+        families.each do |family|
+          family.active_household.hbx_enrollments.each do |e|
+            e.benefit_group_id = plan_year.benefit_groups.first.id
+            e.save!
+          end
+        end
+
+        puts "Found #{employer_profile.census_employees.any_of(CensusEmployee.active.selector, CensusEmployee.waived.selector).count} census emloyees with old reference. Updating..."
+        employer_profile.census_employees.any_of(CensusEmployee.active.selector, CensusEmployee.waived.selector).each do |census_employee|
+          puts "updating ---#{census_employee}--#{census_employee.full_name} with id #{census_employee.id}"
+          census_employee.active_benefit_group_assignment.update_attributes!(benefit_group_id: plan_year.benefit_groups.first.id)
+        end
+
+        employer_profile.application_expired! if employer_profile.registered?
+        plan_year.publish!
       else
         puts plan_year.errors.full_messages.inspect
         puts "Error creating plan year #{plan_year.start_on.year} for employer #{fein}."
