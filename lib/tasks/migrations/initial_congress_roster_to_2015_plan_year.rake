@@ -95,8 +95,8 @@ namespace :migrations do
         end
       end
 
-      employer_profile.aasm_state = "applicant"  #application_expired! if employer_profile.registered?
-      plan_year.publish
+
+      employer_profile.enrollment_denied!
 
       if plan_year.save
         puts "Successfully created plan year: #{plan_year.start_on.year} for employer: #{fein}."
@@ -120,7 +120,7 @@ namespace :migrations do
         #   census_employee.active_benefit_group_assignment.update_attributes!(benefit_group_id: plan_year.benefit_groups.first.id)
         # end
 
-        # plan_year.publish!
+        plan_year.publish!
       else
         puts "Error creating plan year #{plan_year.start_on.year} for employer #{fein}."
         puts plan_year.errors.full_messages.inspect
