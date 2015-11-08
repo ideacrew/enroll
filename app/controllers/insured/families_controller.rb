@@ -73,6 +73,7 @@ class Insured::FamiliesController < FamiliesController
 
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
+    @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
     respond_to do |format|
       format.html
     end

@@ -209,7 +209,6 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = find_person(params[:id])
 
-
     make_new_person_params @person
 
     @person.updated_by = current_user.email unless current_user.nil?
@@ -353,7 +352,7 @@ private
     if person_params["addresses_attributes"].present?
       person_params["addresses_attributes"].each do |key, address|
         if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
-          person_params["addresses_attributes"].delete("#{key}")
+          params["person"]["addresses_attributes"].delete("#{key}")
         end
       end
     end
@@ -361,7 +360,7 @@ private
     if person_params["phones_attributes"].present?
       person_params["phones_attributes"].each do |key, phone|
         if phone["full_phone_number"].blank?
-          person_params["phones_attributes"].delete("#{key}")
+          params["person"]["phones_attributes"].delete("#{key}")
         end
       end
     end
@@ -369,7 +368,7 @@ private
     if person_params["emails_attributes"].present?
       person_params["emails_attributes"].each do |key, email|
         if email["address"].blank?
-          person_params["emails_attributes"].delete("#{key}")
+          params["person"]["emails_attributes"].delete("#{key}")
         end
       end
     end
