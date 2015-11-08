@@ -114,10 +114,15 @@ class Insured::FamiliesController < FamiliesController
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
-      if @enrollment.employee_role.present?
+      if @enrollment.is_shop?
         @benefit_group = @enrollment.benefit_group
         @reference_plan = @benefit_group.reference_plan
-        @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+
+        if @benefit_group.is_congress
+          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
+        else
+          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+        end
       else
         @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end

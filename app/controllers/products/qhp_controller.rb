@@ -51,7 +51,13 @@ class Products::QhpController < ApplicationController
     if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental")
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
+      if @benefit_group.is_congress
+        @plan = PlanCostDecoratorCongress.new(@qhp.plan, @hbx_enrollment, @benefit_group)
+      else
+        @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
+      end
+
+      #@plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
     else
       @plan = UnassistedPlanCostDecorator.new(@qhp.plan, @hbx_enrollment)
     end

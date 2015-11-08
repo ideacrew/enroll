@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health') }
-  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id") }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
   let(:family_members){ [family_member, family_member] }
-  let(:benefit_group) {double("BenefitGroup")}
+  let(:benefit_group) {double("BenefitGroup", is_congress: false)}
   let(:reference_plan) {double("Plan")}
   let(:usermailer) {double("UserMailer")}
   let(:person) { FactoryGirl.create(:person) }
@@ -26,6 +26,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(hbx_enrollment).to receive(:may_select_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:select_coverage!).and_return(true)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(UserMailer).to receive(:plan_shopping_completed).and_return(usermailer)
       allow(usermailer).to receive(:deliver_now).and_return(true)
@@ -65,15 +66,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   context "GET receipt" do
 
     let(:user) { double("User") }
-    let(:enrollment) { double("HbxEnrollment") }
+    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
     let(:plan) { double("Plan") }
-    let(:benefit_group) { double("BenefitGroup") }
+    let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
+      allow(enrollment).to receive(:is_shop?).and_return(false)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(enrollment).to receive(:employee_role).and_return(employee_role)
@@ -91,9 +93,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   context "GET thankyou" do
 
-    let(:enrollment) { double("HbxEnrollment") }
+    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double)) }
     let(:plan) { double("Plan") }
-    let(:benefit_group) { double("BenefitGroup") }
+    let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:family) { double("Family") }
     let(:plan_year) { double("PlanYear") }
@@ -103,6 +105,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(Plan).to receive(:find).with("plan_id").and_return(plan)
       allow(enrollment).to receive(:plan).and_return(plan)
+      allow(enrollment).to receive(:is_shop?).and_return(false)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
