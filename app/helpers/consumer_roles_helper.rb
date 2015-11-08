@@ -54,4 +54,8 @@ module ConsumerRolesHelper
   def show_vlp_documents_container(obj)
     show_naturalization_doc_type(obj) || show_immigration_doc_type(obj)
   end
+
+  def show_keep_existing_plan(shop_for_plans, hbx_enrollment, new_effective_on)
+    shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
+  end
 end

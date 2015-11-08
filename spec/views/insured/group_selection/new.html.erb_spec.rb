@@ -251,6 +251,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "when hbx_enrollment not terminated" do
+      allow(view).to receive(:show_keep_existing_plan).and_return true
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)

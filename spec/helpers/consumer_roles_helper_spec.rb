@@ -133,4 +133,23 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       expect(helper.show_vlp_documents_container(person)).to eq false
     end
   end
+
+  context "show_keep_existing_plan" do
+    let(:date) { TimeKeeper.date_of_record }
+    let(:hbx_enrollment) {double(effective_on: date)}
+
+    it "should return false with shop_for_plans" do
+      expect(helper.show_keep_existing_plan("shop_for_plans", hbx_enrollment, date)).to eq false
+    end
+
+    context "without shop_for_plans" do
+      it "hbx_enrollment and new_effective_on is in the same year" do
+        expect(helper.show_keep_existing_plan("", hbx_enrollment, date)).to eq true
+      end
+
+      it "hbx_enrollment and new_effective_on is not in the same year" do
+        expect(helper.show_keep_existing_plan("", hbx_enrollment, (date + 1.year))).to eq false
+      end
+    end
+  end
 end

@@ -122,7 +122,7 @@
               <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% end %>
             <% if @hbx_enrollment.present? and @hbx_enrollment.coverage_selected? %>
-              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if @shop_for_plans.blank? %>
+              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
               <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' %>
             <% end %>

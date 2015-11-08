@@ -28,6 +28,13 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
+    @new_effective_on = HbxEnrollment.calculate_effective_on_from(
+      market_kind:@market_kind,
+      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      family: @family,
+      employee_role: @employee_role,
+      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_sponsorship: HbxProfile.current_hbx.benefit_sponsorship)
   end
 
   def create
@@ -126,7 +133,7 @@ class Insured::GroupSelectionController < ApplicationController
       @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     end
 
-    @hbx_enrollment = @family.latest_household.hbx_enrollments.enrolled[0] if @hbx_enrollment.blank?
+    @hbx_enrollment = @family.latest_household.hbx_enrollments.enrolled.last if @hbx_enrollment.blank?
     # @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
     if params[:employee_role_id].present?
       emp_role_id = params.require(:employee_role_id)

@@ -589,6 +589,48 @@ describe HbxProfile, "class methods", type: :model do
       expect(enrollment.enrollment_kind).to eq "special_enrollment"
     end
   end
+
+  context "calculate_effective_on_from" do
+    let(:date) {TimeKeeper.date_of_record}
+    let(:family) { double(current_sep: double(effective_on:date), is_under_special_enrollment_period?: true) }
+    let(:hbx_profile) {double} 
+    let(:benefit_sponsorship) { double }
+    let(:bcp) { double }
+    let(:benefit_group) {double()}
+    let(:employee_role) {double(hired_on: date)}
+
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+    end
+
+    context "shop" do
+      it "special_enrollment" do
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'shop', qle:true, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: nil)).to eq date
+      end
+
+      it "open_enrollment" do
+        effective_on = date - 10.days
+        allow(benefit_group).to receive(:effective_on_for).and_return(effective_on)
+        allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'shop', qle:false, family: family, employee_role: employee_role, benefit_group: benefit_group, benefit_sponsorship: nil)).to eq effective_on 
+      end
+    end
+
+    context "individual" do
+      it "special_enrollment" do
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'individual', qle:true, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: nil)).to eq date
+      end
+
+      it "open_enrollment" do
+        effective_on = date - 10.days
+        allow(bcp).to receive(:earliest_effective_date).and_return effective_on
+        allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'individual', qle:false, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: benefit_sponsorship)).to eq effective_on 
+      end
+    end
+  end
 end
 
 # describe HbxEnrollment, "#save", type: :model do
