@@ -2,12 +2,19 @@ module Factories
   class FamilyEnrollmentRenewalFactory
     include Mongoid::Document
 
+    # Renews a family's active enrollments from current plan year
+
     attr_accessor :family
 
     def renew
       raise ArgumentError unless defined?(@family)
 
-      shop_enrollments = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+      # shop_enrollments = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+      excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
+                            renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
+                          )
+
+      shop_enrollments = @family.enrollments.shop_market.reduce { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e } 
 
       if shop_enrollments.any?
         @census_employee = get_census_employee(shop_enrollments.first)
