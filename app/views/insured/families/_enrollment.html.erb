@@ -81,6 +81,7 @@
               </table>
 
               <% names = hbx_enrollment.covered_members_first_names %>
+              <% if names.present? %>
               <div class="family-members info">
                 <p>
                   <label>Covered:</label>
@@ -92,6 +93,7 @@
                   <% end %>
                 </p>
               </div>
+              <% end %>
 
             </div>
             <div class="col-xs-3">
