@@ -336,7 +336,7 @@ class ConsumerRole
       person.phones.build(kind: kind) if person.phones.select { |phone| phone.kind == kind }.blank?
     end
 
-    Address::KINDS.each do |kind|
+    (Address::KINDS - ['work']).each do |kind|
       person.addresses.build(kind: kind) if person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
     end
 

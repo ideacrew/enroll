@@ -436,5 +436,30 @@ describe "#find_vlp_document_by_key" do
       expect(found_document).to eql(vlp_document)
     end
   end
+end
 
+describe "#build_nested_models_for_person" do
+  let(:person) {FactoryGirl.create(:person)}
+  let(:consumer_role) {ConsumerRole.new}
+
+  before do
+    allow(consumer_role).to receive(:person).and_return person
+    consumer_role.build_nested_models_for_person
+  end
+
+  it "should get home and mailing address" do
+    expect(person.addresses.map(&:kind)).to include "home"
+    expect(person.addresses.map(&:kind)).to include 'mailing'
+  end
+
+  it "should get home and mobile phone" do
+    expect(person.phones.map(&:kind)).to include "home"
+    expect(person.phones.map(&:kind)).to include "mobile"
+  end
+
+  it "should get emails" do
+    Email::KINDS.each do |kind|
+      expect(person.emails.map(&:kind)).to include kind
+    end
+  end
 end

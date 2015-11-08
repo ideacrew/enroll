@@ -384,14 +384,16 @@ $(document).ready(function () {
     })
   }
 
-  $('#address_info + span.form-action').toggleClick(function () {
-    $(this).text('Remove Mailing Address');
-    $('.row-form-wrapper.mailing-div').show();
-  }, function () {
-    $(this).text('Add Mailing Address');
-    $('.mailing-div').hide();
-    $('.mailing-div input').val("");
-    $('.mailing-div .label-floatlabel').hide();
+  $(document).on('click', '#address_info + span.form-action', function(){
+    if ($(this).text() == "Add Mailing Address"){
+      $(this).text('Remove Mailing Address');
+      $('.row-form-wrapper.mailing-div').show();
+    }else if ($(this).text() == "Remove Mailing Address"){
+      $(this).text('Add Mailing Address');
+      $('.mailing-div').hide();
+      $(".mailing-div input[type='text']").val("");
+      $('.mailing-div .label-floatlabel').hide();
+    }
   });
 
 
