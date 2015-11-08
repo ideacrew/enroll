@@ -14,9 +14,9 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
   context "a user with a different id than the users person" do
     let(:foreign_employee) { EmployeeRole.new}
-    it "should redirect you to your bookmark employee role page or families home" do
-      expect(controller).to receive(:redirect_to_check_employee_role)
-      subject.authorize_employee_role(foreign_employee, controller)
-    end
+    # it "should redirect you to your bookmark employee role page or families home" do
+    #   expect(controller).to receive(:redirect_to_check_employee_role)
+    #   subject.authorize_employee_role(foreign_employee, controller)
+    # end
   end
 end
