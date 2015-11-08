@@ -1,6 +1,7 @@
 namespace :migrations do
   desc "Update congressional employee roster initial load to 2015 plan years and benefit groups"
   task :initial_congress_roster_to_2015_plan_year => :environment do
+    
     gold_2015 = Plan.valid_shop_by_metal_level_and_year("gold", "2015").collect(&:_id)
 
     plan_year_attributes = [
