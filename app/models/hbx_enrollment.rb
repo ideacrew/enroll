@@ -35,12 +35,12 @@ class HbxEnrollment
     ]
 
   TERMINATED_STATUSES = ["coverage_terminated", "coverage_canceled", "unverified"]
-  RENEWAL_STATUSES = %w(renewing_passive renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled)
+  RENEWAL_STATUSES = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled)
 
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
-                                  "renewing_passive" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
+                                  "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
   ENROLLMENT_TRAIN_STOPS_STEPS.default = 0
 
   COVERAGE_KINDS = %w[health dental]
@@ -593,7 +593,7 @@ class HbxEnrollment
 
     state :inactive   # :after_enter inform census_employee
 
-    state :renewing_passive
+    state :auto_renewing
     state :renewing_coverage_selected
     state :renewing_transmitted_to_carrier
     state :renewing_coverage_enrolled      # effectuated
@@ -606,17 +606,17 @@ class HbxEnrollment
     end
 
     event :renew_enrollment do
-      transitions from: :shopping, to: :renewing_passive
+      transitions from: :shopping, to: :auto_renewing
     end
 
     event :select_coverage do
       transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
-      transitions from: :renewing_passive, to: :renewing_coverage_selected, after: :propogate_selection
+      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection
     end
 
     event :transmit_coverage do
       transitions from: :coverage_selected, to: :transmitted_to_carrier
-      transitions from: :renewing_passive, to: :renewing_transmitted_to_carrier
+      transitions from: :auto_renewing, to: :renewing_transmitted_to_carrier
       transitions from: :renewing_coverage_selected, to: :renewing_transmitted_to_carrier
     end
 
@@ -626,12 +626,12 @@ class HbxEnrollment
     end
 
     event :waive_coverage do
-      transitions from: [:shopping, :coverage_selected, :renewing_passive, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
+      transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
-      transitions from: :renewing_passive, to: :coverage_terminated, after: :propogate_terminate
+      transitions from: :auto_renewing, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :renewing_coverage_selected, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :enrolled_contingent, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :unverified, to: :coverage_terminated, after: :propogate_terminate
