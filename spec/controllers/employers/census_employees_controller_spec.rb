@@ -182,7 +182,12 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET show" do
+    let(:benefit_group_assignment) { double(hbx_enrollment: hbx_enrollment) }
+    let(:hbx_enrollment) { double }
+
     it "should be render show template" do
+      allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(double)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)

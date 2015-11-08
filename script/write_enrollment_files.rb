@@ -26,8 +26,8 @@ ConnectionSlug = Struct.new(:policy_id) do
   end
 end
 
-CSV.foreach("policy_transmission_list.csv", headers: false) do |row|
-   pid, *rest = row.to_a
+CSV.foreach("effective_date_changes.csv", headers: true) do |row|
+   pid, *rest = row.fields
    properties_slug = PropertiesSlug.new("", {:policy_id => pid})
    controller.resource(ConnectionSlug.new(pid), "", properties_slug, "")
 end

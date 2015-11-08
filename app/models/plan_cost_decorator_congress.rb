@@ -96,12 +96,12 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def large_family_factor(member)
     if age_of(member) > 20
-      1.0
+      1.00
     else
       if child_index(member) > 2
-        0.0
+        0.00
       else
-        1.0
+        1.00
       end
     end
   end
@@ -129,27 +129,27 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def employer_contribution_for(member)
-    (total_employer_contribution * ((premium_for(member)/total_premium).round(2))).round(2)
+    (total_employer_contribution * (premium_for(member)/total_premium)).round(2)
     # premium_for(member) * ( total_employer_contribution / total_premium )
   end
 
   def employee_cost_for(member)
-    premium_for(member) - (employer_contribution_for(member).cents/100.0)
+    premium_for(member) - employer_contribution_for(member)
   end
 
   def total_premium
-    members.reduce(0) do |sum, member|
-      (sum + premium_for(member)).round(2)
-    end
+    members.reduce(0.00) do |sum, member|
+      (sum + premium_for(member))
+    end.round(2)
   end
 
   def total_employer_contribution
-    ([total_premium * employer_contribution_percent / 100.0, total_max_employer_contribution].min).round(2)
+    ([total_premium * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
   end
 
   def total_employee_cost
-    members.reduce(0) do |sum, member|
+    (members.reduce(0.00) do |sum, member|
       (sum + premium_for(member)).round(2)
-    end - (total_employer_contribution.cents/100.0)
+    end) - total_employer_contribution
   end
 end
