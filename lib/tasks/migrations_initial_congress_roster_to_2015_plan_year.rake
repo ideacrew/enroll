@@ -1,9 +1,8 @@
-namespace :congress do
-  desc "Create 2015 & 2016 plan years and benefit groups for congress employers."
-  task :create_plan_years => :environment do
+namespace :migrations do
+  desc "Update congressional employee roster initial load to 2015 plan years and benefit groups"
+  task :initial_congress_roster_to_2015_plan_year => :environment do
     gold_2015 = Plan.valid_shop_by_metal_level_and_year("gold", "2015").collect(&:_id)
-    # gold_2016 = Plan.valid_shop_by_metal_level_and_year("gold", "2016").collect(&:_id)
-    congress_employer_feins = []
+
     plan_year_attributes = [
       {
         start_on: Date.new(2015, 1, 1),
@@ -21,25 +20,9 @@ namespace :congress do
           plan_option_kind: "metal_level", 
           is_congress: true
         }
-      }#,
-=begin  
-      {
-        start_on: Date.new(2016, 1, 1),
-        end_on: Date.new(2016, 12, 31),
-        open_enrollment_start_on: Date.new(2016, 11, 9),
-        open_enrollment_end_on: Date.new(2016, 12, 13),
-        benefit_group_attributes: {
-          title: "2016 Benefit Group",
-          contribution_pct_as_int: 75,
-          employee_max_amt_in_cents: 462_30,
-          first_dependent_max_amt_in_cents: 998_88,
-          over_one_dependents_max_amt_in_cents: 1058_42,
-          reference_plan_id: gold_2016.first,
-          elected_plan_ids: gold_2016
-        }
-      }
-=end
+      }    
     ]
+
     relationship_benefit_attributes = [
       {
         relationship: :employee,
@@ -68,18 +51,17 @@ namespace :congress do
       }
     ]
 
-    # Destroy all HBX Enrollments associated with Renewal
-
-    ["536002522"].each do |fein|
+    employer_feins = ["536002522"]#, "536002523", "536002558"]
+    employer_feins.each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
 
       families = Family.all_enrollments_by_benefit_group_id(employer_profile.plan_years.first.benefit_groups.first.id)
-      puts "families found #{families.count}"
+      puts "families found: #{families.size}"
 
-      # renewed_families = families.select{|family| family.active_household.hbx_enrollments.size > 1}.count
+      # renewed_families = families.select{|family| family.active_household.hbx_enrollments.size > 1}.size
       # puts "families with renewal enrollment #{renewed_families}"
 
-      puts "deleting renewed plan year, assingments, enrollments"
+      puts "deleting renewed plan year, assignments, enrollments"
       employer_profile.plan_years.renewing.each do |plan_year|
         renewing_bg_id = plan_year.benefit_groups.first.id
 
@@ -112,9 +94,8 @@ namespace :congress do
         end
       end
 
-
       if plan_year.save
-        puts "Successfully created plan year #{plan_year.start_on.year} for employer #{fein}."
+        puts "Successfully created plan year: #{plan_year.start_on.year} for employer: #{fein}."
 
         families.each do |family|
           family.active_household.hbx_enrollments.each do |e|
@@ -123,8 +104,14 @@ namespace :congress do
           end
         end
 
-        puts "Found #{employer_profile.census_employees.any_of(CensusEmployee.active.selector, CensusEmployee.waived.selector).count} census emloyees with old reference. Updating..."
-        employer_profile.census_employees.any_of(CensusEmployee.active.selector, CensusEmployee.waived.selector).each do |census_employee|
+        # census_employees = employer_profile.census_employees.any_of(CensusEmployee.active.selector,
+        #                                                             CensusEmployee.waived.selector,
+        #                                                             initialized: true)
+
+        census_employees = employer_profile.census_employees
+
+        puts "Checking #{census_employees.size} census employees with reference to deleted plan year..."
+        census_employees.each do |census_employee|
           puts "updating ---#{census_employee}--#{census_employee.full_name} with id #{census_employee.id}"
           census_employee.active_benefit_group_assignment.update_attributes!(benefit_group_id: plan_year.benefit_groups.first.id)
         end
@@ -132,8 +119,8 @@ namespace :congress do
         employer_profile.application_expired! if employer_profile.registered?
         plan_year.publish!
       else
-        puts plan_year.errors.full_messages.inspect
         puts "Error creating plan year #{plan_year.start_on.year} for employer #{fein}."
+        puts plan_year.errors.full_messages.inspect
       end
     end
   end
