@@ -33,7 +33,9 @@ class TaxHousehold
 
   def current_max_aptc
     eligibility_determination = latest_eligibility_determination
-    if eligibility_determination.present? and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
+    #TODO need business rule to decide how to get the max aptc
+    #during open enrollment and determined_at
+    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
       eligibility_determination.max_aptc
     else
       0
@@ -99,7 +101,7 @@ class TaxHousehold
     end
 
     # FIXME should get hbx_enrollments by effective_starting_on
-    household.current_year_hbx_enrollments.select {|hbx| hbx.applied_aptc_amount > 0}.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+    household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)

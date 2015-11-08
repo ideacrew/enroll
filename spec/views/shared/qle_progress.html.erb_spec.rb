@@ -50,6 +50,10 @@ describe "shared/_qle_progress.html.erb" do
     it "should have previous option" do
       expect(rendered).to match /PREVIOUS/
     end
+
+    it "should not have disabled link" do
+      expect(rendered).not_to have_selector('a.disabled')
+    end
   end
 
   context "step 3 Consumer" do
@@ -59,7 +63,7 @@ describe "shared/_qle_progress.html.erb" do
       assign :enrollment, enrollment
       allow(person).to receive(:consumer_role).and_return(true)
       @person = person
-      render 'shared/qle_progress', step: '3'
+      render 'shared/qle_progress', step: '3', kind: 'individual'
     end
 
     it "should have 75% complete" do
@@ -76,6 +80,10 @@ describe "shared/_qle_progress.html.erb" do
 
     it "should have previous option" do
       expect(rendered).to match /PREVIOUS/
+    end
+
+    it "should have disabled link" do
+      expect(rendered).to have_selector('a.disabled')
     end
   end
 end

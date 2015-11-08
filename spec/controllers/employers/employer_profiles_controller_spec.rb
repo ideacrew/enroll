@@ -438,6 +438,7 @@ RSpec.describe Employers::EmployerProfilesController do
       }
     }
 
+
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:roles).and_return(["employer_staff"])
@@ -448,6 +449,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(organization).to receive(:assign_attributes).and_return(true)
       allow(organization).to receive(:save).and_return(true)
       allow(organization).to receive(:update_attributes).and_return(true)
+
+      allow(controller).to receive(:employer_params).and_return({"dob"=>"07/16/1980","first_name"=>"test"})
 
       allow(controller).to receive(:organization_profile_params).and_return({})
       allow(controller).to receive(:employer_profile_params).and_return({})

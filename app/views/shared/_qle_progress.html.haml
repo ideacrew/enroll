@@ -1,5 +1,6 @@
 - step = (defined? step) ? step.to_i : 1
 - no_purchase = (defined? no_purchase) ? no_purchase : false
+- kind = (defined? kind) ? kind : 'employer_sponsored'
 
 - percent_complete = 0
 - percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100: 0)))
@@ -23,7 +24,7 @@
     .vertical-line-progress
     Complete
 - if step == 3 and !no_purchase
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary btn-br btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post
   %ul.list-unstyled.list-right-section
     %li
       %a.back{href: '#'}

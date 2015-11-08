@@ -23,7 +23,7 @@
       </div>
       <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
         <li class="header-text">
-          <% if current_user.try(:has_employee_role?) || current_user.try(:has_consumer_role?) %>
+          <% if current_user.try(:has_employee_role?) || (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) %>
           <a href="<%= family_account_path %>" <% if current_user.try(:has_employee_role?) %>style="padding: 7px 10px 0 10px;"<% end %>>
             <%= portal_display_name(controller_name) %>
           </a>
