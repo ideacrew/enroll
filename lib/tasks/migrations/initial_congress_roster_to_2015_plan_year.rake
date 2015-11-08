@@ -95,9 +95,6 @@ namespace :migrations do
         end
       end
 
-
-      employer_profile.enrollment_denied!
-
       if plan_year.save
         puts "Successfully created plan year: #{plan_year.start_on.year} for employer: #{fein}."
 
@@ -119,6 +116,13 @@ namespace :migrations do
         #   puts "updating ---#{census_employee}--#{census_employee.full_name} with id #{census_employee.id}"
         #   census_employee.active_benefit_group_assignment.update_attributes!(benefit_group_id: plan_year.benefit_groups.first.id)
         # end
+
+        if employer_profile.binder_paid?
+          employer_profile.binder_reversed!
+          employer_profile.enrollment_expired!
+        else
+          employer_profile.enrollment_denied! if employer_profile.registered? || employer_profile.enrolled?
+        end
 
         plan_year.publish!
       else
