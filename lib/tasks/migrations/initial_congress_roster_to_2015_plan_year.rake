@@ -98,24 +98,6 @@ namespace :migrations do
       if plan_year.save
         puts "Successfully created plan year: #{plan_year.start_on.year} for employer: #{fein}."
 
-        # families.each do |family|
-        #   family.active_household.hbx_enrollments.each do |e|
-        #     e.benefit_group_id = plan_year.benefit_groups.first.id
-        #     e.save!
-        #   end
-        # end
-
-        # census_employees = employer_profile.census_employees.any_of(CensusEmployee.active.selector,
-        #                                                             CensusEmployee.waived.selector,
-        #                                                             initialized: true)
-
-        # census_employees = employer_profile.census_employees
-
-        # puts "Checking #{census_employees.size} census employees with reference to deleted plan year..."
-        # census_employees.each do |census_employee|
-        #   puts "updating ---#{census_employee}--#{census_employee.full_name} with id #{census_employee.id}"
-        #   census_employee.active_benefit_group_assignment.update_attributes!(benefit_group_id: plan_year.benefit_groups.first.id)
-        # end
 
         if employer_profile.binder_paid?
           employer_profile.binder_reversed!

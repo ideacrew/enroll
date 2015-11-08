@@ -1057,7 +1057,16 @@ describe Family, 'coverage_waived?' do
   let(:family) {Family.new}
   let(:household) {double}
   let(:hbx_enrollment) {HbxEnrollment.new}
+  let(:hbx_enrollments) { double }
+
+  # def coverage_waived?
+  #   latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.waived.any?
+  # end
+
   before :each do
+    allow(hbx_enrollments).to receive(:any?).and_return(true)
+    allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:waived).and_return([]) 
     allow(family).to receive(:latest_household).and_return household
   end
 
@@ -1067,13 +1076,11 @@ describe Family, 'coverage_waived?' do
   end
 
   it "return false with hbx_enrollments" do
-    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
     expect(family.coverage_waived?).to eq false
   end
 
   it "return true" do
-    allow(household).to receive(:hbx_enrollments).and_return [hbx_enrollment]
-    allow(hbx_enrollment).to receive(:aasm_state).and_return "inactive"
+    allow(hbx_enrollments).to receive(:waived).and_return([hbx_enrollment]) 
     expect(family.coverage_waived?).to eq true
   end
 end

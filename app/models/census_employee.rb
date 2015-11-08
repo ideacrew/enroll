@@ -53,6 +53,8 @@ class CensusEmployee < CensusMember
 
   scope :active,      ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
   scope :terminated,  ->{ any_in(aasm_state: ["employment_terminated", "rehired"]) }
+  scope :non_terminated, -> { where(:aasm_state.nin => ["employment_terminated", "rehired"]) }
+
   #TODO - need to add fix for multiple plan years
   scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
   scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }

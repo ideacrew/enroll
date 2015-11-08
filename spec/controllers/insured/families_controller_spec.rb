@@ -5,16 +5,18 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
-  let(:family) { double("Family") }
-  let(:household) { double("HouseHold") }
+  let(:family) { double("Family", active_household: household) }
+  let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:family_members){[double("FamilyMember")]}
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
+
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
