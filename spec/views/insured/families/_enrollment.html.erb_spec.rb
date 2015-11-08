@@ -83,4 +83,21 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('strong', text: '$100')
     end
   end
+
+  context "about covered_members_first_names of hbx_enrollment" do
+    let(:plan) {FactoryGirl.build(:plan)}
+   
+    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+                                 covered_members_first_names: [], can_complete_shopping?: false,
+                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+    end
+
+    it "should not display family_members info" do
+      expect(rendered).not_to have_selector('.family_members.info')
+    end
+  end
 end
