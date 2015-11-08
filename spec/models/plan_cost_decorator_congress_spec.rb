@@ -64,7 +64,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         let(:premium_constant) { Money.new("1000") }
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq ((plan_cost_decorator.premium_for(hem_employee)/plan_cost_decorator.total_premium).round(2)*plan_cost_decorator.total_employer_contribution).round(2)
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq ((plan_cost_decorator.premium_for(hem_employee)/plan_cost_decorator.total_premium)*plan_cost_decorator.total_employer_contribution).round(2)
         end
       end
 

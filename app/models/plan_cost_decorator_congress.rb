@@ -129,7 +129,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def employer_contribution_for(member)
-    (total_employer_contribution * ((premium_for(member)/total_premium).round(2))).round(2)
+    (total_employer_contribution * (premium_for(member)/total_premium)).round(2)
     # premium_for(member) * ( total_employer_contribution / total_premium )
   end
 
@@ -139,8 +139,8 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def total_premium
     members.reduce(0.00) do |sum, member|
-      (sum + premium_for(member)).round(2)
-    end
+      (sum + premium_for(member))
+    end.round(2)
   end
 
   def total_employer_contribution
