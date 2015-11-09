@@ -8,7 +8,11 @@ $(function() {
       $.ajax({
         url: $('span[name=employee_families_url]').text() + '.js',
         type: "GET",
-        data : { 'status': filter, 'employee_name': search }
+        data : { 'status': filter, 'employee_name': search },
+        crossDomain: true,
+        xhrFields: {
+          withCredentials: true
+        }
       });
     })
   })

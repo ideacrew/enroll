@@ -6,6 +6,7 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
+  skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
 
   layout "two_column", except: [:new]
 
@@ -374,5 +375,9 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def employer_params
     params.permit(:first_name, :last_name, :dob)
+  end
+
+  def check_origin?
+    request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
   end
 end
