@@ -160,7 +160,8 @@ class Employers::CensusEmployeesController < ApplicationController
     @hbx_enrollment = @benefit_group_assignment.try(:hbx_enrollment)
     @benefit_group = @benefit_group_assignment.try(:benefit_group)
     # reference_plan = @benefit_group.try(:reference_plan)
-    @plan = @hbx_enrollment.decorated_hbx_enrollment
+    @plan = @hbx_enrollment && @hbx_enrollment.decorated_hbx_enrollment
+
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
