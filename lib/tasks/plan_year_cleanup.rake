@@ -45,6 +45,45 @@ namespace :update_data do
     end
   end
 
+  desc "Unpublish published plan years for employers"
+  task :unpublish_plan_years => :environment do 
+    employers = {
+      "Cullen Law Firm" => "522093298",
+      "Capital Guidance" => "742112921",
+      "Thunderbird Strategic LLC" => "473893217"
+    }
+
+    begin
+      employers.each do |employer_name, fein|
+        employer = EmployerProfile.find_by_fein(fein)
+        if employer.blank?
+          puts "employer #{employer_name} not found!!"
+          next
+        end
+
+        published_plan_years = employer.plan_years.select{|py| py.published? }
+
+        if published_plan_years.count > 1
+          puts "employer #{employer_name} has more than 1 published plan year!!"
+          next
+        end
+
+        if published_plan_years.count == 0
+          puts "employer #{employer_name} has 0 published plan years!!"
+          next
+        end
+
+        published_plan_years.each do |plan_year|
+          plan_year.revert_application!
+        end
+
+        employer_profile.enrollment_denied!
+      end
+    rescue => e
+      puts e.to_s
+    end
+  end
+
   desc "Cleanup plan years with invalid benefit groups"
   task :bad_plans_cleanup => :environment do 
     employers = {
@@ -54,7 +93,6 @@ namespace :update_data do
     }
 
     begin
-
 
     bad_plan_ids = []
 
