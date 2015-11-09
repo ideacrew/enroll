@@ -13,7 +13,7 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
     session.delete(:pre_hbx_enrollment_id)
-   
+
     if hbx_enrollment.is_shop?
       benefit_group = hbx_enrollment.benefit_group
       reference_plan = benefit_group.reference_plan
@@ -73,26 +73,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @employer_profile = @person.employee_roles.first.employer_profile
     end
 
-    if @person.emails.first.nil?
-      begin
-        raise
-      rescue => err
-        error_message = {
-          :error => {
-            :message => "Person does not have email address",
-            :person_emails => @person.emails.inspect,
-            :consumer_role => @person.consumer_role.inspect,
-            :employee_role => @person.employee_roles.inspect,
-            :belongs_to_user => @person.user.inspect,
-            :backtrace => err.backtrace.join("\n")
-          }
-        }
-  	  log(JSON.dump(error_message), {:severity => 'error'})
-      end
-      return nil
-    else
-      send_receipt_emails
-    end
+    send_receipt_emails if @person.emails.first
   end
 
   def thankyou
