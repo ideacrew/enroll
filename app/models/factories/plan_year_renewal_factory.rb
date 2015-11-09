@@ -122,7 +122,7 @@ module Factories
 
     def renew_census_employees(active_group, new_group)
       eligible_employees(active_group).each do |census_employee|
-        if census_employee.active_benefit_group_assignment && census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
+        if census_employee.active_benefit_group_assignment #&& census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
           census_employee.add_renew_benefit_group_assignment(new_group)
           
           unless census_employee.save 

@@ -24,7 +24,8 @@ namespace :update_shop do
       # "Alter Modus International Corporation" => "260376753",
       # "Annie's Ace Hardware" => "272665426",
       # "Arturo Ardila-Gomez" => "451474721"
-"Member-US House of Rep." => "536002522",
+      
+      "Member-US House of Rep." => "536002522",
 
     }
 
@@ -38,7 +39,7 @@ namespace :update_shop do
         end
 
         # Set ER to correct state from data migration
-        employer.employer_enrolled! if employer.binder_paid?
+        # employer.employer_enrolled! if employer.binder_paid?
 
         # clear existing renewing plan years and benefit group assignments
         employer.plan_years.renewing.each do |plan_year|
@@ -65,6 +66,7 @@ namespace :update_shop do
 
   desc "Auto renew employees enrollments"
   task :family_enrollment_renewal => :environment do
+
     employers = {
       # "RehabFocus LLC" => "711024079",
       # "Hooks Solutions LLC" => "331138193",
@@ -102,35 +104,76 @@ namespace :update_shop do
           next
         end
 
-        families = employer.census_employees.inject([]) do |families, ce|
+        changed_count = 0
+        family_missing = 0
+
+        employer.census_employees.non_terminated.each do |ce|
           person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
           if person.blank?
-            families
-          else
-            families << person.primary_family
+            employee_role, family = Factories::EnrollmentFactory.add_employee_role(
+                                                                                    first_name: ce.first_name,
+                                                                                    last_name: ce.last_name,
+                                                                                    ssn: ce.ssn, 
+                                                                                    dob: ce.dob,
+                                                                                    employer_profile: employer,
+                                                                                    gender: ce.gender,
+                                                                                    hired_on: ce.hired_on
+                                                                                  )
+            puts "created person record for #{ce.full_name}"
           end
-        end
 
-        changed_count = 0
+          family = person.primary_family if family.blank?
 
-        families.compact.each do |family|
-          if family.enrollments.any?
-            puts "  renewing: #{family.primary_family_member.full_name}"
+        #   if family.blank?
+        #     Factories::EnrollmentFactory.build_employee_role(
+        #        person, false, employer, ce, ce.hired_on
+        # )
+        #   end
+
+          if family.nil?
+            puts "family missing for #{ce.full_name}"
+            family_missing += 1
+          else
+          # if family.enrollments.any?
+            puts "  renewing: #{ce.full_name}"
             factory = Factories::FamilyEnrollmentRenewalFactory.new
             factory.family = family
+            factory.census_employee = ce
             factory.renew
 
             changed_count += 1
-            puts "  renewed: #{family.primary_family_member.full_name}"
-          else
-            puts "  no active enrollments for: #{family.primary_family_member.full_name}"
+            puts "  renewed: #{ce.full_name}"
           end
         end
+
+        # families = employer.census_employees.inject([]) do |families, ce|
+        #   person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
+        #   if person.blank?
+        #     families
+        #   else
+        #     families << person.primary_family
+        #   end
+        # end
+
+        # changed_count = 0
+
+        # families.compact.each do |family|
+        #   if family.enrollments.any?
+        #     puts "  renewing: #{family.primary_family_member.full_name}"
+        #     factory = Factories::FamilyEnrollmentRenewalFactory.new
+        #     factory.family = family
+        #     factory.renew
+
+        #     changed_count += 1
+        #     puts "  renewed: #{family.primary_family_member.full_name}"
+        #   else
+        #     puts "  no active enrollments for: #{family.primary_family_member.full_name}"
+        #   end
+        # end
       rescue => e
         puts e.to_s
       end
-
-      puts "Processed #{families.count} families, renewed #{changed_count} families"
+      puts "Processed #{employer.census_employees.non_terminated.count} census employees, renewed #{changed_count} families, missing #{family_missing} families"
     end
 
   end

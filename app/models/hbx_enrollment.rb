@@ -105,7 +105,7 @@ class HbxEnrollment
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
-  scope :waived,              ->{ where(:aasm_state => "inactive" )}
+  scope :waived,              ->{ where(:aasm_state.in => ["inactive", "renewing_waived"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
@@ -591,6 +591,7 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     state :renewing_passive
+    state :renewing_waived
     state :renewing_coverage_selected
     state :renewing_transmitted_to_carrier
     state :renewing_coverage_enrolled      # effectuated
@@ -604,6 +605,10 @@ class HbxEnrollment
 
     event :renew_enrollment do
       transitions from: :shopping, to: :renewing_passive
+    end
+
+    event :renew_waived do
+      transitions from: :shopping, to: :renewing_waived
     end
 
     event :select_coverage do
