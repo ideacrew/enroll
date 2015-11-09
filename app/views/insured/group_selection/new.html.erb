@@ -23,7 +23,7 @@
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
-          <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>          
+          <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
 
           <div class="table-responsive table-border">
@@ -104,7 +104,7 @@
             </div>
           </div>
           <% end %>
-          <% if show_residency_alert %>
+          <% if show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>Since <%= @person.full_name %> is not a resident of the District of Columbia she/he is not eligible to purchase a plan through DC Health Link. Other members may still be eligible to enroll. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> to learn about other health insurance options for <%= @person.full_name %>.</p>
