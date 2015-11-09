@@ -107,7 +107,7 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
-  scope :waived,              ->{ where(:aasm_state => "inactive" )}
+  scope :waived,              ->{ where(:aasm_state.in => ["inactive", "renewing_waived"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
@@ -593,6 +593,8 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     state :auto_renewing
+    state :renewing_passive
+    state :renewing_waived
     state :renewing_coverage_selected
     state :renewing_transmitted_to_carrier
     state :renewing_coverage_enrolled      # effectuated
@@ -606,6 +608,10 @@ class HbxEnrollment
 
     event :renew_enrollment do
       transitions from: :shopping, to: :auto_renewing
+    end
+
+    event :renew_waived do
+      transitions from: :shopping, to: :renewing_waived
     end
 
     event :select_coverage do

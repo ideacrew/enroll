@@ -4,35 +4,35 @@ module Factories
 
     # Renews a family's active enrollments from current plan year
 
-    attr_accessor :family
+    attr_accessor :family, :census_employee
 
     def renew
       raise ArgumentError unless defined?(@family)
 
-      # shop_enrollments = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
-      excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
-                            renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-                          )
+      # excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
+      #                       renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
+      #                     )
+      # shop_enrollments = @family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e } 
 
-      shop_enrollments = @family.enrollments.shop_market.reduce { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e } 
+      ## Works only for data migrated into Enroll 
+      ## FIXME add logic to support Enroll native renewals 
+      if @family.active_household.hbx_enrollments.empty?
+        renew_waived_enrollment
+      else
+        shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
 
-      if shop_enrollments.any?
-        @census_employee = get_census_employee(shop_enrollments.first)
+        shop_enrollments.each do |active_enrollment|       
+          next unless active_enrollment.currently_active?
 
-        if @census_employee.present?
-          shop_enrollments.each do |active_enrollment|       
-            next unless active_enrollment.currently_active?
+          # renewal_enrollment = renewal_builder.call(active_enrollment)
+          renewal_enrollment = renewal_builder(active_enrollment)
+          renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
 
-            # renewal_enrollment = renewal_builder.call(active_enrollment)
-            renewal_enrollment = renewal_builder(active_enrollment)
-            renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
-
-            renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
-            save_renewal_enrollment(renewal_enrollment, active_enrollment)
-          end
+          renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
+          save_renewal_enrollment(renewal_enrollment, active_enrollment)
         end
       end
-
+     
       # @family.enrollments.individual_market do |active_enrollment|       
       #   next unless active_enrollment.currently_active?
 
@@ -44,6 +44,43 @@ module Factories
       # enrollment_kind == "special_enrollment" || "open_enrollment"
     end
 
+
+    def renew_waived_enrollment
+      renewal_enrollment = @family.active_household.hbx_enrollments.new
+
+      renewal_enrollment.coverage_kind = "health"
+      renewal_enrollment.enrollment_kind = "open_enrollment"
+      renewal_enrollment.kind = "employer_sponsored"
+
+      benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
+      if benefit_group_assignment.blank?
+        message = "Unable to find benefit_group_assignment for census_employee: \n"\
+          "census_employee: #{@census_employee.full_name} "\
+          "id: #{@census_employee.id} "
+
+        Rails.logger.error { message }
+        raise FamilyEnrollmentRenewalFactoryError, message
+      end
+
+      renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+      renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
+      renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
+  
+      renewal_enrollment.waiver_reason = "I do not have other coverage"
+      renewal_enrollment.renew_waived
+
+      if renewal_enrollment.save
+        return
+      else
+        message = "Unable to save waived renewal enrollment: #{renewal_enrollment.inspect}, \n" \
+          "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
+
+          Rails.logger.error { message }
+
+        raise FamilyEnrollmentRenewalFactoryError, message
+      end
+    end
+
     def renewal_builder(active_enrollment)
       renewal_enrollment = @family.active_household.hbx_enrollments.new
       renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
@@ -51,22 +88,6 @@ module Factories
       renewal_enrollment
     end
 
-    def get_census_employee(active_enrollment)
-      employee = active_enrollment.household.family.primary_family_member
-      census_employee = CensusEmployee.by_ssn(employee.ssn).active.first
-      
-      if census_employee.blank?
-        message = "Unable to find census_employee for "\
-          "primary family member: #{employee.full_name} "\
-          "id: #{employee.id} "\
-          "for hbx_enrollment: #{active_enrollment.id}"
-
-        Rails.logger.error { message }
-        raise FamilyEnrollmentRenewalFactoryError, message
-      else
-        census_employee
-      end
-    end
 
     # def display_premiums(enrollment)
     #   puts "#{enrollment.aasm_state.humanize} enrollment amounts-------"
@@ -86,6 +107,8 @@ module Factories
           "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
 
         Rails.logger.error { message }
+binding.pry
+
         raise FamilyEnrollmentRenewalFactoryError, message
       end
     end
@@ -100,9 +123,6 @@ module Factories
 
       renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id
       renewal_enrollment
-    end
-
-    def clone_moc_enrollment
     end
 
     def clone_ivl_enrollment
@@ -129,6 +149,7 @@ module Factories
           "for hbx_enrollment #{active_enrollment.id}"
 
         Rails.logger.error { message }
+binding.pry
         raise FamilyEnrollmentRenewalFactoryError, message
       end
 
@@ -138,6 +159,7 @@ module Factories
       renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
       # Set the HbxEnrollment to proper state
+
       # Renew waiver status
       if active_enrollment.is_coverage_waived? 
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
