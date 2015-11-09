@@ -19,7 +19,7 @@ class CuramUser
 
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
-  end  
+  end
 
   def self.match_ssn ssn
     CuramUser.where(encrypted_ssn: self.encrypt_ssn(ssn)).exists?
@@ -54,6 +54,10 @@ class CuramUser
     else
       nil
     end
+  end
+
+  def self.name_in_curam_list(fname, lname)
+    self.where(first_name: fname, last_name: lname).any? ? true : false
   end
 
 end
