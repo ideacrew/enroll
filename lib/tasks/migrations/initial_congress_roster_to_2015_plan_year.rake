@@ -56,28 +56,28 @@ namespace :migrations do
     employer_feins.each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
 
-      families = Family.all_enrollments_by_benefit_group_id(employer_profile.plan_years.first.benefit_groups.first.id)
-      puts "families found: #{families.size}"
+      # families = Family.all_enrollments_by_benefit_group_id(employer_profile.plan_years.first.benefit_groups.first.id)
+      # puts "families found: #{families.size}"
 
-      renewed_families = families.select{|family| family.active_household.hbx_enrollments.size > 1}.size
-      puts "families with renewal enrollment #{renewed_families}"
+      # renewed_families = families.select{|family| family.active_household.hbx_enrollments.size > 1}.size
+      # puts "families with renewal enrollment #{renewed_families}"
 
-      puts "deleting renewed plan year, assignments, enrollments"
-      employer_profile.plan_years.renewing.each do |plan_year|
-        renewing_bg_id = plan_year.benefit_groups.first.id
+      # puts "deleting renewed plan year, assignments, enrollments"
+      # employer_profile.plan_years.renewing.each do |plan_year|
+      #   renewing_bg_id = plan_year.benefit_groups.first.id
 
-        families.each do |family|
-          family.active_household.hbx_enrollments.renewing.each{|e| e.destroy}
-        end
+      #   families.each do |family|
+      #     family.active_household.hbx_enrollments.renewing.each{|e| e.destroy}
+      #   end
 
-        employer_profile.census_employees.by_benefit_group_ids([renewing_bg_id]).each do |census_employee|
-          census_employee.renewal_benefit_group_assignment.destroy
-        end
+      #   employer_profile.census_employees.by_benefit_group_ids([renewing_bg_id]).each do |census_employee|
+      #     census_employee.renewal_benefit_group_assignment.destroy
+      #   end
 
-        plan_year.destroy
-      end
+      #   plan_year.destroy
+      # end
 
-      active_benefit_group_id = employer_profile.plan_years.first.benefit_groups.first.id
+      # active_benefit_group_id = employer_profile.plan_years.first.benefit_groups.first.id
 
       plan_year = nil
       if employer_profile.nil?
