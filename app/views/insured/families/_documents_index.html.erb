@@ -23,12 +23,7 @@
            <tr>
              <td><%= member.person.first_name %></td>
              <td>
-               <% if member.person.consumer_role.aasm_state == "verifications_pending" %>
-                   <%= "Pending" %>
-                 <% elsif member.person.consumer_role.aasm_state == "fully_verified" %>
-                   <%= "Ferified" %>
-                 <% else "Outstanding verification" %>
-               <% end %>
+               <%= show_consumer_role_state(member.person.consumer_role) %>
              </td>
              <td colspan="4">
                <table class="table table-condensed">
