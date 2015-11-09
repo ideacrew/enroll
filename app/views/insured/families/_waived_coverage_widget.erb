@@ -1,24 +1,42 @@
-<div class="panel panel-default myplanyear col-xs-12">
-  <div class="panel-heading">
-    <h5>Health Coverage - Waived</h5>
+<div class="hbx-enrollment-panel">
+
+
+  <div class="panel panel-default min-h">
+
+
+
+    <div class="panel-heading">
+      <h4 class="bg-title"><%#= hbx_enrollment.active_year %> <%= hbx_enrollment.coverage_kind %> Coverage
+        <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
+      </h4>
+      <hr>
+    </div>
+
+    <div class="panel-body">
+      <div class="row">   
+        <div class="col-xs-12">
+          <div class="row">
+              <div class="col-xs-9">
+                      <h4>You have selected to waive your employer coverage for <%= hbx_enrollment.effective_on.year %></h4>
+              </div>
+            <div class="col-xs-3">
+              <div class="family-plan-selection">
+                <div class="status">
+                <h4 class="ttc wsn"><%= hbx_enrollment.aasm_state.titleize %> </h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="padding: 0 0 5px;">
+        <div class="col-xs-5 btn-stack pull-right">
+          <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-trans pull-right" %>
+        </div>
+      </div>
+    </div>
+
+
   </div>
-  <table>
-    <tr>
-      <td>
-        <h4>You have selected to waive your employer coverage.</h4>
-      </td>
-      <td>
-        <h3>
-          Status
-        </h3>
-      </td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>
-          Waived
-      </td>
-    </tr>
-  </table>
 </div>
