@@ -79,7 +79,9 @@ class Insured::GroupSelectionController < ApplicationController
     end
   rescue Exception => error
     flash[:error] = error.message
-    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, enrollment_kind: @enrollment_kind)
+    employee_role_id = @employee_role.id if @employee_role
+    consumer_role_id = @consumer_role.id if @consumer_role
+    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, consumer_role_id: consumer_role_id, change_plan: @change_plan, market_kind: @market_kind, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection
