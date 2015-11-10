@@ -17,6 +17,7 @@ RSpec.describe Insured::FamiliesController do
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
+    allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)

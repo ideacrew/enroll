@@ -129,6 +129,13 @@ class Insured::FamiliesController < FamiliesController
       else
         @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end
+
+      begin 
+        @plan.name
+      rescue => e
+        log("#{e.message};  #3742 plan: #{@plan}, family_id: #{@family.id}, hbx_enrollment_id: #{@enrollment.id}", {:severity => "error"})
+      end
+
       @enrollable = @family.is_eligible_to_enroll?
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
