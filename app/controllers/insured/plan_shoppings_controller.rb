@@ -29,6 +29,7 @@ class Insured::PlanShoppingsController < ApplicationController
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc, @shopping_tax_household)
         hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
         hbx_enrollment.update_current(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: @elected_aptc/@max_aptc)
+
       else
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
       end
@@ -160,6 +161,9 @@ class Insured::PlanShoppingsController < ApplicationController
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
+    else
+      session[:max_aptc] = 0
+      session[:elected_aptc] = 0
     end
 
     @carriers = @carrier_names_map.values
