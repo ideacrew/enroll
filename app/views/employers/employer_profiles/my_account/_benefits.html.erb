@@ -1,13 +1,13 @@
 <div class="col-xs-12 benefits-tab">
   <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-8">
       <h1>Coverage - Benefits You Offer</h1>
     </div>
-    <!-- <div class="col-xs-4">
-      <% if @plan_years.present? %>
-      <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-trans btn-br btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+    <div class="col-xs-4">
+      <% if @plan_years.present? && @employer_profile.published_plan_year.blank? %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-trans btn-br btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
       <% end %>
-    </div> -->
+    </div>
 
 
   </div>
