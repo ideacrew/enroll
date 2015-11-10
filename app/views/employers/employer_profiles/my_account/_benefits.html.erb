@@ -1,13 +1,13 @@
 <div class="col-xs-12 benefits-tab">
   <div class="row">
-    <div class="col-xs-8">
+    <div class="col-xs-12">
       <h1>Coverage - Benefits You Offer</h1>
     </div>
-    <div class="col-xs-4">
+    <!-- <div class="col-xs-4">
       <% if @plan_years.present? %>
       <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-trans btn-br btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
       <% end %>
-    </div>
+    </div> -->
 
 
   </div>
@@ -66,9 +66,9 @@
                 <header>Eligibility</header>
               </td>
               <td>
-                <p> 
+                <p>
                   <% if bg.effective_on_offset == 0 %>
-                    First of the month following or coinciding with date of hire 
+                    First of the month following or coinciding with date of hire
                   <% else %>
                     <%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %>
                   <% end %>
