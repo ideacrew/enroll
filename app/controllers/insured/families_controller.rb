@@ -1,5 +1,6 @@
 class Insured::FamiliesController < FamiliesController
   include VlpDoc
+  include Acapi::Notifiers
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -9,6 +10,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, coverage_kind: :desc) || []
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
