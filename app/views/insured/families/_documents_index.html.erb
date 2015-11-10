@@ -21,7 +21,7 @@
 
          <% @family_members.each do |member|%>
            <tr>
-             <td><%= member.person.first_name %></td>
+             <td><%= member.person.first_name %> <%= member.person.last_name%></td>
              <td>
                <%= show_consumer_role_state(member.person.consumer_role) %>
              </td>

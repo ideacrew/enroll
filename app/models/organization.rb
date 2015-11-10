@@ -123,9 +123,11 @@ class Organization
 
   def primary_office_location
     if employer_profile.present?
-      office_locations.each do |office_location|
-        if office_location.present? && office_location.address.present?
-          office_location.is_primary = false unless office_location.address.kind == "primary"
+      unless office_locations.size == 1
+        office_locations.each do |office_location|
+          if office_location.present? && office_location.address.present?
+            office_location.is_primary = false unless office_location.address.kind == "primary"
+          end
         end
       end
     end
