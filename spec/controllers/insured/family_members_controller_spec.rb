@@ -16,6 +16,7 @@ RSpec.describe Insured::FamilyMembersController do
         allow(user).to receive(:person).and_return(person)
         allow(employee_role).to receive(:save!).and_return(true)
         sign_in(user)
+        allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
         get :index, :employee_role_id => employee_role_id
       end
 
@@ -39,6 +40,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(person).to receive(:broker_role).and_return(nil)
       allow(employee_role).to receive(:save!).and_return(true)
       sign_in user
+      allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
       expect{
         get :index, employee_role_id: employee_role_id, qle_id: qle.id, effective_on_kind: 'date_of_event', qle_date: '10/10/2015'
       }.to change(fm.special_enrollment_periods, :count).by(1)
@@ -190,7 +192,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
       allow(address).to receive(:is_a?).and_return(true)
       allow(dependent).to receive(:same_with_primary=)
-      allow(dependent).to receive(:addresses=) 
+      allow(dependent).to receive(:addresses=)
     end
 
     describe "with an invalid dependent" do
@@ -199,7 +201,7 @@ RSpec.describe Insured::FamilyMembersController do
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
-      end 
+      end
     end
 
     describe "with a valid dependent" do
@@ -209,14 +211,14 @@ RSpec.describe Insured::FamilyMembersController do
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
-      end 
+      end
 
       it "should render the edit template when update_vlp_documents failure" do
         allow(controller).to receive(:update_vlp_documents).and_return(false)
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
-      end 
-    end 
+      end
+    end
   end
 end

@@ -23,6 +23,8 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.save
     end
+    @prev_url_include_intractive_identity = request.referer.include?("interactive_identity_verifications")
+    @prev_url_include_consumer_role_id = request.referer.include?("consumer_role_id")
   end
 
   def new
