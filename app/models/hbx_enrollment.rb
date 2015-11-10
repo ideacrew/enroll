@@ -615,7 +615,6 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     state :auto_renewing
-    state :renewing_passive
     state :renewing_waived
     state :renewing_coverage_selected
     state :renewing_transmitted_to_carrier
