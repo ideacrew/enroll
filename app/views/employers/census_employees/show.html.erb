@@ -56,7 +56,7 @@
           <% end %>
 
         </div>
-        <% if @plan.present? and @hbx_enrollment.present? %>
+        <% if @plan.present? and @hbx_enrollment.present? and @plan.class != OpenStruct %>
 
         <div class="table-border table-responsive">
           <table class="table table-striped">
