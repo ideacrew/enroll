@@ -115,6 +115,7 @@ class HbxEnrollment
 
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector]) }
+  scope :with_plan, -> { where(:plan_id.ne => nil) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -698,6 +699,7 @@ class HbxEnrollment
     elsif plan.present? && consumer_role.present?
       UnassistedPlanCostDecorator.new(plan, self)
     else
+      log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
