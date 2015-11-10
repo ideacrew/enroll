@@ -364,7 +364,7 @@ When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
   select_carrier.li(text: /CareFirst/).click
   select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
   click_when_present(select_hsa)
-  select_hsa.li(text: /All/i).click
+  select_hsa.li(text: /No/i).click
   scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
