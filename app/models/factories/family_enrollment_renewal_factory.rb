@@ -16,12 +16,15 @@ module Factories
 
       ## Works only for data migrated into Enroll 
       ## FIXME add logic to support Enroll native renewals 
-      if @family.active_household.hbx_enrollments.empty?
+
+      return nil if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
+
+      shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+
+      if shop_enrollments.empty?
         renew_waived_enrollment
       else
-        shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
-
-        shop_enrollments.each do |active_enrollment|       
+        shop_enrollments.each do |active_enrollment|  
           next unless active_enrollment.currently_active?
 
           # renewal_enrollment = renewal_builder.call(active_enrollment)
@@ -42,8 +45,8 @@ module Factories
       # end
 
       # enrollment_kind == "special_enrollment" || "open_enrollment"
+      return @family
     end
-
 
     def renew_waived_enrollment
       renewal_enrollment = @family.active_household.hbx_enrollments.new
@@ -107,8 +110,6 @@ module Factories
           "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
 
         Rails.logger.error { message }
-binding.pry
-
         raise FamilyEnrollmentRenewalFactoryError, message
       end
     end
@@ -149,7 +150,6 @@ binding.pry
           "for hbx_enrollment #{active_enrollment.id}"
 
         Rails.logger.error { message }
-binding.pry
         raise FamilyEnrollmentRenewalFactoryError, message
       end
 
