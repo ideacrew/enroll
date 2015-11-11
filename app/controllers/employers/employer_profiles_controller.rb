@@ -97,6 +97,7 @@ class Employers::EmployerProfilesController < ApplicationController
       when 'brokers'
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
       when 'inbox'
+        
       else
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year || @employer_profile.published_plan_year
 
