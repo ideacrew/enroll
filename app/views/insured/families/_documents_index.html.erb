@@ -21,13 +21,14 @@
 
          <% @family_members.each do |member|%>
            <tr>
-             <td><%= member.person.first_name %></td>
+             <td><%= member.person.first_name %> <%= member.person.last_name%></td>
              <td>
                <% if member.person.consumer_role.aasm_state == "verifications_pending" %>
-                   <%= "Pending" %>
+                   Pending
                  <% elsif member.person.consumer_role.aasm_state == "fully_verified" %>
-                   <%= "Ferified" %>
-                 <% else "Outstanding verification" %>
+                   Verified
+                 <% else %>
+                   Outstanding verification
                <% end %>
              </td>
              <td colspan="4">

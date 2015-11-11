@@ -1,8 +1,7 @@
-
 <p>
-  <i class="fa fa-refresh fa-spin fa-2x" style="color:green"></i> Review in progress
-  <i class="fa fa-times-circle fa-2x" style="color:red"></i> All documents rejected
-  <i class="fa fa-file fa-2x"></i> New documents uploaded
+  <i class="fa fa-refresh fa-spin" style="color:green"></i> Review in progress
+  <i class="fa fa-times-circle" style="color:red"></i> No valid documents
+  <i class="fa fa-file"></i> New documents uploaded
 </p>
 
   <div class="documents-table">
@@ -27,22 +26,20 @@
         <tr>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
-          <td style="text-align:center;"><%= person.consumer_role.vlp_documents.all.count %></td>
+          <td style="text-align:center;"><%= person.consumer_role.vlp_documents.where(identifier: {:$exists => true}).count %></td>
           <td style="text-align:center;"><%= distance_of_time_in_words(person.created_at.to_date, @time_to.to_date) %></td>
           <td style="text-align:center;">
             <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
-              <i class="fa fa-file fa-2x"></i>
+              <i class="fa fa-file"></i>
             <% elsif person.consumer_role.vlp_documents.where(status:"in review").count > 0 || person.consumer_role.vlp_documents.where(status:"verified").count > 0 %>
-              <i class="fa fa-refresh fa-spin fa-2x" style="color:green"></i>
-            <% elsif person.consumer_role.vlp_documents.all? {|doc| doc.status == "rejected"} %>
-              <i class="fa fa-times-circle fa-2x" style="color:red"></i>
+              <i class="fa fa-refresh fa-spin" style="color:green"></i>
+            <% elsif %>
+              <i class="fa fa-times-circle" style="color:red"></i>
             <% end %>
           </td>
           <th><%= link_to "Review documents", documents_path(:person_id => person.id, :status=>"in review"), class: "btn btn-default" %></th>
         </tr>
         <% end %>
-
       </table>
-
     </div>
   </div>
