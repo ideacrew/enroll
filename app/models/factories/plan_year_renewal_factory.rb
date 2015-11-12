@@ -15,13 +15,17 @@ module Factories
       @active_plan_year = @employer_profile.active_plan_year
 
       # Set renewal open enrollment period
-      open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
-                                           @active_plan_year.open_enrollment_end_on.month,
-                                           1)
+      # open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
+      #                                      @active_plan_year.open_enrollment_end_on.month,
+      #                                      1)
 
-      open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
-                                         @active_plan_year.open_enrollment_end_on.month,
-                                         HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
+      # open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
+      #                                    @active_plan_year.open_enrollment_end_on.month,
+      #                                    HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
+
+      ## Remove this following Dec OE
+      open_enrollment_start_on = Date.new(2015,11,11)
+      open_enrollment_end_on = Date.new(2015,11,13)
 
 
       @renewal_plan_year = @employer_profile.plan_years.build({
@@ -116,7 +120,7 @@ module Factories
         relationship_benefits: active_group.relationship_benefits,
         reference_plan_id: reference_plan_id,
         elected_plan_ids: elected_plan_ids,
-        is_congress: is_congress || false
+        is_congress: false
       })
     end
 
