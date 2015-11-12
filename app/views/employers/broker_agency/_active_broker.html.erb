@@ -23,7 +23,8 @@
                 <% date = TimeKeeper.date_of_record - 1.day %>
               <% end %>
               <div class="bottom-pd">
-                <%= link_to 'Change Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-trans" %>
+                <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans", data: {toggle: "modal", target: "#terminate_broker"} %>
+                <!-- employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true) -->
               </div>
             <% else %>
 
@@ -117,7 +118,29 @@
 </div>
 </div>
 </div>
+<% if (defined?(direct_terminate) ? direct_terminate : false) %>
 
+<div id="terminate_broker" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Broker Termination Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Select 'Terminate' to unhire the selected Broker. They will be terminated effective immediately.</p>
+      </div>
+      <div class="modal-footer">
+        <%= link_to 'Terminate Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-primary btn-br mtz" %>
+        <button type="button" class="btn btn-default btn-trans" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<% end %>
 
 <div class="row no-buffer">
   <div class="">
