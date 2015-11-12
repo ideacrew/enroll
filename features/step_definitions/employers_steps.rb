@@ -364,7 +364,7 @@ When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
   select_carrier.li(text: /CareFirst/).click
   select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
   click_when_present(select_hsa)
-  select_hsa.li(text: /No/i).click
+  select_hsa.li(text: /All/i).click
   scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
@@ -385,11 +385,11 @@ When(/^.+ enters? combined filter in plan selection page$/) do
     'arguments[0].scrollIntoView();',
     @browser.element(:text => /Choose Healthcare/i)
   )
-  @browser.checkboxes(class: /plan-metal-level-selection-filter/).first.set(true)
+  @browser.checkbox(class: /interaction-choice-control-value-plan-metal-level-silver/).set(true)
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
-  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
+  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("5500")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
   @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/i).click
