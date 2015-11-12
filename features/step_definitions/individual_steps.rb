@@ -15,6 +15,7 @@ Then(/Individual creates HBX account$/) do
 end
 
 And(/user should see your information page$/) do
+
   click_when_present(@browser.a(class: /interaction-click-control-continue/))
 end
 
@@ -25,6 +26,7 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-last-name/).set(@u.last_name :last_name1)
   @browser.text_field(class: /interaction-field-control-person-name-sfx/).set("Jr")
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(@u.adult_dob)
+  @browser.h1(class: /darkblue/).click
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn1)
   @browser.text_field(class: /interaction-field-control-person-ssn/).click
   expect(@browser.text_field(class: /interaction-field-control-person-ssn/).value).to_not eq("")
@@ -459,7 +461,7 @@ end
 And(/Aptc user set elected amount and select plan/) do
   @browser.text_field(id: /elected_aptc/).wait_until_present
   @browser.text_field(id: "elected_aptc").set("20")
-  
+
   click_when_present(@browser.a(text: /Select Plan/))
   screenshot("aptc_setamount")
 end
