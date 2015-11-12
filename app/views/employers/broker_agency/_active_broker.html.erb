@@ -88,21 +88,6 @@
         <div class="row">
           <div class="col-xs-4">
             <span class="lg ttu twelve">
-              Fein:
-            </span>
-            <span class="dg">
-              <%= @employer_profile.broker_agency_profile.organization.fein %>
-            </span>
-            <br/>
-            <span class="lg ttu twelve">
-              Entity Type:
-            </span>
-            <span class="dg">
-              <%= @employer_profile.broker_agency_profile.entity_kind.try(:humanize).try(:titleize) %>
-            </span>
-          </div>
-          <div class="col-xs-4">
-            <span class="lg ttu twelve">
               New Clients:
             </span>
             <span class="dg">
@@ -135,7 +120,7 @@
 
 
 <div class="row no-buffer">
-  <div class="col-xs-12 row">
+  <div class="">
   <div id="show_broker_agency"></div>
   <div id="broker_agencies_panel">
   </div>

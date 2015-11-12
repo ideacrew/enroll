@@ -14,10 +14,10 @@
     <br/>
     <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", onclick: '$("#brokers-empty").hide();' %>
   </div>
-  <div class="col-xs-12 row" id="browse_brokers">
-    <%= render "employers/broker_agency/active_broker" %>
-
+  <div class="row">
+    <div class="col-xs-12" id="browse_brokers">
+      <%= render "employers/broker_agency/active_broker" %>
+    </div>
   </div>
   <% end %>
-
 </div>
