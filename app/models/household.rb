@@ -255,4 +255,8 @@ class Household
   def enrolled_hbx_enrollments
     hbx_enrollments.my_enrolled_plans
   end
+
+  def current_year_hbx_enrollments
+    hbx_enrollments.active.current_year
+  end
 end

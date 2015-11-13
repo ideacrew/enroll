@@ -62,6 +62,7 @@ describe HbxEnrollment do
       expect(employer_profile.census_employees.size).to eq fte_count
     end
 
+
     context "and employees create employee roles and families" do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
@@ -125,6 +126,22 @@ describe HbxEnrollment do
         expect(white_collar_employee_roles.size).to eq white_collar_employee_count
         expect(white_collar_families.size).to eq white_collar_employee_count
       end
+
+      context "scope" do 
+        it "with current year" do 
+          family = blue_collar_families.first
+          employee_role = family.primary_family_member.person.employee_roles.first
+          enrollment = HbxEnrollment.create_from(
+              employee_role: employee_role,
+              coverage_household: family.households.first.coverage_households.first,
+              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            )
+          enrollment.update(effective_on: Date.new(2015, 9, 12))
+
+          enrollments = family.households.first.coverage_households.first.household.hbx_enrollments
+          expect(enrollments.current_year).to eq [enrollment]
+        end
+      end 
 
       context "and families either select plan or waive coverage" do
         let!(:blue_collar_enrollment_waivers) do
