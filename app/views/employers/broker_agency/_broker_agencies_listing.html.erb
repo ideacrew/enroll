@@ -16,8 +16,9 @@
       <% broker_roles = (broker_roles & @filtered_broker_roles) if @filtered_broker_roles.present? %>
       <% next if broker_roles.empty? %>
       <tr>
-        <td <%= "rowspan=#{broker_roles.size}" %>>
-          <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
+         <td <%= "rowspan=#{broker_roles.size}" %>>
+         <% @broker_roles=broker_roles %>
+          <%= render 'active_broker_modal', locals: {broker_roles: broker_roles} %>
         </td>
         <td <%= "rowspan=#{broker_roles.size}" %>>
           <%= broker_agency.working_hours ? "Yes" : "No" %>
