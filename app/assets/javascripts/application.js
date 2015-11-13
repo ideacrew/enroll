@@ -661,6 +661,18 @@ $(document).ready(function () {
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
 
+  $(document).on('focusout', "#person_ssn, .mask-ssn", function(){
+    var ssn_val = $(this).val();
+    ssn_patt1=/^000/;
+    ssn_patt2=/^666/;
+    ssn_patt3=/^....00/;
+    ssn_patt4=/000$/;
+    if (ssn_val.match(ssn_patt1) || ssn_val.match(ssn_patt2) || ssn_val.match(ssn_patt3) || ssn_val.match(ssn_patt4) ) {
+      $(this).val("SSN is INVALID");
+    }
+  });
+
+
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
