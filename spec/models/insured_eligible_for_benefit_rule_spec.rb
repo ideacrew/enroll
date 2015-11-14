@@ -147,7 +147,105 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
         end
       end
+    end
+  end
 
+  context "#is_medicaid_eligibility_satisfied?" do
+    let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+    let(:benefit_package) {FactoryGirl.build(:benefit_package)}
+    let(:tax_household_member) {TaxHouseholdMember.new}
+
+    it "when medicaid_eligibility is any in benefit_package" do
+      allow(benefit_package).to receive(:medicaid_eligibility).and_return ["any"]
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_medicaid_eligibility_satisfied?).to eq true
+    end
+
+    context "when medicaid_eligibility is eligible in benefit_package" do
+      before :each do
+        allow(benefit_package).to receive(:medicaid_eligibility).and_return ["eligible"]
+      end
+
+      it "should return true" do
+        allow(tax_household_member).to receive(:is_medicaid_chip_eligible?).and_return true
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        allow(rule).to receive(:tax_household_member).and_return tax_household_member
+        expect(rule.is_medicaid_eligibility_satisfied?).to eq true
+      end
+
+      it "should return false" do
+        allow(tax_household_member).to receive(:is_medicaid_chip_eligible?).and_return false
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        allow(rule).to receive(:tax_household_member).and_return tax_household_member
+        expect(rule.is_medicaid_eligibility_satisfied?).to eq false
+      end
+    end
+
+    context "when medicaid_eligibility is non_eligible in benefit_package" do
+      before :each do
+        allow(benefit_package).to receive(:medicaid_eligibility).and_return ["non_eligible"]
+      end
+
+      it "should return true" do
+        allow(tax_household_member).to receive(:is_medicaid_chip_eligible?).and_return false
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        allow(rule).to receive(:tax_household_member).and_return tax_household_member
+        expect(rule.is_medicaid_eligibility_satisfied?).to eq true
+      end
+
+      it "should return false" do
+        allow(tax_household_member).to receive(:is_medicaid_chip_eligible?).and_return true
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        allow(rule).to receive(:tax_household_member).and_return tax_household_member
+        expect(rule.is_medicaid_eligibility_satisfied?).to eq false
+      end
+    end
+  end
+
+  context "#is_applicant_status_satisfied?" do
+    let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+    let(:benefit_package) {FactoryGirl.build(:benefit_package)}
+
+    it "when applicant_status is any in benefit_package" do
+      allow(benefit_package).to receive(:applicant_status).and_return ["any"]
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_applicant_status_satisfied?).to eq true
+    end
+
+    context "when applicant_status is applicant in benefit_package" do
+      before :each do
+        allow(benefit_package).to receive(:applicant_status).and_return ["applicant"]
+      end
+
+      it "should return true" do
+        allow(consumer_role).to receive(:is_applicant).and_return true
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_applicant_status_satisfied?).to eq true
+      end
+
+      it "should return false" do
+        allow(consumer_role).to receive(:is_applicant).and_return false
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_applicant_status_satisfied?).to eq false
+      end
+    end
+
+    context "when applicant_status is non_applicant in benefit_package" do
+      before :each do
+        allow(benefit_package).to receive(:applicant_status).and_return ["non_applicant"]
+      end
+
+      it "should return false" do
+        allow(consumer_role).to receive(:is_applicant).and_return true
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_applicant_status_satisfied?).to eq false
+      end
+
+      it "should return true" do
+        allow(consumer_role).to receive(:is_applicant).and_return false
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_applicant_status_satisfied?).to eq true
+      end
     end
   end
 end

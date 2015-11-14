@@ -1,4 +1,30 @@
 namespace :update_benefit_packages do
+  desc "update benefit_packages ivl 2015 and 2016 for applicant-status and medicaid-eligible"
+  task :applicant_and_medicaid => :environment do
+    puts "*"*80
+    puts "updating benefit_packages ivl 2015 and 2016 for applicant-status and medicaid-eligible"
+
+    hbx = HbxProfile.current_hbx
+    bc_period_for_2016 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2016 }.first
+    bc_period_for_2015 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+
+    bc_period_for_2015.benefit_packages.update_all({"benefit_eligibility_element_group"=>{"applicant_status"=> ["applicant"]}})
+    bc_period_for_2015.benefit_packages.update_all({"benefit_eligibility_element_group"=>{"medicaid_eligibility"=> ["non_eligible"]}})
+    puts bc_period_for_2015.benefit_packages.map(&:benefit_eligibility_element_group).map(&:applicant_status).to_s
+    puts bc_period_for_2015.benefit_packages.map(&:benefit_eligibility_element_group).map(&:medicaid_eligibility).to_s
+    puts "2015 benefit_package update complete"
+
+
+    bc_period_for_2016.benefit_packages.update_all({"benefit_eligibility_element_group"=>{"applicant_status"=> ["applicant"]}})
+    bc_period_for_2016.benefit_packages.update_all({"benefit_eligibility_element_group"=>{"medicaid_eligibility"=> ["non_eligible"]}})
+    puts bc_period_for_2016.benefit_packages.map(&:benefit_eligibility_element_group).map(&:applicant_status).to_s
+    puts bc_period_for_2016.benefit_packages.map(&:benefit_eligibility_element_group).map(&:medicaid_eligibility).to_s
+    puts "2016 benefit_package update complete"
+
+    puts "complete"
+    puts "*"*80
+  end
+
   desc "update benefit_packages ivl 2015 and 2016"
   task :ivl => :environment do
     hbx = HbxProfile.current_hbx
