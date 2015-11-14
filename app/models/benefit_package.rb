@@ -34,11 +34,12 @@ class BenefitPackage
   delegate :start_on, :end_on, to: :benefit_coverage_period
 
   delegate :market_places, :enrollment_periods, :family_relationships, :benefit_categories, 
-           :incarceration_status, :age_range, :citizenship_status, :residency_status, :ethnicity, :cost_sharing,
+           :incarceration_status, :age_range, :citizenship_status, :residency_status, :ethnicity,
+           :cost_sharing, :medicaid_eligibility, :applicant_status,
            to: :benefit_eligibility_element_group
 
   delegate :market_places=, :enrollment_periods=, :family_relationships=, :benefit_categories=, 
-           :incarceration_status=, :age_range=, :citizenship_status=, :residency_status=, :ethnicity=, 
+           :incarceration_status=, :age_range=, :citizenship_status=, :residency_status=, :ethnicity=,
            to: :benefit_eligibility_element_group
 
 

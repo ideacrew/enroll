@@ -1,4 +1,5 @@
 class InsuredEligibleForBenefitRule
+  include Acapi::Notifiers
 
   # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
 
@@ -57,6 +58,26 @@ class InsuredEligibleForBenefitRule
 
     return true if csr_kind.blank? or cost_sharing.blank?
     csr_kind == cost_sharing
+  rescue => e
+    log("call is_cost_sharing_satisfied? error: #{e.message}", {:severity => "error"})
+    true
+  end
+
+  def is_medicaid_eligibility_satisfied?
+    required_status = @benefit_package.medicaid_eligibility
+    return true if required_status.include? "any"
+    return true if tax_household_member.blank?
+
+    status = tax_household_member.is_medicaid_chip_eligible? ? "eligible" : "non_eligible"
+    required_status.include? status
+  end
+
+  def is_applicant_status_satisfied?
+    required_status = @benefit_package.applicant_status
+    return true if required_status.include? "any"
+
+    status = @role.is_applicant ? "applicant" : "non_applicant"
+    required_status.include? status
   end
 
   def is_market_places_satisfied?
@@ -130,4 +151,24 @@ class InsuredEligibleForBenefitRule
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
   end
 
+  def tax_households
+    begin
+      year = @benefit_package.benefit_coverage_period.start_on.year
+
+      tax_households = @role.person.families.map do |family|
+        family.latest_active_tax_household_with_year(year)
+      end
+      tax_households.compact
+    rescue => e
+      log("get tax_household error: #{e.message}, consumer_role: #{@role.id}", {:severity => "error"})
+      []
+    end
+  end
+
+  def tax_household_member
+    return nil if tax_households.blank?
+
+    members = tax_households.map(&:tax_household_members).uniq
+    members.detect {|member| member.applicant_id == @role.applicant_id}
+  end
 end

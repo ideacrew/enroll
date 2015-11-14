@@ -466,7 +466,7 @@ class Family
   def build_consumer_role(family_member, opts = {})
     person = family_member.person
     return if person.consumer_role.present?
-    person.build_consumer_role({:is_applicant => false}.merge(opts))
+    person.build_consumer_role({:is_applicant => false, :applicant_id => family_member.id}.merge(opts))
     person.save!
   end
 
