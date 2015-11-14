@@ -74,8 +74,9 @@ class EmployeeRole
   end
 
   def is_under_open_enrollment?
-    return false if benefit_group.blank?
-    benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    return false if employer_profile.blank?
+    employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    # benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def new_census_employee=(new_census_employee)
