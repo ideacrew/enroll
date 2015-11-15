@@ -88,6 +88,7 @@ FactoryGirl.define do
   factory(:generative_person, {class: Person}) do
     first_name { Forgery(:name).first_name }
     last_name { Forgery(:name).first_name }
+    hbx_id { "76f55832508f4e5087c5d5d944664b9f" }
   end
 
   factory(:generative_owner, {class: Person}) do
@@ -135,7 +136,7 @@ FactoryGirl.define do
 
     after(:stub) do |obj|
       extend RSpec::Mocks::ExampleMethods
-      allow(obj).to receive(:staff_roles).and_return([(FactoryGirl.build_stubbed :generative_owner)])
+      allow(obj).to receive(:staff_roles).and_return([(FactoryGirl.build_stubbed :generative_person)])
     end
   end
 end
