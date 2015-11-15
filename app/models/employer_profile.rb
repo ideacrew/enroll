@@ -155,6 +155,10 @@ class EmployerProfile
     plan_years.published.first
   end
 
+  def show_plan_year
+    renewing_plan_year || active_plan_year || published_plan_year
+  end
+
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end

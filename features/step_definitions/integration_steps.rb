@@ -527,8 +527,10 @@ end
 When(/^Employer publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
-  start_on = @browser.p(text: /SELECT START ON/i)
-  click_when_present(start_on)
+  @browser.element(class: /interaction-choice-control-plan-year-start-on/).wait_until_present
+  @browser.element(class: /interaction-choice-control-plan-year-start-on/).click
+  # start_on = @browser.p(text: /SELECT START ON/i)
+  # click_when_present(start_on)
   start_on = @browser.li(text: /SELECT START ON/i)
   click_when_present(start_on.parent().lis()[1])
   click_when_present(@browser.element(class: /change-plan/))

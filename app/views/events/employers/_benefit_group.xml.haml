@@ -12,6 +12,8 @@
       %name= benefit_group.reference_plan.carrier_profile.legal_name
     %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{benefit_group.reference_plan.metal_level.downcase}"
     %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{benefit_group.reference_plan.coverage_kind}"
+  %elected_plans
+    = render :partial => "events/employers/elected_plan", :collection => benefit_group.elected_plans
   %relationship_benefits
     = render :partial => "events/employers/relationship_benefit", :collection => benefit_group.relationship_benefits
 

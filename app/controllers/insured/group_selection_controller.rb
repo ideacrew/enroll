@@ -1,8 +1,9 @@
 class Insured::GroupSelectionController < ApplicationController
+  before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
+  before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
-    initialize_common_vars
 
     if params[:employee_role_id].present?
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == params["employee_role_id"].to_s }
@@ -38,7 +39,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    initialize_common_vars
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
 
@@ -85,7 +85,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def terminate_selection
-    initialize_common_vars
     @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
   end
 
@@ -149,5 +148,14 @@ class Insured::GroupSelectionController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+  end
+
+  private
+
+  def is_under_open_enrollment
+    if @employee_role.present? && !@employee_role.is_under_open_enrollment?
+      flash[:alert] = "You can only shop for plans during open enrollment."
+      redirect_to family_account_path
+    end
   end
 end

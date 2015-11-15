@@ -171,7 +171,7 @@ RSpec.describe Employers::EmployerProfilesController do
         total_employer_contribution: 200
         )
     }
-    let(:published_plan_year) {
+    let(:plan_year) {
       double("PlanYear",
         additional_required_participants_count: 10
         )
@@ -184,11 +184,9 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:last_portal_visited=).and_return("true")
       allow(user).to receive(:save).and_return(true)
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-      allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
-      allow(published_plan_year).to receive(:open_enrollment_contains?).and_return(true)
-      allow(employer_profile).to receive(:renewing_plan_year).and_return(nil)
-      allow(employer_profile).to receive(:active_plan_year).and_return(nil)
-      allow(published_plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
+      allow(plan_year).to receive(:open_enrollment_contains?).and_return(true)
+      allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
       sign_in(user)
     end
     context "it should return published plan year " do
@@ -197,11 +195,11 @@ RSpec.describe Employers::EmployerProfilesController do
         get :show, id: employer_profile.id, tab: "home"
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
-        expect(assigns(:current_plan_year)).to eq published_plan_year
+        expect(assigns(:current_plan_year)).to eq plan_year
         expect(assigns(:employer_contribution_total)).to eq hbx_enrollment.total_employer_contribution
         expect(assigns(:premium_amt_total)).to eq hbx_enrollment.total_premium
         expect(assigns(:employee_cost_total)).to eq hbx_enrollment.total_employee_cost
-        expect(assigns(:additional_required_participants_count)).to eq published_plan_year.additional_required_participants_count
+        expect(assigns(:additional_required_participants_count)).to eq plan_year.additional_required_participants_count
       end
     end
   end
