@@ -36,7 +36,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
     it "should have no_ssn label" do
       expect(rendered).to have_selector('span.no_ssn')
-      expect(rendered).to match /NO SSN/
+      expect(rendered).to match /have an SSN/
     end
 
     it "should have show tribal_container" do

@@ -414,18 +414,19 @@ describe EmployeeRole, dbclean: :after_each do
   context "is under open enrollment" do
     let(:employee_role) { EmployeeRole.new }
 
-    it "return false without benefit_group" do
-      allow(employee_role).to receive(:benefit_group).and_return nil
+    it "return false without employer profile" do
+      allow(employee_role).to receive(:employer_profile).and_return nil
 
       expect(employee_role.is_under_open_enrollment?).to eq false
     end
 
-    context "with benefit_group" do
+    context "with employer profile" do
       let(:plan_year) {FactoryGirl.create(:plan_year)}
-      let(:benefit_group) { double(plan_year: plan_year) }
+      let(:employer_profile) { double("EmployerProfile") }
 
       before :each do
-        allow(employee_role).to receive(:benefit_group).and_return benefit_group
+        allow(employee_role).to receive(:employer_profile).and_return employer_profile
+        allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
       end
 
       it "return false" do

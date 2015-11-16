@@ -47,6 +47,17 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(response).to have_http_status(:success)
     end
 
+    it "returns to family home page when employee is not under open enrollment" do
+      sign_in user
+      employee_roles = [employee_role]
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(employee_roles).to receive(:detect).and_return(employee_role)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      get :new, person_id: person.id, employee_role_id: employee_role.id
+      expect(response).to redirect_to(family_account_path)
+      expect(flash[:alert]).to eq "You can only shop for plans during open enrollment."
+    end
+
     it "return blank change_plan" do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
