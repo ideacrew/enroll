@@ -67,14 +67,10 @@
               <div class="">
 
             <div class="form-group form-group-lg top-buffer">
-
-              <div class="checkbox">
-                <%= f.check_box :no_ssn %>
-                <%= f.label :no_ssn do %>
-                <span class='no_ssn twelve'></span>
-                <div class="no_ssn twelve">I don't have an SSN</div>
-                <% end %>
-            </div>
+              <%= f.check_box :no_ssn %>
+                          <%= f.label :no_ssn, :value => true do %>
+                          <span class='no_ssn nine'>&nbsp;I don't have an SSN</span>
+                          <% end %>
 
 
               <!-- <span><i class='fa fa-question-circle'></i></span> -->
