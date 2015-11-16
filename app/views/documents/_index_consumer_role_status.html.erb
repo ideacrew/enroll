@@ -27,7 +27,7 @@
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
           <td style="text-align:center;"><%= person.consumer_role.vlp_documents.where(identifier: {:$exists => true}).count %></td>
-          <td style="text-align:center;"><%= distance_of_time_in_words(person.created_at.to_date, @time_to.to_date) %></td>
+          <td style="text-align:center;"><%= time_remaining_in_words(person.created_at) %></td>
           <td style="text-align:center;">
             <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
               <i class="fa fa-file"></i>

@@ -10,7 +10,6 @@ class DocumentsController < ApplicationController
   end
 
   def consumer_role_status
-    @time_to = Time.now + 95.days
     @unverified_persons=Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending']).to_a
     respond_to do |format|
       format.html { render partial: "index_consumer_role_status" }
