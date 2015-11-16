@@ -4066,8 +4066,8 @@ ul.list-right-section li a img {
     width: 0;
 }
 .row-form-wrapper .radio {margin: 6px 0;}
-.row-form-wrapper input[type="radio"] {display: none;}
-.row-form-wrapper input[type="radio"] + label span {
+.row-form-wrapper input[type="radio"], .row-form-wrapper input[type="checkbox"], {display: none;}
+.row-form-wrapper input[type="radio"] + label span, .row-form-wrapper input[type="checkbox"] + label span {
     background: rgba(0, 0, 0, 0) url("<%= asset_path('icons/check_radio_sheet.png') %>") no-repeat scroll left top;
     cursor: pointer;
     display: inline-block;
@@ -4076,10 +4076,14 @@ ul.list-right-section li a img {
     vertical-align: middle;
     width: 19px;
 }
-.row-form-wrapper input[type="radio"] + label span {
+.row-form-wrapper input[type="checkbox"] + label div.no_ssn {
+  display: inline;
+}
+.row-form-wrapper input[type="radio"] + label span, .row-form-wrapper input[type="checkbox"] + label span {
     padding-left: 22px;
 }
-.row-form-wrapper input[type="radio"]:checked + label span {
+.row-form-wrapper input[type="radio"]:checked + label span,
+.row-form-wrapper input[type="checkbox"]:checked + label span {
     background: rgba(0, 0, 0, 0) url("<%= asset_path('icons/check_radio_sheet.png') %>") no-repeat scroll -24px top;
 }
 
