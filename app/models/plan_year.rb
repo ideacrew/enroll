@@ -470,7 +470,7 @@ class PlanYear
     state :expired        # Non-published plans are expired following their end on date
 
 
-    # Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
+    # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
       transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
@@ -532,7 +532,7 @@ class PlanYear
       transitions from: :active, to: :suspended
     end
 
-    # Coverage termianted due to non-payment
+    # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
     end
@@ -546,16 +546,22 @@ class PlanYear
     end
 
     # Admin ability to reset plan year application
-    event :revert_application, :after => [:record_transition, :revert_employer_application] do
-      transitions from: [:active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft, :guard => :is_employer_application_reverted?
+    event :revert_application, :after => :record_transition do
+      transitions from: [:enrolled, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft, :guard => :is_employer_application_reverted?
     end
 
-    event :revert_renewal, :after => :record_transition do
+    # Admin ability to accept application and successfully complete enrollment 
+    event :enroll, :after => :record_transition do
+      transitions from: [:published, :enrolling], to: :enrolled
+    end
+
+    # Admin ability to reset renewing plan year application
+   event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
     end
   end
 
-  def employer_application_reverted?
+  def is_employer_application_reverted?
     employer_profile.revert_application!
   end
 
