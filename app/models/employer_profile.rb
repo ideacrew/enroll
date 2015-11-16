@@ -149,8 +149,6 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
-  #TODO - this code will not able to support renewing plan year
-  #there should be one published and one renewing or enrolled plan year
   def published_plan_year
     plan_years.published.first
   end
@@ -167,8 +165,16 @@ class EmployerProfile
     plan_years.where(id: id).first
   end
 
+  def renewing_published_plan_year
+    plan_years.published.first
+  end
+
   def renewing_plan_year
     plan_years.renewing.first
+  end
+
+  def renewing_plan_year_drafts
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
   end
 
   def is_primary_office_local?
@@ -329,7 +335,7 @@ class EmployerProfile
       transitions from: :binder_paid, to: :eligible
     end
 
-    event :employer_enrolled, :after => :record_transition do
+    event :enroll_employer, :after => :record_transition do
       transitions from: :binder_paid, to: :enrolled
     end
 
@@ -351,6 +357,11 @@ class EmployerProfile
 
     event :benefit_canceled, :after => :record_transition do
       transitions from: :eligible, to: :applicant, :after => :cancel_benefit
+    end
+
+    # Admin capability to reset an Employer to applicant state
+    event :revert_application, :after => :record_transition do
+      transitions from: [:registered, :eligible, :ineligible, :suspended, :binder_paid, :enrolled], to: :applicant
     end
 
   end
