@@ -402,6 +402,16 @@ $(document).ready(function () {
   //   $('#plan_year .alert-error').fadeOut(2000);
   // });
 
+  // personal form js
+
+  $( "#new_person" ).submit(function( event ) {
+    $('#person_first_name, #person_middle_name, #person_last_name').each(function() {
+      var name = $(this).val();
+      var trimmed_name = $.trim(name)
+      $(this).val(trimmed_name);
+    });
+  });
+
   // personal-info-row focus fields
   $(document).on('focusin', 'input.form-control', function() {
     $(this).parents(".row-form-wrapper").addClass("active");
