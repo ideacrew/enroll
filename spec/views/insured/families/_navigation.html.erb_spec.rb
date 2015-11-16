@@ -29,7 +29,6 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:has_active_employee_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
-    allow(inbox).to receive(:inbox_messages).and_return(3)
     allow(inbox).to receive(:unread_messages).and_return(3)
     allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
     allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)

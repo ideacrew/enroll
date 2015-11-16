@@ -2,7 +2,7 @@
   <div id="inbox_form" class="col-md-3 col-sm-4 col-xs-12">
     <ul class="list-group">
       <%= link_to(inbox_insured_families_path(provider)) do%>
-      <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.inbox_messages.count.to_i %></span></li>
+      <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
       <% end %>
       <%- if @sent_box == true %>
       <%= link_to(inbox_insured_families_path(provider, folder: 'Sent')) do%>

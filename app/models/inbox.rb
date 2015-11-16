@@ -10,10 +10,6 @@ class Inbox
 
   before_create :generate_acccess_key
 
-  def inbox_messages
-    messages.where(folder: Message::FOLDER_TYPES[:inbox])
-  end
-
   def read_messages
     messages.where(message_read: true, folder: Message::FOLDER_TYPES[:inbox])
   end
