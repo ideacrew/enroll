@@ -1,3 +1,10 @@
+<% if @current_user_is_hbx_staff || @current_user_is_broker %>
+    <div class="pull-right">
+        <h5><%="Contact name: #{@employer_contact.first_name} #{@employer_contact.last_name}" %></h5>
+        <h5><%="Contact email: #{@employer_contact_email}" %></h5>
+    </div>
+<% end %>
+
 <div class="col-xs-12 employer-edit-tab">
 <h1>Business Info</h1>
     <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(id: @organization.id), method: :put} do |f| %>
