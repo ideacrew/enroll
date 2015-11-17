@@ -55,7 +55,7 @@ describe HbxEnrollment do
                                                     }
 
     it "should have a valid plan year in enrolling state" do
-      expect(plan_year.aasm_state).to eq "enrolling"
+      expect(plan_year.aasm_state).to eq "published"
     end
 
     it "should have a roster with all blue and white collar employees" do
