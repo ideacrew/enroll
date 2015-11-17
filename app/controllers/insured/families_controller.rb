@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
-  before_action :check_for_address_info, only: [:find_sep]
+  before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
 
   def home
@@ -30,6 +30,7 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
+  
   def brokers
     @tab = params['tab']
 

@@ -7,6 +7,7 @@ RSpec.describe Insured::FamiliesController do
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
+  let(:addresses) { [double] }
   let(:family_members){[double("FamilyMember")]}
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
@@ -37,6 +38,7 @@ RSpec.describe Insured::FamiliesController do
       allow(user).to receive(:save).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:addresses).and_return(addresses)
       allow(consumer_role).to receive(:save!).and_return(true)
       session[:portal] = "insured/families"
     end
