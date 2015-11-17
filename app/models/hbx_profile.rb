@@ -156,7 +156,6 @@ class HbxProfile
   # Minimum number of days for SHOP open enrollment period
   ShopOpenEnrollmentPeriodMinimum = 5
   ShopOpenEnrollmentEndDueDayOfMonth = 10
-  ShopOpenEnrollmentPeriodMinimum = 3
 
   # Maximum number of months for SHOP open enrollment period
   ShopOpenEnrollmentPeriodMaximum = 2
