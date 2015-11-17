@@ -33,7 +33,7 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       person.us_citizen = true
       expect(helper.show_naturalized_citizen_container(person)).to eq true
     end
-    
+
     it "should return false" do
       person.us_citizen = false
       expect(helper.show_naturalized_citizen_container(person)).to eq false
@@ -62,7 +62,7 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       person.indian_tribe_member = true
       expect(helper.show_tribal_container(person)).to eq true
     end
-    
+
     it "should return false" do
       person.indian_tribe_member = false
       expect(helper.show_tribal_container(person)).to eq false
@@ -165,9 +165,9 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       expect(helper.show_consumer_role_state(consumer_role)).to eq "Pending"
     end
 
-    it "should return Ferified when consumer_role is Ferified" do
+    it "should return Verified when consumer_role is Verified" do
       allow(consumer_role).to receive(:aasm_state).and_return "fully_verified"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Ferified"
+      expect(helper.show_consumer_role_state(consumer_role)).to eq "Verified"
     end
 
     it "should return Outstanding verifications when consumer_role is verification_outstanding" do

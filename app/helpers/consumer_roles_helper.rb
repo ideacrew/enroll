@@ -64,7 +64,7 @@ module ConsumerRolesHelper
     if consumer_role.verifications_pending?
       "Pending"
     elsif consumer_role.fully_verified?
-      "Ferified"
+      "Verified"
     else
       "Outstanding verification"
     end

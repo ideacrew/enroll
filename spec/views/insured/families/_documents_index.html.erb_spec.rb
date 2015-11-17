@@ -14,9 +14,9 @@ RSpec.describe "insured/families/_documents_index.html.erb" do
 
   it "should show the state of consumer_role" do
     allow(family_member).to receive(:person).and_return person
-    allow(view).to receive(:show_consumer_role_state).and_return "Ferified"
+    allow(view).to receive(:show_consumer_role_state).and_return "Verified"
     allow(person).to receive(:created_at).and_return TimeKeeper.date_of_record
     render file: "insured/families/_documents_index.html.erb"
-    expect(rendered).to have_content "Ferified"
+    expect(rendered).to have_content "Verified"
   end
 end
