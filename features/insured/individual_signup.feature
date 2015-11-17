@@ -3,6 +3,7 @@ Feature: Insured Plan Shopping on Individual market
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
       When I visit the Insured portal
+      And Individual asks how to make an email account
       Then Individual creates HBX account
       Then I should see a successful sign up message
       And user should see your information page
