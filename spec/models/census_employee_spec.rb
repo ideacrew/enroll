@@ -435,7 +435,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     before { plan_year.publish! }
 
     it "should be in published status" do
-      expect(plan_year.aasm_state).to eq "enrolling"
+      expect(plan_year.aasm_state).to eq "published"
     end
 
     context "and a new census employee is added with no benefit group assigned" do
