@@ -39,7 +39,7 @@ describe EmployeeRole do
                   end
 
                   it "that plan year should be published" do
-                    expect(plan_year_a.aasm_state).to eq "enrolling"
+                    expect(plan_year_a.aasm_state).to eq "published"
                   end
 
                   it "the new employee role should see the correct benefit group" do
@@ -54,7 +54,7 @@ describe EmployeeRole do
 
                   it "that plan year should be published" do
 
-                    expect(plan_year_b.aasm_state).to eq "enrolling"
+                    expect(plan_year_b.aasm_state).to eq "published"
                   end
 
                   it "the new employee role should see the correct benefit group" do
