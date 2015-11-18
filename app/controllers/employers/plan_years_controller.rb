@@ -193,11 +193,6 @@ class Employers::PlanYearsController < ApplicationController
       end
     end
     render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
-    # 
-    # respond_to do |format|
-    #   format.js { render :layout => false }
-    # end
-    # redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
   end
 
   def publish
