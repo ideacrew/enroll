@@ -3,6 +3,7 @@ FactoryGirl.define do
     market_kind "both"
     entity_kind "s_corporation"
     association :primary_broker_role, factory: :broker_role
+    organization
     sequence(:corporate_npn) {|n| "2002345#{n}" }
     # before(:create) do |broker_agency|
     #   FactoryGirl.create(:organization, broker_agency_profile: broker_agency)

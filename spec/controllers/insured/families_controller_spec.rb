@@ -7,6 +7,7 @@ RSpec.describe Insured::FamiliesController do
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
+  let(:addresses) { [double] }
   let(:family_members){[double("FamilyMember")]}
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
@@ -38,14 +39,21 @@ RSpec.describe Insured::FamiliesController do
       allow(user).to receive(:save).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:addresses).and_return(addresses)
       allow(consumer_role).to receive(:save!).and_return(true)
       session[:portal] = "insured/families"
     end
 
     context "for SHOP market" do
+
+      let(:employee_roles) { double }
+      let(:employee_role) { [double("EmployeeRole")] }
+
       before :each do
         sign_in user
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(employee_roles).to receive(:active).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         get :home
       end
@@ -61,7 +69,7 @@ RSpec.describe Insured::FamiliesController do
       it "should assign variables" do
         expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
         expect(assigns(:hbx_enrollments)).to eq(hbx_enrollments)
-        expect(assigns(:employee_role)).to eq(employee_roles[0])
+        expect(assigns(:employee_role)).to eq(employee_role)
       end
 
       it "should get shop market events" do
@@ -70,8 +78,15 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "for IVL market" do
+      let(:user) { double(identity_verified?: true, last_portal_visited: '') }
+      let(:employee_roles) { double }
+
       before :each do
-        allow(person).to receive(:employee_roles).and_return([])
+        allow(person).to receive(:user).and_return(user)
+        allow(person).to receive(:has_active_employee_role?).and_return(false)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(employee_roles).to receive(:active).and_return([])
         get :home
       end
 
@@ -156,7 +171,12 @@ RSpec.describe Insured::FamiliesController do
 
 
   describe "GET find_sep" do
+    let(:user) { double(identity_verified?: true) }
+
     before :each do
+      allow(person).to receive(:user).and_return(user)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_active_consumer_role?).and_return(true)
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
