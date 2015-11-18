@@ -1,6 +1,8 @@
 class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :welcome, :search]
-  before_action :check_employee_role_permissions, only: [:edit, :update]
+  before_action :check_employee_role_permissions_edit, only: [:edit]
+  before_action :check_employee_role_permissions_update, only: [:update]
+
 
   def welcome
   end
@@ -172,8 +174,14 @@ class Insured::EmployeeRolesController < ApplicationController
 
   private
 
-  def check_employee_role_permissions
+  def check_employee_role_permissions_edit
     @employee_role = EmployeeRole.find(params.require(:id))
+    policy = ::AccessPolicies::EmployeeRole.new(current_user)
+    policy.authorize_employee_role(@employee_role, self)
+  end
+
+  def check_employee_role_permissions_update
+    @employee_role = EmployeeRole.find(params.require(:person).require(:employee_role_id))
     policy = ::AccessPolicies::EmployeeRole.new(current_user)
     policy.authorize_employee_role(@employee_role, self)
   end
