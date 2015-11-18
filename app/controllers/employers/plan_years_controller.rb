@@ -174,7 +174,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def revert
-    binding.pry
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     if @employer_profile.plan_years.renewing.include?(@plan_year) && @plan_year.may_revert_renewal?
       @plan_year.revert_renewal
@@ -193,7 +192,12 @@ class Employers::PlanYearsController < ApplicationController
         flash[:error] = "Plan Year could not be reverted. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
     end
-    redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
+    render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
+    # 
+    # respond_to do |format|
+    #   format.js { render :layout => false }
+    # end
+    # redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
   end
 
   def publish

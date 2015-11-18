@@ -16,7 +16,7 @@ class PlanYear
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
 
-  field :imported_plan_year, type: Boolean, default: false 
+  field :imported_plan_year, type: Boolean, default: false
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
 
@@ -459,7 +459,7 @@ class PlanYear
 
     state :active         # Published plan year is in-force
 
-    state :renewing_draft   
+    state :renewing_draft
     state :renewing_published
     state :renewing_enrolling
     state :renewing_enrolled
@@ -546,11 +546,11 @@ class PlanYear
     end
 
     # Admin ability to reset plan year application
-    event :revert_application, :after => :record_transition do
-      transitions from: [:enrolled, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft, :guard => :is_employer_application_reverted?
+    event :revert_application, :after => :revert_employer_profile_application do
+      transitions from: [:enrolled, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
     end
 
-    # Admin ability to accept application and successfully complete enrollment 
+    # Admin ability to accept application and successfully complete enrollment
     event :enroll, :after => :record_transition do
       transitions from: [:published, :enrolling], to: :enrolled
     end
@@ -561,8 +561,9 @@ class PlanYear
     end
   end
 
-  def is_employer_application_reverted?
+  def revert_employer_profile_application
     employer_profile.revert_application!
+    record_transition
   end
 
   def accept_application
