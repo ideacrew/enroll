@@ -69,7 +69,7 @@ class QhpBuilder
   end
 
   def mark_2015_catastrophic_plans_as_individual
-    Plan.catastrophic_level.by_active_year(2014).each do |plan|
+    Plan.catastrophic_level.by_active_year(2015).each do |plan|
       plan.update_attribute(:market, "individual")
     end
   end
