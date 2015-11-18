@@ -97,8 +97,9 @@ class Employers::EmployerProfilesController < ApplicationController
       when 'brokers'
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
       when 'inbox'
+
       else
-        @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year || @employer_profile.published_plan_year
+        @current_plan_year = @employer_profile.show_plan_year
 
         if @current_plan_year.present? && @current_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
           @additional_required_participants_count = @current_plan_year.additional_required_participants_count
@@ -142,6 +143,10 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
     @employer = @employer_profile.match_employer(current_user)
+    @employer_contact = @employer_profile.staff_roles.first
+    @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
+    @current_user_is_hbx_staff = current_user.has_hbx_staff_role?
+    @current_user_is_broker = current_user.has_broker_agency_staff_role?
   end
 
   def create

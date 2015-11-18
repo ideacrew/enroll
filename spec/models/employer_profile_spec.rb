@@ -6,7 +6,7 @@ describe EmployerProfile, dbclean: :after_each do
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -177,7 +177,7 @@ end
 
 describe EmployerProfile, "given multiple existing employer profiles", :dbclean => :after_all do
   before(:all) do
-    home_office = FactoryGirl.build(:office_location)
+    home_office = FactoryGirl.build(:office_location, :primary)
     @er0 = EmployerProfile.new(entity_kind: "partnership")
     @er1 =  EmployerProfile.new(entity_kind: "partnership")
     @er2 = EmployerProfile.new(entity_kind: "partnership")

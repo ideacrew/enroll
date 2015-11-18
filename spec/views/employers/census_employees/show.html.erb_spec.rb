@@ -22,7 +22,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should show the plan" do
     allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
-    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(nil)
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Plan/

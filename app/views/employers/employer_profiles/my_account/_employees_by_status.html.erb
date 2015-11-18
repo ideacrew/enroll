@@ -13,6 +13,7 @@
           <th>SSN</th>
           <th>DOB</th>
           <th>Hire Date</th>
+          <th>Date Added to Roster</th>
           <th>Benefit Package</th>
           <% if @employer_profile.renewing_plan_year.present? %>
           <th>Renewal Benefit Package</th>
@@ -38,10 +39,9 @@
             <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id) %>
           </td>
           <td><%= number_to_obscured_ssn census_employee.ssn %></td>
-          <td><%= format_date census_employee.dob %>
-          </td>
-          <td><%= format_date census_employee.hired_on %>
-          </td>
+          <td><%= format_date census_employee.dob %></td>
+          <td><%= format_date census_employee.hired_on %></td>
+          <td><%= format_date census_employee.created_at %></td>
           <td>
           <% if census_employee.active_benefit_group_assignment.present? %>
             <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>

@@ -4,8 +4,8 @@ FactoryGirl.define do
     dba         "Turner Brokers"
     sequence(:fein, 100000000)
     home_page   "http://www.example.com"
-    office_locations  { [FactoryGirl.build(:office_location),
-                         FactoryGirl.build(:office_location, is_primary: false)] }
+    office_locations  { [FactoryGirl.build(:office_location, :primary),
+                         FactoryGirl.build(:office_location)] }
   end
 
   factory :broker_agency, class: Organization do
@@ -13,8 +13,8 @@ FactoryGirl.define do
     sequence(:dba) {|n| "Broker Agency#{n}" }
     sequence(:fein, 200000000)
     home_page   "http://www.example.com"
-    office_locations  { [FactoryGirl.build(:office_location),
-                         FactoryGirl.build(:office_location, is_primary: false)] }
+    office_locations  { [FactoryGirl.build(:office_location, :primary),
+                         FactoryGirl.build(:office_location)] }
 
     after(:create) do |organization|
       FactoryGirl.create(:broker_agency_profile, organization: organization)

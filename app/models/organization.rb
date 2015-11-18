@@ -45,7 +45,7 @@ class Organization
 
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
   scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
-  scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})} 
+  scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})}
 
   scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
   scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
@@ -122,6 +122,15 @@ class Organization
   end
 
   def primary_office_location
+    if employer_profile.present?
+      unless office_locations.size == 1
+        office_locations.each do |office_location|
+          if office_location.present? && office_location.address.present?
+            office_location.is_primary = false unless office_location.address.kind == "primary"
+          end
+        end
+      end
+    end
     office_locations.detect(&:is_primary?)
   end
 

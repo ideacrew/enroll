@@ -9,7 +9,7 @@
         <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox'), remote: true) do%>
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= @employer_profile.inbox.unread_messages.size %></span></li>
         <% end %>
-        <%- if @sent_box == true %>
+        <% if @sent_box == true %>
           <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true) do%>
             <li class="list-group-item">Sent</li>
           <% end %>
@@ -19,7 +19,7 @@
         <% end %>
       </ul>
     </div>
-   <%- @folder = (@folder||'Inbox').capitalize %>
+   <% @folder = (@folder||'Inbox').capitalize %>
     <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12 table-responsive" id="message_list_form">
       <table class="table table-hover">
         <thead>
@@ -31,8 +31,8 @@
         </thead>
 
         <tbody>
-          <%- if @provider.try(:inbox).try(:messages) %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => @provider.inbox.messages.select{|m| @folder.capitalize == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @provider} %>
+          <% if @employer_profile.inbox && @employer_profile.inbox.messages %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => @employer_profile.inbox.messages.select{|m| @folder.capitalize == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @employer_profile} %>
           <% end %>
         </tbody>
       </table>

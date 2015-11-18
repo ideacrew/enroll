@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <% if request.referer.include?("interactive_identity_verifications") || request.referer.include?("consumer_role_id") %>
+    <% if @prev_url_include_intractive_identity || @prev_url_include_consumer_role_id %>
       <div class="row row-form-wrapper no-buffer">
         <div class="col-md-6 col-sm-6 no-pd">
           <div class="form-group form-group-lg">

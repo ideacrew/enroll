@@ -385,11 +385,11 @@ When(/^.+ enters? combined filter in plan selection page$/) do
     'arguments[0].scrollIntoView();',
     @browser.element(:text => /Choose Healthcare/i)
   )
-  @browser.checkboxes(class: /plan-metal-level-selection-filter/).first.set(true)
+  @browser.checkbox(class: /interaction-choice-control-value-plan-metal-level-silver/).set(true)
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
-  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
+  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("5500")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
   @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/i).click

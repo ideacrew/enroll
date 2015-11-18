@@ -402,6 +402,16 @@ $(document).ready(function () {
   //   $('#plan_year .alert-error').fadeOut(2000);
   // });
 
+  // personal form js
+
+  $( "#new_person" ).submit(function( event ) {
+    $('#person_first_name, #person_middle_name, #person_last_name').each(function() {
+      var name = $(this).val();
+      var trimmed_name = $.trim(name)
+      $(this).val(trimmed_name);
+    });
+  });
+
   // personal-info-row focus fields
   $(document).on('focusin', 'input.form-control', function() {
     $(this).parents(".row-form-wrapper").addClass("active");
@@ -660,6 +670,18 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
+
+  $(document).on('focusout', "#person_ssn, .mask-ssn", function(){
+    var ssn_val = $(this).val();
+    ssn_patt1=/^000/;
+    ssn_patt2=/^666/;
+    ssn_patt3=/^....00/;
+    ssn_patt4=/000$/;
+    if (ssn_val.match(ssn_patt1) || ssn_val.match(ssn_patt2) || ssn_val.match(ssn_patt3) || ssn_val.match(ssn_patt4) ) {
+      $(this).val("SSN is INVALID");
+    }
+  });
+
 
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {

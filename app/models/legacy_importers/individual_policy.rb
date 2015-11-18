@@ -15,6 +15,7 @@ module LegacyImporters
         false
       end
       sc.and_then do |d_hash|
+        check_existing_enrollment(d_hash)
         @person = locate_head_of_family(d_hash)
         @family = locate_family(@person)
         @plan = find_plan(d_hash)
@@ -31,6 +32,12 @@ module LegacyImporters
         true
       end
       sc.call(@data_hash)
+    end
+
+    def check_existing_enrollment(dhash)
+      p_id = dhash["hbx_id"]
+      pol = HbxEnrollment.by_hbx_id(p_id).first
+      throw :missing_object, "Policy already exists with hbx_id: #{p_id}" if pol
     end
 
     def create_consumer_role(person)
