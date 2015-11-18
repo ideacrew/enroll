@@ -7,7 +7,7 @@ module AccessPolicies
     end
 
     def authorize_show(employer, controller)
-      return(true) if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) 
+      return(true) if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id)
       person = user.person
 
       if person.employer_staff_roles.length > 0
@@ -30,7 +30,6 @@ module AccessPolicies
       controller.redirect_to_new
     end
 
-
     def is_broker_for_employer?(employer_id)
       person = user.person
       return false unless person.broker_role || person.broker_agency_staff_roles.present?
@@ -41,6 +40,6 @@ module AccessPolicies
         employers = broker_agency_profiles.map { |bap| ::EmployerProfile.find_by_broker_agency_profile(bap) }.flatten
       end
       employers.map(&:id).map(&:to_s).include?(employer_id.to_s)
-    end  
+    end
   end
 end
