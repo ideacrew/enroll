@@ -25,7 +25,6 @@
              <td><%= show_consumer_role_state(member.person.consumer_role) %></td>
              <td><%= time_remaining_in_words(member.person.created_at) %></td>
              <td colspan="3">
-             <td colspan="4">
                <table class="table table-condensed">
                  <col width="150">
                  <col width="100">
@@ -50,15 +49,6 @@
                    </tr>
                    <% end %>
                </table>
-             </td>
-             <td>
-               <% if member.person.consumer_role.aasm_state == "verifications_pending" %>
-                   Pending
-                 <% elsif member.person.consumer_role.aasm_state == "fully_verified" %>
-                   Verified
-                 <% else %>
-                   Outstanding verification
-               <% end %>
              </td>
            </tr>
          <% end %>

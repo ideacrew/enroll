@@ -1,5 +1,6 @@
 <% plan_carrier = Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile } %>
-<div class="plan-row panel panel-default" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc metro" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible.to_i %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= @plan_hsa_status[plan.id.to_s] %>" data-plan-ehb="<%= plan.ehb %>">
+
+<div class="plan-row panel panel-default" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc metro" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible == "Not Applicable" ? "$0" : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= @plan_hsa_status[plan.id.to_s] %>" data-plan-ehb="<%= plan.ehb %>">
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
