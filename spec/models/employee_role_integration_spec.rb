@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 describe EmployeeRole do
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
+  end
+
   context "an organization exists" do
     let!(:organization) { FactoryGirl.create(:organization) }
 
@@ -8,8 +12,8 @@ describe EmployeeRole do
       let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
 
       context "and two draft plan years exist" do
-        let!(:plan_year_a) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
-        let!(:plan_year_b) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
+        let!(:plan_year_a) { FactoryGirl.create(:plan_year_not_started, employer_profile: employer_profile) }
+        let!(:plan_year_b) { FactoryGirl.create(:plan_year_not_started, employer_profile: employer_profile) }
 
         context "with benefit groups" do
           let!(:benefit_group_a) { FactoryGirl.create(:benefit_group, plan_year: plan_year_a) }

@@ -7,8 +7,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   it { should validate_presence_of :is_business_owner }
   it { should validate_presence_of :employer_profile_id }
 
-  let(:benefit_group)    { FactoryGirl.create(:benefit_group) }
-  let(:plan_year)        { benefit_group.plan_year }
+  let(:benefit_group)    { plan_year.benefit_groups.first }
+  let(:plan_year)        do
+    py = FactoryGirl.create(:plan_year_not_started)
+    bg = FactoryGirl.create(:benefit_group, plan_year: py)
+    PlanYear.find(py.id)
+  end
   let(:employer_profile) { plan_year.employer_profile }
 
   let(:first_name){ "Lynyrd" }
@@ -38,6 +42,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       address: address
     }
   }
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
+  end
 
   context "a new instance" do
     context "with no arguments" do
@@ -593,12 +601,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "and the employee links to roster" do
 
-      it "should create an employee_role" 
+      it "should create an employee_role"
     end
 
     context "and the employee is terminated" do
 
-      it "should create an employee_role" 
+      it "should create an employee_role"
     end
 
   end

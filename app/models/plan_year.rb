@@ -480,10 +480,12 @@ class PlanYear
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
 
-      transitions from: :draft,  to: :renewing_draft,                 :guard  => :is_event_date_valid?
+      transitions from: :draft,  to: :renewing_draft,                 :guard  => :is_renewing_event_date_valid?
       transitions from: :renewing_enrolled,  to: :active,             :guard  => :is_event_date_valid?
       transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling, to: :renewing_enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+
+      transitions from: :enrolling, to: :enrolling # prevents error when plan year is already enrolling
     end
 
     ## Application eligibility determination process
@@ -547,7 +549,7 @@ class PlanYear
 
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
-      transitions from: [:enrolled, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -608,12 +610,22 @@ class PlanYear
   end
 
 private
-  def is_event_date_valid?
+  def is_renewing_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
     when "draft"
       today >= (end_on + 1.day) - HbxProfile::ShopMaximumRenewalPeriodBeforeStartOn
-    when "published", "renewing_published"
+    else
+      false
+    end
+
+    valid
+  end
+
+  def is_event_date_valid?
+    today = TimeKeeper.date_of_record
+    valid = case aasm_state
+    when "published", "draft", "renewing_published"
       today >= open_enrollment_start_on
     when "enrolling", "renewing_enrolling"
       today.end_of_day >= open_enrollment_end_on
