@@ -162,7 +162,7 @@ class EmployerProfile
   end
 
   def find_plan_year_by_date(target_date)
-    plan_years.to_a.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
+    plan_years.published.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
   end
 
   def find_plan_year(id)

@@ -134,7 +134,8 @@ describe HbxEnrollment do
           enrollment = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
-              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group,
             )
           enrollment.update(effective_on: Date.new(2015, 9, 12))
 
@@ -150,6 +151,7 @@ describe HbxEnrollment do
           election = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
           election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
@@ -166,6 +168,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
                 coverage_household: family.households.first.coverage_households.first,
+                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
@@ -183,6 +186,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
             election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
@@ -200,6 +204,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
                 coverage_household: family.households.first.coverage_households.first,
+                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
@@ -252,7 +257,8 @@ describe HbxEnrollment, dbclean: :after_all do
       @enrollment = household.create_hbx_enrollment_from(
         employee_role: mikes_employee_role,
         coverage_household: coverage_household,
-        benefit_group: mikes_benefit_group
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
       )
     end
 
@@ -323,7 +329,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment2 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
         )
         @enrollment2.save
         @enrollment2.update_current(is_active: false)
@@ -347,7 +354,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment3 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
         )
         @enrollment3.save
         @enrollment3.inactive_related_hbxs
