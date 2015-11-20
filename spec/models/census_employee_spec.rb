@@ -566,7 +566,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       @enrollment = @household.create_hbx_enrollment_from(
         employee_role: mikes_employee_role,
         coverage_household: @coverage_household,
-        benefit_group: mikes_benefit_group
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
       )
       @enrollment.save
     end
