@@ -180,6 +180,7 @@ Rails.application.routes.draw do
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
+        post 'revert'
         post 'publish'
         post 'force_publish'
         get 'search_reference_plan', on: :collection

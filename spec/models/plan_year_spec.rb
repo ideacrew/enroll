@@ -855,7 +855,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "should transition directly to enrolling state" do
-          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq("published")
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq("enrolling")
         end
       end
 
@@ -1352,14 +1352,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:renewal_health_plan)       { FactoryGirl.create(:plan_with_premium_tables,
                                                           coverage_kind: "health",
                                                           active_year: coverage_effective_date.year.to_i + 1) }
-    let(:current_health_plan)       { FactoryGirl.create(:plan_with_premium_tables, 
-                                                          coverage_kind: "health", 
+    let(:current_health_plan)       { FactoryGirl.create(:plan_with_premium_tables,
+                                                          coverage_kind: "health",
                                                           active_year: (coverage_effective_date - 1.day).year.to_i,
                                                           renewal_plan_id: renewal_health_plan.id) }
-    let(:benefit_group)             { FactoryGirl.build(:benefit_group, 
-                                                          reference_plan_id: current_health_plan.id, 
+    let(:benefit_group)             { FactoryGirl.build(:benefit_group,
+                                                          reference_plan_id: current_health_plan.id,
                                                           elected_plans: [current_health_plan]) }
-    let(:plan_year)                 { FactoryGirl.build(:plan_year, 
+    let(:plan_year)                 { FactoryGirl.build(:plan_year,
                                                           start_on: coverage_effective_date,
                                                           end_on: coverage_effective_date + 1.year - 1.day,
                                                           benefit_groups: [benefit_group]) }
@@ -1372,7 +1372,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     it "plan year should be in published state to support open enrollment" do
-      expect(PlanYear.find(plan_year.id).aasm_state).to eq "published"
+      expect(PlanYear.find(plan_year.id).aasm_state).to eq "enrolling"
     end
 
     it "employer should be in registered state" do

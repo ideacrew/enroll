@@ -171,6 +171,7 @@ RSpec.describe Employers::EmployerProfilesController do
         total_employer_contribution: 200
         )
     }
+
     let(:plan_year) {
       double("PlanYear",
         additional_required_participants_count: 10
@@ -187,6 +188,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
       allow(plan_year).to receive(:open_enrollment_contains?).and_return(true)
       allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+
       sign_in(user)
     end
     context "it should return published plan year " do

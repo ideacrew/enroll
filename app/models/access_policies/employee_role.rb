@@ -7,13 +7,24 @@ module AccessPolicies
     end
 
     def authorize_employee_role(employee_role, controller)
-      return true if user.has_hbx_staff_role?
-      # if !(user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s)
-      #   controller.redirect_to_check_employee_role
-      # else
-      #   return true
-      # end
-      return true
+      return true if user.has_hbx_staff_role? || is_broker_for_employer?(employee_role.employer_profile_id)
+      if !(user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s)
+        controller.redirect_to_check_employee_role
+      else
+        return true
+      end
+    end
+
+    def is_broker_for_employer?(employer_id)
+      person = user.person
+      return false unless person.broker_role || person.broker_agency_staff_roles.present?
+      if person.broker_role
+        employers = ::EmployerProfile.find_by_writing_agent(person.broker_role)
+      else
+        broker_agency_profiles = person.broker_agency_staff_roles.map {|role| ::BrokerAgencyProfile.find(role.broker_agency_profile_id) }
+        employers = broker_agency_profiles.map { |bap| ::EmployerProfile.find_by_broker_agency_profile(bap) }.flatten
+      end
+      employers.map(&:id).map(&:to_s).include?(employer_id.to_s)
     end
   end
 end

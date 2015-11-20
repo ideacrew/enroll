@@ -422,6 +422,8 @@ describe Forms::FamilyMember, "relationship validation" do
     it "should success" do
       allow(family_member).to receive(:relationship).and_return("life_partner")
       allow(family_member).to receive(:reactivate!).and_return(true)
+      allow(family_member).to receive(:is_primary_applicant?).and_return(true)
+      allow(family_member).to receive(:is_active?).and_return(true)
       allow(FamilyMember).to receive(:find).and_return(family_member)
 
       dependent = Forms::FamilyMember.find(family_member.id)

@@ -63,7 +63,21 @@ class Address
   end
 
   def kind=(new_kind)
-    write_attribute(:kind, new_kind.to_s.squish.downcase)
+    kind_val = new_kind.to_s.squish.downcase
+    if kind_val == 'primary' and office_location.present? and office_location.is_primary
+      write_attribute(:kind, 'work')
+    else
+      write_attribute(:kind, kind_val)
+    end
+  end
+
+  def kind
+    kind_val = read_attribute(:kind)
+    if office_location.present? and office_location.is_primary and kind_val == 'work'
+      'primary'
+    else
+      kind_val
+    end
   end
 
   def address_1=(new_address_1)

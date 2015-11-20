@@ -5,13 +5,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:employee_role_id) { "123455555" }
     let(:person_parameters) { { :first_name => "SOMDFINKETHING", :employee_role_id => employee_role_id} }
     let(:organization_id) { "1234324234" }
-    let(:person_id) { "4324324234" }
-    let(:benefit_group) { double }
+    let(:benefit_group) { double(effective_on_for: effective_date) }
     let(:census_employee) { double(:hired_on => "whatever" ) }
-    let(:employer_profile) { double }
+    let(:employer_profile) { double(id: "23827831278") }
     let(:effective_date) { double }
-    let(:person_id) { "5234234" }
-    let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, :benefit_group => benefit_group, :census_employee => census_employee) }
+    let(:person_id) { BSON::ObjectId::new }
+    let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, employer_profile_id: employer_profile.id, :benefit_group => benefit_group, :census_employee => census_employee) }
     let(:person) { Person.new }
     let(:user) {FactoryGirl.create(:user)}
     let(:role_form) {
@@ -23,12 +22,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(Person).to receive(:find).with(person_id).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
-      allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
       allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
+      allow(EmployeeRole).to receive(:find).and_return(employee_role)
       sign_in user
       put :update, :person => person_parameters, :id => person_id
     end
@@ -98,11 +97,11 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
   describe "PUT update" do
     let(:user) { double("User") }
-    let(:person) { double("Person") }
+    let(:person) { double("Person", broker_role: BrokerRole.new) }
     let(:census_employee) { double("CensusEmployee") }
     let(:address) { double("Address") }
     let(:addresses) { [address] }
-    let(:employee_role) { double("EmployeeRole", id: double("id"), :person => person) }
+    let(:employee_role) { double("EmployeeRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
     let(:family) { double("Family") }
     let(:email){ double("Email", address: "test@example.com") }
     let(:id){ EmployeeRole.new.id }
@@ -118,6 +117,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(census_employee).to receive(:email).and_return(email)
       allow(email).to receive(:address=).and_return("test@example.com")
       allow(controller).to receive(:build_nested_models).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
       get :edit, id: employee_role.id
       expect(response).to have_http_status(:success)

@@ -55,7 +55,7 @@ describe HbxEnrollment do
                                                     }
 
     it "should have a valid plan year in enrolling state" do
-      expect(plan_year.aasm_state).to eq "published"
+      expect(plan_year.aasm_state).to eq "enrolling"
     end
 
     it "should have a roster with all blue and white collar employees" do
@@ -127,21 +127,22 @@ describe HbxEnrollment do
         expect(white_collar_families.size).to eq white_collar_employee_count
       end
 
-      context "scope" do 
-        it "with current year" do 
+      context "scope" do
+        it "with current year" do
           family = blue_collar_families.first
           employee_role = family.primary_family_member.person.employee_roles.first
           enrollment = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
-              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group,
             )
           enrollment.update(effective_on: Date.new(2015, 9, 12))
 
           enrollments = family.households.first.coverage_households.first.household.hbx_enrollments
           expect(enrollments.current_year).to eq [enrollment]
         end
-      end 
+      end
 
       context "and families either select plan or waive coverage" do
         let!(:blue_collar_enrollment_waivers) do
@@ -150,6 +151,7 @@ describe HbxEnrollment do
           election = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
           election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
@@ -166,6 +168,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
                 coverage_household: family.households.first.coverage_households.first,
+                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
@@ -183,6 +186,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
               employee_role: employee_role,
               coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
             election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
@@ -200,6 +204,7 @@ describe HbxEnrollment do
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
                 coverage_household: family.households.first.coverage_households.first,
+                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
@@ -252,7 +257,8 @@ describe HbxEnrollment, dbclean: :after_all do
       @enrollment = household.create_hbx_enrollment_from(
         employee_role: mikes_employee_role,
         coverage_household: coverage_household,
-        benefit_group: mikes_benefit_group
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
       )
     end
 
@@ -323,7 +329,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment2 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
         )
         @enrollment2.save
         @enrollment2.update_current(is_active: false)
@@ -347,7 +354,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment3 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
         )
         @enrollment3.save
         @enrollment3.inactive_related_hbxs
@@ -389,7 +397,7 @@ describe HbxEnrollment, dbclean: :after_all do
           benefit_package: benefit_package
         )
       }
-      let(:hbx_profile) {double} 
+      let(:hbx_profile) {double}
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
       let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
       let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
@@ -564,7 +572,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:consumer_role) { FactoryGirl.create(:consumer_role) }
     let(:person) { double(primary_family: family)}
     let(:family) { double(current_sep: double(effective_on:TimeKeeper.date_of_record)) }
-    let(:hbx_profile) {double} 
+    let(:hbx_profile) {double}
     let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
     let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
     let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
@@ -593,7 +601,7 @@ describe HbxProfile, "class methods", type: :model do
   context "calculate_effective_on_from" do
     let(:date) {TimeKeeper.date_of_record}
     let(:family) { double(current_sep: double(effective_on:date), is_under_special_enrollment_period?: true) }
-    let(:hbx_profile) {double} 
+    let(:hbx_profile) {double}
     let(:benefit_sponsorship) { double }
     let(:bcp) { double }
     let(:benefit_group) {double()}
@@ -614,7 +622,7 @@ describe HbxProfile, "class methods", type: :model do
         effective_on = date - 10.days
         allow(benefit_group).to receive(:effective_on_for).and_return(effective_on)
         allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
-        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'shop', qle:false, family: family, employee_role: employee_role, benefit_group: benefit_group, benefit_sponsorship: nil)).to eq effective_on 
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'shop', qle:false, family: family, employee_role: employee_role, benefit_group: benefit_group, benefit_sponsorship: nil)).to eq effective_on
       end
     end
 
@@ -627,7 +635,7 @@ describe HbxProfile, "class methods", type: :model do
         effective_on = date - 10.days
         allow(bcp).to receive(:earliest_effective_date).and_return effective_on
         allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
-        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'individual', qle:false, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: benefit_sponsorship)).to eq effective_on 
+        expect(HbxEnrollment.calculate_effective_on_from(market_kind:'individual', qle:false, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: benefit_sponsorship)).to eq effective_on
       end
     end
   end

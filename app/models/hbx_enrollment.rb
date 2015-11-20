@@ -456,7 +456,37 @@ class HbxEnrollment
     nil
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
+    if qle
+      effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+    else
+      if employee_role.is_under_open_enrollment?
+        effective_date = employee_role.employer_profile.show_plan_year.start_on
+        if employee_role.effective_on < effective_date 
+          raise "You're not currently eligible to enroll under this open enrollment period"
+        end
+      else
+        raise "You may not enroll until you're eligible under an enrollment period"
+      end
+    end
+
+    plan_year = employee_role.employer_profile.find_plan_year_by_date(effective_date)
+    if plan_year.blank?
+      raise "Plan year not found"
+    end
+
+    benefit_group_assignments = employee_role.census_employee.benefit_group_assignments
+    active_bg_assignments = benefit_group_assignments.renewing + benefit_group_assignments.select{|bg_assignment| bg_assignment.is_active? }
+    benefit_group_assignment = active_bg_assignments.detect{|bg_assignment| plan_year.benefit_groups.include?(bg_assignment.benefit_group)}
+
+    if benefit_group_assignment.blank?
+      raise "not assigned to a benefit group"
+    end
+
+    return benefit_group_assignment.benefit_group, benefit_group_assignment
+  end
+
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     enrollment = HbxEnrollment.new
 
     enrollment.household = coverage_household.household
@@ -464,7 +494,10 @@ class HbxEnrollment
 
     case
     when employee_role.present?
-      raise unless benefit_group.present?
+      if benefit_group.blank?
+        benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
+      end
+
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
 
@@ -475,15 +508,9 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
-
-      # benefit_group.plan_year.start_on
-      enrollment.benefit_group = benefit_group
-      census_employee = employee_role.census_employee
-      #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change
-      #it will be better to create a new benefit_group_assignment
-      benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
+  
+      enrollment.benefit_group_id = benefit_group.id
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
-
     when consumer_role.present?
       enrollment.consumer_role = consumer_role
       enrollment.kind = "individual"
@@ -511,11 +538,12 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package
     )

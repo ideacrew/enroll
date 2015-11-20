@@ -79,6 +79,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
+  index({"households.coverage_households.coverage_household_members.family_member_id" => 1}, {unique: true})
 
   index({"irs_groups.hbx_assigned_id" => 1})
 
@@ -316,6 +317,8 @@ class Family
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
     if existing_family_member
+      active_household.add_household_coverage_member(existing_family_member)
+      existing_family_member.is_active = true
       return existing_family_member
     end
 

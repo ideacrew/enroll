@@ -51,7 +51,7 @@ class Insured::ConsumerRolesController < ApplicationController
             if found_person.try(:consumer_role)
                session[:already_has_consumer_role] = true
                session[:person_id] = found_person.id
-             end
+            end
             format.html { render 'match' }
           else
             format.html { render 'no_match' }
@@ -84,7 +84,7 @@ class Insured::ConsumerRolesController < ApplicationController
       respond_to do |format|
         format.html {
           if is_assisted
-            @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
+            @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}") if @person.primary_family
             redirect_to navigate_to_assistance_saml_index_path
           else
             if session[:already_has_consumer_role] == true

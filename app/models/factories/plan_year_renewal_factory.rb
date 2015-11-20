@@ -15,17 +15,13 @@ module Factories
       @active_plan_year = @employer_profile.active_plan_year
 
       # Set renewal open enrollment period
-      # open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
-      #                                      @active_plan_year.open_enrollment_end_on.month,
-      #                                      1)
+      open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
+                                           @active_plan_year.open_enrollment_end_on.month,
+                                           1)
 
-      # open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
-      #                                    @active_plan_year.open_enrollment_end_on.month,
-      #                                    HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
-
-      ## Remove this following Dec OE
-      open_enrollment_start_on = Date.new(2015,11,11)
-      open_enrollment_end_on = Date.new(2015,11,13)
+      open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
+                                         @active_plan_year.open_enrollment_end_on.month,
+                                         HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
 
 
       @renewal_plan_year = @employer_profile.plan_years.build({
@@ -39,9 +35,9 @@ module Factories
       })
 
       if @renewal_plan_year.may_renew_plan_year?
-        @renewal_plan_year.renew_plan_year 
+        @renewal_plan_year.renew_plan_year
       else
-        raise PlanYearRenewalFactoryError, 
+        raise PlanYearRenewalFactoryError,
           "For employer: #{@employer_profile.inspect}, \n" \
           "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"
       end
@@ -50,7 +46,7 @@ module Factories
         renew_benefit_groups
         @renewal_plan_year
       else
-        raise PlanYearRenewalFactoryError, 
+        raise PlanYearRenewalFactoryError,
           "For employer: #{@employer_profile.inspect}, \n" \
           "Error(s): \n #{@renewal_plan_year.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n" \
           "Unable to save renewal plan year: #{@renewal_plan_year.inspect}"
@@ -86,7 +82,7 @@ module Factories
 
     def reference_plan_ids(active_group)
       start_on_year = (active_group.start_on + 1.year).year
-      if active_group.plan_option_kind == "single_carrier"        
+      if active_group.plan_option_kind == "single_carrier"
         Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
       elsif active_group.plan_option_kind == "metal_level"
         Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
@@ -128,8 +124,8 @@ module Factories
       eligible_employees(active_group).each do |census_employee|
         if census_employee.active_benefit_group_assignment #&& census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
           census_employee.add_renew_benefit_group_assignment(new_group)
-          
-          unless census_employee.save 
+
+          unless census_employee.save
             raise PlanYearRenewalFactoryError, "For employer: #{@employer_profile.inspect}, unable to save census_employee: #{census_employee.inspect}"
           end
         end
@@ -148,7 +144,7 @@ module Factories
     end
 
   end
-  
+
   class PlanYearRenewalFactoryError < StandardError; end
 end
 

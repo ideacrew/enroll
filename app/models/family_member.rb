@@ -136,6 +136,7 @@ class FamilyMember
     return if (primary_relationship == relationship)
     family.remove_family_member(person)
     self.reactivate!(relationship)
+    family.save!
   end
 
   def self.find(family_member_id)

@@ -3,7 +3,7 @@ class Insured::FamiliesController < FamiliesController
   include Acapi::Notifiers
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
-  before_action :check_for_address_info, only: [:find_sep]
+  before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
 
   def home
@@ -14,7 +14,7 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
     @waived = @family.coverage_waived?
-    @employee_role = @person.employee_roles.try(:first)
+    @employee_role = @person.employee_roles.active.first
     @tab = params['tab']
     respond_to do |format|
       format.html
@@ -32,6 +32,7 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
+  
   def brokers
     @tab = params['tab']
 
@@ -166,8 +167,16 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_for_address_info
-    if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
-      redirect_to edit_insured_consumer_role_path(@person.consumer_role)
+    if @person.has_active_employee_role?
+      if @person.addresses.blank?
+        redirect_to edit_insured_employee_path(@person.employee_roles.active.first)
+      end
+    elsif @person.has_active_consumer_role?
+      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+        redirect_to edit_insured_consumer_role_path(@person.consumer_role)
+#      elsif @person.user && !@person.user.identity_verified?
+#        redirect_to ridp_agreement_insured_consumer_role_index_path
+      end
     end
   end
 
