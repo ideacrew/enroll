@@ -232,12 +232,13 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
@@ -245,11 +246,12 @@ class Household
     )
   end
 
-  def create_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, submitted_at: nil)
+  def create_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, submitted_at: nil)
     enrollment = new_hbx_enrollment_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       submitted_at: TimeKeeper.datetime_of_record
