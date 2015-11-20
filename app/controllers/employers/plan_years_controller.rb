@@ -180,16 +180,24 @@ class Employers::PlanYearsController < ApplicationController
       if @plan_year.save
         flash[:notice] = "Plan Year successfully reverted from renewing to applicant."
       else
-        errors = @plan_year.application_errors.values.to_s
-        flash[:error] = "Renewing Plan Year could not be reverted to draft. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+        application_errors = @plan_year.application_errors
+        errors = @plan_year.errors.full_messages
+        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
+                         errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
+
+        flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
     elsif @employer_profile.plan_years.published.include?(@plan_year) && @plan_year.may_revert_application?
       @plan_year.revert_application
       if @plan_year.save
         flash[:notice] = "Plan Year successfully reverted from published to applicant."
       else
-        errors = @plan_year.application_errors.values.to_s
-        flash[:error] = "Published Plan Year could not be reverted to draft. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+        application_errors = @plan_year.application_errors
+        errors = @plan_year.errors.full_messages
+        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
+                         errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
+
+        flash[:error] = "Published Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
     end
     render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
