@@ -1,5 +1,8 @@
 class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :welcome, :search]
+  before_action :check_employee_role_permissions_edit, only: [:edit]
+  before_action :check_employee_role_permissions_update, only: [:update]
+
 
   def welcome
   end
@@ -60,7 +63,6 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def edit
     set_employee_bookmark_url
-    @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
@@ -118,7 +120,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @person = current_user.person
     @family = @person.primary_family
     @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
-    @employee_role = @person.employee_roles.first
+    @employee_role = @person.employee_roles.first #should be latest active
     @employer_profile = @employee_role.employer_profile
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
     @broker = @broker_agency_accounts.first.writing_agent
@@ -126,7 +128,7 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def send_message_to_broker
     @person = current_user.person
-    @employee_role = @person.employee_roles.first
+    @employee_role = @person.employee_roles.first #should be latest active
     @employer_profile = @employee_role.employer_profile
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
     @broker = @broker_agency_accounts.first.writing_agent
@@ -166,7 +168,23 @@ class Insured::EmployeeRolesController < ApplicationController
     ]
   end
 
+  def redirect_to_check_employee_role
+    redirect_to search_insured_employee_index_path
+  end
+
   private
+
+  def check_employee_role_permissions_edit
+    @employee_role = EmployeeRole.find(params.require(:id))
+    policy = ::AccessPolicies::EmployeeRole.new(current_user)
+    policy.authorize_employee_role(@employee_role, self)
+  end
+
+  def check_employee_role_permissions_update
+    @employee_role = EmployeeRole.find(params.require(:person).require(:employee_role_id))
+    policy = ::AccessPolicies::EmployeeRole.new(current_user)
+    policy.authorize_employee_role(@employee_role, self)
+  end
 
   def check_employee_role
     set_current_person

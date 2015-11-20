@@ -141,7 +141,7 @@ private
   end
 
   def enroll_employer
-    employer_profile.employer_enrolled!
+    employer_profile.enroll_employer!
   end
 
   def expire_enrollment

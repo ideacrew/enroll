@@ -7,6 +7,7 @@
   <div class="documents-table">
     <div class="table-responsive">
       <table class="table table-hover table-striped">
+        <col width="250">
         <col width="150">
         <col width="150">
         <col width="100">
@@ -14,6 +15,7 @@
         <col width="100">
         <col width="170">
         <tr>
+          <th>HBX id</th>
           <th>First name</th>
           <th>Last name</th>
           <th># of Docs</th>
@@ -24,10 +26,11 @@
 
         <% @unverified_persons.each do |person| %>
         <tr>
+          <td><%= person.hbx_id %></td>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
           <td style="text-align:center;"><%= person.consumer_role.vlp_documents.where(identifier: {:$exists => true}).count %></td>
-          <td style="text-align:center;"><%= distance_of_time_in_words(person.created_at.to_date, @time_to.to_date) %></td>
+          <td style="text-align:center;"><%= time_remaining_in_words(person.created_at) %></td>
           <td style="text-align:center;">
             <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
               <i class="fa fa-file"></i>

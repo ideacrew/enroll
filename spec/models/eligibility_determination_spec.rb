@@ -30,21 +30,6 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       }
     }
 
-  let(:csr_kinds){[
-    "csr_100",
-    "csr_94",
-    "csr_87",
-    "csr_73",
-    "csr_0"
-    ]
-  }
-
-  context "csr_kinds" do
-    it "should match" do
-      expect(csr_kinds).to eq EligibilityDetermination::CSR_KINDS
-    end
-  end
-
   context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}

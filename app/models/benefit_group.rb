@@ -241,24 +241,11 @@ class BenefitGroup
   end
 
   def self.find(id)
-    orgs = Organization.where({
-      "employer_profile.plan_years.benefit_groups._id" => id
-    })
-    found_value = catch(:found_benefit_group) do
-      orgs.each do |org|
-        org.employer_profile.plan_years.each do |py|
-          py.benefit_groups.each do |bg|
-            if bg.id == id
-              throw :found_benefit_group, bg
-            end
-          end
-        end
-      end
-      raise Mongoid::Errors::DocumentNotFound.new(self, id)
-    end
-    return found_value
+    organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
+    benefit_groups = organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
+      bg.id == id
+    end.first
   end
-
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100

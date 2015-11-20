@@ -203,6 +203,10 @@ class CensusEmployee < CensusMember
     is_business_owner
   end
 
+  def is_covered_or_waived?
+    ["coverage_selected", "coverage_waived"].include?(active_benefit_group_assignment.aasm_state)
+  end
+
   def email_address
     return nil unless email.present?
     email.address

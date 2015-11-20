@@ -24,6 +24,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         residency_status:     ["state_resident"],
         ethnicity:            ["any"]
     ))}
+    let(:hbx_profile) {double} 
+    let(:benefit_sponsorship) { double }
+    let(:bcp) { double }
 
   before do
     allow(Person).to receive(:find).and_return(person)
@@ -32,6 +35,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
   end
 
   context "GET new" do
@@ -39,6 +45,17 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns to family home page when employee is not under open enrollment" do
+      sign_in user
+      employee_roles = [employee_role]
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(employee_roles).to receive(:detect).and_return(employee_role)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      get :new, person_id: person.id, employee_role_id: employee_role.id
+      expect(response).to redirect_to(family_account_path)
+      expect(flash[:alert]).to eq "You can only shop for plans during open enrollment."
     end
 
     it "return blank change_plan" do
@@ -64,12 +81,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         allow(person).to receive(:has_active_consumer_role?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(HbxEnrollment).to receive(:find).and_return nil
+        allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
       end
 
       it "should set session" do
         sign_in user
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(session[:pre_hbx_enrollment_id]).to eq "123"
+      end
+
+      it "should get new_effective_on" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
+        expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
     end
   end

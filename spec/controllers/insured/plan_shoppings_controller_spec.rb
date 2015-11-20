@@ -356,11 +356,29 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         end
 
         it "should get max_aptc" do
-          expect(session[:max_aptc]).to eq nil
+          expect(session[:max_aptc]).to eq 0
         end
 
         it "should get default selected_aptc" do
-          expect(session[:selected_aptc]).to eq nil
+          expect(session[:elected_aptc]).to eq 0
+        end
+      end
+
+      context "without tax_household when has aptc session" do
+        before :each do
+          allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          session[:max_aptc] = 100
+          session[:elected_aptc] = 80
+          get :show, id: "hbx_id"
+        end
+
+        it "should get max_aptc" do
+          expect(session[:max_aptc]).to eq 0
+        end
+
+        it "should get default selected_aptc" do
+          expect(session[:elected_aptc]).to eq 0
         end
       end
     end

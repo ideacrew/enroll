@@ -197,6 +197,7 @@ class QhpBuilder
           metal_level: parse_metal_level,
           market: parse_market,
           ehb: @qhp.ehb_percent_premium,
+          # carrier_profile_id: "53e67210eb899a460300000d",
           carrier_profile_id: get_carrier_id(@carrier_name),
           coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
           )
@@ -238,7 +239,15 @@ class QhpBuilder
   def build_cost_share_variances_list
     cost_share_variance_list_params.each do |csvp|
       @csvp = csvp
+      next if hios_plan_and_variant_id.split("-").last == "00"
+      update_hsa_eligibility
       build_cost_share_variance
+    end
+  end
+
+  def update_hsa_eligibility
+    if hios_plan_and_variant_id.split("-").last == "01" && @qhp.active_year > 2015
+      @qhp.hsa_eligibility = hsa_params[:hsa_eligibility]
     end
   end
 
@@ -271,6 +280,14 @@ class QhpBuilder
     else
       @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes)
     end
+  end
+
+  def hios_plan_and_variant_id
+    cost_share_variance_attributes[:hios_plan_and_variant_id]
+  end
+
+  def hsa_params
+    @csvp[:hsa_attributes]
   end
 
   def service_visits_params

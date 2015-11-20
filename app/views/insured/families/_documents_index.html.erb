@@ -13,27 +13,19 @@
          <tr>
            <th>Member</th>
            <th>Verification Status</th>
+           <th>Time left to provide verification docs</th>
            <th>Document</th>
            <th>Download</th>
-           <th>Time left to provide verification docs</th>
            <th>Document status</th>
          </tr>
 
          <% @family_members.each do |member|%>
            <tr>
              <td><%= member.person.first_name %> <%= member.person.last_name%></td>
-             <td>
-               <% if member.person.consumer_role.aasm_state == "verifications_pending" %>
-                   Pending
-                 <% elsif member.person.consumer_role.aasm_state == "fully_verified" %>
-                   Verified
-                 <% else %>
-                   Outstanding verification
-               <% end %>
-             </td>
-             <td colspan="4">
+             <td><%= show_consumer_role_state(member.person.consumer_role) %></td>
+             <td><%= time_remaining_in_words(member.person.created_at) %></td>
+             <td colspan="3">
                <table class="table table-condensed">
-                 <col width="170">
                  <col width="150">
                  <col width="100">
                  <col width="100">
@@ -50,9 +42,6 @@
                        <i class="fa fa-download fa-2x"></i>
                        <% end %>
                        <% end %>
-                     </td>
-                     <td>
-                       <%= distance_of_time_in_words(member.person.created_at.to_date, @time_to.to_date) %>
                      </td>
                      <td>
                        <%= doc.status %><br>

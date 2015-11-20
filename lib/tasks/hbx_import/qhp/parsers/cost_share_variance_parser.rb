@@ -2,6 +2,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','sbc_pars
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','maximum_out_of_pockets_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','deductible_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','service_visits_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','hsa_parser')
 
 module Parser
   class CostShareVarianceParser
@@ -29,6 +30,7 @@ module Parser
     has_many :maximum_out_of_pockets_attributes, Parser::MaximumOutOfPocketsParser, tag: "moop", deep: true
     has_one :deductible_attributes, Parser::DeductibleParser, tag: "planDeductible", deep:true
     has_many :service_visits_attributes, Parser::ServiceVisitsParser, tag: "serviceVisit", deep: true
+    has_one :hsa_attributes, Parser::HsaParser, tag: "hsa", deep: true
 
     def to_hash
       response = {
@@ -51,6 +53,7 @@ module Parser
         },
         maximum_out_of_pockets_attributes: maximum_out_of_pockets_attributes.map(&:to_hash),
         deductible_attributes: deductible_attributes.to_hash,
+        hsa_attributes: hsa_attributes.present? ? hsa_attributes.to_hash : {},
         service_visits_attributes: service_visits_attributes.map(&:to_hash)
       }
       response[:sbc_attributes] = sbc_attributes.to_hash if sbc_attributes

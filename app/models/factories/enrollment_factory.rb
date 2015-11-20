@@ -44,7 +44,6 @@ module Factories
         person_params["name_sfx"], person_params["ssn"].gsub("-",""),
         person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
         )
-
       if person.blank? and person_new.blank?
         begin
           raise

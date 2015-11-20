@@ -5,8 +5,10 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
   let(:plan_year) { FactoryGirl.create(:plan_year) }
   let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let(:plan) { FactoryGirl.create(:plan) }
+  let(:user) { FactoryGirl.create(:user) }
 
   before :each do
+    sign_in(user)
     allow(benefit_group).to receive(:reference_plan).and_return(plan)
     allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
     allow(benefit_group).to receive(:effective_on_offset).and_return 30
@@ -21,7 +23,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       expect(rendered).to have_selector("td", text: "#{pct.to_i}%")
     end
   end
-  
+
   it "should display title by effective_on_offset" do
     render "employers/employer_profiles/my_account/benefits"
     expect(rendered).to match /Date of hire after 30 days from date of hire/
