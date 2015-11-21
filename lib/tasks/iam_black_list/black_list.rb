@@ -4,11 +4,11 @@ BlackList = Struct.new(
 
   def self.from_row(row)
     list_item = BlackList.new
-    list_item.first_name = row[0].strip
-    list_item.last_name = row[1].strip
-    list_item.login = row[2].strip
-    list_item.email = row[3].strip
-    list_item.type = row[4].strip
+    list_item.first_name = row[0].present? ? row[0].strip : ""
+    list_item.last_name = row[1].present? ? row[1].strip : ""
+    list_item.login = row[2].present? ? row[2].strip : ""
+    list_item.email = row[3].present? ? row[3].strip : ""
+    list_item.type = row[4].present? ? row[4].strip : ""
     list_item
   end
 
