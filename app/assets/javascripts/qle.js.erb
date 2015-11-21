@@ -23,10 +23,24 @@ $(function () {
     });
   }
 
-  function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days) {
+  function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
     var target = $('.qle-date-picker');
-    var dateMin = '-' + post_event_sep_in_days + 'd';
-    var dateMax = '+' + pre_event_sep_in_days + 'd';
+    var splitedate = cdate.split('/');
+    var cur_date = new Date(splitedate[2], splitedate[0]-1, splitedate[1]);
+    var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
+
+    var post_days = (idays - post_event_sep_in_days);
+    var pre_days = (pre_event_sep_in_days + idays);
+    if (post_days >= 0){
+      var dateMin = '+' + post_days + 'd';
+    }else{
+      var dateMin = post_days + 'd';
+    }
+    if (pre_days >= 0){
+      var dateMax = '+' + pre_days + 'd';
+    }else{
+      var dateMax = pre_days + 'd';
+    }
     var cur_qle_title = $('.qle-details-title').html();
 
     $(target).val('');
@@ -35,9 +49,10 @@ $(function () {
       changeMonth: true,
       changeYear: true,
       dateFormat: 'mm/dd/yy',
+      defaultDate: cdate,
       minDate: dateMin,
       maxDate: dateMax});
-  }
+  };
 
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
@@ -53,7 +68,7 @@ $(function () {
       $('#qle-date-chose').addClass('hidden');
       $('#qle-details .error-info').removeClass('hidden');
     } else {
-      init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'));
+      init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'), $(this).data('current-date'));
       $('#qle-date-chose').removeClass('hidden');
     };
 

@@ -19,7 +19,7 @@ class Products::QhpController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @qhps = find_qhp_cost_share_variances.each do |qhp|
         qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-        qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
+        qhp[:total_employee_cost] =  @benefit_group.decorated_plan(qhp.plan, @hbx_enrollment).total_employee_cost
       end
     else
       tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)

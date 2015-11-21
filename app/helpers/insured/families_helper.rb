@@ -30,7 +30,8 @@ module Insured::FamiliesHelper
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       post_event_sep_in_days: qle.post_event_sep_in_days, 
       pre_event_sep_in_days: qle.pre_event_sep_in_days,
-      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested 
+      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested,
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     } 
 
     if qle.tool_tip.present?  
