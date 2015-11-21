@@ -157,16 +157,9 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def is_under_open_enrollment
-    if @employee_role.present?
-      @change_plan = "change_by_qle" if @employee_role.families.is_under_special_enrollment_period?
-      return if @employee_role.is_under_open_enrollment?
-      if !@employee_role.families.is_under_special_enrollment_period?
-        flash[:alert] = "You can only shop for plans during open enrollment."
-        redirect_to family_account_path
-      elsif !@employee_role.is_shoppable_by_sep?
-        flash[:alert] = "Unable to purchase plans at this time."
-        redirect_to family_account_path
-      end
+    if @employee_role.present? && !@employee_role.is_under_open_enrollment?
+      flash[:alert] = "You can only shop for plans during open enrollment."
+      redirect_to family_account_path
     end
   end
 end
