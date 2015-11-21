@@ -70,7 +70,7 @@ class EmployeeRole
   end
 
   def benefit_group
-    census_employee.published_benefit_group
+    census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
   end
 
   def is_under_open_enrollment?

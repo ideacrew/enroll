@@ -177,11 +177,27 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.renewing.first
+    benefit_group_assignments.detect{ |assignment| assignment.plan_year.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
     benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def published_benefit_group_assignment
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def renewal_published_benefit_group
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      renewal_benefit_group_assignment.benefit_group
+    end
   end
 
   # Initialize a new, refreshed instance for rehires via deep copy
@@ -247,16 +263,6 @@ class CensusEmployee < CensusMember
 
     terminate_employee_role
     self
-  end
-
-  def published_benefit_group_assignment
-    benefit_group_assignments.detect do |benefit_group_assignment|
-      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-    end
-  end
-
-  def published_benefit_group
-    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
 
   def employee_relationship

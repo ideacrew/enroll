@@ -7,7 +7,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
 
   <% case %>
   <% when @qle_aptc_block %>
-    var qleBlockNotice = "We need a bit of additional information to redetermine your eligibility. Please call us at 1-855-532-5465.<br><a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>";
+    var qleBlockNotice = "We need a bit of additional information to redetermine your eligibility. Please call us at <%= HbxProfile::CallCenterPhoneNumber %>.<br><a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>";
     $("#qle-details .error-text").html(qleBlockNotice);
 
     $('#qle-details .error-info').removeClass('hidden');

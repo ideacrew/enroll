@@ -79,7 +79,6 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
-  index({"households.coverage_households.coverage_household_members.family_member_id" => 1}, {unique: true})
 
   index({"irs_groups.hbx_assigned_id" => 1})
 
