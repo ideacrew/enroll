@@ -28,7 +28,8 @@
           <br>
 	        <div class="actions">
 	          <%= f.submit "Create account", class: "btn btn-primary btn-lg btn-br mz" %>
-            <%= link_to "Sign In Existing Account", new_user_session_path , class: "btn btn-default btn-lg" unless Rails.env.production?%>
+            <%= link_to "Sign In Existing Account", new_user_session_path , class: "btn btn-default btn-lg" unless Rails.env.production? %>
+            <%= link_to "Sign In", url_for(SamlInformation.iam_login_url) , class: "btn btn-default btn-lg" unless Rails.env.development? %>
 	        </div>
 		    <% end %>
       </div>

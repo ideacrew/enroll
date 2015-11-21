@@ -311,6 +311,8 @@ class Family
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
     if existing_family_member
+      active_household.add_household_coverage_member(existing_family_member)
+      existing_family_member.is_active = true
       return existing_family_member
     end
 

@@ -213,3 +213,54 @@ describe '#matches?' do
     end
   end
 end
+
+describe "#kind" do
+  let(:office_location) {FactoryGirl.build(:office_location, :primary)}
+  let(:address) {FactoryGirl.build(:address)}
+
+  context "write kind" do
+    it "kind should be work with primary office_location when primary" do
+      allow(address).to receive(:office_location).and_return office_location
+      address.kind = 'primary'
+      expect(address.read_attribute(:kind)).to eq 'work'
+    end
+
+    it "kind should not be itself with normal office_location" do
+      allow(office_location).to receive(:is_primary).and_return false
+      allow(address).to receive(:office_location).and_return office_location
+      address.kind = 'primary'
+      expect(address.read_attribute(:kind)).to eq 'primary'
+    end
+
+    it "kind should be itself without office_location" do
+      address.kind = 'primary'
+      expect(address.read_attribute(:kind)).to eq 'primary'
+    end
+  end
+
+  context "read kind" do
+    it "should return primary when kind is work and has primary office_location" do
+      allow(address).to receive(:office_location).and_return office_location
+      address.write_attribute(:kind, 'work')
+      expect(address.kind).to eq 'primary'
+    end
+
+    it "should return primary when kind is home and has primary office_location" do
+      allow(address).to receive(:office_location).and_return office_location
+      address.write_attribute(:kind, 'home')
+      expect(address.kind).to eq 'home'
+    end
+
+    it "should return itself when kind is work but has normal office_location" do
+      allow(office_location).to receive(:is_primary).and_return false
+      allow(address).to receive(:office_location).and_return office_location
+      address.write_attribute(:kind, 'work')
+      expect(address.kind).to eq 'work'
+    end
+
+    it "should return itself" do
+      address.write_attribute(:kind, 'work')
+      expect(address.kind).to eq 'work'
+    end
+  end
+end
