@@ -73,6 +73,12 @@ class EmployeeRole
     census_employee.published_benefit_group
   end
 
+  def is_shoppable_by_sep?
+    current_sep = families.current_sep
+    return false if !current_sep.present?
+    employer_profile.find_plan_year_by_date(current_sep.effective_on).present?
+  end
+
   def is_under_open_enrollment?
     return false if employer_profile.blank?
     employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)

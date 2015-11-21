@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe Users::RegistrationsController do
 
   context "create" do
-
     let(:curam_user){ double("CuramUser") }
 
     context "when the email is in the black list" do
@@ -16,6 +15,7 @@ RSpec.describe Users::RegistrationsController do
       it "should redirect to saml recovery page if user matches" do
         post :create, { user: { email: "test@example.com", password: "password", password_confirmation: "password" } }
         expect(response).to redirect_to(SamlInformation.account_recovery_url)
+        expect(flash[:alert]).to eq "An account with this email address already exists. Click her if you've forgotten your password."
       end
 
     end
