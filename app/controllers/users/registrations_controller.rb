@@ -10,12 +10,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # POST /resource
   def create
     build_resource(sign_up_params)
-
-    # TODO add code here to check email against CuramUser emails
-    # if email already exists
+#   Check for curam user email, if present then restrict the user.
     if CuramUser.match_email(resource.email).first.present?
-      flash[:alert] = "An account with this email address already exists. Click her if you've forgotten your password."
-      redirect_to SamlInformation.account_recovery_url and return
+      flash[:alert] = "An account with this email address ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+      "Successfully created #{view_context.link_to('product', @product)}."
+      render :new and return
     end
 
     resource_saved = resource.save
