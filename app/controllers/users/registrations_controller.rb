@@ -13,7 +13,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
     # TODO add code here to check email against CuramUser emails
     # if email already exists
-    (redirect_to SamlInformation.account_recovery_url and return) if CuramUser.match_email(resource.email).first.present?
+    if CuramUser.match_email(resource.email).first.present?
+      flash[:alert] = "An account with this email address already exists. Click her if you've forgotten your password."
+      redirect_to SamlInformation.account_recovery_url and return
+    end
+
     resource_saved = resource.save
     yield resource if block_given?
     if resource_saved
