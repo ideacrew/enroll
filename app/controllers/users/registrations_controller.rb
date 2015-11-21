@@ -13,7 +13,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
 #   Check for curam user email, if present then restrict the user.
     if CuramUser.match_email(resource.email).first.present?
       flash[:alert] = "An account with this email address ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      "Successfully created #{view_context.link_to('product', @product)}."
       render :new and return
     end
 
