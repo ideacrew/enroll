@@ -1,6 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
-  before_action :is_under_open_enrollment, only: [:new]
+  # before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
@@ -156,10 +156,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
-  def is_under_open_enrollment
-    if @employee_role.present? && !@employee_role.is_under_open_enrollment?
-      flash[:alert] = "You can only shop for plans during open enrollment."
-      redirect_to family_account_path
-    end
-  end
+  # def is_under_open_enrollment
+  #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?
+  #     flash[:alert] = "You can only shop for plans during open enrollment."
+  #     redirect_to family_account_path
+  #   end
+  # end
 end

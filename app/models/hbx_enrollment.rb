@@ -458,11 +458,11 @@ class HbxEnrollment
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     if qle
-      effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+      qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
     else
       if employee_role.is_under_open_enrollment?
-        effective_date = employee_role.employer_profile.show_plan_year.start_on
-        if employee_role.effective_on < effective_date 
+        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        if open_enrollment_effective_date < employee_role.effective_on
           raise "You're not currently eligible to enroll under this open enrollment period"
         end
       else
@@ -470,17 +470,19 @@ class HbxEnrollment
       end
     end
 
-    plan_year = employee_role.employer_profile.find_plan_year_by_date(effective_date)
+    effective_date = qle_effective_date || open_enrollment_effective_date
+
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
     if plan_year.blank?
-      raise "Plan year not found"
+      raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
 
-    benefit_group_assignments = employee_role.census_employee.benefit_group_assignments
-    active_bg_assignments = benefit_group_assignments.renewing + benefit_group_assignments.select{|bg_assignment| bg_assignment.is_active? }
-    benefit_group_assignment = active_bg_assignments.detect{|bg_assignment| plan_year.benefit_groups.include?(bg_assignment.benefit_group)}
+    census_employee = employee_role.census_employee
+    benefit_group_assignment = plan_year.is_renewing? ? 
+        census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
-    if benefit_group_assignment.blank?
-      raise "not assigned to a benefit group"
+    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
@@ -501,7 +503,7 @@ class HbxEnrollment
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
 
-      if qle and enrollment.family.is_under_special_enrollment_period?
+      if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       else
@@ -524,7 +526,6 @@ class HbxEnrollment
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
         enrollment.enrollment_kind = "open_enrollment"
       end
-
     else
       raise "either employee_role or consumer_role is required"
     end
