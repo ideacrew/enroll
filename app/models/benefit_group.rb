@@ -285,6 +285,10 @@ class BenefitGroup
     plan_option_kind == "single_plan"
   end
 
+  def is_default?
+    default
+  end
+
   def elected_plans_by_option_kind
     case self.plan_option_kind
     when "single_plan"
