@@ -39,7 +39,7 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    benefit_group.plan_year
+    benefit_group.plan_year if benefit_group
   end
 
   def benefit_group=(new_benefit_group)
