@@ -146,8 +146,8 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def ridp_agreement
-    set_current_person
-    if session[:original_application_type] == 'paper' || @person.created_at < '2015-10-12'
+    if session[:original_application_type] == 'paper'
+      set_current_person
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       return
     else

@@ -156,62 +156,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
-  context "GET ridp_agreeement"  do
-    before(:each) do
-      allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:consumer_role).and_return(consumer_role)
-      sign_in user
-    end
-    describe "happy path to collect agreement" do
-      before(:each) do
-        request.session[:original_application_type]  = ''
-        person.created_at = Date.new( 2015, 11, 1)
-        get :ridp_agreement
-      end
-      it "should begin ridp" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template(:ridp_agreement)
-      end
-      it "should change url" do
-        expect(consumer_role.bookmark_url).to eq("http://test.host/insured/consumer_role/ridp_agreement")
-      end
-    end
-    describe "paper enrollment skips ridp" do
-      before(:each) do
-        request.session[:original_application_type]  = 'paper'
-        person.created_at = Date.new( 2015, 11, 1)
-        get :ridp_agreement
-      end
-      it "should redirect and skip ridp" do
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(insured_family_members_path(:consumer_role_id => person.consumer_role.id))
-      end
-    end
-    describe "phone enrollment does not skip ridp" do
-      before(:each) do
-        request.session[:original_application_type]  = 'phone'
-        person.created_at = Date.new( 2015, 11, 1)
-        get :ridp_agreement
-      end
-      it "should begin ridp" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template(:ridp_agreement)
-      end
-    end
-    describe "Legacy Curam enrollment before 2015-10-12 skips ridp" do
-      before(:each) do
-        request.session[:original_application_type]  = 'phone'
-        person.created_at = Date.new( 2015, 10, 11)
-        get :ridp_agreement
-      end
-      it "should redirect and skip ridp" do
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(insured_family_members_path(:consumer_role_id => person.consumer_role.id))
-      end
-    end
-
-  end
-
   describe "GET immigration_document_options" do
 
     it "render javascript template" do
