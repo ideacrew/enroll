@@ -79,7 +79,7 @@ class HbxEnrollmentMember
 
   def end_date_gt_start_date
     return unless coverage_end_on.present?
-    if end_date < start_date
+    if coverage_end_on < coverage_start_on
       self.errors.add(:coverage_end_on, "Coverage start date must preceed or equal end date")
     end
   end
