@@ -302,4 +302,20 @@ RSpec.describe Organization, dbclean: :after_each do
       end
     end
   end
+
+  context "primary_office_location" do
+    let(:organization) {FactoryGirl.build(:organization)}
+    let(:office_location) {FactoryGirl.build(:office_location, :primary)}
+    let(:office_location2) {FactoryGirl.build(:office_location, :primary)}
+
+    it 'should save fail with more than one primary office_location' do
+      organization.office_locations = [office_location, office_location2]
+      expect(organization.save).to eq false
+    end
+
+    it "should save success with one primary office_location" do
+      organization.office_locations = [office_location]
+      expect(organization.save).to eq true
+    end
+  end
 end

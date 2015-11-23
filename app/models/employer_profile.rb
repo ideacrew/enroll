@@ -142,7 +142,7 @@ class EmployerProfile
     @active_plan_year if defined? @active_plan_year
     plan_year = find_plan_year_by_date(today)
     # @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
-    @active_plan_year = plan_year if (plan_year.present? && plan_year.is_published?)
+    @active_plan_year = plan_year if (plan_year && plan_year.is_published?)
   end
 
   def latest_plan_year
@@ -162,7 +162,13 @@ class EmployerProfile
   end
 
   def find_plan_year_by_date(target_date)
-    plan_years.to_a.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
+    plan_years.published.detect{ |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
+  end
+
+  def find_plan_year_by_effective_date(target_date)
+    (plan_years.published + plan_years.renewing_published_state).detect do |py| 
+      (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
+    end
   end
 
   def find_plan_year(id)

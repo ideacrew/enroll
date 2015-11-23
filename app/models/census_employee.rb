@@ -177,11 +177,27 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.renewing.first
+    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
     benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def published_benefit_group_assignment
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def renewal_published_benefit_group
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      renewal_benefit_group_assignment.benefit_group
+    end
   end
 
   # Initialize a new, refreshed instance for rehires via deep copy
@@ -249,16 +265,6 @@ class CensusEmployee < CensusMember
     self
   end
 
-  def published_benefit_group_assignment
-    benefit_group_assignments.detect do |benefit_group_assignment|
-      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-    end
-  end
-
-  def published_benefit_group
-    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
-  end
-
   def employee_relationship
     "employee"
   end
@@ -274,7 +280,7 @@ class CensusEmployee < CensusMember
   end
 
   def send_invite!
-    if has_active_benefit_group_assignment?
+    if has_benefit_group_assignment?
       plan_year = active_benefit_group_assignment.benefit_group.plan_year
       if plan_year.employees_are_matchable?
         Invitation.invite_employee!(self)
@@ -313,7 +319,7 @@ class CensusEmployee < CensusMember
     end
 
     event :link_employee_role do
-      transitions from: :eligible, to: :employee_role_linked, :guard => :has_active_benefit_group_assignment?
+      transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
     end
 
     event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
@@ -394,9 +400,9 @@ private
     end
   end
 
-  def has_active_benefit_group_assignment?
-    active_benefit_group_assignment.present? &&
-    %w(published enrolling enrolled active).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)
+  def has_benefit_group_assignment?
+    (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
+    (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
   end
 
   def clear_employee_role

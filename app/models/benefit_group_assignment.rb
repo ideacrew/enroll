@@ -38,6 +38,10 @@ class BenefitGroupAssignment
     end
   end
 
+  def plan_year
+    benefit_group.plan_year if benefit_group
+  end
+
   def benefit_group=(new_benefit_group)
     raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id

@@ -28,6 +28,6 @@ class WorkflowStateTransition
 
 private
   def set_transition_timestamp
-    self.transition_at ||= TimeKeeper.datetime_of_record
+    self.transition_at ||= Time.now
   end
 end

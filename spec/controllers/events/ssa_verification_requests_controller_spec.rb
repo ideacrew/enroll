@@ -15,7 +15,7 @@ describe Events::SsaVerificationRequestsController do
         @event_name = e_name
         @body = payload
       end
-      allow(TimeKeeper).to receive(:datetime_of_record).and_return(mock_now)
+      allow(Time).to receive(:now).and_return(mock_now)
       expect(controller).to receive(:render_to_string).with(
         "events/lawful_presence/ssa_verification_request", {:formats => ["xml"], :locals => {
          :individual => person

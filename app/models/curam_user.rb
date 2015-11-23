@@ -1,13 +1,25 @@
 class CuramUser
   include Mongoid::Document
 
+  field :username, type: String
+  field :email, type: String
   field :first_name, type: String
   field :last_name, type: String
   field :encrypted_ssn, type: String
   field :dob, type: Date
 
+  index({email: 1})
+  index({username: 1})
   index({encrypted_ssn: 1, dob: 1})
-  index({lname: 1, fname: 1, dob: 1})
+  index({last_name: 1, first_name: 1, dob: 1})
+
+  def self.match_email(value)
+    where(email: value)
+  end
+
+  def self.match_username(value)
+    where(username: value)
+  end
 
   def self.encrypt_ssn(val)
     if val.blank?

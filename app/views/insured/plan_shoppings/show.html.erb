@@ -79,7 +79,7 @@
           <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
             <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
           <% else %>
-            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
           <% end %>
         <% end %>
       </div>
@@ -110,11 +110,20 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+
+  <%
+    #if coverage_kind is dental, disabled metal level options as it's not applicable.
+    if @hbx_enrollment.coverage_kind == "dental"
+  %>
+    $(".plan-metal-level-selection-filter").attr("disabled", true);
+  <% end %>
+
   console.log('triggered');
   $.ajax({
     url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
     type: "GET"
   });
 });
+
 
 </script>

@@ -8,6 +8,7 @@ class PlanYear
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -39,8 +40,9 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
-  scope :published,      ->{ any_in(aasm_state: PUBLISHED) }
-  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
+  scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
+  scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
+  scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -303,7 +305,7 @@ class PlanYear
   end
 
   def employees_are_matchable?
-    %w(published enrolling enrolled active).include? aasm_state
+    %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
   end
 
   class << self

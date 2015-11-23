@@ -44,7 +44,7 @@ class TimeKeeper
 
   def self.datetime_of_record
     instant = Time.current
-    date_of_record.to_datetime.utc + instant.hour.hours + instant.min.minutes + instant.sec.seconds
+    instance.date_of_record.to_datetime + instant.hour.hours + instant.min.minutes + instant.sec.seconds
   end
 
   def set_date_of_record(new_date)
@@ -54,11 +54,11 @@ class TimeKeeper
   def date_of_record
     tl_value = thread_local_date_of_record
     return tl_value unless tl_value.blank?
-    found_data = Rails.cache.fetch(CACHE_KEY) do
+    found_value = Rails.cache.fetch(CACHE_KEY) do
       log("date_of_record not available for TimeKeeper - using Date.current")
       Date.current.strftime("%Y-%m-%d")
     end
-    Date.strptime(found_data, "%Y-%m-%d")
+    Date.strptime(found_value, "%Y-%m-%d")
   end
 
   def push_date_of_record

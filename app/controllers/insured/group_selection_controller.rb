@@ -1,6 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
-  before_action :is_under_open_enrollment, only: [:new]
+  # before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
@@ -16,6 +16,7 @@ class Insured::GroupSelectionController < ApplicationController
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
+
     if @market_kind == 'individual'
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
@@ -61,6 +62,8 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
+
+
     hbx_enrollment.coverage_kind = @coverage_kind
 
     if hbx_enrollment.save
@@ -110,32 +113,32 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
+      if @hbx_enrollment.present?
+        benefit_group = @hbx_enrollment.benefit_group
+        benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
+      end
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,
-        benefit_group: @hbx_enrollment.present? ? @hbx_enrollment.benefit_group : @employee_role.benefit_group,
+        benefit_group: benefit_group,
+        benefit_group_assignment: benefit_group_assignment,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     when 'individual'
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
         coverage_household: @coverage_household,
-        benefit_package: @benefit_package,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     end
   end
+
 
   def initialize_common_vars
     person_id = params.require(:person_id)
     @person = Person.find(person_id)
     @family = @person.primary_family
     @coverage_household = @family.active_household.immediate_family_coverage_household
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
 
-    if params[:hbx_enrollment_id].present?
-      @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
-    end
-
-    @hbx_enrollment = @family.latest_household.hbx_enrollments.enrolled.last if @hbx_enrollment.blank?
-    # @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
     if params[:employee_role_id].present?
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
@@ -144,6 +147,7 @@ class Insured::GroupSelectionController < ApplicationController
       @consumer_role = @person.consumer_role
       @role = @consumer_role
     end
+
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -152,10 +156,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
-  def is_under_open_enrollment
-    if @employee_role.present? && !@employee_role.is_under_open_enrollment?
-      flash[:alert] = "You can only shop for plans during open enrollment."
-      redirect_to family_account_path
-    end
-  end
+  # def is_under_open_enrollment
+  #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?
+  #     flash[:alert] = "You can only shop for plans during open enrollment."
+  #     redirect_to family_account_path
+  #   end
+  # end
 end
