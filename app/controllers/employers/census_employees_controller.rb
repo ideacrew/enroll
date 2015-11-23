@@ -27,6 +27,7 @@ class Employers::CensusEmployeesController < ApplicationController
     if @census_employee.save
       if benefit_group_id.present?
         @census_employee.send_invite!
+        @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully created."
       else
         flash[:notice] = "Your employee was successfully added to your roster."
