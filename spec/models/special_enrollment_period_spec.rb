@@ -18,7 +18,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                               tool_tip: "Enroll or add a family member due to a new domestic partnership"
                             )
                           }
-  let(:ivl_qle)       { QualifyingLifeEventKind.create(
+  let(:retro_ivl_qle) { QualifyingLifeEventKind.create(
                               title: "Had a baby",
                               tool_tip: "Household adds a member due to birth",
                               action_kind: "add_member",
@@ -33,12 +33,30 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                               is_self_attested: true
                             )
                           }
+
+  let(:ivl_qle)       { QualifyingLifeEventKind.create(
+                              title: "Lost or will soon lose other health insurance ",
+                              tool_tip: "Someone in the household is losing other health insurance involuntarily",
+                              action_kind: "add_benefit",
+                              event_kind_label: "Coverage end date",
+                              market_kind: "individual",
+                              ordinal_position: 50,
+                              reason: "lost_access_to_mec",
+                              edi_code: "33-LOST ACCESS TO MEC", 
+                              effective_on_kinds: ["first_of_next_month"],
+                              pre_event_sep_in_days: 60,
+                              post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
+                              is_self_attested: true
+                            )
+                          }
+                          
   let(:qle_on)         { Date.current }
 
   let(:valid_params){
     {
       family: family,
       qualifying_life_event_kind: ivl_qle,
+      effective_on_kind: "first_of_next_month", 
       qle_on: qle_on,
     }
   }
@@ -47,7 +65,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     context "with no family" do
       let(:params) {valid_params.except(:family)}
 
-      it "should be invalid" do
+      it "should raise an error" do
         expect{SpecialEnrollmentPeriod.create(**params)}.to raise_error(Mongoid::Errors::NoParent)
       end
     end
@@ -92,49 +110,108 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
 
   context "for an Individual Qualifying Life Event" do
-    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }
+    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
 
-    it "qle market kind should be shop" do
-      expect(ivl_qle_sep.qualifying_life_event_kind.market_kind).to eq "shop"
+    it "qle market kind should be individual" do
+      expect(ivl_qle_sep.qualifying_life_event_kind.market_kind).to eq "individual"
     end
 
     it "sep title should be set to QLE kind title" do
-      expect(ivl_qle_sep.title).to eq shop_qle.title
+      expect(ivl_qle_sep.title).to eq ivl_qle.title
     end
 
     it "effective date should not be set" do
       expect(ivl_qle_sep.effective_on).to be_nil
     end
 
-    context "and this is retro QLE that has lapsed" do
+    context "and QLE is reported before end of SEP" do
+      let(:today)                           { TimeKeeper.date_of_record }
+      let(:monthly_enrollment_deadline)     { today.beginning_of_month + HbxProfile::IndividualEnrollmentDueDayOfMonth.days - 1.day }
+
+      let(:qle_on_date)                     { today.beginning_of_month }
+
+      let(:pre_enrollment_deadline_date)    { monthly_enrollment_deadline }
+      let(:post_enrollment_deadline_date)   { monthly_enrollment_deadline  + 1.day }
+
+      let(:next_month_date)                 { today.end_of_month + 1.day }
+      let(:month_after_next_date)           { next_month_date.next_month }
+      let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on_date) }
+
+
+      context "and 'effective on kind' is 'first of month' and date reported is before the deadline for current month" do
+        let(:reporting_date)  { pre_enrollment_deadline_date }
+        
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          ivl_qle_sep.effective_on_kind = "first_of_month" 
+        end
+
+        it "the effective date should be first of month immediately following current date" do
+          expect(ivl_qle_sep.effective_on).to eq next_month_date
+        end
+      end
+
+      context "and 'effective on kind' is 'first of month' and date reported is after the monthly deadline" do
+        let(:reporting_date)  { post_enrollment_deadline_date }
+
+        before do 
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          ivl_qle_sep.effective_on_kind = "first_of_month" 
+        end
+
+        it "the effective date is first of next month following QLE date" do
+          expect(ivl_qle_sep.effective_on).to eq month_after_next_date
+        end
+      end
+
+      context "and 'effective on kind' is 'first of next month' and date reported is before the deadline for current month" do
+        let(:reporting_date)  { pre_enrollment_deadline_date }
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+        end
+
+        it "the effective date should be first of month following current date" do
+          expect(ivl_qle_sep.effective_on).to eq next_month_date
+        end
+      end
+
+      context "and 'effective on kind' is 'first of next month' and date reported is after the monthly deadline" do
+        let(:reporting_date)  { post_enrollment_deadline_date }
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+        end
+
+        it "the effective date should be first of month following current date" do
+          expect(ivl_qle_sep.effective_on).to eq next_month_date
+        end
+      end
+    end
+
+    context "and QLE is reported after the that has lapsed" do
       let(:lapsed_qle_on_date)  { (TimeKeeper.date_of_record.beginning_of_month + 16.days) - 1.year }
-      let(:qle_start_on_date)   { lapsed_qle_on_date }
-      let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
+
+      # let(:qle_start_on_date)   { lapsed_qle_on_date }
+      # let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
+
+      let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: lapsed_qle_on_date) }
+      let(:reporting_date)        { Date.current }
+      let(:lapsed_effective_date) { ivl_qle_sep.end_on.end_of_month + 1.day }
 
       before do
-        ivl_qle_sep.qle_on = lapsed_qle_on_date
+        TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+        ivl_qle_sep.effective_on_kind = "first_of_next_month" 
       end
 
-      it "should have a start date" do
-        expect(ivl_qle_sep.start_on).to eq qle_start_on_date
+      it "the effective date should be in the past: first of month following the lapsed date" do
+        expect(ivl_qle_sep.effective_on).to eq lapsed_effective_date
       end
 
-      it "should have an end date" do
-        expect(ivl_qle_sep.end_on).to eq qle_end_on_date
-      end
-
-      context "and 'effective on kind' is not set" do
-        it "effective date should not be set" do
-          expect(ivl_qle_sep.effective_on).to be_nil
-        end
-      end
-
-      context "and 'effective on kind' is 'date of event'" do
-        before { ivl_qle_sep.effective_on_kind = "date_of_event" }
-
-        it "the effective date and QLE date should be the same" do
-          expect(ivl_qle_sep.effective_on).to eq lapsed_qle_on_date
-        end
+      it "Special Enrollment Period should not be active" do
+        expect(ivl_qle_sep.is_active?).to be_falsey
       end
 
       context "and 'effective on kind' is 'fixed first of next month'" do
@@ -145,82 +222,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           expect(ivl_qle_sep.effective_on).to eq first_of_next_month_date
         end
       end
-
-      context "and 'effective on kind' is 'first of next month'" do
-        let(:first_of_next_month_date)  { qle_end_on_date.end_of_month + 1.day }
-        before { ivl_qle_sep.effective_on_kind = "first_of_next_month" }
-
-        it "the effective date should be first of month immediately following last day of SEP date" do
-          expect(ivl_qle_sep.effective_on).to eq first_of_next_month_date
-        end
-      end
-
-      context "and 'effective on kind' is 'first of month'" do
-        let(:expired_date)  { ivl_qle_sep.end_on.next_month.end_of_month + 1.day }
-        before { ivl_qle_sep.effective_on_kind = "first_of_month" }
-
-        it "the effective date should be first of month immediately following QLE date" do
-          expect(ivl_qle_sep.effective_on).to eq expired_date
-        end
-      end
     end
 
-    context "and this QLE date is reported on timely basis" do
-      let(:today)               { TimeKeeper.date_of_record }
-      # Ensure date is past 15th of the month
-      let(:qle_on_date)         { today.day < 16 ? today.beginning_of_month - 1.day : today }
-      let(:qle_start_on_date)   { lapsed_qle_on_date }
-      let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
-
-      before do
-        ivl_qle_sep.qle_on = qle_on_date
-      end
-
-      it "Special Enrollment Period should be active" do
-        expect(ivl_qle_sep.is_active?).to be_truthy
-      end
-
-      context "and 'effective on kind' is 'first of month' and date is 16th of month or later" do
-        let(:fifteenth_of_month_rule_date)  { qle_on_date.next_month.end_of_month + 1.day }
-        before do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
-          ivl_qle_sep.effective_on_kind = "first_of_month"
-        end
-        after do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
-        end
-
-        it "the effective date is first of next month following QLE date" do
-          expect(ivl_qle_sep.effective_on).to eq fifteenth_of_month_rule_date
-        end
-      end
-
-      context "and 'effective on kind' is 'first of month' and date is 15th of month or ealier" do
-        let(:qle_on_date)                   { Date.new(today.year, (today.month+1), 1) }
-        let(:fifteenth_of_month_rule_date)  { [today, qle_on_date].max.end_of_month + 1.day }
-        before do 
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,5))
-          ivl_qle_sep.effective_on_kind = "first_of_month"
-          ivl_qle_sep.qle_on = qle_on_date
-        end
-        after do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
-        end
-
-        it "the effective date is first of next month following QLE date" do
-          expect(ivl_qle_sep.effective_on).to eq fifteenth_of_month_rule_date
-        end
-      end
-
-      context "and 'effective on kind' is 'first of next month'" do
-        let(:first_of_next_month_date)  { today.end_of_month + 1.day }
-        before { ivl_qle_sep.effective_on_kind = "first_of_next_month" }
-
-        it "the effective date should be first of month immediately following current date" do
-          expect(ivl_qle_sep.effective_on).to eq first_of_next_month_date
-        end
-      end
-    end
   end
 
   context "Family experiences IVL Qualifying Life Event" do
@@ -319,46 +322,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         expect(sep.effective_on).to eq event_date
       end
 
-      context "for first_of_month" do
-        before :each do
-          sep.qualifying_life_event_kind = qle
-          sep.effective_on_kind = "first_of_month"
-        end
-
-        context "current date is 15th of month or earlier" do
-          before {TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,5))}
-          after {TimeKeeper.set_date_of_record_unprotected!(Date.today)}
-            
-          it "should the first of month following qle date" do
-            event_date = TimeKeeper.date_of_record + 10.days
-            sep.qle_on = event_date
-            expect(sep.effective_on).to eq event_date.end_of_month + 1.day
-          end
-
-          it "should the first of month following current date" do
-            event_date = TimeKeeper.date_of_record - 8.days
-            sep.qle_on = event_date
-            expect(sep.effective_on).to eq TimeKeeper.date_of_record.end_of_month + 1.day
-          end
-        end
-
-        context "current date is 16th of month or later" do
-          before {TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,25))}
-          after {TimeKeeper.set_date_of_record_unprotected!(Date.today)}
-            
-          it "should the first of next month following qle date" do
-            event_date = TimeKeeper.date_of_record + 10.days
-            sep.qle_on = event_date
-            expect(sep.effective_on).to eq event_date.next_month.end_of_month + 1.day
-          end
-            
-          it "should the first of next month following current date" do
-            event_date = TimeKeeper.date_of_record - 28.days
-            sep.qle_on = event_date
-            expect(sep.effective_on).to eq TimeKeeper.date_of_record.next_month.end_of_month + 1.day
-          end
-        end
-      end
     end
 
     context "SEP is active as of this date" do
