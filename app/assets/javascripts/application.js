@@ -677,9 +677,11 @@ $(document).ready(function () {
     ssn_patt2=/^666/;
     ssn_patt3=/^....00/;
     ssn_patt4=/000$/;
-    if (ssn_val.match(ssn_patt1) || ssn_val.match(ssn_patt2) || ssn_val.match(ssn_patt3) || ssn_val.match(ssn_patt4) ) {
-      $(this).val("SSN is INVALID");
-    }
+
+    // Fix for #4041
+    // if (ssn_val.match(ssn_patt1) || ssn_val.match(ssn_patt2) || ssn_val.match(ssn_patt3) || ssn_val.match(ssn_patt4) ) {
+    //   $(this).val("SSN is INVALID");
+    // }
   });
 
 
