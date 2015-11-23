@@ -242,7 +242,7 @@ class Household
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: TimeKeeper.datetime_of_record
+      submitted_at: Time.now
     )
   end
 
@@ -254,7 +254,7 @@ class Household
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
-      submitted_at: TimeKeeper.datetime_of_record
+      submitted_at: Time.now
     )
     enrollment.save
     enrollment
