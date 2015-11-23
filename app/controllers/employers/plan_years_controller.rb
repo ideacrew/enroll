@@ -6,6 +6,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
+    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
   end
 
   def reference_plans
