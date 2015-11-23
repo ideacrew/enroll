@@ -15,6 +15,14 @@ class Employers::CensusEmployeesController < ApplicationController
   def create
     @census_employee = CensusEmployee.new
     @census_employee.build_from_params(census_employee_params, benefit_group_id)
+
+    if renewal_benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
+      if @census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
+        @census_employee.add_renew_benefit_group_assignment(benefit_group)
+      end
+    end
+
     @census_employee.employer_profile = @employer_profile
     if @census_employee.save
       if benefit_group_id.present?
