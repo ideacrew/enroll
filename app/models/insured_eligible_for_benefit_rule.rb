@@ -48,6 +48,7 @@ class InsuredEligibleForBenefitRule
       end
       return status, @errors
     end
+    [false]
   end
 
   def is_cost_sharing_satisfied?
