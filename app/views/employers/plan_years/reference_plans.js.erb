@@ -5,7 +5,7 @@ $('#<%= @location_id %> .reference-plans').css({ "height": "450px", "y-overflow"
 $('#<%= @location_id %> .reference-plans').show();
 
 $('#<%= @location_id %> .reference-plan .col-xs-3').on('click', function() {
-  
+
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
       $(this).find('input[type=radio]').prop('checked', true )
@@ -19,6 +19,13 @@ var reference_plan_count = $('#<%= @location_id %> .reference-plan').length
 var reference_plan_remainder = reference_plan_count % 4;
 if (reference_plan_remainder > 0 ) {
   $('#<%= @location_id %> .reference-plan').slice(-reference_plan_remainder).css({"border-bottom":"none" });
+} else {
+
+}
+var dental_reference_plan_count = $('#<%= @location_id %> .dental-reference-plan').length
+var dental_reference_plan_remainder = dental_reference_plan_count % 4;
+if (dental_reference_plan_remainder > 0 ) {
+  $('#<%= @location_id %> .dental-reference-plan').slice(-dental_reference_plan_remainder).css({"border-bottom":"none" });
 } else {
 
 }

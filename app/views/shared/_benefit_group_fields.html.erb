@@ -87,7 +87,23 @@
       <% end %>
     </div>
 
-    <div class="dental-plan-options">
+    <br>
+      <br>
+        <h1>
+          Select Your Dental Reference Plan
+        </h1>
+        <h4 style='position: relative;'>
+          <span class='starter' style='display: inline-block;'>
+            Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+          </span>
+          <span style='position: absolute; right: 0; bottom: 0;'>Displaying:
+            <strong>
+              <%= @dental_plans.count %> Plans
+            </strong>
+          </span>
+        </h4>
+      <br/>
+    <div class="dental-reference-plans">
 
       <%= render "employers/plan_years/plan_selection/dental_plans", locals: { :plans => @dental_plans } %>
 

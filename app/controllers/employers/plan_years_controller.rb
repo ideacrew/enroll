@@ -7,6 +7,8 @@ class Employers::PlanYearsController < ApplicationController
   def new
     @plan_year = build_plan_year
     @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
+    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+
   end
 
   def reference_plans
