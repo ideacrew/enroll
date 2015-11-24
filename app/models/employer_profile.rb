@@ -317,6 +317,7 @@ class EmployerProfile
     end
 
     event :application_accepted, :after => :record_transition do
+      transitions from: [:registered], to: :registered
       transitions from: [:applicant, :ineligible], to: :registered
     end
 
