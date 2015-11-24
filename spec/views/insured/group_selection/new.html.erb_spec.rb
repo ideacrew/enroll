@@ -216,6 +216,57 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
 
+  context "family member with no benefit group" do
+    def new_family_member
+      random_value=rand(999_999_999)
+      instance_double(
+        "FamilyMember",
+        id: "id_#{random_value}",
+        dob: 25.years.ago,
+        full_name: "full_name_#{random_value}",
+        is_primary_applicant?: true,
+        primary_relationship: "self",
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+      )
+    end
+
+    def new_family_member_1
+      random_value=rand(999_999_999)
+      instance_double(
+        "FamilyMember",
+        id: "id_#{random_value}",
+        dob: 3.years.ago,
+        full_name: "full_name_#{random_value}",
+        is_primary_applicant?: false,
+        primary_relationship: "child",
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+      )
+    end
+
+    let(:family_members){[new_family_member, new_family_member_1]}
+    let(:person) { instance_double("Person", id: "Person.id") }
+    let(:coverage_household) { instance_double("CoverageHousehold", family_members: family_members) }
+    let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: nil) }
+    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+
+    before :each do
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
+      assign :hbx_enrollment, hbx_enrollment
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      render file: "insured/group_selection/new.html.erb"
+    end
+
+    it "should display family members" do
+      family_members.each do |member|
+        expect(rendered).to match(/#{member.full_name}/m)
+      end
+    end
+  end
+
   context "change plan" do
     let(:person) { FactoryGirl.create(:person) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
