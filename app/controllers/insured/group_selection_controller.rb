@@ -1,13 +1,11 @@
 class Insured::GroupSelectionController < ApplicationController
-  before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
+  before_action :initialize_common_vars, only: [:create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
-
-    if params[:employee_role_id].present?
-      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == params["employee_role_id"].to_s }
-    end
+    initialize_common_vars
+    construct_employee_role_for_person_by_census_employee if @person and !@person.has_active_employee_role?
 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
@@ -117,6 +115,7 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_group = @hbx_enrollment.benefit_group
         benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
       end
+      @employee_role = @person.employee_roles.active.last if @employee_role.blank? and @person.has_active_employee_role?
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,
@@ -155,6 +154,12 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+  def construct_employee_role_for_person_by_census_employee
+    match_census_employees = CensusEmployee.matchable(@person.ssn, @person.dob)
+    match_census_employees.last.construct_employee_role_for_match_person if match_census_employees.present?
+    @person.reload
+    @employee_role = @person.employee_roles.active.last if @employee_role.blank? and @person.has_active_employee_role?
+  end
 
   # def is_under_open_enrollment
   #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?
