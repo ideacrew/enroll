@@ -108,9 +108,10 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = ""
     end
     last_day_of_work = termination_date
-    if termination_date.present?
+    if termination_date.present? && termination_date >= (Date.today-60.days)
       @census_employee.terminate_employment(last_day_of_work)
       @fa = @census_employee.save
+
     end
     respond_to do |format|
       format.js {
