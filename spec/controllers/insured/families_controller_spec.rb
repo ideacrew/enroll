@@ -1,6 +1,30 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamiliesController do
+  context "with no person" do
+    let(:user) { double("User", last_portal_visited: "test.com") }
+    let(:person) {nil}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      sign_in user
+    end
+
+    it "should log the error" do
+      expect(subject).to receive(:log)
+      begin
+        get :home
+      rescue
+      end
+    end
+
+    it "should raise the error" do
+      expect{get :home}.to raise_error
+    end
+  end
+end
+
+RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
