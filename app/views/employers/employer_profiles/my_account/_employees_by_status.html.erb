@@ -101,7 +101,7 @@
 
               <div class="pull-right">
               <!--<h5>Enter termination date to remove this employee:</h5>-->
-              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="MM/DD/YYYY" type="text">
+              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
               <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
               Terminate Employee
               </a>
