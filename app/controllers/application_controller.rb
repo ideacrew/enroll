@@ -2,7 +2,11 @@ class ApplicationController < ActionController::Base
   include Pundit
   include Acapi::Notifiers
 
-  after_action :update_url
+  after_action :update_url, :unless => :format_js?
+
+  def format_js?
+   request.format.js?
+  end
 
   # force_ssl
 

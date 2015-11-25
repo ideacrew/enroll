@@ -105,7 +105,13 @@
             <header>Eligibility</header>
           </td>
           <td>
-            <p><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></p>
+            <p>
+              <% if bg.effective_on_offset == 0 %>
+                First of the month following or coinciding with date of hire
+              <% else %>
+                <%= "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days" %>
+              <% end %>
+            </p>
           </td>
         </tr>
         <tr>
