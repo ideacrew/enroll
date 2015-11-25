@@ -70,8 +70,12 @@ class Exchanges::HbxProfilesController < ApplicationController
         role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
       end
     else
-      if params[:broker] && params[:broker] != ''
+      if params[:broker].present?
         agent = Person.find(params[:broker])
+        broker_role_id = agent.broker_role.id
+        consumer = Person.find(params[:person])
+        family = consumer.primary_family
+        family.hire_broker_agency(broker_role_id)
         role = 'Broker'
       else
         agent = Person.find(params[:assister])

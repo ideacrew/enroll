@@ -8,7 +8,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
          },
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
-    $('#help_status').after(response)
+    $('#help_status').html(response)
   });
 })
 
@@ -24,7 +24,7 @@ $.ajax({
   }).done(function(response) {
     console.log(response)
     console.log('here')
-    $('#help_index_status').after(response).removeClass('hide')
+    $('#help_index_status').html(response).removeClass('hide')
   });
 })
 
