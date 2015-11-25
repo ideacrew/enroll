@@ -41,11 +41,14 @@
         Broker Mail
        <% end %>
       </li>
+      <% if current_user.has_hbx_staff_role? %>
+      <% else %>
       <li role="presentation">
-        <%= link_to url_for(SamlInformation.curam_broker_dashboard), target: '_blank' unless current_user.has_hbx_staff_role? do %>
+        <%= link_to url_for(SamlInformation.curam_broker_dashboard), target: '_blank' do %>
         Individual-Assisted Dashboard
        <% end %>
       </li>
+      <% end %>
     </ul>
   </div>
 </div>
