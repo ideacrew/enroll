@@ -23,7 +23,8 @@ class SamlInformation
     'saml_logout_url',
     'account_conflict_url',
     'account_recovery_url',
-    'iam_login_url'
+    'iam_login_url',
+    'curam_broker_dashboard'
   ]
 
   attr_reader :config

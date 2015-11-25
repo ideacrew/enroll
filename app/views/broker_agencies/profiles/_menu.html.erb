@@ -1,7 +1,7 @@
 <div class="mainmenu">
   <div class="container">
     <ul role="tablist" class="list-unstyled list-inline" id="myTab">
-      <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>> 
+      <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
         <%= link_to(broker_agencies_profile_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "home", "role" => "tab" ) do  %>
           <span class="hidden-xs">Home</span>
           <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
@@ -23,7 +23,7 @@
       <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab") %>>
        <%= link_to(broker_agencies_profile_applicants_path(@broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
           <span class="hidden-xs">Brokers</span>
-          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>        
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>
        <% end %>
       </li>
       <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
@@ -32,6 +32,8 @@
         Agency Mail
        <% end %>
       </li>
+
+
       <% end %>
       <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
        <%= link_to(messages_broker_agencies_profiles_path(id: @provider), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
@@ -39,7 +41,14 @@
         Broker Mail
        <% end %>
       </li>
+      <% if current_user.has_hbx_staff_role? %>
+      <% else %>
+      <li role="presentation">
+        <%= link_to url_for(SamlInformation.curam_broker_dashboard), target: '_blank' do %>
+        Individual-Assisted Dashboard
+       <% end %>
+      </li>
+      <% end %>
     </ul>
   </div>
 </div>
-
