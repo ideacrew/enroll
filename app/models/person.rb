@@ -380,6 +380,10 @@ class Person
     employee_roles.present? and employee_roles.active.present?
   end
 
+  def active_employee_roles
+    employee_roles.present? ? employee_roles.active : []
+  end
+
   def residency_eligible?
     no_dc_address and no_dc_address_reason.present?
   end

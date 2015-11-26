@@ -8,4 +8,5 @@
     </div>
   <% end %>
   <%= render 'qles_panel' %>
+  <%= render 'employer_panel' if show_employer_panel?(@person, @hbx_enrollments) %>
 </div>
