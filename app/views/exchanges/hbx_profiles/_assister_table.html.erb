@@ -9,9 +9,9 @@
 <tbody>
   <% @staff.each do |staff| %>
     <tr>
-      <td><%= staff.first_name + " " + staff.last_name %></td>
-      <td><%= staff.try(:user).try(:email) %></td>
-      <td><a href='#' data-assister='<%=staff.id%>' class='help_button'> Request Help </a></td>
+      <td style="padding: 3px"><%= staff.first_name + " " + staff.last_name %></td>
+      <td style="padding: 3px"><%= staff.try(:user).try(:email) %></td>
+      <td style="padding: 3px"><a href='#' data-assister='<%=staff.id%>' class='help_button'> Request Help </a></td>
     </tr>
   <% end %>
 </tbody>
