@@ -110,7 +110,11 @@ class Employers::CensusEmployeesController < ApplicationController
     last_day_of_work = termination_date
     if termination_date.present?
       @census_employee.terminate_employment(last_day_of_work)
-      @fa = @census_employee.save
+      if termination_date >= (Date.today-60.days)
+        @fa = @census_employee.save
+      else
+      end
+
     end
     respond_to do |format|
       format.js {
@@ -118,6 +122,7 @@ class Employers::CensusEmployeesController < ApplicationController
           flash[:notice] = "Successfully terminated Census Employee."
           render text: true
         else
+          flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
           render text: false
         end
       }
