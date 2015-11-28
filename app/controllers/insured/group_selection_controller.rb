@@ -6,6 +6,7 @@ class Insured::GroupSelectionController < ApplicationController
     set_bookmark_url
     initialize_common_vars
     construct_employee_role_for_person_by_census_employee if @person and !@person.has_active_employee_role?
+    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
