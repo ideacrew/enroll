@@ -9,7 +9,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
-    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
     let(:current_user) {FactoryGirl.create(:user)}
 
     before(:each) do
@@ -24,6 +24,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
 
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
@@ -87,7 +89,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member3) { instance_double("FamilyMember",id: "family_member", primary_relationship: "spouse", dob: Date.new(1991,9,21), full_name: "spouse", is_primary_applicant: false, person: person3) }
     let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
     let(:coverage_household_jail) { instance_double("CoverageHousehold",family_members: [family_member4, family_member2, family_member3]) }
-    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
     let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
     let(:current_hbx) {double(benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
     let(:current_user) {FactoryGirl.create(:user)}
@@ -104,6 +106,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
       allow(person3).to receive(:consumer_role).and_return(consumer_role3)
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(family_member4).to receive(:first_name).and_return('joey')
@@ -195,7 +199,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { instance_double("Person", id: "Person.id") }
     let(:coverage_household) { instance_double("CoverageHousehold", family_members: family_members) }
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group) }
-    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
 
     before :each do
       assign :person, person
@@ -205,6 +209,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -221,7 +227,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
-    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -231,6 +237,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
     end
 
     it "should display title" do
@@ -282,7 +291,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
-    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -291,6 +300,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :coverage_household, coverage_household
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
     end
 
     it "when present" do

@@ -124,7 +124,7 @@
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.can_terminate_coverage? %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
@@ -150,7 +150,7 @@
             <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
             <% else %>
-              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
             <% end %>
           <% end %>
         </div>
@@ -158,6 +158,7 @@
     <% end %>
     <% end %>
   </div>
+  <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.present? and @hbx_enrollment.employee_role.present? %>
 </div>
 <script>
   $(function(){
