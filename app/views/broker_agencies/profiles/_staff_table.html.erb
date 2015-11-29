@@ -1,17 +1,11 @@
-<thead>
-  <tr>
-    <th>Broker</th>
-    <th>Organization</th>
-    <th>Signup</th>
-  </tr>
-</thead>
 
-<tbody>
+
+<tbody style="max-height: 430px; overflow:auto; display: block;">
   <% @staff.each do |staff| %>
-    <tr>
+    <tr style='display: table; width: 600px; table-layout:fixed;'>
       <td style="padding: 3px"><%= staff.first_name + ' ' + staff.last_name %></td>
       <td style="padding: 3px"><%= BrokerAgencyProfile.find(staff.broker_role.broker_agency_profile_id).legal_name %></td>
-      <td style="padding: 3px"><a href='#' data-broker='<%=staff.id%>' class='help_button'> Help </a></td>
+      <td style="padding: 3px; width:35px"><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'> Help </a></td>
    </tr>
   <% end %>
 </tbody>

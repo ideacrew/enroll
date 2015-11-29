@@ -104,7 +104,7 @@ class Family
 
   scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
-  scope :by_writing_agent_id,                 ->(broker_id){ where(:"broker_agency_accounts.writing_agent_id" => broker_id) }
+  scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
 
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
@@ -382,22 +382,21 @@ class Family
 
   def hire_broker_agency(broker_role_id)
     return unless broker_role_id
-    existing_agency = broker_agency_accounts.detect { |account| account.is_active? }
+    existing_agency = current_broker_agency
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
-    different_agency = existing_agency && existing_agency.broker_agency_profile_id != broker_agency_profile_id
-    fire_broker_agency(existing_agency) if different_agency
-    if !existing_agency || different_agency
-      start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
-      broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
-      broker_agency_accounts << broker_agency_account
-      self.save
-    end
+    fire_broker_agency(existing_agency) if existing_agency
+    start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
+    broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
+    broker_agency_accounts.push(broker_agency_account)
+    self.save
   end
 
   def fire_broker_agency(existing_agency)
-    existing_agency.end_on = (TimeKeeper.date_of_record.to_date - 1.day).end_of_day
-    existing_agency.is_active = false
-    self.save
+    existing_agency.update_attributes!(end_on: (TimeKeeper.date_of_record.to_date - 1.day).end_of_day, is_active: false)
+  end
+
+  def current_broker_agency
+    broker_agency_accounts.detect { |account| account.is_active? }
   end
 
   class << self
