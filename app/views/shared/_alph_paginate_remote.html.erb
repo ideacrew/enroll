@@ -2,6 +2,9 @@
 <% status ||= nil %>
 <% url_params ||= {} %>
 <ul class='pagination'>
+  <% if path %>
+    <li><%= link_to "ALL", family_index_broker_agencies_profiles_path, remote: true %></li>
+  <% end %>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>
     <% alph_url += "&status=#{status}" if status %>
