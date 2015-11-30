@@ -13,7 +13,7 @@ class SamlController < ApplicationController
 
     sign_out current_user if current_user.present?
 
-    if response.is_valid?
+    if response.is_valid? && response.attributes['mail'].present?
       email = response.attributes['mail'].downcase
 
       user_with_email = User.where(email: email).first
