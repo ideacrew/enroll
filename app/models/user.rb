@@ -55,11 +55,13 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
-  field :identity_verified_date, type: Date
-  field :identity_final_decision_code, type: String
-  field :identity_final_decision_transaction_id, type: String
-  field :identity_response_code, type: String
-  field :identity_response_description_text, type: String
+
+  ##RIDP
+  field :identity_verified_date, type: Date #TimeKeeper.date_of_record
+  field :identity_final_decision_code, type: String #CONSTANT
+  field :identity_final_decision_transaction_id, type: String #BLANK
+  field :identity_response_code, type: String #CONSTANT
+  field :identity_response_description_text, type: String #CURAM
 
   ## Rememberable
   field :remember_created_at, type: Time
@@ -284,6 +286,14 @@ class User
   def identity_verified?
     return false if identity_final_decision_code.blank?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+  end
+
+  def ridp_by_payload!
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_description_text = "curam payload"
+    self.identity_verified_date = TimeKeeper.date_of_record
+    self.save!
   end
 
   def self.get_saml_settings

@@ -207,6 +207,9 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "should update the users identity final decision code" do
         expect(consumer_role_db.person.user.identity_final_decision_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+        expect(consumer_role_db.person.user.identity_response_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+        expect(consumer_role_db.person.user.identity_response_description_text).to eq "curam payload"
+        expect(consumer_role_db.person.user.identity_verified_date).to eq TimeKeeper.date_of_record
       end
 
       it "updates the tax household with aptc from the payload on the primary persons family" do
