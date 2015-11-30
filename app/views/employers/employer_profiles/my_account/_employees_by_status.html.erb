@@ -97,11 +97,15 @@
             <div class="confirm-terminate">
 
 
-              <h5><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong></h5>
+              <h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong>
+                <br/>
+                <span class="lg fourteen">(termination date must be within the past 60 days)</span>
+              </h5>
 
-              <div class="pull-right">
+
+              <div class="pull-right" style="margin-top: 2px;>
               <!--<h5>Enter termination date to remove this employee:</h5>-->
-              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="MM/DD/YYYY" type="text">
+              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
               <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
               Terminate Employee
               </a>

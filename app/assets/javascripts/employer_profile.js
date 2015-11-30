@@ -36,11 +36,9 @@ $(document).on('click', ".delete_confirm", function(){
     url: link_to_delete,
     data: {termination_date: termination_date},
     success: function(response){
-      if(response=="true") {
+  
         window.location.reload();
-      } else {
 
-      }
     },
     error: function(response){
       Alert("Sorry, something went wrong");
