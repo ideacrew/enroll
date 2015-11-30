@@ -205,6 +205,14 @@ class User
     has_role?(:csr)
   end
 
+  def has_csr_subrole?
+    person && person.csr_role && !person.csr_role.cac
+  end
+
+  def has_cac_subrole?
+    person && person.csr_role && person.csr_role.cac
+  end
+
   def has_assister_role?
     has_role?(:assister)
   end
