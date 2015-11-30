@@ -15,9 +15,13 @@ namespace :employers do
     end
 
     def get_broker_agency_account(broker_agency_accounts, plan_year)
-      broker_agency_accounts.detect do |broker_agency_account|
+      broker_agency_account = broker_agency_accounts.detect do |broker_agency_account|
+        next if broker_agency_account.end_on.nil?
         (plan_year.start_on >= broker_agency_account.start_on) && (plan_year.end_on <= broker_agency_account.end_on)
       end
+
+      broker_agency_account = broker_agency_accounts.first if broker_agency_account.nil?
+      broker_agency_account
     end
 
 
