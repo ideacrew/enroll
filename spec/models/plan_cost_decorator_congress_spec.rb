@@ -21,6 +21,14 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
     allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * premium_constant}
   end
 
+  context "when no hbx enrollment members" do
+    let(:plan_cost_decorator) { PlanCostDecoratorCongress.new(chosen_plan, hbx_enrollment, benefit_group) }
+    let(:hbx_enrollment_members){ [] }
+    it "should return total_employee_cost as zero" do
+      expect(plan_cost_decorator.total_employee_cost).to eq 0.0
+    end
+  end
+
   context "rating an hbx enrollment" do
     let(:plan_cost_decorator) { PlanCostDecoratorCongress.new(chosen_plan, hbx_enrollment, benefit_group) }
 
