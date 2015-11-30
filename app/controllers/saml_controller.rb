@@ -56,7 +56,14 @@ class SamlController < ApplicationController
         end
       end
     else
+
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
+
+      # Log additional critical error if the mail attribute is missing
+      if !response.attributes['mail'].present?
+        log("ERROR: SAMLResponse has missing required mail attribute", {:severity => "critical"})
+      end
+
       render file: 'public/403.html', status: 403
     end
   end

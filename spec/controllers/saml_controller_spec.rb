@@ -22,6 +22,12 @@ RSpec.describe SamlController do
           expect(arg1).to match(/ERROR: SAMLResponse assertion errors/)
           expect(arg2).to eq(:severity => 'error')
         end
+
+        allow(subject).to receive(:log) do |arg1, arg2|
+          expect(arg1).to match(/ERROR: SAMLResponse has missing required mail attribute/)
+          expect(arg2).to eq(:severity => 'critical')
+        end
+
         post :login, :SAMLResponse => invalid_xml
         expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
         expect(response).to have_http_status(403)
