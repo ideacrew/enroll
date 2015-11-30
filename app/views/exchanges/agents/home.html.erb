@@ -1,9 +1,22 @@
+
+<% if current_user.has_csr_subrole? %>
+
+<div class="content landing">
+  <%= render "exchanges/agents/primary_nav", :active_tab => "home-tab" %>  
+  <div class="container top-pd">
+    <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane-hbx" role="tabpanel">
+      <div class="col-md-10 col-sm-12">
+          <%= render 'consumer_application_links' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% else %>
+
 <div class='content'>
    <div class='container top-pd'>
        <h4> <%= @title%> </h4>
-       <% if current_user.has_csr_role? && !@cac%>
-         <%= render 'consumer_application_links' %>
-       <% end %>
        <br/>
        <div class='col-md-12 col-lg-12'>
          <p> After working on an enrollment return to this page via the person icon in the header </p>
@@ -19,3 +32,5 @@
         </div>
     </div>
 </div>
+
+<% end %>

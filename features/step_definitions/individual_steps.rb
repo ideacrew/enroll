@@ -283,8 +283,7 @@ When(/^CSR accesses the HBX portal$/) do
 end
 
 Then(/CSR should see the Agent Portal/) do
-  wait_and_confirm_text /Agent Messages/
-  wait_and_confirm_text /New Consumer Paper Application/
+  wait_and_confirm_text /a Trained Expert/
 end
 
 Then(/CSR opens the most recent Please Contact Message/) do

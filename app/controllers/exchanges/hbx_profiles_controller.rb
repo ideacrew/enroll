@@ -1,11 +1,11 @@
 class Exchanges::HbxProfilesController < ApplicationController
 
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index]
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
+  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
-
+  before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   def index
@@ -294,6 +294,12 @@ private
   def check_hbx_staff_role
     unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+    end
+  end
+
+  def check_csr_or_hbx_staff
+    unless current_user.has_hbx_staff_role? || (current_user.person.csr_role && !current_user.person.csr_role.cac)
+      redirect_to root_path, :flash => { :error => "You must be an HBX staff member or a CSR" }
     end
   end
 
