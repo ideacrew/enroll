@@ -45,7 +45,19 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { redirect_to SamlInformation.account_recovery_url }
-        else
+        else 
+          unless params[:persisted] == "true"
+            @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
+
+            if @employee_candidate.valid?
+              found_census_employees = @employee_candidate.match_census_employees
+              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+              if @employment_relationships.present?
+                format.html { render 'insured/employee_roles/match' }
+              end
+            end
+          end
+
           found_person = @consumer_candidate.match_person
           if found_person.present?
             if found_person.try(:consumer_role)
