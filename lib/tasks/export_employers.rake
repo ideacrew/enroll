@@ -8,8 +8,7 @@ namespace :employers do
     INCLUDED_ATTRIBUTES = %w(employer_max_amt employee_max_amt first_dependent_max_amt over_one_dependents_max_amt elected_plan_ids)
     MONEY_ATTRIBUTES = %w(employer_max_amt employee_max_amt first_dependent_max_amt over_one_dependents_max_amt)
     ARRAY_ATTRIBUTES = %w(elected_plan_ids)
-
-    EMPTY_COLUMN = ","
+    FILE_PATH = Rails.root.join "employer_export.csv"
 
     def extract_value(key, value)
       return nil if value.nil?
@@ -48,7 +47,7 @@ namespace :employers do
       end
     end
 
-    CSV.open("employer_export.csv", "w") do |csv|
+    CSV.open(FILE_PATH, "w") do |csv|
       schema(csv)
 
       employers.each do |employer|
@@ -93,6 +92,10 @@ namespace :employers do
           end
         end
       end
+
     end
+
+    puts "Output written to #{FILE_PATH}"
+
   end
 end
