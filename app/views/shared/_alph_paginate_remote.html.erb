@@ -1,7 +1,11 @@
+<% path ||= nil %>
 <% remote = remote.blank? ? false : remote %>
 <% status ||= nil %>
 <% url_params ||= {} %>
 <ul class='pagination'>
+  <% if path %>
+    <li><%= link_to "ALL", path, remote: true %></li>
+  <% end %>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>
     <% alph_url += "&status=#{status}" if status %>
