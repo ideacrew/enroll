@@ -641,24 +641,28 @@ describe HbxProfile, "class methods", type: :model do
   end
 
   context "can_terminate_coverage?" do
-    let(:hbx_enrollment) {HbxEnrollment.new}
+    let(:hbx_enrollment) {HbxEnrollment.new(
+                            kind: 'employer_sponsored',
+                            aasm_state: 'coverage_selected',
+                            effective_on: TimeKeeper.date_of_record - 10.days
+                          )}
     it "should return false when may not terminate_coverage" do
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return false
+      hbx_enrollment.aasm_state = 'inactive'
       expect(hbx_enrollment.can_terminate_coverage?).to eq false
     end
 
     context "when may_terminate_coverage is true" do
       before :each do
-        allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
+        hbx_enrollment.aasm_state = 'coverage_selected'
       end
 
       it "should return true" do
-        allow(hbx_enrollment).to receive(:effective_on).and_return (TimeKeeper.date_of_record - 10.days)
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record - 10.days
         expect(hbx_enrollment.can_terminate_coverage?).to eq true
       end
 
       it "should return false" do
-        allow(hbx_enrollment).to receive(:effective_on).and_return (TimeKeeper.date_of_record + 10.days)
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record + 10.days
         expect(hbx_enrollment.can_terminate_coverage?).to eq false
       end
     end
