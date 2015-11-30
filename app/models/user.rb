@@ -57,11 +57,11 @@ class User
   field :reset_password_sent_at, type: Time
 
   ##RIDP
-  field :identity_verified_date, type: Date #TimeKeeper.date_of_record
-  field :identity_final_decision_code, type: String #CONSTANT
-  field :identity_final_decision_transaction_id, type: String #BLANK
-  field :identity_response_code, type: String #CONSTANT
-  field :identity_response_description_text, type: String #CURAM
+  field :identity_verified_date, type: Date
+  field :identity_final_decision_code, type: String
+  field :identity_final_decision_transaction_id, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
 
   ## Rememberable
   field :remember_created_at, type: Time
