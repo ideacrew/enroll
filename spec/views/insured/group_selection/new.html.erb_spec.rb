@@ -256,7 +256,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "should not show shop for new plan submit when single_plan" do
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector("input[value='Shop for new plan']", count: 0)
+      expect(rendered).to have_selector("input[value='Shop for new plan']", count: 1)
     end
 
     it "when hbx_enrollment not terminated" do
