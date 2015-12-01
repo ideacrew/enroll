@@ -34,6 +34,31 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    context 'with no referer' do
+      before(:each) do
+        allow(person).to receive(:employee_role).and_return(employee_role)
+        allow(person).to receive(:broker_role).and_return(nil)
+        allow(user).to receive(:person).and_return(person)
+        allow(employee_role).to receive(:save!).and_return(true)
+        sign_in(user)
+        allow(controller.request).to receive(:referer).and_return(nil)
+        get :index, :employee_role_id => employee_role_id
+      end
+
+      it "renders the 'index' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("index")
+      end
+
+      it "assigns the person" do
+        expect(assigns(:person)).to eq person
+      end
+
+      it "assigns the family" do
+        expect(assigns(:family)).to eq family
+      end
+    end
+
     it "with qle_id" do
       allow(person).to receive(:employee_role).and_return(employee_role)
       allow(person).to receive(:primary_family).and_return(fm)
