@@ -16,7 +16,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should display filter selections' do
-      expect(rendered).to match /Hsa Eligibility/ 
+      expect(rendered).to match /HSA Eligibility/i
       expect(rendered).to match /Carrier/
       expect(rendered).to have_selector('select', count: 2)
     end

@@ -38,7 +38,16 @@ class User
     # self.password = new_password
     # self.password_confirmation = new_password
     self.idp_verified = true
-    self.save!
+    begin
+      self.save!
+    rescue => e
+      message = "#{e.message}; "
+      message = message + "user: #{self}, "
+      message = message + "errors.full_messages: #{self.errors.full_messages}, "
+      message = message + "stacktrace: #{e.backtrace}"
+      log(message, {:severity => "error"})
+      raise e
+    end
   end
 
   # for i18L

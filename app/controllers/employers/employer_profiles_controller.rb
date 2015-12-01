@@ -144,7 +144,13 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     @employer = @employer_profile.match_employer(current_user)
     @employer_contact = @employer_profile.staff_roles.first
-    @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
+
+    if @employer_contact.try(:emails)
+      @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
+    else
+      @employer_contact_email = @employer_contact.user.email
+    end
+
     @current_user_is_hbx_staff = current_user.has_hbx_staff_role?
     @current_user_is_broker = current_user.has_broker_agency_staff_role?
   end
