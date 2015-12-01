@@ -29,6 +29,17 @@ RSpec.describe CensusMember, :db_clean => :after_all do
     it "date_of_birth" do
       expect(census_employee.date_of_birth).to eq "12/01/1980"
     end
+
+    context "dob more than 110 years ago" do
+      before(:each) do
+        census_employee.dob = 111.years.ago
+      end
+
+      it "generate validation error" do
+        expect(census_employee.valid?).to be_falsey
+        expect(census_employee.errors.full_messages).to include("Dob date cannot be more than 110 years ago")
+      end
+    end
   end
 
   context "validate of date_of_birth_is_past" do

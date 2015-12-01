@@ -65,12 +65,18 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     if !session[:already_has_consumer_role] == true
-      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-      if @consumer_role.present?
-        @person = @consumer_role.person
-      else
+      begin
+        @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+        if @consumer_role.present?
+          @person = @consumer_role.person
+        else
         # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
+          render file: 'public/500.html', status: 500
+          return
+        end
+      rescue Exception => e
+        flash[:error] = e.message
+        redirect_to :back
         return
       end
     else
