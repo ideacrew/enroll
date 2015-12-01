@@ -2,12 +2,10 @@ class Exchanges::AgentsController < ApplicationController
   before_action :check_agent_role
   def home
      @title = current_user.agent_title
-     @assister = current_user.has_assister_role?
-     @cac = current_user.person.csr_role.try(:cac)
      person_id = session[:person_id]
      @person=nil
-     @person = Person.find(person_id) if person_id && person_id != ''
-     if @person && !@person.csr_role && !@person.assister_role && !@assister && !@cac
+     @person = Person.find(person_id) if person_id.present?
+     if @person && !@person.csr_role && !@person.assister_role
        root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + person_id
        hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
        message_params = {
