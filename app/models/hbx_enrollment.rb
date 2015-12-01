@@ -573,6 +573,10 @@ class HbxEnrollment
     end
   end
 
+  def can_terminate_coverage?
+    may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({

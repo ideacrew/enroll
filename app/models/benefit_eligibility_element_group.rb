@@ -39,7 +39,8 @@ class BenefitEligibilityElementGroup
   field :residency_status,      type: Array, default: ["any"]   # %w[any state_resident],
   field :ethnicity,             type: Array, default: ["any"]   # %w[any indian_tribe_member],
   field :cost_sharing,          type: String, default: ""
-
+  field :medicaid_eligibility,  type: Array, default: ["any"]   # %w(any eligible non_eligible)
+  field :applicant_status,      type: Array, default: ["any"]   # %w(any applicant non_applicant)
 
   # validates :eligible_relationship_categories,
   #   allow_blank: false,

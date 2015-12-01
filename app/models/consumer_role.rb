@@ -49,6 +49,7 @@ class ConsumerRole
   field :residency_determined_at, type: DateTime
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
+  field :applicant_id, type: BSON::ObjectId
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true

@@ -64,8 +64,8 @@ module Factories
     end
 
     def self.build_consumer_role(person, person_new)
-      role = find_or_build_consumer_role(person)
       family, primary_applicant =  initialize_family(person,[])
+      role = find_or_build_consumer_role(person, primary_applicant)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         role
@@ -75,9 +75,9 @@ module Factories
       return role
     end
 
-    def self.find_or_build_consumer_role(person)
+    def self.find_or_build_consumer_role(person, applicant)
       return person.consumer_role if person.consumer_role.present?
-      person.build_consumer_role(is_applicant: true)
+      person.build_consumer_role(is_applicant: true, applicant_id: applicant.id)
     end
 
     def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
@@ -170,8 +170,6 @@ module Factories
       employee_role.benefit_group_id = census_employee.active_benefit_group_assignment.benefit_group_id #TODO
     end
 
-    private
-
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       self.link_census_employee(census_employee, role, employer_profile)
@@ -184,6 +182,8 @@ module Factories
       end
       return role, family
     end
+
+    private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
                                last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
