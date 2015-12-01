@@ -609,7 +609,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should create an employee_role"
     end
+  end
 
+  context "construct_employee_role_for_match_person" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:person) { FactoryGirl.create(:person, ssn: census_employee.ssn) }
+
+    it "should return false when not match person" do
+      allow(Person).to receive(:by_ssn).and_return(nil)
+      expect(census_employee.construct_employee_role_for_match_person).to eq false
+    end
+
+    it "should return false when match person which has active employee role" do
+      allow(Person).to receive(:by_ssn).and_return([person])
+      allow(person).to receive(:has_active_employee_role?).and_return true
+      expect(census_employee.construct_employee_role_for_match_person).to eq false
+    end
+
+    it "should return false when match person which has no active employee role" do
+      allow(Person).to receive(:by_ssn).and_return([person])
+      allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
+      expect(census_employee.construct_employee_role_for_match_person).to eq true
+    end
   end
 
   # context '.edit' do
