@@ -136,8 +136,11 @@ class HbxProfile
   # Length of time preceeding next effective date that an employer may renew
   ShopMaximumRenewalPeriodBeforeStartOn = 3.months
 
-  # Number of days preceeding effective date that an employee may submit a plan enrollment
+  # Length of time preceeding effective date that an employee may submit a plan enrollment
   ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
+
+  # Length of time following effective date that an employee may submit a plan enrollment
+  ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
 
   # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
