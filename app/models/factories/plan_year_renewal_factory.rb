@@ -9,7 +9,6 @@ module Factories
     def renew
       @employer_profile = employer_profile
 
-
       validate_employer_profile
 
       @active_plan_year = @employer_profile.active_plan_year
@@ -55,6 +54,10 @@ module Factories
 
   private
     def validate_employer_profile
+      if @employer_profile.plan_years.renewing.any?
+        raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} already renewed"
+      end
+
       unless PlanYear::PUBLISHED.include? @employer_profile.active_plan_year.aasm_state
         raise PlanYearRenewalFactoryError, "Renewals require an existing, published Plan Year"
       end
@@ -97,7 +100,7 @@ module Factories
 
       reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
       if reference_plan_id.blank?
-        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: #{active_group.reference_plan}"
+        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{active_group.reference_plan.id} Year #{active_group.reference_plan.active_year} Hios #{active_group.reference_plan.hios_id}"
       end
 
       elected_plan_ids = reference_plan_ids(active_group)
