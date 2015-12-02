@@ -76,7 +76,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
       rescue Exception => e
         flash[:error] = e.message
-        redirect_to :back
+        render action: "new"
         return
       end
     else

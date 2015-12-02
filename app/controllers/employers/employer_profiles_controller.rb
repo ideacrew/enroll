@@ -157,7 +157,7 @@ class Employers::EmployerProfilesController < ApplicationController
       organization_saved = @organization.save(current_user)
     rescue Exception => e
       flash[:error] = e.message
-      redirect_to :back
+      render action: "new"
       return
     end
 
