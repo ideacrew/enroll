@@ -1,0 +1,58 @@
+
+site:
+  short_name: "DC Health Link"
+  byline: "DC's Online Health Insurance Marketplace"
+  long_name: ""
+  copyright_period: "2013-2015"
+  header_message: "Welcome to the District's Health Insurance Marketplace"
+  logo_file_name: "logo.png"
+
+contact_center: 
+  name: "DC Health Link's Customer Care Center"
+  phone_number: "1-855-532-5465"
+  email_address: "info@dchealthlink.com"
+
+aca:
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
+
+  ivl: 
+    enrollment_due_day_of_month: 15
+
+  shop:
+    small_market_fte_count_maximum: 50
+    benefit_period:
+      renewal_period_before_start_on_maximum:
+        months: -3
+      open_enrollment_period_minimum:
+        days: 5
+
+    retroactive_termination_maximum: 
+      days: -60
+
+#   ShopPlanYearPeriodMinimum = 1.year - 1.day
+
+# ShopMaximumEnrollmentPeriodBeforeEligibilityInDays: 30
+# ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
+
+# ShopApplicationAppealPeriodMaximum = 30.days
+
+#   ShopOpenEnrollmentEndDueDayOfMonth = 10
+#   ShopOpenEnrollmentPeriodMaximum = 2
+
+#   # Maximum length of time for SHOP Plan Year
+#   ShopPlanYearPeriodMaximum = 1.year - 1.day
+
+#   # Maximum number of months prior to coverage effective date to submit a Plan Year application
+#   ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
+
+#   ShopEmployerContributionPercentMinimum = 50.0
+#   ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
+#   ShopEnrollmentNonOwnerParticipationMinimum = 1
+
+#   ShopBinderPaymentDueDayOfMonth = 15
+#   ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
+  
+
+#   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+#   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth

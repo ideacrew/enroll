@@ -9,6 +9,7 @@ class CensusEmployee < CensusMember
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
+  field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
 
   # Employer for this employee
@@ -239,30 +240,60 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employment!(terminated_on)
-    unless self.may_terminate_employee_role?
-      (employee_role.present? && employee_role.hbx_id.present?) ? ee_id = "(ee role id: #{self.employee_role.hbx_id})" : ee_id = "(census id: #{self.id})"
-      active_benefit_group_assignment.present? ? bga_status = "#{active_benefit_group_assignment.aasm_state.tr('_', ' ')}. " : bga_status = "no benefit group assigned. "
-      message =  "Unable to terminate employee.  Employment status: #{aasm_state.tr('_', ' ')}. "\
-        "Coverage status: #{bga_status} #{ee_id}"
-      Rails.logger.error { message }
-      raise CensusEmployeeError, message
+    return self unless may_terminate_employee_role?
+
+    if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
+      active_benefit_group_assignment.terminate_coverage!
+    end
+
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
+      renewal_benefit_group_assignment.terminate_coverage!
     end
 
     self.employment_terminated_on = terminated_on.to_date.end_of_day
 
-    # Coverage termination date may not exceed HBX max
-    reported_coverage_term_on = self.employment_terminated_on.end_of_month
-    max_coverage_term_on = (TimeKeeper.date_of_record.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
-    coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
+    # Coverage termination date may not exceed HBX max retro date
+    self.coverage_terminated_on = earliest_termination_on
 
-    if active_benefit_group_assignment.try(:may_terminate_coverage?)
-      if active_benefit_group_assignment.hbx_enrollment.try(:may_terminate_coverage?)
-        active_benefit_group_assignment.hbx_enrollment.terminate_coverage!
-      end
-    end
-
+    # active_benefit_group_assignment.hbx_enrollment.terminate_coverage!
     terminate_employee_role
+
+    #     if active_benefit_group_assignment.hbx_enrollment && active_benefit_group_assignment.hbx_enrollment.may_terminate_coverage?
+    #     else
+    #     end
+    #   else
+    #     message = "Error terminating employment: unable to terminate coverage on benefit group assignment for employee #{self.full_name}"
+    #     Rails.logger.error { message }
+    #     raise CensusEmployeeError, message
+    #   end
+    # else
+    #   message = "Error terminating employment: unable to terminate employee role for #{self.full_name}"
+    #   Rails.logger.error { message }
+    #   raise CensusEmployeeError, message
+    # end
+
+    # unless self.may_terminate_employee_role?
+    #   (employee_role.present? && employee_role.hbx_id.present?) ? ee_id = "(ee role id: #{self.employee_role.hbx_id})" : ee_id = "(census id: #{self.id})"
+    #   active_benefit_group_assignment.present? ? bga_status = "#{active_benefit_group_assignment.aasm_state.tr('_', ' ')}. " : bga_status = "no benefit group assigned. "
+    #   message =  "Unable to terminate employee.  Employment status: #{aasm_state.tr('_', ' ')}. "\
+    #     "Coverage status: #{bga_status} #{ee_id}"
+    #   Rails.logger.error { message }
+    #   raise CensusEmployeeError, message
+    # end
+
     self
+  end
+
+  def earliest_termination_on
+    return nil unless employment_terminated_on.present?
+
+    earliest_date = employment_terminated_on.end_of_month
+    reported_date = TimeKeeper.date_of_record.
+                      end_of_day.
+                      advance(Settings.aca.shop.retroactive_termination_maximum.to_hash).
+                      end_of_month
+# binding.pry
+    [earliest_date, reported_date].compact.max
   end
 
   def employee_relationship

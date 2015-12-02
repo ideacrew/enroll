@@ -62,6 +62,9 @@ gem 'sass'
 # spreadsheet support
 gem 'roo', '~> 2.1.0'
 
+# configuration support
+gem "config", '~> 1.0.0'
+
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem "pundit", '~> 1.0.1'

@@ -262,8 +262,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                         end
 
                         context "and employee is terminated" do
-                          let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
-                          let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
+                          let(:invalid_termination_date)  { (TimeKeeper.date_of_record.advance(Settings.aca.shop.retroactive_termination_maximum.to_hash)).beginning_of_month - 1.day }
+                          let(:valid_termination_date)    { TimeKeeper.date_of_record.advance(Settings.aca.shop.retroactive_termination_maximum.to_hash) }
 
                           it "transition to termination should be valid" do
                             expect(initial_census_employee.may_terminate_employee_role?).to be_truthy
