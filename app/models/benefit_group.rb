@@ -340,6 +340,19 @@ private
     [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
   end
 
+  def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
+
+    # Length of time prior to effective date that EE may purchase plan
+    HBXProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays
+
+    # Length of time following effective date that EE may purchase plan
+    HBXProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays
+
+    # Length of time that EE may enroll following correction to Census Employee Identifying info
+    HBXProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays
+    
+  end
+
   # Non-congressional
   # pick reference plan
   # two pctages
