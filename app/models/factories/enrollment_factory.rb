@@ -183,6 +183,12 @@ module Factories
       return role, family
     end
 
+    def self.build_family(person, dependents)
+      family, primary_applicant = self.initialize_family(person, dependents)
+      saved = save_all_or_delete_new(family, primary_applicant)
+      return family
+    end
+
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
