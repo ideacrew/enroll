@@ -55,6 +55,9 @@ class EmployerProfile
   scope :active,      ->{ any_in(aasm_state: ["applicant", "registered", "eligible", "binder_paid", "enrolled"]) }
   scope :inactive,    ->{ any_in(aasm_state: ["suspended", "ineligible"]) }
 
+  scope :all_renewing, ->{ Organization.all_employers_renewing }
+  scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) } 
+
   alias_method :is_active?, :is_active
 
   def parent
