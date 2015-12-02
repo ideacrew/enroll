@@ -256,16 +256,16 @@ $(document).ready(function () {
   }
 
   // check dates are not before 1900
-    $(document).on('blur', "input[id*='jq_datepicker']", function() {
+    $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"], [id*="date"]', function() {
         var entered_date = $(this).val();
         var entered_year =  entered_date.substring(entered_date.length -4);
 
-        if ((entered_year.length == 4) && (entered_year < 1900)) {
-            alert("Please enter a date with the year after 1900.");
+        if ((entered_year.length == 4) && (entered_year <= 1905)) {
+            alert("Please enter a date with the year after 1905.");
             $(this).val("");
             $(this).focus();
         }
-    })
+    });
 
         // check that dob entered is not a future date
   $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
