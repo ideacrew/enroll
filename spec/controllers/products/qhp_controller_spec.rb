@@ -4,7 +4,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
   let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
-  let(:plan) { double(coverage_kind: '') }
+  let(:plan) { double("Plan") }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
@@ -17,6 +17,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(plan).to receive(:coverage_kind).and_return("health")
     end
 
     it "should return comparison of multiple plans" do
@@ -42,8 +43,10 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
+
     it "should return summary of a plan for shop and coverage_kind as health" do
       allow(hbx_enrollment).to receive(:kind).and_return("shop")
+      allow(hbx_enrollment).to receive(:plan).and_return(false)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "health"
       expect(response).to have_http_status(:success)
@@ -55,6 +58,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return summary of a plan for shop and coverage_kind as dental" do
       allow(hbx_enrollment).to receive(:kind).and_return("shop")
+      allow(plan).to receive(:coverage_kind).and_return("dental")
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "dental"
@@ -67,6 +71,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return dental plan if hbx_enrollment does not have plan object" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(plan).to receive(:coverage_kind).and_return("dental")
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       allow(hbx_enrollment).to receive(:plan).and_return(nil)
       sign_in(user)
@@ -78,6 +83,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return summary of a plan for ivl and coverage_kind: health" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(hbx_enrollment).to receive(:plan).and_return(false)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "health"
       expect(response).to have_http_status(:success)
@@ -89,6 +95,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     it "should return summary of a plan for ivl and coverage_kind: dental" do
       allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      allow(plan).to receive(:coverage_kind).and_return("dental")
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual", coverage_kind: "dental"
@@ -142,6 +149,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(qhp4).to receive(:plan).and_return plan4
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_employee_cost: 100))
       allow(hbx_enrollment).to receive(:plan).and_return(plan)
+      allow(plan).to receive(:coverage_kind).and_return("dental")
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.year)
     end
 
