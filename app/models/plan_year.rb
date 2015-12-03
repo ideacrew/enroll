@@ -551,7 +551,7 @@ class PlanYear
 
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
-      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published, :publish_pending], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
