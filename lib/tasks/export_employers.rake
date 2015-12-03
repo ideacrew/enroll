@@ -30,7 +30,8 @@ namespace :employers do
       headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
                                 office_location.address.city office_location.address.state office_location.address.zip
-                                office_location.phone.full_phone_number relationship_benefit.relationship relationship_benefit.premium_pct
+                                office_location.phone.full_phone_number staff.name staff.phone staff.email
+                                relationship_benefit.relationship relationship_benefit.premium_pct
                                 relationship_benefit.offered benefit_group.title, benefit_group.plan_option_kind
                                 benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
                                 benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
@@ -44,10 +45,31 @@ namespace :employers do
         office_location = get_primary_office_location(employer.organization)
         employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
                                 office_location.address.state, office_location.address.zip]
+
         if office_location.phone.present?
           employer_attributes += [office_location.phone.full_phone_number]
         else
           employer_attributes += [""]
+        end
+
+        if employer.staff_roles.size > 0
+          staff_role = employer.staff_roles.first
+          staff_name = staff_role.full_name
+          employer_attributes += [staff_name]
+
+          if staff_role.phones.present? && staff_role.phones.where(kind: "work").size > 0
+            employer_attributes += [staff_role.phones.where(kind: "work").first.full_phone_number]
+          else
+            employer_attributes += [""]
+          end
+
+          if staff_role.emails.present? && staff_role.emails.where(kind: "work").size > 0
+            employer_attributes +=  [staff_role.emails.where(kind: "work").first.address]
+          else
+            employer_attributes += [""]
+          end
+        else
+          employer_attributes += ["","",""]
         end
 
         employer.plan_years.each do |plan_year|
