@@ -200,6 +200,28 @@ class BenefitGroup
     end
   end
 
+  def date_of_hire_effective_on_for(date_of_hire)
+    [plan_year.start_on, date_of_hire].max
+  end
+
+  def first_of_month_effective_on_for(date_of_hire)
+    [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
+  end
+
+  def new_hire_enrollment_period(date_of_hire)
+    effective_date = effective_on_for(date_of_hire)
+
+    lower_limit = (effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
+    upper_limit = (effective_date + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+
+
+    # TODO
+    # Length of time that EE may enroll following correction to Census Employee Identifying info
+    # HBXProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays
+
+    return lower_limit..upper_limit
+  end
+
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end

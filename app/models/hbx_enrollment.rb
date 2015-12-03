@@ -459,18 +459,21 @@ class HbxEnrollment
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     if qle
       qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+    elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+      new_hire_effective_date = employee_role.coverage_effective_on
     else
       if employee_role.is_under_open_enrollment?
         open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-        if open_enrollment_effective_date < employee_role.effective_on
-          raise "You're not currently eligible to enroll under this open enrollment period"
+        if open_enrollment_effective_date < employee_role.coverage_effective_on
+          new_hire_enrollment_period = employee_role.benefit_group.new_hire_enrollment_period(employee_role.new_census_employee.hired_on)
+          raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.first} to enroll for coverage."
         end
       else
         raise "You may not enroll until you're eligible under an enrollment period"
       end
     end
 
-    effective_date = qle_effective_date || open_enrollment_effective_date
+    effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
 
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
     if plan_year.blank?
