@@ -9,6 +9,20 @@ describe CuramUser, "verification if user exists in Curam" do
     user1 = FactoryGirl.create(:curam_user, ssn: "123456789")
   end
 
+  context "match email" do
+    it "should match if email is case-sensitive" do
+      expect(CuramUser.match_email("test@example.com").any?).to be true
+    end
+
+    it "should match when email has all uppercase characters" do
+      expect(CuramUser.match_email("TEST@EXAMPLE.COM").any?).to be true
+    end
+
+    it "should match when email has only one uppercase character" do
+      expect(CuramUser.match_email("test@Example.COM").any?).to be true
+    end
+  end
+
   it "returns true if SSN is matching any record" do
     expect(CuramUser.match_ssn(123456789)).to be true
   end
