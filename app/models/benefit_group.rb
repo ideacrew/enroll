@@ -200,6 +200,19 @@ class BenefitGroup
     end
   end
 
+  def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
+    effective_date = effective_on_for(date_of_hire)
+
+    lower_limit = (effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
+    upper_limit = (effective_date + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+
+    # TODO
+    # Length of time that EE may enroll following correction to Census Employee Identifying info
+    # HBXProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays
+
+    (lower_limit <= enrollment_date) && (enrollment_date <= upper_limit)
+  end
+
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end

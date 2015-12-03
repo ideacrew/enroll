@@ -461,10 +461,15 @@ class HbxEnrollment
       qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
     else
       if employee_role.is_under_open_enrollment?
-        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-        if open_enrollment_effective_date < employee_role.effective_on
+
+        unless employee_role.is_eligible_to_enroll_on?
           raise "You're not currently eligible to enroll under this open enrollment period"
         end
+
+        # open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        # if open_enrollment_effective_date < employee_role.effective_on
+        #   raise "You're not currently eligible to enroll under this open enrollment period"
+        # end
       else
         raise "You may not enroll until you're eligible under an enrollment period"
       end

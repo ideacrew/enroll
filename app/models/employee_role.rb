@@ -94,7 +94,11 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def effective_on
-    benefit_group.try(:effective_on_for, new_census_employee.hired_on)
+    benefit_group.effective_on_for(new_census_employee.hired_on)
+  end
+
+  def is_eligible_to_enroll_on?(enrollment_date = TimeKeeper.date_of_record)
+    benefit_group.is_eligible_to_enroll_on?(new_census_employee.hired_on, enrollment_date)
   end
 
   def is_active?
