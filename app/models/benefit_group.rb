@@ -200,14 +200,6 @@ class BenefitGroup
     end
   end
 
-  def date_of_hire_effective_on_for(date_of_hire)
-    [plan_year.start_on, date_of_hire].max
-  end
-
-  def first_of_month_effective_on_for(date_of_hire)
-    [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
-  end
-
   def new_hire_enrollment_period(date_of_hire)
     effective_date = effective_on_for(date_of_hire)
 
