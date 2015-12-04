@@ -184,8 +184,13 @@ module Factories
     end
 
     def self.build_family(person, dependents)
-      family, primary_applicant = self.initialize_family(person, dependents)
-      saved = save_all_or_delete_new(family, primary_applicant)
+      #only build family if there is no primary family, otherwise return primary family
+      if person.primary_family.nil?
+        family, primary_applicant = self.initialize_family(person, dependents)
+        saved = save_all_or_delete_new(family, primary_applicant)
+      else
+        family = person.primary_family
+      end
       return family
     end
 

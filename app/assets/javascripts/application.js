@@ -260,7 +260,7 @@ $(document).ready(function () {
         var entered_date = $(this).val();
         var entered_year =  entered_date.substring(entered_date.length -4);
 
-        if ((entered_year.length == 4) && (entered_year <= (new Date().getFullYear() - 110))) {
+        if ((entered_year.length == 4) && (entered_year < (new Date().getFullYear() - 110))) {
             alert("Please enter a date not more than 110 years ago.");
             $(this).val("");
             $(this).focus();

@@ -113,7 +113,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   def total_max_employer_contribution
     case members.count
     when 0
-      0
+      0.to_money
     when 1
       benefit_group.employee_max_amt
     when 2
