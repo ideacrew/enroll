@@ -70,7 +70,7 @@ def shop_policies_by_purchase_date
       ]}
     }
   })
-  by_purchase_date(q)
+  q.group_by_purchase_date
 end
 
 def individual_policies_2016_by_purchase_date
@@ -85,7 +85,7 @@ def individual_policies_2016_by_purchase_date
       ]}
     }
   })
-  by_purchase_date(q)
+  q.group_by_purchase_date
 end
 
 def individual_sep_policies_by_purchase_date
@@ -100,7 +100,7 @@ def individual_sep_policies_by_purchase_date
       ]}
     }
   })
-  by_purchase_date(q)
+  q.group_by_purchase_date
 end
 
 def individual_policies_by_purchase_date
@@ -114,32 +114,7 @@ def individual_policies_by_purchase_date
       ]}
     }
   })
-  by_purchase_date(q)
-end
-
-def by_purchase_date(q)
-  q.add({
-    "$project" => {
-      "policy_created_on" => {"$dateToString" => {"format" => "%Y-%m-%d", "date" => "$households.hbx_enrollments.created_at"}},
-      "policy_submitted_on" => {"$dateToString" => {"format" => "%Y-%m-%d", "date" => "$households.hbx_enrollments.submitted_at"}}
-    }
-  })
-  q.add({
-    "$group" => {"_id" => {"created_on" => "$policy_created_on", "submitted_on" => "$policy_submitted_on"}, "count" => {"$sum" => 1}}
-  })
-  results = q.evaluate
-  h = results.inject({}) do |acc,r|
-    k = [r["_id"]["created_on"], r["_id"]["submitted_on"]].compact.first
-    if acc.has_key?(k)
-      acc[k] = acc[k] + r["count"]
-    else
-      acc[k] = r["count"]
-    end
-    acc
-  end
-  h.keys.sort.map do |k|
-    [k, h[k]]
-  end
+  q.group_by_purchase_date
 end
 
 puts "IVL SEP by purchase date:"
