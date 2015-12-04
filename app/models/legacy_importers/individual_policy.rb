@@ -93,7 +93,7 @@ module LegacyImporters
           :eligibility_date => Date.strptime(en["coverage_start"], "%Y%m%d")
         }
         if !prop_hash["coverage_end"].blank?
-          prop_hash[:coverage_end] = Date.strptime(en["coverage_end"], "%Y%m%d")
+          prop_hash[:coverage_end_on] = Date.strptime(en["coverage_end"], "%Y%m%d")
         end
         prop_hash
       end
