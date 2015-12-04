@@ -6,6 +6,8 @@ class Employers::PremiumStatementsController < ApplicationController
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
     @hbx_enrollments = @current_plan_year.hbx_enrollments.first(100) rescue []
+    @page_alphabets = page_alphabets(@hbx_enrollments, "full_name")
+
 
     # @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
