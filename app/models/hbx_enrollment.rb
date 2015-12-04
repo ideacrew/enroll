@@ -478,7 +478,7 @@ class HbxEnrollment
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ? 
+    benefit_group_assignment = plan_year.is_renewing? ?
         census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
@@ -510,7 +510,7 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
-  
+
       enrollment.benefit_group_id = benefit_group.id
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
     when consumer_role.present?
@@ -571,10 +571,6 @@ class HbxEnrollment
     when coverage_canceled? || coverage_terminated? #canceled/terminated
       5
     end
-  end
-
-  def can_terminate_coverage?
-    may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
   def self.find(id)
