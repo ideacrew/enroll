@@ -1,0 +1,91 @@
+<% active_broker = @broker %>
+<% broker_agency_profile =  BrokerAgencyProfile.find(active_broker.broker_agency_profile.id)%>
+
+
+<div id="broker_show_<%= active_broker.id %>" tabindex="-1" class='hide broker_selection_choice'>
+
+      <div class="no-buffer" id="active_broker_tab">
+         <div class="col-xs-12">
+	
+			  
+
+			  <div class="panel benefits-tab col-xs-12">              
+			        <div class="col-xs-4">
+			          <header class="row">
+			            <h5 class="bg-title" style="margin-bottom: 0;"><%= active_broker.person.full_name %></h5><br/>
+			            <span class="tt-u"><%= broker_agency_profile.legal_name %><span>
+			          </header>
+			        </div>
+			        
+			        <div class="col-xs-8">
+			        <table>
+			          <tbody><tr>
+			            <td class='col-xs-5'>
+			              <header>
+			                <% if broker_agency_profile.organization.office_locations.any? %>
+			                  <%= broker_agency_profile.organization.primary_office_location.address.address_1 %><br/>
+			                  <%= broker_agency_profile.organization.primary_office_location.address.city %>,
+			                  <%= broker_agency_profile.organization.primary_office_location.address.state %>
+			                  <%= broker_agency_profile.organization.primary_office_location.address.zip %>
+			                <% else %>
+			                No Address
+			                <% end %>
+			              </header>
+			            </td>
+			            <td class='col-xs-5'>
+			                <% if active_broker.person.phones.any? %>
+			                <i class="fa fa-phone"></i>
+			                  <%= active_broker.person.phones[0].to_s %>
+			                  <% else %>
+			                  <i class="fa fa-phone"></i>
+			                  No Phone Number
+			                <% end %>
+			                <br/>
+			                <i class="fa fa-at"></i>
+			                <a href="mailto:<%= active_broker.person.emails.first.address %>">
+			                  <%= active_broker.person.emails.first.address %>
+			                </a>
+			            </td>
+			          </tr>
+			        </tbody>
+			      </table>
+			    </div>
+			    </div>
+
+		      <div class="panel benefitgroup col-xs-12">
+		        <div class="row">
+		          <div class="col-xs-6">
+		            <span class="lg ttu twelve">
+		              New Clients:
+		            </span>
+		            <span class="dg">
+		              <%= broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+		            </span>
+		            <br/>
+		            <span class="lg ttu twelve">
+		              Weekend/Evening Hours:
+		            </span>
+		            <span class="dg">
+		              <%= broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+		            </span>
+		          </div>
+		          <div class="col-xs-6">
+		            <span class="lg ttu twelve">
+		              Language:
+		            </span>
+		            <span class="dg">
+		              <%= broker_agency_profile.languages %>
+		            </span>
+		          </div>
+		        </div>
+		        <br/>
+		       
+             <p class="lg"> <b>Warning: if you already have an existing Broker, they will be terminated effective immediately.</b></p>
+               <button type="button" class="btn btn-primary btn-small help_button close_broker_select" data-broker='<%=@staff.id%>'>Select this Broker</button>
+             
+               <button type="button" class="btn btn-default btn-trans btn-small close_broker_select">Close</button>
+            </div> 
+          
+      </div>
+  </div>
+</div>

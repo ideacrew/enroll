@@ -66,6 +66,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname", :match_census_employees => []) }
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
 
@@ -74,7 +75,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       sign_in(user)
       allow(mock_consumer_candidate).to receive(:match_person).and_return(found_person)
       allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
-      post :match, :person => person_parameters
+      allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+      allow(mock_employee_candidate).to receive(:valid?).and_return(false)
     end
 
     context "given invalid parameters" do
@@ -82,6 +84,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       let(:found_person) { [] }
 
       it "renders the 'search' template" do
+        post :match, :person => person_parameters
         expect(response).to have_http_status(:success)
         expect(response).to render_template("search")
         expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -95,6 +98,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         let(:found_person) { [] }
         let(:person){ double("Person") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
+        before :each do 
+          post :match, :person => person_parameters
+        end
 
         it "renders the 'no_match' template" do
           expect(response).to have_http_status(:success)
@@ -110,6 +116,22 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
             expect(response).to render_template("match")
             expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
           end
+        end
+      end
+
+      context "when match employer" do 
+        before :each do 
+          allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
+          allow(mock_employee_candidate).to receive(:valid?).and_return(true)
+          allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
+          allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
+          post :match, :person => person_parameters
+        end
+
+        it "render employee role match tempalte" do 
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template('insured/employee_roles/match')
+          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
         end
       end
     end

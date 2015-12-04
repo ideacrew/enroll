@@ -27,6 +27,7 @@ class Employers::CensusEmployeesController < ApplicationController
     if @census_employee.save
       if benefit_group_id.present?
         @census_employee.send_invite!
+        @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully created."
       else
         flash[:notice] = "Your employee was successfully added to your roster."
@@ -110,7 +111,11 @@ class Employers::CensusEmployeesController < ApplicationController
     last_day_of_work = termination_date
     if termination_date.present?
       @census_employee.terminate_employment(last_day_of_work)
-      @fa = @census_employee.save
+      if termination_date >= (Date.today-60.days)
+        @fa = @census_employee.save
+      else
+      end
+
     end
     respond_to do |format|
       format.js {
@@ -118,6 +123,7 @@ class Employers::CensusEmployeesController < ApplicationController
           flash[:notice] = "Successfully terminated Census Employee."
           render text: true
         else
+          flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
           render text: false
         end
       }

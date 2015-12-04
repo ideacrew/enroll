@@ -55,9 +55,13 @@ class TaxHouseholdMember
     end
   end
 
+  def person
+    return @person unless @person.blank?
+    @person = family_member.person
+  end
+
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
-    person = Rails.cache.fetch("hbx_enrollment_member/person_age/#{family_member.person_id}") { family_member.person }
     dob = person.dob
     coverage_start_on = Forms::TimeKeeper.new.date_of_record
     return unless coverage_start_on.present?

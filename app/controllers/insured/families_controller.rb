@@ -32,7 +32,7 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
-  
+
   def brokers
     @tab = params['tab']
 
@@ -131,7 +131,7 @@ class Insured::FamiliesController < FamiliesController
         @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end
 
-      begin 
+      begin
         @plan.name
       rescue => e
         log("#{e.message};  #3742 plan: #{@plan}, family_id: #{@family.id}, hbx_enrollment_id: #{@enrollment.id}", {:severity => "error"})
@@ -158,6 +158,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def init_qualifying_life_events
+    begin
+      raise if @person.nil?
+    rescue => e
+      message = "no person in init_qualifying_life_events"
+      message = message + "stacktrace: #{e.backtrace}"
+      log(message, {:severity => "error"})
+      raise e
+    end
+
     @qualifying_life_events = []
     if @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events

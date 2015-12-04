@@ -110,10 +110,19 @@ class BrokerAgencies::ProfilesController < ApplicationController
       bap = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
       broker_agent_id = bap.try(:writing_agents).try(:first).try(:id) || bap.primary_broker_role_id
     end
-    total_families = (broker_agent_id != nil) ? Family.by_writing_agent_id(broker_agent_id) : []
+    total_families = Family.by_writing_agent_id(broker_agent_id) 
     @total = total_families.count
     @families = total_families.page page_no
     @family_count = 0
+    @staff = Person.where(:id.in => total_families.map(&:primary_applicant).map(&:person))
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    if params[:page]
+      page_no = params[:page]
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page_no}/i }
+    end
+    if @q
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
+    end
     @families.each{|f| @family_count +=1}
     respond_to do |format|
       format.html { render "insured/families/index" }
