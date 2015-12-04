@@ -189,7 +189,7 @@ module Factories
         family, primary_applicant = self.initialize_family(person, dependents)
         saved = save_all_or_delete_new(family, primary_applicant)
       else
-        family = primary_family
+        family = person.primary_family
       end
       return family
     end
