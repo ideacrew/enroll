@@ -152,23 +152,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   end
 
-  context "POST create with exisiting consumer_role" do
-    let(:family_obj) { FactoryGirl.build(:family)}
-    before(:each) do
-
-      session[:already_has_consumer_role] = true
-      expect(Person).to receive(:find).and_return(person)
-      expect(person).to receive(:primary_family).and_return(nil)
-      expect(Factories::EnrollmentFactory).to receive(:build_family).and_return(family_obj)
-    end
-
-    it "should create family object for existing consumer_role/person" do
-      sign_in user
-      post :create
-      type = family_obj.class.to_s
-      expect(type).to eq("Family")
-    end
-  end
 
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}

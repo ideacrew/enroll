@@ -76,6 +76,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+
     if !session[:already_has_consumer_role] == true
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
@@ -91,12 +92,9 @@ class Insured::ConsumerRolesController < ApplicationController
       @person.user = current_user
       @person.save
 
-
       # 3717 - Person has consumer role but no family document as a result of previously consumer role added as dependent
-      if @person.primary_family.nil?
-        family = Factories::EnrollmentFactory.build_family(@person, [])
-      end
-
+      # Attempt to create new family
+      family = Factories::EnrollmentFactory.build_family(@person, [])
 
     end
     is_assisted = session["individual_assistance_path"]
