@@ -2,95 +2,106 @@ require 'csv'
 
 namespace :employers do
   desc "Export employers to csv."
+  # Usage rake employers:export
   task :export => [:environment] do
     employers = Organization.where("employer_profile" => {"$exists" => true}).map(&:employer_profile)
-    EXCLUDED_ATTRIBUTES = %w(aasm_state updated_at created_at)
-    INCLUDED_ATTRIBUTES = %w(employer_max_amt employee_max_amt first_dependent_max_amt over_one_dependents_max_amt elected_plan_ids)
-    MONEY_ATTRIBUTES = %w(employer_max_amt employee_max_amt first_dependent_max_amt over_one_dependents_max_amt)
-    ARRAY_ATTRIBUTES = %w(elected_plan_ids)
+
     FILE_PATH = Rails.root.join "employer_export.csv"
 
-    def extract_value(key, value)
-      return nil if value.nil?
-
-      if MONEY_ATTRIBUTES.include? key
-        return value["cents"]
-      elsif ARRAY_ATTRIBUTES.include? key
-        ""
-      else
-        return value
+    def get_primary_office_location(organization)
+      organization.office_locations.detect do |office_location|
+        office_location.is_primary?
       end
     end
 
-    def keys_values(document)
-      return_values = []
-      document.attribute_names.each do |key|
-        #debugger if document.class == BenefitGroup && key == "employer_max_amt"
-        next if ((document.attributes[key].is_a? BSON::Document) || (document.attributes[key].is_a? Array)) && (!INCLUDED_ATTRIBUTES.include? key)
-        return_values << (extract_value(key, document.attributes[key]) || document.attributes[key].to_s)
+    def get_broker_agency_account(broker_agency_accounts, plan_year)
+      broker_agency_account = broker_agency_accounts.detect do |broker_agency_account|
+        next if broker_agency_account.end_on.nil?
+        (plan_year.start_on >= broker_agency_account.start_on) && (plan_year.end_on <= broker_agency_account.end_on)
       end
-      return_values
+
+      broker_agency_account = broker_agency_accounts.first if broker_agency_account.nil?
+      broker_agency_account
     end
 
-    def add_to_csv(type, object, csv)
-      op = [type]
-      op.append keys_values(object)
-      csv << op.flatten
-    end
-
-    def schema(csv)
-      models = [EmployerProfile, Organization, OfficeLocation, Address, Phone, EmployerProfileAccount, BrokerAgencyAccount, CensusEmployee,
-                CensusDependent, PlanYear, BenefitGroup, RelationshipBenefit, Plan]
-
-      models.each do |model|
-        csv << model.attribute_names.unshift(model.to_s)
-      end
-    end
 
     CSV.open(FILE_PATH, "w") do |csv|
-      schema(csv)
+
+      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code
+                                office_location.is_primary office_location.address.address_1 office_location.address.address_2
+                                office_location.address.city office_location.address.state office_location.address.zip
+                                office_location.phone.full_phone_number staff.name staff.phone staff.email
+                                relationship_benefit.relationship relationship_benefit.premium_pct
+                                relationship_benefit.offered benefit_group.title, benefit_group.plan_option_kind
+                                benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
+                                benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
+                                plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on
+                                plan_year.fte_count plan_year.pte_count plan_year.msp_count broker_agency_account.corporate_npn broker_agency_account.legal_name)
+      csv << headers
 
       employers.each do |employer|
-        add_to_csv("EmployerProfile", employer, csv)
-        add_to_csv("Organization", employer.organization, csv)
+        employer_attributes = []
+        employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code]
+        office_location = get_primary_office_location(employer.organization)
+        employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
+                                office_location.address.state, office_location.address.zip]
 
-        employer.organization.office_locations.each do |office_location|
-          add_to_csv("OfficeLocation", office_location, csv)
-          add_to_csv("Address", office_location.address, csv)
-          add_to_csv("Phone", office_location.phone, csv)
+        if office_location.phone.present?
+          employer_attributes += [office_location.phone.full_phone_number]
+        else
+          employer_attributes += [""]
         end
 
-        if employer.employer_profile_account.present?
-          add_to_csv("EmployerProfileAccount", employer.employer_profile_account, csv)
-        end
+        if employer.staff_roles.size > 0
+          staff_role = employer.staff_roles.first
+          staff_name = staff_role.full_name
+          employer_attributes += [staff_name]
 
-        employer.broker_agency_accounts.each do |broker_agency_account|
-          add_to_csv("BrokerAgencyAccount", broker_agency_account, csv)
-        end
-
-        employer.census_employees.each do |census_employee|
-          add_to_csv("CensusEmployee", census_employee, csv)
-
-          census_employee.census_dependents.each do |census_dependent|
-            add_to_csv("CensusDependent", census_dependent, csv)
+          if staff_role.phones.present? && staff_role.phones.where(kind: "work").size > 0
+            employer_attributes += [staff_role.phones.where(kind: "work").first.full_phone_number]
+          else
+            employer_attributes += [""]
           end
+
+          if staff_role.emails.present? && staff_role.emails.where(kind: "work").size > 0
+            employer_attributes +=  [staff_role.emails.where(kind: "work").first.address]
+          else
+            employer_attributes += [""]
+          end
+        else
+          employer_attributes += ["","",""]
         end
 
         employer.plan_years.each do |plan_year|
-          add_to_csv("PlanYear", plan_year, csv)
-
           plan_year.benefit_groups.each do |benefit_group|
-            add_to_csv("BenefitGroup", benefit_group, csv)
-
             benefit_group.relationship_benefits.each do |relationship_benefit|
-              add_to_csv("RelationshipBenefit", relationship_benefit, csv)
-            end
+              row = []
 
-            benefit_group.elected_plans.each do |elected_plan|
-              add_to_csv("Plan (elected plan)", elected_plan, csv)
+              begin
+                row += [relationship_benefit.relationship, relationship_benefit.premium_pct,
+                        relationship_benefit.offered]
+                row += [benefit_group.title, benefit_group.plan_option_kind, benefit_group.carrier_for_elected_plan,
+                        benefit_group.metal_level_for_elected_plan, (benefit_group.single_plan_type? ? benefit_group.elected_plans_by_option_kind.name : ""),
+                        benefit_group.reference_plan.name, benefit_group.effective_on_kind, benefit_group.effective_on_offset]
+                row += [plan_year.start_on, plan_year.end_on, plan_year.open_enrollment_start_on, plan_year.open_enrollment_end_on,
+                        plan_year.fte_count, plan_year.pte_count, plan_year.msp_count]
+
+                broker_agency_account = get_broker_agency_account(employer.broker_agency_accounts, plan_year)
+                if broker_agency_account.present?
+                  row += [broker_agency_account.broker_agency_profile.corporate_npn, broker_agency_account.broker_agency_profile.legal_name]
+                else
+                  row += ["", ""]
+                end
+              rescue Exception => e
+                puts "ERROR: #{employer.legal_name} " + e.message
+                next
+              end
+
+              csv << employer_attributes + row
             end
           end
         end
+        csv << employer_attributes if employer.plan_years.empty?
       end
 
     end
