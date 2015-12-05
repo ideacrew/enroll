@@ -6,6 +6,9 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
 
+  def ssn_taken
+  end
+
   def privacy
     set_current_person
     redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
@@ -69,6 +72,12 @@ class Insured::ConsumerRolesController < ApplicationController
             format.html { render 'no_match' }
           end
         end
+      elsif @consumer_candidate.errors[:ssn_taken].present?
+        text = "The SSN entered is associated with an existing user. "
+        text += "Please #{view_context.link_to('Sign In', SamlInformation.iam_login_url)} with your user name and password "
+        text += "or #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+        flash[:alert] = text
+        format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
       else
         format.html { render 'search' }
       end

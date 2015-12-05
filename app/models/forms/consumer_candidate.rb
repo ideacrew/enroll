@@ -67,7 +67,7 @@ module Forms
       return true if ssn.blank?
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
       if same_ssn.present? && same_ssn.first.try(:user)
-        errors.add(:base,
+        errors.add(:ssn_taken,
                   #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
                   "The social security number you entered is affiliated with another account.")
       end
