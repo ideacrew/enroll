@@ -8,9 +8,9 @@ class CoverageHouseholdMember
   field :is_subscriber, type: Boolean, default: false
 
 
-  def save_parent
-    coverage_household.save
-  end
+  # def save_parent
+  #   coverage_household.save
+  # end
 
   include BelongsToFamilyMember
 
