@@ -104,6 +104,14 @@ class PlanYear
     PUBLISHED.include?(aasm_state)
   end
 
+  def default_benefit_group
+    benefit_groups.detect(&:default)
+  end
+
+  def default_renewal_benefit_group
+    # benefit_groups.detect { |bg| bg.is_default? && is_coverage_renewing? }
+  end
+
   def minimum_employer_contribution
     unless benefit_groups.size == 0
       benefit_groups.map do |benefit_group|
@@ -551,7 +559,7 @@ class PlanYear
 
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
-      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published, :publish_pending], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -566,7 +574,8 @@ class PlanYear
   end
 
   def revert_employer_profile_application
-    employer_profile.revert_application!
+    return unless employer_profile.may_revert_application?
+    employer_profile.revert_application! 
     record_transition
   end
 
