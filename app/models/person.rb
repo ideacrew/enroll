@@ -31,6 +31,7 @@ class Person
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
+  field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
 
