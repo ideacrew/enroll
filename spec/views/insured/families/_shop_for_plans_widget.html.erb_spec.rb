@@ -29,7 +29,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should have link with change_plan" do
-      expect(rendered).to have_selector('button', text: 'Shop for Plans')
+      expect(rendered).to have_selector("input[type=submit][value='Shop for Plans']")
       expect(rendered).to have_selector('strong', text: 'Shop for health and dental plans')
       expect(rendered).to have_selector("a[href='/insured/group_selections/new?change_plan=change_plan&employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
     end
