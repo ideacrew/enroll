@@ -16,42 +16,57 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
 
-  ivl: 
-    enrollment_due_day_of_month: 15
+  individual_market: 
+    monthly_enrollment_due_on: 15
 
-  shop:
-    small_market_fte_count_maximum: 50
-    benefit_period:
-      renewal_period_before_start_on_maximum:
-        months: -3
-      open_enrollment_period_minimum:
-        days: 5
+    open_enrollment:
+      benefit_year_2016:
+        start_on: <%= Date.new(2015,11,1) %>
+        end_on: <%= Date.new(2016,1,31) %>
 
-    retroactive_termination_maximum: 
+  shop_market:
+    small_market_employee_count_maximum: 50
+    employer_contribution_percent_minimum: 50
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
+    non_owner_participation_count_minimum: 1
+    binder_payment_due_on: 15
+
+    earliest_enroll_prior_to_effective_on:
+      days: -30
+    latest_enroll_after_effective_on:
+      days: 30
+    latest_enroll_after_employee_roster_correction_on:
+      days: 30
+
+    retroactive_coverage_termination_maximum: 
       days: -60
 
-#   ShopPlanYearPeriodMinimum = 1.year - 1.day
+    initial_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      denial_appeal_submit_maximum:
+        days: 30
 
-# ShopMaximumEnrollmentPeriodBeforeEligibilityInDays: 30
-# ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
+    renewal_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      monthly_open_enrollment_end_on: 13
 
-# ShopApplicationAppealPeriodMaximum = 30.days
+    benefit_period:
+      length_minimum:
+        year: 1
+      length_maximum:
+        year: 1
 
-#   ShopOpenEnrollmentEndDueDayOfMonth = 10
-#   ShopOpenEnrollmentPeriodMaximum = 2
+    open_enrollment:
+      monthly_start_on: 1
+      monthly_end_on: 10
 
-#   # Maximum length of time for SHOP Plan Year
-#   ShopPlanYearPeriodMaximum = 1.year - 1.day
+      minimum_length:
+        days: 5
+      maximum_length:
+        months: 2
 
-#   # Maximum number of months prior to coverage effective date to submit a Plan Year application
-#   ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
-
-#   ShopEmployerContributionPercentMinimum = 50.0
-#   ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
-#   ShopEnrollmentNonOwnerParticipationMinimum = 1
-
-#   ShopBinderPaymentDueDayOfMonth = 15
-#   ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
   
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
