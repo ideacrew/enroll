@@ -72,18 +72,42 @@ class VitalSign
     end
   end
 
-  def all_enrollments
-    families = Family.all_enrollments.and(
-        {:"households.hbx_enrollments.created_at".gte => @start_at},
-        {:"households.hbx_enrollments.created_at".lte => @end_at}
-      ).to_a
+# new vs. re-enrollee and active vs. auto re-enrollee breakouts
 
-    @all_enrollments = families.flat_map() do |family|
-      family.households.flat_map() do |household|
-        household.hbx_enrollments.enrolled.gte(created_at: @start_at).lte(created_at: @end_at).and(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES)
-      end
+  def all_families_enrolling_in_date_range
+    Family.all_enrollments.by_enrollment_created_datetime_range(@start_at, @end_at)
+  end
+
+  def all_enrollments
+    @all_enrollments = all_families_enrolling_in_date_range.reduce([]) do |list, family| 
+      list << family.latest_household.
+                      hbx_enrollments.
+                      enrolled.
+                      gte(created_at: @start_at).lte(created_at: @end_at)
     end
   end
+
+  def individual_new_enrollments
+    Family.all_enrollments.
+      by_enrollment_individual_market.
+      by_enrollment_renewing.
+      by_enrollment_datetime_range(@start_at, @end_at)
+  end
+
+  def individual_renewing_enrollments
+    renewal_date = Date.new(2016,1,1)
+    Family.all_enrollments.
+      by_enrollment_individual_market.
+      by_enrollment_renewing.by_enrollment_effective_date_range(renewal_date, renewal_date).
+      by_enrollment_created_datetime_range(@start_at, @end_at)
+  end
+
+  def individual_auto_renewing_enrollments
+  end
+
+  def individual_active_renewing_enrollments
+  end
+
 
   def all_individual_eligibility_determinations
     families = Family.and(
