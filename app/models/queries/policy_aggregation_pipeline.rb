@@ -22,16 +22,20 @@ module Queries
     def group_by_purchase_date
       add({
         "$project" => {
-          "policy_created_on" => {"$dateToString" => {"format" => "%Y-%m-%d", "date" => "$households.hbx_enrollments.created_at"}},
-          "policy_submitted_on" => {"$dateToString" => {"format" => "%Y-%m-%d", "date" => "$households.hbx_enrollments.submitted_at"}}
-        }
-      })
+          "policy_purchased_at" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] },
+          "policy_purchased_on" => {
+              "$dateToString" => {"format" => "%Y-%m-%d",
+                                   "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+               }
+          }
+      }})
+      yield self if block_given?
       add({
-        "$group" => {"_id" => {"created_on" => "$policy_created_on", "submitted_on" => "$policy_submitted_on"}, "count" => {"$sum" => 1}}
+        "$group" => {"_id" => {"purchased_on" => "$policy_purchased_on"}, "count" => {"$sum" => 1}}
       })
       results = self.evaluate
       h = results.inject({}) do |acc,r|
-        k = [r["_id"]["created_on"], r["_id"]["submitted_on"]].compact.first
+        k = r["_id"]["purchased_on"]
         if acc.has_key?(k)
           acc[k] = acc[k] + r["count"]
         else
