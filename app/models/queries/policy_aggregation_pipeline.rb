@@ -19,16 +19,71 @@ module Queries
       Family.collection.raw_aggregate(@pipeline)
     end
 
+    def filter_to_individual
+      add({
+        "$match" => {
+          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.consumer_role_id" => {"$ne" => nil},
+          "households.hbx_enrollments.aasm_state" => { "$nin" => [
+            "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+          ]}
+        }
+      })
+      self
+    end
+
+    def with_effective_date(criteria)
+      add({
+        "$match" => {
+          "households.hbx_enrollments.effective_on" => criteria
+        }
+      })
+    end
+
+    def filter_to_shop
+      add({
+        "$match" => {
+          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "$or" => [
+            {"households.hbx_enrollments.consumer_role_id" => {"$exists" => false}},
+            {"households.hbx_enrollments.consumer_role_id" => nil}
+          ],
+          "households.hbx_enrollments.aasm_state" => { "$nin" => [
+            "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+          ]}
+        }
+      })
+      self
+    end
+
+    def hbx_id_with_purchase_date_and_time
+      add({
+        "$project" => {
+          "policy_purchased_at" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] },
+          "policy_purchased_on" => {
+            "$dateToString" => {"format" => "%Y-%m-%d",
+                                "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+          }
+          },
+          "hbx_id" => "$households.hbx_enrollments.hbx_id"
+        }})
+      yield self if block_given?
+      results = self.evaluate
+      results.map do |r|
+        r['hbx_id']
+      end
+    end
+
     def group_by_purchase_date
       add({
         "$project" => {
           "policy_purchased_at" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] },
           "policy_purchased_on" => {
-              "$dateToString" => {"format" => "%Y-%m-%d",
-                                   "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
-               }
+            "$dateToString" => {"format" => "%Y-%m-%d",
+                                "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
           }
-      }})
+          }
+        }})
       yield self if block_given?
       add({
         "$group" => {"_id" => {"purchased_on" => "$policy_purchased_on"}, "count" => {"$sum" => 1}}
@@ -43,9 +98,13 @@ module Queries
         end
         acc
       end
-      h.keys.sort.map do |k|
+      result = h.keys.sort.map do |k|
         [k, h[k]]
       end
+      total = result.inject(0) do |acc, i|
+        acc + i.last
+      end
+      result << ["Total     ", total] 
     end
   end
 end
