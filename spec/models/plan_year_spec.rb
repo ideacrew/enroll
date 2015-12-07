@@ -12,8 +12,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   let(:valid_open_enrollment_start_on)  { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
   let(:valid_fte_count)                 { 5 }
-  let(:max_fte_count)                   { HbxProfile::ShopSmallMarketFteCountMaximum }
-  let(:invalid_fte_count)               { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
+  let(:max_fte_count)                   { Settings.aca.shop_market.small_market_employee_count_maximum }
+  let(:invalid_fte_count)               { Settings.aca.shop_market.small_market_employee_count_maximum + 1 }
 
   let(:valid_params) do
     {
@@ -880,7 +880,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
           context "and enrollment non-owner participation minimum not met" do
-            let(:invalid_non_owner_count) { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum - 1 }
+            let(:invalid_non_owner_count) { Settings.aca.shop_market.non_owner_participation_count_minimum - 1 }
             let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
             let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
 
@@ -975,7 +975,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #   let(:benefit_group)         { FactoryGirl.build(:benefit_group)}
   #   let(:plan_year)             { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
   #   let!(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-  #   let(:min_non_owner_count )  { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum }
+  #   let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
 
   #   it "should initialize in applicant status" do
   #     expect(employer_profile.applicant?).to be_truthy
@@ -1170,8 +1170,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "application is submitted to be published" do
     let(:plan_year)                   { PlanYear.new(aasm_state: "draft", **valid_params) }
-    let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
-    let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
+    let(:valid_fte_count)             { Settings.aca.shop_market.small_market_employee_count_maximum }
+    let(:invalid_fte_count)           { Settings.aca.shop_market.small_market_employee_count_maximum + 1 }
 
     it "plan year should be in draft state" do
       expect(plan_year.draft?).to be_truthy
@@ -1339,7 +1339,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #   let(:benefit_group)         { FactoryGirl.build(:benefit_group)}
   #   let(:plan_year)             { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
   #   let!(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-  #   let(:min_non_owner_count )  { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum }
+  #   let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
 
   #   it "should initialize in applicant status" do
   #     expect(employer_profile.applicant?).to be_truthy

@@ -27,15 +27,15 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
-  of every person who is applying for Medicaid and DC Health Link. We will only use your Social Security Number to verify the
-  information you told us on your application or renewal form. We will check your information in the District and Federal databases,
-  and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
+  of every person who is applying for Medicaid and #{Settings.site.short_name}. We will only use your Social Security Number to verify the
+  information you told us on your application or renewal form. We will check your information in the #{Settings.aca.state_name} and Federal databases,
+  and the databases of other #{Settings.aca.state_name}, Federal agencies, and a consumer reporting agency."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us. If you do not have a
   Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a
   Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact
-  #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.  "} %>
+  #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.  "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span>
@@ -187,7 +187,7 @@
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_color_text}>[IF Residency Unverified]</span> <strong><i>Documents Showing D.C. Residency.</i></strong>
-    A document that shows that the following household members live in the District of Columbia:"} %>
+    A document that shows that the following household members live in the #{Settings.aca.state_name}:"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "[Residency Inconsistent First Name 1][Residency Inconsistent Last Name 1]
@@ -198,9 +198,9 @@
     previous: "This can include any of the following:",
     listings: ["A copy of an active lease agreement , certified deed, or mortgage statement with D.C address in their name,",
                "A phone or utility bill from within the past two months,",
-               "A signed statement with contact information from another District resident stating that the applicant lives at their address in the District,",
+               "A signed statement with contact information from another #{Settings.aca.state_name} resident stating that the applicant lives at their address in the #{Settings.aca.state_name},",
                "D.C. Voter Registration Card,",
-               "Non-expired District of Columbia Motor Vehicle Registration or DC DMV Identification Card,",
+               "Non-expired #{Settings.aca.state_name} Motor Vehicle Registration or DC DMV Identification Card,",
                "Cancelled checked or receipts for mortgage or rental payments within the past 2 months,",
                "Utility bills and payment receipts with D.C. address within the past 2 months,",
                "Non-expired Automobile insurance statement with D.C. residency address,",
@@ -283,19 +283,19 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can send the necessary documents either online, through U.S. Postal mail, or in-person.",
   listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.",
-             "U.S. Postal Mail: <span style='margin-left: 10px;'>DC Health Link</span><br>
+             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{Settings.site.short_name}</span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
              <span style='margin-left:96px;'>Washington, DC 20090</span><br>
              <i>Be sure to write your account number (<account number>) on your submission.</i>",
             "<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
-            (call the #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber} for locations)."]
+            (call the #{Settings.contact_center.name} at #{Settings.contact_center.phone_number} for locations)."]
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already,
+  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already,
     you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling
-    #{HbxProfile::CallCenterName} toll-free at #{HbxProfile::CallCenterPhoneNumber}."],
+    #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

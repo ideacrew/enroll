@@ -191,7 +191,7 @@ class EmployerProfile
   end
 
   def is_primary_office_local?
-    organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
+    organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
 
   ## Class methods
@@ -260,6 +260,8 @@ class EmployerProfile
       end
 
       # Find employers with events today and trigger their respective workflow states
+      appeal_period_end = new_date.advance(Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.to_hash)
+      ineligible_period_end = new_date.advance(Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.to_hash)
       orgs = Organization.or(
         {:"employer_profile.plan_years.start_on" => new_date},
         {:"employer_profile.plan_years.end_on" => new_date - 1.day},
@@ -267,8 +269,8 @@ class EmployerProfile
         {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
         {:"employer_profile.workflow_state_transitions".elem_match => {
             "$and" => [
-              {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-              {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+              {:transition_at.gte => (ineligible_period_end.beginning_of_day )},
+              {:transition_at.lte => (ineligible_period_end.end_of_day)},
               {:to_state => "ineligible"}
             ]
           }
@@ -405,7 +407,14 @@ class EmployerProfile
 
   def enrollment_ineligible_period_expired?
     if latest_workflow_state_transition.to_state == "ineligible"
-      (latest_workflow_state_transition.transition_at.to_date + HbxProfile::ShopApplicationIneligiblePeriodMaximum) <= TimeKeeper.date_of_record
+      (latest_workflow_state_transition.transition_at.to_date.advance(Settings.
+                                                                          aca.
+                                                                          shop_market.
+                                                                          initial_application.
+                                                                          ineligible_period_after_application_denial.
+                                                                          to_hash
+                                                                        )
+                                                                      ) <= TimeKeeper.date_of_record
     else
       true
     end
@@ -466,8 +475,8 @@ private
   end
 
   def save_inbox
-    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
-    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

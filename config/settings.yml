@@ -6,10 +6,16 @@ site:
   copyright_period: "2013-2015"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
+  home_url: "https://www.dchealthlink.com/"
+
+  social_media:
+    facebook_url: ""
 
 contact_center: 
   name: "DC Health Link's Customer Care Center"
   phone_number: "1-855-532-5465"
+  tty_number: "1-855-532-5465"
+  alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
 aca:
@@ -44,8 +50,11 @@ aca:
     initial_application:
       earliest_start_prior_to_effective_on:
         months: -3
-      denial_appeal_submit_maximum:
+      appeal_period_after_application_denial:
         days: 30
+      # After submitting an ineligible plan year application, time period an Employer must wait
+      ineligible_period_after_application_denial:
+        days: 90
 
     renewal_application:
       earliest_start_prior_to_effective_on:

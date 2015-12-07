@@ -202,8 +202,8 @@ class HbxProfile
   end
 
   def save_inbox
-    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
-    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end
