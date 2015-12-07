@@ -137,6 +137,14 @@ describe BenefitGroupAssignment, type: :model do
           expect(benefit_group_assignment.initialized?).to be_truthy
         end
 
+        context "and employee is terminated before selecting or waiving coverage" do
+          before { benefit_group_assignment.terminate_coverage }
+
+          it "should transition to coverage void status" do
+            expect(benefit_group_assignment.aasm_state).to eq "coverage_void"
+          end
+        end
+
         context "and coverage is selected" do
           before { benefit_group_assignment.select_coverage }
 
@@ -196,9 +204,10 @@ describe BenefitGroupAssignment, type: :model do
             expect(benefit_group_assignment.coverage_waived?).to be_truthy
           end
 
-          context "and an ill-fated attempt is made to terminate waived coverage" do
+          context "and waived coverage is terminated" do
+
             it "should fail transition and remain in coverage waived state" do
-              expect { benefit_group_assignment.terminate_coverage }.to raise_error AASM::InvalidTransition
+              expect { benefit_group_assignment.terminate_coverage! }.to raise_error AASM::InvalidTransition
               expect(benefit_group_assignment.coverage_waived?).to be_truthy
             end
           end
@@ -218,6 +227,15 @@ describe BenefitGroupAssignment, type: :model do
               end
             end
           end
+        end
+
+        context "and coverage is terminated" do
+          before { benefit_group_assignment.terminate_coverage }
+
+          it "should transistion to coverage coverage_unused state" do
+            expect(benefit_group_assignment.coverage_void?).to be_truthy
+          end
+
         end
       end
     end

@@ -76,6 +76,7 @@ class BenefitGroupAssignment
     state :coverage_selected
     state :coverage_waived
     state :coverage_terminated
+    state :coverage_void
     state :coverage_renewing
 
     #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
@@ -93,17 +94,21 @@ class BenefitGroupAssignment
     end
 
     event :terminate_coverage do
+      transitions from: :initialized, to: :coverage_void
       transitions from: :coverage_selected, to: :coverage_terminated
     end
 
     event :delink_coverage do
-      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated], to: :initialized, after: :propogate_delink
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
     end
   end
 
 private
   def propogate_delink
-    self.hbx_enrollment_id = nil
+    if hbx_enrollment.present?
+      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
+    end
+    # self.hbx_enrollment_id = nil
   end
 
   def model_integrity
