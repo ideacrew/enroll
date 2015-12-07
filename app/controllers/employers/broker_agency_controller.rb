@@ -43,7 +43,7 @@ class Employers::BrokerAgencyController < ApplicationController
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
-      @employer_profile.save!
+      @employer_profile.save!(validate: false)
     end
 
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'."
