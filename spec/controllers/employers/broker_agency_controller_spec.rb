@@ -119,4 +119,20 @@ RSpec.describe Employers::BrokerAgencyController do
       end
     end
   end
+
+  describe ".create for invalid plan year" do
+    before (:each) do
+          sign_in(@user)
+          @employer_profile.plan_years=[]
+          invalid_plan=FactoryGirl.build(:plan_year, open_enrollment_end_on: Date.today)
+          invalid_plan.save!(validate: false)
+          @employer_profile.plan_years << invalid_plan
+          @employer_profile.save!(validate:false)
+          post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+    end
+
+    it "should be a success" do
+          expect(assigns(:employer_profile).broker_role_id).to eq(@broker_role2.id.to_s)
+        end
+  end
 end
