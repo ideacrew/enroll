@@ -173,6 +173,10 @@ class Invitation
     UserMailer.agent_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
+  def send_broker_invitation!(invitee_name)
+    UserMailer.broker_invitation_email(invitation_email, invitee_name, self).deliver_now
+  end
+
   def self.invite_employee!(census_employee)
     if !census_employee.email_address.blank?
       invitation = self.create(
@@ -194,7 +198,7 @@ class Invitation
         :source_id => broker_role.id,
         :invitation_email => broker_role.email_address
       )
-      invitation.send_invitation!(broker_role.parent.full_name)
+      invitation.send_broker_invitation!(broker_role.parent.full_name)
       invitation
     end
   end
