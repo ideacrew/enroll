@@ -1,3 +1,4 @@
+<% debugger %>
 <% if @employee_role.employer_profile.active_broker_agency_account.present? %>
 <aside class="panel panel-default">
   <section class="row">
@@ -33,7 +34,7 @@
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %><br>
           </small>
           <small>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %><br>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
             <br/><br/>
           </small>
