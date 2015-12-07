@@ -406,8 +406,8 @@ module ApplicationHelper
         end
 
         if eligible > 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;"
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"})
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;" unless plan_year.start_on.to_date.month == 1
+          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
        #binding.pry
