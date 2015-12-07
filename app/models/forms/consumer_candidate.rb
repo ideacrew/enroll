@@ -8,6 +8,8 @@ module Forms
     attr_accessor :gender
     attr_accessor :user_id
     attr_accessor :no_ssn
+    attr_accessor :dob_check #hidden input filed for one time DOB warning
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
@@ -23,6 +25,7 @@ module Forms
     validate :dob_not_in_future
     validate :ssn_or_checkbox
     validate :uniq_ssn
+    validate :age_less_than_18
     attr_reader :dob
 
     def ssn_or_checkbox
@@ -64,7 +67,7 @@ module Forms
       return true if ssn.blank?
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
       if same_ssn.present? && same_ssn.first.try(:user)
-        errors.add(:base,
+        errors.add(:ssn_taken,
                   #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
                   "The social security number you entered is affiliated with another account.")
       end
@@ -86,11 +89,24 @@ module Forms
     end
 
     def dob_not_in_future
+
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
             :dob,
             "#{dob} can't be in the future.")
         self.dob=""
+      end
+    end
+
+    # Throw Error/Warning if user age is less than 18
+    def age_less_than_18
+      if self.dob_check == "false" || self.dob_check.blank?
+        if ::TimeKeeper.date_of_record.year - self.dob.year < 18
+          errors.add(:base, "Please verify your date of birth. If it's correct, please continue.")
+          self.dob_check = true
+        else
+          self.dob_check = false
+        end
       end
     end
 
