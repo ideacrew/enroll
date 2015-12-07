@@ -178,7 +178,7 @@ class PlanYear
     warnings = application_errors
 
     unless employer_profile.is_primary_office_local?
-      warnings.merge!({primary_office_location: "Primary office must be located in #{HbxProfile::StateName}"})
+      warnings.merge!({primary_office_location: "Primary office must be located in #{Settings.aca.state_name}"})
     end
 
     # Employer is in ineligible state from prior enrollment activity
@@ -187,8 +187,8 @@ class PlanYear
     end
 
     # Maximum company size at time of initial registration on the HBX
-    if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
-      warnings.merge!({fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
+    if fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
+      warnings.merge!({fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})"})
     end
 
     # Exclude Jan 1 effective date from certain checks
@@ -266,7 +266,7 @@ class PlanYear
   end
 
   def minimum_enrolled_count
-    (HbxProfile::ShopEnrollmentParticipationRatioMinimum * eligible_to_enroll_count).ceil
+    (Settings.aca.shop_market.employee_participation_ratio_minimum * eligible_to_enroll_count).ceil
   end
 
   def additional_required_participants_count
@@ -296,16 +296,16 @@ class PlanYear
 
     # At least one employee who isn't an owner or family member of owner must enroll
     if non_business_owner_enrollment_count < eligible_to_enroll_count
-      if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-        errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+      if non_business_owner_enrollment_count < Settings.aca.shop_market.non_owner_participation_count_minimum
+        errors.merge!(non_business_owner_enrollment_count: "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll")
       end
     end
 
     # January 1 effective date exemption(s)
     unless effective_date.yday == 1
       # Verify ratio for minimum number of eligible employees that must enroll is met
-      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
-        errors.merge!(enrollment_ratio: "number of eligible participants enrolling (#{total_enrolled_count}) is less than minimum required #{eligible_to_enroll_count * HbxProfile::ShopEnrollmentParticipationRatioMinimum}")
+      if enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+        errors.merge!(enrollment_ratio: "number of eligible participants enrolling (#{total_enrolled_count}) is less than minimum required #{eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum}")
       end
     end
 
