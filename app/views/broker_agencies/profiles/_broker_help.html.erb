@@ -1,5 +1,5 @@
 <% active_broker = @broker %>
-<% broker_agency_profile =  BrokerAgencyProfile.find(active_broker.broker_agency_profile.id)%>
+<% broker_agency_profile =  active_broker.broker_agency_profile%>
 
 
 <div id="broker_show_<%= active_broker.id %>" tabindex="-1" class='hide broker_selection_choice'>
@@ -16,11 +16,9 @@
 			            <span class="tt-u"><%= broker_agency_profile.legal_name %><span>
 			          </header>
 			        </div>
-			        
-			        <div class="col-xs-8">
 			        <table>
 			          <tbody><tr>
-			            <td class='col-xs-5'>
+			            <td class='col-xs-4'><br/>
 			              <header>
 			                <% if broker_agency_profile.organization.office_locations.any? %>
 			                  <%= broker_agency_profile.organization.primary_office_location.address.address_1 %><br/>
@@ -32,24 +30,23 @@
 			                <% end %>
 			              </header>
 			            </td>
-			            <td class='col-xs-5'>
-			                <% if active_broker.person.phones.any? %>
+			            <td class='col-xs-4'><br/>
+			                <% if active_broker.phone %>
 			                <i class="fa fa-phone"></i>
-			                  <%= active_broker.person.phones[0].to_s %>
+			                  <%= active_broker.phone.to_s %>
 			                  <% else %>
 			                  <i class="fa fa-phone"></i>
 			                  No Phone Number
 			                <% end %>
 			                <br/>
 			                <i class="fa fa-at"></i>
-			                <a href="mailto:<%= active_broker.person.emails.first.address %>">
-			                  <%= active_broker.person.emails.first.address %>
+			                <a href="mailto:<%= active_broker.email.address %>">
+			                  <%= active_broker.email.address %>
 			                </a>
 			            </td>
 			          </tr>
 			        </tbody>
 			      </table>
-			    </div>
 			    </div>
 
 		      <div class="panel benefitgroup col-xs-12">
