@@ -86,7 +86,11 @@ class Products::QhpController < ApplicationController
     end
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "employer_sponsored") ? "employer_sponsored" : "individual"
-    @coverage_kind = (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
+    @coverage_kind = if @hbx_enrollment.plan.present?
+      @hbx_enrollment.plan.coverage_kind
+    else
+      (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
+    end
 
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
