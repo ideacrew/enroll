@@ -76,7 +76,6 @@ class EmployeeRole
   def is_under_open_enrollment?
     return false if employer_profile.blank?
     employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-    # benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def new_census_employee=(new_census_employee)
@@ -93,8 +92,12 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
-  def effective_on
-    benefit_group.try(:effective_on_for, new_census_employee.hired_on)
+  def coverage_effective_on
+    benefit_group.effective_on_for(new_census_employee.hired_on)
+  end
+
+  def is_eligible_to_enroll_as_new_hire_on?(enrollment_date = TimeKeeper.date_of_record)
+    benefit_group.new_hire_enrollment_period(new_census_employee.hired_on).cover?(enrollment_date)
   end
 
   def is_active?

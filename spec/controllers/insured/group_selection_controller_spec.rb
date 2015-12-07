@@ -41,6 +41,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
   end
 
   context "GET new" do
+    let(:census_employee) {FactoryGirl.build(:census_employee)}
     it "return http success" do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
@@ -68,6 +69,20 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
+    end
+
+    it "should get person" do
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id
+      expect(assigns(:person)).to eq person
+    end
+
+    it "should call construct_employee_role_for_person_by_census_employee" do
+      sign_in user
+      allow(person).to receive(:has_active_employee_role?).and_return false
+      allow(CensusEmployee).to receive(:matchable).and_return [census_employee]
+      expect(census_employee).to receive(:construct_employee_role_for_match_person)
+      get :new, person_id: person.id, employee_role_id: employee_role.id
     end
 
     context "individual" do

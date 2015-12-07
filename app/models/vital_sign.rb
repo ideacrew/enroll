@@ -50,6 +50,29 @@ class VitalSign
     end
   end
 
+  def other_shop_completed_enrollments 
+    fams = Family.unscoped.where({
+      "households.hbx_enrollments" => {
+        "$elemMatch" => {
+          "effective_on" => {
+            "$gt" => Date.new(2015,11,30),
+            "$lt" => Date.new(2016,1,1)
+          },
+          "aasm_state" => { "$nin" => [
+              "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+          ]}
+        }
+      }
+    })
+    puts fams.count
+
+    all_pols = fams.flat_map(&:households).flat_map(&:hbx_enrollments)
+    all_pols.select do |pol|
+      pol.consumer_role_id.blank? &&
+        (!["shopping", "inactive", "coverage_canceled", "coverage_terminated"].include?(pol.aasm_state.to_s))
+    end
+  end
+
   def all_completed_enrollments
     fams = Family.unscoped.where({
       "households.hbx_enrollments" => {
@@ -72,42 +95,95 @@ class VitalSign
     end
   end
 
-# new vs. re-enrollee and active vs. auto re-enrollee breakouts
+  def all_completed_enrollments_by_created_at
+    fams = Family.unscoped.where({
+      "households.hbx_enrollments" => {
+        "$elemMatch" => {
+          "created_at" => { "$gte" => @start_at, "$lte" => @end_at},
+          "effective_on" => { "$lt" => Date.new(2016,1,1) },
+           "aasm_state" => { "$nin" => [
+              "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+           ]}
+        }
+      }
+    })
 
-  def all_families_enrolling_in_date_range
-    Family.all_enrollments.by_enrollment_created_datetime_range(@start_at, @end_at)
-  end
-
-  def all_enrollments
-    @all_enrollments = all_families_enrolling_in_date_range.reduce([]) do |list, family| 
-      list << family.latest_household.
-                      hbx_enrollments.
-                      enrolled.
-                      gte(created_at: @start_at).lte(created_at: @end_at)
+    all_pols = fams.flat_map(&:households).flat_map(&:hbx_enrollments)
+    all_pols.select do |pol|
+      (!pol.created_at.blank?) &&
+      (pol.created_at >= @start_at) &&
+      (pol.created_at <= @end_at) &&
+        (!["shopping", "inactive", "coverage_canceled", "coverage_terminated"].include?(pol.aasm_state.to_s)) &&
+      (pol.effective_on < Date.new(2016,1,1))
     end
   end
 
-  def individual_new_enrollments
-    Family.all_enrollments.
-      by_enrollment_individual_market.
-      by_enrollment_renewing.
-      by_enrollment_datetime_range(@start_at, @end_at)
+  def all_completed_enrollments_by_submitted_at
+    fams = Family.unscoped.where({
+      "households.hbx_enrollments" => {
+        "$elemMatch" => {
+          "submitted_at" => { "$gte" => @start_at, "$lte" => @end_at},
+          "effective_on" => { "$lt" => Date.new(2016,1,1) },
+           "aasm_state" => { "$nin" => [
+              "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+           ]}
+        }
+      }
+    })
+
+    all_pols = fams.flat_map(&:households).flat_map(&:hbx_enrollments)
+    all_pols.select do |pol|
+      (!pol.submitted_at.blank?) &&
+      (pol.submitted_at >= @start_at) &&
+      (pol.submitted_at <= @end_at) &&
+        (!["shopping", "inactive", "coverage_canceled", "coverage_terminated"].include?(pol.aasm_state.to_s)) &&
+      (pol.effective_on < Date.new(2016,1,1))
+    end
   end
 
-  def individual_renewing_enrollments
-    renewal_date = Date.new(2016,1,1)
-    Family.all_enrollments.
-      by_enrollment_individual_market.
-      by_enrollment_renewing.by_enrollment_effective_date_range(renewal_date, renewal_date).
-      by_enrollment_created_datetime_range(@start_at, @end_at)
+  def all_completed_2016
+    fams = Family.unscoped.where({
+      "households.hbx_enrollments" => {
+        "$elemMatch" => {
+           "effective_on" => Date.new(2016,1,1),
+           "aasm_state" => { "$nin" => [
+              "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+           ]}
+        }
+      }
+    })
+
+    all_pols = fams.flat_map(&:households).flat_map(&:hbx_enrollments)
+    all_pols.select do |pol|
+        (!["shopping", "inactive", "coverage_canceled", "coverage_terminated"].include?(pol.aasm_state.to_s)) &&
+        (pol.effective_on == Date.new(2016,1,1))
+    end
   end
 
-  def individual_auto_renewing_enrollments
+  def all_shop_2016
+    all_completed_2016.select do |en|
+      en.consumer_role_id.blank?
+    end
   end
 
-  def individual_active_renewing_enrollments
+  def all_individual_2016
+    all_completed_2016.select do |en|
+      !en.consumer_role_id.blank?
+    end
   end
 
+  def all_enrollments
+    families = Family.all_enrollments.and(
+        {:"households.hbx_enrollments.created_at".gte => @start_at},
+        {:"households.hbx_enrollments.created_at".lte => @end_at}
+      ).to_a
+
+    @all_enrollments = families.flat_map() do |family|
+      family.households.flat_map() do |household|
+        household.hbx_enrollments.enrolled.gte(created_at: @start_at).lte(created_at: @end_at).and(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES)
+      end
+    end
+  end
 
   def all_individual_eligibility_determinations
     families = Family.and(

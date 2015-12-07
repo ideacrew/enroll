@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
 
+    log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, coverage_kind: :desc) || []
     log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
@@ -32,7 +33,7 @@ class Insured::FamiliesController < FamiliesController
       format.html
     end
   end
-  
+
   def brokers
     @tab = params['tab']
 
@@ -131,7 +132,7 @@ class Insured::FamiliesController < FamiliesController
         @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end
 
-      begin 
+      begin
         @plan.name
       rescue => e
         log("#{e.message};  #3742 plan: #{@plan}, family_id: #{@family.id}, hbx_enrollment_id: #{@enrollment.id}", {:severity => "error"})
@@ -158,6 +159,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def init_qualifying_life_events
+    begin
+      raise if @person.nil?
+    rescue => e
+      message = "no person in init_qualifying_life_events"
+      message = message + "stacktrace: #{e.backtrace}"
+      log(message, {:severity => "error"})
+      raise e
+    end
+
     @qualifying_life_events = []
     if @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events

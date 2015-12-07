@@ -2,6 +2,8 @@ class CensusMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include UnsetableSparseFields
+  validates_with Validations::DateRangeValidator
+
   GENDER_KINDS = %W(male female)
 
   field :first_name, type: String

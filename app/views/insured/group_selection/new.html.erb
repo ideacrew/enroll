@@ -20,7 +20,7 @@
         <h4><strong>Who needs coverage?</strong></h4>
 
           <%= hidden_field_tag(:person_id, @person.id) %>
-          <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
+          <%= hidden_field_tag(:employee_role_id, @employee_role.id) if @employee_role %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
@@ -29,11 +29,11 @@
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
-                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
+                <% offered_relationship_benefits = @employee_role.present? && @employee_role.benefit_group.present? && @employee_role.benefit_group.relationship_benefits.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
                 %>
                 <% show_residency_alert = false %>
-                <% @coverage_household.family_members.each_with_index do |family_member, index| %>
-                    <% is_coverage = @employee_role.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
+                <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
+                    <% is_coverage = @employee_role.present? && offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
                       is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
 
                       if @market_kind == 'individual'
@@ -117,14 +117,11 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
             <h4><strong>What would you like to do?</strong></h4>
-            <% if @employee_role.try(:benefit_group).try(:plan_option_kind) != "single_plan" %>
-
-              <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
-            <% end %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.can_terminate_coverage? %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
@@ -150,7 +147,7 @@
             <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
             <% else %>
-              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
             <% end %>
           <% end %>
         </div>
@@ -158,6 +155,7 @@
     <% end %>
     <% end %>
   </div>
+  <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.present? and @hbx_enrollment.employee_role.present? %>
 </div>
 <script>
   $(function(){

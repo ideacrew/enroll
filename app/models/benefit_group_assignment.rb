@@ -96,6 +96,7 @@ class BenefitGroupAssignment
     event :terminate_coverage do
       transitions from: :initialized, to: :coverage_void
       transitions from: :coverage_selected, to: :coverage_terminated
+      transitions from: :coverage_renewing, to: :coverage_terminated
     end
 
     event :delink_coverage do

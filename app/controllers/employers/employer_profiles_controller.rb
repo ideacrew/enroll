@@ -144,7 +144,13 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     @employer = @employer_profile.match_employer(current_user)
     @employer_contact = @employer_profile.staff_roles.first
-    @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
+
+    if @employer_contact.try(:emails)
+      @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
+    else
+      @employer_contact_email = @employer_contact.user.email
+    end
+
     @current_user_is_hbx_staff = current_user.has_hbx_staff_role?
     @current_user_is_broker = current_user.has_broker_agency_staff_role?
   end
@@ -152,7 +158,16 @@ class Employers::EmployerProfilesController < ApplicationController
   def create
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
-    if @organization.save(current_user)
+    organization_saved = false
+    begin
+      organization_saved = @organization.save(current_user)
+    rescue Exception => e
+      flash[:error] = e.message
+      render action: "new"
+      return
+    end
+
+    if organization_saved
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
         redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')

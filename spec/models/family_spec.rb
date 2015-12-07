@@ -224,18 +224,33 @@ describe Family, type: :model, dbclean: :after_each do
         carols_family.hire_broker_agency(writing_agent.id)
         expect(carols_family.broker_agency_accounts.length).to eq(1)
       end
-      it "adding twice only gives one broker agency account" do
+      it "adding twice only gives two broker agency accounts" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent.id)
-        expect(carols_family.broker_agency_accounts.length).to eq(1)
+        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
+        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(1)
       end
       it "new broker adds a broker_agency_account" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent2.id)
-        expect(carols_family.broker_agency_accounts.length).to eq(2)
+        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
         expect(carols_family.broker_agency_accounts[0].is_active).to be_falsey
         expect(carols_family.broker_agency_accounts[1].is_active).to be_truthy
         expect(carols_family.broker_agency_accounts[1].writing_agent_id).to eq(writing_agent2.id)
+      end
+      it "carol changes brokers" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.hire_broker_agency(writing_agent2.id)
+        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(0)
+        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(1)
+      end
+      it "writing_agent is popular" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.hire_broker_agency(writing_agent.id)
+        mikes_family.hire_broker_agency(writing_agent.id)
+        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
+        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
       end
 
     end
@@ -433,14 +448,14 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
       end
 
       it "and create a coverage_household with one family_member" do
-        expect(single_family.households.first.coverage_households.size).to eq 1
+        expect(single_family.households.first.coverage_households.size).to eq 2
         expect(single_family.households.first.coverage_households.first.coverage_household_members.first.family_member).to eq single_family.family_members.first
       end
     end
 
     context "and employee has spouse and child" do
-      it "creates one coverage_household with all family members" do
-        expect(married_family.households.first.coverage_households.size).to eq 1
+      it "creates two coverage_households and one will have all family members" do
+        expect(married_family.households.first.coverage_households.size).to eq 2
       end
 
       it "and all family_members are members of this coverage_household" do

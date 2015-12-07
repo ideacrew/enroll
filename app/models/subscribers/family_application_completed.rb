@@ -120,6 +120,8 @@ module Subscribers
           end.first.relationship_uri.split('#').last
 
           if existing_person.present?
+            find_or_build_consumer_role(existing_person)
+            update_vlp_for_consumer_role(existing_person.consumer_role, verified_family_member)
             new_people << [existing_person, relationship, [verified_family_member.id]]
           else
             new_member = Person.new(

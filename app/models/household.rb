@@ -34,17 +34,12 @@ class Household
   # after_build :build_irs_group
 
   def add_household_coverage_member(family_member)
-    # OPTIMIZE
     if ImmediateFamily.include?(family_member.primary_relationship)
-      immediate_family_coverage_household.coverage_household_members.build(
-          family_member: family_member,
-          is_subscriber: family_member.is_primary_applicant?
-        ) unless immediate_family_coverage_household.coverage_household_members.where(family_member_id: family_member.id).present?
+      immediate_family_coverage_household.add_coverage_household_member(family_member)
+      extended_family_coverage_household.remove_family_member(family_member)
     else
-      extended_family_coverage_household.coverage_household_members.build(
-          family_member: family_member,
-          is_subscriber: family_member.is_primary_applicant?
-        ) unless extended_family_coverage_household.coverage_household_members.where(family_member_id: family_member.id).present?
+      immediate_family_coverage_household.remove_family_member(family_member)
+      extended_family_coverage_household.add_coverage_household_member(family_member)
     end
   end
 

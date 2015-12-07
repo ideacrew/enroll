@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "broker_agencies/profiles/show.html.erb" do
+RSpec.describe "broker_agencies/profiles/staff_table.html.erb" do
   let(:organization) { FactoryGirl.create(:organization) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
   let(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
@@ -15,8 +15,8 @@ RSpec.describe "broker_agencies/profiles/show.html.erb" do
     render template: "broker_agencies/profiles/_staff_table.html.erb"
   end
 
-  it "should have title" do
-    expect(rendered).to have_selector('.help_button', text: 'Help')
-    expect(rendered).to have_selector('th', text: 'Organization')
+  it "should offer have Help" do
+    expect(rendered).to have_selector('.broker_select_button', text: 'Help')
+    expect(rendered).to have_selector('td', text: person1.full_name)
   end
 end
