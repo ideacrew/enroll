@@ -152,7 +152,8 @@ class Family
   end
 
   def active_household
-    households.detect { |household| household.is_active? }
+    # households.detect { |household| household.is_active? }
+    latest_household
   end
 
   def enrolled_benefits
@@ -315,6 +316,7 @@ class Family
     is_consent_applicant     = opts[:is_consent_applicant]  || false
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+
     if existing_family_member
       active_household.add_household_coverage_member(existing_family_member)
       existing_family_member.is_active = true

@@ -25,7 +25,7 @@ class CoverageHousehold
   field :submitted_at, type: DateTime
 
   embeds_many :coverage_household_members, cascade_callbacks: true
-  accepts_nested_attributes_for :coverage_household_members
+  accepts_nested_attributes_for :coverage_household_members, allow_destroy: true
 
   validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
@@ -69,11 +69,30 @@ class CoverageHousehold
     coverage_household_members.map(&:family_member_id)
   end
 
-  def remove_family_member(member)
-    family_member = coverage_household_members.detect { |ch_member| ch_member.family_member_id.to_s == member.id.to_s }
-    if family_member.present?
-       coverage_household_members.delete(family_member)
+  def add_coverage_household_member(family_member)
+    return if coverage_household_members.where(family_member_id: family_member.id).present?
+
+    chm = CoverageHouseholdMember.new(
+      family_member: family_member,
+      is_subscriber: family_member.is_primary_applicant?,
+      coverage_household: self
+    )
+
+    # chm.save_parent
+    # household.save
+  end
+
+  def remove_family_member(family_member)
+    coverage_household_members.where(family_member_id: family_member.id).each do |chm|
+      chm.destroy
     end
+
+    # if chm = coverage_household_members.first
+    #   chm.reload
+    #   chm.save_parent
+    # end
+
+    # household.save
   end
   
   def notify_the_user(member)
@@ -87,7 +106,6 @@ class CoverageHousehold
       end
     end
   end
-  
 
   aasm do
     state :unverified, initial: true
