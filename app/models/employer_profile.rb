@@ -260,8 +260,28 @@ class EmployerProfile
       end
 
       # Find employers with events today and trigger their respective workflow states
-      appeal_period_end = new_date.advance(Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.to_hash)
-      ineligible_period_end = new_date.advance(Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.to_hash)
+      appeal_period = (Settings.
+                          aca.
+                          shop_market.
+                          initial_application.
+                          appeal_period_after_application_denial.
+                          to_hash
+                        )
+
+      # Negate period value to query past date
+      appeal_period.each {|k,v| appeal_period[k] = (v * -1) }
+
+      ineligible_period = (Settings.
+                              aca.
+                              shop_market.
+                              initial_application.
+                              ineligible_period_after_application_denial.
+                              to_hash
+                            )
+
+      # Negate period value to query past date
+      ineligible_period.each {|k,v| ineligible_period[k] = (v * -1) }
+
       orgs = Organization.or(
         {:"employer_profile.plan_years.start_on" => new_date},
         {:"employer_profile.plan_years.end_on" => new_date - 1.day},
@@ -269,8 +289,8 @@ class EmployerProfile
         {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
         {:"employer_profile.workflow_state_transitions".elem_match => {
             "$and" => [
-              {:transition_at.gte => (ineligible_period_end.beginning_of_day )},
-              {:transition_at.lte => (ineligible_period_end.end_of_day)},
+              {:transition_at.gte => (new_date.advance(ineligible_period).beginning_of_day )},
+              {:transition_at.lte => (new_date.advance(ineligible_period).end_of_day)},
               {:to_state => "ineligible"}
             ]
           }
