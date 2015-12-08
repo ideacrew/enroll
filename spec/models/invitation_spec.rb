@@ -142,4 +142,16 @@ describe Invitation do
       expect(subject.user).to eq user
     end
   end
+
+  context "broker invitation email" do
+    let(:broker_role) {broker_role=FactoryGirl.create(:broker_role);
+      broker_role.email=Email.new(kind:"work", address:"broker@email.com");
+      broker_role}
+
+    describe "invite_broker!" do
+      it "returns an Invitation" do
+        expect(Invitation.invite_broker!(broker_role)).to be_a_kind_of(Invitation)
+      end
+    end
+  end
 end
