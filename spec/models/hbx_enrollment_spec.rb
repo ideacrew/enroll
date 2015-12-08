@@ -598,6 +598,23 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "coverage_year" do
+    let(:date){ TimeKeeper.date_of_record }
+    let(:plan_year){ PlanYear.new(start_on: date) }
+    let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
+    let(:plan){ Plan.new(active_year: date.year) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, kind: "employer_sponsored", plan: plan) }
+
+    it "should return plan year start on year when shop" do
+      expect(hbx_enrollment.coverage_year).to eq date.year
+    end
+
+    it "should return plan year when ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("")
+      expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.plan.active_year
+    end
+  end
+
   context "calculate_effective_on_from" do
     let(:date) {TimeKeeper.date_of_record}
     let(:family) { double(current_sep: double(effective_on:date), is_under_special_enrollment_period?: true) }
