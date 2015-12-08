@@ -375,9 +375,11 @@ private
   def check_employer_contribution_for_employee
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
-
-    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
-      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+    if start_on.month != 1 && start_on.day != 1
+      if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
+        self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+      end
+    else
     end
   end
 
