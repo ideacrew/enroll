@@ -195,6 +195,8 @@ Rails.application.routes.draw do
         get 'calc_employer_contributions', on: :collection
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
+        get 'reference_plan_summary', on: :collection
+
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

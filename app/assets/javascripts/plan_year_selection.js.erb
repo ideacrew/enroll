@@ -17,7 +17,7 @@ ready = function() {
 
   // get all dental plan options for all plans option
   $('label.elected_plan:contains("All plans")').on('click', function() {
-    
+
     var plan_year_id = $('a#generate-dental-carriers-and-plans').data('plan-year-id');
     var location_id = $(this).closest('.benefit-group-fields').attr('id');
     var carrier_id = 'all_plans';
@@ -251,9 +251,11 @@ ready = function() {
       $(this).attr('href', url+"&start_on="+start_on);
     });
 
+
   });
 
   //add start on date to end of summary link in reference plan options
+
     $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
 
     $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {

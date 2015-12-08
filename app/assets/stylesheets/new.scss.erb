@@ -904,8 +904,14 @@
 
         &:hover {
           border-bottom: solid 1px #007bc4;
+          .col-xs-10 .panel .panel-body .view-summary {
+            display: inline-block;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
-        .col-xs-3:first-of-type {
+        .col-xs-2:first-of-type {
           padding-left: 0;
         }
         .panel {
@@ -935,6 +941,10 @@
               color: #b7b7b7;
               font-size: 10px;
 
+            }
+            a.view-summary {
+              display: none;
+              margin-top: 3.5%;
             }
           }
         }
