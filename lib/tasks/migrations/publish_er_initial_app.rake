@@ -25,9 +25,9 @@ class EmployerAppMigration
                       reference_plan_id: EmployerAppMigration.reference_plan_id_for("78079DC0230008-01"),
                       relationship_benefits: [
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 50, offered: true),
-                            RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true),
+                            RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: false),
+                            RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: false),
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: false),
                             RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
@@ -64,6 +64,31 @@ class EmployerAppMigration
           plan_year: {
               imported_plan_year: true, 
               start_on: Date.new(2015,5,1), 
+              benefit_groups: [
+                  BenefitGroup.new(
+                      title: "Employee Benefits",
+                      plan_option_kind: "single_carrier",
+                      effective_on_kind: "date_of_hire",
+                      effective_on_offset: 60,
+                      default: true,
+                      reference_plan_id: EmployerAppMigration.reference_plan_id_for("86052DC0440009-01"),
+                      relationship_benefits: [
+                            RelationshipBenefit.new(relationship: "employee", premium_pct: 100, offered: true),
+                            RelationshipBenefit.new(relationship: "spouse", premium_pct: 100, offered: true),
+                            RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 100, offered: true),
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 100, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
+                          ]
+                      )
+                  ]
+              }
+
+          },
+
+        { legal_name: "bellrose glass",
+          plan_year: {
+              imported_plan_year: true, 
+              start_on: Date.new(2015,4,1), 
               benefit_groups: [
                   BenefitGroup.new(
                       title: "Employee Benefits",
