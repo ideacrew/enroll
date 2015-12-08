@@ -17,7 +17,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_plan",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -41,7 +41,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,4,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -64,7 +64,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,5,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 60,
@@ -88,7 +88,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,3,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -106,13 +106,13 @@ class EmployerAppMigration
 
           },
 
-        { legal_name: "Mele Brengarth",
+        { legal_name: "mba consulting",
           plan_year: {
               imported_plan_year: true, 
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -130,13 +130,14 @@ class EmployerAppMigration
 
           },
 
-        { legal_name: "Anytime Canine",
+        { legal_name: "Tonia Woods",
+        # { legal_name: "anytime canine",
           plan_year: {
               imported_plan_year: true, 
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "2015 Benefits",
+                      title: "Staff Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 30,
