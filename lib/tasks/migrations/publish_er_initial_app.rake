@@ -17,7 +17,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_plan",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -27,7 +27,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 50, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true),
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -41,7 +42,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,4,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -51,7 +52,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 100, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -64,7 +66,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,5,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 60,
@@ -74,7 +76,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 75, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -88,7 +91,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,3,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -98,7 +101,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 100, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -112,7 +116,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 0,
@@ -122,7 +126,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 100, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 50, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 50, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 50, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 50, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -137,7 +142,7 @@ class EmployerAppMigration
               start_on: Date.new(2015,1,1), 
               benefit_groups: [
                   BenefitGroup.new(
-                      title: "Staff Benefits",
+                      title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
                       effective_on_offset: 30,
@@ -147,7 +152,8 @@ class EmployerAppMigration
                             RelationshipBenefit.new(relationship: "employee", premium_pct: 50, offered: true),
                             RelationshipBenefit.new(relationship: "spouse", premium_pct: 0, offered: true),
                             RelationshipBenefit.new(relationship: "domestic_partner", premium_pct: 0, offered: true),
-                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true)
+                            RelationshipBenefit.new(relationship: "child_under_26", premium_pct: 0, offered: true) ,
+                            RelationshipBenefit.new(relationship: "child_26_and_over", premium_pct: 0, offered: false)
                           ]
                       )
                   ]
@@ -181,17 +187,26 @@ namespace :migrations do
         if initial_plan_year.blank?
           plan_year = PlanYear.new(application[:plan_year])
           plan_year.employer_profile = employer_profile
-          plan_year.end_on = (plan_year.start_on + 1.year) - 1.day
-          plan_year.open_enrollment_start_on = (plan_year.start_on - 1.day).beginning_of_month
-          plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 9.days
           plan_year.fte_count = EmployerAppMigration.census_employees(employer_profile).size
+          plan_year.end_on = (plan_year.start_on + 1.year) - 1.day
+
+          if plan_year.start_on == Date.new(2015,1,1)
+            plan_year.open_enrollment_start_on = Date.new(2015,12,1)
+            plan_year.open_enrollment_end_on = Date.new(2015,12,10)
+          else
+            plan_year.open_enrollment_start_on = (plan_year.start_on - 1.day).beginning_of_month
+            plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 9.days
+          end
 
           plan_year.benefit_groups.each do |benefit_group| 
+            # benefit_group.build_relationship_benefits
             benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
           end
 
+          plan_year.benefit_groups.first.save!
+          plan_year.aasm_state = "published" #! if plan_year.may_publish?
           plan_year.save!
-          plan_year.publish! if plan_year.may_publish?
+          employer_profile.save!
         else
           puts "  plan year #{initial_plan_year.start_on} already exists for #{employer_profile.legal_name}"
         end
