@@ -3,10 +3,15 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Referene Plan Summary</h4>
+        <h4 class="modal-title">Reference Plan Summary</h4>
       </div>
       <div class="modal-body">
         <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
+          <tr>
+            <th>PLAN BENEFITS</th>
+            <th>CO-PAY</th>
+            <th>COINSURANCE</th>
+          </tr>
           <% @visit_types.each do |visit_type| %>
             <tr>
               <td><%= visit_type %></td>
