@@ -542,6 +542,12 @@ When(/^Employer publishes a plan year$/) do
   plans_tab = @browser.div(class: /reference-plans/)
   @browser.element(text: /select your reference plan/i).wait_until_present
   plans_tab.labels.last.fire_event('onclick')
+  binding.pry
+  @browser.as(class: /view-summary/)[1].fire_event('onclick')
+  @browser.td(text: /Not Applicable/).wait_until_present
+  summary_modal = @browser.element(id: "referencePlanSummaryModal")
+  summary_modal.button(class: /close/).fire_event("onclick")
+  sleep(3)
   click_when_present(@browser.button(class: /interaction-click-control-save-plan-year/))
   @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))

@@ -51,10 +51,12 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def reference_plan_summary
-    ref_plan_ids = Array.new()
-    ref_plan_ids << params[:ref_plan_id]
-    plan_hios_ids = Plan.where(:id.in => ref_plan_ids).map(&:hios_id)
-    @qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_hios_ids, params[:Year], params[:coverage_kind])
+    hios_id = [] << params[:hios_id]
+    @qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, params[:start_on], params[:coverage_kind])
+    @visit_types = params[:coverage_kind] == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+    respond_to do |format|
+      format.js
+    end
   end
 
   def plan_details

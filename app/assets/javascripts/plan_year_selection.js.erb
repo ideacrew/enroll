@@ -250,7 +250,10 @@ ready = function() {
       var url = $(this).attr('href');
       $(this).attr('href', url+"&start_on="+start_on);
     });
-
+    $('.view-summary').each(function() {
+      var url = $(this).attr('href');
+      $(this).attr('href', url+"&start_on="+start_on);
+    });
 
   });
 
