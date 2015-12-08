@@ -27,7 +27,7 @@ class BenefitGroupAssignment
     census_employees = CensusEmployee.where({
       "benefit_group_assignments.benefit_group_id" => bg_id
     })
-    census_employees.flat_map(&:benefit_group_assignments).select |bga|
+    census_employees.flat_map(&:benefit_group_assignments).select do |bga|
       bga.benefit_group_id == bg_id
     end
   end
