@@ -69,7 +69,7 @@ class EmployerAppMigration
                       title: "Employee Benefits",
                       plan_option_kind: "single_carrier",
                       effective_on_kind: "date_of_hire",
-                      effective_on_offset: 60,
+                      effective_on_offset: 0,
                       default: true,
                       reference_plan_id: EmployerAppMigration.reference_plan_id_for("86052DC0440009-01"),
                       relationship_benefits: [
@@ -160,8 +160,8 @@ class EmployerAppMigration
 
           },
 
-        { legal_name: "Tonia Woods",
-        # { legal_name: "anytime canine",
+        # { legal_name: "Tonia Woods",
+        { legal_name: "anytime canine",
           plan_year: {
               imported_plan_year: true, 
               start_on: Date.new(2015,1,1), 
