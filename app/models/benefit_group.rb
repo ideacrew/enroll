@@ -4,6 +4,8 @@ class BenefitGroup
 
   embedded_in :plan_year
 
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
+
   PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 30, 60]
@@ -51,8 +53,6 @@ class BenefitGroup
 
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
-
-  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
   #TODO add following attributes: :title,
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
@@ -256,7 +256,7 @@ class BenefitGroup
 
   def self.find(id)
     organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
-    benefit_groups = organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
+    organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
       bg.id == id
     end.first
   end
@@ -304,13 +304,16 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
-    case self.plan_option_kind
+    case plan_option_kind
     when "single_plan"
-      Plan.where(id: self.reference_plan_id).first
+      Plan.where(id: reference_plan_id).first
     when "single_carrier"
-      Plan.valid_shop_health_plans("carrier", self.carrier_for_elected_plan, self.start_on.year)
+      if carrier_for_elected_plan.blank?
+        @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
+      end
+      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", self.metal_level_for_elected_plan, self.start_on.year)
+      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
     end
   end
 
