@@ -67,7 +67,7 @@ module Factories
       end
 
       unless @employer_profile.is_primary_office_local?
-        raise PlanYearRenewalFactoryError, "Employer primary address must be located in #{HbxProfile.StateName}"
+        raise PlanYearRenewalFactoryError, "Employer primary address must be located in #{Settings.aca.state_name}"
       end
     end
 
@@ -150,4 +150,3 @@ module Factories
 
   class PlanYearRenewalFactoryError < StandardError; end
 end
-

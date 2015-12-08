@@ -11,7 +11,7 @@ site:
   social_media:
     facebook_url: ""
 
-contact_center: 
+contact_center:
   name: "DC Health Link's Customer Care Center"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
@@ -22,7 +22,7 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
 
-  individual_market: 
+  individual_market:
     monthly_enrollment_due_on: 15
 
     open_enrollment:
@@ -44,7 +44,7 @@ aca:
     latest_enroll_after_employee_roster_correction_on:
       days: 30
 
-    retroactive_coverage_termination_maximum: 
+    retroactive_coverage_termination_maximum:
       days: -60
 
     initial_application:
@@ -76,7 +76,7 @@ aca:
       maximum_length:
         months: 2
 
-  
+
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
