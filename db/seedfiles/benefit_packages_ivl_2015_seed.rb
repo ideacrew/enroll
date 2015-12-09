@@ -29,8 +29,6 @@ individual_health_benefit_package = BenefitPackage.new(
       age_range:            0..0,
       citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
       residency_status:     ["state_resident"],
-      medicaid_eligibility: ["non_eligible"],
-      applicant_status:     ["applicant"],
       ethnicity:            ["any"]
     )
 )
@@ -48,8 +46,6 @@ individual_dental_benefit_package = BenefitPackage.new(
       age_range:            0..0,
       citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
       residency_status:     ["state_resident"],
-      medicaid_eligibility: ["non_eligible"],
-      applicant_status:     ["applicant"],
       ethnicity:            ["any"]
     )
 )
@@ -67,8 +63,6 @@ individual_catastrophic_health_benefit_package = BenefitPackage.new(
     age_range:            0..30,
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["any"]
   )
 )
@@ -86,8 +80,6 @@ native_american_health_benefit_package = BenefitPackage.new(
     age_range:            0..0,
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["indian_tribe_member"]
   )
 )
@@ -105,8 +97,6 @@ native_american_dental_benefit_package = BenefitPackage.new(
     age_range:            0..0,
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["indian_tribe_member"]
   )
 )
@@ -130,8 +120,6 @@ individual_health_benefit_package_for_csr_100 = BenefitPackage.new(
     cost_sharing:         "csr_100",
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["any"]
   )
 )
@@ -150,8 +138,6 @@ individual_health_benefit_package_for_csr_94 = BenefitPackage.new(
     cost_sharing:         "csr_94",
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["any"]
   )
 )
@@ -170,8 +156,6 @@ individual_health_benefit_package_for_csr_87 = BenefitPackage.new(
     cost_sharing:         "csr_87",
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["any"]
   )
 )
@@ -190,8 +174,6 @@ individual_health_benefit_package_for_csr_73 = BenefitPackage.new(
     cost_sharing:         "csr_73",
     citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
     residency_status:     ["state_resident"],
-    medicaid_eligibility: ["non_eligible"],
-    applicant_status:     ["applicant"],
     ethnicity:            ["any"]
   )
 )
