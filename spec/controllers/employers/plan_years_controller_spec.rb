@@ -5,6 +5,20 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
 
+  describe "GET reference_plan_summary" do
+    let(:qhp_cost_share_variance){ Products::QhpCostShareVariance.new }
+    it 'should return qhp cost share variance for the plan' do
+      allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return([qhp_cost_share_variance])
+      sign_in
+      xhr :get, :reference_plan_summary, coverage_kind: "health", start_on: 2016, hios_id: "48484848", employer_profile_id: "1111", format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("reference_plan_summary")
+      expect(assigns[:visit_types].size).to eq 11
+      expect(assigns[:qhps]).to be_an_instance_of(Array)
+      expect(assigns[:qhps].first).to be_an_instance_of(Products::QhpCostShareVariance)
+    end
+  end
+
   describe "GET new" do
 
     before :each do

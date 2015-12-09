@@ -12,21 +12,7 @@
             <th>CO-PAY</th>
             <th>COINSURANCE</th>
           </tr>
-          <% @visit_types.each do |visit_type| %>
-            <tr>
-              <td><%= visit_type %></td>
-              <% qhps.each do |qhp|%>
-                <% service_visit = qhp.qhp_service_visits.detect{|a| a.visit_type == visit_type} %>
-                <% if service_visit %>
-                  <td  colspan="1"><%= service_visit.present? ? service_visit.copay_in_network_tier_1 : "N/A" %></td>
-                  <td  colspan="1"><%= service_visit.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
-                <% else %>
-                  <td  colspan="1"><%= "N/A" %></td>
-                  <td  colspan="1"><%= "N/A" %></td>
-                <% end %>
-              <% end %>
-            </tr>
-          <%end%>
+          <%= render partial: "shared/plan_shoppings/plan_visit_types" %>
         </table>
       </div>
       <div class="modal-footer">
