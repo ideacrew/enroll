@@ -70,7 +70,7 @@
               <label for="coverage_kind_health">Health</label>
             </div>
 
-            <% if @employer_profile.present? || @person.has_active_employee_role? %>
+            <% if (@employer_profile.present? || @person.has_active_employee_role?) && !@person.has_active_consumer_role? %>
             <% else %>
             <div class="col-md-3 col-lg-3 col-sm-6">
               <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
