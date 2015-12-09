@@ -39,8 +39,7 @@ describe BenefitGroup, dbclean: :after_each do
       context "starting on 1/1/xxxx" do
         let(:start_plan_year) {Date.new(2015, 1, 1)}
         context "and a benefit_group_exists" do
-          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
-          let!(:relationship_benefit) { FactoryGirl.create(:relationship_benefit, benefit_group: benefit_group )}
+          let(:benefit_group) { FactoryGirl.create(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
 
           it "is true" do
             expect(benefit_group.save).to be_truthy
