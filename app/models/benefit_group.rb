@@ -373,7 +373,6 @@ private
   end
 
   def check_employer_contribution_for_employee
-    binding.pry
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
     # all employee contribution < 50% for 1/1 employers
