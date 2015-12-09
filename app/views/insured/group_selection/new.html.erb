@@ -117,10 +117,7 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
             <h4><strong>What would you like to do?</strong></h4>
-            <% if @employee_role.try(:benefit_group).try(:plan_option_kind) != "single_plan" %>
-
-              <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
-            <% end %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 

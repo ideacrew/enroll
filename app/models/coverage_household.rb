@@ -78,8 +78,9 @@ class CoverageHousehold
       coverage_household: self
     )
 
-    chm.save_parent
-    household.save
+
+    # chm.save_parent
+    # household.save
   end
 
   def remove_family_member(family_member)
@@ -87,12 +88,12 @@ class CoverageHousehold
       chm.destroy
     end
 
-    if chm = coverage_household_members.first
-      chm.reload
-      chm.save_parent
-    end
+    # if chm = coverage_household_members.first
+    #   chm.reload
+    #   chm.save_parent
+    # end
 
-    household.save
+    # household.save
   end
   
   def notify_the_user(member)
