@@ -36,7 +36,8 @@ end
 
 describe Forms::BrokerAgencyProfile, ".save" do
 
-  let(:persist_organization) { FactoryGirl.create(:broker_agency, fein: "223230323") }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency, fein: "223230323") }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, fein: "333230323") }
 
   let(:attributes) { {
     first_name: 'joe',
@@ -45,37 +46,37 @@ describe Forms::BrokerAgencyProfile, ".save" do
     email: 'useraccount@gmail.com',
     npn: "8422323232",
     legal_name: 'useragency',
-    fein: "223232323", 
+    fein: "223232323",
     entity_kind: "c_corporation",
     market_kind: "individual",
-    working_hours: "0", 
+    working_hours: "0",
     accept_new_clients: "0",
     office_locations_attributes: office_locations
     }.merge(other_attributes) }
 
   let(:other_attributes) { { } }
 
-  let(:office_locations) { { 
-    "0" => { 
-      address_attributes: address_attributes, 
+  let(:office_locations) { {
+    "0" => {
+      address_attributes: address_attributes,
       phone_attributes: phone_attributes
     }
     }}
 
   let(:address_attributes) {
-    { 
+    {
       kind: "primary",
-      address_1: "99 N ST", 
-      city: "washignton", 
+      address_1: "99 N ST",
+      city: "washignton",
       state: "dc",
       zip: "20006"
     }
   }
 
   let(:phone_attributes) {
-    { 
-      kind: "phone main", 
-      area_code: "202", 
+    {
+      kind: "phone main",
+      area_code: "202",
       number: "324-2232"
     }
   }
@@ -92,8 +93,8 @@ describe Forms::BrokerAgencyProfile, ".save" do
       dob: "1974-10-10"
       }}
 
-    before(:each) do 
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") } 
+    before(:each) do
+      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
       subject.save
     end
 
@@ -102,14 +103,16 @@ describe Forms::BrokerAgencyProfile, ".save" do
     end
   end
 
-  context 'when organization already exists with same FEIN' do
+  context 'when broker agency already exists with same FEIN' do
 
-    let(:other_attributes) { {
-      fein: "223230323"
-      }}
+    let(:other_attributes) {
+      {
+        fein: "223230323"
+      }
+    }
 
-    before(:each) do 
-      persist_organization # This is to persist organization record in the database
+    before(:each) do
+      broker_agency_profile.save
       subject.save
     end
 
@@ -118,6 +121,20 @@ describe Forms::BrokerAgencyProfile, ".save" do
     end
   end
 
+  context 'when an employer_profile already exists with the same FEIN' do
+    let(:other_attributes) {
+      { fein: "333230323", npn: "3322323232" }
+    }
+
+    before(:each) do
+      employer_profile.organization.save!
+      subject.save
+    end
+
+    it 'should add the broker agency profile to the organization of the employer profile' do
+      expect(Organization.where({fein: "333230323"}).first.broker_agency_profile).to be_truthy
+    end
+  end
 
   context 'when existing user matched with same personal information' do
 
@@ -127,7 +144,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
       dob: "1974-10-10"
       }}
 
-    before(:each) do 
+    before(:each) do
       FactoryGirl.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
       subject.save
     end
@@ -153,11 +170,11 @@ describe Forms::BrokerAgencyProfile, ".save" do
       fein: "223232300"
       }}
 
-    before(:each) do 
+    before(:each) do
       subject.save
     end
 
-    it 'should build broker agency from new person record and set person as primary' do 
+    it 'should build broker agency from new person record and set person as primary' do
       person = Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob).first
       expect(person).to be_truthy
       expect(person.broker_role).to be_truthy
@@ -182,7 +199,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     dob: "1974-10-10",
     npn: "8422323232",
     legal_name: 'useragency',
-    fein: "223232323", 
+    fein: "223232323",
     entity_kind: "c_corporation",
     market_kind: "individual"
   }.merge(other_attributes)}
@@ -194,9 +211,9 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
   }
 
 
-  context 'when email address invalid' do 
+  context 'when email address invalid' do
 
-    it 'should have error on email' do 
+    it 'should have error on email' do
       broker_agency = Forms::BrokerAgencyProfile.new(attributes.merge({email: "test@email"}))
       broker_agency.valid?
       expect(broker_agency).to have_errors_on(:email)
@@ -204,7 +221,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     end
   end
 
-  context 'when more than 1 person matched' do 
+  context 'when more than 1 person matched' do
     before :each do
       2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
     end
@@ -214,7 +231,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     end
   end
 
-  context 'when person with same information already present in the system' do 
+  context 'when person with same information already present in the system' do
     let(:other_attributes) { {first_name: "larry"}}
 
      before :each do
@@ -228,7 +245,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     end
   end
 
-  context 'when person not matched in the system' do 
+  context 'when person not matched in the system' do
     let(:other_attributes) { {
       first_name: "robin",
       last_name: "smith",
@@ -236,7 +253,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
       dob: "1978-08-10"
       } }
 
-    before :each do 
+    before :each do
       subject.match_or_create_person
     end
 
@@ -298,42 +315,42 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
     dob: "2015-06-01",
     email: 'useraccount@gmail.com',
     legal_name: organization.legal_name,
-    fein: organization.fein, 
+    fein: organization.fein,
     dba: organization.dba,
     home_page: 'dchealth.com',
     entity_kind: broker_agency_profile.entity_kind,
     market_kind: "individual",
     languages_spoken: ["English"],
-    working_hours: "0", 
+    working_hours: "0",
     accept_new_clients: "0",
     office_locations_attributes: office_locations
     } }
 
- let(:office_locations) { { 
-   "0" => { 
-     address_attributes: address_attributes, 
+ let(:office_locations) { {
+   "0" => {
+     address_attributes: address_attributes,
      phone_attributes: phone_attributes
    }
    }}
 
  let(:address_attributes) {
-   { 
+   {
      kind: "primary",
-     address_1: "99 N ST", 
-     city: "washignton", 
+     address_1: "99 N ST",
+     city: "washignton",
      state: "dc",
      zip: "20006"
    }
  }
 
  let(:phone_attributes) {
-   { 
-     kind: "phone main", 
-     area_code: "202", 
+   {
+     kind: "phone main",
+     area_code: "202",
      number: "324-2232"
    }
  }
-  
+
   before :each do
     @form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)
     @form.update_attributes(attributes)

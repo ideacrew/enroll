@@ -89,6 +89,9 @@ module Subscribers
         consumer_role.is_state_resident = verified_verifications.is_lawfully_present
         consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
         consumer_role.save!
+        if consumer_role.person.user.present?
+          consumer_role.person.user.ridp_by_payload!
+        end
       rescue => e
         errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
         throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")

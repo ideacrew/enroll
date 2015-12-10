@@ -10,7 +10,7 @@ class DocumentsController < ApplicationController
   end
 
   def consumer_role_status
-    @unverified_persons=Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending']).to_a
+    @unverified_persons=Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending']).order_by(:created_at => 'asc').page(params[:page]).per(20)
     respond_to do |format|
       format.html { render partial: "index_consumer_role_status" }
       format.js {}

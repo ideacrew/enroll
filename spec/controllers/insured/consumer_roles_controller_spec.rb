@@ -296,4 +296,62 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(assigns(:vlp_doc_target)).to eq "vlp doc"
     end
   end
+
+  context "GET ridp_agreement" do
+    context "on a paper application" do
+      let(:admin_person) { double(:agent? => true) }
+
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        session[:person_id] = person.id
+        allow(user).to receive(:person).and_return(admin_person)
+        allow(Person).to receive(:find).and_return person
+        allow(person).to receive(:consumer_role?).and_return(true)
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        session[:original_application_type] = "paper"
+        get "ridp_agreement"
+      end
+
+      it "should redirect" do
+        expect(response).to be_redirect
+      end
+    end
+
+    context "with a user who has already passed RIDP" do
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        allow(user).to receive(:person).and_return(person)
+        allow(person).to receive(:consumer_role?).and_return(true)
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:completed_identity_verification?).and_return(true) 
+        get "ridp_agreement"
+      end
+
+      it "should redirect" do
+        expect(response).to be_redirect
+      end
+    end
+
+    context "with a user who has not passed RIDP" do
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        allow(user).to receive(:person).and_return(person)
+        allow(person).to receive(:completed_identity_verification?).and_return(false) 
+        get "ridp_agreement"
+      end
+
+      it "should render the agreement page" do
+        expect(response).to render_template("ridp_agreement")
+      end
+    end
+  end
 end

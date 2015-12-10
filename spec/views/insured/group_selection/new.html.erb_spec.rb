@@ -26,7 +26,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
-      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
 
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
@@ -111,7 +111,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person3).to receive(:consumer_role).and_return(consumer_role3)
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
-      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(family_member4).to receive(:first_name).and_return('joey')
@@ -218,7 +218,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
-      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -298,9 +298,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
-      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
-      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
     it "should display title" do
@@ -364,7 +364,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
-      allow(hbx_enrollment).to receive(:can_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
     it "when present" do

@@ -194,6 +194,11 @@ class Person
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
+  def completed_identity_verification?
+    return false unless user
+    user.identity_verified?
+  end
+
   def consumer_fields_validations
     if self.is_consumer_role.to_s == "true"
       if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true

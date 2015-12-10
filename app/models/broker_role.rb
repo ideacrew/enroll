@@ -104,8 +104,8 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.detect { |phone| phone.kind == "work" }
-  end
+    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone
+  end  
 
   def email=(new_email)
     parent.emails << new_email

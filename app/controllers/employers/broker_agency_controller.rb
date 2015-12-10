@@ -61,7 +61,7 @@ class Employers::BrokerAgencyController < ApplicationController
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
       @employer_profile.fire_broker_agency(termination_date)
-      @fa = @employer_profile.save!
+      @fa = @employer_profile.save!(validate: false)
     end
 
     respond_to do |format|

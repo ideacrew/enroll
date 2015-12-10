@@ -1,5 +1,5 @@
 <% broker = @broker_roles.first %>
-<% broker_agency_profile =  BrokerAgencyProfile.find(broker.broker_agency_profile.id)%>
+<% broker_agency_profile =  broker.broker_agency_profile%>
 <%= link_to broker_agency_profile.legal_name, '#', data: {toggle: "modal", target: "#broker_show_#{broker.id}"} %>
 
 <div class="modal fade" id="broker_show_<%= broker.id %>" tabindex="-1" role="dialog" aria-labelledby="brokerShow" role="document">
@@ -34,17 +34,17 @@
 			              </header>
 			            </td>
 			            <td>
-			                <% if active_broker.person.phones.any? %>
+			                <% if active_broker.phone %>
 			                <i class="fa fa-phone"></i>
-			                  <%= active_broker.person.phones[0].to_s %>
+			                  <%= active_broker.phone.to_s %>
 			                  <% else %>
 			                  <i class="fa fa-phone"></i>
 			                  No Phone Number
 			                <% end %>
 			                <br/>
 			                <i class="fa fa-at"></i>
-			                <a href="mailto:<%= active_broker.person.emails.first.address %>">
-			                  <%= active_broker.person.emails.first.address %>
+			                <a href="mailto:<%= active_broker.email.address %>">
+			                  <%= active_broker.email.address %>
 			                </a>
 			            </td>
 			          </tr>
