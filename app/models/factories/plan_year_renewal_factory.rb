@@ -2,7 +2,7 @@ module Factories
   class PlanYearRenewalFactory
     include Mongoid::Document
 
-    EARLIEST_RENEWAL_START_ON = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on
+    EARLIEST_RENEWAL_START_ON = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
     attr_accessor :employer_profile, :is_congress
 

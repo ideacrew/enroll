@@ -268,7 +268,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                                                                   shop_market.
                                                                                   retroactive_coverage_termination_maximum.
                                                                                   to_hash)
-                                                                                ).end_of_month 
+                                                                                ).end_of_month
                                                                               }
                           let(:earliest_valid_employment_termination_date)  { earliest_retro_coverage_termination_date.beginning_of_month }
                           let(:invalid_employment_termination_date) { earliest_valid_employment_termination_date - 1.day }

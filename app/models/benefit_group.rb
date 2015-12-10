@@ -203,8 +203,8 @@ class BenefitGroup
   def new_hire_enrollment_period(date_of_hire)
     effective_date = effective_on_for(date_of_hire)
 
-    lower_limit = (effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on)
-    upper_limit = (effective_date + Settings.aca.shop_market.ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+    lower_limit = (effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
+    upper_limit = (effective_date + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
 
 
     # TODO
@@ -360,13 +360,13 @@ private
   def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
 
     # Length of time prior to effective date that EE may purchase plan
-    Settings.aca.shop_market.earliest_enroll_prior_to_effective_on
+    Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days
 
     # Length of time following effective date that EE may purchase plan
-    Settings.aca.shop_market.latest_enroll_after_effective_on
+    Settings.aca.shop_market.latest_enroll_after_effective_on.days
 
     # Length of time that EE may enroll following correction to Census Employee Identifying info
-    Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on
+    Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days
 
   end
 

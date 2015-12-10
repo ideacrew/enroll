@@ -323,7 +323,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the effective date is too far in the future" do
-          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months + 1.month }
+          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
           let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }

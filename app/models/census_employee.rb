@@ -264,7 +264,7 @@ class CensusEmployee < CensusMember
       active_benefit_group_assignment.terminate_coverage! if active_benefit_group_assignment.present?
       renewal_benefit_group_assignment.terminate_coverage! if renewal_benefit_group_assignment.present?
       terminate_employee_role!
-      
+
     else
       message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
       Rails.logger.error { message }
@@ -281,7 +281,8 @@ class CensusEmployee < CensusMember
                               advance(Settings.
                                           aca.
                                           shop_market.
-                                          retroactive_coverage_termination_maximum.to_hash
+                                          retroactive_coverage_termination_maximum
+                                          .to_hash
                                         ).end_of_month
 
     # if current_user.has_hbx_staff_role?

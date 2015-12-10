@@ -332,8 +332,8 @@ class PlanYear
       employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
       open_enrollment_earliest_start_on     = effective_date - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
       open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-      open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth}").to_date
-      binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopBinderPaymentDueDayOfMonth}")
+      open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
+      binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}")
 
 
       timetable = {
@@ -575,7 +575,7 @@ class PlanYear
 
   def revert_employer_profile_application
     return unless employer_profile.may_revert_application?
-    employer_profile.revert_application! 
+    employer_profile.revert_application!
     record_transition
   end
 
@@ -625,7 +625,7 @@ private
     today = TimeKeeper.date_of_record
     valid = case aasm_state
     when "draft"
-      today >= (end_on + 1.day) - HbxProfile::ShopMaximumRenewalPeriodBeforeStartOn
+      today >= (end_on + 1.day) - Settings.
     else
       false
     end
@@ -738,8 +738,8 @@ private
        errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
       end
     else
-      if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
-       errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
+      if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.open_enrollment.monthly_end_on
+       errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
       end
     end
 
