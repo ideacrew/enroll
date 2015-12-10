@@ -23,7 +23,7 @@
           <th>Review status</th>
           <th>Review</th>
         </tr>
-
+       <%= paginate @unverified_persons, :remote => true %>
         <% @unverified_persons.each do |person| %>
         <tr>
           <td><%= person.hbx_id %></td>
