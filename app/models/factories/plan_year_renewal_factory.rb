@@ -30,7 +30,10 @@ module Factories
         open_enrollment_end_on: open_enrollment_end_on,
         fte_count: @active_plan_year.fte_count,
         pte_count: @active_plan_year.pte_count,
-        msp_count: @active_plan_year.msp_count
+        msp_count: @active_plan_year.msp_count,
+
+    ## Remove this setting when plan year business rules should be engaged
+        imported_plan_year: @active_plan_year.imported_plan_year
       })
 
       if @renewal_plan_year.may_renew_plan_year?
@@ -109,7 +112,7 @@ module Factories
       end
 
       @renewal_plan_year.benefit_groups.build({
-        title: "Benefit Package #{new_year} ##{index} (#{active_group.title})",
+        title: "#{active_group.title} (#{new_year})",
         effective_on_kind: "first_of_month",
         terminate_on_kind: active_group.terminate_on_kind,
         plan_option_kind: active_group.plan_option_kind,
