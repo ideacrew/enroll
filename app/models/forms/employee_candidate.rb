@@ -66,7 +66,7 @@ module Forms
           if matched_person.user.id.to_s != self.user_id.to_s
             errors.add(
                 :base,
-                "An account already exists for #{first_name} #{last_name}."
+                "#{first_name} #{last_name} is already affiliated with another account"
             )
           end
         end
