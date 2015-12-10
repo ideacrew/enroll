@@ -25,68 +25,68 @@ class EmployerAppMigration
       #     }
       #   },
 
+      {
+        employer_profile: {
+            fein: "464579728", 
+            plan_year: {
+                open_enrollment_start_on: Date.new(2015,12,1),
+                open_enrollment_end_on: Date.new(2015,12,14),
+                imported_plan_year: true, 
+              }
+          }
+        },
+
       # {
-        # employer_profile: {
-        #     fein: "464579728", 
-        #     plan_year: {
-        #         open_enrollment_start_on: Date.new(2015,12,1),
-        #         open_enrollment_end_on: Date.new(2015,12,14),
-        #         imported_plan_year: true, 
-        #       }
-        #   }
-        # },
+      #   employer_profile: {
+      #       fein: "451657216", 
+      #       plan_year: {
+      #           start_on: Date.new(2016,1,1),
+      #           end_on: Date.new(2016,12,31),
+      #           open_enrollment_start_on: Date.new(2015,12,1),
+      #           open_enrollment_end_on: Date.new(2015,12,14),
+      #           imported_plan_year: true, 
+      #         }
+      #     }
+      #   },
 
-      {
-        employer_profile: {
-            fein: "451657216", 
-            plan_year: {
-                start_on: Date.new(2016,1,1),
-                end_on: Date.new(2016,12,31),
-                open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,14),
-                imported_plan_year: true, 
-              }
-          }
-        },
+      # {
+      #   employer_profile: {
+      #       fein: "621058763", 
+      #       plan_year: {
+      #           start_on: Date.new(2016,1,1),
+      #           end_on: Date.new(2016,12,31),
+      #           open_enrollment_start_on: Date.new(2015,12,1),
+      #           open_enrollment_end_on: Date.new(2015,12,14),
+      #           imported_plan_year: true, 
+      #         }
+      #     }
+      #   },
 
-      {
-        employer_profile: {
-            fein: "621058763", 
-            plan_year: {
-                start_on: Date.new(2016,1,1),
-                end_on: Date.new(2016,12,31),
-                open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,14),
-                imported_plan_year: true, 
-              }
-          }
-        },
+      # {
+      #   employer_profile: {
+      #       fein: "472622751", 
+      #       plan_year: {
+      #           start_on: Date.new(2016,1,1),
+      #           end_on: Date.new(2016,12,31),
+      #           open_enrollment_start_on: Date.new(2015,12,1),
+      #           open_enrollment_end_on: Date.new(2015,12,14),
+      #           imported_plan_year: true, 
+      #         }
+      #     }
+      #   },
 
-      {
-        employer_profile: {
-            fein: "472622751", 
-            plan_year: {
-                start_on: Date.new(2016,1,1),
-                end_on: Date.new(2016,12,31),
-                open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,14),
-                imported_plan_year: true, 
-              }
-          }
-        },
-
-      {
-        employer_profile: {
-            fein: "272812649", 
-            plan_year: {
-                start_on: Date.new(2016,1,1),
-                end_on: Date.new(2016,12,31),
-                open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,14),
-                imported_plan_year: true, 
-              }
-          }
-        },
+      # {
+      #   employer_profile: {
+      #       fein: "272812649", 
+      #       plan_year: {
+      #           start_on: Date.new(2016,1,1),
+      #           end_on: Date.new(2016,12,31),
+      #           open_enrollment_start_on: Date.new(2015,12,1),
+      #           open_enrollment_end_on: Date.new(2015,12,14),
+      #           imported_plan_year: true, 
+      #         }
+      #     }
+      #   },
     ]
   end
 
@@ -170,6 +170,8 @@ namespace :migrations do
       end
 
       plan_years_2016 = employer_profile.plan_years.select { |py| py.start_on.year == 2016 }
+      plan_years_2016.each { |py| py.destroy! if py.aasm_state == "enrolling" }
+      plan_years_2016 = employer_profile.plan_years.select { |py| py.start_on.year == 2016 }
 
       if plan_years_2016.size == 1
         plan_year_2016 = plan_years_2016.first
@@ -178,6 +180,7 @@ namespace :migrations do
 
         census_employee_ids.each do |ce_id|
           census_employee = CensusEmployee.find(ce_id)
+          census_employee.benefit_group_assignments = []
           census_employee.add_benefit_group_assignment(plan_year_2016.benefit_groups.first, plan_year_2016.start_on)
           census_employee.save!
         end
