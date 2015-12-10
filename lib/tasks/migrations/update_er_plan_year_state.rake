@@ -1,15 +1,15 @@
 class EmployerAppMigration
 
-  # 5. septcarres, llc (45-1657216) (#4256) - has two published PYs (one for 12/1/2015, one for 1/1/2016).  EEs blocked.  When we try to unpublish 2015 PY, it unpublishes the 2016 PY.
 
 
   def self.start_on_jan_1_employer_updates
     # 4. Joint Aid Management (38-2726350) - 2015 ref plan with 2016 PYs.... needs to be unpublished but has 2 EEs linked (no enrollments).  OK to try using Revert button or should EA team do it instead?
+    # 3. Two Foxes LLC (46-4579728) - needs OE extended thru 12/10 (OE closed on 12/4,  no one enrolled)
+
     # 5. septcarres, llc (45-1657216) (#4256) - has two published PYs (one for 12/1/2015, one for 1/1/2016).  EEs blocked.  When we try to unpublish 2015 PY, it unpublishes the 2016 PY.
     # 1. Candace Ashley (62-1058763) - 2/1 draft PY, needs to be changed to 1/1 eff date and published
     # 2. Tricore Systems, LLC (47-2622751) - 2/1 draft PY, needs to be changed to 1/1 eff date and published
     # 6.  Baked by Yael (27-2812649) - 2/1 draft PY, needs to be changed to 1/1 eff date and published.(edited)
-    # 3. Two Foxes LLC (46-4579728) - needs OE extended thru 12/10 (OE closed on 12/4,  no one enrolled)
 
     [
       # {
@@ -19,11 +19,22 @@ class EmployerAppMigration
       #           start_on: Date.new(2016,1,1),
       #           end_on: Date.new(2016,12,31),
       #           open_enrollment_start_on: Date.new(2015,12,1),
-      #           open_enrollment_end_on: Date.new(2015,12,10),
+      #           open_enrollment_end_on: Date.new(2015,12,14),
       #           imported_plan_year: true, 
       #         }
       #     }
       #   },
+
+      # {
+        # employer_profile: {
+        #     fein: "464579728", 
+        #     plan_year: {
+        #         open_enrollment_start_on: Date.new(2015,12,1),
+        #         open_enrollment_end_on: Date.new(2015,12,14),
+        #         imported_plan_year: true, 
+        #       }
+        #   }
+        # },
 
       {
         employer_profile: {
@@ -32,7 +43,7 @@ class EmployerAppMigration
                 start_on: Date.new(2016,1,1),
                 end_on: Date.new(2016,12,31),
                 open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,10),
+                open_enrollment_end_on: Date.new(2015,12,14),
                 imported_plan_year: true, 
               }
           }
@@ -45,7 +56,7 @@ class EmployerAppMigration
                 start_on: Date.new(2016,1,1),
                 end_on: Date.new(2016,12,31),
                 open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,10),
+                open_enrollment_end_on: Date.new(2015,12,14),
                 imported_plan_year: true, 
               }
           }
@@ -58,7 +69,7 @@ class EmployerAppMigration
                 start_on: Date.new(2016,1,1),
                 end_on: Date.new(2016,12,31),
                 open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,10),
+                open_enrollment_end_on: Date.new(2015,12,14),
                 imported_plan_year: true, 
               }
           }
@@ -71,18 +82,7 @@ class EmployerAppMigration
                 start_on: Date.new(2016,1,1),
                 end_on: Date.new(2016,12,31),
                 open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,10),
-                imported_plan_year: true, 
-              }
-          }
-        },
-      {
-
-        employer_profile: {
-            fein: "464579728", 
-            plan_year: {
-                open_enrollment_start_on: Date.new(2015,12,1),
-                open_enrollment_end_on: Date.new(2015,12,10),
+                open_enrollment_end_on: Date.new(2015,12,14),
                 imported_plan_year: true, 
               }
           }
@@ -191,7 +191,7 @@ namespace :migrations do
         if plan_years_2016.size == 0
           puts "  error: no plan_years matched for employer #{employer_profile[:fein]}"
         else
-          puts "  error: no plan_years matched for employer  #{employer_profile[:fein]}"
+          puts "  error: multiple plan_years matched for employer  #{employer_profile[:fein]}"
         end
       end
 
