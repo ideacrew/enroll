@@ -28,4 +28,11 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     render "employers/employer_profiles/my_account/benefits"
     expect(rendered).to match /Date of hire following 30 days/
   end
+
+  it "should display title by benefit groups coverage year" do
+    render "employers/employer_profiles/my_account/benefits"
+    expect(rendered).to match /Coverage Year/
+    expect(rendered).to have_selector("p", text: "#{plan_year.start_on.to_date.to_formatted_s(:long_ordinal)} - #{plan_year.end_on.to_date.to_formatted_s(:long_ordinal)}")
+  end
+
 end

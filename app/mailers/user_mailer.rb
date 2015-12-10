@@ -25,6 +25,13 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def broker_invitation_email(email, person_name, invitation)
+
+    mail({to: email, subject: "Invitation to create your Broker account on DC Health Link "}) do |format|
+      format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
+    end
+  end
+
   def message_to_broker(person, broker, params)
     mail({to: broker.email_address, subject: params[:subject], from: person.user.email}) do |format|
       format.html { render "message_to_broker", :locals => { :person => person, :broker => broker, :message_body => params[:body] }}
