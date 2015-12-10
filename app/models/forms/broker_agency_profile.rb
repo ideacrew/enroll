@@ -50,7 +50,7 @@ module Forms
 
       person.save!
       add_broker_role
-      organization = create_new_organization
+      organization = create_or_find_organization
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.save!
@@ -83,21 +83,35 @@ module Forms
       self.person.add_work_email(email)
     end
 
-    def create_new_organization
-      Organization.create!(
-        :fein => fein,
-        :legal_name => legal_name,
-        :dba => dba,
-        :broker_agency_profile => ::BrokerAgencyProfile.new({
-          :entity_kind => entity_kind,
-          :home_page => home_page,
-          :market_kind => market_kind,
-          :languages_spoken => languages_spoken,
-          :working_hours => working_hours,
-          :accept_new_clients => accept_new_clients
-        }),
-        :office_locations => office_locations
-      )
+    def create_or_find_organization
+      existing_org = Organization.where(:fein => self.fein)
+      if existing_org.present? && !existing_org.first.broker_agency_profile.present?
+        new_broker_agency_profile = ::BrokerAgencyProfile.new({
+            :entity_kind => entity_kind,
+            :home_page => home_page,
+            :market_kind => market_kind,
+            :languages_spoken => languages_spoken,
+            :working_hours => working_hours,
+            :accept_new_clients => accept_new_clients})
+        existing_org = existing_org.first
+        existing_org.update_attributes!(broker_agency_profile: new_broker_agency_profile)
+        existing_org
+      else
+        Organization.create!(
+          :fein => fein,
+          :legal_name => legal_name,
+          :dba => dba,
+          :broker_agency_profile => ::BrokerAgencyProfile.new({
+            :entity_kind => entity_kind,
+            :home_page => home_page,
+            :market_kind => market_kind,
+            :languages_spoken => languages_spoken,
+            :working_hours => working_hours,
+            :accept_new_clients => accept_new_clients
+          }),
+          :office_locations => office_locations
+        )
+      end
     end
 
     def self.find(broker_agency_profile_id)
@@ -183,7 +197,8 @@ module Forms
     end
 
     def check_existing_organization
-      if Organization.where(:fein => self.fein).any?
+      existing_org = Organization.where(:fein => self.fein)
+      if existing_org.present? && existing_org.first.broker_agency_profile.present?
         raise OrganizationAlreadyMatched.new
       end
     end

@@ -84,6 +84,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       let(:found_person) { [] }
 
       it "renders the 'search' template" do
+        allow(mock_consumer_candidate).to receive(:errors).and_return({})
         post :match, :person => person_parameters
         expect(response).to have_http_status(:success)
         expect(response).to render_template("search")
@@ -103,6 +104,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         end
 
         it "renders the 'no_match' template" do
+          post :match, :person => person_parameters
           expect(response).to have_http_status(:success)
           expect(response).to render_template("no_match")
           expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -112,6 +114,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           let(:found_person) { [person] }
 
           it "renders the 'match' template" do
+            post :match, :person => person_parameters
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
             expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -133,6 +136,19 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           expect(response).to render_template('insured/employee_roles/match')
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
         end
+      end
+    end
+
+    context "given user enters ssn that is already taken" do
+      let(:validation_result) { true }
+      before(:each) do
+        allow(mock_consumer_candidate).to receive(:valid?).and_return(false)
+        allow(mock_consumer_candidate).to receive(:errors).and_return({:ssn_taken => "test test test"})
+      end
+      it "should navigate to another page which has information for user to signin/recover account" do
+        post :match, :person => person_parameters
+        expect(response).to redirect_to(ssn_taken_insured_consumer_role_index_path)
+        expect(flash[:alert]).to eq "The SSN entered is associated with an existing user. Please <a href=\"https://iam_login_url\">Sign In</a> with your user name and password or <a href=\"https://account_recovery\">Click here</a> if you've forgotten your password."
       end
     end
   end

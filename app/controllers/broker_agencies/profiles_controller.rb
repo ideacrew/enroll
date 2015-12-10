@@ -114,6 +114,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @total = total_families.count
     @families = total_families.page page_no
     @family_count = 0
+    @staff = Person.where(:id.in => total_families.map(&:primary_applicant).map(&:person))
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    if params[:page]
+      page_no = params[:page]
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page_no}/i }
+    end
+    if @q
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
+    end
     @families.each{|f| @family_count +=1}
     respond_to do |format|
       format.html { render "insured/families/index" }

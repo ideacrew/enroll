@@ -448,14 +448,14 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
       end
 
       it "and create a coverage_household with one family_member" do
-        expect(single_family.households.first.coverage_households.size).to eq 1
+        expect(single_family.households.first.coverage_households.size).to eq 2
         expect(single_family.households.first.coverage_households.first.coverage_household_members.first.family_member).to eq single_family.family_members.first
       end
     end
 
     context "and employee has spouse and child" do
-      it "creates one coverage_household with all family members" do
-        expect(married_family.households.first.coverage_households.size).to eq 1
+      it "creates two coverage_households and one will have all family members" do
+        expect(married_family.households.first.coverage_households.size).to eq 2
       end
 
       it "and all family_members are members of this coverage_household" do

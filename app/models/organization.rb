@@ -148,7 +148,7 @@ class Organization
   end
 
   def self.valid_carrier_names_filters
-    Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+    Rails.cache.fetch("carrier-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name
         carrier_names

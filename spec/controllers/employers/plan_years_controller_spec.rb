@@ -501,7 +501,73 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
   end
 
-  describe "POST make_default_benefit_group", dbclean: :after_each do 
+  describe "POST make_default_benefit_group", dbclean: :after_each do
+    context "when plan year is invalid" do
+      let(:entity_kind)     { "partnership" }
+      let(:bad_entity_kind) { "fraternity" }
+      let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
+
+      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+      let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
+
+      let(:office_location) do
+        OfficeLocation.new(
+          is_primary: true,
+          address: address,
+          phone: phone
+          )
+      end
+
+      let(:organization) { Organization.create(
+        legal_name: "Sail Adventures, Inc",
+        dba: "Sail Away",
+        fein: "001223333",
+        office_locations: [office_location]
+        )
+      }
+
+      let(:valid_params)  do {
+        organization: organization,
+        entity_kind: entity_kind
+        }
+      end
+
+      let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
+      let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+      let(:plan_year)         do
+        py = FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group])
+        py.open_enrollment_end_on = py.open_enrollment_start_on + 1.day
+        py
+      end
+      let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+
+      let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
+      let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
+      let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+
+      before do
+        employer_profile.save(:validate => false)
+        sign_in
+      end
+
+      it "should log the validation error" do
+        expect(subject).to receive(:log)
+        begin
+          post :make_default_benefit_group, employer_profile_id: employer_profile.id.to_s, plan_year_id: plan_year.id.to_s, benefit_group_id: benefit_group.id.to_s, format: :js
+        rescue
+        end
+      end
+
+      it "should raise the error" do
+        expect do
+          post :make_default_benefit_group, employer_profile_id: employer_profile.id.to_s, plan_year_id: plan_year.id.to_s, benefit_group_id: benefit_group.id.to_s, format: :js
+        end.to raise_error
+      end
+    end
+  end
+
+  describe "POST make_default_benefit_group", dbclean: :after_each do
 
     let(:entity_kind)     { "partnership" }
     let(:bad_entity_kind) { "fraternity" }
@@ -511,7 +577,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
-    let(:office_location) do 
+    let(:office_location) do
       OfficeLocation.new(
         is_primary: true,
         address: address,
@@ -558,7 +624,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
 
     context 'when multiple plan years present' do
-      before do 
+      before do
         employer_profile1.save(:validate => false)
       end
 

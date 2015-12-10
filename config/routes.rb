@@ -118,6 +118,7 @@ Rails.application.routes.draw do
     end
 
     resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
+      get :ssn_taken, on: :collection
       get :search, on: :collection
       get :privacy, on: :collection
       post :match, on: :collection
