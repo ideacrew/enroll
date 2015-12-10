@@ -187,7 +187,7 @@
 
 <% if notice.residency_unverified.any? %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the District of Columbia:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the #{Settings.aca.state_name}:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.residency_unverified.map(&:full_name).join("<br>")

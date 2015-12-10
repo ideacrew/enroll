@@ -5,7 +5,7 @@ QualifyingLifeEventKind.create!(
   market_kind: "individual",
   event_kind_label: "Date of birth",
   reason: "birth",
-  edi_code: "02-BIRTH", 
+  edi_code: "02-BIRTH",
   ordinal_position: 10,
   effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
   pre_event_sep_in_days: 0,
@@ -22,7 +22,7 @@ QualifyingLifeEventKind.create!(
   event_kind_label: "Date of adoption",
   ordinal_position: 20,
   reason: "adoption",
-  edi_code: "05-ADOPTION", 
+  edi_code: "05-ADOPTION",
   effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -38,7 +38,7 @@ QualifyingLifeEventKind.create!(
   event_kind_label: "Date of marriage",
   ordinal_position: 30,
   reason: "marriage",
-  edi_code: "32-MARRIAGE", 
+  edi_code: "32-MARRIAGE",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -48,13 +48,13 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "Entered into a legal domestic partnership",
-  tool_tip: "Entering a domestic partnership as permitted or recognized by the District of Columbia",
+  tool_tip: "Entering a domestic partnership as permitted or recognized by the #{Settings.aca.state_name}",
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of domestic partnership",
   ordinal_position: 40,
   reason: "domestic_partnership",
-  edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
+  edi_code: "33-ENTERING DOMESTIC PARTNERSHIP",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -71,7 +71,7 @@ QualifyingLifeEventKind.create!(
   event_kind_label: "Divorce or partnership end date",
   ordinal_position: 45,
   reason: "divorce",
-  edi_code: "01-DIVORCE", 
+  edi_code: "01-DIVORCE",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -88,7 +88,7 @@ QualifyingLifeEventKind.create!(
   market_kind: "individual",
   ordinal_position: 50,
   reason: "lost_access_to_mec",
-  edi_code: "33-LOST ACCESS TO MEC", 
+  edi_code: "33-LOST ACCESS TO MEC",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
@@ -98,14 +98,14 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Moved or moving to the District of Columbia",
+  title: "Moved or moving to the #{Settings.aca.state_name}",
   tool_tip: " ",
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Date of move",
   ordinal_position: 60,
   reason: "relocate",
-  edi_code: "43-CHANGE OF LOCATION", 
+  edi_code: "43-CHANGE OF LOCATION",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60,
@@ -126,7 +126,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",    
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -154,12 +154,12 @@ QualifyingLifeEventKind.create!(
   market_kind: "individual",
   ordinal_position: 90,
   reason: "contract_violation",
-  edi_code: "33-CONTRACT VIOLATION", 
+  edi_code: "33-CONTRACT VIOLATION",
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",       
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -175,7 +175,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 30,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",    
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -259,7 +259,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",    
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -275,7 +275,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",       
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -339,7 +339,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-    # start_of_sep: "Date approved by HBX",       
+    # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
   )
 
@@ -401,7 +401,7 @@ QualifyingLifeEventKind.create!(
   market_kind: "individual",
   ordinal_position: 14,
   reason: "employee_gaining_medicare",
-  edi_code: "33-LOST ACCESS TO MEC", 
+  edi_code: "33-LOST ACCESS TO MEC",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
@@ -410,4 +410,3 @@ QualifyingLifeEventKind.create!(
     # start_of_sep: "60 days before loss of MEC",
     # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
   )
-

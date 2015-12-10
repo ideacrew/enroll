@@ -1,4 +1,4 @@
-
+#
 site:
   short_name: "DC Health Link"
   byline: "DC's Online Health Insurance Marketplace"
@@ -10,21 +10,21 @@ site:
 
   social_media:
     facebook_url: ""
-
+#
 contact_center:
   name: "DC Health Link's Customer Care Center"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
-
+#
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-
+#
   individual_market:
     monthly_enrollment_due_on: 15
-
+#
     open_enrollment:
       benefit_year_2016:
         start_on: <%= Date.new(2015,11,1) %>

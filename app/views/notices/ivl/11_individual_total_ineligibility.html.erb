@@ -42,7 +42,7 @@
 <% if notice.residency_unverified.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because they are not residents of the District of Columbia. They are encouraged to submit another application for the state where they live. You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>.
+  content: "The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because they are not residents of the #{Settings.aca.state_name}. They are encouraged to submit another application for the state where they live. You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>.
     45 C.F.R. §155.305(a)(3)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

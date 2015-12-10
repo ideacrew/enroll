@@ -25,7 +25,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This means that, although you may be eligible to participate in DC Health Link, either with or without financial assistance (such as premium tax credits and/or cost-sharing reductions), you <u>either</u> are not eligible to enroll in a health plan at this time OR are not eligible to <u>change</u> from the plan you are currently enrolled in because open enrollment is closed.  Circumstances that allow individuals to enroll in health plans outside of open enrollment include the following, <u>when reported promptly</u>."} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Moving to the District of Columbia",
+  ["Moving to the #{Settings.aca.state_name}",
    "Birth, adoption, or placement for adoption",
    "Getting married",
    "Losing health coverage during the year",

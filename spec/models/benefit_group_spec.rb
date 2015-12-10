@@ -412,7 +412,7 @@ describe BenefitGroup, type: :model do
     let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
 
     context "and employer contribution for employee" do
-      let(:minimum_contribution) { HbxProfile::ShopEmployerContributionPercentMinimum }
+      let(:minimum_contribution) { Settings.aca.shop_market.employer_contribution_percent_minimum }
       let(:invalid_minimum_contribution) { minimum_contribution - 1 }
 
       context "when the start_on of plan year is Jan 1" do

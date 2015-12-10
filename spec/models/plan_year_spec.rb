@@ -113,7 +113,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and effective date is specified and effective date doesn't provide enough time for enrollment" do
-      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}
       let(:invalid_effective_date)   { (prior_month_open_enrollment_start + 1.month).beginning_of_month }
       before do
         plan_year.effective_date = invalid_effective_date
@@ -133,7 +133,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and effective date is specified and effective date does provide enough time for enrollment" do
-      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}
       let(:valid_effective_date)   { (prior_month_open_enrollment_start + 3.months).beginning_of_month }
       before do
         plan_year.effective_date = valid_effective_date
@@ -163,7 +163,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too short" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 2 }
+        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.minimum_length.days - 2 }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -179,8 +179,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "when open enrollment period is over the end of year" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 2 }
-        let(:valid_length) { HbxProfile::ShopOpenEnrollmentPeriodMinimum + 2 }
+        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.minimum_length.days - 2 }
+        let(:valid_length) { Settings.aca.shop_market.open_enrollment.minimum_length.days + 2 }
         let(:open_enrollment_start_on)  { Date.new(2015,12,30) }
         let(:open_enrollment_end_on_invalid)    { open_enrollment_start_on + invalid_length }
         let(:open_enrollment_end_on_valid)    { open_enrollment_start_on + valid_length }
@@ -205,7 +205,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too long" do
-        let(:invalid_length)  { (HbxProfile::ShopOpenEnrollmentPeriodMaximum).months + 1.day }
+        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.maximum_length.months + 1.day }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -268,7 +268,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too long" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1.day }
+          let(:invalid_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year + 1.day }
           let(:start_on)  { TimeKeeper.date_of_record.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -284,8 +284,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the open enrollment period is 5 days" do
-          let(:minimum_open_enrollment_length) { HbxProfile::ShopOpenEnrollmentPeriodMinimum }
-          let(:open_enrollment_end_on) { Date.new(2015, 7, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth) }
+          let(:minimum_open_enrollment_length) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
+          let(:open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
           let(:open_enrollment_start_on) { open_enrollment_end_on - minimum_open_enrollment_length.days + 1.days }
           before do
             TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 7, 1))
@@ -304,8 +304,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year begins before open enrollment ends" do
-          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum }
-          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum }
+          let(:valid_open_enrollment_length)  { Settings.aca.shop_market.open_enrollment.maximum_length.months }
+          let(:valid_plan_year_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year }
           let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
@@ -323,7 +323,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the effective date is too far in the future" do
-          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
+          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months + 1.month }
           let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }
@@ -514,7 +514,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         let(:invalid_relationship_benefit)  { RelationshipBenefit.new(
                                                 relationship: :employee,
                                                 offered: true,
-                                                premium_pct: HbxProfile::ShopEmployerContributionPercentMinimum - 1
+                                                premium_pct: Settings.aca.shop_market.employer_contribution_percent_minimum - 1
                                               ) }
 
         let(:invalid_benefit_group)         { FactoryGirl.build(:benefit_group,
@@ -656,7 +656,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
                 before do
-                  TimeKeeper.set_date_of_record(submit_date + HbxProfile::ShopApplicationIneligiblePeriodMaximum)
+                  TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
 
                 it "should transition employer to applicant status" do

@@ -2,7 +2,7 @@ module Factories
   class PlanYearRenewalFactory
     include Mongoid::Document
 
-    EARLIEST_RENEWAL_START_ON = HbxProfile::ShopMaximumRenewalPeriodBeforeStartOn
+    EARLIEST_RENEWAL_START_ON = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on
 
     attr_accessor :employer_profile, :is_congress
 
@@ -20,7 +20,7 @@ module Factories
 
       open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
                                          @active_plan_year.open_enrollment_end_on.month,
-                                         HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth)
+                                         Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
 
 
       @renewal_plan_year = @employer_profile.plan_years.build({
