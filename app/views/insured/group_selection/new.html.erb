@@ -158,7 +158,7 @@
     <% end %>
     <% end %>
   </div>
-  <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.present? and @hbx_enrollment.employee_role.present? %>
+  <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? and (@hbx_enrollment.employee_role.present? or @hbx_enrollment.benefit_group.present?)) %>
 </div>
 <script>
   $(function(){
