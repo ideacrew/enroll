@@ -612,22 +612,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
-    let(:census_employee) { FactoryGirl.create(:census_employee) }
-    let(:person) { FactoryGirl.create(:person, ssn: census_employee.ssn) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
-      allow(Person).to receive(:matchable).and_return(nil)
-      expect(census_employee.construct_employee_role_for_match_person).to eq false
+      expect(census_employee1.construct_employee_role_for_match_person).to eq false
     end
 
     it "should return false when match person which has active employee role" do
-      allow(Person).to receive(:matchable).and_return([person])
-      allow(person).to receive(:has_active_employee_role?).and_return true
       expect(census_employee.construct_employee_role_for_match_person).to eq false
     end
 
     it "should return false when match person which has no active employee role" do
-      allow(Person).to receive(:matchable).and_return([person])
+      person.employee_roles.destroy_all
       allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
