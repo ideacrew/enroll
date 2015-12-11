@@ -158,7 +158,16 @@ class Employers::EmployerProfilesController < ApplicationController
   def create
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
-    if @organization.save(current_user)
+    organization_saved = false
+    begin
+      organization_saved = @organization.save(current_user)
+    rescue Exception => e
+      flash[:error] = e.message
+      render action: "new"
+      return
+    end
+
+    if organization_saved
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
         redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')

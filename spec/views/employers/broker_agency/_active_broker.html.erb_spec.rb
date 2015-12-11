@@ -4,7 +4,9 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:broker_agency_account) {
     double(writing_agent: double(
-      person: FactoryGirl.create(:person)
+      person: FactoryGirl.create(:person),
+      phone: '3015551212',
+      email: double('email', address: 'stuff@dc.gov')
     ))
   }
   let(:broker_agency_accounts) { [broker_agency_account] }
@@ -13,6 +15,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   let(:office_location) { double(primary_office_location: primary_office_location )}
   let(:primary_office_location) { double(address: address)}
   let(:address) {double(address_1: "somewhere", city: "Washington", state: "DC", zip: 20002)}
+
 
   before :each do
     assign(:employer_profile, employer_profile)
@@ -38,6 +41,25 @@ describe "employers/broker_agency/_active_broker.html.erb" do
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record - 1.day, direct_terminate: true)
       render "employers/broker_agency/active_broker", direct_terminate: true
       expect(rendered).to have_link('Terminate Broker', href: link)
+    end
+  end
+
+  context "show broker information" do
+
+    before :each do
+      allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+      @employer_profile = employer_profile
+      render "employers/broker_agency/active_broker.html.erb"
+    end
+
+    it "should show Broker Agency name" do
+      expect(rendered).to have_selector('.tt-u', text: broker_agency_profile.legal_name)
+    end
+    it "show should the Broker email" do
+      expect(rendered).to match(/stuff@dc.gov/)
+    end
+    it "show should the Broker phone" do
+      expect(rendered).to match(/3015551212/)
     end
   end
 end
