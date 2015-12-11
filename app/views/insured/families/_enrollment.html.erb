@@ -3,7 +3,7 @@
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
-      <h4 class="bg-title"><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
+      <h4 class="bg-title"><%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
         <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
       </h4>
       <hr>

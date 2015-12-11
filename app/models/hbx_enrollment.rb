@@ -374,6 +374,14 @@ class HbxEnrollment
     self
   end
 
+  def coverage_year
+    year = if self.is_shop?
+      benefit_group.plan_year.start_on.year
+    else
+      plan.active_year
+    end
+  end
+
   def update_current(updates)
     household.hbx_enrollments.where(id: id).update_all(updates)
   end
