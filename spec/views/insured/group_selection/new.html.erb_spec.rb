@@ -347,6 +347,35 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
 
+  context "waive plan" do
+    let(:person) { employee_role.person }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+
+    let(:hbx_enrollment) {HbxEnrollment.new}
+    let(:coverage_household) { double(coverage_household_members: []) }
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'shop'
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(nil)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+    end
+
+    it "should have the waive confirmation modal" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(view).to render_template(:partial => "insured/plan_shoppings/_waive_confirmation", :count => 1)
+    end
+  end
+
   context "market_kind" do
     let(:person) { FactoryGirl.create(:person) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
