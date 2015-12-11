@@ -36,14 +36,6 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>
-                    <div class="enrollment-type info">
-                      <p>
-                        <label class="bullet-separator"><%= HbxProfile::ShortName %> ID:</label>
-                        <strong><%= hbx_enrollment.id.to_s.truncate(8, omission: "").upcase %></strong>
-                      </p>
-                    </div>
-                  </td>
                   <% if hbx_enrollment.coverage_terminated? %>
                    <td>
                     <div class="enrollment-effective info">
@@ -61,7 +53,13 @@
                     </div>
                   </td>
                   <% end %>
-
+                  <td>
+                    <div class="enrollment-created-at info">
+                      <label>Plan Selected:
+                      </label>
+                      <strong><%= format_datetime hbx_enrollment.created_at %></strong>
+                    </div>
+                  </td>
                 </tr>
                 <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
 
@@ -80,11 +78,13 @@
 
               </table>
 
-              <div class="enrollment-created-at info">
-                <label>Plan Selected:
-                </label>
-                <strong><%= format_datetime hbx_enrollment.created_at %></strong>
-              </div>
+
+                <div class="enrollment-type info">
+                  <p>
+                    <label class="bullet-separator"><%= HbxProfile::ShortName %> ID:</label>
+                    <strong><%= hbx_enrollment.hbx_id %></strong>
+                  </p>
+                </div>
 
               <% names = hbx_enrollment.covered_members_first_names %>
               <% if names.present? %>
