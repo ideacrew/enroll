@@ -1,2 +1,2 @@
 $('.navbar-white').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
-alert(123);
+$('#sessionExpirationWarningModal').show();

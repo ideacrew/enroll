@@ -41,14 +41,14 @@ function check_time_until_logout(){
     url: '/check_time_until_logout',
     type: 'GET',
     success: function(response){
-      alert(123);
+      alert('123');
     },
     error: function(response){
       alert("Sorry, something went wrong");
     }
   });
 }
-setTimeout(check_time_until_logout, 2000);
+setTimeout(check_time_until_logout, 10000);
 
 
 function applyFloatLabels() {
