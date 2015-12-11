@@ -206,7 +206,7 @@ describe BrokerRole, dbclean: :after_each do
   end
 
   # Instance methods
-  describe BrokerRole, :dbclean => :after_each do
+  describe BrokerRole, :dbclean => :around_each do
     before :all do 
       @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
