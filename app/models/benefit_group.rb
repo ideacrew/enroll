@@ -40,6 +40,10 @@ class BenefitGroup
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
+  # Employer dental plan_ids
+  field :dental_reference_plan_id, type: BSON::ObjectId
+  field :elected_dental_plan_ids, type: Array, default: []
+
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
@@ -229,6 +233,9 @@ class BenefitGroup
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.relationship_benefits.build(relationship: relationship, offered: true)
+    end
+    self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 

@@ -136,6 +136,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
+    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
     @just_a_warning = false
     if plan_year.publish_pending?
       plan_year.withdraw_pending!
@@ -310,6 +311,9 @@ class Employers::PlanYearsController < ApplicationController
                                       :carrier_for_elected_plan, :metal_level_for_elected_plan,
                                       :plan_option_kind, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
+                                        :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ],
+                                      :dental_relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ]
     ]
