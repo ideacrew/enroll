@@ -8,6 +8,8 @@ class Person
   include UnsetableSparseFields
 
   extend Mongorder
+  validates_with Validations::DateRangeValidator
+
 
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
