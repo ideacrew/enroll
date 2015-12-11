@@ -41,6 +41,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(true)
+      allow(hbx_enrollment).to receive(:hbx_id).and_return(plan.hbx_id)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
