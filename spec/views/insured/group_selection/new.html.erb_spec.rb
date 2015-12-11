@@ -26,6 +26,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
 
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
@@ -109,6 +111,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
       allow(person3).to receive(:consumer_role).and_return(consumer_role3)
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(family_member4).to receive(:first_name).and_return('joey')
@@ -204,7 +208,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { instance_double("CoverageHousehold", coverage_household_members: coverage_household_members) }
 
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group) }
-    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:hbx_enrollment) {HbxEnrollment.new}
 
     before :each do
       assign :person, person
@@ -214,6 +218,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -292,6 +298,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
     it "should display title" do
@@ -338,6 +347,35 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
 
+  context "waive plan" do
+    let(:person) { employee_role.person }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+
+    let(:hbx_enrollment) {HbxEnrollment.new}
+    let(:coverage_household) { double(coverage_household_members: []) }
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'shop'
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(nil)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+    end
+
+    it "should have the waive confirmation modal" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(view).to render_template(:partial => "insured/plan_shoppings/_waive_confirmation", :count => 1)
+    end
+  end
+
   context "market_kind" do
     let(:person) { FactoryGirl.create(:person) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
@@ -352,6 +390,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :coverage_household, coverage_household
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
     it "when present" do
