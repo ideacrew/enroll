@@ -228,12 +228,6 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
-  end
-
-
-
-  def propogate_selection
 
     self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.individual_market.each do |p|
       if p.plan.carrier_profile_id == self.plan.carrier_profile_id
@@ -244,12 +238,34 @@ class HbxEnrollment
       end
     end
 
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.shop_market.each do |p|
-      if p.aasm_state == "coverage_selected"
-        p.cancel_coverage! # State Machine Event - Not working
-        p.update_current(terminated_on: self.effective_on) # Working as Work Around - Sean does not approve of this.
+    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+  end
+
+  def cancel_previous
+    # Indivial market - Perform cancel only if from same carrier
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.individual_market.each do |p|
+      if p.plan.carrier_profile_id == self.plan.carrier_profile_id
+          if p.aasm_state == "coverage_selected"
+            p.cancel_coverage!
+            p.update_current(terminated_on: self.effective_on)
+          end
       end
     end
+
+    # Shop market - Perform Cancels
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.shop_market.each do |p|
+      if p.aasm_state == "coverage_selected"
+        if p.may_cancel_coverage?
+          p.cancel_coverage!
+          p.update_current(terminated_on: self.effective_on)
+        end
+      end
+    end
+  end
+
+  def propogate_selection
+
+    cancel_previous
 
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
