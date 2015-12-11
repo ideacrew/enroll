@@ -2,7 +2,7 @@ class SessionTimeoutController < ApplicationController
   # These are what prevent check_time_until_logout and
   # reset_user_clock from resetting users' Timeoutable
   # Devise "timers"
-  before_action :skip_timeout, only: [:check_time_until_logout, :has_user_timed_out]
+  prepend_before_action :skip_timeout, only: [:check_time_until_logout, :has_user_timed_out]
   def skip_timeout
     request.env["devise.skip_trackable"] = true
   end
