@@ -33,6 +33,7 @@ class Person
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
+  field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
 
@@ -191,6 +192,11 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+  end
+
+  def completed_identity_verification?
+    return false unless user
+    user.identity_verified?
   end
 
   def consumer_fields_validations

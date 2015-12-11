@@ -7,6 +7,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @current_plan_year = @employer_profile.published_plan_year
     @hbx_enrollments = @current_plan_year.hbx_enrollments.first(100) rescue []
 
+
     # @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
     respond_to do |format|

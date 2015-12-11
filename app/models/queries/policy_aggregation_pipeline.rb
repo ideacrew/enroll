@@ -19,6 +19,40 @@ module Queries
       Family.collection.raw_aggregate(@pipeline)
     end
 
+    def denormalize
+      add({
+        "$project" => {
+          "_id" => "$households.hbx_enrollments.hbx_id",
+          "policy_purchased_at" => { 
+            "$dateToString" => {"format" => "%Y-%m-%d %H:%M:S",
+              "date" => {"$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }}},
+          "policy_purchased_on" => {
+            "$dateToString" => {"format" => "%Y-%m-%d",
+                                "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+          }
+          },
+          "policy_effective_on" => {
+            "$dateToString" => {"format" => "%Y-%m-%d",
+            "date" => "$households.hbx_enrollments.effective_on"}},
+          "enrollee_count" => {"$size" => {"$ifNull" => ["$households.hbx_enrollments.hbx_enrollment_members", []]}},
+          "market" => {"$cond" => ["$households.hbx_enrollments.consumer_role_id","SHOP","IVL"]},
+          "plan_id" => "$households.hbx_enrollments.plan_id"
+        }})
+      self
+    end
+
+    def filter_to_active
+      add({
+        "$match" => {
+          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.aasm_state" => { "$nin" => [
+            "shopping", "inactive", "coverage_canceled", "coverage_terminated"
+          ]}
+        }
+      })
+      self
+    end
+
     def filter_to_individual
       add({
         "$match" => {

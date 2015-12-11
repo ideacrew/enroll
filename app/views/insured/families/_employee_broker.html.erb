@@ -1,0 +1,63 @@
+
+
+  <div class="col-md-12 my-broker">
+    <h1>Your Broker</h1>
+    <div class="panel benefitgroup col-xs-12">
+      <section class="col-xs-6">
+        <header class="row">
+          <h5 class="bg-title sb">Your Broker:<span>
+<%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+</span></h5>
+        </header>
+      </section>
+      <section class="col-xs-6">
+        <header class="row">
+        </header>
+      </section>
+      <table>
+        <tr>
+          <td>
+            <header>Your Broker</header>
+          </td>
+          <td>
+            <p><%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
+               <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %></p>
+          </td>
+        </tr>
+        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone.present? %>
+        <tr>
+          <td>
+            <header>Phone Number</header>
+          </td>
+          <td>
+            <p>
+              <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
+            </p>
+          </td>
+        </tr>
+        <% end %>
+        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address.present? %>
+        <tr>
+          <td>
+            <header>Email Address</header>
+          </td>
+          <td>
+            <p>
+              <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>
+            </p>
+          </td>
+        </tr>
+        <% end %>
+
+
+      </table>
+    </div>
+    <div class="col-xs-12">
+      <div class="row">
+      <br/>
+
+      <%= link_to "Back", :back, class: 'btn btn-trans' %>
+    </div>
+    </div>
+
+  </div>

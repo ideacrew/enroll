@@ -8,7 +8,6 @@ describe BenefitGroup, dbclean: :after_each do
         FactoryGirl.create(:census_employee, employer_profile: employer_profile)
       end.sort_by(&:id)
     end
-
     context "and a plan year exists" do
       let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
 
@@ -33,6 +32,17 @@ describe BenefitGroup, dbclean: :after_each do
             date_of_hire = Date.new(2015, 1, 31)
             expected_effective = Date.new(2015, 4, 1)
             expect(benefit_group.effective_on_for(date_of_hire)).to eq expected_effective
+          end
+        end
+      end
+
+      context "starting on 1/1/xxxx" do
+        let(:start_plan_year) {Date.new(2015, 1, 1)}
+        context "and a benefit_group_exists" do
+          let(:benefit_group) { FactoryGirl.create(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+
+          it "is true" do
+            expect(benefit_group.save).to be_truthy
           end
         end
       end

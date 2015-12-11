@@ -23,7 +23,7 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:user).and_return(true)
       subject.uniq_ssn
-      expect(subject.errors[:base]).to eq ["The social security number you entered is affiliated with another account."]
+      expect(subject.errors[:ssn_taken]).to eq ["The social security number you entered is affiliated with another account."]
     end
 
     it "does not add errors when duplicated ssn and no account" do

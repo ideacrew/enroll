@@ -51,21 +51,41 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
   end
 
-  context "waive button" do
-    let(:employee_role) {FactoryGirl.build(:employee_role)}
-    before :each do
-      allow(enrollment).to receive(:employee_role).and_return employee_role
-      assign :enrollment, enrollment
+    context "waive button with employee role" do
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      before :each do
+        allow(enrollment).to receive(:employee_role).and_return employee_role
+        assign :enrollment, enrollment
+      end
+
+      it "should show waive coverage link" do
+        render 'shared/shop_for_plans_progress', step: '1', show_waive: true
+        expect(rendered).to have_selector('a', text: 'Waive Coverage')
+      end
+
+      it "should not show waive coverage link" do
+        render 'shared/shop_for_plans_progress', step: '1'
+        expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
+      end
     end
 
-    it "should show waive coverage link" do
-      render 'shared/shop_for_plans_progress', step: '1', show_waive: true
-      expect(rendered).to have_selector('a', text: 'Waive Coverage')
-    end
+      context "waive button without employee role" do
+        let(:employee_role) {FactoryGirl.build(:employee_role)}
+        let(:benefit_group) {double("Benefit group")}
+        before :each do
+          allow(enrollment).to receive(:employee_role).and_return nil
+          allow(enrollment).to receive(:benefit_group).and_return benefit_group
+          assign :enrollment, enrollment
+        end
 
-    it "should not show waive coverage link" do
-      render 'shared/shop_for_plans_progress', step: '1'
-      expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
-    end
-  end
+        it "should show waive coverage link" do
+          render 'shared/shop_for_plans_progress', step: '1', show_waive: true
+          expect(rendered).to have_selector('a', text: 'Waive Coverage')
+        end
+
+        it "should not show waive coverage link" do
+          render 'shared/shop_for_plans_progress', step: '1'
+          expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
+        end
+      end
 end

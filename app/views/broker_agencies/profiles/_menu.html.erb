@@ -44,7 +44,7 @@
       <% if current_user.has_hbx_staff_role? %>
       <% else %>
       <li role="presentation">
-        <%= link_to url_for(SamlInformation.curam_broker_dashboard), target: '_blank' do %>
+        <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
         Individual-Assisted Dashboard
        <% end %>
       </li>
