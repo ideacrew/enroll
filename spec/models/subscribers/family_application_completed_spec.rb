@@ -331,6 +331,17 @@ describe Subscribers::FamilyApplicationCompleted do
     context "simulating consumer role controller create action" do
       let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml"))).first }
       let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+      let(:dependent) { parser.family_members.last }
+      let!(:existing_dep ) { Person.create(
+          first_name: dependent.person.name_first,
+          last_name: dependent.person.name_last,
+          middle_name: dependent.person.name_middle,
+          name_pfx: dependent.person.name_pfx,
+          name_sfx: dependent.person.name_sfx,
+          dob: dependent.person_demographics.birth_date,
+          ssn: dependent.person_demographics.ssn == "999999999" ? "" : dependent.person_demographics.ssn ,
+          gender: dependent.person_demographics.sex.split('#').last
+        )}
       let(:person) { consumer_role.person }
       let(:ua_params) do
         {
@@ -357,7 +368,8 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:tax_household_db) { family_db.active_household.tax_households.first }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
-      let(:dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
+      let(:new_dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
+      let(:existing_dep_consumer_role_db) { Person.where(first_name: "Megan", last_name: "Zoo").first.consumer_role }
 
       it "should not log any errors" do
         person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
@@ -440,13 +452,22 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
         end
 
-        it "updates all consumer role verifications" do
-          expect(dep_consumer_role_db.fully_verified?).to be_truthy
-          expect(dep_consumer_role_db.vlp_authority).to eq "curam"
-          expect(dep_consumer_role_db.residency_determined_at).to eq primary.created_at
-          expect(dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
-          expect(dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
-          expect(dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+        it "updates all consumer role verifications for dependents new to the system" do
+          expect(new_dep_consumer_role_db.fully_verified?).to be_truthy
+          expect(new_dep_consumer_role_db.vlp_authority).to eq "curam"
+          expect(new_dep_consumer_role_db.residency_determined_at).to eq primary.created_at
+          expect(new_dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+          expect(new_dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(new_dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+        end
+
+        it "updates all consumer role verifications for dependents who already exist in the system" do
+          expect(existing_dep_consumer_role_db.fully_verified?).to be_truthy
+          expect(existing_dep_consumer_role_db.vlp_authority).to eq "curam"
+          expect(existing_dep_consumer_role_db.residency_determined_at).to eq primary.created_at
+          expect(existing_dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+          expect(existing_dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(existing_dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
         end
 
         it "updates the address for the primary applicant's person" do
