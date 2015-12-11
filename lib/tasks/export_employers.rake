@@ -36,7 +36,8 @@ namespace :employers do
                                 benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
                                 benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
                                 plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on
-                                plan_year.fte_count plan_year.pte_count plan_year.msp_count broker_agency_account.corporate_npn broker_agency_account.legal_name)
+                                plan_year.fte_count plan_year.pte_count plan_year.msp_count broker_agency_account.corporate_npn broker_agency_account.legal_name
+                                broker.name)
       csv << headers
 
       employers.each do |employer|
@@ -88,7 +89,12 @@ namespace :employers do
 
                 broker_agency_account = get_broker_agency_account(employer.broker_agency_accounts, plan_year)
                 if broker_agency_account.present?
-                  row += [broker_agency_account.broker_agency_profile.corporate_npn, broker_agency_account.broker_agency_profile.legal_name]
+                  row += [broker_agency_account.broker_agency_profile.primary_broker_role.npn, broker_agency_account.broker_agency_profile.legal_name]
+                  if broker_agency_account.broker_agency_profile.primary_broker_role.present?
+                    row += [broker_agency_account.broker_agency_profile.primary_broker_role.person.first_name + " " + broker_agency_account.broker_agency_profile.primary_broker_role.person.last_name]
+                  else
+                    row += [""]
+                  end
                 else
                   row += ["", ""]
                 end
