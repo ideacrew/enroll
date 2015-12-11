@@ -478,7 +478,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     it "should fail when terminated date not within 60 days" do
-      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 90.days
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 75.days
       expect(census_employee.valid?).to be_falsey
       expect(census_employee.errors[:base].any?).to be_truthy
     end
