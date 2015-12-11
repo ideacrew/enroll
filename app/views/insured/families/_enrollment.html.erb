@@ -57,7 +57,7 @@
                     <div class="enrollment-created-at info">
                       <label>Plan Selected:
                       </label>
-                      <strong><%= hbx_enrollment.created_at %></strong>
+                      <strong><%= format_date(hbx_enrollment.created_at) %> <%= hbx_enrollment.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%I:%M%p") %></strong>
                     </div>
                   </td>
                 </tr>
