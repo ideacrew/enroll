@@ -34,7 +34,7 @@ FactoryGirl.define do
     sequence(:age, (19..66).cycle)
     start_on  "2015-01-01"
     end_on  "2015-12-31"
-    cost {(age * 1001.0) / 100}
+    cost {(age * 1001.00) / 100.00}
   end
 
 
