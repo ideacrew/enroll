@@ -64,18 +64,17 @@
               </header>
             </td>
             <td>
-
-                <% if active_broker.person.phones.any? %>
+                <% if active_broker.phone %>
                 <i class="fa fa-phone"></i>
-                  <%= active_broker.person.phones[0].to_s %>
+                  <%= active_broker.phone %>
                   <% else %>
                   <i class="fa fa-phone"></i>
                   No Phone Number
                 <% end %>
                 <br/>
                 <i class="fa fa-at"></i>
-                <a href="mailto:<%= active_broker.person.emails.first.address %>">
-                  <%= active_broker.person.emails.first.address %>
+                <a href="mailto:<%= active_broker.email.address %>">
+                  <%= active_broker.email.address %>
                 </a>
 
 

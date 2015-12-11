@@ -125,6 +125,11 @@ class BrokerAgencyProfile
     organization.legal_name
   end
 
+  def phone
+    office = organization.primary_office_location
+    office && office.phone.to_s
+  end
+
   def market_kind=(new_market_kind)
     write_attribute(:market_kind, new_market_kind.to_s.downcase)
   end
