@@ -99,7 +99,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         let(:found_person) { [] }
         let(:person){ double("Person") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
-        before :each do 
+        before :each do
           post :match, :person => person_parameters
         end
 
@@ -122,8 +122,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         end
       end
 
-      context "when match employer" do 
-        before :each do 
+      context "when match employer" do
+        before :each do
           allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
@@ -131,7 +131,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           post :match, :person => person_parameters
         end
 
-        it "render employee role match tempalte" do 
+        it "render employee role match tempalte" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template('insured/employee_roles/match')
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
@@ -152,6 +152,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
     end
   end
+
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     before(:each) do
@@ -163,7 +164,11 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       post :create, person: person_params
       expect(response).to have_http_status(:redirect)
     end
+
+
   end
+
+
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     before(:each) do
@@ -289,6 +294,64 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(response).to have_http_status(:success)
       expect(assigns(:target).class).to eq Forms::FamilyMember
       expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+    end
+  end
+
+  context "GET ridp_agreement" do
+    context "on a paper application" do
+      let(:admin_person) { double(:agent? => true) }
+
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        session[:person_id] = person.id
+        allow(user).to receive(:person).and_return(admin_person)
+        allow(Person).to receive(:find).and_return person
+        allow(person).to receive(:consumer_role?).and_return(true)
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        session[:original_application_type] = "paper"
+        get "ridp_agreement"
+      end
+
+      it "should redirect" do
+        expect(response).to be_redirect
+      end
+    end
+
+    context "with a user who has already passed RIDP" do
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        allow(user).to receive(:person).and_return(person)
+        allow(person).to receive(:consumer_role?).and_return(true)
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:completed_identity_verification?).and_return(true) 
+        get "ridp_agreement"
+      end
+
+      it "should redirect" do
+        expect(response).to be_redirect
+      end
+    end
+
+    context "with a user who has not passed RIDP" do
+      before :each do
+        sign_in user
+      end
+
+      before :each do
+        allow(user).to receive(:person).and_return(person)
+        allow(person).to receive(:completed_identity_verification?).and_return(false) 
+        get "ridp_agreement"
+      end
+
+      it "should render the agreement page" do
+        expect(response).to render_template("ridp_agreement")
+      end
     end
   end
 end

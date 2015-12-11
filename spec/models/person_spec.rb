@@ -211,6 +211,16 @@ describe Person do
           @person.is_active = false
           expect(@person.is_active?).to eq false
         end
+
+        context "dob more than 110 years ago" do
+          let(:dob){ 200.years.ago }
+
+          it "should have a validation error" do
+            expect(@person.valid?).to be_falsey
+            expect(@person.errors.full_messages).to include("Dob date cannot be more than 110 years ago")
+          end
+
+        end
       end
 
       context "with invalid date values" do

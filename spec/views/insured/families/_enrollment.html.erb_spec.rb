@@ -39,6 +39,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
@@ -70,6 +71,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
 
     before :each do
+      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
@@ -93,6 +95,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
 
     before :each do
+      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 

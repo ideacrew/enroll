@@ -76,7 +76,7 @@ $(document).on('page:update', function(){
 
 
   } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
-    validatePlanYear()
+    validatePlanYear();
 
     $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
       validatePlanYear();
@@ -120,19 +120,24 @@ function getCarrierPlans(ep, ci) {
         return;
       }
     });
-    editbgemployeepremiums.each(function() {
+    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+      editvalidatedbgemployeepremiums = true;
+      editvalidated = true;
+    } else {
+      editbgemployeepremiums.each(function() {
 
-      if ( parseInt($(this).val() ) >= parseInt(50) ) {
-        editvalidatedbgemployeepremiums = true
-        editvalidated = true;
+        if ( parseInt($(this).val() ) >= parseInt(50) ) {
+          editvalidatedbgemployeepremiums = true
+          editvalidated = true;
+        } else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          editvalidatedbgemployeepremiums = false;
+          editvalidated = false;
+          return false;
 
-      } else {
-        editvalidatedbgemployeepremiums = false;
-        editvalidated = false;
-
-        return;
-      }
-    });
+        }
+      });
+    }
 
     if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
       editvalidatedreferenceplanselections = true
@@ -183,19 +188,22 @@ function getCarrierPlans(ep, ci) {
           return;
         }
       });
-      bgemployeepremiums.each(function() {
-
-        if ( parseInt($(this).val() ) >= parseInt(50) ) {
-          validatedbgemployeepremiums = true
-          validated = true;
-
-        } else {
-          validatedbgemployeepremiums = false;
-          validated = false;
-
-          return;
-        }
-      });
+      if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+        validatedbgemployeepremiums = true;
+        validated = true;
+      } else {
+        bgemployeepremiums.each(function() {
+          if ( parseInt($(this).val()) >= parseInt(50) ) {
+            validatedbgemployeepremiums = true;
+            validated = true;
+          } else {
+            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+            validatedbgemployeepremiums = false;
+            validated = false;
+            return false;
+          }
+        });
+      }
 
       if ( referenceplanselections.length != $('.benefit-group-fields').length ) {
         validatedreferenceplanselections = false
@@ -254,7 +262,20 @@ $(document).ready(function () {
   if ( $('.plan-year').find('.fa-star.enrolling, .fa-star.published').length )  {
     $('.plan-year').find('.fa-star.enrolling, .fa-star.published').closest('.plan-year').find('a.benefit-details').trigger('click');
   }
-  // check that dob entered is not a future date
+
+  // check dates are not before 1900
+    $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"], [id*="date"]', function() {
+        var entered_date = $(this).val();
+        var entered_year =  entered_date.substring(entered_date.length -4);
+
+        if ((entered_year.length == 4) && (entered_year < (new Date().getFullYear() - 110))) {
+            alert("Please enter a date not more than 110 years ago.");
+            $(this).val("");
+            $(this).focus();
+        }
+    });
+
+        // check that dob entered is not a future date
   $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
     var entered_dob = $(this).val();
     var entered_year = entered_dob.substring(entered_dob.length -4);

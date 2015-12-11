@@ -598,6 +598,23 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "coverage_year" do
+    let(:date){ TimeKeeper.date_of_record }
+    let(:plan_year){ PlanYear.new(start_on: date) }
+    let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
+    let(:plan){ Plan.new(active_year: date.year) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, kind: "employer_sponsored", plan: plan) }
+
+    it "should return plan year start on year when shop" do
+      expect(hbx_enrollment.coverage_year).to eq date.year
+    end
+
+    it "should return plan year when ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("")
+      expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.plan.active_year
+    end
+  end
+
   context "calculate_effective_on_from" do
     let(:date) {TimeKeeper.date_of_record}
     let(:family) { double(current_sep: double(effective_on:date), is_under_special_enrollment_period?: true) }
@@ -636,6 +653,34 @@ describe HbxProfile, "class methods", type: :model do
         allow(bcp).to receive(:earliest_effective_date).and_return effective_on
         allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
         expect(HbxEnrollment.calculate_effective_on_from(market_kind:'individual', qle:false, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: benefit_sponsorship)).to eq effective_on
+      end
+    end
+  end
+
+  context "can_terminate_coverage?" do
+    let(:hbx_enrollment) {HbxEnrollment.new(
+                            kind: 'employer_sponsored',
+                            aasm_state: 'coverage_selected',
+                            effective_on: TimeKeeper.date_of_record - 10.days
+                          )}
+    it "should return false when may not terminate_coverage" do
+      hbx_enrollment.aasm_state = 'inactive'
+      expect(hbx_enrollment.can_terminate_coverage?).to eq false
+    end
+
+    context "when may_terminate_coverage is true" do
+      before :each do
+        hbx_enrollment.aasm_state = 'coverage_selected'
+      end
+
+      it "should return true" do
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record - 10.days
+        expect(hbx_enrollment.can_terminate_coverage?).to eq true
+      end
+
+      it "should return false" do
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record + 10.days
+        expect(hbx_enrollment.can_terminate_coverage?).to eq false
       end
     end
   end

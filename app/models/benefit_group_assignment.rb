@@ -21,8 +21,16 @@ class BenefitGroupAssignment
   validates_presence_of :benefit_group_id, :start_on, :is_active
   validate :date_guards, :model_integrity
 
-  scope :by_benefit_group_id, ->(benefit_group_id) {where(benefit_group_id: benefit_group_id)}
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
+      
+  def self.by_benefit_group_id(bg_id)
+    census_employees = CensusEmployee.where({
+      "benefit_group_assignments.benefit_group_id" => bg_id
+    })
+    census_employees.flat_map(&:benefit_group_assignments).select do |bga|
+      bga.benefit_group_id == bg_id
+    end
+  end
 
   class << self
     def find(id)
@@ -94,6 +102,7 @@ class BenefitGroupAssignment
 
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated
+      transitions from: :coverage_renewing, to: :coverage_terminated
     end
 
     event :delink_coverage do
