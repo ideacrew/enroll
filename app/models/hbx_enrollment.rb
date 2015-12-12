@@ -229,43 +229,36 @@ class HbxEnrollment
 
   def propogate_waiver
 
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.individual_market.each do |p|
-      if p.plan.carrier_profile_id == self.plan.carrier_profile_id
-          if p.aasm_state == "coverage_selected"
-            p.cancel_coverage! # State Machine Event - Not working
-            p.update_current(terminated_on: self.effective_on) # Working as Work Around - Sean does not approve of this.
-          end
-      end
+    if benefit_group_assignment.may_waive_coverage?
+      cancel_previous(self.effective_on.year)
+      benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+    else
+      return false
     end
 
-    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
   end
 
-  def cancel_previous
+  def cancel_previous(year)
     # Indivial market - Perform cancel only if from same carrier
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.individual_market.each do |p|
-      if p.plan.carrier_profile_id == self.plan.carrier_profile_id
-          if p.aasm_state == "coverage_selected"
-            p.cancel_coverage!
-            p.update_current(terminated_on: self.effective_on)
-          end
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.individual_market.each do |p|
+      if p.plan.carrier_profile_id == self.plan.carrier_profile_id && p.aasm_state == "coverage_selected"
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
       end
     end
 
     # Shop market - Perform Cancels
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(self.plan.active_year).cancel_eligible.shop_market.each do |p|
-      if p.aasm_state == "coverage_selected"
-        if p.may_cancel_coverage?
-          p.cancel_coverage!
-          p.update_current(terminated_on: self.effective_on)
-        end
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.shop_market.each do |p|
+      if p.aasm_state == "coverage_selected" && p.may_cancel_coverage?
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
       end
     end
   end
 
   def propogate_selection
 
-    cancel_previous
+    cancel_previous(self.plan.active_year)
 
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
