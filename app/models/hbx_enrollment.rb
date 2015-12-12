@@ -104,10 +104,12 @@ class HbxEnrollment
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :by_coverage_kind,    ->(kind) { where(coverage_kind: kind)}
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :waived,              ->{ where(:aasm_state.in => ["inactive", "renewing_waived"] )}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected", "coverage_enrolled"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
@@ -226,10 +228,38 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+
+    if benefit_group_assignment.may_waive_coverage?
+      cancel_previous(self.effective_on.year)
+      benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+    else
+      return false
+    end
+
+  end
+
+  def cancel_previous(year)
+    # Indivial market - Perform cancel only if from same carrier
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.individual_market.each do |p|
+      if p.plan.carrier_profile_id == self.plan.carrier_profile_id && p.aasm_state == "coverage_selected"
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
+      end
+    end
+
+    # Shop market - Perform Cancels
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.shop_market.each do |p|
+      if p.aasm_state == "coverage_selected" && p.may_cancel_coverage?
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
+      end
+    end
   end
 
   def propogate_selection
+
+    cancel_previous(self.plan.active_year)
+
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
@@ -691,6 +721,10 @@ class HbxEnrollment
 
     event :waive_coverage do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
+    end
+
+    event :cancel_coverage do
+      transitions from: [:coverage_selected, :coverage_enrolled], to: :coverage_canceled
     end
 
     event :terminate_coverage do
