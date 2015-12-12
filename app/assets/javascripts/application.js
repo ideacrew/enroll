@@ -44,7 +44,7 @@ function check_time_until_logout(){
     }
   });
 }
-setTimeout(check_time_until_logout, 870000);
+setTimeout(check_time_until_logout, 87000);
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({

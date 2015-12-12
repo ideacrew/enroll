@@ -1,18 +1,22 @@
+<% if @time_left <= 30 %>
 $('.navbar-white').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
 $('#sessionExpirationWarningModal').show();
-
 // reset user clock
 $('#stay-logged-in').on('click', function() {
     $.ajax({
       url: '/reset_user_clock',
       type: 'GET',
       success: function(response){
-        $('#sessionExpirationWarningModal').hide();
-        setTimeout(check_time_until_logout, 870000);
+//        $('#sessionExpirationWarningModal').hide();
+        $('#sessionExpirationWarningModal').remove();
+        setTimeout(check_time_until_logout, <%= (Devise.timeout_in - 30) * 1000 %>);
       },
       error: function(response){
-        alert('Your session has already expired, please login again to continute.')
+        window.location.reload();
       }
     });
 
 });
+<% else %>
+setTimeout(check_time_until_logout, <%= (@time_left - 30) * 1000 %>);
+<% end %>
