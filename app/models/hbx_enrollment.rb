@@ -68,6 +68,7 @@ class HbxEnrollment
   field :terminated_on, type: Date
 
   field :plan_id, type: BSON::ObjectId
+  field :carrier_profile_id, type: BSON::ObjectId
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
@@ -96,6 +97,7 @@ class HbxEnrollment
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
+
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
@@ -111,6 +113,7 @@ class HbxEnrollment
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :waived,              ->{ where(:aasm_state.in => ["inactive", "renewing_waived"] )}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
@@ -363,11 +366,14 @@ class HbxEnrollment
 
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
+    #binding.pry
     self.plan_id = new_plan._id
+    self.carrier_profile_id = new_plan.carrier_profile_id #new_plan.carrier_profile_id
     @plan = new_plan
   end
 
   def plan
+    #binding.pry
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
@@ -763,6 +769,10 @@ class HbxEnrollment
 
     event :waive_coverage do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
+    end
+
+    event :cancel_coverage do
+      transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     end
 
     event :terminate_coverage do

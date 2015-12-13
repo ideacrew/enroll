@@ -9,7 +9,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def checkout
     plan = Plan.find(params.require(:plan_id))
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.update_current(plan_id: plan.id)
+    hbx_enrollment.update_current(plan_id: plan.id, carrier_profile_id: plan.carrier_profile_id)
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
     session.delete(:pre_hbx_enrollment_id)
@@ -226,6 +226,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end
     end
+
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
     @carrier_names_map = Organization.valid_carrier_names_filters.select{|k, v| carrier_profile_ids.include?(k)}

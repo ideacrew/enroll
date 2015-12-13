@@ -11,7 +11,25 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @family.enrollments.order(submitted_at: :desc, effective_on: :desc, coverage_kind: :desc) || []
 
-    @enrollment_filter = Family.collection.aggregate([
+    @enrollment_filter = @family.collection.aggregate([
+      {"$match" => {'_id' => @family._id}},
+      #{"$lookUp" => {
+      #  "from" => "plans",
+      #  "localField" => "plan_id",
+      #  "foreignField" => "_id",
+      #  "as" => "plan"
+      #  }},
+      {"$unwind" => '$households'},
+      {"$unwind" => '$households.hbx_enrollments'},
+      #{"$unwind" => '$households.hbx_enrollments.plan'},
+      {"$match" => {"aasm_state" => {"$ne" => 'inactive'}}},
+      {"$sort" => {"submitted_at" => -1 }},
+      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'}, 'provider_id' => '$households.hbx_enrollments.carrier_profile_id', 'state' => '$households.hbx_enrollments.aasm_state', 'kind' => '$households.hbx_enrollments.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
+      ])
+
+
+    @fil = Family.collection.aggregate([
       {"$match" => {'_id' => @family._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
