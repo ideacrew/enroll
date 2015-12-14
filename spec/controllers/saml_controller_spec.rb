@@ -94,17 +94,17 @@ RSpec.describe SamlController do
       context "with no mail attribute" do
         let(:attributes_double) {{ }}
 
-      #   it "should render a 403 and log the error as critical" do
-      #     expect(subject).to receive(:log) do |arg1, arg2|
-      #       expect(arg1).to match(/ERROR: SAMLResponse has missing required mail attribute/)
-      #       expect(arg2).to eq(:severity => 'critical')
-      #     end
+        it "should render a 403 and log the error as critical" do
+          expect(subject).to receive(:log) do |arg1, arg2|
+            expect(arg1).to match(/ERROR: SAMLResponse has missing required mail attribute/)
+            expect(arg2).to eq(:severity => 'critical')
+          end
 
-      #     post :login, :SAMLResponse => sample_xml
-      #     expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
-      #     expect(response).to have_http_status(403)
-      #   end
-      # end
+          post :login, :SAMLResponse => sample_xml
+          expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
+          expect(response).to have_http_status(403)
+        end
+      end
     end
   end
 
