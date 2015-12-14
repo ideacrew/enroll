@@ -6,8 +6,8 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
 
   end
 
@@ -15,6 +15,7 @@ class Employers::PlanYearsController < ApplicationController
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
+    @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
 
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
@@ -73,6 +74,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+      # benefit_group.elected_dental_plans =
     end
 
     if @employer_profile.default_benefit_group.blank?
