@@ -72,10 +72,9 @@ class CoverageHousehold
   def add_coverage_household_member(family_member)
     return if coverage_household_members.where(family_member_id: family_member.id).present?
 
-    chm = CoverageHouseholdMember.new(
+    coverage_household_members.build(
       family_member: family_member,
-      is_subscriber: family_member.is_primary_applicant?,
-      coverage_household: self
+      is_subscriber: family_member.is_primary_applicant?
     )
 
     # chm.save_parent
