@@ -5049,15 +5049,20 @@ input:required:valid {
     display: none;
   }
 }
-
 @media print {
   body * {
-    visibility:hidden;
   }
   body {
     background: #FFF;
+    #home {
+      .col-md-2:first-of-type {
+        display: none;
+      }
+    }
   }
   body button, body a, body .content {
+  }
+  body a {
     display: none;
   }
   #printSection, #printSection * {
