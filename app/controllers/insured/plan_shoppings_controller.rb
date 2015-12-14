@@ -140,7 +140,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
       hbx_enrollment.propogate_terminate
       redirect_to family_account_path
-    elsif hbx_enrollment.may_cancel_coverage?
+    elsif hbx_enrollment.may_cancel_coverage? # This is in place if trying to "terminate" an Enrollment in Coverage Selected
       hbx_enrollment.cancel_coverage!
       hbx_enrollment.update_current(terminated_on: hbx_enrollment.effective_on)
       redirect_to family_account_path
