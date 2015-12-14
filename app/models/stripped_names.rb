@@ -11,10 +11,6 @@ module StrippedNames
     write_attribute(:last_name, val.blank? ? nil : val.strip)
   end
 
-  def name_pfx=(val)
-    write_attribute(:name_pfx, val.blank? ? nil : val.strip)
-  end 
-
   def name_sfx=(val)
     write_attribute(:name_sfx, val.blank? ? nil : val.strip)
   end 
