@@ -83,7 +83,7 @@ QualifyingLifeEventKind.create!(
     reason: "lost_access_to_mec",
     edi_code: "33-LOST ACCESS TO MEC", 
     market_kind: "shop", 
-    effective_on_kinds: ["first_of_month"],
+    effective_on_kinds: ["first_of_next_month"],
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
