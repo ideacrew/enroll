@@ -150,8 +150,6 @@ class Insured::FamiliesController < FamiliesController
   def purchase
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
 
-    binding.pry
-
     if @enrollment.present?
       plan = @enrollment.try(:plan)
       if @enrollment.is_shop?
