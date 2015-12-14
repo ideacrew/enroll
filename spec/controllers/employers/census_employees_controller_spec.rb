@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: "2015-1-1", hired_on: "2014-11-11") }
+  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 45.days,  hired_on: "2014-11-11") }
   let(:census_employee_params) {
     {"first_name" => "aqzz",
      "middle_name" => "",
@@ -12,6 +12,7 @@ RSpec.describe Employers::CensusEmployeesController do
      "is_business_owner" => true,
      "hired_on" => "05/02/2015",
      "employer_profile_id" => employer_profile_id} }
+
 
   describe "GET new" do
     let(:user) { double("user") }
@@ -50,6 +51,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
+      allow(census_employee).to receive(:check_coverage_terminated_on).and_return(true)
     end
 
     it "should be redirect when valid" do
@@ -268,7 +270,7 @@ RSpec.describe Employers::CensusEmployeesController do
         sign_in
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
         allow(CensusEmployee).to receive(:find).and_return(census_employee)
-        xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
+        xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
         expect(response).to have_http_status(:success)
         expect(flash[:error]).to eq "Census Employee is already active."
       end
@@ -292,7 +294,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
-          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
+          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
         end
@@ -303,7 +305,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
-          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
+          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
           expect(assigns(:census_employee)).to eq new_census_employee
@@ -311,7 +313,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
         it "when new_census_employee invalid" do
           allow(new_census_employee).to receive(:valid?).and_return(false)
-          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
+          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Error during rehire."
         end

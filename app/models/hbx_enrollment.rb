@@ -374,6 +374,14 @@ class HbxEnrollment
     self
   end
 
+  def coverage_year
+    year = if self.is_shop?
+      benefit_group.plan_year.start_on.year
+    else
+      plan.active_year
+    end
+  end
+
   def update_current(updates)
     household.hbx_enrollments.where(id: id).update_all(updates)
   end
@@ -478,7 +486,7 @@ class HbxEnrollment
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ? 
+    benefit_group_assignment = plan_year.is_renewing? ?
         census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
@@ -510,7 +518,7 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
-  
+
       enrollment.benefit_group_id = benefit_group.id
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
     when consumer_role.present?

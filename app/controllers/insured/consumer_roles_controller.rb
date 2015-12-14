@@ -86,12 +86,18 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     if !session[:already_has_consumer_role] == true
-      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-      if @consumer_role.present?
-        @person = @consumer_role.person
-      else
+      begin
+        @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+        if @consumer_role.present?
+          @person = @consumer_role.person
+        else
         # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
+          render file: 'public/500.html', status: 500
+          return
+        end
+      rescue Exception => e
+        flash[:error] = set_error_message(e.message)
+        redirect_to search_insured_consumer_role_index_path
         return
       end
     else
@@ -167,10 +173,12 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def ridp_agreement
+    set_current_person
     if session[:original_application_type] == 'paper'
-      set_current_person
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       return
+    elsif @person.completed_identity_verification?
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
     end
@@ -221,6 +229,14 @@ class Insured::ConsumerRolesController < ApplicationController
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
       # render 'privacy'
+    end
+  end
+
+  def set_error_message(message)
+    if message.include? "year too big to marshal"
+      return "Date of birth cannot be more than 110 years ago"
+    else
+      return message
     end
   end
 end

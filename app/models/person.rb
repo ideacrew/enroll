@@ -8,6 +8,8 @@ class Person
   include UnsetableSparseFields
 
   extend Mongorder
+  validates_with Validations::DateRangeValidator
+
 
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
@@ -190,6 +192,11 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+  end
+
+  def completed_identity_verification?
+    return false unless user
+    user.identity_verified?
   end
 
   def consumer_fields_validations
