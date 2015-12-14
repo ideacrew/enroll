@@ -53,13 +53,16 @@
                     </div>
                   </td>
                   <% end %>
+                  <% if hbx_enrollment.benefit_group.present? && hbx_enrollment.benefit_group.is_congress && hbx_enrollment.created_at <= Time.zone.parse("2015-11-09 14:00:00").utc || !hbx_enrollment.consumer_role_id.blank? && hbx_enrollment.created_at <= Time.zone.parse("2015-10-13 14:00:00").utc %>
+                  <% else %>
                   <td>
                     <div class="enrollment-created-at info">
                       <label>Plan Selected:
                       </label>
-                      <strong><%= format_date(hbx_enrollment.created_at) %> <%= hbx_enrollment.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%I:%M%p") %></strong>
+                      <strong><%= format_date(hbx_enrollment.created_at) %> (<%= hbx_enrollment.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%-I:%M%p") %>)</strong>
                     </div>
                   </td>
+                  <% end %>
                 </tr>
                 <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
 
