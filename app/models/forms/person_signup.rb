@@ -3,7 +3,8 @@ module Forms
     include ActiveModel::Validations
     attr_accessor :id
     attr_accessor :person
-    attr_accessor :first_name, :last_name, :email, :dob
+    include FnameLname
+    attr_accessor :email, :dob
 
     validates_presence_of :dob
     validates_presence_of :first_name

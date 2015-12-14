@@ -11,6 +11,8 @@ class CensusMember
   field :last_name, type: String
   field :name_sfx, type: String
 
+  include StrippedNames
+
   field :encrypted_ssn, type: String
   field :dob, type: Date
   field :gender, type: String
