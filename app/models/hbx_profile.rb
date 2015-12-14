@@ -106,6 +106,8 @@ class HbxProfile
 
   # FIXME
   IndividualEnrollmentDueDayOfMonth = 15
+  IndividualEnrollmentTerminationMinimum = 14.days
+
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,
