@@ -1,6 +1,25 @@
+
 <% if @time_left <= 30 %>
 $('.navbar-white').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
 $('#sessionExpirationWarningModal').show();
+
+// make time left count down
+var countdown_timer = setInterval(session_countdown, 1000);
+
+function session_countdown (){
+  time = parseInt($('#sessionExpirationWarningModal p strong').text());
+  new_time = time - 1;
+  $('#sessionExpirationWarningModal p strong').text(new_time)
+  console.log(new_time);
+  if ( new_time == 0 ) {
+    clearInterval(countdown_timer);
+    $('#sessionExpirationWarningModal p').text("Your session has timed out due to inactivity. Please log back in.");
+    $('h4#modal-title').text("Session Ended");
+    $('.modal-footer .btn-trans').hide();
+    $('.modal-footer .btn-primary').text('Login');
+  }
+}
+
 // reset user clock
 $('#stay-logged-in').on('click', function() {
     $.ajax({
