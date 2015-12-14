@@ -230,7 +230,6 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-
     if benefit_group_assignment.may_waive_coverage?
       cancel_previous(self.effective_on.year)
       benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment

@@ -41,15 +41,11 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived
     update_changing_hbxs(@hbx_enrollments)
 
-    #binding.pry
-
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
     unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
-
-    #binding.pry
 
     @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
     @employee_role = @person.employee_roles.active.first
@@ -153,6 +149,8 @@ class Insured::FamiliesController < FamiliesController
 
   def purchase
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+
+    binding.pry
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
