@@ -9,7 +9,7 @@ class Insured::GroupSelectionController < ApplicationController
     elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
       'individual'
     else
-      redirect_to "http://httpstatusdogs.com/wp-content/uploads/300.jpg"
+      nil
     end
   end
 
