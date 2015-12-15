@@ -100,39 +100,7 @@
           </span>
         </h4>
       <br/>
-      <% @dental_plans.each do |p| %>
-      <div class="col-xs-3">
-        <div class="col-xs-12 dental-reference-plan">
-          <div class="col-xs-3">
-            <%= f.check_box :dental_reference_plan_id, {:multiple => true}, p.id %>
-            <%= f.label :dental_reference_plan_id do %>
-            <i class="fa fa-check-square-o fa-2x"></i>
-            <i class="fa fa-square-o fa-2x"></i>
-            <% end %>
-          </div>
-
-          <div class="col-xs-9">
-            <div class="panel row">
-              <div class="panel-heading">
-                <h3><%= p.name %></h3>
-              </div>
-              <div class="panel-body">
-                <span class="plan-label">Type: </span><span><%= p.plan_type %></span><br>
-                <span class="plan-label">Carrier: </span><span><%= @carriers_cache[p.carrier_profile_id] %></span><br>
-                <span class="plan-label">Level: </span><span><%= p.metal_level %></span><br>
-                <span class="plan-label">Network: </span><span><%= p.nationwide ? 'Nationwide' : 'DC Metro' %></span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <% end %>
-
     <% if @plan_year.new_record? %>
-    <% 13.times.each do %>
-      <%= f.text_field :dental_reference_plan_id, value: "", class: "dental-ref-plans hidden-param" %>
-    <% end %>
     <% else %>
       <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plans hidden-param" %>
     <% end %>
