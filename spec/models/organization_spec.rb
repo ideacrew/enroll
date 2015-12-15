@@ -149,6 +149,7 @@ RSpec.describe Organization, dbclean: :after_each do
 
     context ".scopes" do 
       context 'approved_broker_agencies' do 
+
         before do 
           @agency1.broker_agency_profile.approve!
         end
@@ -166,6 +167,32 @@ RSpec.describe Organization, dbclean: :after_each do
 
         it 'should return shop market agencies' do
           expect(Organization.broker_agencies_by_market_kind(['shop', 'both']).count).to eq(2)
+        end 
+      end
+
+      context 'by_broker_agency_profile' do  
+        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
+        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
+        let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
+        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+        let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
+
+        it 'should match employers with active broker agency_profile' do
+          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
+          expect(employers.size).to eq(1)
+        end
+
+        it 'broker agency_profile match does not count unless active account' do
+          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
+          expect(employers.size).to eq(1)
+          employer = Organization.find(employer.organization.id).employer_profile
+          employer.hire_broker_agency(broker_agency_profile7)
+          employer.save
+          employer = Organization.find(employer.organization.id).employer_profile
+          employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
+          expect(employers.size).to eq(0)
         end 
       end
     end

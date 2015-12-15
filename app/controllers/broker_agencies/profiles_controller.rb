@@ -134,8 +134,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
     else
-      broker_role_id = current_user.person.broker_role._id
-      @orgs = Organization.where({'employer_profile.broker_agency_accounts.writing_agent_id' => broker_role_id})
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
     end
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
