@@ -1,10 +1,24 @@
 <p>
-  <i class="fa fa-refresh fa-spin" style="color:green"></i> Review in progress
-  <i class="fa fa-times-circle" style="color:red"></i> No valid documents
+  <i class="fa fa-refresh fa-spin" style="color:green"></i> Review in progress&nbsp&nbsp
+  <i class="fa fa-times-circle" style="color:red"></i> No valid documents&nbsp&nbsp
   <i class="fa fa-file"></i> New documents uploaded
-</p>
+</p><br>
+
+<div class="row container">
+  <!-- <%= link_to "Verification type", consumer_role_status_documents_path(), remote: true, class: "btn btn-default" %> -->
+  <%= admin_docs_filter 'waiting', "Doc waiting for review", "btn btn-default" %>
+  <%= admin_docs_filter 'no_docs_uloaded', "Missing documents", "btn btn-default" %>
+  <!-- <%= admin_docs_filter 'uqhp', "UQHP", "btn btn-default" %>
+  <%= admin_docs_filter 'aqhp', "AQHP", "btn btn-default" %> -->
+  <div class="form-inline button-group-wrapper">
+    <div class="input-group search-wp">
+      <%= render 'shared/search', url: consumer_role_status_documents_path, q: @search, placeholder: "First/Last Name, SSN", remote: true %>
+    </div>
+  </div>
+</div>
 
   <div class="documents-table">
+  <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets %>
     <div class="table-responsive">
       <table class="table table-hover table-striped">
         <col width="250">
@@ -15,13 +29,13 @@
         <col width="100">
         <col width="170">
         <tr>
-          <th>HBX id</th>
-          <th>First name</th>
-          <th>Last name</th>
-          <th># of Docs</th>
-          <th>Time remaining for verification</th>
-          <th>Review status</th>
-          <th>Review</th>
+          <th class="text-center">HBX id</th>
+          <th><%= admin_docs_filter 'first_name', " First name", 'admin_docs' %></th>
+          <th><%= admin_docs_filter 'last_name', " Last name", 'admin_docs'  %></th>
+          <th class="text-center"> # of Docs</th>
+          <th class="text-center"><%= admin_docs_filter 'created_at', " Remaining time", 'admin_docs'  %></th>
+          <th class="text-center">Review status</th>
+          <th class="text-center">Review</th>
         </tr>
 
         <% @unverified_persons.each do |person| %>
@@ -29,7 +43,7 @@
           <td><%= person.hbx_id %></td>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
-          <td style="text-align:center;"><%= person.consumer_role.vlp_documents.where(identifier: {:$exists => true}).count %></td>
+          <td style="text-align:center;"><%= person.consumer_role.vlp_documents.uploaded.count %></td>
           <td style="text-align:center;"><%= time_remaining_in_words(person.created_at) %></td>
           <td style="text-align:center;">
             <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
@@ -40,9 +54,11 @@
               <i class="fa fa-times-circle" style="color:red"></i>
             <% end %>
           </td>
-          <th><%= link_to "Review documents", documents_path(:person_id => person.id, :status=>"in review"), class: "btn btn-default" %></th>
+          <th><%= link_to "Docs review", documents_path(:person_id => person.id, :status=>"in review"), class: "btn btn-default" %></th>
         </tr>
         <% end %>
       </table>
     </div>
+    <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets %>
+
   </div>

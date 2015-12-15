@@ -87,6 +87,8 @@ class VlpDocument < Document
 
   field :comment, type: String
 
+  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
+
   validates :subject,
         inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
         allow_blank: false
