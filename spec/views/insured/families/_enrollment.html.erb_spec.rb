@@ -21,6 +21,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :coverage_kind => "health",
       :hios_id => "19393939399",
       :plan_type => "A plan type",
+      :created_at =>  TimeKeeper.date_of_record,
 
       :nationwide => true,
       :deductible => 0,
@@ -36,13 +37,19 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employee_role: nil, status_step: 2, applied_aptc_amount: 23.00, aasm_state: 'coverage_selected')}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
+      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
+
+
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
-
     it "should open the sbc pdf" do
       expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
@@ -63,15 +70,25 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "with consumer_role" do
-    let(:plan) {FactoryGirl.build(:plan)}
-   
+    let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
+
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
+   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
+      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
+      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
+
+
+
+
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
@@ -87,15 +104,24 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "about covered_members_first_names of hbx_enrollment" do
-    let(:plan) {FactoryGirl.build(:plan)}
-   
+    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record)}
+
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: [], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employee_role: nil, status_step: 2, aasm_state: 'coverage_selected')}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
+      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
+      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
+
+
+
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 

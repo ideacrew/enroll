@@ -1,9 +1,12 @@
+require 'autoinc'
+
 class Family
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Sortable
+  include Mongoid::Autoinc
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -11,7 +14,9 @@ class Family
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
 
-  auto_increment :hbx_assigned_id, seed: 9999
+  field :hbx_assigned_id, type: Integer
+
+  increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
   field :e_status_code, type: String

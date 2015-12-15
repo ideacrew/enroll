@@ -305,7 +305,21 @@ module Factories
 
     def self.save_all_or_delete_new(*list)
       objects_to_save = list.reject {|o| !o.changed?}
-      num_saved = objects_to_save.count { |o| o.save }
+      num_saved = objects_to_save.count do |o|
+        begin
+          o.save
+        rescue => e
+          error_message = {
+            :error => {
+              :message => "unable to save object in enrollment factory",
+              :object_kind => o.class.to_s,
+              :object_id => o.id.to_s
+            }
+          }
+          log(JSON.dump(error_message), {:severity => 'critical'})
+          raise e
+        end
+      end
       if num_saved < objects_to_save.count
         objects_to_save.each {|o| o.delete}
         false
