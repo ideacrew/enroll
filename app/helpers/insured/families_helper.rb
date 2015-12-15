@@ -9,7 +9,7 @@ module Insured::FamiliesHelper
   end
 
   def hide_policy_selected_date?(hbx_enrollment)
-    return false if hbx_enrollment.created_at.blank?
+    return true if hbx_enrollment.created_at.blank?
     return true if hbx_enrollment.benefit_group.present? && hbx_enrollment.benefit_group.is_congress && hbx_enrollment.created_at <= Time.zone.parse("2015-11-09 14:00:00").utc
     return true if !hbx_enrollment.consumer_role_id.blank? && hbx_enrollment.created_at <= Time.zone.parse("2015-10-13 14:00:00").utc
     false
