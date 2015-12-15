@@ -81,7 +81,7 @@
 
           <% if @market_kind.present? %>
             <%= hidden_field_tag 'market_kind', @market_kind %>
-          <% else %>
+          <% elsif can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
               <div class="col-md-3 col-lg-3 col-sm-6">
                 <strong>Market Kind: </strong>
@@ -93,6 +93,10 @@
                 </div>
               <% end %>
             </div>
+          <% elsif can_shop_shop?(@person) %>
+	    <%= hidden_field_tag 'market_kind', 'shop' %>
+	  <% else %>
+	    <%= hidden_field_tag 'market_kind', 'individual' %>
           <% end %>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
