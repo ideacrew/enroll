@@ -86,4 +86,7 @@ Rails.application.configure do
 #  config.active_record.dump_schema_after_migration = false
   config.acapi.publish_amqp_events = true
   config.acapi.app_id = "enroll"
+
+  Mongoid.logger.level = Logger::ERROR
+  Mongo::Logger.logger.level = Logger::ERROR
 end
