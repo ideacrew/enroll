@@ -36,6 +36,30 @@
 
 - if step == 4 && defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+- elsif step == 2
+  - @employment_relationships.each do |emp_relationship|
+    = form_for(emp_relationship, :url => insured_employee_index_path, :as => :employment_relationship, :method => :post) do |f|
+      = f.submit "continue", :class => "btn btn-primary btn-br full-width"
+      = f.hidden_field :first_name
+      = f.hidden_field :last_name
+      = f.hidden_field :middle_name
+      = f.hidden_field :name_pfx
+      = f.hidden_field :name_sfx
+      = f.hidden_field :gender
+      = f.hidden_field :hired_on
+      = f.hidden_field :eligible_for_coverage_on
+      = f.hidden_field :census_employee_id
+    = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
+      = f.hidden_field :first_name, value: @person_params[:first_name]
+      = f.hidden_field :middle_name, value: @person_params[:middle_name]
+      = f.hidden_field :last_name, value: @person_params[:last_name]
+      = f.hidden_field :name_sfx, value: @person_params[:name_sfx]
+      = f.hidden_field :dob, value: @person_params[:dob]
+      = f.hidden_field :ssn, value: @person_params[:ssn]
+      = f.hidden_field :no_ssn, value: @person_params[:no_ssn]
+      = f.hidden_field :gender, value: @person_params[:gender]
+      = hidden_field_tag :persisted, true
+      = f.submit "continue", :class => "btn btn-primary btn-br full-width"
 - elsif step == 5 || step == 2
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
     CONTINUE

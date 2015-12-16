@@ -1,3 +1,8 @@
-.row
-  .col-md-12.col-sm-12.col-xs-12
+%h3 Healthcare Marketplace
+
+- @employment_relationships.each do |er|
+  %p
+    =er.employer_name
+    has added you as an employee. You're eligible for coverage starting
+    ="#{format_date er.eligible_for_coverage_on}."
     = render partial: "insured/employee_roles/employment_relationships"

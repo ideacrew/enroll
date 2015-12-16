@@ -264,3 +264,49 @@
 .fa-question-circle {
     color: #007bc4;
 }
+
+// phasing out out styles
+
+// new radio style
+.n-radio-group {
+  .n-radio-row {
+    background-color: #fff;
+    border-left: 1px solid #b7b7b7;
+    border-right: 1px solid #b7b7b7;
+    border-bottom: 1px solid #b7b7b7;
+    width: 100%;
+    padding: 15px 10px;
+    &:first-of-type {
+      border-top: 1px solid #b7b7b7;
+    }
+    label.n-radio {
+      font-size: 16px;
+      cursor:pointer;
+      width: 100%;
+      margin: 0;
+      input.n-radio[type=radio]:checked + span {
+        background-position: left center;
+      }
+      span.n-radio {
+        height: 20px;
+        width: 20px;
+        display: inline-block;
+        overflow: hidden;
+        background-image: url('<%= asset_path('ui/radiobutton_100.png') %>');
+        background-size: 40px 20px;
+        background-repeat: no-repeat;
+        background-position: right center;
+        position: relative;
+        top: 4px;
+        margin-right: 10px;
+      }
+      input.n-radio {
+        display: none;
+      }
+    }
+  }
+}
+// hide individual benefits continue button in employee match_person
+.right-section #new_person input[type=submit] {
+  display: none;
+}

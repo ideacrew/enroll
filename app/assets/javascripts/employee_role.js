@@ -1,3 +1,15 @@
+$(document).ready(function() {
+	$('input[name="healthcare-marketplace"]').on('change', function() {
+		if ( $('#employee-sponsored-benefits').is(':checked') ) {
+			$('#new_employment_relationship input[type=submit]').show();
+			$('#new_person input[type=submit]').hide();
+		} else {
+			$('#new_employment_relationship input[type=submit]').hide();
+			$('#new_person input[type=submit]').show();
+		}
+	});
+});
+
 function displayEmployeeRoleSearch() {
 	$("#overlay").css("display", "none");
 	$("a.name").css("padding-top", "30px");
@@ -50,7 +62,7 @@ function match_person()
 		//Sidebar Switch - Search Active
 				$(".overlay-in").css("display", "block");
 			}
-		});  
+		});
 	} else {
 		$('#personal_info .employee-info').addClass('require-field');
 	}
