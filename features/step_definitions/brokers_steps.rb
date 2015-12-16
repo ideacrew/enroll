@@ -257,9 +257,9 @@ Then(/^.+ sees employer census family created$/) do
 end
 
 Then(/^.+ should see the matched employee record form$/) do
-  @browser.dd(text: /Legal LLC/).wait_until_present
+  @browser.p(text: /Legal LLC/).wait_until_present
   screenshot("broker_employer_search_results")
-  expect(@browser.dd(text: /Legal LLC/).visible?).to be_truthy
+  expect(@browser.p(text: /Legal LLC/).visible?).to be_truthy
 end
 
 Then(/^Broker Assisted is a family$/) do
