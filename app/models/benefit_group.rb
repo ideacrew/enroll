@@ -204,7 +204,7 @@ class BenefitGroup
     effective_date = effective_on_for(date_of_hire)
 
     lower_limit = (effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
-    upper_limit = (effective_date + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+    upper_limit = (effective_date + HbxProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays)
 
 
     # TODO
