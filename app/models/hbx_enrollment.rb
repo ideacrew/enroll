@@ -247,20 +247,23 @@ class HbxEnrollment
   def cancel_previous(year)
 
     # Indivial market - Perform cancel of previous enrollments for the same plan year only if from same carrier
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).individual_market.each do |p|
-      if p.plan.carrier_profile_id == self.plan.carrier_profile_id and p.may_cancel_coverage?
-        p.cancel_coverage!
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |p|
+
+      binding.pry
+
+      if (p.plan.carrier_profile_id == self.plan.carrier_profile_id && p.kind != "employer_sponsored") || p.kind == "employer_sponsored"
+        p.cancel_coverage! if p.may_cancel_coverage?
         p.update_current(terminated_on: self.effective_on)
       end
     end
 
     # Shop market - Perform Cancels of previous enrollments for the same coverage kind and plan year
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).shop_market.each do |p|
-      if p.may_cancel_coverage?
-        p.cancel_coverage!
-        p.update_current(terminated_on: self.effective_on)
-      end
-    end
+    #self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).shop_market.each do |p|
+    #  if p.may_cancel_coverage?
+    #    p.cancel_coverage!
+    #    p.update_current(terminated_on: self.effective_on)
+    #  end
+    #end
   end
 
   def propogate_selection
