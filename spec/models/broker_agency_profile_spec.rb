@@ -154,4 +154,13 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       end
     end
   end
+  describe "#phone for broker agency" do
+    before :each, :dbclean => :after_each  do
+      @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
+    end
+    it 'should have a phone' do
+      expect(@ba.phone).to match(@ba.organization.primary_office_location.phone.to_s)
+    end
+  end
+
 end

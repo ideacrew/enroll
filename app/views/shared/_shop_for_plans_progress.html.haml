@@ -22,7 +22,7 @@
 
 - if show_waive
   - enrollment = @hbx_enrollment || @enrollment
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if enrollment and enrollment.employee_role.present?
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if (enrollment and (enrollment.employee_role.present? or enrollment.benefit_group.present?))
 
 - if step == 2 and !no_purchase
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post

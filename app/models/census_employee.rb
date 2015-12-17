@@ -29,6 +29,7 @@ class CensusEmployee < CensusMember
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
+  validate :check_coverage_terminated_on # date must be within 60 days of TimeKeeper.date_of_record
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
@@ -362,6 +363,12 @@ private
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before hiring date")
+    end
+  end
+
+  def check_coverage_terminated_on
+    if employment_terminated_on and employment_terminated_on <= TimeKeeper.date_of_record - 60.days
+      errors.add(:base, "Employee termination must be within the past 60 days")
     end
   end
 

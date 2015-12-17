@@ -212,7 +212,7 @@ class Organization
     def broker_agencies_with_matching_agency_or_broker(search_params)
       if search_params[:q].present?
         orgs2 = self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
-          "broker_agency_profile._id" => {
+          "broker_agency_profile.id" => {
             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
           }
         })

@@ -128,7 +128,7 @@ describe Person do
 
       context 'duplicated key issue' do
         before do
-          Person.collection.indexes.drop({'ssn' => 1})
+          Person.remove_indexes
           Person.create_indexes
         end
         context "with blank ssn" do
@@ -210,6 +210,16 @@ describe Person do
           expect(@person.is_active?).to eq true
           @person.is_active = false
           expect(@person.is_active?).to eq false
+        end
+
+        context "dob more than 110 years ago" do
+          let(:dob){ 200.years.ago }
+
+          it "should have a validation error" do
+            expect(@person.valid?).to be_falsey
+            expect(@person.errors.full_messages).to include("Dob date cannot be more than 110 years ago")
+          end
+
         end
       end
 
@@ -557,7 +567,7 @@ describe Person do
       person1.user_id = user_id
       person2.user_id = user_id
       person1.save!
-      expect { person2.save! }.to raise_error(Moped::Errors::OperationFailure)
+      expect { person2.save! }.to raise_error
     end
 
   end

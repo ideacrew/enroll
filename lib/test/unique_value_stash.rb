@@ -13,7 +13,7 @@ module UniqueValueStash
       @unique_values[key]
     end
     def adult_dob key=nil
-      unique_date = "0#{number 1}/0#{number 1}/#{1950+rand(60)}"
+      unique_date = "0#{number 1}/0#{number 1}/#{1950+rand(40)}"
       @unique_values[key] = unique_date if key
       unique_date
     end

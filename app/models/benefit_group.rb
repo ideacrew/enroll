@@ -91,6 +91,8 @@ class BenefitGroup
   #   super new_plan_option_kind.to_s
   # end
 
+  alias_method :is_congress?, :is_congress
+
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
@@ -102,18 +104,30 @@ class BenefitGroup
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
   end
 
-  def set_bounding_cost_plans
-    plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-    if plans.size > 0
-      plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
+  def is_open_enrollment?
+    plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
 
-      self.lowest_cost_plan_id  = plans_by_cost.first.id
-      @lowest_cost_plan = plans_by_cost.first
-
-      self.highest_cost_plan_id = plans_by_cost.last.id
-      @highest_cost_plan = plans_by_cost.last
+  def termination_effective_on_for(new_date)
+    if plan_year.open_enrollment_contains?(new_date) || new_date < plan_year.start_on
+      plan_year.start_on
+    else
+      new_date.end_of_month if terminate_on_kind == "end_of_month"
     end
   end
+
+  # def set_bounding_cost_plans
+  #   plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+  #   if plans.size > 0
+  #     plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
+
+  #     self.lowest_cost_plan_id  = plans_by_cost.first.id
+  #     @lowest_cost_plan = plans_by_cost.first
+
+  #     self.highest_cost_plan_id = plans_by_cost.last.id
+  #     @highest_cost_plan = plans_by_cost.last
+  #   end
+  # end
 
 
   def set_bounding_cost_plans

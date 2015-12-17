@@ -47,4 +47,7 @@ Rails.application.configure do
     :host => "127.0.0.1",
     :port => 3000
   }
+
+  Mongoid.logger.level = Logger::ERROR
+  Mongo::Logger.logger.level = Logger::ERROR
 end

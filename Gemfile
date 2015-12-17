@@ -32,16 +32,14 @@ gem 'less-rails-bootstrap', '~> 3.3.1.0'
 gem 'font-awesome-rails'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 
-gem 'mongoid', '~> 4.0.2'
-gem 'origin', '~> 2.1.1'
-gem 'moped', '~> 2.0.4'
-gem 'carrierwave-mongoid', '0.7.1', :require => 'carrierwave/mongoid'
-gem "mongoid_auto_increment"
+gem 'mongoid', '5.0.1'
+gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
+gem "mongoid-autoinc"
 # gem 'mongoid-autoinc'
 gem 'mongoid-versioning'
 
 gem 'money-rails', '~> 1.3.0'
-gem "mongoid-enum", '~> 0.2.0'
+gem "mongoid-enum"
 gem 'mongo_session_store-rails4', '~> 6.0.0'
 
 ## Add field-level encryption
@@ -75,7 +73,7 @@ gem 'sprockets' , "~> 2.12.3"
 # for I18n
 gem 'rails-i18n', '~> 4.0.0'
 gem 'mail'
-gem 'bson', '2.3.0'
+gem 'bson'
 # gem 'rypt', '0.2.0'
 
 gem 'language_list', '~> 1.1.0'
@@ -121,7 +119,7 @@ group :test do
   gem 'mongoid-rspec'
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
-  gem 'database_cleaner', '1.3.0'
+  gem 'database_cleaner', '1.5.1'
   gem 'shoulda-matchers'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
 #  gem 'headless'
