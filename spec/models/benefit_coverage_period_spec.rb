@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BenefitCoveragePeriod, type: :model do
+RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
   let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship) }
   let(:title)                     { "My new enrollment period" }
@@ -68,6 +68,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
           expect(BenefitCoveragePeriod.find(benefit_coverage_period.id)).to eq benefit_coverage_period
         end
 
+        it "should be findable by date" do
+          expect(BenefitCoveragePeriod.find_by_date(benefit_coverage_period.start_on + 25.days)).to eq benefit_coverage_period
+        end
+
         context "and a second lowest cost silver plan is specified" do
           let(:silver_plan) { FactoryGirl.create(:plan, metal_level: "silver") }
           let(:bronze_plan) { FactoryGirl.create(:plan, metal_level: "bronze") }
@@ -108,7 +112,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
 
         context "and today is the last day to obtain benefits starting first of next month" do
           before do
-            monthly_effective_date_deadline = 15
+            monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
             TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, monthly_effective_date_deadline))
           end
 
@@ -119,7 +123,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
 
         context "and today is past the deadline to obtain benefits starting first of next month" do
           before do
-            monthly_effective_date_deadline = 15
+            monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
             TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, (monthly_effective_date_deadline + 1)))
           end
 
@@ -127,11 +131,68 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
             expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
           end
         end
+
+        context "and termination effective on date is requested" do
+          let(:fifty_days_before_start_on)        { start_on - 50.days }
+          let(:thirty_five_days_before_start_on)  { start_on - 35.days }
+          let(:twenty_days_before_start_on)       { start_on - 20.days }
+          let(:ten_days_before_start_on)          { start_on - 10.days }
+
+          let(:five_days_after_start_on)          { start_on + 5.days }
+          let(:twenty_days_after_start_on)        { start_on + 20.days }
+
+          context "and termination is during open enrollment" do
+
+            it "termination date should be start_on date" do
+              expect(benefit_coverage_period.termination_effective_on_for(fifty_days_before_start_on)).to eq start_on
+            end
+
+            it "termination date should be start_on date" do
+              expect(benefit_coverage_period.termination_effective_on_for(thirty_five_days_before_start_on)).to eq start_on
+            end
+
+            context "and termination is before monthly enrollment due date" do
+              it "termination date should be start_on date" do
+                expect(benefit_coverage_period.termination_effective_on_for(twenty_days_before_start_on)).to eq start_on
+              end
+            end
+
+            context "and termination is after monthly enrollment deadline" do
+              it "termination date should be last day of month following start_on date" do
+                expect(benefit_coverage_period.termination_effective_on_for(ten_days_before_start_on)).to eq start_on.end_of_month
+              end
+            end
+
+            context "and termination is after start_on date" do
+              context "and before monthly enrollment deadline" do
+                it "termination date should be last day of month following start_on date" do
+                  expect(benefit_coverage_period.termination_effective_on_for(five_days_after_start_on)).to eq start_on.end_of_month
+                end
+              end
+
+              context "and after monthly enrollment deadline" do
+                it "termination date should be last day of next month following start_on date" do
+                  expect(benefit_coverage_period.termination_effective_on_for(twenty_days_after_start_on)).to eq start_on.next_month.end_of_month
+                end
+              end
+            end
+          end
+
+          context "and termination is outside open enrollment" do
+            let(:offset_period)                 { 40 }
+            let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
+            let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
+
+              it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
+                expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
+              end
+          end
+        end
       end
     end
   end
 
-  context "elected_plans_by_enrollment_members" do
+  context "elected_plans_by_enrollment_members", dbclean: :before_each do
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
@@ -143,6 +204,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
     let(:plan4) { FactoryGirl.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
+    let(:benefit_packages)  { [benefit_package1, benefit_package2] }
     let(:rule) {double}
 
     before :each do
