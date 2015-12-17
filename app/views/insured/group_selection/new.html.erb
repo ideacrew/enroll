@@ -174,10 +174,11 @@
 })
 $(document).ready(function() {
   $('#group-selection-form').on('change', function() {
-    if ( $('#coverage_kind_dental').is(':checked') ) {
-      $('#market_kind_shop').hide();
+    if ( $('#market_kind_shop').is(':checked') ) {
+      $('#coverage_kind_dental').parent().hide();
     } else {
-        $('#market_kind_shop').show();
+      $('#coverage_kind_dental').parent().show();
+
     }
   })
 });
