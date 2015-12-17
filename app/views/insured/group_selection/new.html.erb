@@ -175,7 +175,7 @@
 $(document).ready(function() {
   if ( $('#market_kind_shop').is(':checked') ) {
     $('#coverage_kind_dental').parent().hide();
-    $("#coverage_kind_health").prop("checked", true)
+    $("#coverage_kind_health").prop("checked", true);
   }
   $('#group-selection-form').on('change', function() {
     if ( $('#market_kind_shop').is(':checked') ) {
@@ -185,5 +185,12 @@ $(document).ready(function() {
 
     }
   })
+  $('#market_kind_shop').on('change', function() {
+    if ( $('#coverage_kind_dental').is(':checked') ) {
+      $("#coverage_kind_health").prop("checked", true);
+    }
+  });
+
+
 });
 </script>
