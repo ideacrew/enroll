@@ -214,18 +214,18 @@ class BenefitGroup
     end
   end
 
-  def new_hire_enrollment_period(date_of_hire)
+  def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
     effective_date = effective_on_for(date_of_hire)
 
     lower_limit = (effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
     upper_limit = (effective_date + HbxProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays)
 
-
-    # TODO
     # Length of time that EE may enroll following correction to Census Employee Identifying info
-    # HBXProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays
-
-    return lower_limit..upper_limit
+    if date_of_roster_entry
+      date_of_roster_entry..(date_of_roster_entry + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+    else
+      lower_limit..upper_limit
+    end
   end
 
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
