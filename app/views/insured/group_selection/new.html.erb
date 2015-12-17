@@ -13,7 +13,7 @@
         <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
       </div>
     <% else %>
-    <%= form_tag(:insured_group_selections) do %>
+    <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
@@ -172,4 +172,13 @@
     });
   }
 })
+$(document).ready(function() {
+  $('#group-selection-form').on('change', function() {
+    if ( $('#coverage_kind_dental').is(':checked') ) {
+      $('#market_kind_shop').hide();
+    } else {
+        $('#market_kind_shop').show();
+    }
+  })
+});
 </script>
