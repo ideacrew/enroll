@@ -14,7 +14,7 @@ class CuramUser
   index({last_name: 1, first_name: 1, dob: 1})
 
   def self.match_email(value)
-    where(email: /#{value}/i)
+    where(email: /^#{value}$/i)
   end
 
   def self.match_username(value)

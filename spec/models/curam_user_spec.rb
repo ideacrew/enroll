@@ -21,6 +21,14 @@ describe CuramUser, "verification if user exists in Curam" do
     it "should match when email has only one uppercase character" do
       expect(CuramUser.match_email("test@Example.COM").any?).to be true
     end
+
+    it "returns false for incomplete email address" do
+      expect(CuramUser.match_email("TEST@EXAMPLE").any?).to be false
+    end
+
+    it "returns false for extra letters on front of email address" do
+      expect(CuramUser.match_email("extraTEST@EXAMPLE.com").any?).to be false
+    end
   end
 
   it "returns true if SSN is matching any record" do
