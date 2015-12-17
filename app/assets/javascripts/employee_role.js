@@ -1,11 +1,9 @@
 $(document).ready(function() {
-	$('input[name="healthcare-marketplace"]').on('change', function() {
+	$('#new_person_wrapper #btn-continue').on('click', function() {
 		if ( $('#employee-sponsored-benefits').is(':checked') ) {
-			$('#new_employment_relationship input[type=submit]').show();
-			$('#new_person input[type=submit]').hide();
+			$('#new_employment_relationship').submit();
 		} else {
-			$('#new_employment_relationship input[type=submit]').hide();
-			$('#new_person input[type=submit]').show();
+			$('#new_person').submit();
 		}
 	});
 });
