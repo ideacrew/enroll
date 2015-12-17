@@ -3,7 +3,7 @@ namespace :update_shop do
   task :plan_year_renewal => :environment do 
     changed_count = 0
 
-    effective_date = Date.new(2015,1,1)
+    effective_date = Date.new(2015,2,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|

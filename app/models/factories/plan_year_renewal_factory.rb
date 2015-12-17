@@ -131,7 +131,7 @@ module Factories
         if census_employee.active_benefit_group_assignment #&& census_employee.active_benefit_group_assignment.benefit_group_id == active_group.id
           census_employee.add_renew_benefit_group_assignment(new_group)
 
-          unless census_employee.save
+          unless census_employee.renewal_benefit_group_assignment.save
             raise PlanYearRenewalFactoryError, "For employer: #{@employer_profile.inspect}, unable to save census_employee: #{census_employee.inspect}"
           end
         end
