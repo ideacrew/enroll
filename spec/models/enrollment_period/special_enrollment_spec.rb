@@ -168,7 +168,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     context "and this QLE date is reported on timely basis" do
       let(:today)               { TimeKeeper.date_of_record }
       # Ensure date is past 15th of the month
-      let(:qle_on_date)         { today.day < HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
+      let(:qle_on_date)         { today.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
       let(:qle_start_on_date)   { lapsed_qle_on_date }
       let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
 
