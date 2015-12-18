@@ -261,6 +261,9 @@ class HbxEnrollment
   end
 
   def propogate_selection
+
+    cancel_previous(self.plan.active_year)
+
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
@@ -366,14 +369,12 @@ class HbxEnrollment
 
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
-    #binding.pry
     self.plan_id = new_plan._id
     self.carrier_profile_id = new_plan.carrier_profile_id #new_plan.carrier_profile_id
     @plan = new_plan
   end
 
   def plan
-    #binding.pry
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
