@@ -1,5 +1,30 @@
 require 'rails_helper'
 
 RSpec.describe VlpDocument, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+
+
+  describe "creates person with vlp_docs" do
+    it "creates scope for uploaded docs" do
+      expect(person.consumer_role.vlp_documents).to exist
+    end
+
+    it "returns number of uploaded documents" do
+      person2.consumer_role.vlp_documents.first.identifier = "url"
+      expect(person2.consumer_role.vlp_documents.uploaded.count).to eq(1)
+    end
+  end
+
+  describe "assisted families" do
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+
+    before :each do
+      family.build_household
+    end
+
+    xit "create family with househild" do
+      expect(family.households).to exist
+    end
+  end
 end

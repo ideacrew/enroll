@@ -105,7 +105,6 @@ class VlpDocument < Document
 
 
 
-
   # hash of doc type and necessary fields
   def required_fields
     {
@@ -125,6 +124,13 @@ class VlpDocument < Document
         "Other (With Alien Number)": [:alien_number],
         "Other (With I-94 Number)": [:i94_number]
     }
+  end
+
+  def all_with_aqhp
+    #TODO change query
+    aqhp_families = Family.all_assistance_applying
+    @aqhp_peope = Person.unverified_persons.select{|person| aqhp_families.include? person.primary_family }
+
   end
 
   private
