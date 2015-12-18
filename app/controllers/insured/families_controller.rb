@@ -11,25 +11,7 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @family.enrollments.order(submitted_at: :desc, effective_on: :desc, coverage_kind: :desc) || []
 
-    @enrollment_filter = @family.collection.aggregate([
-      {"$match" => {'_id' => @family._id}},
-      #{"$lookUp" => {
-      #  "from" => "plans",
-      #  "localField" => "plan_id",
-      #  "foreignField" => "_id",
-      #  "as" => "plan"
-      #  }},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      #{"$unwind" => '$households.hbx_enrollments.plan'},
-      {"$match" => {"aasm_state" => {"$ne" => 'inactive'}}},
-      {"$sort" => {"submitted_at" => -1 }},
-      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'}, 'provider_id' => '$households.hbx_enrollments.carrier_profile_id', 'state' => '$households.hbx_enrollments.aasm_state', 'kind' => '$households.hbx_enrollments.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
-      ])
-
-
-    @fil = Family.collection.aggregate([
+    @enrollment_filter = Family.collection.aggregate([
       {"$match" => {'_id' => @family._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
@@ -56,7 +38,7 @@ class Insured::FamiliesController < FamiliesController
     @waived_enrollment_filter.each  { |e| valid_display_waived_enrollments.push e['hbx_enrollment']['_id'] }
 
     log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
-    @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
+    @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived
     update_changing_hbxs(@hbx_enrollments)
 
     # Filter out enrollments for display only
@@ -64,7 +46,6 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
     unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
-
 
     @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
     @employee_role = @person.employee_roles.active.first
