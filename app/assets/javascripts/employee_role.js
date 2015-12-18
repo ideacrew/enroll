@@ -3,7 +3,7 @@ $(document).ready(function() {
 		if ( $('#employee-sponsored-benefits').is(':checked') ) {
 			$('#new_employment_relationship').submit();
 		} else {
-			$('#new_person').submit();
+			$('.new_person:last').submit();
 		}
 	});
 });
