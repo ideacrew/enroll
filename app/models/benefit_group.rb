@@ -365,7 +365,11 @@ private
   end
 
   def first_of_month_effective_on_for(date_of_hire)
-    [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
+    if effective_on_offset == 0 && date_of_hire.day == 1
+      [plan_year.start_on, date_of_hire].max
+    else
+      [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
+    end
   end
 
   # Non-congressional
