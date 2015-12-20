@@ -221,7 +221,7 @@ class BenefitGroup
     upper_limit = (effective_date + HbxProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays)
 
     # Length of time that EE may enroll following correction to Census Employee Identifying info
-    if date_of_roster_entry
+    if date_of_roster_entry > effective_date
       date_of_roster_entry..(date_of_roster_entry + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
     else
       lower_limit..upper_limit
