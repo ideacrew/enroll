@@ -353,7 +353,7 @@ end
 
 When(/^.+ accepts? the matched employer$/) do
   scroll_then_click(@browser.label(text: /Enroll in employer-sponsored benefits/))
-  @browser.element(class: /interaction-click-control-continue/).fire_event("onclick")
+  @browser.element(id: /btn-continue/).fire_event("onclick")
   @browser.input(name: "person[emails_attributes][0][address]").wait_until_present
   screenshot("update_personal_info")
 end

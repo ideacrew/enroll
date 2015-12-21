@@ -67,7 +67,7 @@
                 <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <input class="n-radio" name="market_kind" <% if kind=="shop" %>checked="checked"<% end %> type="radio" id="market_kind_<%= kind %>"/>
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio" %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
@@ -96,7 +96,7 @@
               <div class="n-radio-group">
                 <div class="n-radio-row">
                   <label class="n-radio" for="coverage_kind_health">
-                    <input class="n-radio" name="coverage_kind" type="radio" id="coverage_kind_health"/>
+                    <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Health
@@ -109,7 +109,7 @@
 
               <div class="n-radio-row">
                 <label class="n-radio" for="coverage_kind_dental">
-                  <input class="n-radio" name="coverage_kind" type="radio" id="coverage_kind_dental"/>
+                  <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                   <span class="n-radio">
                   </span>
                   Dental
@@ -142,7 +142,7 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
-            <h4><strong>What would you like to do?</strong></h4>
+            <h3>What would you like to do?</h3>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
