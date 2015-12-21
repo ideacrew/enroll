@@ -110,7 +110,8 @@ class Family
   scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-
+  scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
+  
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
