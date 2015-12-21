@@ -3,13 +3,15 @@ require 'rails_helper'
 RSpec.describe "insured/employee_roles/match.html.haml" do
   let(:person) {FactoryGirl.create(:person)}
   let(:user) {FactoryGirl.create(:user, :person=>person)}
+  let(:person_params){{"dob"=>person.id, "first_name"=>person.first_name,"gender"=>person.gender,"last_name"=>person.last_name,"middle_name"=>"","name_sfx"=>"","ssn"=>person.ssn,"user_id"=>person.id}}
+
 
   before :each do
     assign(:person, person)
+    assign(:person_params, person_params)
     @employee_candidate = Forms::EmployeeCandidate.new(user_id: person.id)
     found_census_employees = @employee_candidate.match_census_employees
     @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
-
     sign_in user
     render template: "insured/employee_roles/match.html.haml"
   end
