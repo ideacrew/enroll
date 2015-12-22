@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-class DubiousClass
+class DubiousDocumentClass
   include Mongoid::Document
   include FullStrippedNames
 
