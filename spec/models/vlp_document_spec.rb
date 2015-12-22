@@ -16,15 +16,4 @@ RSpec.describe VlpDocument, :type => :model do
     end
   end
 
-  describe "assisted families" do
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-
-    before :each do
-      family.build_household
-    end
-
-    xit "create family with househild" do
-      expect(family.households).to exist
-    end
-  end
 end

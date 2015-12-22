@@ -195,6 +195,11 @@ class Person
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
+  def is_aqhp?
+    family_id = self.primary_family ? self.primary_family.id : 1
+    Family.all_assistance_applying.only(:_id).map(&:_id).include? family_id
+  end
+
   def completed_identity_verification?
     return false unless user
     user.identity_verified?

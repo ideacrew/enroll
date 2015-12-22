@@ -99,10 +99,6 @@ end
      @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
    when 'no_docs_uloaded'
      @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-   when 'uqhp'
-
-   when 'aqhp'
-
    else
      @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
    end

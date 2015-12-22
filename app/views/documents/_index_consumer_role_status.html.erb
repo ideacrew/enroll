@@ -5,11 +5,8 @@
 </p><br>
 
 <div class="row container">
-  <!-- <%= link_to "Verification type", consumer_role_status_documents_path(), remote: true, class: "btn btn-default" %> -->
   <%= admin_docs_filter 'waiting', "Doc waiting for review", "btn btn-default" %>
   <%= admin_docs_filter 'no_docs_uloaded', "Missing documents", "btn btn-default" %>
-  <!-- <%= admin_docs_filter 'uqhp', "UQHP", "btn btn-default" %>
-  <%= admin_docs_filter 'aqhp', "AQHP", "btn btn-default" %> -->
   <div class="form-inline button-group-wrapper">
     <div class="input-group search-wp">
       <%= render 'shared/search', url: consumer_role_status_documents_path, q: @search, placeholder: "First/Last Name, SSN", remote: true %>
@@ -18,10 +15,11 @@
 </div>
 
   <div class="documents-table">
-  <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets %>
+  <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets, all: consumer_role_status_documents_path %>
     <div class="table-responsive">
       <table class="table table-hover table-striped">
         <col width="250">
+        <col width="100">
         <col width="150">
         <col width="150">
         <col width="100">
@@ -30,6 +28,7 @@
         <col width="170">
         <tr>
           <th class="text-center">HBX id</th>
+          <th class="text-center">AQHP/UQHP</th>
           <th><%= admin_docs_filter 'first_name', " First name", 'admin_docs' %></th>
           <th><%= admin_docs_filter 'last_name', " Last name", 'admin_docs'  %></th>
           <th class="text-center"> # of Docs</th>
@@ -41,6 +40,7 @@
         <% @unverified_persons.each do |person| %>
         <tr>
           <td><%= person.hbx_id %></td>
+          <td><%= person.is_aqhp? ? "AQHP"+person.primary_family.e_case_id.to_s : "UQHP" %></td>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
           <td style="text-align:center;"><%= person.consumer_role.vlp_documents.uploaded.count %></td>
