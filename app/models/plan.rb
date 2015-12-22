@@ -372,6 +372,13 @@ class Plan
       end
     end
 
+    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 0.hour) do
+        Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
+
+      end
+    end
+
     def reference_plan_metal_level_for_options
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end

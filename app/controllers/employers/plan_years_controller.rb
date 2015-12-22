@@ -294,6 +294,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
+    @dental_carrier_names = Organization.valid_dental_carrier_names
+    @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
     @carrier_names = Organization.valid_carrier_names
     @carriers_array = Organization.valid_carrier_names_for_options
   end

@@ -67,13 +67,9 @@
     <div class="select-dental-plan row" style="display: none;">
       <br/>
       <br/>
-      <% if @plan_year.new_record? %>
-        <h1>Select Your Dental Plan Offering</h1>
-        <h4 style="max-width: 660px;">Never brush another tooth.</h4>
-      <% else %>
-        <h1>Select Your Dental Plan Offering</h1>
-        <h4 style="max-width: 660px;">Never brush another tooth.</h4>
-      <% end %>
+      <br/>
+      <h1><%= @plan_year.new_record? ? 'Coverage – Set up Employee Benefit Package' : 'Coverage - Edit Employee Benefit Package' %></h1>
+      <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
       <br/>
       <div class="dental-benefits-fields">
         <div class="row row-form-wrapper no-buffer heading">
@@ -85,21 +81,9 @@
       <% end %>
     </div>
 
-    <br>
-      <br>
-        <h1>
-          Select Your Dental Reference Plan
-        </h1>
-        <h4 style='position: relative;'>
-          <span class='starter' style='display: inline-block;'>
-            Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
-          </span>
-          <span style='position: absolute; right: 0; bottom: 0;' class="dental-plan-count">Displaying:
-            <strong>
-            </strong>
-          </span>
-        </h4>
-      <br/>
+    <%= render "shared/dental_reference_plans_list", f: f, p: p %>
+
+
     <% if @plan_year.new_record? %>
     <% else %>
       <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plans hidden-param" %>
