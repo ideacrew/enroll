@@ -656,7 +656,93 @@ describe HbxProfile, "class methods", type: :model do
       end
     end
   end
+
 end
+
+context "Benefits are terminated" do
+  let(:effective_on_date)         { TimeKeeper.date_of_record.beginning_of_month }
+  let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
+  let!(:benefit_coverage_period)  { FactoryGirl.create(:benefit_coverage_period,
+                                        start_on: effective_on_date.beginning_of_year,
+                                        end_on: effective_on_date.end_of_year,
+                                        open_enrollment_start_on: effective_on_date.beginning_of_year - 1.month,
+                                        open_enrollment_end_on: effective_on_date.beginning_of_year + 1.month
+                                      ) 
+                                    }
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(effective_on_date.year, 6, 1))
+  end
+
+  context "Individual benefit" do
+    let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment, 
+                                                    household: ivl_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "individual",
+                                                    submitted_at: effective_on_date - 10.days
+                                                  ) 
+                                                }
+    let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
+
+    it "should be open enrollment" do
+      expect(ivl_enrollment.is_open_enrollment?).to be_truthy
+    end
+
+    context "and coverage is terminated" do
+      before do
+        ivl_enrollment.terminate_benefit(TimeKeeper.date_of_record)
+      end
+
+      it "should have terminated date" do
+        expect(ivl_enrollment.terminated_on).to eq ivl_termination_date
+      end
+
+      it "should be in terminated state" do
+        expect(ivl_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+    end
+  end
+
+  context "SHOP benefit" do
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment, 
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_on_date - 10.days,
+                                                    benefit_group_id: benefit_group.id
+                                                  ) 
+                                                }
+
+    let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
+
+
+    it "should be SHOP enrollment kind" do
+      expect(shop_enrollment.is_shop?).to be_truthy
+    end
+
+    context "and coverage is terminated" do
+      before do
+        shop_enrollment.terminate_benefit(TimeKeeper.date_of_record)
+      end
+
+      it "should have terminated date" do
+        expect(shop_enrollment.terminated_on).to eq shop_termination_date
+      end
+
+      it "should be in terminated state" do
+        expect(shop_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+    end
+
+  end
+
+end
+
 
 # describe HbxEnrollment, "#save", type: :model do
 #
