@@ -12,7 +12,7 @@ class DubiousDocumentClass
 end
 
 describe FullStrippedNames do
-  let(:dummy) { DubiousClass.new }
+  let(:dummy) { DubiousDocumentClass.new }
   let(:prespace) {"  space"}
   let(:postspace) {"space   "}
   let(:bothspace) {"   space   "}
