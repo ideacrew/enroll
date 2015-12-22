@@ -57,7 +57,10 @@ class BenefitGroup
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
-  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
+  embeds_many :dental_relationship_benefits, cascade_callbacks: true
+  accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan, :carrier_for_elected_dental_plan
 
   #TODO add following attributes: :title,
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,

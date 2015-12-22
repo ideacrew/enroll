@@ -11,6 +11,13 @@ class Employers::PlanYearsController < ApplicationController
 
   end
 
+  def dental_reference_plans
+    @benefit_group = params[:benefit_group]
+    @plan_year = PlanYear.find(params[:plan_year_id])
+    @location_id = params[:location_id]
+    @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
+  end
+
   def reference_plans
     @benefit_group = params[:benefit_group]
     @plan_year = PlanYear.find(params[:plan_year_id])
@@ -294,7 +301,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @dental_carrier_names = Organization.valid_dental_carrier_names
+    @dental_carrier_names = Plan.valid_for_carrier(2016)
     @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
     @carrier_names = Organization.valid_carrier_names
     @carriers_array = Organization.valid_carrier_names_for_options

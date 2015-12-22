@@ -187,13 +187,19 @@ ready = function() {
     $(document).on('click', '.nav-tabs li label', function() {
       if ( $(this).closest('.nav').parent().hasClass('health') ) {
         nav = '.health';
+        $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
+        $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
+        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health.referenceplan').hide();
+
       } else {
+        nav = '.dental';
+        $(this).closest('.benefit-group-fields').find('.dental-reference-plans').hide();
+        $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
+        $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').hide();
+
       }
-      $(this).closest('.benefit-group-fields').find('.select-reference').remove();
-      $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
       $(this).closest('.benefit-group-fields').find(nav+' .nav-tabs li').removeClass('active');
       $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', false);
-      $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
       $(this).closest('li').addClass('active');
       $(this).closest('.benefit-group-fields').find(nav+' .nav-tabs li.active label').attr('style', '');
       $(this).closest('.benefit-group-fields').find(nav+' .nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
@@ -233,19 +239,32 @@ ready = function() {
     //toggle plan options checkbox through parent anchor
 
     $(document).on('click', '.plan-options a', function() {
-      if ( $(this).closest('.nav').parent().hasClass('health') ) {
+      if ( $(this).closest('.plan-options').parent().hasClass('health') ) {
         nav = '.health';
+        console.log(nav);
+        $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
+        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health.referenceplan').hide();
+        $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
+        $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
       } else {
         nav = '.dental';
+        console.log(nav);
+        $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
+        $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').hide();
+        $(this).closest('.benefit-group-fields').find('.dental-reference-plans').css({ "height": "auto", "y-overflow": "default" })
+        $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
       }
-      $(this).closest('.benefit-group-fields').find('.select-reference').remove();
-      $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
-      $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
-      $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
+
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
-        $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
-        $(this).closest('.benefit-group-fields').find(".reference-plans").show();
+        console.log(nav);
+        if ( nav == '.health' ) {
+          $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
+          $(this).closest('.benefit-group-fields').find(".reference-plans").show();
+        } else {
+          $(this).closest('.benefit-group-fields').find('.dental-reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
+          $(this).closest('.benefit-group-fields').find(".dental-reference-plans").show();
+        }
         $(this).find('input[type=radio]').prop('checked', true );
 
         if ($(this).parents('.carriers-tab').length > 0 ) {
@@ -272,7 +291,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     if (start_date == "") {
       return
     }
-    $(this).closest('.benefit-group-fields').find('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+    $(this).closest('.benefit-group-fields').find('.health.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
     $('.selected-plan').show();
 
     calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);

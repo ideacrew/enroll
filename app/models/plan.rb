@@ -372,10 +372,14 @@ class Plan
       end
     end
 
-    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
-      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 0.hour) do
-        Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
+    def valid_for_carrier(active_year)
+      carrier_ids = Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile_id).uniq.each
+      carrier_ids.map{|c| org= Organization.where(:'carrier_profile._id' => c).first;org.legal_name}
+    end
 
+    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
+        Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
       end
     end
 
