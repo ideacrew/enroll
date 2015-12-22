@@ -785,7 +785,8 @@ describe Person do
         family1.save
         family1.households.first.tax_households.first.eligibility_determinations<<eligibility_determination
         family1.save
-        expect(Family.all_assistance_applying.first.id).to eq(family1.id)
+        person_aqhp = family1.primary_applicant.person
+        expect(person_aqhp.is_aqhp?).to eq(true)
 
       end
     end
