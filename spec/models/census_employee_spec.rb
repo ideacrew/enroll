@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
-  it { should validate_presence_of :ssn }
-  it { should validate_presence_of :dob }
-  it { should validate_presence_of :hired_on }
-  it { should validate_presence_of :is_business_owner }
-  it { should validate_presence_of :employer_profile_id }
+  # it { should validate_presence_of :ssn }
+  # it { should validate_presence_of :dob }
+  # it { should validate_presence_of :hired_on }
+  # it { should validate_presence_of :is_business_owner }
+  # it { should validate_presence_of :employer_profile_id }
 
   let(:benefit_group)    { plan_year.benefit_groups.first }
   let(:plan_year)        do
@@ -330,6 +330,118 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
         end
       end
+    end
+
+    context "multiple employers have active, terminated and rehired employees", dbclean: :around_each do
+      let(:today)                          { TimeKeeper.date_of_record }
+      let(:one_month_ago)                  { today - 1.month }
+      let(:last_month)                     { one_month_ago.beginning_of_month..one_month_ago.end_of_month}
+      let(:last_year_to_date)              { (today - 1.year)..today }
+
+      let(:er1_active_employee_count)      { 2 }
+      let(:er1_terminated_employee_count)  { 1 }
+      let(:er1_rehired_employee_count)     { 1 }
+
+      let(:er2_active_employee_count)      { 1 }
+      let(:er2_terminated_employee_count)  { 1 }
+
+      let(:employee_count)                 { 
+                                              er1_active_employee_count +
+                                              er1_terminated_employee_count +
+                                              er1_rehired_employee_count +
+                                              er2_active_employee_count +
+                                              er2_terminated_employee_count
+                                           }
+
+      let(:terminated_today_employee_count)       { 2 }
+      let(:terminated_last_month_employee_count)  { 1 }
+      let(:er1_termination_count)                 { er1_terminated_employee_count + er1_rehired_employee_count }
+
+      let(:terminated_employee_count)      { er1_terminated_employee_count + er2_terminated_employee_count }
+      let(:termed_status_employee_count)   { terminated_employee_count + er1_rehired_employee_count }
+
+      let(:employer_count)                 { 2 }
+      let(:employer_profile_1)             { FactoryGirl.create(:employer_profile) }
+      let(:employer_profile_2)             { FactoryGirl.create(:employer_profile) }
+
+      let(:er1_active_employees)      { FactoryGirl.create_list(:census_employee, er1_active_employee_count,
+                                                                 employer_profile: employer_profile_1
+                                                                ) 
+                                                              }
+      let(:er1_terminated_employees)  { FactoryGirl.create_list(:census_employee, er1_terminated_employee_count,
+                                                                 employer_profile: employer_profile_1
+                                                                ) 
+                                                              }
+      let(:er1_rehired_employees)     { FactoryGirl.create_list(:census_employee, er1_rehired_employee_count,
+                                                                 employer_profile: employer_profile_1
+                                                            )
+                                                          }
+      let(:er2_active_employees)      { FactoryGirl.create_list(:census_employee, er2_active_employee_count,
+                                                                 employer_profile: employer_profile_2
+                                                                ) 
+                                                              }
+      let(:er2_terminated_employees)  { FactoryGirl.create_list(:census_employee, er2_terminated_employee_count,
+                                                                 employer_profile: employer_profile_2
+                                                                ) 
+                                                              }
+
+      before do
+        er1_active_employees.each do |ee| 
+          ee.aasm_state = "employee_role_linked"
+          ee.save!
+        end
+
+        er1_terminated_employees.each do |ee| 
+          ee.aasm_state = "employment_terminated"
+          ee.employment_terminated_on = today
+          ee.save!
+        end
+
+        er1_rehired_employees.each do |ee|
+          ee.aasm_state = "rehired"
+          ee.employment_terminated_on = today
+          ee.save!
+        end
+
+        er2_active_employees.each do |ee| 
+          ee.aasm_state = "employee_role_linked"
+          ee.save!
+        end
+
+        er2_terminated_employees.each do |ee|
+          ee.aasm_state = "employment_terminated"
+          ee.employment_terminated_on = one_month_ago
+          ee.save!
+        end
+      end
+
+      it "should find all employers" do
+        expect(EmployerProfile.all.size).to eq employer_count
+      end
+
+      it "should find all employees" do
+        expect(CensusEmployee.all.size).to eq employee_count
+      end
+
+      context "and terminated employees are queried with no passed parameters" do
+        it "should find the all employees terminated today" do
+          expect(CensusEmployee.find_all_terminated.size).to eq terminated_today_employee_count
+        end
+      end
+
+      context "and terminated employees who were terminated one month ago are queried" do
+        it "should find the correct set" do
+          expect(CensusEmployee.find_all_terminated(date_range: last_month).size).to eq terminated_last_month_employee_count
+        end
+      end
+
+      context "and for one employer, the set of employees terminated since company joined the exchange are queried" do
+        it "should find the correct set" do
+          expect(CensusEmployee.find_all_terminated(employer_profiles: [employer_profile_1], 
+                                                    date_range: last_year_to_date).size).to eq er1_termination_count
+        end
+      end
+
     end
 
     context "a census employee is added in the database" do
