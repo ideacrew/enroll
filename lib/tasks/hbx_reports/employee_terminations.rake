@@ -16,12 +16,12 @@ namespace :reports do
 
       processed_count = 0
       file_name = "#{Rails.root}/public/employee_terminations.csv"
-      CSV.open(file_name, "w") do |csv|
+      CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         census_employees.each do |census_employee|
           last_name                 = census_employee.last_name
           first_name                = census_employee.first_name
-          ssn                       = census_employee.ssn.to_s
+          ssn                       = census_employee.ssn
           dob                       = census_employee.dob
           hired_on                  = census_employee.hired_on
           employment_terminated_on  = census_employee.employment_terminated_on
@@ -29,7 +29,14 @@ namespace :reports do
 
           employer_name = census_employee.employer_profile.organization.legal_name
 
-          csv << field_names.map { |field_name| field_name == "ssn" ? '"' + eval(field_name) + '"' : eval("#{field_name}") }
+          # csv << field_names.map { |field_name| field_name == "ssn" ? '"' + eval(field_name) + '"' : eval("#{field_name}") }
+          csv << field_names.map do |field_name| 
+            if field_name == "ssn"
+              '="' + eval(field_name) + '"'
+            else
+              eval("#{field_name}")
+            end
+          end
           processed_count += 1
         end
       end
