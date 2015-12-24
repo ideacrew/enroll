@@ -4,7 +4,7 @@
 <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
 
 <fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields'>
-  <div class="row">
+  <div class="row health">
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="row row-form-wrapper no-buffer plan-title">
         <div class="col-xs-12 form-group form-group-lg">
@@ -48,7 +48,7 @@
     <br>
     <div class="health selected-plan row" style="display: none;">
     </div>
-    <div class="select-dental-plan row" style="display: none;">
+    <div class="select-dental-plan dental row" style="display: none;">
       <br/>
       <br/>
       <br/>
@@ -77,14 +77,16 @@
         <% end %>
       </div>
       <%= render "shared/dental_reference_plans_list", f: f, p: p %>
-      <div class="dental selected-plan row" style="display: none;">
-      </div>
+
       <% if @plan_year.new_record? %>
       <% else %>
         <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plans hidden-param" %>
       <% end %>
       <br class="clear"/>
       <div class="dental-reference-plans">
+      </div>
+      <br/>
+      <div class="dental selected-plan row" style="display: none;">
       </div>
     </div>
   </div>

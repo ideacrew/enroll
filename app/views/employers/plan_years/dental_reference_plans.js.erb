@@ -3,3 +3,14 @@ $('#<%= @location_id %> .dental-reference-plans').html("<%= escape_javascript(re
 $('#<%= @location_id %> .dental-plan-count strong').html("<%= @dental_plans.count %> Plans");
 $('#<%= @location_id %> .dental-reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#<%= @location_id %> .dental-reference-plans').show();
+
+$('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('click', function() {
+
+  if ($(this).find('input[type=radio]').is(':checked')) {
+  } else {
+      $(this).find('input[type=radio]').prop('checked', true )
+      var id = $(this).find('input[type=radio]').attr('value');
+      $(this).closest('#<%= @location_id %>').find('.dental-ref-plan.hidden-param').attr('value', id);
+  }
+
+});

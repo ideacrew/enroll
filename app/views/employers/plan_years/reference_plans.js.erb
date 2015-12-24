@@ -3,7 +3,8 @@ $('#<%= @location_id %> .reference-plans').html("<%= escape_javascript(render(pa
 $('#<%= @location_id %> .reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#<%= @location_id %> .reference-plans').show();
 
-$('#<%= @location_id %> .reference-plan .col-xs-3').on('click', function() {
+
+$('#<%= @location_id %> .health .reference-plan .col-xs-2').on('click', function() {
 
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {

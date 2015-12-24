@@ -78,6 +78,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
+    debugger
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
@@ -120,7 +121,7 @@ class Employers::PlanYearsController < ApplicationController
   def calc_employer_contributions
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-
+    @coverage_type = params[:coverage_type]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan

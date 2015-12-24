@@ -285,31 +285,50 @@ ready = function() {
 $(document).on('click', '.reference-plan input + label', function() {
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
   var location_id = $(this).parents('fieldset').attr('id')
+  if ( $(this).closest('.health').length > 0 ) {
+    var coverage_type = '.health';
+  } else {
+    var coverage_type = '.dental';
+  }
 
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
       return
     }
-    $(this).closest('.benefit-group-fields').find('.health.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+    $(this).closest('.benefit-group-fields').find(coverage_type+'.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
     $('.selected-plan').show();
 
-    calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
+    calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
   };
 });
 
 
   $('.contribution_handler').each(function() {
     $(this).change(function(){
+      if ( $(this).closest('.health').length > 0 ) {
+        var coverage_type = '.health';
+        alert('health');
+      } else {
+        var coverage_type = '.dental';
+        alert('dental');
+      }
       var location_id = $(this).parents('.benefit-group-fields').attr('id');
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
     });
   });
 
   $('.contribution_slide_handler').each(function() {
     $(this).on("slideStop", function(slideEvt) {
+      if ( $(this).closest('.health').length > 0 ) {
+        var coverage_type = '.health';
+        alert('health');
+      } else {
+        var coverage_type = '.dental';
+        alert('dental');
+      }
       var location_id = $(this).parents('.benefit-group-fields').attr('id');
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
     });
   });
 
@@ -319,11 +338,17 @@ $(document).on("click", ".reference_plan_info h4 span", function() {
 };
 
 
-function calcEmployerContributions(url, location) {
 
-    var reference_plan_id = $('#'+location+' .reference-plan input[type=radio]:checked').val();
-    var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
-    var location_id = location;
+function calcEmployerContributions(url, location, coverage_type) {
+  var coverage_type = coverage_type;
+  var plan_option_kind = $("#"+location+" "+ coverage_type +" .nav-tabs input[type=radio]:checked").val();
+  var location_id = location;
+
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 && $("#"+location+" .edit-offering").is(':visible') ) {
+    var reference_plan_id = $('#'+location+' .ref-plan').val();
+  } else {
+    var reference_plan_id = $('#'+location+' '+ coverage_type +' .reference-plan input[type=radio]:checked').val();
+  }
 
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
@@ -334,11 +359,11 @@ function calcEmployerContributions(url, location) {
       return
     }
 
-    var premium_pcts = $('#'+location+' .benefits-fields input.hidden-param').map(function() {
+    var premium_pcts = $('#'+location+' '+ coverage_type +' .benefits-fields input.hidden-param').map(function() {
       return $(this).val();
     }).get();
 
-    var is_offered = $('#'+location+' .benefits-fields .checkbox label > input[type=checkbox]').map(function() {
+    var is_offered = $('#'+location+' '+ coverage_type +' .benefits-fields .checkbox label > input[type=checkbox]').map(function() {
       return $(this).is(":checked");
     }).get();
 
@@ -380,6 +405,7 @@ function calcEmployerContributions(url, location) {
         "reference_plan_id": reference_plan_id,
         "plan_option_kind": plan_option_kind,
         "relation_benefits": relation_benefits,
+        "coverage_type": coverage_type,
         "location_id": location_id
 
       }

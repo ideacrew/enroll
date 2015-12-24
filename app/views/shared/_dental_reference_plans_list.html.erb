@@ -94,6 +94,11 @@
       </div>
       <% end %>
     </div>
+    <% if @plan_year.new_record? %>
+      <%= f.hidden_field :dental_reference_plan_id, value: "", class: "dental-ref-plan hidden-param" %>
+    <% else %>
+      <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plan hidden-param" %>
+    <% end %>
       <div class="col-xs-12 single-plan-tab" style="display: none;">
         <br/>
         <br/>
