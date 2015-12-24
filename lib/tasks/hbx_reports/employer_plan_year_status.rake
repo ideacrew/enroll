@@ -14,7 +14,7 @@ namespace :reports do
         ref_plan_name ref_plan_hios_id staff_name staff_phone staff_email broker_name broker_phone broker_email
         )
 
-      CSV.open("#{Rails.root}/public/er_plan_year_status.csv", "w") do |csv|
+      CSV.open("#{Rails.root}/public/er_plan_year_status.csv", "w", force_quotes: true) do |csv|
         csv << field_names
         organizations.each do |organization|
           organization.employer_profile.plan_years.each do |plan_year|
@@ -55,7 +55,13 @@ namespace :reports do
                 end
               end
 
-              csv << field_names.map { |field_name| eval "#{field_name}" }
+              csv << field_names.map do |field_name| 
+                if field_name == "fein"
+                  '="' + eval(field_name) + '"'
+                else
+                  eval("#{field_name}")
+                end
+              end
             end
           end
         end
