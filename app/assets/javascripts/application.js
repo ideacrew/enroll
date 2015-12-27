@@ -197,7 +197,7 @@ function getCarrierPlans(ep, ci) {
         }
       });
 
-      if ( referenceplanselections.length != $('.benefit-group-fields').length * 2 ) {
+      if ( referenceplanselections.length != $('.benefit-group-fields').length * 2) {
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Each benefit group is required to have a reference plan selection before it can be saved');
         validatedreferenceplanselections = false;
         validated = false;

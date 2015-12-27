@@ -284,14 +284,25 @@ ready = function() {
 
 // set reference_plan_id
 $(document).on('click', '.reference-plan input + label', function() {
-  var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
-  var location_id = $(this).parents('fieldset').attr('id')
-  if ( $(this).closest('.health').length > 0 ) {
-    var coverage_type = '.health';
-  } else {
-    var coverage_type = '.dental';
-  }
+  if ( $(this).closest('#dental-reference-plans-options-modal').length > 0 ) {
 
+    var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
+    $(this).closest('.reference-plan').find('input').attr('checked', 1);
+    var location_id = $(this).parents('fieldset').attr('id')
+    $(this).parents('fieldset').find('.dental-ref-plan').val(reference_plan_id);
+    $('body').removeClass('modal-open');
+  } else {
+
+    var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
+    var location_id = $(this).parents('fieldset').attr('id')
+
+
+  }
+  if ( $(this).closest('.dental').length > 0 || $(this).closest('#dental-reference-plans-options-modal').length > 0 ) {
+    var coverage_type = '.dental';
+  } else {
+    var coverage_type = '.health';
+  }
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
@@ -302,6 +313,7 @@ $(document).on('click', '.reference-plan input + label', function() {
 
     calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
   };
+
 });
 
 
@@ -348,7 +360,13 @@ function calcEmployerContributions(url, location, coverage_type) {
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 && $("#"+location+" .edit-offering").is(':visible') ) {
     var reference_plan_id = $('#'+location+' .ref-plan').val();
   } else {
-    var reference_plan_id = $('#'+location+' '+ coverage_type +' .reference-plan input[type=radio]:checked').val();
+    if ( coverage_type == '.dental' ) {
+      var reference_plan_id = $('#'+location+' '+ coverage_type +' .dental-ref-plan').val();
+      alert('dis');
+    } else {
+      var reference_plan_id = $('#'+location+' '+ coverage_type +' .reference-plan input[type=radio]:checked').val();
+
+    }
   }
 
     if (reference_plan_id == "" || reference_plan_id == undefined) {

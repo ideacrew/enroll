@@ -12,6 +12,22 @@ $('#<%= @location_id %> .dental-config-reference-selection').on('click', functio
   $("#<%= @location_id %> .dental-ref-plan").val("","");
   $("#<%= @location_id %> .dental .nav-tabs input[type=radio], #<%= @location_id %> .dental .plan-options input[type=radio]").removeAttr('checked');
 });
+$('#<%= @location_id %> .change-dental-reference-plan').on('click', function() {
+  reference_plan_options = $('#<%= @location_id %> .dental-reference-plans').clone();
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .modal-body').html(reference_plan_options);
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .dental-reference-plans').show().css({'height':'auto'});
+  if ( $('#<%= @location_id %> #dental-reference-plans-options-modal .dental-reference-plans').length > 1 ) {
+    $('#<%= @location_id %> #dental-reference-plans-options-modal .dental-reference-plans').not(":first").remove();
+  }
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .modal-dialog').css({'width':'900px'});
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .view-summary').css({'float': 'none'});
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .panel-heading').css({'padding-left': '0'});
+  $('#<%= @location_id %> #dental-reference-plans-options-modal .dental-reference-plans input + label').unbind('click');
+});
+
+
+
+
 
    $("#employer_cost_info_btn .btn").click(function(){
     var location_id = $(this).parents('.benefit-group-fields').attr('id');

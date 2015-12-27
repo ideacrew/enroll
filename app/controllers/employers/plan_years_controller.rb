@@ -78,7 +78,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    debugger
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
@@ -319,9 +318,9 @@ class Employers::PlanYearsController < ApplicationController
     plan_year_params = params.require(:plan_year).permit(
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
-      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :effective_on_offset,
-                                      :carrier_for_elected_plan, :metal_level_for_elected_plan,
-                                      :plan_option_kind, :employer_max_amt_in_cents, :_destroy,
+      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
+                                      :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
+                                      :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ],
