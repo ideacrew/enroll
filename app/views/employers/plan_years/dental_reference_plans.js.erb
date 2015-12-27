@@ -1,8 +1,11 @@
-$('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 dental select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @dental_plans.count %> Plans</strong> </span></h4><br/></div>");
+$('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 dental select-reference'></div>");
+//$('#.dental-reference-plans').before("<div class='col-xs-12 dental select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @dental_plans.count %> Plans</strong> </span></h4><br/></div>");
+
 $('#<%= @location_id %> .dental-reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/dental_plans", locals: { :plans => @dental_plans, :benefit_group => @benefit_group, :plan_year => @plan_year })).html_safe %>");
 $('#<%= @location_id %> .dental-plan-count strong').html("<%= @dental_plans.count %> Plans");
 $('#<%= @location_id %> .dental-reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#<%= @location_id %> .dental-reference-plans').show();
+$('#<%= @location_id %> .dental.select-reference').hide();
 
 $('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('click', function() {
 

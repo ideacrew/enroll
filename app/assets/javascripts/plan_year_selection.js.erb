@@ -249,6 +249,7 @@ ready = function() {
       } else {
         nav = '.dental';
         console.log(nav);
+        $(this).closest('.benefit-group-fields').find('.dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').hide();
         $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
         $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').hide();
         $(this).closest('.benefit-group-fields').find('.dental-reference-plans').css({ "height": "auto", "y-overflow": "default" })

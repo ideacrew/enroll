@@ -3,8 +3,15 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan h2.employer-monthly-
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
 $("#<%= @location_id %> .select-dental-plan").show();
+$("#<%= @location_id %> .dental-reference-plans, #<%= @location_id %> .dental.selected-plan > .row:first").hide();
+$("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> .dental .change-dental-reference-plan").show();
 
-$(function() {
+$('#<%= @location_id %> .dental-config-reference-selection').on('click', function() {
+  $('#<%= @location_id %> .dental.selected-plan').hide();
+  $('#<%= @location_id %> .dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').show();
+  $("#<%= @location_id %> .dental-ref-plan").val("","");
+  $("#<%= @location_id %> .dental .nav-tabs input[type=radio], #<%= @location_id %> .dental .plan-options input[type=radio]").removeAttr('checked');
+});
 
    $("#employer_cost_info_btn .btn").click(function(){
     var location_id = $(this).parents('.benefit-group-fields').attr('id');

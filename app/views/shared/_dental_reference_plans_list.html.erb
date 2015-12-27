@@ -2,10 +2,12 @@
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
 <% if @plan_year.new_record? %>
-  <br/>
-  <h1>Select Your Dental Plan Offering</h1>
-  <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
-  <br/>
+  <div class="dental-plan-offering">
+    <br/>
+    <h1>Select Your Dental Plan Offering</h1>
+    <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
+    <br/>
+  </div>
 <% else %>
 <div class="edit-offering">
 

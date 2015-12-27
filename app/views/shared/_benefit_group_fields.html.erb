@@ -53,7 +53,7 @@
       <br/>
       <br/>
       <h1>
-        <%= @plan_year.new_record? ? 'Coverage – Set up Employee Benefit Package' : 'Coverage - Edit Employee Benefit Package' %>
+        <%= @plan_year.new_record? ? 'Dental - Set Up Employee Benefit Package' : 'Edit Your Dental Employee Benefit Package' %>
       </h1>
       <h4>
         Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
@@ -82,11 +82,12 @@
       <% else %>
         <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plans hidden-param" %>
       <% end %>
-      <br class="clear"/>
+      <span class="clear"/></span>
       <div class="dental-reference-plans">
       </div>
-      <br/>
-      <div class="dental selected-plan row" style="display: none;">
+      <div class="col-xs-12">
+        <div class="dental selected-plan row" style="display: none;">
+        </div>
       </div>
     </div>
   </div>
