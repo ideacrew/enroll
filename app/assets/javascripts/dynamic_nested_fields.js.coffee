@@ -38,8 +38,12 @@ $(document).on 'click', 'form .add_fields', (event) ->
 
   $('.benefit-group-fields:last .contribution_slide_handler').each ->
     $(this).on 'slideStop', (slideEvt) ->
+      if $(this).closest('.health').length > 0
+        coverage_type = '.health'
+      else
+        coverage_type = '.dental'
       location_id = $(this).parents('.benefit-group-fields').attr('id')
-      calcEmployerContributions $('a#calc_employer_contributions_link').data('href'), location_id
+      calcEmployerContributions $('a#calc_employer_contributions_link').data('href'), location_id, coverage_type
       return
     return
 

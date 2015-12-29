@@ -55,9 +55,19 @@
       <h1>
         <%= @plan_year.new_record? ? 'Dental - Set Up Employee Benefit Package' : 'Edit Your Dental Employee Benefit Package' %>
       </h1>
-      <h4>
-        Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
-      </h4>
+        <h4>
+          <span class="starter" style="display: inline-block;">
+            Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
+          </span>
+          <span class="pull-right" style="display: none;">
+            <div id="edit_employer_cost_info_btn" style="padding-top: 10px;">
+              <div class="btn btn-trans btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
+                Employee Detail Costs
+              </div>
+              <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
+            </div>
+          </span>
+        </h4>
       <br/>
       <div class="dental-benefits-fields">
         <div class="row row-form-wrapper no-buffer heading">
