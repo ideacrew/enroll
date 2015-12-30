@@ -6,7 +6,6 @@ $('#<%= @location_id %> .dental-plan-count strong').html("<%= @dental_plans.coun
 $('#<%= @location_id %> .dental-reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#<%= @location_id %> .dental-reference-plans').show();
 $('#<%= @location_id %> .dental.select-reference').hide();
-
 $('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('click', function() {
 
   if ($(this).find('input[type=radio]').is(':checked')) {
@@ -17,3 +16,9 @@ $('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('clic
   }
 
 });
+if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+  $('#<%= @location_id %> .select-dental-plan .edit-offering').hide();
+  $('#<%= @location_id %> .select-dental-plan .reference-steps div:first').hide();
+} else {
+
+}

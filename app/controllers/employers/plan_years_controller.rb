@@ -174,8 +174,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def update
-    debugger
-
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|

@@ -19,7 +19,6 @@ ready = function() {
       })
 
 
-
     $('.change-plan').on('click', function() {
       if ( $(this).closest('.dental').length > 0 ) {
         var coverage_type = '.dental';
@@ -346,6 +345,8 @@ $(document).on('click', '.reference-plan input + label', function() {
   } else {
     var coverage_type = '.health';
     var reference_plan_id = $(this).closest('.health .reference-plan').find('input').attr('value');
+    $(this).closest('.benefit-group-fields').find(coverage_type+'.selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+
   }
   var location_id = $(this).parents('fieldset').attr('id');
   if (reference_plan_id != "" && reference_plan_id != undefined){
@@ -353,7 +354,6 @@ $(document).on('click', '.reference-plan input + label', function() {
     if (start_date == "") {
       return
     }
-    $(this).closest('.benefit-group-fields').find(coverage_type+'.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
     $('.selected-plan').show();
 
     calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
@@ -400,7 +400,8 @@ function calcEmployerContributions(url, location, coverage_type) {
   var plan_option_kind = $("#"+location+" "+ coverage_type +" .nav-tabs input[type=radio]:checked").val();
   var location_id = location;
 
-  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 && $("#"+location+" .edit-offering").is(':visible') ) {
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 ) {
+
     if ( coverage_type == '.dental' ) {
       var reference_plan_id = $('#'+location+' '+ coverage_type +' .dental-ref-plan').val();
       var premium_pcts = $('#'+location+' '+ coverage_type +' .dental-benefits-fields input.hidden-param').map(function() {
@@ -410,7 +411,8 @@ function calcEmployerContributions(url, location, coverage_type) {
         return $(this).is(":checked");
       }).get();
     } else {
-      var reference_plan_id = $('#'+location+' '+ coverage_type +' .reference-plan input[type=radio]:checked').val();
+
+      var reference_plan_id = $('#'+location+' '+ coverage_type +' .ref-plan').val();
       var premium_pcts = $('#'+location+' '+ coverage_type +' .benefits-fields input.hidden-param').map(function() {
         return $(this).val();
       }).get();

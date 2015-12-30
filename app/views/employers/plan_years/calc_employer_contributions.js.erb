@@ -1,21 +1,30 @@
+
 $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/plan_details")).html_safe %>")
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
 $("#<%= @location_id %> .select-dental-plan").show();
+$('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 $("#<%= @location_id %> .dental-reference-plans, #<%= @location_id %> .dental.selected-plan > .row:first").hide();
-$("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> .dental .change-dental-reference-plan").show();
+$("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").show();
 
 if ( '<%= @coverage_type %>' == '.dental' ) {
    $('#<%= @location_id %> .select-dental-plan h4 .starter:first + span').show();
    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').hide();
     $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').show();
-    $('#<%= @location_id %> <%= @coverage_type %> .reference-steps').hide();
    }
+} else {
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    $("#<%= @location_id %> .health.selected-plan .row:first").hide();
+  } else {
+
+  }
 }
 
-$('#<%= @location_id %> .dental-config-reference-selection').on('click', function() {
-  $('#<%= @location_id %> .dental.selected-plan').hide();
+$('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
+  $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').show();
+  $('#<%= @location_id %>  <%= @coverage_type %> .selected-plan').hide();
   $('#<%= @location_id %> .dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').show();
   $("#<%= @location_id %> .dental-ref-plan").val("","");
 

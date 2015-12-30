@@ -44,8 +44,6 @@
   </div>
   <%= render "shared/reference_plans_list", f: f, p: p %>
   <div class="col-xs-12">
-    <br>
-    <br>
     <div class="health selected-plan row" style="display: none;">
     </div>
     <div class="select-dental-plan dental row" style="display: none;">
@@ -90,7 +88,6 @@
 
       <% if @plan_year.new_record? %>
       <% else %>
-        <%= f.hidden_field :dental_reference_plan_id, class: "dental-ref-plans hidden-param" %>
       <% end %>
       <span class="clear"/></span>
       <div class="dental-reference-plans">
