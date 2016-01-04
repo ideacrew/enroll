@@ -51,7 +51,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
     $('.benefit-group-fields:last .reference-steps h1').html '<h1>Select Your Plan Offering</h1>'
     $('.benefit-group-fields:last .reference-steps .currently-offering').html 'Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.'
     $('.benefit-group-fields:last .health .col-md-12.top-pd').hide();
-
+    $('.benefit-group-fields:last .health .col-xs-12:first').hide();
   else
 
 

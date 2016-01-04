@@ -264,7 +264,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def employee_costs
-
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
 

@@ -31,6 +31,8 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
   if ( window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 ) {
     $("#<%= @location_id %> .health.selected-plan .row:first").hide();
     $('#<%= @location_id %> .reference-steps:first').hide();
+    $('#<%= @location_id %> .health .col-xs-12:first').show();
+
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();

@@ -2,11 +2,23 @@
 <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
-<div class="col-xs-12">
   <%= render "employers/plan_years/employee_costs_modal" %>
-</div>
 <fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields'>
+
   <div class="row health">
+    <% if @plan_year.new_record? != true %>
+    <div class="col-xs-12">
+      <span class="pull-right">
+        <div id="edit_employer_cost_info_btn" style="padding-top: 10px;">
+          <div class="btn btn-trans btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
+            Employee Detail Costs
+          </div>
+          <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
+        </div>
+      </span>
+    </div>
+    <% end %>
+    <br/>
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="row row-form-wrapper no-buffer plan-title">
         <div class="col-xs-12 form-group form-group-lg">
