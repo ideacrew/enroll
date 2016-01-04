@@ -206,27 +206,18 @@ class PeopleController < ApplicationController
   end
 
   def update
+    #binding.pry
     sanitize_person_params
     @person = find_person(params[:id])
 
-    make_new_person_params @person
+    #make_new_person_params @person
 
     @person.updated_by = current_user.email unless current_user.nil?
 
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
-      @person.update_attributes({:emails => [], :addresses => []})
     else
-
-      #find associated  census employee record
-      @census_employee = get_census_employee(@person.employee_roles[0].census_employee_id)
-
-      #@email = Email.new(person_params[:emails_attributes].values.map(&:symbolize_keys).first);
-      @email = Email.new(person_params[:emails_attributes].values.first);
-
-      #Propagate New Email address to Census Employee so data is in Synch
-      @census_employee.update_attributes(:email => @email)
 
       redirect_path = family_account_path
     end
@@ -412,9 +403,9 @@ private
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
+      { :phones_attributes => [:kind, :full_phone_number, :id] },
+      { :emails_attributes => [:kind, :address, :id] },
       :consumer_role_attributes,
       :first_name,
       :middle_name,
@@ -433,7 +424,8 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :id
     ]
   end
 
