@@ -5,10 +5,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship) }
   let(:title)                     { "My new enrollment period" }
   let(:service_market)            { "individual" }
-  let(:start_on)                  { Date.current.beginning_of_year }
-  let(:end_on)                    { Date.current.end_of_year }
-  let(:open_enrollment_start_on)  { Date.current.beginning_of_year - 2.months }
-  let(:open_enrollment_end_on)    { Date.current.end_of_year + 2.months }
+  let(:start_on)                  { Date.new(2015,10,1).beginning_of_year }
+  let(:end_on)                    { Date.new(2015,10,1).end_of_year }
+  let(:open_enrollment_start_on)  { Date.new(2015,10,1).beginning_of_year - 2.months }
+  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
   let(:benefit_packages) do
     bp = FactoryGirl.build(:benefit_package)
     bpeg = FactoryGirl.build(:benefit_eligibility_element_group, benefit_package: bp)
