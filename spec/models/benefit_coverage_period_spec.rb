@@ -208,9 +208,14 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:rule) {double}
 
     before :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
       Plan.delete_all
       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it "when satisfied" do
