@@ -12,11 +12,6 @@ class DocumentsController < ApplicationController
 
   def consumer_role_status
     docs_page_filter
-    @page_alphabets = page_alphabets(@unverified_persons, "last_name")
-    if params[:page]
-      page_no = params[:page]
-      @unverified_persons = @unverified_persons.select{|person| person.last_name =~ /^#{page_no}/i }
-    end
     search_box
     respond_to do |format|
       format.html { render partial: "index_consumer_role_status" }
