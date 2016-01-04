@@ -373,8 +373,9 @@ class Plan
     end
 
     def valid_for_carrier(active_year)
-      carrier_ids = Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile_id).uniq
-      carrier_ids.map{|c| org= Organization.where(:'carrier_profile._id' => c).first;org}
+      # carrier_ids = Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile_id).uniq
+      # carrier_ids.map{|c| org= Organization.where(:'carrier_profile._id' => c).first;org}
+      Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile).uniq
     end
 
     def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)

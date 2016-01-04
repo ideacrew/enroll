@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates]
+  before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
 
   layout "two_column"
 
@@ -12,10 +12,15 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def dental_reference_plans
-    @benefit_group = params[:benefit_group]
-    @plan_year = PlanYear.find(params[:plan_year_id])
+
+    @plan_year_id = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
-    @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
+    @carrier_profile = params[:carrier_id]
+    if @carrier_profile == 'all_plans'
+      @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage
+    else
+      @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.by_carrier_profile(@carrier_profile)
+    end
   end
 
   def reference_plans
@@ -259,9 +264,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def employee_costs
-    @location_id = params[:location_id]
+
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-    @coverage_kind = params[:coverage_kind]
+    @coverage_type = params[:coverage_type]
 
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
@@ -272,6 +277,17 @@ class Employers::PlanYearsController < ApplicationController
     @benefit_group.set_bounding_cost_plans
 
     @benefit_group_costs = build_employee_costs_for_benefit_group
+  end
+
+  def generate_dental_carriers_and_plans
+
+    @location_id = params[:location_id]
+    @plan_year_id = params[:plan_year_id]
+    @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
+    @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
+    respond_to do |format|
+      format.js
+    end
   end
 
   private
@@ -298,14 +314,13 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def find_employer
-    id_params = params.permit(:id, :employer_profile_id)
+    id_params = params.permit(:id, :employer_profile_id, :active_year, :plan_year_id)
     id = id_params[:employer_profile_id] || id_params[:id]
     @employer_profile = EmployerProfile.find(id)
+
   end
 
   def generate_carriers_and_plans
-    @dental_carrier_names = Plan.valid_for_carrier(2016)
-    @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
     @carrier_names = Organization.valid_carrier_names
     @carriers_array = Organization.valid_carrier_names_for_options
   end

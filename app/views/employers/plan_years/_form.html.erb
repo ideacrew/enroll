@@ -28,6 +28,7 @@
             </div>
           <% end %>
 
+          <%= link_to '', employers_employer_profile_plan_year_generate_dental_carriers_and_plans_path(@employer_profile, @plan_year.id), id: "generate-dental-carriers-and-plans", class: "hidden", data: {'plan-year-id': @plan_year.id} %>
 
           <%= render "shared/plan_year_fields", f: f %>
 </div>

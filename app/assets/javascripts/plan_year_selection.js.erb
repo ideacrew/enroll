@@ -1,7 +1,59 @@
 var plan_year_selection_loader;
 ready = function() {
+
+  // match health with dental offering selections
+  $('.health .offerings input[type=checkbox]').on('change', function() {
+    var checkedValue = $(this).closest('label').find('span').find('p').text();
+    if ( $(this).is(':checked') ) {
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').prop('checked');
+
+
+
+    } else {
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('checked');
+
+    }
+  });
+
+  // get all dental plan options for all plans option
+  $('label.elected_plan:contains("All plans")').on('click', function() {
+    
+    var plan_year_id = $('a#generate-dental-carriers-and-plans').data('plan-year-id');
+    var location_id = $(this).closest('.benefit-group-fields').attr('id');
+    var carrier_id = 'all_plans';
+    var start_on = $("#plan_year_start_on").val().substr(0,4);
+    var url = $(this).closest('li').find('.dental-reference-plans-link').attr('href');
+    $.ajax({
+      type: "GET",
+      data:{
+        plan_year_id: plan_year_id,
+        location_id: location_id,
+        carrier_id: carrier_id,
+        start_on: start_on
+      },
+      url: url
+    });
+  });
+
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+
+    // get dental carrier names
+    var dental_target_url = $('a#generate-dental-carriers-and-plans').attr('href');
+    var plan_year_id = $('a#generate-dental-carriers-and-plans').data('planYearId');
+    var location_id = $('.benefit-group-fields:last').attr('id');
+    var active_year = $("#plan_year_start_on").val().substr(0,4);
+    $.ajax({
+      type: "GET",
+      data:{
+        active_year: active_year,
+        plan_year_id: plan_year_id,
+        location_id: location_id
+      },
+      url: dental_target_url
+
+    });
+
 
     //alert('edit');
     //$('.add_fields').remove();
@@ -230,7 +282,7 @@ ready = function() {
         nav = '.health';
         $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
         $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
-        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health.referenceplan').hide();
+        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').hide();
 
       } else {
         nav = '.dental';
@@ -284,7 +336,7 @@ ready = function() {
         nav = '.health';
         console.log(nav);
         $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
-        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health.referenceplan').hide();
+        $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').hide();
         $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
       } else {

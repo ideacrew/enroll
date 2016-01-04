@@ -11,6 +11,7 @@ $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 
+
 $(".change-dental-reference-plan").show();
 
 if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
@@ -18,15 +19,21 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
     $("#<%= @location_id %> .dental .change-dental-reference-plan").on('click', function() {
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.dental .edit-offering, .dental .nav-tabs').show();
-
+      $('#<%= @location_id %> <%= @coverage_type %> .currently-offered').html('You currently offer <%= @plan.name %>.');
+      $('#<%= @location_id %> <%= @coverage_type %> .currently-offering').html('You currently offer <%= @plan.name %>.');
+      var newLocationId = $(this).closest('.benefit-group-fields').attr('id');
+      $('#<%= @location_id %> .dental .plan-options a').each(function() {
+        var url = $(this).attr('href');
+        $(this).attr('href', url+"&location_id="+newLocationId);
+      });
 
     });
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
-
-
+      $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
+      $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
     });
 
   }
