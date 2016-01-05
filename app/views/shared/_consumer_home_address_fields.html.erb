@@ -2,7 +2,7 @@
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 
 
-    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
+    <%= f.fields_for :addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
       <% style = "" %>
