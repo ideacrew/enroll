@@ -157,8 +157,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(jail_person).to receive(:has_active_employee_role?).and_return true
       allow(jail_person).to receive(:has_active_consumer_role?).and_return false
       render :template => "insured/group_selection/new.html.erb"
-      expect(rendered).not_to have_selector('input[value="dental"]')
-      expect(rendered).not_to have_selector('label', text: 'Dental')
     end
 
     it "should have an incarceration warning with more text" do
