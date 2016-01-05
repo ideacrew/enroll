@@ -11,13 +11,15 @@ namespace :reports do
       census_employees = CensusEmployee.find_all_terminated(date_range: date_range)
 
       field_names  = %w(
-          last_name first_name ssn dob hired_on employment_terminated_on aasm_state employer_name
+          employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at 
         )
 
       processed_count = 0
       file_name = "#{Rails.root}/public/employee_terminations.csv"
+
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
+
         census_employees.each do |census_employee|
           last_name                 = census_employee.last_name
           first_name                = census_employee.first_name
@@ -26,18 +28,21 @@ namespace :reports do
           hired_on                  = census_employee.hired_on
           employment_terminated_on  = census_employee.employment_terminated_on
           aasm_state                = census_employee.aasm_state
+          updated_at                = census_employee.updated_at.localtime
 
           employer_name = census_employee.employer_profile.organization.legal_name
 
-          # csv << field_names.map { |field_name| field_name == "ssn" ? '"' + eval(field_name) + '"' : eval("#{field_name}") }
-          csv << field_names.map do |field_name| 
-            if field_name == "ssn"
-              '="' + eval(field_name) + '"'
-            else
-              eval("#{field_name}")
+          # Only include ERs active on the HBX 
+          if census_employee.employer_profile.binder_paid? ||census_employee.employer_profile.enrolled? || census_employee.employer_profile.suspended?
+            csv << field_names.map do |field_name| 
+              if field_name == "ssn"
+                '="' + eval(field_name) + '"'
+              else
+                eval("#{field_name}")
+              end
             end
+            processed_count += 1
           end
-          processed_count += 1
         end
       end
 
