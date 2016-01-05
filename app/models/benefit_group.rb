@@ -60,6 +60,8 @@ class BenefitGroup
   embeds_many :dental_relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
+  field :carrier_for_elected_dental_plan, type: BSON::ObjectId
+
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan, :carrier_for_elected_dental_plan
 
   #TODO add following attributes: :title,
@@ -182,6 +184,15 @@ class BenefitGroup
     set_bounding_cost_plans
     @elected_plans = new_plans
   end
+
+  def elected_dental_plans=(new_plans)
+    return unless new_plans.present?
+    self.elected_dental_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+
+    # set_bounding_cost_plans
+    @elected_dental_plans = new_plans
+  end
+
 
   def elected_plans
     return @elected_plans if defined? @elected_plans
@@ -322,6 +333,14 @@ class BenefitGroup
       Plan.valid_shop_health_plans("carrier", self.carrier_for_elected_plan, self.start_on.year)
     when "metal_level"
       Plan.valid_shop_health_plans("metal_level", self.metal_level_for_elected_plan, self.start_on.year)
+    end
+  end
+
+  def dental_elected_plans_by_option_kind
+    if dental_plan_option_kind == "single_carrier"
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+    else
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
     end
   end
 

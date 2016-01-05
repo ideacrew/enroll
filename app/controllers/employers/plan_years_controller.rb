@@ -93,9 +93,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
+
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
-      # benefit_group.elected_dental_plans =
+      benefit_group.elected_dental_plans = benefit_group.dental_elected_plans_by_option_kind
     end
 
     if @employer_profile.default_benefit_group.blank?

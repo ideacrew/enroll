@@ -5,7 +5,10 @@ ready = function() {
   $('.health .offerings input[type=checkbox]').on('change', function() {
     var checkedValue = $(this).closest('label').find('span').find('p').text();
     if ( $(this).is(':checked') ) {
-      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').prop('checked');
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('disabled', false);
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').trigger('click');
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').prop('disabled');
+
 
 
 
@@ -17,6 +20,8 @@ ready = function() {
 
   // get all dental plan options for all plans option
   $('label.elected_plan:contains("All plans")').on('click', function() {
+    $(this).closest('.reference-steps').find('div:first').hide();
+    $(this).closest('.nav-tabs').hide();
 
     var plan_year_id = $('a#generate-dental-carriers-and-plans').data('plan-year-id');
     var location_id = $(this).closest('.benefit-group-fields').attr('id');
