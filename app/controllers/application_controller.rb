@@ -188,7 +188,18 @@ class ApplicationController < ActionController::Base
 
     def set_current_person
       if current_user.try(:person).try(:agent?)
-        @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
+        if session[:person_id].present?
+          @person = Person.find(session[:person_id])
+        else
+          message = {}
+          message[:message] = 'Security Exception'
+          message[:user_id] = current_user.id
+          message[:email] = current_user.email
+          message[:url] = request.original_url
+          log(message, :severity=>'error')
+          redirect_to default_redirect_location
+          return
+        end
       else
         @person = current_user.person
       end
@@ -250,5 +261,13 @@ class ApplicationController < ActionController::Base
 
     def authorize_for
       authorize(controller_name.classify.constantize, "#{action_name}?".to_sym)
+    end
+
+    def default_redirect_location
+      if current_user.has_csr_role? || current_user.try(:has_assister_role?) || current_user.has_agent_role? || current_user.has_broker_role?
+        home_exchanges_agents_path
+      else
+        privacy_insured_consumer_role_index_path
+      end
     end
 end
