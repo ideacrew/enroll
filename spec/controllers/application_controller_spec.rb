@@ -66,7 +66,6 @@ RSpec.describe ApplicationController do
   context "session[person_id] is nil" do
       let(:person) {FactoryGirl.create(:person);}
       let(:user) { FactoryGirl.create(:user, :person=>person); }
-      #let(:subject) { ApplicationController.new }
 
       before do
         sign_in(user)
@@ -76,13 +75,11 @@ RSpec.describe ApplicationController do
       end
 
       context "agent role" do
-
         before do
           user.roles << 'csr'
         end
 
         it "writes a log message" do
-
           expect(subject).to receive(:log) do |msg, severity|
             expect(severity[:severity]).to eq('error')
             expect(msg[:user_id]).to match(user.id)
@@ -93,9 +90,7 @@ RSpec.describe ApplicationController do
       end
 
       context "non agent role" do
-
         it "writes a log message" do
-
           expect(subject).to receive(:log) do |msg, severity|
             expect(severity[:severity]).to eq('error')
             expect(msg[:user_id]).to match(user.id)
@@ -104,23 +99,5 @@ RSpec.describe ApplicationController do
           subject.instance_eval{set_current_person}
         end
       end
-
-    describe "default_redirect_location" do
-      context "agent role" do
-        before do
-          user.roles << 'csr'
-        end
-
-        it "returns home_exchanges_agents_path" do
-          expect(subject.instance_eval{default_redirect_location}).to eq(home_exchanges_agents_path)
-        end
-      end
-
-      context "non agent role" do
-        it "returns privacy_insured_consumer_role_index_path" do
-          expect(subject.instance_eval{default_redirect_location}).to eq(privacy_insured_consumer_role_index_path)
-        end
-      end
-    end
   end
 end
