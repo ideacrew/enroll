@@ -114,6 +114,11 @@ class BenefitGroup
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
   end
 
+  def dental_reference_plan
+    return @dental_reference_plan if defined? @dental_reference_plan
+    @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
+  end
+
   def is_open_enrollment?
     plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
@@ -199,16 +204,23 @@ class BenefitGroup
     @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
-  def decorated_elected_plans(member_provider)
-    max_contribution_cache = Hash.new
-    elected_plans.collect(){|plan| decorated_plan(plan, member_provider, max_contribution_cache)}
+  def elected_dental_plans
+    return @elected_dental_plans if defined? @elected_dental_plans
+    @elected_dental_plans ||= Plan.where(:id => {"$in" => elected_dental_plan_ids}).to_a
   end
 
-  def decorated_plan(plan, member_provider, max_contribution_cache = {})
+  def decorated_elected_plans(member_provider, coverage_kind="")
+    max_contribution_cache = Hash.new
+    get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
+    ref_plan = (coverage_kind == "health" ? reference_plan : dental_reference_plan)
+    get_elected_plans.collect(){|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
+  end
+
+  def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
     else
-      PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
+      PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
   end
 
@@ -336,7 +348,7 @@ class BenefitGroup
     end
   end
 
-  def dental_elected_plans_by_option_kind
+  def elected_dental_plans_by_option_kind
     if dental_plan_option_kind == "single_carrier"
       Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
     else

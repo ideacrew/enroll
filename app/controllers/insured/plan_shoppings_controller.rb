@@ -218,7 +218,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
-        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end
