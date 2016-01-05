@@ -445,10 +445,9 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   household = person.primary_family.latest_household
 
   start_on = TimeKeeper.date_of_record + 3.months
-  end_on = TimeKeeper.date_of_record + 1.year
 
   if household.tax_households.blank?
-    household.tax_households.create(is_eligibility_determined: Date.current, allocated_aptc: 100, effective_starting_on: start_on, effective_ending_on: end_on, submitted_at: Date.current)
+    household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
     fm_id = person.primary_family.family_members.last.id
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
     household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)

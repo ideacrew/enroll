@@ -128,6 +128,15 @@ describe HbxEnrollment do
       end
 
       context "scope" do
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,12,15))
+        end
+
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
         it "with current year" do
           family = blue_collar_families.first
           employee_role = family.primary_family_member.person.employee_roles.first
@@ -142,6 +151,7 @@ describe HbxEnrollment do
           enrollments = family.households.first.coverage_households.first.household.hbx_enrollments
           expect(enrollments.current_year).to eq [enrollment]
         end
+
       end
 
       context "and families either select plan or waive coverage" do
@@ -667,7 +677,7 @@ context "Benefits are terminated" do
                                         end_on: effective_on_date.end_of_year,
                                         open_enrollment_start_on: effective_on_date.beginning_of_year - 1.month,
                                         open_enrollment_end_on: effective_on_date.beginning_of_year + 1.month
-                                      ) 
+                                      )
                                     }
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(effective_on_date.year, 6, 1))
@@ -675,14 +685,14 @@ context "Benefits are terminated" do
 
   context "Individual benefit" do
     let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment, 
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
                                                     household: ivl_family.latest_household,
                                                     coverage_kind: "health",
                                                     effective_on: effective_on_date,
                                                     enrollment_kind: "open_enrollment",
                                                     kind: "individual",
                                                     submitted_at: effective_on_date - 10.days
-                                                  ) 
+                                                  )
                                                 }
     let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
@@ -707,7 +717,7 @@ context "Benefits are terminated" do
 
   context "SHOP benefit" do
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment, 
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
                                                     household: shop_family.latest_household,
                                                     coverage_kind: "health",
                                                     effective_on: effective_on_date,
@@ -715,7 +725,7 @@ context "Benefits are terminated" do
                                                     kind: "employer_sponsored",
                                                     submitted_at: effective_on_date - 10.days,
                                                     benefit_group_id: benefit_group.id
-                                                  ) 
+                                                  )
                                                 }
 
     let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
