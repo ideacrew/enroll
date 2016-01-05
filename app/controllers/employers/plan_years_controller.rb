@@ -8,11 +8,9 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = build_plan_year
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
-
   end
 
   def dental_reference_plans
-
     @plan_year_id = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
@@ -28,7 +26,6 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
     @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
-
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
@@ -44,7 +41,6 @@ class Employers::PlanYearsController < ApplicationController
     end
 
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
-
     respond_to do |format|
       format.js
     end
