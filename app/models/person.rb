@@ -6,6 +6,7 @@ class Person
 
   include Notify
   include UnsetableSparseFields
+  include FullStrippedNames
 
   extend Mongorder
   validates_with Validations::DateRangeValidator
