@@ -68,6 +68,7 @@ class HbxEnrollment
   field :terminated_on, type: Date
 
   field :plan_id, type: BSON::ObjectId
+  field :carrier_profile_id, type: BSON::ObjectId
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
@@ -96,6 +97,7 @@ class HbxEnrollment
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
+
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
@@ -105,10 +107,12 @@ class HbxEnrollment
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :by_coverage_kind,    ->(kind) { where(coverage_kind: kind)}
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :waived,              ->{ where(:aasm_state.in => ["inactive", "renewing_waived"] )}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
@@ -233,10 +237,37 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+    if benefit_group_assignment.may_waive_coverage?
+      cancel_previous(self.effective_on.year)
+      benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
+    else
+      return false
+    end
+
+  end
+
+  def cancel_previous(year)
+    # Indivial market - Perform cancel only if from same carrier
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.individual_market.each do |p|
+      if p.plan.carrier_profile_id == self.plan.carrier_profile_id and p.may_cancel_coverage?
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
+      end
+    end
+
+    # Shop market - Perform Cancels
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.shop_market.each do |p|
+      if p.may_cancel_coverage?
+        p.cancel_coverage!
+        p.update_current(terminated_on: self.effective_on)
+      end
+    end
   end
 
   def propogate_selection
+
+    cancel_previous(self.plan.active_year)
+
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
@@ -342,11 +373,14 @@ class HbxEnrollment
 
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
+    #binding.pry
     self.plan_id = new_plan._id
+    self.carrier_profile_id = new_plan.carrier_profile_id #new_plan.carrier_profile_id
     @plan = new_plan
   end
 
   def plan
+    #binding.pry
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
@@ -742,6 +776,10 @@ class HbxEnrollment
 
     event :waive_coverage do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
+    end
+
+    event :cancel_coverage do
+      transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     end
 
     event :terminate_coverage do
