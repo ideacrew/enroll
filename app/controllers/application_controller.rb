@@ -188,7 +188,6 @@ class ApplicationController < ActionController::Base
 
     def set_current_person
       if current_user.try(:person).try(:agent?)
-        session[:person_id] = nil
         if session[:person_id].present?
           @person = Person.find(session[:person_id])
         else
