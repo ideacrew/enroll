@@ -314,7 +314,7 @@ end
 
 Then(/^click continue again$/) do
   wait_and_confirm_text /continue/i
-  scroll_then_click(@browser.a(text: /continue/i))
+  scroll_then_click(@browser.button(text: /continue/i))
 end
 
 Given(/^\w+ visits the Employee portal$/) do
