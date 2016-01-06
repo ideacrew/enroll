@@ -385,6 +385,12 @@ class ConsumerRole
     end
   end
 
+  def latest_active_tax_household_with_year(year)
+    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+  rescue => e
+    log("person: #{person.try(:id)}", {:severity => 'critical'})
+    nil
+  end
 
 private
   def notify_of_eligibility_change

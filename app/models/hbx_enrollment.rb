@@ -453,7 +453,7 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_household = household.latest_active_tax_household rescue nil
+    tax_household = household.latest_active_tax_household_with_year(effective_on.year)
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
