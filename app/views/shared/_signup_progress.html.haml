@@ -36,6 +36,9 @@
 
 - if step == 4 && defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+- elsif step == 2
+  %span.btn.btn-primary.btn-br.btn-block#btn-continue
+    Continue
 - elsif step == 5 || step == 2
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
     CONTINUE

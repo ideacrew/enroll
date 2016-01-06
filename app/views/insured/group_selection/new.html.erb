@@ -1,7 +1,7 @@
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
-<div class="container">
+<div class="container group-selection">
   <div class="row">
     <% if @aptc_blocked.present? and @aptc_blocked %>
       <br />
@@ -17,7 +17,7 @@
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
-        <h4><strong>Who needs coverage?</strong></h4>
+        <h3>Who Needs Coverage?</h3>
 
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
@@ -58,37 +58,28 @@
               </tbody>
             </table>
           </div>
-
-          <br>
-
-          <div id="coverage_kinds" class='row no-buffer'>
-            <div class="col-md-3 col-lg-3 col-sm-6">
-              <strong>Coverage Type: </strong>
-            </div>
-            <div class="col-md-3 col-lg-3 col-sm-6">
-              <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>
-              <label for="coverage_kind_health">Health</label>
-            </div>
-
-            <% if (@employer_profile.present? || @person.has_active_employee_role?) && !@person.has_active_consumer_role? %>
-            <% else %>
-            <div class="col-md-3 col-lg-3 col-sm-6">
-              <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
-              <label for="coverage_kind_dental">Dental</label>
-            </div>
-            <% end %>
-          </div>
           <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
-              <div class="col-md-3 col-lg-3 col-sm-6">
-                <strong>Market Kind: </strong>
+                <h3>Marketplace</h3>
+              <span class="clear" style="display: il"></span>
+
+              <div class="n-radio-group">
+                <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
+                  <div class="n-radio-row">
+                    <label class="n-radio" for="market_kind_<%= kind %>">
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio" %>
+                      <span class="n-radio">
+                      </span>
+                      <% if kind=="shop" %>
+                      Employer-Sponsored Benefits
+                      <% else %>
+                      Individual Benefits
+                      <% end %>
+                    </label>
+                  </div>
+                <% end %>
               </div>
-              <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
-                <div class="col-md-3 col-lg-3 col-sm-6">
-                  <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true %>
-                  <label for="market_kind_<%= kind %>"><%= kind.humanize %></label>
-                </div>
-              <% end %>
+
             </div>
           <% elsif can_shop_shop?(@person) %>
 	    <%= hidden_field_tag 'market_kind', 'shop' %>
@@ -99,6 +90,36 @@
         <%= hidden_field_tag 'market_kind', @market_kind %>
         <% end %>
           <% end %>
+          <div id="coverage_kinds" class='row no-buffer'>
+              <h3>Benefit Type</h3>
+
+              <div class="n-radio-group">
+                <div class="n-radio-row">
+                  <label class="n-radio" for="coverage_kind_health">
+                    <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health', class: 'n-radio' %>
+                    <span class="n-radio">
+                    </span>
+                    Health
+                  </label>
+                </div>
+
+
+            <% if (@employer_profile.present? || @person.has_active_employee_role?) && !@person.has_active_consumer_role? %>
+            <% else %>
+
+              <div class="n-radio-row">
+                <label class="n-radio" for="coverage_kind_dental">
+                  <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
+                  <span class="n-radio">
+                  </span>
+                  Dental
+                </label>
+              </div>
+
+
+            <% end %>
+              </div>
+          </div>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
           <% if @change_plan.blank? && @enrollment_kind.blank?%>
@@ -121,7 +142,7 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
-            <h4><strong>What would you like to do?</strong></h4>
+            <h3>What would you like to do?</h3>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
@@ -174,14 +195,14 @@
 })
 $(document).ready(function() {
   if ( $('#market_kind_shop').is(':checked') ) {
-    $('#coverage_kind_dental').parent().hide();
+    $('#coverage_kind_dental').closest('.n-radio-row').hide();
     $("#coverage_kind_health").prop("checked", true);
   }
   $('#group-selection-form').on('change', function() {
     if ( $('#market_kind_shop').is(':checked') ) {
-      $('#coverage_kind_dental').parent().hide();
+      $('#coverage_kind_dental').closest('.n-radio-row').slideUp();
     } else {
-      $('#coverage_kind_dental').parent().show();
+      $('#coverage_kind_dental').closest('.n-radio-row').slideDown();
 
     }
   })

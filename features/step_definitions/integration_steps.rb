@@ -339,9 +339,9 @@ Then(/^.+ should not see the matched employee record form$/) do
 end
 
 Then(/^Employee should see the matched employee record form$/) do
-  @browser.dd(text: /Acme Inc\./).wait_until_present
+  @browser.p(text: /Acme Inc\./).wait_until_present
   screenshot("employer_search_results")
-  expect(@browser.dd(text: /Acme Inc\./).visible?).to be_truthy
+  expect(@browser.p(text: /Acme Inc\./).visible?).to be_truthy
 end
 
 # TODO: needs to be merged
@@ -352,7 +352,8 @@ Then(/^.+ should see the matching employee record form$/) do
 end
 
 When(/^.+ accepts? the matched employer$/) do
-  scroll_then_click(@browser.input(value: /This is my employer/))
+  scroll_then_click(@browser.label(text: /Enroll in Employer-Sponsored Benefits/i))
+  @browser.element(id: /btn-continue/).fire_event("onclick")
   @browser.input(name: "person[emails_attributes][0][address]").wait_until_present
   screenshot("update_personal_info")
 end

@@ -1,33 +1,19 @@
-%br
+.n-radio-group
+  .n-radio-row
+    %label.n-radio{ :for=>"employee-sponsored-benefits" }
+      %input.n-radio{ :type=>"radio", :checked=>"checked", :id=>"employee-sponsored-benefits", :name=>"healthcare-marketplace" }
+      %span.n-radio
+      Enroll in Employer-Sponsored Benefits
+  .n-radio-row
+    %label.n-radio{ :for=>"individual-benefits" }
+      %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
+      %span.n-radio
+      Enroll in Individual Benefits
+  %br
 .row
   .col-md-12.col-sm-12.col-xs-12
     %p
+      %br
       If you don't see your employer listed below, click
       = link_to 'here', 'https://dchealthlink.com/help', class: '', target: '_blank'
       for help.
-
-.row
-  .col-md-12.col-sm-12.col-xs-12
-    .notification-error-wrapper
-      - @employment_relationships.each do |emp_relationship|
-        = form_for(emp_relationship, :url => insured_employee_index_path, :as => :employment_relationship, :method => :post) do |f|
-          .row
-            .col-md-8.col-sm-8.col-xs-12
-              %dl.dl-horizontal
-                %dt Employer :
-                %dd= emp_relationship.employer_name
-                %dt Hired On :
-                %dd= format_date emp_relationship.hired_on
-                %dt Eligible for Coverage :
-                %dd= format_date emp_relationship.eligible_for_coverage_on
-            .col-md-4.col-sm-4.col-xs-12.text-right
-              = f.submit "This is my employer", :class => "btn btn-default btn-trans full-width"
-              = f.hidden_field :first_name
-              = f.hidden_field :last_name
-              = f.hidden_field :middle_name
-              = f.hidden_field :name_pfx
-              = f.hidden_field :name_sfx
-              = f.hidden_field :gender
-              = f.hidden_field :hired_on
-              = f.hidden_field :eligible_for_coverage_on
-              = f.hidden_field :census_employee_id
