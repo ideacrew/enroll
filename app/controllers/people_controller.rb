@@ -208,7 +208,7 @@ class PeopleController < ApplicationController
   def update
     sanitize_person_params
     @person = find_person(params[:id])
-    @person.addresses = [] #fix unexpected duplicates issue
+    clean_duplicate_addresses
     @person.updated_by = current_user.email unless current_user.nil?
 
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
@@ -224,13 +224,14 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
+        @person.addresses = @old_addresses
         if @person.has_active_consumer_role?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
         end
         build_nested_models
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
-        format.html { redirect_to redirect_path, alert: "Person update failed.<br />" + person_error_megs }
+        format.html { redirect_to redirect_path, alert: "Person update failed. #{person_error_megs}" }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -300,6 +301,7 @@ class PeopleController < ApplicationController
   end
 
 private
+
   def safe_find(klass, id)
     # puts "finding #{klass} #{id}"
     begin
@@ -396,6 +398,11 @@ private
 
   def dependent_params
     params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
+  end
+
+  def clean_duplicate_addresses
+    @old_addresses = @person.addresses
+    @person.addresses = [] #fix unexpected duplicates issue
   end
 
 end
