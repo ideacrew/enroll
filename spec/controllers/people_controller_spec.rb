@@ -32,7 +32,6 @@ RSpec.describe PeopleController do
       allow(Person).to receive(:where).and_return(Person)
       allow(Person).to receive(:first).and_return(person)
       allow(controller).to receive(:sanitize_person_params).and_return(true)
-      allow(controller).to receive(:make_new_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
 
       sign_in user

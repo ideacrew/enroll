@@ -206,12 +206,9 @@ class PeopleController < ApplicationController
   end
 
   def update
-    #binding.pry
     sanitize_person_params
     @person = find_person(params[:id])
-
-    #make_new_person_params @person
-
+    @person.addresses = [] #fix unexpected duplicates issue
     @person.updated_by = current_user.email unless current_user.nil?
 
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
@@ -233,7 +230,6 @@ class PeopleController < ApplicationController
         end
         build_nested_models
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
-
         format.html { redirect_to redirect_path, alert: "Person update failed.<br />" + person_error_megs }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
@@ -346,6 +342,7 @@ private
           params["person"]["addresses_attributes"].delete("#{key}")
         end
       end
+      params["person"]["addresses_attributes"] = person_params["addresses_attributes"].values.uniq #fix unexpected duplicate issue
     end
 
     if person_params["phones_attributes"].present?
@@ -360,38 +357,6 @@ private
       person_params["emails_attributes"].each do |key, email|
         if email["address"].blank?
           params["person"]["emails_attributes"].delete("#{key}")
-        end
-      end
-    end
-  end
-
-  def make_new_person_params person
-
-    # Delete old sub documents
-    person.addresses.each {|address| address.delete}
-    person.phones.each {|phone| phone.delete}
-    person.emails.each {|email| email.delete}
-
-    if person_params["addresses_attributes"].present?
-      person_params["addresses_attributes"].each do |key, address|
-        if address.has_key?('id')
-          address.delete('id')
-        end
-      end
-    end
-
-    if person_params["phones_attributes"].present?
-      person_params["phones_attributes"].each do |key, phone|
-        if phone.has_key?('id')
-          phone.delete('id')
-        end
-      end
-    end
-
-    if person_params["emails_attributes"].present?
-      person_params["emails_attributes"].each do |key, email|
-        if email.has_key?('id')
-          email.delete('id')
         end
       end
     end
