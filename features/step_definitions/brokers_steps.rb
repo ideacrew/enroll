@@ -245,7 +245,7 @@ Then(/^.* creates and publishes a plan year$/) do
   plans_tab.labels.last.fire_event('onclick')
   sleep(3)
 
-  scroll_then_click(@browser.button(class: /interaction-click-control-create-plan-year/))
+  @browser.button(class: /interaction-click-control-create-plan-year/).fire_event("onclick")
   @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))

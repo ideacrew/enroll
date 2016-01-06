@@ -343,7 +343,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   # benefit_groups.last.text_fields.first.set("Gold HMO")
   # @browser.text_fields(name: /relationship_benefits_attributes/).set(55)
 
-  @browser.button(class: /interaction-click-control-create-plan-year/).click
+  @browser.button(class: /interaction-click-control-create-plan-year/).fire_event("onclick")
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
