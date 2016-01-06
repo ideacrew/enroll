@@ -13,7 +13,7 @@
         <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
       </div>
     <% else %>
-    <%= form_tag(:insured_group_selections) do %>
+    <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
@@ -70,7 +70,7 @@
               <label for="coverage_kind_health">Health</label>
             </div>
 
-            <% if @employer_profile.present? || @person.has_active_employee_role? %>
+            <% if (@employer_profile.present? || @person.has_active_employee_role?) && !@person.has_active_consumer_role? %>
             <% else %>
             <div class="col-md-3 col-lg-3 col-sm-6">
               <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
@@ -78,10 +78,7 @@
             </div>
             <% end %>
           </div>
-
-          <% if @market_kind.present? %>
-            <%= hidden_field_tag 'market_kind', @market_kind %>
-          <% else %>
+          <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
               <div class="col-md-3 col-lg-3 col-sm-6">
                 <strong>Market Kind: </strong>
@@ -93,6 +90,14 @@
                 </div>
               <% end %>
             </div>
+          <% elsif can_shop_shop?(@person) %>
+	    <%= hidden_field_tag 'market_kind', 'shop' %>
+	  <% elsif can_shop_individual?(@person) %>
+	    <%= hidden_field_tag 'market_kind', 'individual' %>
+      <% else %>
+      <% if @market_kind.present? %>
+        <%= hidden_field_tag 'market_kind', @market_kind %>
+        <% end %>
           <% end %>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
@@ -167,4 +172,25 @@
     });
   }
 })
+$(document).ready(function() {
+  if ( $('#market_kind_shop').is(':checked') ) {
+    $('#coverage_kind_dental').parent().hide();
+    $("#coverage_kind_health").prop("checked", true);
+  }
+  $('#group-selection-form').on('change', function() {
+    if ( $('#market_kind_shop').is(':checked') ) {
+      $('#coverage_kind_dental').parent().hide();
+    } else {
+      $('#coverage_kind_dental').parent().show();
+
+    }
+  })
+  $('#market_kind_shop').on('change', function() {
+    if ( $('#coverage_kind_dental').is(':checked') ) {
+      $("#coverage_kind_health").prop("checked", true);
+    }
+  });
+
+
+});
 </script>

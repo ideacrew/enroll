@@ -129,7 +129,9 @@ class ApplicationController < ActionController::Base
 
     def require_login
       unless current_user
-        session[:portal] = url_for(params)
+        unless request.format.js?
+          session[:portal] = url_for(params)
+        end
         redirect_to new_user_registration_path
       end
     end

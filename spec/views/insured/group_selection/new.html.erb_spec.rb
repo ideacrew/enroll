@@ -118,34 +118,48 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member4).to receive(:first_name).and_return('joey')
       allow(family_member4).to receive(:gender).and_return('female')
       sign_in current_user
+    end
+
+    context "base area" do
+      before :each do
+        render :template => "insured/group_selection/new.html.erb"
+      end
+
+      it "should show the title of family members" do
+        expect(rendered).to match /Choose Coverage for your Household/
+      end
+
+      it "should have three checkbox option" do
+        expect(rendered).to have_selector("input[type='checkbox']", count: 3)
+      end
+
+      it "should have one ineligible row" do
+        expect(rendered).to have_selector("tr[class='ineligible_row']", count: 1)
+      end
+
+      it "should have coverage_kinds area" do
+        expect(rendered).to match /Coverage Type/
+      end
+
+      it "should have health radio button" do
+        expect(rendered).to have_selector('input[value="health"]')
+        expect(rendered).to have_selector('label', text: 'Health')
+      end
+    end
+
+    it "should have dental radio button when has consumer_role" do
       render :template => "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('input[value="dental"]')
+      expect(rendered).to have_selector('label', text: 'Dental')
     end
 
-    it "should show the title of family members" do
-      expect(rendered).to match /Choose Coverage for your Household/
+    it "should not have dental radio button" do
+      allow(jail_person).to receive(:has_active_employee_role?).and_return true
+      allow(jail_person).to receive(:has_active_consumer_role?).and_return false
+      render :template => "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_selector('input[value="dental"]')
+      expect(rendered).not_to have_selector('label', text: 'Dental')
     end
-
-    it "should have three checkbox option" do
-      expect(rendered).to have_selector("input[type='checkbox']", count: 3)
-    end
-
-    it "should have one ineligible row" do
-      expect(rendered).to have_selector("tr[class='ineligible_row']", count: 1)
-    end
-
-    it "should have coverage_kinds area" do
-      expect(rendered).to match /Coverage Type/
-    end
-
-    it "should have health radio button" do
-      expect(rendered).to have_selector('input[value="health"]')
-      expect(rendered).to have_selector('label', text: 'Health')
-    end
-
-    #it "should have dental radio button" do
-    #  expect(rendered).to have_selector('input[value="dental"]')
-    #  expect(rendered).to have_selector('label', text: 'Dental')
-    #end
 
     it "should have an incarceration warning with more text" do
       # expect(rendered).to match /Other family members may still be eligible to enroll/

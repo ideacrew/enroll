@@ -16,6 +16,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
       render :new and return
     end
 
+    headless = User.where(email: resource.email).first
+
+    if headless.present? && !headless.person.present?
+      headless.destroy
+    end
+
     resource_saved = resource.save
     yield resource if block_given?
     if resource_saved

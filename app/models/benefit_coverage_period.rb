@@ -69,8 +69,43 @@ class BenefitCoveragePeriod
     (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
   end
 
+  def termination_effective_on_for(date)
+    if open_enrollment_contains?(date)
+
+      ##  Scendario: Open Enrollment is 11/1 - 1/31
+        # 11/3  => 1/1
+        # 11/22 => 1/1
+        # 12/9  => 1/1
+        # 12/23 => 1/31
+        #   1/5 => 1/31
+        #  1/17 => 2/28
+
+      compare_date = date.end_of_month + 1.day
+
+      return case
+      when (compare_date < start_on)  # November
+        start_on
+      when compare_date == start_on   # December
+        if date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+          start_on
+        else
+          start_on.end_of_month
+        end
+      when compare_date > start_on    # January and forward
+        if date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+          date.end_of_month
+        else
+          date.next_month.end_of_month
+        end
+      end
+    else
+      # Open Enrollment has ended, return earliest allowed date
+      date + HbxProfile::IndividualEnrollmentTerminationMinimum
+    end
+  end
+ 
   def earliest_effective_date
-    if TimeKeeper.date_of_record.day < 16
+    if TimeKeeper.date_of_record.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
       effective_date = TimeKeeper.date_of_record.end_of_month + 1.day
     else
       effective_date = TimeKeeper.date_of_record.next_month.end_of_month + 1.day
@@ -102,6 +137,20 @@ class BenefitCoveragePeriod
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
     end
+
+    def find_by_date(date)
+      organizations = Organization.where(
+        :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.start_on".lte => date,
+        :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.end_on".gte => date)
+
+      organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
+    end
+
+    def all
+      organizations = Organization.exists(:"hbx_profile.benefit_sponsorship.benefit_coverage_periods" => true)
+      organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods : nil
+    end
+
   end
 
 private
