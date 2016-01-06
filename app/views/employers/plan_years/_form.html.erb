@@ -2,7 +2,7 @@
       <div class="row">
         <div class="col-xs-12 planyear-add-tab">
           <div id="choose-coverage">
-          <h1><%= @plan_year.new_record? ? 'Coverage - Choose your Coverage Year' : 'Edit your Coverage Year' %></h1>
+          <h1><%= @plan_year.new_record? ? 'Add Plan Year' : 'Edit Plan Year' %></h1>
           <% if @plan_year.errors.any? %>
             <div class="alert-plan-year alert-error">
               <% if @just_a_warning == false %>
@@ -34,7 +34,7 @@
 </div>
           <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab">
 
-          <h1><%= @plan_year.new_record? ? 'Coverage – Set up Employee Benefit Package' : 'Coverage - Edit Employee Benefit Package' %></h1>
+          <h1><%= @plan_year.new_record? ? 'Health – Set Up Benefit Package' : 'Health - Edit Benefit Package' %></h1>
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>

@@ -454,7 +454,7 @@ Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
 end
 
 Then(/^.+ should see a plan year successfully saved message$/) do
-  @browser.element( text: /coverage - benefits you offer/i).wait_until_present
+  @browser.element( text: /Benefits - Coverage you offer/i).wait_until_present
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end
