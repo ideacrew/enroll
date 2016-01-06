@@ -152,8 +152,20 @@ private
     elsif qualifying_life_event_kind.is_moved_to_dc?
       calculate_effective_on_for_moved_qle
     else
-      @earliest_effective_date.end_of_month + 1.day
+      is_shop? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
     end    
+  end
+
+  def first_of_next_month_effective_date_for_individual
+    @earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_next_month_effective_date_for_shop
+    if @earliest_effective_date == @earliest_effective_date.beginning_of_month
+      @earliest_effective_date
+    else
+      @earliest_effective_date.end_of_month + 1.day
+    end
   end
 
   def fixed_first_of_next_month_effective_date

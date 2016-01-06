@@ -189,6 +189,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           expect(ivl_qle_sep.effective_on).to eq next_month_date
         end
       end
+
+      it "and 'effective on kind' is 'first of next month' and date reported is after the monthly deadline and date of event is beginning of month" do
+        ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+        ivl_qle_sep.qle_on = TimeKeeper.date_of_record.end_of_month + 1.days
+        expect(ivl_qle_sep.effective_on).to eq ((TimeKeeper.date_of_record.end_of_month + 1.days).end_of_month + 1.days)
+      end
     end
 
     context "and QLE is reported after the that has lapsed" do
@@ -293,18 +299,25 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           end
         end
 
-        it "should set effective date to date of event" do
+        it "should set effective date to date of event when date of event is not beginning of month" do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
           sep.qle_on = TimeKeeper.date_of_record + 40.days
           expect(sep.effective_on).to eq ((TimeKeeper.date_of_record+40.days).end_of_month + 1.day)
         end
 
-        it "should set effective date to date of event" do
+        it "should set effective date to date of event when date of event is not beginning of month" do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
           sep.qle_on = TimeKeeper.date_of_record - 40.days
           expect(sep.effective_on).to eq ((TimeKeeper.date_of_record-40.days).end_of_month + 1.day)
+        end
+
+        it "should set effective date to date of event when date of event is beginning of month" do
+          sep.qualifying_life_event_kind = qle
+          sep.effective_on_kind = "first_of_next_month"
+          sep.qle_on = TimeKeeper.date_of_record.beginning_of_month
+          expect(sep.effective_on).to eq TimeKeeper.date_of_record.beginning_of_month
         end
       end
 
