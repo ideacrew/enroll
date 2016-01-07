@@ -159,20 +159,41 @@ class HbxEnrollment
     )
   end
 
-  def self.by_hbx_id(policy_hbx_id)
-    families = Family.with_enrollment_hbx_id(policy_hbx_id)
-    households = families.flat_map(&:households)
-    households.flat_map(&:hbx_enrollments).select do |hbxe|
-      hbxe.hbx_id == policy_hbx_id
-    end
-  end
+  class << self
 
-  def self.update_individual_eligibilities_for(consumer_role)
-    found_families = Family.find_all_by_person(consumer_role.person)
-    found_families.each do |ff|
-      ff.households.each do |hh|
-        hh.hbx_enrollments.active.each do |he|
-          he.evaluate_individual_market_eligiblity
+    def by_hbx_id(policy_hbx_id)
+      families = Family.with_enrollment_hbx_id(policy_hbx_id)
+      households = families.flat_map(&:households)
+      households.flat_map(&:hbx_enrollments).select do |hbxe|
+        hbxe.hbx_id == policy_hbx_id
+      end
+    end
+
+    def advance_day(new_date)
+      families_with_effective_renewals_as_of(new_date).each do |family|
+        family.enrollments.renewing.each do |hbx_enrollment|
+          if hbx_enrollment.effective_on <= new_date
+            if census_employee = hbx_enrollment.census_employee
+              census_employee.renewal_benefit_group_assignment.select_coverage!
+            end
+            hbx_enrollment.begin_coverage!
+          end
+        end
+      end
+    end
+
+    def families_with_effective_renewals_as_of(new_date)
+      Family.where({ :"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES, 
+        :"households.hbx_enrollments.effective_on".lte => new_date)
+    end
+
+    def update_individual_eligibilities_for(consumer_role)
+      found_families = Family.find_all_by_person(consumer_role.person)
+      found_families.each do |ff|
+        ff.households.each do |hh|
+          hh.hbx_enrollments.active.each do |he|
+            he.evaluate_individual_market_eligiblity
+          end
         end
       end
     end
@@ -812,6 +833,11 @@ class HbxEnrollment
       transitions from: :coverage_selected, to: :unverified
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
+    end
+
+    event :begin_coverage, :after => :record_transition do
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled], to: :coverage_enrolled
+      transitions from: :renewing_waived, to: :inactive
     end
   end
 
