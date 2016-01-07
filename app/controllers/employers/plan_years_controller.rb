@@ -15,6 +15,7 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     if @carrier_profile == 'all_plans'
+      @nav_option = params[:nav_option]
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage
     else
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.by_carrier_profile(@carrier_profile)

@@ -830,12 +830,33 @@
         }
       }
     }
+    .elected-plans-continue {
+      padding: 15px 0 20px;
+      background-color: #fff;
+      .di {
+        position: relative;
+        top: 7px;
+      }
+    }
     .plan-options {
       background-color: #ffffff;
       border: solid 1px #b7b7b7;
       .metals-tab {
         >.col-xs-3:last-of-type {
           display: none;
+        }
+      }
+      .elected-plans-tab {
+        border: none;
+        padding: 0;
+        height: 450px;
+        span:first-of-type {
+          text-align: initial;
+          font-size: initial;
+          display: initial;
+          padding: none;
+          margin: none;
+          max-width: none;
         }
       }
       span:first-of-type {
@@ -881,7 +902,7 @@
         }
       }
     }
-    .reference-plans, .dental-reference-plans {
+    .reference-plans, .dental-reference-plans, .elected-plans-tab  {
       background-color: #ffffff;
       border: solid 1px #d7d7d7;
       padding-bottom: 25px;
