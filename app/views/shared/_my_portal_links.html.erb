@@ -16,25 +16,22 @@
     <li class="hidden-xs">&nbsp;|</li>
   </li>
 <% elsif portal_count > 1 %>
-<div class="dropdown">
-  <button class="btn btn-default dropdown-toggle g14" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    My Portal
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu b brz" aria-labelledby="dropdownMenu1">
-    <% if insured %>
-      <li><%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %></li>
-    <% end %>
-    <% if employer %>
-    <li><%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'g14' %></li>
-    <% end %>
-    <% if broker %>
-    <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'g14' %></li>
-    <% end %>
-  </ul>
-  <li class="hidden-xs">|</li>
-
-</div>
-
-
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle g14" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      My Portal
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu b brz" aria-labelledby="dropdownMenu1">
+      <% if insured %>
+        <li><%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %></li>
+      <% end %>
+      <% if employer %>
+      <li><%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'g14' %></li>
+      <% end %>
+      <% if broker %>
+      <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'g14' %></li>
+      <% end %>
+    </ul>
+    <li class="hidden-xs">|</li>
+  </div>
 <% end %>
