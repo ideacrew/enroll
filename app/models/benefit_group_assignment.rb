@@ -89,7 +89,7 @@ class BenefitGroupAssignment
     #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
     #then we will not need from coverage_terminated to coverage_selected
     event :select_coverage do
-      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
+      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected, after: :make_benefit_group_assignment_active
     end
 
     event :waive_coverage do
@@ -110,7 +110,13 @@ class BenefitGroupAssignment
     end
   end
 
-private
+  private
+
+  def make_benefit_group_assignment_active
+    census_employee.reset_active_benefit_group_assignments(self)
+    update_attributes(is_active: true)
+  end
+
   def propogate_delink
     self.hbx_enrollment_id = nil
   end

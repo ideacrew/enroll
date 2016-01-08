@@ -170,6 +170,8 @@ class HbxEnrollment
     end
 
     def advance_day(new_date)
+      
+      #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
         family.enrollments.renewing.each do |hbx_enrollment|
           if hbx_enrollment.effective_on <= new_date
@@ -183,8 +185,8 @@ class HbxEnrollment
     end
 
     def families_with_effective_renewals_as_of(new_date)
-      Family.where({ :"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES, 
-        :"households.hbx_enrollments.effective_on".lte => new_date)
+      Family.where({ :"households.hbx_enrollments.aasm_state".in => RENEWAL_STATUSES, 
+        :"households.hbx_enrollments.effective_on".lte => new_date })
     end
 
     def update_individual_eligibilities_for(consumer_role)
