@@ -4,7 +4,7 @@ module Factories
 
     # Renews a family's active enrollments from current plan year
 
-    attr_accessor :family, :census_employee
+    attr_accessor :family, :census_employee, :employer
 
     def renew
       raise ArgumentError unless defined?(@family)
@@ -20,20 +20,29 @@ module Factories
       return nil if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
       shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+      return nil if shop_enrollments.any? {|enrollment| enrollment.effective_on >= employer.renewing_plan_year.start_on }
+
+      prev_plan_year_start = employer.renewing_plan_year.start_on - 1.year
+      prev_plan_year_end = employer.renewing_plan_year.start_on - 1.day
+
+      shop_enrollments.reject! {|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
+      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
 
       if shop_enrollments.empty?
         renew_waived_enrollment
       else
-        shop_enrollments.each do |active_enrollment|  
-          next unless active_enrollment.currently_active?
+        
+        active_enrollment = shop_enrollments.sort_by{|e| e.created_at}.last
 
+        # shop_enrollments.each do |active_enrollment|
+          # next unless active_enrollment.currently_active?
           # renewal_enrollment = renewal_builder.call(active_enrollment)
           renewal_enrollment = renewal_builder(active_enrollment)
           renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
 
           renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
           save_renewal_enrollment(renewal_enrollment, active_enrollment)
-        end
+        # end
       end
      
       # @family.enrollments.individual_market do |active_enrollment|       

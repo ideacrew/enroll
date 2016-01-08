@@ -54,33 +54,41 @@ namespace :update_shop do
   desc "Auto renew employees enrollments"
   task :family_enrollment_renewal => :environment do
 
-    employers = {
-      "RehabFocus LLC" => "711024079",
-      "Hooks Solutions LLC" => "331138193",
-      "Don Ciccio & Figli" => "263057381",
-      "Elevate Interval Fitness LLC" => "463256626",
-      "Garner & Associates LLC" => "273578793",
-      "Set Sports Physical Therapy PLLC" => "010887598",
-      "ICWA" => "131621044",
-      "Game Change LLC" => "460937444",
-      "NSight365 LLC" => "465732698",
-      "The New LeDroit Park Building Company" => "454467977",
-      "Hattie Ruttenberg" => "133712482",
-      "Cap 8 Doors & Hardware" => "455162389",
-      "District Restaurant Group" => "274667942",
-      "GWHCC" => "223860377",
-      "Annie's Ace Hardware" => "272665426",
-      "Arturo Ardila-Gomez" => "451474721",
-      "Morales Public Relations" => "462817580",
-      "Alter Modus International Corporation" => "260376753",
+    # employers = {
+    #   "RehabFocus LLC" => "711024079",
+    #   "Hooks Solutions LLC" => "331138193",
+    #   "Don Ciccio & Figli" => "263057381",
+    #   "Elevate Interval Fitness LLC" => "463256626",
+    #   "Garner & Associates LLC" => "273578793",
+    #   "Set Sports Physical Therapy PLLC" => "010887598",
+    #   "ICWA" => "131621044",
+    #   "Game Change LLC" => "460937444",
+    #   "NSight365 LLC" => "465732698",
+    #   "The New LeDroit Park Building Company" => "454467977",
+    #   "Hattie Ruttenberg" => "133712482",
+    #   "Cap 8 Doors & Hardware" => "455162389",
+    #   "District Restaurant Group" => "274667942",
+    #   "GWHCC" => "223860377",
+    #   "Annie's Ace Hardware" => "272665426",
+    #   "Arturo Ardila-Gomez" => "451474721",
+    #   "Morales Public Relations" => "462817580",
+    #   "Alter Modus International Corporation" => "260376753",
 
-      # "Arab Center Washington DC" => "464736138",
-      # "ADW Capital Management, LLC" => "471516657",
+    #   # "Arab Center Washington DC" => "464736138",
+    #   # "ADW Capital Management, LLC" => "471516657",
 
-      # "Member-US House of Rep." => "536002522",
-      # "STAFF US House of Representatives" => "536002523",
-      # "United States Senate" => "536002558",
-    }
+    #   # "Member-US House of Rep." => "536002522",
+    #   # "STAFF US House of Representatives" => "536002523",
+    #   # "United States Senate" => "536002558",
+    # }
+
+    effective_date = Date.new(2015,2,1)
+    organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
+
+    employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
+      employers[profile.legal_name] = profile.fein
+      employers
+    end
 
     employers.each do |name, fein|
         puts "Processing employer: #{name}"
@@ -95,6 +103,10 @@ namespace :update_shop do
 
         default_benefit_group = employer.default_benefit_group
         renewing_group = employer.renewing_plan_year.benefit_groups.first
+
+        if default_benefit_group.blank? && employer.plan_years.published.any?
+          default_benefit_group = employer.plan_years.published.first.benefit_groups.first
+        end
 
         employer.census_employees.exists("benefit_group_assignments" => false).each do |ce|
           ce.add_benefit_group_assignment(default_benefit_group, default_benefit_group.start_on)
@@ -118,9 +130,7 @@ namespace :update_shop do
                 hired_on: ce.hired_on
               })
               puts "created person record for #{ce.full_name}"
-            end
-
-            if family.blank?
+            else
               family = person.primary_family
             end
 
@@ -128,6 +138,7 @@ namespace :update_shop do
               factory = Factories::FamilyEnrollmentRenewalFactory.new
               factory.family = family
               factory.census_employee = ce
+              factory.employer = employer
               if factory.renew
                 changed_count += 1
                 puts "  renewed: #{ce.full_name}"
@@ -136,8 +147,8 @@ namespace :update_shop do
               puts "family missing for #{ce.full_name}"
               family_missing += 1
             end
-          rescue => e
-            puts e.to_s
+          rescue Exception => e
+            puts "Renewal failed for #{ce.full_name} due to #{e.to_s}"
           end
         end
 
