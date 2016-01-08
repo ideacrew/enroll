@@ -43,9 +43,9 @@ class Exchanges::AgentsController < ApplicationController
     employee_role = person.employee_roles.last
 
     if consumer_role && consumer_role.bookmark_url
-      redirect_to consumer_role.bookmark_url
+      redirect_to bookmark_url_path(consumer_role.bookmark_url)
     elsif employee_role && employee_role.bookmark_url
-      redirect_to employee_role.bookmark_url
+      redirect_to bookmark_url_path(employee_role.bookmark_url)
     else
       redirect_to family_account_path
     end
@@ -69,6 +69,15 @@ class Exchanges::AgentsController < ApplicationController
     current_user.save!
   end
 
+
+  private
+
+  def bookmark_url_path(bookmark_url)
+    uri = URI.parse(bookmark_url)
+    bookmark_path = uri.path
+    bookmark_path += "?#{uri.query}" unless uri.query.blank?
+    return bookmark_path
+  end
 end
 
 

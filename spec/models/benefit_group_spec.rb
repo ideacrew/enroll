@@ -46,7 +46,8 @@ describe BenefitGroup, dbclean: :after_each do
             day = 15
             (0..11).each do |month_offset|
               date = (start_plan_year + 0.days) + month_offset.months
-              expected_effective = (date + benefit_group.effective_on_offset.days).beginning_of_month.next_month
+              doh_with_offset = (date + benefit_group.effective_on_offset.days)
+              expected_effective = doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.beginning_of_month.next_month
               expect(benefit_group.effective_on_for(date)).to eq expected_effective
             end
             date_of_hire = Date.new(2010, 01, 01)
@@ -552,6 +553,144 @@ describe BenefitGroup, type: :model do
         benefit_group.effective_on_offset = 60
         expect(benefit_group.effective_title_by_offset).to eq "First of the month following 60 days"
       end
+    end
+  end
+
+
+  describe BenefitGroup, dbclean: :after_each do
+    context "effective_on_for" do
+
+      let(:start_plan_year) { Date.new(2016, 1, 1) }
+      let(:plan_year) { FactoryGirl.create(:plan_year, start_on: start_plan_year)}
+
+      context "when employer picked 'Date of Hire'" do
+        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "date_of_hire")}
+
+        context "when doh is a past date" do 
+          let(:doh) { Date.new(2015, 8, 1)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end
+        end
+
+        context "when doh is a current date" do
+          let(:doh) { Date.new(2016, 1, 1)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end 
+        end
+
+        context "when doh is a future date" do 
+          let(:doh) { Date.new(2016, 1, 1)}
+
+          it "should return date of hire" do
+            expect(benefit_group.effective_on_for(doh)).to eq doh
+          end   
+        end
+      end
+
+      context "when employer picked 'First of the month following or coinciding with date of hire'" do
+        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 0)}
+
+        context "when doh is a past date first of month" do
+          let(:doh) { Date.new(2015, 11, 1)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end
+        end
+
+        context "when doh is a past date other than first of month" do
+          let(:doh) { Date.new(2015, 10, 28)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end
+        end
+
+        context "when doh is a future date first of month" do
+          let(:doh) { Date.new(2016, 2, 1)}
+
+          it "should return date of hire" do
+            expect(benefit_group.effective_on_for(doh)).to eq doh
+          end 
+        end
+
+        context "when doh is a future date other than first of month" do 
+          let(:doh) { Date.new(2016, 2, 15)}
+
+          it "should return first of next month from date of hire" do
+            expect(benefit_group.effective_on_for(doh)).to eq doh.beginning_of_month.next_month
+          end
+        end
+      end
+
+      context "when employer picked 'First of the month following 30 days'" do
+        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+
+        context "when doh is a very old date" do
+          let(:doh) { Date.new(2015, 8, 1)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end
+        end
+
+        context "when doh is less than a month from plan year start on" do
+          let(:doh) { Date.new(2015, 12, 5) }
+
+          it "should return eligible date as first of month following 30 days" do
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 2, 1)
+          end
+        end
+
+        context "when doh is a future date" do
+          let(:doh) { Date.new(2016, 2, 1)}
+
+          it "should return eligible date as first of month following 30 days" do
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 4, 1)
+            doh = Date.new(2016, 1, 10)
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 3, 1)
+            doh = Date.new(2016, 1, 2)
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 2, 1)
+          end
+        end
+      end
+
+      context "when employer picked 'First of the month following 60 days'" do
+        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 60)}
+
+        context "when doh is a very old date" do
+          let(:doh) { Date.new(2015, 8, 10)}
+
+          it "should return plan year start on" do
+            expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
+          end
+        end
+
+        context "when doh is less than 60 days from plan year start on" do
+          let(:doh) { Date.new(2015, 12, 5) }
+
+          it "should return eligible date as first of month following 60 days" do
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 3, 1)
+          end
+        end
+
+        context "when doh is a future date" do
+          let(:doh) { Date.new(2016, 2, 5)}
+
+          it "should return eligible date as first of month following 60 days" do
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 5, 1)
+            doh = Date.new(2016, 3, 2)
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 5, 1)
+            doh = Date.new(2016, 3, 3)
+            expect(benefit_group.effective_on_for(doh)).to eq Date.new(2016, 6, 1)
+          end
+        end
+      end
+
     end
   end
 end
