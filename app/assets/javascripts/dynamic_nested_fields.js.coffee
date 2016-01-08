@@ -15,13 +15,24 @@ $(document).on 'click', 'form .add_fields', (event) ->
   applyJQDatePickers()
   validatePlanYear()
 
-  # get all dental plan options for all plans option
-  $('label.elected_plan:contains("All plans")').on 'click', ->
+
+
+  # get all dental plan options for all plans option or for elected dental plans
+  $('span:contains("Select Reference Plan"), label.elected_plan:contains("Custom")').on 'click', ->
+    `var url`
+    `var nav_option`
+    # $(this).closest('.reference-steps').find('div:first').hide();
+    # $(this).closest('.nav-tabs').hide();
+    if $(this).is(':contains("Custom")')
+      nav_option = 'custom'
+      url = $(this).closest('li').find('.dental-reference-plans-link').attr('href')
+    else
+      nav_option = 'all_plans'
+      url = $(this).closest('.reference-steps').find('.dental-reference-plans-link').attr('href')
     plan_year_id = $('a#generate-dental-carriers-and-plans').data('plan-year-id')
     location_id = $(this).closest('.benefit-group-fields').attr('id')
     carrier_id = 'all_plans'
     start_on = $('#plan_year_start_on').val().substr(0, 4)
-    url = $(this).closest('li').find('.dental-reference-plans-link').attr('href')
     $.ajax
       type: 'GET'
       data:
@@ -29,10 +40,16 @@ $(document).on 'click', 'form .add_fields', (event) ->
         location_id: location_id
         carrier_id: carrier_id
         start_on: start_on
+        nav_option: nav_option
       url: url
     return
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
+  $('.benefit-group-fields:last').data 'time', time
 
+  $('.benefit-group-fields:last .elected-plans-tab .reference-plan input[checkbox]').each ->
+    name = $(this).attr('name')
+    alert name
+    return
   # get dental plan carrier namespace
   dental_target_url = $('a#generate-dental-carriers-and-plans').attr('href')
   plan_year_id = $('a#generate-dental-carriers-and-plans').data('planYearId')

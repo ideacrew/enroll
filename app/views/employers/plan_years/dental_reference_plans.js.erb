@@ -7,6 +7,23 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
   $('#<%= @location_id %> .elected-plans-tab').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/dental_plans")).html_safe %>");
   $('#<%= @location_id %> .elected-plans-tab').show();
   $('#<%= @location_id %> .elected-plans-continue').show();
+  if ( $('.benefit-group-fields').length > 1 ) {
+    $('.benefit-group-fields:last .elected-plans-tab .reference-plan input[type=checkbox]').each(function() {
+      var name = $(this).attr('name');
+      var new_name = name.replace("[0]", "["+$(this).closest('.benefit-group-fields').data('time')+"]");
+      $(this).attr('name', new_name);
+    });
+  }
+  $('#<%= @location_id %> .elected-plans-tab .reference-plan .col-xs-2').on('click', function() {
+
+    if ($(this).find('input[type=checkbox]').is(':checked')) {
+      $(this).find('input[type=checkbox]').removeProp('checked');
+    } else {
+      $(this).find('input[type=checkbox]').prop('checked', true );
+    }
+
+  });
+
 <% else %>
 if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 } else {
