@@ -89,6 +89,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
+    debugger
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each do |benefit_group|

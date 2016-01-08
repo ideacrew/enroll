@@ -569,6 +569,10 @@ function calcEmployerContributions(url, location, coverage_type) {
       }
     }).done(function() {
     });
+
+    $('#new_plan_year, #edit_plan_year').on('submit', function() {
+      $('.dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').removeProp('disabled');
+    });
 }
 
 
