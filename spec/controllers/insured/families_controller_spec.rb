@@ -65,14 +65,6 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(consumer_role).to receive(:save!).and_return(true)
-
-      allow(family).to receive(:_id).and_return(true)
-      allow(hbx_enrollments).to receive(:_id).and_return(true)
-      #allow(hbx_enrollments).to receive(:each).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:reject).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:map).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
-
       session[:portal] = "insured/families"
     end
 
