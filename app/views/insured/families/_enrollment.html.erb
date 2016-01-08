@@ -53,13 +53,12 @@
                     </div>
                   </td>
                   <% end %>
-                  <% if hbx_enrollment.benefit_group.present? && hbx_enrollment.benefit_group.is_congress && hbx_enrollment.created_at <= Time.zone.parse("2015-11-09 14:00:00").utc || !hbx_enrollment.consumer_role_id.blank? && hbx_enrollment.created_at <= Time.zone.parse("2015-10-13 14:00:00").utc %>
-                  <% else %>
+                  <% unless hide_policy_selected_date?(hbx_enrollment) %>
                   <td>
                     <div class="enrollment-created-at info">
                       <label>Plan Selected:
                       </label>
-                      <strong><%= format_date(hbx_enrollment.created_at) %> (<%= hbx_enrollment.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%-I:%M%p") %>)</strong>
+                      <strong><%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)</strong>
                     </div>
                   </td>
                   <% end %>

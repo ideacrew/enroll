@@ -77,14 +77,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(assigns(:person)).to eq person
     end
 
-    it "should call construct_employee_role_for_person_by_census_employee" do
-      sign_in user
-      allow(person).to receive(:has_active_employee_role?).and_return false
-      allow(CensusEmployee).to receive(:matchable).and_return [census_employee]
-      expect(census_employee).to receive(:construct_employee_role_for_match_person)
-      get :new, person_id: person.id, employee_role_id: employee_role.id
-    end
-
     context "individual" do
       let(:hbx_profile) {double(benefit_sponsorship: benefit_sponsorship)}
       let(:benefit_sponsorship) {double(benefit_coverage_periods: [benefit_coverage_period])}
@@ -142,7 +134,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:update_current)
+      allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
       expect(response).to redirect_to(family_account_path)

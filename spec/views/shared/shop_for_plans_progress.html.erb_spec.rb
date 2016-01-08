@@ -26,6 +26,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
       assign :plan, plan
       assign :enrollment, enrollment
       allow(person).to receive(:consumer_role).and_return(false)
+      allow(enrollment).to receive(:is_shop?).and_return(true)
       @person = person
       render 'shared/shop_for_plans_progress', step: '2'
     end
@@ -45,10 +46,29 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     it "should have previous option" do
       expect(rendered).to match /PREVIOUS/
     end
+  end
 
-    it "should have confirm button disabled" do
-      #expect(rendered).to have_selector('#btn-continue.disabled')
+  context "step 2 - Confirm Button" do
+
+    before :each do
+      assign :change_plan, "change"
+      assign :plan, plan
+      assign :enrollment, enrollment
+      @person = person
     end
+
+    it "should have confirm button initially disabled for IVL" do
+      allow(enrollment).to receive(:is_shop?).and_return(false)
+      render 'shared/shop_for_plans_progress', step: '2'
+      expect(rendered).to have_selector('#btn-continue.disabled')
+    end
+
+     it "should have confirm button styling not disabled for shop " do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      render 'shared/shop_for_plans_progress', step: '2'
+      expect(rendered).not_to have_selector('#btn-continue.disabled')
+    end
+
   end
 
     context "waive button with employee role" do

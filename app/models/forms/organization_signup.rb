@@ -4,10 +4,11 @@ module Forms
     attr_accessor :id
     attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :first_name, :last_name
     attr_accessor :legal_name, :dba, :entity_kind, :fein
     attr_reader :dob
     attr_accessor :office_locations
+
+    include FnameLname
 
     validates :fein,
       length: { is: 9, message: "%{value} is not a valid FEIN" },
