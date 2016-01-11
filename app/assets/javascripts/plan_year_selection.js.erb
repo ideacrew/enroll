@@ -38,7 +38,11 @@ ready = function() {
     var location_id = $(this).closest('.benefit-group-fields').attr('id');
     var carrier_id = 'all_plans';
     var start_on = $("#plan_year_start_on").val().substr(0,4);
-    var is_edit = $("#plan_year_start_on").val().substr(0,4);
+    if ( $('h1:first:contains("Edit")').length > 0 ) {
+      var is_edit = true;
+    } else {
+      var is_edit = false;
+    }
     $.ajax({
       type: "GET",
       data:{
@@ -47,7 +51,8 @@ ready = function() {
         carrier_id: carrier_id,
         start_on: start_on,
         nav_option: nav_option,
-        benefit_group: benefit_group
+        benefit_group: benefit_group,
+        is_edit: is_edit
       },
       url: url
     });
@@ -401,7 +406,7 @@ ready = function() {
 
 
 // set reference_plan_id
-$(document).on('click', '.reference-plan input + label', function() {
+$(document).on('click', '.reference-plan input[type=radio] + label', function() {
   // if ( $(this).closest('#dental-reference-plans-options-modal').length > 0 ) {
   //
   //   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');

@@ -11,19 +11,22 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def dental_reference_plans
+
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     @benefit_group = params[:benefit_group]
+    @is_edit = params[:is_edit]
     if @carrier_profile == 'all_plans'
-      @plan_year_id = PlanYear.find(params[:plan_year_id])
+      if @is_edit == "true"
+        @elected_plans = @employer_profile.plan_years.find(params[:plan_year_id]).benefit_groups.find(params[:benefit_group]).elected_dental_plan_ids
+      end
       @nav_option = params[:nav_option]
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage
-
-      @elected_plans = @employer_profile.plan_years.where(id: @plan_year_id).benefit_groups.where(id: @benefit_group).elected_dental_plan_ids unless @benefit_group.blank?
     else
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.by_carrier_profile(@carrier_profile)
     end
   end
+
 
   def reference_plans
     @benefit_group = params[:benefit_group]
@@ -92,7 +95,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    debugger
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
@@ -207,11 +209,11 @@ class Employers::PlanYearsController < ApplicationController
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
         @i = i
-        if i == 0
-          ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
-        else
+        if benefit_group.elected_dental_plan_ids.blank?
           @time = benefit_group.dental_relationship_benefits_attributes_time
           ids = params["plan_year"]["benefit_groups_attributes"]["#{@time}"]["elected_dental_reference_plan_ids"]
+        else
+          ids = params["plan_year"]["benefit_groups_attributes"]["#{@i}"]["elected_dental_reference_plan_ids"]
         end
         Plan.where(:id.in=> ids)
       else
