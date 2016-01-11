@@ -15,11 +15,11 @@
 </div>
 
   <div class="documents-table">
-    <%= paginate @unverified_persons, :remote => true %>
+    <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets, all: consumer_role_status_documents_path %>
     <div class="table-responsive">
       <table class="table table-hover table-striped">
         <col width="250">
-        <col width="100">
+        <!--<col width="100">-->
         <col width="150">
         <col width="150">
         <col width="100">
@@ -28,7 +28,7 @@
         <col width="170">
         <tr>
           <th class="text-center">HBX id</th>
-          <th class="text-center">AQHP/UQHP</th>
+          <!--<th class="text-center">AQHP/UQHP</th>-->
           <th><%= admin_docs_filter 'first_name', " First name", 'admin_docs' %></th>
           <th><%= admin_docs_filter 'last_name', " Last name", 'admin_docs'  %></th>
           <th class="text-center"> # of Docs</th>
@@ -40,7 +40,7 @@
         <% @unverified_persons.each do |person| %>
         <tr>
           <td><%= person.hbx_id %></td>
-          <td><%= person.is_aqhp? ? "AQHP"+person.primary_family.e_case_id.to_s : "UQHP" %></td>
+          <!--<td> #person.is_aqhp? ? "AQHP"+person.primary_family.e_case_id.to_s : "UQHP" </td>-->
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
           <td style="text-align:center;"><%= person.consumer_role.vlp_documents.uploaded.count %></td>
@@ -59,5 +59,5 @@
         <% end %>
       </table>
     </div>
-    <%= paginate @unverified_persons, :remote => true %>
+    <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets, all: consumer_role_status_documents_path %>
   </div>
