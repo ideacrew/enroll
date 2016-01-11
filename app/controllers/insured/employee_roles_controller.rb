@@ -197,7 +197,7 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def check_employee_role
-    set_current_person
+    set_current_person(required: false)
     if @person.try(:employee_roles).try(:last)
       redirect_to @person.employee_roles.last.bookmark_url || family_account_path
     else
