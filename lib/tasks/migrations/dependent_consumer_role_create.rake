@@ -18,9 +18,9 @@ namespace :migrations do
 
             Factories::EnrollmentFactory.add_consumer_role(
               person: member.person, 
-              new_is_incarcerated: 'false', 
-              new_is_state_resident: true,
-              new_is_applicant: 'false', 
+              new_is_incarcerated: 'false',
+              new_is_state_resident: primary.is_dc_resident?.to_s,
+              new_is_applicant: 'false',
               new_citizen_status: "us_citizen"
               )
           end
