@@ -42,6 +42,7 @@ class BenefitGroup
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Employer dental plan_ids
+  field :dental_relationship_benefits_attributes_time, type: BSON::ObjectId, default: 0
   field :dental_reference_plan_id, type: BSON::ObjectId
   field :elected_dental_plan_ids, type: Array, default: []
 

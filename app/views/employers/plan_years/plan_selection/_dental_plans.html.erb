@@ -1,13 +1,21 @@
-
-  <% @dental_plans.each do |p| %>
+<% @dental_plans.each do |p| %>
   <div class="col-xs-4">
     <div class="col-xs-12 reference-plan">
       <div class="col-xs-2">
         <% if @nav_option == 'custom' %>
-          <%= check_box_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_ids][]", p.id, true %>
-          <%= label_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_#{p.id}][]" do %>
-          <i class="fa fa-check-square-o fa-2x"></i>
-          <i class="fa fa-square-o fa-2x"></i>
+          <% if @plan_year_id.new_record? == true || @elected_plans.blank? %>
+            <%= check_box_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_ids][]", p.id, true %>
+            <%= label_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_#{p.id}][]" do %>
+              <i class="fa fa-check-square-o fa-2x"></i>
+              <i class="fa fa-square-o fa-2x"></i>
+            <% end %>
+          <% else %>
+            <% checked = true if @elected_plans.include?(p.id) %>
+            <%= check_box_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_ids][]", p.id, checked %>
+            <%= label_tag "plan_year[benefit_groups_attributes][0][elected_dental_reference_plan_#{p.id}][]" do %>
+              <i class="fa fa-check-square-o fa-2x"></i>
+              <i class="fa fa-square-o fa-2x"></i>
+            <% end %>
           <% end %>
         <% else %>
           <%= radio_button "#{@location_id}", :dental_reference_plan_id, p.id %>

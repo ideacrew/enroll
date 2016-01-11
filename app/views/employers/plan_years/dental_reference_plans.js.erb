@@ -2,6 +2,9 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
 //$('#.dental-reference-plans').before("<div class='col-xs-12 dental select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @dental_plans.count %> Plans</strong> </span></h4><br/></div>");
 <% if @nav_option == 'custom' %>
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    $('#<%= @location_id %> .dental .nav-tabs label:contains("By carrier")').on('click', function() {
+      $('#<%= @location_id %> .dental .elected-plans-continue').hide();
+    });
   } else {
   }
   $('#<%= @location_id %> .elected-plans-tab').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/dental_plans")).html_safe %>");
@@ -26,6 +29,8 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
 
 <% else %>
 if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+  $('#<%= @location_id %> .select-dental-plan .edit-offering').hide();
+  $('#<%= @location_id %> .select-dental-plan .reference-steps div:first').hide();
 } else {
 }
 $('#<%= @location_id %> .dental-reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/dental_plans")).html_safe %>");
@@ -51,10 +56,3 @@ $('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('clic
 
 });
 <% end %>
-
-if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-  $('#<%= @location_id %> .select-dental-plan .edit-offering').hide();
-  $('#<%= @location_id %> .select-dental-plan .reference-steps div:first').hide();
-} else {
-
-}

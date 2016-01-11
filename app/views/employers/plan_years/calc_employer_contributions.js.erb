@@ -19,7 +19,7 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
       $(this).closest('#<%= @location_id %>').find('.dental .edit-offering, .dental .nav-tabs, .dental .plan-options, .dental .dental').show();
       $(this).closest('#<%= @location_id %>').find('.dental .referenceplan').hide();
       $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').show();
-      $('#<%= @location_id %> <%= @coverage_type %> .currently-offered').html('You currently offer <%= @plan.name %>.');
+      $('#<%= @location_id %> <%= @coverage_type %> .edit-offering').hide();
       $('#<%= @location_id %> <%= @coverage_type %> .currently-offering').html('You currently offer <%= @plan.name %>.');
     });
     $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {

@@ -3,11 +3,12 @@
 <a href="#" data-href="<%= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
   <%= render "employers/plan_years/employee_costs_modal" %>
-<fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields'>
+<fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%= f.object.id.to_s %>">
 
   <div class="row health">
     <% if @plan_year.new_record? != true %>
     <div class="col-xs-12" style="position: relative;">
+      <h1><%= @plan_year.new_record? ? 'Health – Set Up Benefit Package' : 'Health - Edit Benefit Package' %></h1>
       <span class="starter" style="display: inline-block;">
         <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
       </span>

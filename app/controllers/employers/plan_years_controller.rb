@@ -11,12 +11,15 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def dental_reference_plans
-    @plan_year_id = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
+    @benefit_group = params[:benefit_group]
     if @carrier_profile == 'all_plans'
+      @plan_year_id = PlanYear.find(params[:plan_year_id])
       @nav_option = params[:nav_option]
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage
+
+      @elected_plans = @employer_profile.plan_years.where(id: @plan_year_id).benefit_groups.where(id: @benefit_group).elected_dental_plan_ids unless @benefit_group.blank?
     else
       @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.by_carrier_profile(@carrier_profile)
     end
@@ -92,9 +95,20 @@ class Employers::PlanYearsController < ApplicationController
     debugger
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
-    @plan_year.benefit_groups.each do |benefit_group|
+    @plan_year.benefit_groups.each_with_index do |benefit_group, i|
+
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
-      benefit_group.elected_dental_plans = benefit_group.elected_dental_plans_by_option_kind
+      benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
+        if i == 0
+          ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
+        else
+          @time = benefit_group.dental_relationship_benefits_attributes_time
+          ids = params["plan_year"]["benefit_groups_attributes"]["#{@time}"]["elected_dental_reference_plan_ids"]
+        end
+        Plan.where(:id.in=> ids)
+      else
+        benefit_group.elected_dental_plans_by_option_kind
+      end
     end
 
     if @employer_profile.default_benefit_group.blank?
@@ -189,10 +203,16 @@ class Employers::PlanYearsController < ApplicationController
   def update
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
-    @plan_year.benefit_groups.each do |benefit_group|
+    @plan_year.benefit_groups.each_with_index do |benefit_group, i|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
-        ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
+        @i = i
+        if i == 0
+          ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
+        else
+          @time = benefit_group.dental_relationship_benefits_attributes_time
+          ids = params["plan_year"]["benefit_groups_attributes"]["#{@time}"]["elected_dental_reference_plan_ids"]
+        end
         Plan.where(:id.in=> ids)
       else
         benefit_group.elected_dental_plans_by_option_kind
@@ -351,7 +371,7 @@ class Employers::PlanYearsController < ApplicationController
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
                                       :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
-                                      :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy,
+                                      :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
                                       :relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ],
