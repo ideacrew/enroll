@@ -128,7 +128,7 @@ describe Person do
 
       context 'duplicated key issue' do
         before do
-          Person.collection.indexes.drop({'ssn' => 1})
+          Person.remove_indexes
           Person.create_indexes
         end
         context "with blank ssn" do
@@ -567,7 +567,7 @@ describe Person do
       person1.user_id = user_id
       person2.user_id = user_id
       person1.save!
-      expect { person2.save! }.to raise_error(Moped::Errors::OperationFailure)
+      expect { person2.save! }.to raise_error
     end
 
   end

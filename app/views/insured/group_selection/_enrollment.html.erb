@@ -24,7 +24,7 @@
             <div class="family-members">
               <p>
                 <label>Covered:</label>
-                  <a href="#"><%= names.delete_at(0).camelcase %></a>
+                  <a href="#"><%= names.delete_at(0).to_s.camelcase %></a>
                   <% names.each do |name| %>
                     <span class="separator"><a href="#"><%= name.camelcase %></a></span>
                   <% end %>

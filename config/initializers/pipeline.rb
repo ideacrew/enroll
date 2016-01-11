@@ -1,8 +1,7 @@
-module Moped
+module Mongo
   class Collection
-    def raw_aggregate(pipeline)
-      command = { aggregate: name.to_s, pipeline: pipeline }
-      database.session.command(command)["result"]
+    def raw_aggregate(pipeline, options={})
+      aggregate(pipeline, options)
     end
   end
 end

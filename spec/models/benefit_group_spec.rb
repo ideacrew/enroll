@@ -297,6 +297,42 @@ describe BenefitGroup, type: :model do
         it "should be findable" do
           expect(BenefitGroup.find(saved_benefit_group._id)).to eq saved_benefit_group
         end
+
+        context "and termination effective on date is requested" do
+          let(:three_days_after_oe_start_on)  { plan_year.open_enrollment_start_on + 3.days }
+          let(:one_day_after_oe_end_on)       { plan_year.open_enrollment_end_on + 1.day }
+
+          context "and termination is during open enrollment" do
+            it "termination date should be start_on date" do
+              expect(saved_benefit_group.termination_effective_on_for(three_days_after_oe_start_on)).to eq plan_year.start_on
+            end
+
+            it "termination date should be start_on date" do
+              expect(saved_benefit_group.termination_effective_on_for(one_day_after_oe_end_on)).to eq plan_year.start_on
+            end
+
+          end
+
+          context "and termination is outside open enrollment" do
+            let(:one_day_before_start_on)   { plan_year.start_on - 1.day }
+            let(:offset_period)             { 80 }
+            let(:after_start_on)            { plan_year.start_on + offset_period.days }
+
+            context "before start_on date" do
+              it "termination date should be start_on date" do
+                expect(saved_benefit_group.termination_effective_on_for(one_day_before_start_on)).to eq plan_year.start_on
+              end
+            end
+
+            context "and termination is after start_on date" do
+              it "termination date should be last day of month following supplied date" do
+                expect(saved_benefit_group.termination_effective_on_for(after_start_on)).to eq after_start_on.end_of_month
+              end
+
+            end
+          end
+        end
+
       end
     end
   end
@@ -344,9 +380,6 @@ describe BenefitGroup, type: :model do
     context "and the 'metal level' option is offered" do
       let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
       let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
-
-      context "and " do
-      end
 
       context "and elected plans are not all of the same metal level as reference plan" do
         before do

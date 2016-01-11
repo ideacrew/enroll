@@ -10,7 +10,7 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   def active_year;
-    2015;
+    2016;
   end
 
   def hios_id;
@@ -366,7 +366,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       context "individual health by active year" do
-        it "should return individual count" do 
+        it "should return individual count" do
           expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count
         end
 
@@ -375,7 +375,7 @@ RSpec.describe Plan, dbclean: :after_each do
           plan.update(hios_id: "1212312312322-02")
 
           expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count - 1
-        end 
+        end
       end
 
       context "with referenced plan_type scope of either ppo, hmo, pos, epo" do

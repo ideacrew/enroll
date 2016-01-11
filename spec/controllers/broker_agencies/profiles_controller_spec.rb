@@ -162,16 +162,29 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "get employers" do
+    let(:broker_role) {FactoryGirl.build(:broker_role)}
+    let(:person) {double("person", broker_role: broker_role)}
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 
-    it "should get organizations which broker_agency_account is active" do
+    it "should get organizations for employers where broker_agency_account is active" do
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in user
       xhr :get, :employers, id: broker_agency_profile.id, format: :js
       expect(response).to have_http_status(:success)
-      orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile._id}).where({'employer_profile.broker_agency_accounts.is_active' => true})
+      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
+      expect(assigns(:orgs)).to eq orgs
+    end
+
+    it "should get organizations for employers where writing_agent is active" do
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:person).and_return(person)
+      sign_in user
+      xhr :get, :employers, id: broker_agency_profile.id, format: :js
+      expect(response).to have_http_status(:success)
+      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :writing_agent_id=> broker_role.id }}})
       expect(assigns(:orgs)).to eq orgs
     end
   end
