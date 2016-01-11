@@ -2,8 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "broker_agencies/profiles/_families.html.erb"  do |variable|
   before :each do
-    #stub_template "shared/alph_paginate" => ''
-    stub_template "_families_table_for_broker" => ''
+    stub_template "_families_table_for_broker.html.erb" => ''
     @page_alphabets = ['XXX', 'YYY']
     render template: "broker_agencies/profiles/_families.html.erb" 
   end
