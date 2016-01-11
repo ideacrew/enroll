@@ -287,6 +287,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
   allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
   allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
+  allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
+
   allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
