@@ -18,6 +18,9 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
       wa.emails = [
         FactoryGirl.build(:email, kind: "work")
       ]
+      wa.phones = [
+        FactoryGirl.build(:phone, kind: "home")
+      ]
       wa.save
       f
     end

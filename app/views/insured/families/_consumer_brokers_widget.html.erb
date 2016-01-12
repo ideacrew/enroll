@@ -34,7 +34,7 @@
           </small>
           <small>
             <%= @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
-            <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
+            <%= @person.primary_family.current_broker_agency.writing_agent.person.phones.first %>
             <br/><br/>
           </small>
         </span>
