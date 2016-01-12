@@ -134,7 +134,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:update_current)
+      allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
       expect(response).to redirect_to(family_account_path)

@@ -52,9 +52,11 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    cost_sharing = @benefit_package.cost_sharing
-    csr_kind = @role.try(:person).try(:primary_family).try(:latest_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year)
+    return true if tax_household.blank?
 
+    cost_sharing = @benefit_package.cost_sharing
+    csr_kind = tax_household.current_csr_eligibility_kind
     return true if csr_kind.blank? or cost_sharing.blank?
     csr_kind == cost_sharing
   end

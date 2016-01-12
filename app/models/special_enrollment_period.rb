@@ -82,6 +82,11 @@ class SpecialEnrollmentPeriod
     (start_on..end_on).include?(TimeKeeper.date_of_record)
   end
 
+  def is_shop?
+    return false if qualifying_life_event_kind.blank?
+    qualifying_life_event_kind.market_kind == "shop"
+  end
+
   def duration_in_days
     return nil if start_on.blank? || end_on.blank?
     end_on - start_on
@@ -110,7 +115,7 @@ private
 
     # Use end_on date as boundary guard for lapsed SEPs
     @reference_date = [submitted_at.to_date, end_on].min
-    @earliest_effective_date = [@reference_date, qle_on].max
+    @earliest_effective_date = self.is_shop? ? qle_on : [@reference_date, qle_on].max
     start_on..end_on
   end
 
@@ -147,8 +152,20 @@ private
     elsif qualifying_life_event_kind.is_moved_to_dc?
       calculate_effective_on_for_moved_qle
     else
-      @earliest_effective_date.end_of_month + 1.day
+      is_shop? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
     end    
+  end
+
+  def first_of_next_month_effective_date_for_individual
+    @earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_next_month_effective_date_for_shop
+    if @earliest_effective_date == @earliest_effective_date.beginning_of_month
+      @earliest_effective_date
+    else
+      @earliest_effective_date.end_of_month + 1.day
+    end
   end
 
   def fixed_first_of_next_month_effective_date

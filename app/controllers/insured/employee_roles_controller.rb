@@ -3,7 +3,6 @@ class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
 
-
   def welcome
   end
 
@@ -172,6 +171,17 @@ class Insured::EmployeeRolesController < ApplicationController
     redirect_to search_insured_employee_index_path
   end
 
+  def show
+    #PATH REACHED FOR UNKNOWN REASONS, POSSIBLY DUPLICATE PERSONS SO USER, URL ARE LOGGED
+    message={}
+    message[:message] ="insured/employee_role/show is not a valid route, "
+    message[:user] = current_user.email
+    message[:url] = request.original_url
+    log(message, severity: 'error')
+
+    redirect_to search_insured_employee_index_path
+  end
+
   private
 
   def check_employee_role_permissions_edit
@@ -195,4 +205,5 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
+
 end

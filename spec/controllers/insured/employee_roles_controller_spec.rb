@@ -304,6 +304,30 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(family_account_path)
     end
+  end
+  describe "GET show" do
+    let(:user) { FactoryGirl.build(:user) }
+    let(:person) { FactoryGirl.build(:person) }
+
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+    end
+
+    it 'should redirect to a placeholder url' do
+      get :show, id: 888
+      expect(response).to redirect_to(search_insured_employee_index_path)
+    end
+
+    it 'should log user email and url' do
+      expect(subject).to receive(:log) do |msg, severity|
+        expect(severity[:severity]).to eq('error')
+        expect(msg[:user]).to eq(user.email)
+        expect(msg[:url]).to match /insured\/employee\/888/
+      end
+      get :show, id: 888
+    end
+
 
   end
 end

@@ -1,3 +1,13 @@
+$(document).ready(function() {
+	$('#new_person_wrapper #btn-continue').on('click', function() {
+		if ( $('#employee-sponsored-benefits').is(':checked') ) {
+			$('#new_employment_relationship').submit();
+		} else {
+			$('.new_person:last').submit();
+		}
+	});
+});
+
 function displayEmployeeRoleSearch() {
 	$("#overlay").css("display", "none");
 	$("a.name").css("padding-top", "30px");
@@ -50,7 +60,7 @@ function match_person()
 		//Sidebar Switch - Search Active
 				$(".overlay-in").css("display", "block");
 			}
-		});  
+		});
 	} else {
 		$('#personal_info .employee-info').addClass('require-field');
 	}
