@@ -6,6 +6,9 @@ class CensusEmployee < CensusMember
   include Autocomplete
   require 'roo'
 
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
+
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
@@ -52,9 +55,9 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
 
-  scope :active,      ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
-  scope :terminated,  ->{ any_in(aasm_state: ["employment_terminated", "rehired"]) }
-  scope :non_terminated, -> { where(:aasm_state.nin => ["employment_terminated", "rehired"]) }
+  scope :active,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
 
   #TODO - need to add fix for multiple plan years
   scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -292,7 +295,11 @@ class CensusEmployee < CensusMember
   end
 
   def construct_employee_role_for_match_person
-    person = Person.by_ssn(ssn).last if Person.by_ssn(ssn).present?
+    employee_relationship = Forms::EmployeeCandidate.new({first_name: first_name,
+                                                          last_name: last_name,
+                                                          ssn: ssn,
+                                                          dob: dob.strftime("%Y-%m-%d")})
+    person = employee_relationship.match_person if employee_relationship.present?
     return false if person.blank? or (person.present? and person.has_active_employee_role?)
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
@@ -313,6 +320,23 @@ class CensusEmployee < CensusMember
       unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
     end
 
+    def find_all_terminated(employer_profiles: [], date_range: (TimeKeeper.date_of_record..TimeKeeper.date_of_record))
+
+      if employer_profiles.size > 0
+        employer_profile_ids = employer_profiles.map(&:_id) 
+        query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
+                                    where(
+                                      :employment_terminated_on.gte => date_range.first,
+                                      :employment_terminated_on.lte => date_range.last
+                                    )      
+      else
+        query = unscoped.terminated.where(
+                                    :employment_terminated_on.gte => date_range.first,
+                                    :employment_terminated_on.lte => date_range.last
+                                  )
+      end
+      query.to_a
+    end
 
   end
 

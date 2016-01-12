@@ -35,6 +35,10 @@ class TaxHousehold
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
+  def current_csr_eligibility_kind
+    latest_eligibility_determination.csr_eligibility_kind
+  end
+
   def current_max_aptc
     eligibility_determination = latest_eligibility_determination
     #TODO need business rule to decide how to get the max aptc

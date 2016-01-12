@@ -36,11 +36,11 @@ describe Forms::EmploymentRelationship do
   end
 
   describe "given additional data needed by the employee_role factory" do
-    let(:first_name) { double } 
-    let(:last_name) { double } 
-    let(:middle_name) { double } 
-    let(:name_pfx) { double } 
-    let(:name_sfx) { double } 
+    let(:first_name) { "first" } 
+    let(:last_name) { "last" } 
+    let(:middle_name) { "middle" } 
+    let(:name_pfx) { "pfx" } 
+    let(:name_sfx) { "sfx" } 
     let(:gender) { double }
 
     subject { Forms::EmploymentRelationship.new({

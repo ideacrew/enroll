@@ -6,6 +6,7 @@ class Person
 
   include Notify
   include UnsetableSparseFields
+  include FullStrippedNames
 
   extend Mongorder
   validates_with Validations::DateRangeValidator
@@ -178,6 +179,7 @@ class Person
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
   scope :unverified_persons,        -> {Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending'])}
+  scope :matchable,                 ->(ssn, dob, last_name) { where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name: last_name) }
 
 
 #  ViewFunctions::Person.install_queries
