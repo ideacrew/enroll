@@ -29,9 +29,8 @@ if (dental_reference_plan_remainder > 0 ) {
 } else {
 
 }
-
   start_on = $("#plan_year_start_on").val().substr(0,4);
-  $('.view-summaryx').each(function() {
+  $('#<%= @location_id %> .health .view-summary, #<%= @location_id %> .health-view-summary a').each(function() {
     var url = $(this).attr('href');
     $(this).attr('href', url+"&start_on="+start_on);
   });

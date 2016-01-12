@@ -58,3 +58,8 @@ $('#<%= @location_id %> .select-dental-plan .reference-plan .col-xs-2').on('clic
 
 });
 <% end %>
+start_on = $("#plan_year_start_on").val().substr(0,4);
+$('#<%= @location_id %> .dental .view-summary, #<%= @location_id %> .dental-view-summary a').each(function() {
+  var url = $(this).attr('href');
+  $(this).attr('href', url+"&start_on="+start_on);
+});
