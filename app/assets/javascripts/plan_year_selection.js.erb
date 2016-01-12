@@ -317,6 +317,9 @@ ready = function() {
         $(this).closest('.benefit-group-fields').find('.dental-reference-plans').hide();
         $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
         $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').hide();
+        if ( $(this).is(':contains("By carrier")') ) {
+          $(this).closest('.reference-steps').find('.elected-plans-continue').hide();
+        }
 
       }
       $(this).closest('.benefit-group-fields').find(nav+' .nav-tabs li').removeClass('active');
