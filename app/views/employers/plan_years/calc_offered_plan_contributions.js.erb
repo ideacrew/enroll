@@ -17,6 +17,7 @@ $(".change-dental-reference-plan").show();
 if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
   if ( '<%= @coverage_type %>' == '.dental' ) {
     $("#<%= @location_id %> .dental .change-dental-reference-plan").on('click', function() {
+      $("#<%= @location_id %> .dental .nav-tabs input[type=radio]").removeAttr('checked');
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.dental .edit-offering, .dental .nav-tabs').show();
       $('#<%= @location_id %> <%= @coverage_type %> .currently-offered').html('You currently offer <%= @plan.name %>.');

@@ -207,7 +207,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
-      benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
+      ax = if benefit_group.dental_plan_option_kind == "single_plan"
         @i = i
         if benefit_group.elected_dental_plan_ids.blank?
           @time = benefit_group.dental_relationship_benefits_attributes_time
@@ -215,10 +215,11 @@ class Employers::PlanYearsController < ApplicationController
         else
           ids = params["plan_year"]["benefit_groups_attributes"]["#{@i}"]["elected_dental_reference_plan_ids"]
         end
-        Plan.where(:id.in=> ids)
+        ids ? Plan.where(:id.in=> ids) : nil
       else
         benefit_group.elected_dental_plans_by_option_kind
       end
+      benefit_group.elected_dental_plans = ax if ax
     end
 
     if @plan_year.save

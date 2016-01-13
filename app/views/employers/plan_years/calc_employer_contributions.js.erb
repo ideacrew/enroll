@@ -2,13 +2,30 @@ $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').html("<%= escape_j
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
+if ( $("#<%= @location_id %> .select-dental-plan").is(":hidden") ) {
+  $('#<%= @location_id %> label.elected_plan:contains("Custom")').trigger('click');
+  $('#<%= @location_id %> .elected-plans-continue span').trigger('click');
+}
 $("#<%= @location_id %> .select-dental-plan").show();
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 $("#<%= @location_id %> .dental-reference-plans, #<%= @location_id %> .dental.selected-plan > .row:first").hide();
 $("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").show();
 $("#<%= @location_id %> <%= @coverage_type %>-view-summary").show();
-$("#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection").show();
+
 if ( '<%= @coverage_type %>' == '.dental' ) {
+
+  if ( $("#<%= @location_id %> <%= @coverage_type %> label:contains('Custom')").closest('li').find('input').is(':checked') ) {
+    if ( $('#<%= @location_id %> .elected-plans-tab input[type=checkbox]').length == $('#<%= @location_id %> .elected-plans-tab input[type=checkbox]:checked').length ) {
+      $('#<%= @location_id %> .dental-config-reference-selection').text('Currently Offering: All Plans');
+    } else {
+      $('#<%= @location_id %> .dental-config-reference-selection').text('Currently Offering: '+$('#<%= @location_id %> .elected-plans-tab input[type=checkbox]:checked').length+ ' Plans');
+    }
+
+  } else {
+    $("#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection").hide();
+
+  }
+
    $('#<%= @location_id %> .select-dental-plan h4 .starter:first + span').show();
    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
     $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').hide();
@@ -60,11 +77,11 @@ $("#<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").on
 
 $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
   $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').show();
-  $('#<%= @location_id %>  <%= @coverage_type %> .selected-plan').hide();
+  $('#<%= @location_id %>  <%= @coverage_type %> .selected-plan, #<%= @location_id %>  <%= @coverage_type %> .carriers-tab').hide();
   $('#<%= @location_id %> .dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').show();
   $("#<%= @location_id %> .dental-ref-plan").val("","");
 
-  $("#<%= @location_id %> .dental .nav-tabs input[type=radio], #<%= @location_id %> .dental .plan-options input[type=radio]").removeAttr('checked');
+  $("#<%= @location_id %> .dental .plan-options input[type=radio]").removeAttr('checked');
   if ( $("#<%= @location_id %> .dental .nav-tabs label:first").closest('.li').hasClass('active') == true ) {
   } else {
     // $("#<%= @location_id %> .dental .nav-tabs label:first").trigger('click');

@@ -409,7 +409,7 @@ private
 
   def eligible_on(date_of_hire)
     if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire 
+      date_of_hire
     else
       doh_with_offset = date_of_hire + effective_on_offset.days
       doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month
