@@ -169,7 +169,7 @@ function getCarrierPlans(ep, ci) {
     function validatePlanYear() {
       bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
       bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-      referenceplanselections = $('.reference-plan input[type=radio]:checked');
+      referenceplanselections = $('.health .reference-plan input[type=radio]:checked');
 
       bgtitles.each(function() {
 
@@ -197,7 +197,7 @@ function getCarrierPlans(ep, ci) {
         }
       });
 
-      if ( referenceplanselections.length != $('.benefit-group-fields').length * 2) {
+      if ( referenceplanselections.length != $('.benefit-group-fields').length ) {
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Each benefit group is required to have a reference plan selection before it can be saved');
         validatedreferenceplanselections = false;
         validated = false;
