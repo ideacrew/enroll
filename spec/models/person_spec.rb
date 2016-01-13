@@ -751,7 +751,11 @@ describe Person do
       let(:tax_household) {FactoryGirl.create(:tax_household, household: household) }
       let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
 
-
+      before :each do
+        family1.households.first.tax_households<<tax_household
+        family1.save
+        @person_aqhp = family1.primary_applicant.person
+      end
       it "creates person with status verification_pending" do
         expect(person.consumer_role.aasm_state).to eq("verifications_pending")
       end
@@ -767,27 +771,19 @@ describe Person do
       end
 
       it "creates family with households and tax_households" do
-        family1.households.first.tax_households<<tax_household
-        family1.save
         expect(family1.households.first.tax_households).not_to be_empty
       end
 
-      it "creates tax_household with eligibility determination" do
-        family1.households.first.tax_households<<tax_household
-        family1.save
-        family1.households.first.tax_households.first.eligibility_determinations<<eligibility_determination
-        family1.save
-        expect(family1.households.first.tax_households.first.eligibility_determinations).not_to be_empty
+      it "true if person family households present" do
+        expect(@person_aqhp.check_households(family1)).to eq true
       end
 
-      it "returns families with AQHP" do
-        family1.households.first.tax_households<<tax_household
-        family1.save
-        family1.households.first.tax_households.first.eligibility_determinations<<eligibility_determination
-        family1.save
-        person_aqhp = family1.primary_applicant.person
-        expect(person_aqhp.is_aqhp?).to eq(true)
+      it "true if person family households tax_households present" do
+        expect(@person_aqhp.check_tax_households(family1)).to eq true
+      end
 
+      it "returns true if persons is AQHP" do
+        expect(@person_aqhp.is_aqhp?).to eq true
       end
     end
   end

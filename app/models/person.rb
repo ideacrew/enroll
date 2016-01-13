@@ -198,8 +198,20 @@ class Person
   end
 
   def is_aqhp?
-    family_id = self.primary_family ? self.primary_family.id : 1
-    Family.all_assistance_applying.only(:_id).map(&:_id).include? family_id
+    family = self.primary_family if self.primary_family
+    if family
+      check_households(family) && check_tax_households(family)
+    else
+      false
+    end
+  end
+
+  def check_households family
+    family.households.present? ? true : false
+  end
+
+  def check_tax_households family
+    family.households.first.tax_households.present? ? true : false
   end
 
   def completed_identity_verification?
