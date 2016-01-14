@@ -80,6 +80,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "ppo",
         metal_level: "metal_level_1",
         carrier_profile: carrier_profile,
+        id: "12312312312323",
         )
     end
 
@@ -90,6 +91,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "",
         metal_level: "metal_level_2",
         carrier_profile: carrier_profile,
+        id: "12312312312323",
+
         )
     end
 
@@ -101,11 +104,20 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         effective_on_offset: "30",
         plan_option_kind: "plan_option_kind_1",
         relationship_benefits: [relationship_benefits],
+        dental_relationship_benefits: [dental_relationship_benefits],
         reference_plan: reference_plan_1,
         reference_plan_id: double("id"),
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_1",
         monthly_min_employee_cost: "monthly_min_employee_cost_1",
         monthly_max_employee_cost: "monthly_max_employee_cost_1",
+        dental_reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_1,
+        dental_plan_option_kind: 'single_plan',
+        elected_dental_plan_ids: '1231313213123',
+        elected_dental_plan_ids: [:dental_reference_plan_id, :dental_reference_plan_id]
+
+
+
         )
     end
 
@@ -117,15 +129,31 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         effective_on_offset: "0",
         plan_option_kind: "plan_option_kind_2",
         relationship_benefits: [relationship_benefits],
+        dental_relationship_benefits: [dental_relationship_benefits],
         reference_plan: reference_plan_2,
         reference_plan_id: double("id"),
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_2",
         monthly_min_employee_cost: "monthly_min_employee_cost_2",
         monthly_max_employee_cost: "monthly_max_employee_cost_2",
+        dental_reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_2,
+        dental_plan_option_kind: 'single_plan',
+        elected_dental_plan_ids: [:dental_reference_plan_id, :dental_reference_plan_id]
+
         )
     end
 
     def relationship_benefits
+      random_value = rand(999_999_999)
+      double(
+        "RelationshipBenefit",
+        offered: "offered;#{random_value}",
+        relationship: "relationship;#{random_value}",
+        premium_pct: "premium_pct;#{random_value}"
+        )
+    end
+
+    def dental_relationship_benefits
       random_value = rand(999_999_999)
       double(
         "RelationshipBenefit",

@@ -506,14 +506,22 @@
             color: #b7b7b7;
             font-size: 12px;
             text-transform: uppercase;
+            padding-right:15px;
+            &:last-of-type {
+              padding-right: 0;
+            }
+
           }
           td {
             color: #333333;
             font-size: 16px;
             word-wrap: break-word;
             vertical-align: top;
+            padding-right:15px;
             &:last-of-type {
               padding-left: 0;
+              padding-right:0;
+
             }
           }
         }
@@ -582,6 +590,9 @@
         box-shadow: none;
         table {
           border-bottom: 0;
+          tr {
+            vertical-align: top;
+          }
         }
         &.est {
 
