@@ -12,7 +12,6 @@ $("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @
 $("#<%= @location_id %> <%= @coverage_type %>-view-summary").show();
 
 if ( '<%= @coverage_type %>' == '.dental' ) {
-  alert('dental');
   $("#<%= @location_id %> .dental-reference-plans, #<%= @location_id %> .dental.selected-plan > .row:first").hide();
 
   if ( $("#<%= @location_id %> <%= @coverage_type %> label:contains('Custom')").closest('li').find('input').is(':checked') ) {
@@ -65,7 +64,6 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
     });
   } else {
-    alert('health');
 
     $('#<%= @location_id %> .health .change-dental-reference-plan').hide();
   }
