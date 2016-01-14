@@ -3,24 +3,19 @@
 <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
-<% if @plan_year.new_record? %>
-<h1>Health – Set Up Benefit Package</h1>
-<span class="starter" style="display: inline-block;">
-  <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
-</span>
-<% end %>
+
 <div class="reference-summary">
 </div>
 <%= render "employers/plan_years/employee_costs_modal" %>
 <fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%= f.object.id.to_s %>">
 
   <div class="row health">
-    <% if @plan_year.new_record? != true %>
     <div class="col-xs-12" style="position: relative;">
       <h1><%= @plan_year.new_record? ? 'Health – Set Up Benefit Package' : 'Health - Edit Benefit Package' %></h1>
       <span class="starter" style="display: inline-block;">
         <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
       </span>
+      <% if @plan_year.new_record? == false %>
       <span class="pull-right">
         <div id="edit_employer_cost_info_btn" style="bottom: 0; position:absolute; right: 15px;">
           <div class="btn btn-trans btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
@@ -29,9 +24,9 @@
           <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
         </div>
       </span>
+      <% end %>
     </div>
     <br class="clear"/>
-    <% end %>
     <br/>
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="row row-form-wrapper no-buffer plan-title">
