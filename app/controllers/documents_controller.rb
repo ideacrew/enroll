@@ -13,11 +13,6 @@ class DocumentsController < ApplicationController
   def consumer_role_status
     docs_page_filter
     search_box
-    @page_alphabets = page_alphabets(@unverified_persons, "last_name")
-    if params[:page]
-      page_no = params[:page]
-      @unverified_persons = @unverified_persons.select{|person| person.last_name =~ /^#{page_no}/i }
-    end
     respond_to do |format|
       format.html { render partial: "index_consumer_role_status" }
       format.js {}
@@ -90,17 +85,20 @@ end
  end
 
  def search_box
-     @unverified_persons = @unverified_persons.search(params[:q]) if params[:q]
+   if params[:q]
+     @q = params[:q]
+     @unverified_persons = @unverified_persons.search(params[:q])
+   end
  end
 
  def docs_page_filter
    case params[:sort]
-   when 'waiting'
-     @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-   when 'no_docs_uloaded'
-     @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-   else
-     @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+     when 'waiting'
+       @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+     when 'no_docs_uloaded'
+       @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+     else
+       @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
    end
  end
 

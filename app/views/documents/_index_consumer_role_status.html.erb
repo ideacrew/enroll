@@ -5,17 +5,18 @@
 </p><br>
 
 <div class="row container">
-  <%= admin_docs_filter 'waiting', "Doc waiting for review", "btn btn-default" %>
-  <%= admin_docs_filter 'no_docs_uloaded', "Missing documents", "btn btn-default" %>
+  <%= admin_docs_filter 'waiting', "Doc waiting for review (#{docs_waiting_for_review})", "btn btn-default" %>
+  <%= admin_docs_filter 'no_docs_uloaded', "Missing documents (#{missing_docs})", "btn btn-default" %>
+  <%= admin_docs_filter 'all', "All unverified (#{all_unverified})", "btn btn-default" %>
   <div class="form-inline button-group-wrapper">
     <div class="input-group search-wp">
-      <%= render 'shared/search', url: consumer_role_status_documents_path, q: @search, placeholder: "First/Last Name, SSN", remote: true %>
+      <%= render 'shared/search', url: consumer_role_status_documents_path, q: @q, placeholder: "First/Last Name, SSN", remote: true %>
     </div>
   </div>
 </div>
 
   <div class="documents-table">
-    <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets, all: consumer_role_status_documents_path %>
+    <%= paginate @unverified_persons, remote: true %>
     <div class="table-responsive">
       <table class="table table-hover table-striped">
         <col width="250">
@@ -59,5 +60,16 @@
         <% end %>
       </table>
     </div>
-    <%= render 'shared/alph_paginate_remote', url: consumer_role_status_documents_path, alphs: @page_alphabets, all: consumer_role_status_documents_path %>
+   <div class="row container">
+     <div class="col-md-8" id="families_paginator">
+       <%= paginate @unverified_persons, remote: true %>
+     </div>
+     <div class="col-md-4" id="families_count">
+       <p><%= "#{number_with_delimiter(@unverified_persons.count)} / #{number_with_delimiter(Person.count)} " %><small>(people selected / total)</small></p>
+     </div>
+   </div>
   </div>
+
+
+
+
