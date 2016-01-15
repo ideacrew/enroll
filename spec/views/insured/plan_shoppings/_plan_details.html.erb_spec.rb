@@ -10,6 +10,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
       total_employer_contribution: 200,
       ehb: 0.9881,
+      can_use_aptc?: true,
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     )
@@ -54,6 +55,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       expect(rendered).to match(/#{plan.metal_level}/)
       expect(rendered).to match(/#{plan.hios_id}/)
       expect(rendered).to match(/#{plan.ehb}/)
+      expect(rendered).to match(/#{plan.can_use_aptc?}/)
     end
 
     it "should match css selector for standard plan" do
@@ -100,6 +102,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       expect(rendered).to match(/#{plan.plan_type}/)
       expect(rendered).to match(/#{plan.metal_level}/)
       expect(rendered).to match(/#{plan.hios_id}/)
+      expect(rendered).to match(/#{plan.can_use_aptc?}/)
     end
 
     it "should match css selector for standard plan" do
