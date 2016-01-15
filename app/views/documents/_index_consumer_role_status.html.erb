@@ -7,7 +7,6 @@
 <div class="row container">
   <%= admin_docs_filter 'waiting', "Doc waiting for review (#{docs_waiting_for_review})", "btn btn-default" %>
   <%= admin_docs_filter 'no_docs_uloaded', "Missing documents (#{missing_docs})", "btn btn-default" %>
-  <%= admin_docs_filter 'all', "All unverified (#{all_unverified})", "btn btn-default" %>
   <div class="form-inline button-group-wrapper">
     <div class="input-group search-wp">
       <%= render 'shared/search', url: consumer_role_status_documents_path, q: @q, placeholder: "First/Last Name, SSN", remote: true %>
