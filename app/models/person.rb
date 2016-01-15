@@ -378,7 +378,23 @@ class Person
   end
 
   def work_email
-    emails.detect { |adr| adr.kind == "home" }
+    emails.detect { |adr| adr.kind == "work" }
+  end
+
+  def work_phone
+    phones.detect { |phone| phone.kind == "work" } || main_phone
+  end
+
+  def main_phone
+    phones.detect { |phone| phone.kind == "main" }
+  end
+
+  def home_phone
+    phones.detect { |phone| phone.kind == "home" }
+  end
+
+  def mobile_phone
+    phones.detect { |phone| phone.kind == "mobile" }
   end
 
   def has_active_consumer_role?
