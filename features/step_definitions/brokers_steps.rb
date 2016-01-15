@@ -286,7 +286,7 @@ Then(/^.+ sees covered family members$/) do
 end
 
 Then(/^.+ choses a healthcare plan$/) do
-  wait_and_confirm_text(/Choose Healthcare/i)
+  wait_and_confirm_text(/Choose Plan/i)
   wait_and_confirm_text(/Apply/)
   plan = @browser.a(class: 'interaction-click-control-select-plan')
   plan.click

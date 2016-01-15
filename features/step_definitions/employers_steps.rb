@@ -383,7 +383,7 @@ When(/^.+ enters? combined filter in plan selection page$/) do
   # Platinum
   @browser.execute_script(
     'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose Healthcare/i)
+    @browser.element(:text => /Choose Plan/i)
   )
   @browser.checkbox(class: /interaction-choice-control-value-plan-metal-level-silver/).set(true)
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
