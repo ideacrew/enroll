@@ -44,6 +44,8 @@ class PlanYear
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
+  scope :by_date_range,     ->(from, to) { where(:"start_on".gte => from, :"start_on".lte => to) }
+
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
     self.employer_profile
@@ -556,7 +558,7 @@ class PlanYear
 
     # Admin ability to accept application and successfully complete enrollment
     event :enroll, :after => :record_transition do
-      transitions from: [:published, :enrolling], to: :enrolled
+      transitions from: [:published, :enrolling, :renewing_published], to: :enrolled
     end
 
     # Admin ability to reset renewing plan year application

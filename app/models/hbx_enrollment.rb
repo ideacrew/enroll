@@ -759,6 +759,8 @@ class HbxEnrollment
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
 
+    state :coverage_expired
+
     state :inactive   # :after_enter inform census_employee
 
     state :auto_renewing

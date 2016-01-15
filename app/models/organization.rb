@@ -52,6 +52,7 @@ class Organization
   scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
   scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
 
+  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
 
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
