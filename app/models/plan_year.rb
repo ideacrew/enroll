@@ -566,7 +566,7 @@ class PlanYear
   end
 
   def revert_employer_profile_application
-    employer_profile.revert_application!
+    employer_profile.revert_application! if employer_profile.may_revert_application?
     record_transition
   end
 
