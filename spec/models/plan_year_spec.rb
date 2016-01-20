@@ -1794,12 +1794,15 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context 'when plan year start date overlaps with published plan year' do
 
       before do
+
+        old_plan_year_start_on = TimeKeeper.date_of_record.end_of_month + 1.day - 1.year
+
         old_plan_year = PlanYear.new({
             employer_profile: employer_profile,
-            start_on: Date.new(2015,3,1),
-            end_on: Date.new(2015,3,1) + 1.year - 1.day,
-            open_enrollment_start_on: Date.new(2015,3,1) - 1.month,
-            open_enrollment_end_on: Date.new(2015,3,1) - 1.month + 9.days,
+            start_on: old_plan_year_start_on,
+            end_on: old_plan_year_start_on + 1.year - 1.day,
+            open_enrollment_start_on: old_plan_year_start_on - 1.month,
+            open_enrollment_end_on: old_plan_year_start_on - 1.month + 9.days,
             fte_count: valid_fte_count,
             imported_plan_year: true
             })
