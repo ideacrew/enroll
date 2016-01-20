@@ -93,7 +93,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
-    render :text => status_text.html_safe, layout: false
+    @person = Person.find(params[:person])
+    broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
+    render :text => {broker: broker_view, status: status_text}.to_json, layout: false
   end
 
   def family_index

@@ -1,12 +1,14 @@
 <div>
-  <% if @person.has_consumer_role? %>
+    <% if @person.has_consumer_role? %>
     <%= render 'help_signup' %>
   <% end %>
-  <% if @employer_profile.present? || @person.has_active_employee_role? %>
     <div class="brokers-widget">
-      <%= render 'brokers_widget' %>
+      <% if @person.has_active_employee_role? %>
+        <%= render 'employee_brokers_widget' %>
+      <% elsif @person.has_consumer_role? %>
+      <%= render 'consumer_brokers_widget' %>
+      <% end %>
     </div>
-  <% end %>
   <%= render 'qles_panel' %>
   <%- #render 'employer_panel' if show_employer_panel?(@person, @hbx_enrollments) %>
 </div>
