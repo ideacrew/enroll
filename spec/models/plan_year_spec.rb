@@ -1752,4 +1752,66 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       expect(p(blue_collar_benefit_group).monthly_max_employee_cost).to be_within(0.01).of(1121.10)
     end
   end
+
+
+  context 'published_plan_years_within_date_range scope' do 
+
+    let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+    let(:valid_fte_count)                 { 5 }
+    let(:max_fte_count)                   { HbxProfile::ShopSmallMarketFteCountMaximum }
+    let(:invalid_fte_count)               { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
+
+    before do
+       (1..3).each do |months_from_now|
+          valid_plan_year_start_on = TimeKeeper.date_of_record.end_of_month + 1.day + months_from_now.months
+          valid_open_enrollment_start_on = valid_plan_year_start_on - 1.month
+
+          plan_year = PlanYear.new({
+            employer_profile: employer_profile,
+            start_on: valid_plan_year_start_on,
+            end_on: valid_plan_year_start_on + 1.year - 1.day,
+            open_enrollment_start_on: valid_open_enrollment_start_on,
+            open_enrollment_end_on: valid_open_enrollment_start_on + 9.days,
+            fte_count: valid_fte_count,
+            imported_plan_year: true
+            })
+
+          plan_year.benefit_groups = [FactoryGirl.build(:benefit_group)]
+          plan_year.save!
+        end
+    end
+
+    context 'when plan year start date overlaps with published plan year' do
+      it 'should return plan year' do 
+        employer_profile.plan_years[1].publish!
+        current_plan_year = employer_profile.plan_years.first
+        expect(employer_profile.plan_years[0].overlapping_published_plan_years.any?).to be_truthy
+        expect(employer_profile.plan_years[2].overlapping_published_plan_years.any?).to be_truthy
+      end
+    end
+
+
+    context 'when plan year start date overlaps with published plan year' do
+
+      before do
+        old_plan_year = PlanYear.new({
+            employer_profile: employer_profile,
+            start_on: Date.new(2015,3,1),
+            end_on: Date.new(2015,3,1) + 1.year - 1.day,
+            open_enrollment_start_on: Date.new(2015,3,1) - 1.month,
+            open_enrollment_end_on: Date.new(2015,3,1) - 1.month + 9.days,
+            fte_count: valid_fte_count,
+            imported_plan_year: true
+            })
+
+        old_plan_year.benefit_groups = [FactoryGirl.build(:benefit_group)]
+        old_plan_year.save!
+        old_plan_year.publish!
+      end
+
+      it 'should return plan year' do 
+        expect(employer_profile.plan_years[0].overlapping_published_plan_years.any?).to be_falsey
+      end
+    end
+  end
 end
