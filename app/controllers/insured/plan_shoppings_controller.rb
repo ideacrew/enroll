@@ -25,7 +25,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     else
       get_aptc_info_from_session(hbx_enrollment)
-      if @shopping_tax_household.present? and @elected_aptc > 0
+      if can_apply_aptc?(plan)
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc, @shopping_tax_household)
         hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
         hbx_enrollment.update_current(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: @elected_aptc/@max_aptc)
@@ -93,7 +93,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     else
       get_aptc_info_from_session(@enrollment)
-      if @shopping_tax_household.present? and @elected_aptc > 0
+      if can_apply_aptc?(@plan)
         @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc, @shopping_tax_household)
       else
         @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
@@ -247,6 +247,10 @@ class Insured::PlanShoppingsController < ApplicationController
       @max_aptc = 0
       @elected_aptc = 0
     end
+  end
+
+  def can_apply_aptc?(plan)
+    @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
   end
 
   def set_elected_aptc_by_params(elected_aptc)
