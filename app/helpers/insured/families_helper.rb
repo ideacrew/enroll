@@ -61,9 +61,9 @@ module Insured::FamiliesHelper
 
   def show_employer_panel?(person, hbx_enrollments)
     return false if person.blank? or !person.has_active_employee_role?
-    return true if hbx_enrollments.blank? or hbx_enrollments.shop_market.blank?
+    return true if hbx_enrollments.blank? or (hbx_enrollments.class == Mongoid::Criteria and hbx_enrollments.shop_market.blank?)
 
-    if hbx_enrollments.shop_market.entries.map(&:employee_role_id).include? person.active_employee_roles.first.id
+    if hbx_enrollments.class == Mongoid::Criteria and hbx_enrollments.shop_market.entries.map(&:employee_role_id).include?(person.active_employee_roles.first.id)
       false
     else
       true

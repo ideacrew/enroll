@@ -19,6 +19,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:employee_role) {FactoryGirl.build(:employee_role)}
     let(:hbx_enrollment) {HbxEnrollment.new}
     let(:hbx_enrollments) {double}
+    let(:person_with_employee_role) {FactoryGirl.create(:person, :with_employee_role)}
 
     it "should return false without person" do
       expect(helper.show_employer_panel?(nil, [])).to eq false
@@ -27,6 +28,10 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     it "should return false with person who has no active employee_role" do
       allow(person).to receive(:has_active_employee_role?).and_return false
       expect(helper.show_employer_panel?(person, [])).to eq false
+    end
+
+    it "should return true with hbx_enrollments when it is not empty array" do
+      expect(helper.show_employer_panel?(person_with_employee_role, [1,2])).to eq true
     end
 
     context "with person who has active_employee_roles" do
@@ -45,10 +50,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
 
       it "should return false with hbx_enrollments which employee_role is include person's employee_role" do
-        allow(hbx_enrollments).to receive(:shop_market).and_return hbx_enrollments
-        allow(hbx_enrollments).to receive(:entries).and_return [hbx_enrollment]
-        allow(hbx_enrollment).to receive(:employee_role_id).and_return employee_role.id
-        expect(helper.show_employer_panel?(person, hbx_enrollments)).to eq false
+        f = FactoryGirl.create(:family, :with_primary_family_member)
+        hbx = FactoryGirl.create(:hbx_enrollment, household: f.latest_household)
+        hbx_enrollments = f.enrollments
+        per = f.primary_family_member.person
+        #allow(hbx_enrollments).to receive(:shop_market).and_return hbx_enrollments
+        #allow(hbx_enrollments).to receive(:class).and_return Mongoid::Criteria
+        #allow(hbx_enrollments).to receive(:entries).and_return [hbx_enrollment]
+        #allow(hbx_enrollment).to receive(:employee_role_id).and_return employee_role.id
+        expect(helper.show_employer_panel?(per, hbx_enrollments)).to eq false
       end
 
       it "should return true with hbx_enrollments which employee_role is not include person's employee_role" do
