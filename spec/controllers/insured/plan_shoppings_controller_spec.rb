@@ -114,6 +114,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:employee_role).and_return(double)
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
+      allow(family).to receive(:is_eligible_to_enroll?).and_return(true)
     end
 
     it "returns http success" do

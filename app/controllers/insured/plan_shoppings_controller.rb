@@ -1,5 +1,9 @@
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
+  include ActionView::Helpers::TagHelper
+  include ActionView::Helpers::TextHelper
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Context
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
@@ -105,6 +109,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    flash[:error] = qualify_qle_notice if @family.is_eligible_to_enroll?
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
