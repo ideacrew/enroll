@@ -359,15 +359,18 @@ ready = function() {
         nav = '.dental';
       }
       if ($(this).attr('value') == "single_carrier") {
-        $(this).closest('.benefit-group-fields').find(nav+' .plan-options, '+nav+' .carriers-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .carriers-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
+
       }
       else if ($(this).attr('value') == "metal_level") {
-
-        $(this).closest('.benefit-group-fields').find(nav+' .plan-options, '+nav+' .metals-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .metals-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
       }
       else if ($(this).attr('value') == "single_plan") {
 
-        $(this).closest('.benefit-group-fields').find(nav+' .plan-options, '+nav+' .single-plan-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
+        $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
       }
     });
 
@@ -382,7 +385,7 @@ ready = function() {
           nav = '.health';
           console.log(nav);
           $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
-          $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').hide();
+          $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
           $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
         } else {
@@ -390,7 +393,7 @@ ready = function() {
           console.log(nav);
           $(this).closest('.benefit-group-fields').find('.dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').hide();
           $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
-          $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').hide();
+          $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.dental-reference-plans').css({ "height": "auto", "y-overflow": "default" })
           $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
         }

@@ -16,7 +16,6 @@ $(document).on 'click', 'form .add_fields', (event) ->
   validatePlanYear()
 
 
-
   # get all dental plan options for all plans option or for elected dental plans
   $('span:contains("Select Reference Plan"), label.elected_plan:contains("Custom")').on 'click', ->
     `var url`
@@ -44,6 +43,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
       url: url
     return
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
+  $('.benefit-group-fields:last .edit-add-dental').remove();
   $('.benefit-group-fields:last').data 'time', time
   $('.benefit-group-fields:last .dental-relationship-benefits-attributes-time').val time
 
@@ -124,6 +124,12 @@ $(document).on 'click', 'form .remove_fields', (event) ->
 $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
   $('.benefit-group-fields:last').remove()
   event.preventDefault()
+  if $('.benefit-group-fields').length == 1
+    $('.remove_fields').hide();
+  if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
+    validateEditPlanYear()
+  else
+    validatePlanYear()
 
 @update_delete_buttons = ->
   nested_fields = $('.form-inputs')

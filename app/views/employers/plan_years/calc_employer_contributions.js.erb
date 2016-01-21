@@ -9,7 +9,7 @@ if ( $("#<%= @location_id %> .select-dental-plan").is(":hidden") ) {
 $("#<%= @location_id %> .select-dental-plan").show();
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 $("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").show();
-$("#<%= @location_id %> <%= @coverage_type %>-view-summary").show();
+$("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary").show();
 
 if ( '<%= @coverage_type %>' == '.dental' ) {
   $("#<%= @location_id %> .dental-reference-plans, #<%= @location_id %> .dental.selected-plan > .row:first").hide();
@@ -46,8 +46,8 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
 
   } else {
     $('#<%= @location_id %> .dental .change-dental-reference-plan').on('click', function() {
-      $('#<%= @location_id %> .dental-reference-plans').show();
-      $('#<%= @location_id %> .dental.selected-plan').hide();
+      $('#<%= @location_id %> .dental.selected-plan').slideUp();
+      $('#<%= @location_id %> .dental-reference-plans').slideDown();
     });
   }
 } else {
