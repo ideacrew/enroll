@@ -368,9 +368,14 @@ ready = function() {
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
       }
       else if ($(this).attr('value') == "single_plan") {
+        if ( nav == '.health' ) {
+          $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
+          $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
+        } else {
+          $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
 
-        $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
-        $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
+        }
+
       }
     });
 

@@ -8,9 +8,11 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
   } else {
   }
   $('#<%= @location_id %> .elected-plans-tab').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/dental_plans")).html_safe %>");
-  $('#<%= @location_id %> .elected-plans-tab').slideDown();
+  $('#<%= @location_id %> .elected-plans-tab').show();
+  $('#<%= @location_id %> .dental .plan-options').slideDown('400', function() {
+    $('#<%= @location_id %> .elected-plans-continue').fadeIn();
+  });
 
-  $('#<%= @location_id %> .elected-plans-continue').fadeIn();
 
   if ( $('.benefit-group-fields').length > 1 ) {
     $('.benefit-group-fields:last .elected-plans-tab .reference-plan input[type=checkbox]').each(function() {
