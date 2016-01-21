@@ -63,8 +63,10 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
     });
   } else {
-
+    $("#<%= @location_id %> .health .dental-config-links").show();
     $('#<%= @location_id %> .health .change-dental-reference-plan').hide();
+    $('#<%= @location_id %> .health .dental-config-reference-selection').hide();
+
   }
 }
 
@@ -78,7 +80,7 @@ $("#<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").on
 $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
   $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').show();
   $('#<%= @location_id %>  <%= @coverage_type %> .selected-plan, #<%= @location_id %>  <%= @coverage_type %> .carriers-tab').hide();
-  $('#<%= @location_id %> .dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').show();
+  $('#<%= @location_id %> .dental .nav-tabs, #<%= @location_id %> .dental .plan-options, #<%= @location_id %> .dental .dental-plan-offering').show();
   $("#<%= @location_id %> .dental-ref-plan").val("","");
 
   $("#<%= @location_id %> .dental .plan-options input[type=radio]").removeAttr('checked');
