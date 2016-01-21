@@ -473,6 +473,13 @@ class PlanYear
     state :ineligible     # Application is non-compliant for enrollment
     state :expired        # Non-published plans are expired following their end on date
 
+    event :activate, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
+    end
+
+    event :expire, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :active],  to: :expired,  :guard  => :can_be_expired?
+    end
 
     # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
@@ -624,6 +631,22 @@ private
     end
 
     valid
+  end
+
+  def can_be_expired?
+    if PUBLISHED.include?(aasm_state) && TimeKeeper.date_of_record >= end_on
+      true
+    else
+      false
+    end
+  end
+
+  def can_be_activated?
+    if (PUBLISHED + RENEWING_PUBLISHED_STATE).include?(aasm_state) && TimeKeeper.date_of_record >= start_on
+      true
+    else
+      false
+    end
   end
 
   def is_event_date_valid?
