@@ -69,7 +69,26 @@ class BenefitGroupAssignment
 
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
-    @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) unless hbx_enrollment_id.blank?
+
+    if hbx_enrollment_id.blank?
+      families = Family.where({
+        "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+        })
+
+      families.each do |family|
+        family.households.each do |household|
+          household.hbx_enrollments.each do |enrollment|
+            if enrollment.benefit_group_assignment_id == self.id
+              @hbx_enrollment = enrollment
+            end
+          end
+        end
+      end
+
+      return @hbx_enrollment
+    else
+      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) 
+    end
   end
 
   def end_benefit(end_on)
@@ -85,11 +104,12 @@ class BenefitGroupAssignment
     state :coverage_waived
     state :coverage_terminated
     state :coverage_renewing
+    state :coverage_expired
 
     #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
     #then we will not need from coverage_terminated to coverage_selected
     event :select_coverage do
-      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected, after: :make_benefit_group_assignment_active
+      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
     end
 
     event :waive_coverage do
@@ -105,16 +125,24 @@ class BenefitGroupAssignment
       transitions from: :coverage_renewing, to: :coverage_terminated
     end
 
+    event :expire_coverage do
+      transitions from: [:coverage_selected, :coverage_renewing], to: :coverage_expired, :guard  => :can_be_expired?
+    end
+
     event :delink_coverage do
       transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated], to: :initialized, after: :propogate_delink
     end
   end
 
-  private
-
   def make_benefit_group_assignment_active
     census_employee.reset_active_benefit_group_assignments(self)
     update_attributes(is_active: true)
+  end
+
+  private
+
+  def can_be_expired?
+    benefit_group.end_on <= TimeKeeper.date_of_record
   end
 
   def propogate_delink
@@ -124,9 +152,9 @@ class BenefitGroupAssignment
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
 
-    if coverage_selected?
-      self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
-    end
+    # if coverage_selected?
+    #   self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
+    # end
 
     if hbx_enrollment.present?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id

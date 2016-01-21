@@ -844,6 +844,18 @@ class HbxEnrollment
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled], to: :coverage_enrolled
       transitions from: :renewing_waived, to: :inactive
     end
+
+    event :expire_coverage, :after => :record_transition do
+      transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
+    end
+  end
+
+  def can_be_expired?
+    if benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record
+      true
+    else
+      false
+    end
   end
 
   def decorated_hbx_enrollment
