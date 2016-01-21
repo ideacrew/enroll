@@ -303,7 +303,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
           sep.qle_on = TimeKeeper.date_of_record + 40.days
-          expect(sep.effective_on).to eq ((TimeKeeper.date_of_record+40.days).end_of_month + 1.day)
+          expected_effective_on = (TimeKeeper.date_of_record+40.days).end_of_month + 1.day
+          expected_effective_on = sep.qle_on if sep.qle_on == sep.qle_on.at_beginning_of_month
+          expect(sep.effective_on).to eq (expected_effective_on)
         end
 
         it "should set effective date to date of event when date of event is not beginning of month" do
