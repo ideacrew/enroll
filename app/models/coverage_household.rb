@@ -12,7 +12,7 @@ class CoverageHousehold
   # all coverage_household members are immediate relations
   field :is_immediate_family, type: Boolean
 
-  # coverage household includes immediate relations with non-QHP eligibility determination
+  # coverage household includes immediate relations with non-QHP eligibility determination 
   field :is_determination_split_household, type: Boolean, default: false
 
   # Agency representing this coverage household
@@ -77,6 +77,7 @@ class CoverageHousehold
       is_subscriber: family_member.is_primary_applicant?
     )
 
+
     # chm.save_parent
     # household.save
   end
@@ -93,7 +94,7 @@ class CoverageHousehold
 
     # household.save
   end
-
+  
   def notify_the_user(member)
     if member.person && (role = member.person.consumer_role)
       if role.is_hbx_enrollment_eligible? && role.identity_verified_date

@@ -447,7 +447,7 @@ Then(/^.+ should see the plan shopping welcome page$/) do
   @browser.element(text: /Filter Results/i).wait_until_present
   # @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
-  expect(@browser.element(text: /Choose Healthcare/i).visible?).to be_truthy
+  expect(@browser.element(text: /Choose Plan/i).visible?).to be_truthy
   # expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
 end
 
@@ -464,9 +464,9 @@ end
 When(/^.+ selects? a plan on the plan shopping page$/) do
   @browser.execute_script(
     'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose Healthcare/)
+    @browser.element(:text => /Choose Plan/)
   )
-  @browser.element(text: /Choose Healthcare/).wait_until_present
+  @browser.element(text: /Choose Plan/).wait_until_present
   click_when_present(@browser.a(text: /Select Plan/))
 end
 
@@ -640,8 +640,8 @@ Then(/^I should see the dependents and group selection page$/) do
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
-  @browser.element(text: /Choose Healthcare/i).wait_until_present
-  expect(@browser.element(text: /Choose Healthcare/i).visible?).to be_truthy
+  @browser.element(text: /Choose Plan/i).wait_until_present
+  expect(@browser.element(text: /Choose Plan/i).visible?).to be_truthy
   @browser.execute_script("$('.interaction-click-control-select-plan')[1].click()")
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy

@@ -6,6 +6,7 @@ class ConsumerRole
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AASM
+  include Mongoid::Attributes::Dynamic
 
   embedded_in :person
 
@@ -388,7 +389,7 @@ class ConsumerRole
   def latest_active_tax_household_with_year(year)
     person.primary_family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
-    log("person: #{person.try(:id)}", {:severity => 'critical'})
+    log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
   end
 

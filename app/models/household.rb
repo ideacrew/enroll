@@ -167,7 +167,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
+    tax_households = self.tax_households.tax_household_with_year(year) 
     if TimeKeeper.date_of_record.year == year
       tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
     end

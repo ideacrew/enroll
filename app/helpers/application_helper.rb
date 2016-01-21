@@ -4,7 +4,7 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil)
+  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
     # source is account or shopping
     if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
       if hbx_enrollment.coverage_kind == 'health'
@@ -14,7 +14,7 @@ module ApplicationHelper
       end
     end
 
-    if session['elected_aptc'].present? and session['max_aptc'].present?
+    if session['elected_aptc'].present? and session['max_aptc'].present? and can_use_aptc
       aptc_amount = session['elected_aptc'].to_f
       ehb_premium = plan_cost * ehb
       cost = plan_cost - [ehb_premium, aptc_amount].min
@@ -406,8 +406,8 @@ module ApplicationHelper
         end
 
         if eligible > 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;"
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"})
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;" unless plan_year.start_on.to_date.month == 1
+          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
        #binding.pry

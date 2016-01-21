@@ -465,4 +465,19 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
   end
+
+  describe "Instance method" do
+    it "catastrophic plan can not use aptc" do
+      plan = FactoryGirl.create(:plan, metal_level: 'catastrophic')
+      expect(plan.can_use_aptc?).to eq false
+    end
+
+    it "normal metal_level plan can use aptc" do
+      plan = FactoryGirl.build(:plan)
+      (Plan::METAL_LEVEL_KINDS - ['catastrophic']).each do |metal_level|
+        plan.metal_level = metal_level
+        expect(plan.can_use_aptc?).to eq true
+      end
+    end
+  end
 end

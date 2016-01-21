@@ -46,6 +46,9 @@
  .bt-n {
    border-top: none;
  }
+ .brz {
+   border-radius: 0;
+ }
  .btn, button {
    &.btn-trans {
      border: solid 1px #b2b2b2;
@@ -169,7 +172,26 @@
    >.col-xs-6 {
      height: 70px;
    }
-
+   .right-menu .dropdown {
+     display: inline;
+     .btn {
+       padding: 0;
+       border: none;
+       &:hover, &:focus, &:active {
+         background-color: transparent;
+         -webkit-box-shadow: none;
+         box-shadow: none;
+       }
+     }
+     .dropdown-menu {
+       padding: 10px 0;
+       a.g14 {
+         &:hover {
+           color: #007bc4;
+         }
+       }
+     }
+   }
    .g14 {
      text-transform: uppercase;
      color: #b7b7b7;

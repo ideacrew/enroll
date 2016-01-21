@@ -65,14 +65,6 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(consumer_role).to receive(:save!).and_return(true)
-
-      allow(family).to receive(:_id).and_return(true)
-      allow(hbx_enrollments).to receive(:_id).and_return(true)
-      #allow(hbx_enrollments).to receive(:each).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:reject).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:map).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
-
       session[:portal] = "insured/families"
     end
 
@@ -110,7 +102,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "for IVL market" do
-      let(:user) { double(identity_verified?: true, last_portal_visited: '') }
+      let(:user) { double(identity_verified?: true, idp_verified?: true, last_portal_visited: '') }
       let(:employee_roles) { double }
 
       before :each do
@@ -141,7 +133,7 @@ RSpec.describe Insured::FamiliesController do
       end
 
       context "who has not passed ridp" do
-        let(:user) { double(identity_verified?: false, last_portal_visited: '') }
+        let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
 
         before do
           allow(person).to receive(:user).and_return(user)
@@ -220,7 +212,7 @@ RSpec.describe Insured::FamiliesController do
 
 
   describe "GET find_sep" do
-    let(:user) { double(identity_verified?: true) }
+    let(:user) { double(identity_verified?: true, idp_verified?: true) }
 
     before :each do
       allow(person).to receive(:user).and_return(user)

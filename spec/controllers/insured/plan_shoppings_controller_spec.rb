@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
-  let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
+  let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
@@ -187,7 +187,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       #allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
       allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
@@ -202,7 +201,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
-      allow(hbx_enrollment).to receive(:may_cancel_coverage?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end

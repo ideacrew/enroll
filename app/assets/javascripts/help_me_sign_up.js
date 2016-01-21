@@ -8,7 +8,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
          },
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
-    $('#help_status').html(response)
+    $('#help_status').html(JSON.parse(response)['status'])
   });
 })
 
@@ -22,9 +22,11 @@ $.ajax({
          },
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
-    console.log(response)
-    console.log('here')
-    $('#help_index_status').html(response).removeClass('hide')
+    broker_status = JSON.parse(response)
+    var status = broker_status['status']
+    var broker = broker_status['broker']
+    $('#help_index_status').html(status).removeClass('hide')
+    $('#consumer_brokers_widget').html(broker)
   });
 })
 
@@ -36,4 +38,9 @@ $(document).on('click', '.name_search_only', function() {
 })
 $(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide"); $('#back_to_help').addClass("hide") })
 
-$(document).on('click', '#back_to_help', function(){$('.help_reset').addClass("hide"); $("#back_to_help").addClass('hide'); $('#help_list').removeClass("hide")  })
+$(document).on('click', '#back_to_help', function(){
+  $('.help_reset').addClass("hide");
+  $("#back_to_help").addClass('hide');
+  $('#help_list').removeClass("hide");
+  $('#help_status').html('')
+})

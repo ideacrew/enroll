@@ -69,8 +69,7 @@
     %li
       %p
         If you select Save & Exit, you can save your work and continue where you left off the next time you login.
-
+    %br.clear
 - if step != 1
-  .btn.btn-trans{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", "style" => "width: 100%; margin-top: 10px;"}
-    Help me sign up
+  = render partial: 'shared/help_me_sign_up'
   = render partial: 'insured/plan_shoppings/help_with_plan'

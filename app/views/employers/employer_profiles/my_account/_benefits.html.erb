@@ -232,8 +232,9 @@
       <% elsif (plan_year.draft? || plan_year.renewing_draft?) %>
       <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
       <% end %>
+      
       <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
-      <span class="btn btn-trans pull-right" data-toggle="modal" data-target="#revertPlanYear">Revert Application</span>
+      <span class="btn btn-trans pull-right" data-toggle="modal" data-target="#revertPlanYear_<%= plan_year.id %>">Revert Application</span>
       <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->
 
       <% end %>
