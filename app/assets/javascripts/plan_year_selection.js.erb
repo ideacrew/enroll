@@ -61,6 +61,20 @@ ready = function() {
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
+    // add dental button for missing dental plans
+    $('.edit-add-dental span').on('click', function() {
+      $(this).closest('.row').slideUp();
+      $(this).closest('.row').fadeOut();
+      $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
+      $(this).closest('.benefit-group-fields').find('.dental .nav-tabs input').removeProp("checked");
+      $(this).closest('.benefit-group-fields').find('.dental h1:first').text('Dental - Add Benefit Package');
+      $(this).closest('.benefit-group-fields').find('.dental .currently-offered').text("Select which plans your employees will choose from.");
+      $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
+      $(this).closest('.benefit-group-fields').find('.dental .edit-offering').show();
+      $(this).closest('.benefit-group-fields').find('.dental .reference-steps').show();
+      $(this).closest('.benefit-group-fields').find('.dental:first').slideDown();
+    });
+
     // get dental carrier names
     var dental_target_url = $('a#generate-dental-carriers-and-plans').attr('href');
     var plan_year_id = $('a#generate-dental-carriers-and-plans').data('planYearId');

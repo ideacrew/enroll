@@ -10,6 +10,8 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .row:first").hide();
 $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
+// hide dental section when editing benefit groups with no dental plan
+$('.edit-add-dental').closest('.benefit-group-fields').find('.dental:first').hide();
 
 
 $(".change-dental-reference-plan").show();
@@ -27,7 +29,6 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
         var url = $(this).attr('href');
         $(this).attr('href', url+"&location_id="+newLocationId);
       });
-
     });
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
