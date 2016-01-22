@@ -170,6 +170,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         expect(session[:elected_aptc]).to eq 50
       end
     end
+
+    context "for qualify_qle_notice" do
+      it "should get error msg" do
+        allow(family).to receive(:is_eligible_to_enroll?).and_return false
+        sign_in(user)
+        get :thankyou, id: "id", plan_id: "plan_id"
+        expect(flash[:error]).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
+      end
+
+      it "should not get error msg" do
+        allow(family).to receive(:is_eligible_to_enroll?).and_return true
+        sign_in(user)
+        get :thankyou, id: "id", plan_id: "plan_id"
+        expect(flash[:error]).to eq nil
+      end
+    end
   end
 
   context "GET print_waiver" do
