@@ -148,4 +148,28 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     end
   end
+
+  context "is_lawful_presence_status_satisfied?" do
+    let(:consumer_role) {double}
+    let(:benefit_package) {double}
+    let(:role) {FactoryGirl.create(:consumer_role_object)}
+
+    it "returns true for verification_successful state" do
+      rule = InsuredEligibleForBenefitRule.new(role, benefit_package)
+      role.lawful_presence_determination.aasm_state = "verification_successful"
+      expect(rule.is_lawful_presence_status_satisfied?).to eq true
+    end
+
+    it "returns true for verification_pending state" do
+      rule = InsuredEligibleForBenefitRule.new(role, benefit_package)
+      role.lawful_presence_determination.aasm_state = "verification_pending"
+      expect(rule.is_lawful_presence_status_satisfied?).to eq true
+    end
+
+    it "returns false for verification outstanding" do
+      rule = InsuredEligibleForBenefitRule.new(role, benefit_package)
+      role.lawful_presence_determination.aasm_state = "verification_outstanding"
+      expect(rule.is_lawful_presence_status_satisfied?).to eq false
+    end
+  end
 end
