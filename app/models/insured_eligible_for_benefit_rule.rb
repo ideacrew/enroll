@@ -114,6 +114,10 @@ class InsuredEligibleForBenefitRule
     @benefit_package.age_range.cover?(age)
   end
 
+  def is_lawful_presence_status_satisfied?
+    @role.lawful_presence_determination.aasm_state == "verification_outstanding" ? false : true
+  end
+
   def determination_results
     @errors
   end
