@@ -29,7 +29,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               ordinal_position: 10,
                               effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
                               pre_event_sep_in_days: 0,
-                              post_event_sep_in_days: 60,
+                              post_event_sep_in_days: 30,
                               is_self_attested: true
                             )
                           }
@@ -92,14 +92,14 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
 
   context "for an Individual Qualifying Life Event" do
-    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }
+    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
 
-    it "qle market kind should be shop" do
-      expect(ivl_qle_sep.qualifying_life_event_kind.market_kind).to eq "shop"
+    it "qle market kind should be individual" do
+      expect(ivl_qle_sep.qualifying_life_event_kind.market_kind).to eq "individual"
     end
 
     it "sep title should be set to QLE kind title" do
-      expect(ivl_qle_sep.title).to eq shop_qle.title
+      expect(ivl_qle_sep.title).to eq ivl_qle.title
     end
 
     it "effective date should not be set" do
@@ -168,7 +168,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     context "and this QLE date is reported on timely basis" do
       let(:today)               { TimeKeeper.date_of_record }
       # Ensure date is past 15th of the month
-      let(:qle_on_date)         { today.day < HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
+      let(:qle_on_date)         { today.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
       let(:qle_start_on_date)   { lapsed_qle_on_date }
       let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
 

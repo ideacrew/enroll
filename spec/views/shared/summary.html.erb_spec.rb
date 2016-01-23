@@ -20,6 +20,7 @@ describe "shared/_summary.html.erb" do
       :ehb => 0.988,
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
+      :can_use_aptc? => true,
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
                                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }

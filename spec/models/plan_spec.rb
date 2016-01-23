@@ -10,7 +10,7 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   def active_year;
-    2015;
+    2016;
   end
 
   def hios_id;
@@ -366,7 +366,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       context "individual health by active year" do
-        it "should return individual count" do 
+        it "should return individual count" do
           expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count
         end
 
@@ -375,7 +375,7 @@ RSpec.describe Plan, dbclean: :after_each do
           plan.update(hios_id: "1212312312322-02")
 
           expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count - 1
-        end 
+        end
       end
 
       context "with referenced plan_type scope of either ppo, hmo, pos, epo" do
@@ -462,6 +462,21 @@ RSpec.describe Plan, dbclean: :after_each do
       it "should return health plans" do
         plans = [plan2]
         expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household).to_a).to eq plans
+      end
+    end
+  end
+
+  describe "Instance method" do
+    it "catastrophic plan can not use aptc" do
+      plan = FactoryGirl.create(:plan, metal_level: 'catastrophic')
+      expect(plan.can_use_aptc?).to eq false
+    end
+
+    it "normal metal_level plan can use aptc" do
+      plan = FactoryGirl.build(:plan)
+      (Plan::METAL_LEVEL_KINDS - ['catastrophic']).each do |metal_level|
+        plan.metal_level = metal_level
+        expect(plan.can_use_aptc?).to eq true
       end
     end
   end

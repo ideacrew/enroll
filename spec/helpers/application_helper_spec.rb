@@ -161,6 +161,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
         session['elected_aptc'] = 160
         expect(helper.current_cost(100, 1.2)).to eq 0
       end
+
+      it "when can_use_aptc is false" do
+        expect(helper.current_cost(100, 1.2, nil, 'shopping', false)).to eq 100
+      end
+
+      it "when can_use_aptc is true" do
+        expect(helper.current_cost(100, 1.2, nil, 'shopping', true)).to eq 0
+      end
     end
 
     context "with hbx_enrollment" do

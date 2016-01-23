@@ -102,7 +102,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "for IVL market" do
-      let(:user) { double(identity_verified?: true, last_portal_visited: '') }
+      let(:user) { double(identity_verified?: true, idp_verified?: true, last_portal_visited: '') }
       let(:employee_roles) { double }
 
       before :each do
@@ -130,6 +130,23 @@ RSpec.describe Insured::FamiliesController do
 
       it "should get individual market events" do
         expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.individual_market_events
+      end
+
+      context "who has not passed ridp" do
+        let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
+
+        before do
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:employee_roles).and_return(employee_roles)
+          allow(employee_roles).to receive(:active).and_return([])
+          get :home
+        end
+
+        it "should be a redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
       end
     end
   end
@@ -195,7 +212,7 @@ RSpec.describe Insured::FamiliesController do
 
 
   describe "GET find_sep" do
-    let(:user) { double(identity_verified?: true) }
+    let(:user) { double(identity_verified?: true, idp_verified?: true) }
 
     before :each do
       allow(person).to receive(:user).and_return(user)

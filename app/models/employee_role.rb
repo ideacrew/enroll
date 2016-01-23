@@ -97,7 +97,16 @@ class EmployeeRole
   end
 
   def is_eligible_to_enroll_as_new_hire_on?(enrollment_date = TimeKeeper.date_of_record)
-    benefit_group.new_hire_enrollment_period(new_census_employee.hired_on).cover?(enrollment_date)
+    if benefit_group.new_hire_enrollment_period(new_census_employee.hired_on).cover?(enrollment_date)
+      return true
+    end
+
+    # when census employee don't have initial coverage
+    if new_census_employee.is_covered_or_waived?
+      false
+    else
+      benefit_group.new_hire_enrollment_period(new_census_employee.hired_on, new_census_employee.updated_at.to_date).cover?(enrollment_date)
+    end
   end
 
   def is_active?

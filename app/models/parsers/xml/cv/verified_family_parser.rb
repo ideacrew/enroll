@@ -10,6 +10,7 @@ module Parsers::Xml::Cv
     has_many :family_members, Parsers::Xml::Cv::FamilyMembersParser, tag: 'family_member'
     element :primary_family_member_id, String, tag: 'primary_family_member_id/ns0:id'
     has_many :households, Parsers::Xml::Cv::HouseholdsParser, tag: 'household', namespace: 'ns0'
+    has_many :broker_accounts, Parsers::Xml::Cv::FamilyBrokerAccountsParser, tag: 'broker_account', namespace: 'ns0'
     element :submitted_at, DateTime
     element :is_active, Boolean
     element :created_at, DateTime

@@ -1728,6 +1728,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let!(:white_collar_employees) { [white_collar_large_family_employee, white_collar_small_family_employee, white_collar_no_family_employee]}
 
     before do
+
       blue_collar_employees.each do |ce|
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: blue_collar_benefit_group)
       end

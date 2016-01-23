@@ -48,35 +48,33 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "is_cost_sharing_satisfied?" do
-    let(:consumer_role) {double(person: person)}
-    let(:benefit_package) {double}
-    let(:person) {double(primary_family: double(latest_household: double(latest_active_tax_household: double(latest_eligibility_determination: eligibility))))}
-    let(:eligibility) {double}
+    include_context "BradyBunchAfterAll"
+    before :all do
+      create_tax_household_for_mikes_family
+      @consumer_role = mike.consumer_role
+    end
+    let(:benefit_coverage_period) {FactoryGirl.build(:benefit_coverage_period, start_on: TimeKeeper.date_of_record)}
+    let(:benefit_package) {FactoryGirl.build(:benefit_package, benefit_coverage_period: benefit_coverage_period)}
 
     it "should return true when csr_kind is blank" do
-      allow(eligibility).to receive(:csr_eligibility_kind).and_return ""
-      allow(benefit_package).to receive(:cost_sharing).and_return "csr_100"
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(ConsumerRole.new, benefit_package)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is blank" do
-      allow(benefit_package).to receive(:cost_sharing).and_return ""
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, FactoryGirl.build(:benefit_package))
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is equal to csr_kind" do
-      allow(benefit_package).to receive(:cost_sharing).and_return "csr_94"
-      allow(eligibility).to receive(:csr_eligibility_kind).and_return "csr_94"
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_87'
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return false when cost_sharing is not equal to csr_kind" do
-      allow(benefit_package).to receive(:cost_sharing).and_return "csr_100"
-      allow(eligibility).to receive(:csr_eligibility_kind).and_return "csr_94"
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package)
       expect(rule.is_cost_sharing_satisfied?).to eq false
     end
   end

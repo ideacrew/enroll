@@ -51,6 +51,10 @@ class BenefitPackage
     build_benefit_eligibility_element_group if benefit_eligibility_element_group.nil?
   end
 
+  def effective_year
+    start_on.year
+  end
+
   # def initialize(*args)
   #   self.build_benefit_eligibility_element_group
   #   super(*args)

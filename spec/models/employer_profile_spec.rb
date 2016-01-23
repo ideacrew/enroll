@@ -268,7 +268,8 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
     let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
+    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -282,10 +283,51 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(er3.broker_agency_profile.id).to eq broker_agency_profile.id
       expect(er4.broker_agency_profile.id).to eq broker_agency_profile.id
       expect(er5.broker_agency_profile).to be_nil
-
       employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
       expect(employers_with_broker.first).to be_a EmployerProfile
+    end
+
+    it 'shows two employers with broker' do
+      employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker.size).to eq 2
+      expect(employers_with_broker7.size).to eq 0
+    end
+
+    it 'shows one employer moving to another broker agency' do
+      employer =  organization5.create_employer_profile(entity_kind: "partnership");
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      expect(employers_with_broker7.size).to eq 1
+      employer = Organization.find(employer.organization.id).employer_profile
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      expect(employers_with_broker7.size).to eq 0
+    end
+
+    it 'shows an employer selected a broker for the first time' do
+      employer = er5
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      expect(employers_with_broker.size).to eq 2
+      expect(employers_with_broker7.size).to eq 1
+    end
+
+    it 'works with multiple broker_agency_contacts'  do
+      employer = er5
+      org_id = employer.organization.id
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      expect(employers_with_broker7.size).to eq(1)
     end
   end
 

@@ -7,6 +7,7 @@ describe Family, "with 2 policies", :dbclean => :after_each do
   let(:benefit_package) { FactoryGirl.create(:benefit_package) }
 
   before :each do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 12, 15))
     family.add_family_member(primary.person, is_primary_applicant: true)
     family.save!
     @hbx_enrollment_1 = HbxEnrollment.create_from(coverage_household: family.active_household.immediate_family_coverage_household, consumer_role: primary, benefit_package: benefit_package)
@@ -14,6 +15,10 @@ describe Family, "with 2 policies", :dbclean => :after_each do
     @id_for_1 = @hbx_enrollment_1.id
     @id_for_2 = @hbx_enrollment_2.id
     family.reload
+  end
+
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   describe "when the start dates on the second policy are changed" do

@@ -10,6 +10,9 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
       ep.broker_agency_accounts = [
         FactoryGirl.build(:broker_agency_account, employer_profile: ep)
       ]
+      ep.broker_agency_accounts.first.writing_agent.person.phones = [
+        FactoryGirl.build(:phone, kind: "home")
+      ]
       ep.save
       ep
     end
@@ -40,10 +43,10 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
     end
 
 
-    # it "should display broker widget for consumer" do
-    #   expect(rendered).to have_selector('h4', "Your Broker")
-    # end
 
+    it "should display broker widget for consumer" do
+      expect(rendered).to have_selector('h4', "Your Broker")
+    end
   end
 
 end

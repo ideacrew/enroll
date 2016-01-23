@@ -9,7 +9,6 @@ function show_broker(broker_id) {
   $("#broker_index_view").addClass('hide')
   $("#broker_show_" + broker_id).removeClass('hide')
   $("#help_index_status").html('')
-  console.log('select button '+"#broker_show_" + broker_id)
 }
 
 

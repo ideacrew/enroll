@@ -118,34 +118,48 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member4).to receive(:first_name).and_return('joey')
       allow(family_member4).to receive(:gender).and_return('female')
       sign_in current_user
+    end
+
+    context "base area" do
+      before :each do
+        render :template => "insured/group_selection/new.html.erb"
+      end
+
+      it "should show the title of family members" do
+        expect(rendered).to match /Choose Coverage for your Household/
+      end
+
+      it "should have three checkbox option" do
+        expect(rendered).to have_selector("input[type='checkbox']", count: 3)
+      end
+
+      it "should have one ineligible row" do
+        expect(rendered).to have_selector("tr[class='ineligible_row']", count: 1)
+      end
+
+      it "should have coverage_kinds area" do
+        expect(rendered).to match /Benefit Type/
+      end
+
+      it "should have health radio button" do
+        expect(rendered).to have_selector('input[value="health"]')
+        expect(rendered).to have_selector('label', text: 'Health')
+      end
+    end
+
+    it "should have dental radio button when has consumer_role" do
       render :template => "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('input[value="dental"]')
+      expect(rendered).to have_selector('label', text: 'Dental')
     end
 
-    it "should show the title of family members" do
-      expect(rendered).to match /Choose Coverage for your Household/
+    it "should not have dental radio button" do
+      allow(jail_person).to receive(:has_active_employee_role?).and_return true
+      allow(jail_person).to receive(:has_active_consumer_role?).and_return false
+      render :template => "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_selector('input[value="dental"]')
+      expect(rendered).not_to have_selector('label', text: 'Dental')
     end
-
-    it "should have three checkbox option" do
-      expect(rendered).to have_selector("input[type='checkbox']", count: 3)
-    end
-
-    it "should have one ineligible row" do
-      expect(rendered).to have_selector("tr[class='ineligible_row']", count: 1)
-    end
-
-    it "should have coverage_kinds area" do
-      expect(rendered).to match /Coverage Type/
-    end
-
-    it "should have health radio button" do
-      expect(rendered).to have_selector('input[value="health"]')
-      expect(rendered).to have_selector('label', text: 'Health')
-    end
-
-    #it "should have dental radio button" do
-    #  expect(rendered).to have_selector('input[value="dental"]')
-    #  expect(rendered).to have_selector('label', text: 'Dental')
-    #end
 
     it "should have an incarceration warning with more text" do
       # expect(rendered).to match /Other family members may still be eligible to enroll/
@@ -284,7 +298,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   end
 
   context "change plan" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
@@ -345,6 +359,22 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("a[href='/families/home']", text: 'Back to my account')
     end
+
+    it "shouldn't see dental radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to_not have_selector('#coverage_kind_dental')
+    end
+
+    it "should see health radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#coverage_kind_health')
+    end
+
+    it "shouldn't see marketplace options" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+    end
+
   end
 
   context "waive plan" do
@@ -419,4 +449,87 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       # end
     end
   end
+
+  context "change plan with consumer role" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'individual'
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+    end
+
+    it "shouldn't see dental radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#coverage_kind_dental')
+    end
+
+    it "should see health radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#coverage_kind_health')
+    end
+
+    it "shouldn't see marketplace options" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+    end
+  end
+
+  context "change plan with both roles" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'individual'
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+    end
+
+    it "shouldn't see dental radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#coverage_kind_dental')
+    end
+
+    it "should see health radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#coverage_kind_health')
+    end
+
+    it "should see employer-sponsored coverage radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#market_kind_shop')
+    end
+
+    it "should see individual coverage radio option" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('#market_kind_individual')
+    end
+
+    it "shouldn't see marketplace options" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector('h3', text: 'Marketplace')
+    end
+  end
+
 end

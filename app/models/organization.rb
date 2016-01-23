@@ -37,6 +37,21 @@ class Organization
   # User or Person ID who created/updated
   field :updated_by, type: BSON::ObjectId
 
+  default_scope -> {order("legal_name ASC")}
+
+  scope :employer_by_hbx_id, ->(employer_id) {
+    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
+  }
+
+  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  #scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
+  #scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})}
+  scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
+  scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
+
+  scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
+  scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
+
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
@@ -54,8 +69,6 @@ class Organization
     uniqueness: true
 
   validate :office_location_kinds
-
-
 
   index({ hbx_id: 1 }, { unique: true })
   index({ legal_name: 1 })
@@ -218,7 +231,7 @@ class Organization
     def broker_agencies_with_matching_agency_or_broker(search_params)
       if search_params[:q].present?
         orgs2 = self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
-          "broker_agency_profile.id" => {
+          "broker_agency_profile._id" => {
             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
           }
         })
