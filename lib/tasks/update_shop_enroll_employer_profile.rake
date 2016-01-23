@@ -7,21 +7,11 @@ namespace :update_shop do
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
-      employers[profile.legal_name] = profile.fein
+      employers[profile.fein] = profile.legal_name
       employers
     end
-
-    # employers = {
-    #    # "Member-US House of Rep." => "536002522"
-    # # #   "STAFF US House of Representatives" => "536002523",
-    # # #   "United States Senate" => "536002558",
-    # # #   # "YFU International Educational" => "260005055"
-    # "fusionSpan" => "273950719"
-    # }
-
-    
-    employers.each do |name, fein|
-
+        
+    employers.each do |fein, name|
       begin
         puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
@@ -29,8 +19,6 @@ namespace :update_shop do
           puts "  ** employer not found"
           next
         end
-
-        # Congress : is_congress flag
 
         renewal_factory = Factories::PlanYearEnrollFactory.new
         renewal_factory.employer_profile = employer

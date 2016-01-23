@@ -264,6 +264,10 @@ class CensusEmployee < CensusMember
     self
   end
 
+  def is_active?
+    EMPLOYMENT_ACTIVE_STATES.include?(aasm_state)
+  end
+
   def employee_relationship
     "employee"
   end
