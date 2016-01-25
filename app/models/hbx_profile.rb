@@ -134,56 +134,56 @@ class HbxProfile
 
   # Maximum number of days an Employer may notify HBX of termination
   # may terminate an employee and effective date
-  ShopRetroactiveTerminationMaximum = 60.days
+  # ShopRetroactiveTerminationMaximum = 60.days
+  #
+  # # Length of time preceeding next effective date that an employer may renew
+  # ShopMaximumRenewalPeriodBeforeStartOn = 3.months
+  #
+  # # Length of time preceeding effective date that an employee may submit a plan enrollment
+  # ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
+  #
+  # # Length of time following effective date that an employee may submit a plan enrollment
+  # ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
+  #
+  # # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
+  # ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
+  #
+  # # TODO - turn into struct that includes count, plus effective date range
+  # ShopApplicationAppealPeriodMaximum = 30.days
+  #
+  # # After submitting an ineligible plan year application, time period an Employer must wait
+  # #   before submitting a new application
+  # ShopApplicationIneligiblePeriodMaximum = 90.days
+  #
+  # # TODO - turn into struct that includes count, plus effective date range
+  # ShopSmallMarketFteCountMaximum = 50
+  #
+  # ## SHOP enrollment-related periods in days
+  # # Minimum number of days for SHOP open enrollment period
+  # ShopOpenEnrollmentPeriodMinimum = 5
+  # ShopOpenEnrollmentEndDueDayOfMonth = 10
+  #
+  # # Maximum number of months for SHOP open enrollment period
+  # ShopOpenEnrollmentPeriodMaximum = 2
+  #
+  # # Minumum length of time for SHOP Plan Year
+  # ShopPlanYearPeriodMinimum = 1.year - 1.day
+  #
+  # # Maximum length of time for SHOP Plan Year
+  # ShopPlanYearPeriodMaximum = 1.year - 1.day
+  #
+  # # Maximum number of months prior to coverage effective date to submit a Plan Year application
+  # ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
+  #
+  # ShopEmployerContributionPercentMinimum = 50.0
+  # ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
+  # ShopEnrollmentNonOwnerParticipationMinimum = 1
+  #
+  # ShopBinderPaymentDueDayOfMonth = 15
+  # ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
 
-  # Length of time preceeding next effective date that an employer may renew
-  ShopMaximumRenewalPeriodBeforeStartOn = 3.months
 
-  # Length of time preceeding effective date that an employee may submit a plan enrollment
-  ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
-
-  # Length of time following effective date that an employee may submit a plan enrollment
-  ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
-
-  # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
-  ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
-
-  # TODO - turn into struct that includes count, plus effective date range
-  ShopApplicationAppealPeriodMaximum = 30.days
-
-  # After submitting an ineligible plan year application, time period an Employer must wait
-  #   before submitting a new application
-  ShopApplicationIneligiblePeriodMaximum = 90.days
-
-  # TODO - turn into struct that includes count, plus effective date range
-  ShopSmallMarketFteCountMaximum = 50
-
-  ## SHOP enrollment-related periods in days
-  # Minimum number of days for SHOP open enrollment period
-  ShopOpenEnrollmentPeriodMinimum = 5
-  ShopOpenEnrollmentEndDueDayOfMonth = 10
-
-  # Maximum number of months for SHOP open enrollment period
-  ShopOpenEnrollmentPeriodMaximum = 2
-
-  # Minumum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMinimum = 1.year - 1.day
-
-  # Maximum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMaximum = 1.year - 1.day
-
-  # Maximum number of months prior to coverage effective date to submit a Plan Year application
-  ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
-
-  ShopEmployerContributionPercentMinimum = 50.0
-  ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
-  ShopEnrollmentNonOwnerParticipationMinimum = 1
-
-  ShopBinderPaymentDueDayOfMonth = 15
-  ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
-
-
-  ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+  ShopOpenEnrollmentBeginDueDayOfMonth = Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 

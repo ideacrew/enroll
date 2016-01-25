@@ -194,8 +194,8 @@ class PlanYear
     # Exclude Jan 1 effective date from certain checks
     unless effective_date.yday == 1
       # Employer contribution toward employee premium must meet minimum
-      if benefit_groups.size > 0 && (minimum_employer_contribution < HbxProfile::ShopEmployerContributionPercentMinimum)
-        warnings.merge!({minimum_employer_contribution: "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{HbxProfile::ShopEmployerContributionPercentMinimum.to_i}%)"})
+      if benefit_groups.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+        warnings.merge!({minimum_employer_contribution: "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)"})
       end
     end
 
@@ -675,7 +675,7 @@ private
   end
 
   def within_review_period?
-    (latest_workflow_state_transition.transition_at.end_of_day + HbxProfile::ShopApplicationAppealPeriodMaximum) > TimeKeeper.date_of_record
+    (latest_workflow_state_transition.transition_at.end_of_day + Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days) > TimeKeeper.date_of_record
   end
 
   def duration_in_days(duration)
@@ -733,8 +733,8 @@ private
     end
 
     if is_renewing?
-      if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth
-       errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{HbxProfile::ShopRenewalOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
+      if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+       errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
       end
     else
       if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.open_enrollment.monthly_end_on
