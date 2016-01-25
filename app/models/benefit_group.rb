@@ -217,12 +217,12 @@ class BenefitGroup
   def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
     effective_date = effective_on_for(date_of_hire)
 
-    lower_limit = (effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
-    upper_limit = (effective_date + HbxProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays)
+    lower_limit = (effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
+    upper_limit = (effective_date + Settings.aca.shop_market.latest_enroll_after_effective_on.days)
 
     # Length of time that EE may enroll following correction to Census Employee Identifying info
     if date_of_roster_entry && (date_of_roster_entry > effective_date)
-      date_of_roster_entry..(date_of_roster_entry + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+      date_of_roster_entry..(date_of_roster_entry + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
     else
       lower_limit..upper_limit
     end
@@ -369,7 +369,7 @@ private
 
   def eligible_on(date_of_hire)
     if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire 
+      date_of_hire
     else
       doh_with_offset = date_of_hire + effective_on_offset.days
       doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month

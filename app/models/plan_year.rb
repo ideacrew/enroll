@@ -330,7 +330,7 @@ class PlanYear
       employer_initial_application_earliest_start_on = (effective_date - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum)
       employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
       employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
-      open_enrollment_earliest_start_on     = effective_date - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
+      open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
       open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
       open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
       binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}")
@@ -361,7 +361,7 @@ class PlanYear
         msg = "start on must be first day of the month"
       elsif TimeKeeper.date_of_record > shop_enrollment_times[:open_enrollment_latest_start_on]
         result = "failure"
-        msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
+        msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month} or later"
       end
       {result: (result || "ok"), msg: (msg || "")}
     end
@@ -370,7 +370,7 @@ class PlanYear
       # Today - 5 + 2.months).beginning_of_month
       # July 6 => Sept 1
       # July 1 => Aug 1
-      start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
+      start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
       end_on = (TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
       dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
     end
@@ -383,19 +383,19 @@ class PlanYear
       start_on = start_on.to_date
 
       # open_enrollment_start_on = [start_on - 1.month, TimeKeeper.date_of_record].max
-      # candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year.to_i, open_enrollment_start_on.month.to_i, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+      # candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year.to_i, open_enrollment_start_on.month.to_i, Settings.aca.shop_market.open_enrollment.monthly_end_on)
 
-      # open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+      # open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
       #   candidate_open_enrollment_end_on.next_month
       # else
       #   candidate_open_enrollment_end_on
       # end
 
-      open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), TimeKeeper.date_of_record].max
+      open_enrollment_start_on = [(start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max
 
-      #candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+      #candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
 
-      #open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+      #open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
       #  candidate_open_enrollment_end_on.next_month
       #else
       #  candidate_open_enrollment_end_on
@@ -603,7 +603,7 @@ class PlanYear
   def is_within_review_period?
     published_invalid? and
     (latest_workflow_state_transition.transition_at >
-      (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
+      (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days))
   end
 
   # def shoppable? # is_eligible_to_shop?
@@ -711,12 +711,12 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
-     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
+    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
+     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
-     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
+    if (open_enrollment_end_on - open_enrollment_start_on) > Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months.months} months")
     end
 
     if start_on + HbxProfile::ShopPlanYearPeriodMinimum < end_on
