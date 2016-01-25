@@ -115,7 +115,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_lawful_presence_status_satisfied?
-    @role.lawful_presence_determination.aasm_state == "verification_outstanding" ? false : true
+    is_verification_outstanding? || is_person_vlp_verified?
   end
 
   def determination_results
@@ -134,6 +134,16 @@ class InsuredEligibleForBenefitRule
     today = TimeKeeper.date_of_record
     today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
+  end
+
+  private
+
+  def is_verification_outstanding?
+    @role.lawful_presence_determination.aasm_state == "verification_outstanding" ? false : true
+  end
+
+  def is_person_vlp_verified?
+    @role.aasm_state == "fully_verified" ? true : false
   end
 
 end
