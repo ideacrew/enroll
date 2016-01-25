@@ -117,7 +117,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:invalid_effective_date)   { (prior_month_open_enrollment_start + 1.month).beginning_of_month }
       before do
         plan_year.effective_date = invalid_effective_date
-        plan_year.end_on = invalid_effective_date + HbxProfile::ShopPlanYearPeriodMinimum
+        plan_year.end_on = invalid_effective_date + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day
       end
 
       context "and an employer is submitting the effective date" do
@@ -137,7 +137,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:valid_effective_date)   { (prior_month_open_enrollment_start + 3.months).beginning_of_month }
       before do
         plan_year.effective_date = valid_effective_date
-        plan_year.end_on = valid_effective_date + HbxProfile::ShopPlanYearPeriodMinimum
+        plan_year.end_on = valid_effective_date + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day
       end
 
       it "should be valid" do
@@ -223,7 +223,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and a plan year start and end is specified" do
         context "and the plan year start date isn't first day of month" do
           let(:start_on)  { TimeKeeper.date_of_record.beginning_of_month + 1 }
-          let(:end_on)    { start_on + HbxProfile::ShopPlanYearPeriodMinimum }
+          let(:end_on)    { start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day }
 
           before do
             plan_year.start_on = start_on
@@ -252,7 +252,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too short" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1.day }
+          let(:invalid_length)  { Settings.aca.shop_market.benefit_period.length_minimum.year.years - 2.days }
           let(:start_on)  { TimeKeeper.date_of_record.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -268,7 +268,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too long" do
-          let(:invalid_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year + 1.day }
+          let(:invalid_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year.years + 1.day }
           let(:start_on)  { TimeKeeper.date_of_record.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -304,8 +304,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year begins before open enrollment ends" do
-          let(:valid_open_enrollment_length)  { Settings.aca.shop_market.open_enrollment.maximum_length.months }
-          let(:valid_plan_year_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year }
+          let(:valid_open_enrollment_length)  { Settings.aca.shop_market.open_enrollment.maximum_length.months.months }
+          let(:valid_plan_year_length)  { Settings.aca.shop_market.benefit_period.length_maximum.year.years }
           let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
@@ -323,7 +323,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the effective date is too far in the future" do
-          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
+          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 1.month }
           let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }
