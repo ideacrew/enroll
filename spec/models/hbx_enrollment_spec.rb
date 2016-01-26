@@ -673,7 +673,7 @@ describe HbxEnrollment, dbclean: :after_each do
 
   context "Hbx Enrollment select coverage" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-
+    # FIX ME: add created_at, udpated_at
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
@@ -758,20 +758,48 @@ describe HbxEnrollment, dbclean: :after_each do
       end
     end
 
-    # context 'when new hire enrollment period exists' do
+    context 'when its a new hire' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(calender_year, 3, 1)) }
 
-    #   let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', ) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+      end
 
-    #   it "should allow select coverage" do
-    #     expect(shop_enrollment.is_shop?).to be_truthy
-    #   end
-    # end
+      it "should allow select coverage" do
+        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      end
+    end
 
-    # context 'when roster update present' do
-    #   it "should allow select coverage" do
-    #     expect(shop_enrollment.is_shop?).to be_truthy
-    #   end
-    # end
+    context 'when not a new hire' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+      end
+
+      it "should not allow select coverage" do
+        expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+    end
+     
+    # Census employee record has updated_at date as TimeKeeper.date_of_record
+    context 'when roster update present' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 30.days)
+      end
+
+      it "should allow select coverage" do
+        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      end
+    end
+
+    context 'when roster update not present' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 31.days)
+      end 
+        
+      it "should not allow select coverage" do
+        expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+    end
 
     # context 'under special enrollment period' do
     #   it "should allow select coverage" do

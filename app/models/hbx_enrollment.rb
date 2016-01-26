@@ -723,35 +723,35 @@ class HbxEnrollment
     event :advance_date, :after => :record_transition  do
     end
 
-    event :renew_enrollment do
+    event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing
     end
 
-    event :renew_waived do
+    event :renew_waived, :after => :record_transition do
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage do
+    event :select_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
       transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
     end
 
-    event :transmit_coverage do
+    event :transmit_coverage, :after => :record_transition do
       transitions from: :coverage_selected, to: :transmitted_to_carrier
       transitions from: :auto_renewing, to: :renewing_transmitted_to_carrier
       transitions from: :renewing_coverage_selected, to: :renewing_transmitted_to_carrier
     end
 
-    event :effectuate_coverage do
+    event :effectuate_coverage, :after => :record_transition do
       transitions from: :transmitted_to_carrier, to: :coverage_enrolled
       transitions from: :renewing_transmitted_to_carrier, to: :renewing_coverage_enrolled
     end
 
-    event :waive_coverage do
+    event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
-    event :terminate_coverage do
+    event :terminate_coverage, :after => :record_transition do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :auto_renewing, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :renewing_coverage_selected, to: :coverage_terminated, after: :propogate_terminate
@@ -760,14 +760,14 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
-    event :move_to_enrolled! do
+    event :move_to_enrolled!, :after => :record_transition do
       transitions from: :coverage_selected, to: :coverage_selected
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
       transitions from: :coverage_selected, to: :coverage_selected
     end
 
-    event :move_to_contingent! do
+    event :move_to_contingent!, :after => :record_transition do
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
@@ -775,7 +775,7 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :enrolled_contingent
     end
 
-    event :move_to_pending! do
+    event :move_to_pending!, :after => :record_transition do
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
