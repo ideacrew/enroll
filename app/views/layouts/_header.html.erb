@@ -1,56 +1,33 @@
 <div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
   <nav class="navbar navbar-white navbar-fixed-top">
     <div class="container">
-
       <div id="navbar" class="collapse navbar-collapse">
         <div class="col-xs-6">
           <div class="row">
             <div class="col-xs-12">
               <div class="row">
                 <div class="navbar-header col-xs-4">
-
                   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                   </button>
-
                   <span class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></span>
                 </div>
-
                 <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
                   <li class="header-text">
-                    <% if current_user.try(:has_employee_role?) || (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) %>
-
-                      <% if current_user.try(:has_employee_role?) %>
-                        <%= link_to portal_display_name(controller_name), family_account_path, style: "padding: 7px 10px 0 10px;" %>
-                      <% else %>
-                        <%= link_to portal_display_name(controller_name), family_account_path %>
-                      <% end %>
-
-                    <% elsif current_user.try(:has_broker_agency_staff_role?) %>
-                      <%= link_to portal_display_name(controller_name), broker_agencies_root_path %>
-                    <% elsif current_user.try(:has_hbx_staff_role?) %>
-                      <%= link_to portal_display_name(controller_name), exchanges_hbx_profiles_root_path %>
-                    <% elsif current_user.try(:has_csr_role?) %>
-                      <%= link_to portal_display_name(controller_name), home_exchanges_agents_path %>
-                    <% else %>
-                      <a href="#"> <%= portal_display_name(controller_name) %> </a>
-                    <% end %>
+                    <%= get_header_text(controller_name) %>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-
         <div class="col-xs-6">
           <div class="row">
-
             <div class="col-xs-12">
               <div class="row">
-
                 <% if current_user %>
                   <div class="col-xs-5 ccs">
                 <% elsif current_page?('/') || controller.controller_name == 'registrations' || controller.controller_name == 'broker_roles' || controller.controller_name == 'sessions' %>
@@ -58,16 +35,13 @@
                 <% else %>
                   <div class="col-xs-5 ccs">
                 <% end %>
-                
                 <div class="pull-right">
                   <span class="g14">Call Customer Service</span><br/>
                   <i class="fa fa-phone fa-lg"></i>
                   <h4><%= HbxProfile::CallCenterPhoneNumber %></h4>
                 </div>
               </div>
-
               <div class="col-xs-7">
-
                 <div class="right-menu navbar-right">
                   <% if signed_in? %>
                     <ul class="navbar-nav top-menu pull-right">
@@ -88,13 +62,10 @@
                     </ul>
                   <% end %>
                 </div>
-                
               </div>
-
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </nav>
@@ -117,9 +88,9 @@
   </script>
 <% end %>
 <script>
-if (bowser.msie && bowser.version <= 9 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
-  $('body').before('<div id="modal-wrapper"></div>')
-  $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');
-  $('#modal-wrapper').fadeIn();
-}
+  if (bowser.msie && bowser.version <= 9 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
+    $('body').before('<div id="modal-wrapper"></div>')
+    $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');
+    $('#modal-wrapper').fadeIn();
+  }
 </script>
