@@ -804,16 +804,16 @@ class HbxEnrollment
   def can_select_coverage?
     if is_shop?
       coverage_effective_date = nil
-      if benefit_group.present? && benefit_group.is_open_enrollment?
+      if special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
+        coverage_effective_date = hbx_enrollment.special_enrollment_period.effective_on
+      elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+        coverage_effective_date = employee_role.coverage_effective_on
+      elsif benefit_group.is_open_enrollment?
         open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
         if open_enrollment_effective_date < employee_role.coverage_effective_on
           return false
         end
         coverage_effective_date = open_enrollment_effective_date
-      elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
-        coverage_effective_date = hbx_enrollment.special_enrollment_period.effective_on
-      elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
-        coverage_effective_date = employee_role.coverage_effective_on
       end
 
       if coverage_effective_date.present?
