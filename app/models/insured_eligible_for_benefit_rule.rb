@@ -78,7 +78,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
-    true
+    @role.citizen_status == "not_lawfully_present_in_us" ? false : true
   end
 
   def is_ethnicity_satisfied?
@@ -115,7 +115,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_lawful_presence_status_satisfied?
-    is_verification_outstanding? || is_person_vlp_verified?
+    is_verification_outstanding? || is_person_vlp_verified? || is_person_created_less_than_90_days_ago?
   end
 
   def determination_results
@@ -146,4 +146,7 @@ class InsuredEligibleForBenefitRule
     @role.aasm_state == "fully_verified" ? true : false
   end
 
+  def is_person_created_less_than_90_days_ago?
+    (@role.person.created_at + 90.days) > TimeKeeper.date_of_record
+  end
 end
