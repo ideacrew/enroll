@@ -316,17 +316,7 @@ module ApplicationHelper
   end
 
   def get_header_text(controller_name)
-    if current_user.try(:has_employee_role?) || (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false)
       portal_display_name(controller_name)
-    elsif current_user.try(:has_broker_agency_staff_role?)
-      portal_display_name(controller_name)
-    elsif current_user.try(:has_hbx_staff_role?)
-      portal_display_name(controller_name)
-    elsif current_user.try(:has_csr_role?)
-      portal_display_name(controller_name)
-    else
-      portal_display_name(controller_name)
-    end
   end
 
   def can_register_new_account
