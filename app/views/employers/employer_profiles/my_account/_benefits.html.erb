@@ -226,13 +226,13 @@
         </div>
     <div class="bottom-mgn-xs">
 
-      <% if (plan_year.draft? && @current_plan_year.nil?) || (plan_year.renewing_draft? && @employer_profile.renewing_plan_year == plan_year) %>
-      <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
-      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
-      <% elsif (plan_year.draft? || plan_year.renewing_draft?) %>
-      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
+      <% if plan_year.draft? %>
+        <% if plan_year.overlapping_published_plan_years.empty? %>
+          <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+        <% end %>
+        <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
       <% end %>
-      
+
       <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
       <span class="btn btn-trans pull-right" data-toggle="modal" data-target="#revertPlanYear_<%= plan_year.id %>">Revert Application</span>
       <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->

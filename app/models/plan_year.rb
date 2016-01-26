@@ -44,6 +44,23 @@ class PlanYear
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
+  scope :published_plan_years_within_date_range, ->(start_on_date, end_on_date) {
+    where(
+      "$and" => [
+        {:aasm_state.in => PUBLISHED },
+        {"$or" => [
+          { :start_on => {"$gte" => start_on_date, "$lte" => end_on_date }},
+          { :end_on => {"$gte" => start_on_date, "$lte" => end_on_date }}
+        ]
+      }
+    ]
+    )
+  }
+
+  def overlapping_published_plan_years
+    self.employer_profile.plan_years.published_plan_years_within_date_range(self.start_on, self.end_on)
+  end
+
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
     self.employer_profile
@@ -677,6 +694,7 @@ private
   def open_enrollment_date_checks
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
+
     if start_on.day != 1
       errors.add(:start_on, "must be first day of the month")
     end
