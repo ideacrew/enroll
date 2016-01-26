@@ -195,12 +195,12 @@ RSpec.describe ApplicationHelper, :type => :helper do
       let(:hbx_enrollment) { HbxEnrollment.new }
 
       it "should return true when hbx_enrollment is not allow select_coverage" do
-        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return false
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return false
         expect(helper.disable_purchase?(false, hbx_enrollment)).to eq true
       end
 
       it "should return false when hbx_enrollment is allow select_coverage" do
-        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return true
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return true
         expect(helper.disable_purchase?(false, hbx_enrollment)).to eq false
       end
     end

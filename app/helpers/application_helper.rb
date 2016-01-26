@@ -493,7 +493,7 @@ module ApplicationHelper
   end
 
   def disable_purchase?(disabled, hbx_enrollment)
-    disabled || !hbx_enrollment.may_select_coverage?
+    disabled || !hbx_enrollment.can_select_coverage?
   end
 
   def get_key_and_bucket(uri)
