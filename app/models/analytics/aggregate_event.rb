@@ -31,9 +31,8 @@ module Analytics
     end
 
     def self.topic_count_monthly(topic: nil, start_on: DCHBX_EPOCH, end_on: TimeKeeper.date_of_record.end_of_day, site: "dchbx")
-binding.pry
       Analytics::Dimensions::Monthly.where(
-                                              site:  site, 
+                                              site:  site,
                                               topic: topic,
                                               "date.gte" => start_on,
                                               "date.lte" => end_on

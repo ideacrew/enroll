@@ -5,6 +5,8 @@ RSpec.describe "layouts/_header.html.erb" do
   let(:person_user){Person.new(first_name: 'fred', last_name: 'flintstone')}
   let(:current_user){FactoryGirl.create(:user, :person=>person_user)}
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
+  let(:employer_profile){ FactoryGirl.build(:employer_profile) }
+  let(:employer_staff_role){ FactoryGirl.build(:employer_staff_role, :person=>person_user, :employer_profile_id=>employer_profile.id)}
   let(:signed_in?){ true }
   before(:each) do
   	sign_in current_user
