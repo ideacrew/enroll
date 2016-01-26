@@ -38,13 +38,19 @@ class Insured::PlanShoppingsController < ApplicationController
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
       end
     end
+
+    if hbx_enrollment.is_special_enrollment?
+      hbx_enrollment.special_enrollment_period_id = hbx_enrollment.is_shop? ? 
+          hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
+    end
+
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
     if hbx_enrollment.employee_role.present? && hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to family_account_path
     elsif hbx_enrollment.may_select_coverage?
-      hbx_enrollment.update_current(aasm_state: "coverage_selected")
+      hbx_enrollment.select_coverage!
       hbx_enrollment.propogate_selection
       #UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])

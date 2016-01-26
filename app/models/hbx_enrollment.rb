@@ -330,6 +330,7 @@ class HbxEnrollment
     end
   end
 
+
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
   end
@@ -512,9 +513,13 @@ class HbxEnrollment
     nil
   end
 
+
+  # census employees with hire date before open enrollments && eligible date is plan year start are not new hires...if eligible date is later then they should get new hire window
+  # census employees updated before open enrollment will not get new hire window
+
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     if qle
-      qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+      qle_effective_date = hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
@@ -540,7 +545,7 @@ class HbxEnrollment
         census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
@@ -727,8 +732,8 @@ class HbxEnrollment
     end
 
     event :select_coverage do
-      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
-      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection
+      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
     end
 
     event :transmit_coverage do
@@ -791,6 +796,42 @@ class HbxEnrollment
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+    end
+  end
+
+  private 
+
+  def can_select_coverage?
+    if is_shop?
+      coverage_effective_date = nil
+      if special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
+        coverage_effective_date = hbx_enrollment.special_enrollment_period.effective_on
+      elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+        coverage_effective_date = employee_role.coverage_effective_on
+      elsif benefit_group.is_open_enrollment?
+        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        if open_enrollment_effective_date < employee_role.coverage_effective_on
+          return false
+        end
+        coverage_effective_date = open_enrollment_effective_date
+      end
+
+      if coverage_effective_date.present?
+        benefit_group_assignment_valid?(coverage_effective_date)
+      else
+        false
+      end
+    else
+      true
+    end
+  end
+
+  def benefit_group_assignment_valid?(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+      true
+    else
+      false
     end
   end
 end
