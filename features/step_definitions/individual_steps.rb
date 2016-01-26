@@ -24,7 +24,11 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-person-last-name/).set(@u.last_name :last_name1)
-  @browser.text_field(class: /interaction-field-control-person-name-sfx/).set("Jr")
+  @browser.p(text: /suffix/i).click
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.wait_until_present
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.li(text: /Jr./).click
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(@u.adult_dob)
   @browser.h1(class: /darkblue/).click
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn1)
