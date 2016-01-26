@@ -799,8 +799,6 @@ class HbxEnrollment
     end
   end
 
-  private 
-
   def can_select_coverage?
     if is_shop?
       coverage_effective_date = nil
@@ -825,6 +823,8 @@ class HbxEnrollment
       true
     end
   end
+
+  private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
