@@ -62,6 +62,7 @@ function dchbx_enroll_date_of_record() {
 $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
+
   //validate plan year create for title, referencce plan, and premium Percentage
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
     $('.interaction-click-control-save-plan-year').removeClass('disabled');
@@ -172,8 +173,8 @@ function getCarrierPlans(ep, ci) {
       referenceplanselections = $('.reference-plan input[type=radio]:checked');
 
       bgtitles.each(function() {
-
-        if ( $(this).val().length > 0 ) {
+        plantitle = $(this).val();
+        if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"plantitle\"" + ']').size() < 2 ) {
           validatedbgtitles = true;
           validated = true;
         } else {
@@ -251,6 +252,13 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 // reveal published plan years benefit groups
 $(document).ready(function () {
+
+  //warn user before exiting to gmail, ymail, or aol
+
+  $('.email-alert').on('click', function() {
+    window.confirm("You are leaving the DC Health Link web site and entering a privately owned web site created, operated and maintained by a private business. The information that this private business collects and maintains as a result of your visit to its web site is different from the information that the DC Health Link collects and maintains. DC Health Link does not share information with this private company. DC Health Link cannot help you with any information regarding this website, including your username or password, or other technical issues. By linking to this private business, the DC Health Link is not endorsing its products, services, or privacy or security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by this private business.");
+  })
+
   if ( $('.plan-year').find('.fa-star.enrolling, .fa-star.published').length )  {
     $('.plan-year').find('.fa-star.enrolling, .fa-star.published').closest('.plan-year').find('a.benefit-details').trigger('click');
   }
