@@ -492,8 +492,8 @@ module ApplicationHelper
     end
   end
 
-  def disable_purchase?(disabled, family)
-    disabled || !family.is_eligible_to_enroll?
+  def disable_purchase?(disabled, hbx_enrollment)
+    disabled || !hbx_enrollment.may_select_coverage?
   end
 
   def get_key_and_bucket(uri)

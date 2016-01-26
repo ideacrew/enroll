@@ -192,16 +192,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     context "when disable is false" do
-      let(:family) { FactoryGirl.build(:family) }
+      let(:hbx_enrollment) { HbxEnrollment.new }
 
-      it "should return true when family is not eligible_to_enroll" do
-        allow(family).to receive(:is_eligible_to_enroll?).and_return false
-        expect(helper.disable_purchase?(false, family)).to eq true
+      it "should return true when hbx_enrollment is not allow select_coverage" do
+        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return false
+        expect(helper.disable_purchase?(false, hbx_enrollment)).to eq true
       end
 
-      it "should return false when family is eligible_to_enroll" do
-        allow(family).to receive(:is_eligible_to_enroll?).and_return true
-        expect(helper.disable_purchase?(false, family)).to eq false
+      it "should return false when hbx_enrollment is allow select_coverage" do
+        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return true
+        expect(helper.disable_purchase?(false, hbx_enrollment)).to eq false
       end
     end
   end
