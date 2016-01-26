@@ -673,8 +673,9 @@ describe HbxEnrollment, dbclean: :after_each do
 
   context "Hbx Enrollment select coverage" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    # FIX ME: add created_at, udpated_at
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+
+    let(:middle_of_prev_year) { (TimeKeeper.date_of_record - 1.year) + 2.months }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
     let(:employee_role) {
@@ -759,7 +760,7 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when its a new hire' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(calender_year, 3, 1)) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(calender_year, 3, 1), created_at: Date.new(calender_year, 2, 1), updated_at: Date.new(calender_year, 2, 1)) }
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
@@ -780,10 +781,11 @@ describe HbxEnrollment, dbclean: :after_each do
       end
     end
      
-    # Census employee record has updated_at date as TimeKeeper.date_of_record
     context 'when roster update present' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: middle_of_prev_year, updated_at: Date.new(calender_year, 5, 10)) }
+
       before do
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 30.days)
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
       end
 
       it "should allow select coverage" do
@@ -792,8 +794,10 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when roster update not present' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: middle_of_prev_year, updated_at: Date.new(calender_year, 5, 10)) }
+
       before do
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 31.days)
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
       end 
         
       it "should not allow select coverage" do
