@@ -208,15 +208,12 @@ class PeopleController < ApplicationController
   def update
     sanitize_person_params
     @person = find_person(params[:id])
-
-    make_new_person_params @person
-
+    clean_duplicate_addresses
     @person.updated_by = current_user.email unless current_user.nil?
 
     if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
-      @person.update_attributes({:emails => [], :addresses => []})
     else
 
       redirect_path = family_account_path
@@ -227,14 +224,14 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
+        @person.addresses = @old_addresses
         if @person.has_active_consumer_role?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
         end
         build_nested_models
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
-
-        format.html { redirect_to redirect_path, alert: "Person update failed.<br />" + person_error_megs }
+        format.html { redirect_to redirect_path, alert: "Person update failed. #{person_error_megs}" }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -304,6 +301,7 @@ class PeopleController < ApplicationController
   end
 
 private
+
   def safe_find(klass, id)
     # puts "finding #{klass} #{id}"
     begin
@@ -346,6 +344,7 @@ private
           params["person"]["addresses_attributes"].delete("#{key}")
         end
       end
+      params["person"]["addresses_attributes"] = person_params["addresses_attributes"].values.uniq #fix unexpected duplicate issue
     end
 
     if person_params["phones_attributes"].present?
@@ -365,47 +364,15 @@ private
     end
   end
 
-  def make_new_person_params person
-
-    # Delete old sub documents
-    person.addresses.each {|address| address.delete}
-    person.phones.each {|phone| phone.delete}
-    person.emails.each {|email| email.delete}
-
-    if person_params["addresses_attributes"].present?
-      person_params["addresses_attributes"].each do |key, address|
-        if address.has_key?('id')
-          address.delete('id')
-        end
-      end
-    end
-
-    if person_params["phones_attributes"].present?
-      person_params["phones_attributes"].each do |key, phone|
-        if phone.has_key?('id')
-          phone.delete('id')
-        end
-      end
-    end
-
-    if person_params["emails_attributes"].present?
-      person_params["emails_attributes"].each do |key, email|
-        if email.has_key?('id')
-          email.delete('id')
-        end
-      end
-    end
-  end
-
   def person_params
     params.require(:person).permit(*person_parameters_list)
   end
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
+      { :phones_attributes => [:kind, :full_phone_number, :id] },
+      { :emails_attributes => [:kind, :address, :id] },
       :consumer_role_attributes,
       :first_name,
       :middle_name,
@@ -424,12 +391,18 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :id
     ]
   end
 
   def dependent_params
     params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
+  end
+
+  def clean_duplicate_addresses
+    @old_addresses = @person.addresses
+    @person.addresses = [] #fix unexpected duplicates issue
   end
 
 end
