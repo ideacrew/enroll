@@ -671,7 +671,7 @@ end
 
 describe HbxEnrollment, dbclean: :after_each do
 
-  context "Hbx Enrollment select coverage" do
+  context ".can_select_coverage?" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
 
     let(:middle_of_prev_year) { (TimeKeeper.date_of_record - 1.year) + 2.months }
@@ -739,12 +739,12 @@ describe HbxEnrollment, dbclean: :after_each do
       allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
     end
 
-    context 'when open enrollment' do
+    context 'under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
       end
  
-      it "should allow select coverage" do
+      it "should allow" do
         expect(shop_enrollment.can_select_coverage?).to be_truthy
       end
     end
@@ -754,7 +754,7 @@ describe HbxEnrollment, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on + 5.days)
       end
  
-      it "should not allow select coverage" do
+      it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
     end
@@ -766,7 +766,7 @@ describe HbxEnrollment, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
       end
 
-      it "should allow select coverage" do
+      it "should allow" do
         expect(shop_enrollment.can_select_coverage?).to be_truthy
       end
     end
@@ -776,7 +776,7 @@ describe HbxEnrollment, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
       end
 
-      it "should not allow select coverage" do
+      it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
     end
@@ -788,7 +788,7 @@ describe HbxEnrollment, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
       end
 
-      it "should allow select coverage" do
+      it "should allow" do
         expect(shop_enrollment.can_select_coverage?).to be_truthy
       end
     end
@@ -800,22 +800,56 @@ describe HbxEnrollment, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
       end 
         
-      it "should not allow select coverage" do
+      it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
     end
 
-    # context 'under special enrollment period' do
-    #   it "should allow select coverage" do
-    #     expect(shop_enrollment.is_shop?).to be_truthy
-    #   end
-    # end
+    context 'with QLE' do
 
-    # context 'outside special enrollment period' do
-    #   it "should allow select coverage" do
-    #     expect(shop_enrollment.is_shop?).to be_truthy
-    #   end
-    # end
+      let(:qle_date) { effective_date + 15.days }
+      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
+
+      let(:special_enrollment_period) { 
+        special_enrollment = shop_family.special_enrollment_periods.build({
+          qle_on: qle_date,
+          effective_on_kind: "first_of_month",
+        })
+        special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
+        special_enrollment.save
+        special_enrollment
+      }
+   
+      let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_date,
+                                                    enrollment_kind: "special_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_date - 10.days,
+                                                    benefit_group_id: plan_year.benefit_groups.first.id,
+                                                    employee_role_id: employee_role.id,
+                                                    benefit_group_assignment_id: benefit_group_assignment.id,
+                                                    special_enrollment_period_id: special_enrollment_period.id
+                                                  )
+                                                }
+
+      context 'under special enrollment period' do
+        it "should allow" do
+          expect(shop_enrollment.can_select_coverage?).to be_truthy
+        end
+      end
+
+      context 'outside special enrollment period' do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!( special_enrollment_period.end_on + 5.days )
+        end
+
+        it "should not allow" do
+          expect(shop_enrollment.can_select_coverage?).to be_falsey
+        end
+      end
+    end
   end
 end
 
