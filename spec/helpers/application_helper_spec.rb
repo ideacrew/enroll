@@ -185,4 +185,31 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
     end
   end
+
+  describe "disable_purchase?" do
+    it "should return true when disabled is true" do
+      expect(helper.disable_purchase?(true, nil)).to eq true
+    end
+
+    context "when disable is false" do
+      let(:hbx_enrollment) { HbxEnrollment.new }
+
+      it "should return true when hbx_enrollment is not allow select_coverage" do
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return false
+        expect(helper.disable_purchase?(false, hbx_enrollment)).to eq true
+      end
+
+      it "should return false when hbx_enrollment is allow select_coverage" do
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return true
+        expect(helper.disable_purchase?(false, hbx_enrollment)).to eq false
+      end
+    end
+  end
+
+  describe "qualify_qle_notice" do
+    it "should return notice" do
+      expect(helper.qualify_qle_notice).to include('<span class="alert">')
+      expect(helper.qualify_qle_notice).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
+    end
+  end
 end

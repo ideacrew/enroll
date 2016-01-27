@@ -5,7 +5,6 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
   let(:user) {FactoryGirl.create(:user, :person=>person)}
   let(:person_params){{"dob"=>person.id, "first_name"=>person.first_name,"gender"=>person.gender,"last_name"=>person.last_name,"middle_name"=>"","name_sfx"=>"","ssn"=>person.ssn,"user_id"=>person.id}}
 
-
   before :each do
     assign(:person, person)
     assign(:person_params, person_params)
@@ -17,8 +16,9 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
   end
 
   it "should display the employee search page with no match info" do
+
     expect(rendered).to have_selector('h1', text: 'Personal Information')
-    expect(rendered).to have_selector("input[type='text']", count: 6)
+    expect(rendered).to have_selector("input[type='text']", count: 5)
     expect(rendered).to have_selector("input[type='radio']", count: 2)
 
     # expect(rendered).to have_selector("input[type=submit][value='This is my employer']")
