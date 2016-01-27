@@ -32,8 +32,10 @@ namespace :reports do
 
           employer_name = census_employee.employer_profile.organization.legal_name
 
-          # Only include ERs active on the HBX 
-          if census_employee.employer_profile.binder_paid? ||census_employee.employer_profile.enrolled? || census_employee.employer_profile.suspended?
+          # Only include ERs active on the HBX
+          active_states = %w(registered eligible binder_paid enrolled suspended)
+
+          if active_states.include? census_employee.employer_profile.aasm_state
             csv << field_names.map do |field_name| 
               if field_name == "ssn"
                 '="' + eval(field_name) + '"'
