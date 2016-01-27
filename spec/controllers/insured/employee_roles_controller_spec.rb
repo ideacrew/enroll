@@ -50,6 +50,20 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         expect(assigns(:person)).to eq role_form
       end
     end
+
+    context "duplicate addresses records" do
+      let(:person_attributes) { person.attributes.to_hash}
+      let(:save_result) { true }
+      let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
+                                    "1"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
+                                    "2"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"}} }
+
+      it "clean old addresses" do
+        allow(person).to receive(:update_attributes).and_return(true)
+        person_attributes[:addresses_attributes] = addresses_attributes
+        expect(person.addresses).to eq []
+      end
+    end
   end
 
   describe "message to broker" do
@@ -95,7 +109,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
   end
 
-  describe "PUT update" do
+  describe "GET edit" do
     let(:user) { double("User") }
     let(:person) { double("Person", broker_role: BrokerRole.new) }
     let(:census_employee) { double("CensusEmployee") }
@@ -103,8 +117,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:addresses) { [address] }
     let(:employee_role) { double("EmployeeRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
     let(:family) { double("Family") }
-    let(:email){ double("Email", address: "test@example.com") }
+    let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
+
     it "should render edit template" do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(user).to receive(:person).and_return(person)
@@ -121,6 +136,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
+
       get :edit, id: employee_role.id
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
@@ -327,7 +343,5 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       end
       get :show, id: 888
     end
-
-
   end
 end
