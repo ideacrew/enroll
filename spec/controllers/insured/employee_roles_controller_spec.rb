@@ -50,6 +50,20 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         expect(assigns(:person)).to eq role_form
       end
     end
+
+    context "duplicate addresses records" do
+      let(:person_attributes) { person.attributes.to_hash}
+      let(:save_result) { true }
+      let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
+                                    "1"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
+                                    "2"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"}} }
+
+      it "clean old addresses" do
+        allow(person).to receive(:update_attributes).and_return(true)
+        person_attributes[:addresses_attributes] = addresses_attributes
+        expect(person.addresses).to eq []
+      end
+    end
   end
 
   describe "message to broker" do
@@ -327,7 +341,5 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       end
       get :show, id: 888
     end
-
-
   end
 end
