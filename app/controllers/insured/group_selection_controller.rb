@@ -120,6 +120,7 @@ class Insured::GroupSelectionController < ApplicationController
       if @hbx_enrollment.present?
         benefit_group = @hbx_enrollment.benefit_group
         benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
+        @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
       end
       @employee_role = @person.employee_roles.active.last if @employee_role.blank? and @person.has_active_employee_role?
       @coverage_household.household.new_hbx_enrollment_from(
