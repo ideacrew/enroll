@@ -803,7 +803,7 @@ class HbxEnrollment
     if is_shop?
       coverage_effective_date = nil
       if special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
-        coverage_effective_date = hbx_enrollment.special_enrollment_period.effective_on
+        coverage_effective_date = special_enrollment_period.effective_on
       elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
         coverage_effective_date = employee_role.coverage_effective_on
       elsif benefit_group.is_open_enrollment?
