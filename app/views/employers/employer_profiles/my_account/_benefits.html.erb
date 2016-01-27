@@ -18,9 +18,9 @@
     <h3>
       <% if plan_year.draft? || plan_year.renewing_draft? %>
       <i class="fa fa-file"></i>
-      <% elsif plan_year.aasm_state == 'enrolling' %>
+      <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
       <i class="fa fa-star enrolling"></i>
-      <% elsif plan_year.aasm_state == 'published' %>
+      <% elsif plan_year.published? || plan_year.renewing_published? %>
       <i class="fa fa-star published"></i>
       <% end %>
       <strong><%= plan_year.aasm_state.to_s.humanize.upcase %> Plan Year for <%= plan_year.start_on.to_date.year%></strong>
