@@ -671,7 +671,7 @@ end
 
 describe HbxEnrollment, dbclean: :after_each do
 
-  context ".select_coverage" do
+  context ".can_select_coverage?" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
 
     let(:middle_of_prev_year) { (TimeKeeper.date_of_record - 1.year) + 2.months }
