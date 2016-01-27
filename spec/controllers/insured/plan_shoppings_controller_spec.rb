@@ -35,6 +35,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
       allow(hbx_enrollment).to receive(:inactive_pre_hbx).and_return true
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return false
       sign_in user
     end
 

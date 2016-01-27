@@ -330,6 +330,7 @@ class HbxEnrollment
     end
   end
 
+
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
   end
@@ -512,9 +513,13 @@ class HbxEnrollment
     nil
   end
 
+
+  # census employees with hire date before open enrollments && eligible date is plan year start are not new hires...if eligible date is later then they should get new hire window
+  # census employees updated before open enrollment will not get new hire window
+
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     if qle
-      qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+      qle_effective_date = hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
@@ -540,7 +545,7 @@ class HbxEnrollment
         census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
@@ -718,35 +723,35 @@ class HbxEnrollment
     event :advance_date, :after => :record_transition  do
     end
 
-    event :renew_enrollment do
+    event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing
     end
 
-    event :renew_waived do
+    event :renew_waived, :after => :record_transition do
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage do
-      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
-      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection
+    event :select_coverage, :after => :record_transition do
+      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
     end
 
-    event :transmit_coverage do
+    event :transmit_coverage, :after => :record_transition do
       transitions from: :coverage_selected, to: :transmitted_to_carrier
       transitions from: :auto_renewing, to: :renewing_transmitted_to_carrier
       transitions from: :renewing_coverage_selected, to: :renewing_transmitted_to_carrier
     end
 
-    event :effectuate_coverage do
+    event :effectuate_coverage, :after => :record_transition do
       transitions from: :transmitted_to_carrier, to: :coverage_enrolled
       transitions from: :renewing_transmitted_to_carrier, to: :renewing_coverage_enrolled
     end
 
-    event :waive_coverage do
+    event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
-    event :terminate_coverage do
+    event :terminate_coverage, :after => :record_transition do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :auto_renewing, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :renewing_coverage_selected, to: :coverage_terminated, after: :propogate_terminate
@@ -755,14 +760,14 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
-    event :move_to_enrolled! do
+    event :move_to_enrolled!, :after => :record_transition do
       transitions from: :coverage_selected, to: :coverage_selected
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
       transitions from: :coverage_selected, to: :coverage_selected
     end
 
-    event :move_to_contingent! do
+    event :move_to_contingent!, :after => :record_transition do
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
@@ -770,7 +775,7 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :enrolled_contingent
     end
 
-    event :move_to_pending! do
+    event :move_to_pending!, :after => :record_transition do
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
@@ -791,6 +796,42 @@ class HbxEnrollment
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+    end
+  end
+
+  def can_select_coverage?
+    if is_shop?
+      coverage_effective_date = nil
+      if special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
+        coverage_effective_date = hbx_enrollment.special_enrollment_period.effective_on
+      elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+        coverage_effective_date = employee_role.coverage_effective_on
+      elsif benefit_group.is_open_enrollment?
+        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        if open_enrollment_effective_date < employee_role.coverage_effective_on
+          return false
+        end
+        coverage_effective_date = open_enrollment_effective_date
+      end
+
+      if coverage_effective_date.present?
+        benefit_group_assignment_valid?(coverage_effective_date)
+      else
+        false
+      end
+    else
+      true
+    end
+  end
+
+  private 
+
+  def benefit_group_assignment_valid?(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+      true
+    else
+      false
     end
   end
 end

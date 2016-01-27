@@ -286,6 +286,14 @@ class Family
     special_enrollment_periods.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def earliest_effective_shop_sep
+    special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def earliest_effective_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   # List of SEPs active for this Application Group today, or passed date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
