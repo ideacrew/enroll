@@ -11,52 +11,26 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
-    plan = Plan.find(params.require(:plan_id))
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.update_current(plan_id: plan.id)
-    hbx_enrollment.inactive_related_hbxs
-    hbx_enrollment.inactive_pre_hbx(session[:pre_hbx_enrollment_id])
-    session.delete(:pre_hbx_enrollment_id)
+    plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
-    if hbx_enrollment.is_shop?
-      benefit_group = hbx_enrollment.benefit_group
-      reference_plan = benefit_group.reference_plan
-
-      if benefit_group.is_congress
-        decorated_plan = PlanCostDecoratorCongress.new(plan, hbx_enrollment, benefit_group)
-      else
-        decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
-      end
-    else
-      get_aptc_info_from_session(hbx_enrollment)
-      if can_apply_aptc?(plan)
-        decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc, @shopping_tax_household)
-        hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-        hbx_enrollment.update_current(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: @elected_aptc/@max_aptc)
-
-      else
-        decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
-      end
-    end
-
-    if hbx_enrollment.is_special_enrollment?
-      hbx_enrollment.special_enrollment_period_id = hbx_enrollment.is_shop? ? 
-          hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
-    end
-
-    # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
-
-    if hbx_enrollment.employee_role.present? && hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
+    if plan_selection.employee_is_shopping_before_hire?
+      session.delete(:pre_hbx_enrollment_id)
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to family_account_path
-    elsif hbx_enrollment.may_select_coverage?
-      hbx_enrollment.select_coverage!
-      hbx_enrollment.propogate_selection
-      #UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
-      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
-    else
-      redirect_to :back
+      return
     end
+
+    if !plan_selection.may_select_coverage?
+      redirect_to :back
+      return
+    end
+
+    get_aptc_info_from_session(hbx_enrollment)
+    plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
+    previous_enrollment_id = session[:pre_hbx_enrollment_id]
+    plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
+    session.delete(:pre_hbx_enrollment_id)
+    redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
 
   def receipt
