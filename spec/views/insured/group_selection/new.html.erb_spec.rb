@@ -358,9 +358,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector("a[href='/families/home']", text: 'Back to my account')
     end
 
-    it "shouldn't see dental radio option" do
+    it "should see dental radio option" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to_not have_selector('#coverage_kind_dental')
+      expect(rendered).to have_selector('#coverage_kind_dental')
     end
 
     it "should see health radio option" do

@@ -461,7 +461,7 @@ $(document).on('click', '.reference-plan input[type=radio] + label', function() 
     if (start_date == "") {
       return
     }
-    $('.selected-plan').show();
+    $('#'+location_id+' '+coverage_type+'.selected-plan').show();
 
     calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
   };

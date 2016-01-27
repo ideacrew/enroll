@@ -42,6 +42,17 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
     });
 
   }
+  $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
+    $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').hide();
+    if ( '<%= @coverage_type %>' == '.dental' ) {
+      $(this).closest('.select-dental-plan').find('.edit-offering').show();
+      $(this).closest('.select-dental-plan').find('.nav-tabs').show();
+    } else {
+      $('#<%= @location_id %>').find('.reference-steps:first').show();
+      $('#<%= @location_id %> <%= @coverage_type %>').find('.health').find('.nav-tabs').show();
+    }
+  });
+
   $("#<%= @location_id %> <%= @coverage_type %> #employer_cost_info_btn .btn, #<%= @location_id %> <%= @coverage_type %> #edit_employer_cost_info_btn").click(function(){
    var location_id = $(this).parents('.benefit-group-fields').attr('id');
 
