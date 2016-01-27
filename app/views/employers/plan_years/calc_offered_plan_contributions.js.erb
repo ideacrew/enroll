@@ -1,4 +1,4 @@
-$('#<%= @location_id %> <%= @coverage_type %>.selected-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/plan_details")).html_safe %>")
+$('#<%= @location_id %> <%= @coverage_type %>.selected-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/plan_details", locals: { is_edit: @is_edit, calc_offered: true } )).html_safe %>")
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
@@ -14,7 +14,14 @@ $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-
 $('.edit-add-dental').closest('.benefit-group-fields').find('.dental:first').hide();
 // show dental config links
 $("#<%= @location_id %> .dental-config-links").show();
-$("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary").hide();
+
+// make summary links
+$("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary").show();
+start_on = $("#plan_year_start_on").val().substr(0,4);
+$("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary a").each(function() {
+  var url = $(this).attr('href');
+  $(this).attr('href', url+"&start_on="+start_on);
+});
 
 
 $(".change-dental-reference-plan").show();

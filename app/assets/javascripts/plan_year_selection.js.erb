@@ -219,6 +219,12 @@ ready = function() {
           }
         }
 
+        if ( $('h1:first:contains("Edit")').length > 0 ) {
+          var is_edit = true;
+        } else {
+          var is_edit = false;
+        }
+
         $.ajax({
           type: "GET",
           url: url,
@@ -229,6 +235,7 @@ ready = function() {
             "plan_option_kind": plan_option_kind,
             "relation_benefits": relation_benefits,
             "location_id": location_id,
+            "is_edit": is_edit,
             "coverage_type": coverage_type
           }
         }).done(function() {
