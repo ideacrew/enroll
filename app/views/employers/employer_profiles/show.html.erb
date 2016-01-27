@@ -60,7 +60,7 @@
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
       <h3>Premium Billing Report</h3>
-        <% if @employer_profile.published_plan_year.present? %>
+        <% if @employer_profile.show_plan_year.present? %>
           <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
         <% end %>
         <br/>
