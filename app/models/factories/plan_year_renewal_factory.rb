@@ -13,19 +13,25 @@ module Factories
 
       @active_plan_year = @employer_profile.active_plan_year
 
-      # Set renewal open enrollment period
-      open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
-                                           @active_plan_year.open_enrollment_end_on.month,
-                                           1)
+      @plan_year_start_on = @active_plan_year.end_on + 1.day
+      @plan_year_end_on   = @active_plan_year.end_on + 1.year
 
-      open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
-                                         @active_plan_year.open_enrollment_end_on.month,
-                                         Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+      open_enrollment_start_on = @plan_year_start_on - 1.month
+      open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+
+      # # Set renewal open enrollment period
+      # open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
+      #                                      @active_plan_year.open_enrollment_end_on.month,
+      #                                      1)
+
+      # open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
+      #                                    @active_plan_year.open_enrollment_end_on.month,
+      #                                    Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
 
 
       @renewal_plan_year = @employer_profile.plan_years.build({
-        start_on: @active_plan_year.start_on + 1.year,
-        end_on: @active_plan_year.end_on + 1.year,
+        start_on: @plan_year_start_on,
+        end_on: @plan_year_end_on,
         open_enrollment_start_on: open_enrollment_start_on,
         open_enrollment_end_on: open_enrollment_end_on,
         fte_count: @active_plan_year.fte_count,
