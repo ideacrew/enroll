@@ -153,11 +153,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('label', text: 'Dental')
     end
 
-    it "should not have dental radio button" do
-      allow(jail_person).to receive(:has_active_employee_role?).and_return true
-      allow(jail_person).to receive(:has_active_consumer_role?).and_return false
-      render :template => "insured/group_selection/new.html.erb"
-    end
+    # it "should not have dental radio button" do
+    #   allow(jail_person).to receive(:has_active_employee_role?).and_return true
+    #   allow(jail_person).to receive(:has_active_consumer_role?).and_return false
+    #   render :template => "insured/group_selection/new.html.erb"
+    # end
 
     it "should have an incarceration warning with more text" do
       # expect(rendered).to match /Other family members may still be eligible to enroll/
@@ -298,7 +298,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   context "change plan" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
 
@@ -487,7 +487,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   context "change plan with both roles" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
 

@@ -102,7 +102,7 @@
                     Health
                   </label>
                 </div>
-                <% if can_shop_shop?(@person) && @employee_role.benefit_group.dental_reference_plan_id.blank? || can_shop_shop?(@person) && @employee_role.benefit_group.dental_reference_plan_id.blank?  %>
+                <% if can_shop_shop?(@person) && (@employee_role.benefit_group.dental_reference_plan_id.blank? || can_shop_shop?(@person) && @employee_role.benefit_group.dental_reference_plan_id.blank?) %>
                 <% else %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="coverage_kind_dental">
