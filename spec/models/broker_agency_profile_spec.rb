@@ -162,5 +162,48 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       expect(@ba.phone).to match(@ba.organization.primary_office_location.phone.to_s)
     end
   end
+  describe "#families" do
+    let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+    let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+    let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
+    let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family1) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000), person:person)}
+    let(:family2) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000))}
+    let(:organization) {FactoryGirl.create(:organization, fein: 333000535 + rand(1000))}
 
+    it "should find a consumer family" do
+      family1.hire_broker_agency(writing_agent.id)
+      family2.hire_broker_agency(writing_agent2.id)
+      expect(broker_agency_profile.families.count).to be(1)
+    end
+    it "should find the specific consumer family" do
+      family1.hire_broker_agency(writing_agent.id)
+      family2.hire_broker_agency(writing_agent.id)
+      expect(broker_agency_profile.families.count).to be(2)
+    end
+    it "should find a linked employee" do
+      employer = organization.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)
+      employee_role = FactoryGirl.create(:employee_role, person: person, employer_profile: employer)
+      expect(broker_agency_profile.linked_employees.count).to eq(1)
+    end
+    it "should find  linked family" do
+      allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:primary_family).and_return(family1)
+      expect(broker_agency_profile.linked_employees.count).to eq(1)
+      expect(broker_agency_profile.families.count).to eq(1)
+    end
+    it "should find both consumers and employees" do
+      family2.hire_broker_agency(writing_agent.id)
+      allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:primary_family).and_return(family1)
+      expect(broker_agency_profile.families.count).to eq(2)
+    end
+    it "should find unique consumers and employees" do
+      family1.hire_broker_agency(writing_agent.id)
+      allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:primary_family).and_return(family1)
+      expect(broker_agency_profile.families.count).to eq(1)
+    end
+  end
 end
