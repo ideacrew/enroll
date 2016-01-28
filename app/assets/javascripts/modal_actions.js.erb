@@ -1,0 +1,31 @@
+$(document).ready( function() {
+
+  // modal buttons
+  $(document).on('click', '.modal .btn', function() {
+
+    if ( $(this).hasClass('btn-more-details') ) {
+
+      // referencePlanSummaryModal
+      if ( $(this).closest('.modal').attr('id', 'referencePlanSummaryModal') ) {
+
+        $(this).closest('.modal').find('.modal-body').before('<i class=\'fa fa-spinner fa-spin fa-2x fa-center inv\'></i>')
+        $(this).closest('.modal').find('.modal-body').slideUp('normal', function() {
+          $(this).closest('.modal').find('.fa-spinner').css('visibility','visible');
+        });
+        $(this).text('Less Details');
+        $(this).removeClass('btn-more-details');
+        $(this).addClass('btn-less-details');
+
+      };
+
+    } else {
+      $(this).closest('.modal').find('.fa-spinner').remove();
+      $(this).closest('.modal').find('.modal-body').slideDown();
+      $(this).text('More Details');
+      $(this).removeClass('btn-less-details');
+      $(this).addClass('btn-more-details');
+    }
+
+  });
+
+});

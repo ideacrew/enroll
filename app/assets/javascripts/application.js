@@ -26,6 +26,7 @@
 //= require jq_datepicker
 //= require date
 //= require qle
+//= require modal_actions
 //= require print
 //= require browser_issues
 //= require consumer_role
@@ -255,7 +256,6 @@ $(document).ready(function () {
   if ( $('.plan-year').find('.fa-star.enrolling, .fa-star.published').length )  {
     $('.plan-year').find('.fa-star.enrolling, .fa-star.published').closest('.plan-year').find('a.benefit-details').trigger('click');
   }
-
   // check dates are not before 1900
     $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"], [id*="date"]', function() {
         var entered_date = $(this).val();
