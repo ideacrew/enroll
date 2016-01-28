@@ -34,6 +34,7 @@ namespace :update_shop do
   end
 
   task :cancel_benefit_group_assignment => :environment do 
+    changed_count = 0
 
     effective_date = Date.new(2016,1,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
@@ -51,18 +52,24 @@ namespace :update_shop do
           puts "  ** employer not found"
           next
         end
+        next unless employer.active_plan_year.present?
+        next unless employer.active_plan_year.start_on.year == 2016
 
-        benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id) if employer.active_plan_year.present?
-        
+        benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id) 
+        count = 0
         employer.census_employees.each do |ce| 
           if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
             ce.active_benefit_group_assignment.update_attributes(is_active: false)
+            count += 1
           end
         end
+        puts "updated #{count} census employee records"
+        changed_count += 1
       rescue => e
         puts e.to_s
       end
     end
 
+    puts "Processed #{employers.count} employers, fixed #{changed_count} employers"
   end
 end
