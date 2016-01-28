@@ -26,6 +26,9 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
+# JS graph API
+# gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
+
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'less-rails-bootstrap', '~> 3.3.1.0'

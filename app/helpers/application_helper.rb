@@ -315,6 +315,10 @@ module ApplicationHelper
     end
   end
 
+  def get_header_text(controller_name)
+      portal_display_name(controller_name)
+  end
+
   def can_register_new_account
     # Do this once we have invites working:
     # !params[:invitation_id].blank?

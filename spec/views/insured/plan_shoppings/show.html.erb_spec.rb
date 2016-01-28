@@ -57,6 +57,8 @@ RSpec.describe "insured/show" do
 
   it 'should not identify Broker control in the header when signed in as Consumer' do
     sign_in consumer_user
+
+
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to_not match(/I'm a Broker/)
     expect(rendered).to match(/Individual and Family/i)
