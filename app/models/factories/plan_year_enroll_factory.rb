@@ -81,6 +81,7 @@ module Factories
     end
 
     def terminate_employee_coverage(census_employee)
+      return
       person = match_person(census_employee)
       family = person.primary_family
 
