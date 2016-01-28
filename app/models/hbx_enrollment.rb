@@ -352,8 +352,17 @@ class HbxEnrollment
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
 
+  def shop_broker_agency_account
+    return nil if self.employer_profile.blank?
+    return nil if self.employer_profile.broker_agency_accounts.empty?
+    self.employer_profile.broker_agency_accounts.select do |baa|
+      (baa.start_on < self.time_of_purchase) &&
+        ((baa.end_on.blank?) || (baa.end_on >= self.time_of_purchase))
+    end.first
+  end
+
   def broker_agency_account
-    return nil if is_shop?
+    return shop_broker_agency_account if is_shop?
     return nil if family.broker_agency_accounts.empty?
     family.broker_agency_accounts.select do |baa|
       (baa.start_on < self.time_of_purchase) &&
