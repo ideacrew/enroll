@@ -99,7 +99,7 @@ $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection
 
 // make view summary link
 var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .reference-plan input:checked').closest('.reference-plan').find('.view-summary').attr('href');
-$('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink);
+$('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
 
      $("#<%= @location_id %> <%= @coverage_type %> #employer_cost_info_btn .btn, #<%= @location_id %> <%= @coverage_type %> #edit_employer_cost_info_btn").click(function(){
       var location_id = $(this).parents('.benefit-group-fields').attr('id');

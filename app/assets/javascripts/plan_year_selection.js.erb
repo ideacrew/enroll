@@ -354,7 +354,7 @@ ready = function() {
         $(this).find('input[type=radio]').prop('checked', true );
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > *').hide();
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
-        $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+        $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
       }
 
       });
@@ -414,10 +414,10 @@ ready = function() {
         } else {
           console.log(nav);
           if ( nav == '.health' ) {
-            $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
+            $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
             $(this).closest('.benefit-group-fields').find(".reference-plans").show();
           } else {
-            $(this).closest('.benefit-group-fields').find('.dental-reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
+            $(this).closest('.benefit-group-fields').find('.dental-reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
             $(this).closest('.benefit-group-fields').find(".dental-reference-plans").show();
           }
           $(this).find('input[type=radio]').prop('checked', true );
@@ -459,7 +459,7 @@ $(document).on('click', '.reference-plan input[type=radio] + label', function() 
   } else {
     var coverage_type = '.health';
     var reference_plan_id = $(this).closest('.health .reference-plan').find('input').attr('value');
-    $(this).closest('.benefit-group-fields').find(coverage_type+'.selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+    $(this).closest('.benefit-group-fields').find(coverage_type+'.selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
 
   }
   var location_id = $(this).parents('fieldset').attr('id');
