@@ -1,5 +1,9 @@
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
+  include ActionView::Helpers::TagHelper
+  include ActionView::Helpers::TextHelper
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Context
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
@@ -34,13 +38,14 @@ class Insured::PlanShoppingsController < ApplicationController
         decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
       end
     end
+
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
     if hbx_enrollment.employee_role.present? && hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to family_account_path
     elsif hbx_enrollment.may_select_coverage?
-      hbx_enrollment.update_current(aasm_state: "coverage_selected")
+      hbx_enrollment.select_coverage!
       hbx_enrollment.propogate_selection
       #UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
@@ -82,6 +87,11 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
+    
+    if @enrollment.is_special_enrollment?
+      sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
+      @enrollment.update_current(special_enrollment_period_id: sep_id)
+    end
 
     if @enrollment.is_shop?
       @benefit_group = @enrollment.benefit_group
@@ -105,6 +115,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile

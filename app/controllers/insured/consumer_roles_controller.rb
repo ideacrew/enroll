@@ -10,7 +10,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def privacy
-    set_current_person
+    set_current_person(required: false)
     redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
   end
 
@@ -221,7 +221,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def check_consumer_role
-    set_current_person
+    set_current_person(required: false)
     if @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
 

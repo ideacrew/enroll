@@ -315,6 +315,10 @@ module ApplicationHelper
     end
   end
 
+  def get_header_text(controller_name)
+      portal_display_name(controller_name)
+  end
+
   def can_register_new_account
     # Do this once we have invites working:
     # !params[:invitation_id].blank?
@@ -483,6 +487,19 @@ module ApplicationHelper
   def purchase_or_confirm
     'Confirm'
   end
+
+  def qualify_qle_notice
+    content_tag(:span, class: :alert) do
+      concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
+      concat link_to("Click here", find_sep_insured_families_path)
+      concat " to see if you qualify for a Special Enrollment period"
+    end
+  end
+
+  def disable_purchase?(disabled, hbx_enrollment)
+    disabled || !hbx_enrollment.can_select_coverage?
+  end
+
   def get_key_and_bucket(uri)
     splits = uri.split('#')
     key = splits.last
