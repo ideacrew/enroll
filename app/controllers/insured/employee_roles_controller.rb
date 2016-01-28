@@ -65,7 +65,6 @@ class Insured::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       if @employee_role.new_census_employee.address.present? && @person.addresses.empty?
-
         @person.addresses << @employee_role.new_census_employee.address.clone
       end
       if @employee_role.new_census_employee.email.present? && @employee_role.new_census_employee.email.kind == "work" && @person.emails.count < 2
