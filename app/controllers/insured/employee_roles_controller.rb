@@ -81,7 +81,7 @@ class Insured::EmployeeRolesController < ApplicationController
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
-    clean_duplicate_addresses
+    @person.addresses = [] #fix unexpected duplicates issue
     if @person.update_attributes(object_params)
       if save_and_exit
         respond_to do |format|
@@ -204,10 +204,4 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
-
-  def clean_duplicate_addresses
-    @old_addresses = @person.addresses
-    @person.addresses = [] #fix unexpected duplicates issue
-  end
-
 end

@@ -11,14 +11,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:effective_date) { double }
     let(:person_id) { BSON::ObjectId::new }
     let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, employer_profile_id: employer_profile.id, :benefit_group => benefit_group, :census_employee => census_employee) }
-    let(:person) { Person.new }
+    let(:person) { FactoryGirl.create(:person) }
     let(:user) {FactoryGirl.create(:user)}
-    let(:role_form) {
-      Forms::EmployeeRole.new(person, employee_role)
-    }
+    let(:role_form) { Forms::EmployeeRole.new(person, employee_role)}
+    let(:address) {FactoryGirl.create(:address, :person => person)}
 
     before(:each) do
-      sign_in
       allow(Person).to receive(:find).with(person_id).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
@@ -34,34 +32,24 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     describe "given valid person parameters" do
       let(:save_result) { true }
-
       it "should redirect to dependent_details" do
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_family_members_path(:employee_role_id => employee_role_id))
+      end
+
+      context "clean duplicate addresses" do
+        it "returns empty array for people's addresses" do
+          expect(person.addresses).to eq []
+        end
       end
     end
 
     describe "given invalid person parameters" do
       let(:save_result) { false }
-
       it "should render edit" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
-      end
-    end
-
-    context "duplicate addresses records" do
-      let(:person_attributes) { person.attributes.to_hash}
-      let(:save_result) { true }
-      let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-                                    "1"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-                                    "2"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"}} }
-
-      it "clean old addresses" do
-        allow(person).to receive(:update_attributes).and_return(true)
-        person_attributes[:addresses_attributes] = addresses_attributes
-        expect(person.addresses).to eq []
       end
     end
   end
@@ -120,7 +108,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
 
-    it "should render edit template" do
+    before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(user).to receive(:person).and_return(person)
       allow(Forms::EmployeeRole).to receive(:new).and_return(person)
@@ -138,8 +126,34 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       sign_in user
 
       get :edit, id: employee_role.id
+
+    end
+
+    it "return success http status" do
       expect(response).to have_http_status(:success)
+    end
+
+    it "should render edit template" do
       expect(response).to render_template(:edit)
+    end
+
+    it "return false if person already has address record" do
+      expect(person.addresses.empty?).to eq false
+    end
+
+    it "should NOT overwrite existing address from ER roaster" do
+      expect(person.addresses).to eq addresses
+    end
+
+    it "return true if person doesn't have any address" do
+      allow(person).to receive(:addresses).and_return([])
+      expect(person.addresses.empty?).to eq true
+    end
+
+    it "takes address from ER roaster" do
+      allow(person).to receive(:addresses).and_return([])
+      get :edit, id: employee_role.id
+      expect(person.addresses.count).to eq 1
     end
   end
 
