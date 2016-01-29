@@ -352,22 +352,27 @@ class HbxEnrollment
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
 
+  def select_applicable_broker_account(broker_accounts)
+    last_broker_before_purchase = broker_accounts.select do |baa|
+      (baa.start_on < self.time_of_purchase)# &&
+    end.sort_by(&:start_on).last
+    if  ((last_broker_before_purchase.end_on.blank?) || (last_broker_before_purchase.end_on >= self.time_of_purchase))
+      last_broker_before_purchase
+    else
+      nil
+    end
+  end
+
   def shop_broker_agency_account
     return nil if self.employer_profile.blank?
     return nil if self.employer_profile.broker_agency_accounts.empty?
-    self.employer_profile.broker_agency_accounts.select do |baa|
-      (baa.start_on < self.time_of_purchase) &&
-        ((baa.end_on.blank?) || (baa.end_on >= self.time_of_purchase))
-    end.first
+    select_applicable_broker_account(self.employer_profile.broker_agency_accounts)
   end
 
   def broker_agency_account
     return shop_broker_agency_account if is_shop?
     return nil if family.broker_agency_accounts.empty?
-    family.broker_agency_accounts.select do |baa|
-      (baa.start_on < self.time_of_purchase) &&
-        ((baa.end_on.blank?) || (baa.end_on >= self.time_of_purchase))
-    end.first
+    select_applicable_broker_account(family.broker_agency_accounts)
   end
 
   def time_of_purchase
