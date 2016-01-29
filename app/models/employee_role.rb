@@ -105,7 +105,7 @@ class EmployeeRole
     if new_census_employee.is_covered_or_waived?
       false
     else
-      benefit_group.new_hire_enrollment_period(new_census_employee.hired_on, new_census_employee.updated_at.to_date).cover?(enrollment_date)
+      benefit_group.new_hire_enrollment_period(new_census_employee.hired_on, new_census_employee.created_at.to_date).cover?(enrollment_date)
     end
   end
 

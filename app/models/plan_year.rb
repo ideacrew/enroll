@@ -44,13 +44,14 @@ class PlanYear
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
-  scope :published_plan_years_within_date_range, ->(start_on_date, end_on_date) {
+  scope :by_date_range,     ->(begin_on, end_on) { where(:"start_on".gte => begin_on, :"start_on".lte => end_on) }
+  scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
     where(
       "$and" => [
         {:aasm_state.in => PUBLISHED },
         {"$or" => [
-          { :start_on => {"$gte" => start_on_date, "$lte" => end_on_date }},
-          { :end_on => {"$gte" => start_on_date, "$lte" => end_on_date }}
+          { :start_on => {"$gte" => begin_on, "$lte" => end_on }},
+          { :end_on => {"$gte" => begin_on, "$lte" => end_on }}
         ]
       }
     ]
@@ -488,6 +489,13 @@ class PlanYear
     state :ineligible     # Application is non-compliant for enrollment
     state :expired        # Non-published plans are expired following their end on date
 
+    event :activate, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
+    end
+
+    event :expire, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :active],  to: :expired,  :guard  => :can_be_expired?
+    end
 
     # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
@@ -573,7 +581,7 @@ class PlanYear
 
     # Admin ability to accept application and successfully complete enrollment
     event :enroll, :after => :record_transition do
-      transitions from: [:published, :enrolling], to: :enrolled
+      transitions from: [:published, :enrolling, :renewing_published], to: :enrolled
     end
 
     # Admin ability to reset renewing plan year application
@@ -639,6 +647,22 @@ private
     end
 
     valid
+  end
+
+  def can_be_expired?
+    if PUBLISHED.include?(aasm_state) && TimeKeeper.date_of_record >= end_on
+      true
+    else
+      false
+    end
+  end
+
+  def can_be_activated?
+    if (PUBLISHED + RENEWING_PUBLISHED_STATE).include?(aasm_state) && TimeKeeper.date_of_record >= start_on
+      true
+    else
+      false
+    end
   end
 
   def is_event_date_valid?

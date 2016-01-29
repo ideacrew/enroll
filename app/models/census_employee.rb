@@ -167,12 +167,7 @@ class CensusEmployee < CensusMember
 
   def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
     raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-
-    benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
-      benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
-      benefit_group_assignment.update_attributes(is_active: false)
-    end
-
+    reset_active_benefit_group_assignments(new_benefit_group)
     benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
   end
 
@@ -267,6 +262,10 @@ class CensusEmployee < CensusMember
 
     terminate_employee_role
     self
+  end
+
+  def is_active?
+    EMPLOYMENT_ACTIVE_STATES.include?(aasm_state)
   end
 
   def employee_relationship
@@ -373,7 +372,15 @@ class CensusEmployee < CensusMember
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
-private
+  private
+
+  def reset_active_benefit_group_assignments(new_benefit_group)
+    benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
+      benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
+      benefit_group_assignment.update_attributes(is_active: false)
+    end
+  end
+
   def set_autocomplete_slug
     return unless (first_name.present? && last_name.present?)
     @autocomplete_slug = first_name.concat(" #{last_name}")
