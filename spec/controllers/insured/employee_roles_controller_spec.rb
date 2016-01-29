@@ -120,7 +120,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
 
-    it "should render edit template" do
+    before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(user).to receive(:person).and_return(person)
       allow(Forms::EmployeeRole).to receive(:new).and_return(person)
@@ -138,8 +138,34 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       sign_in user
 
       get :edit, id: employee_role.id
+
+    end
+
+    it "return success http status" do
       expect(response).to have_http_status(:success)
+    end
+
+    it "should render edit template" do
       expect(response).to render_template(:edit)
+    end
+
+    it "return false if person already has address record" do
+      expect(person.addresses.empty?).to eq false
+    end
+
+    it "should NOT overwrite existing address from ER roaster" do
+      expect(person.addresses).to eq addresses
+    end
+
+    it "return true if person doesn't have any address" do
+      allow(person).to receive(:addresses).and_return([])
+      expect(person.addresses.empty?).to eq true
+    end
+
+    it "takes address from ER roaster" do
+      allow(person).to receive(:addresses).and_return([])
+      get :edit, id: employee_role.id
+      expect(person.addresses.count).to eq 1
     end
   end
 
