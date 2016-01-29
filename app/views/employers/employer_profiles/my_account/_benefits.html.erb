@@ -78,11 +78,7 @@
               <td>
                 <p>
                   <% if bg.effective_on_offset == 0 %>
-                    <% if bg.effective_on_kind == "date_of_hire" %>
-                      Date of hire
-                    <% else %>
-                      First of the month following or coinciding with date of hire
-                    <% end %>
+                    First of the month following or coinciding with date of hire
                   <% else %>
                     <%= "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days" %>
                   <% end %>
