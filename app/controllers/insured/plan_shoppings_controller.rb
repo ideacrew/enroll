@@ -25,7 +25,7 @@ class Insured::PlanShoppingsController < ApplicationController
       return
     end
 
-    get_aptc_info_from_session(hbx_enrollment)
+    get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
