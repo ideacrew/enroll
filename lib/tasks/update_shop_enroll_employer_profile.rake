@@ -46,24 +46,64 @@ namespace :update_shop do
 
     employers.each do |fein, name|
       begin
+
         puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
         if employer.blank?
           puts "  ** employer not found"
           next
         end
+
         next unless employer.active_plan_year.present?
-        next unless employer.active_plan_year.start_on.year == 2016
+        next unless employer.active_plan_year.start_on == effective_date
+
+        published_plan_years = employer.plan_years.where(:"start_on" => effective_date).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
+
+        if published_plan_years.size == 0
+          next
+        end
+
+        if published_plan_years.size > 1
+          next
+        end
 
         benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id) 
+
         count = 0
+        found = 0
+
         employer.census_employees.each do |ce| 
           if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
             ce.active_benefit_group_assignment.update_attributes(is_active: false)
-            count += 1
           end
         end
-        puts "updated #{count} census employee records"
+
+        employer.census_employees.each do |ce| 
+          if ce.is_active? && ce.active_benefit_group_assignment.blank?
+
+            renewing_benefit_group_assignment = ce.benefit_group_assignments.renewing.detect{|bg_assignment|
+              benefit_group_ids.include?(bg_assignment.benefit_group_id)
+            }
+
+            # TODO Handle cases where benefit group assignment shows coverage selected, while employee don't have coverage
+
+            # if renewing_benefit_group_assignment.blank?
+            #   renewing_benefit_group_assignment = ce.benefit_group_assignments.detect{ |bg_assignment| 
+            #     benefit_group_ids.include?(bg_assignment.benefit_group_id) 
+            #   }
+            #   found += 1 if renewing_benefit_group_assignment.present?
+            # end
+
+            if renewing_benefit_group_assignment.blank?
+              count += 1
+            else 
+              renewing_benefit_group_assignment.update_attributes(is_active: true)
+            end
+          end
+        end
+
+        puts "#{count} census employee records missing active benefit group assignments"
+        # {found} mapped to #{effective_date.year} benefit group"
         changed_count += 1
       rescue => e
         puts e.to_s
