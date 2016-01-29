@@ -82,13 +82,15 @@ namespace :update_shop do
     #   # "United States Senate" => "536002558",
     # }
 
-    effective_date = Date.new(2015,2,1)
+    effective_date = Date.new(2015,3,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
       employers[profile.legal_name] = profile.fein
       employers
     end
+
+    employer_changed_count = 0
 
     employers.each do |name, fein|
         puts "Processing employer: #{name}"
@@ -152,6 +154,8 @@ namespace :update_shop do
           end
         end
 
+        employer_changed_count += 1
+
         # families = employer.census_employees.inject([]) do |families, ce|
         #   person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
         #   if person.blank?
@@ -179,5 +183,7 @@ namespace :update_shop do
 
       puts "Processed #{employer.census_employees.non_terminated.count} census employees, renewed #{changed_count} families, missing #{family_missing} families"
     end
+
+    puts "Processed #{employers.count} employers, renewed #{employer_changed_count} employers"
   end
 end
