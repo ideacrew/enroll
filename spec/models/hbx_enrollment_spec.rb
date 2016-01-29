@@ -781,8 +781,8 @@ describe HbxEnrollment, dbclean: :after_each do
       end
     end
      
-    context 'when roster update present' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: middle_of_prev_year, updated_at: Date.new(calender_year, 5, 10)) }
+    context 'when roster create present' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))

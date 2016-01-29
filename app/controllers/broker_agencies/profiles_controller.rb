@@ -101,31 +101,30 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def family_index
     @q = params.permit(:q)[:q]
-    page_string = params.permit(:families_page)[:families_page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-    id = params.permit([:id])[:id]
+    id = params.permit(:id)[:id]
+    page = params.permit([:page])[:page]
     if current_user.has_broker_role?
-      broker_agent_id = current_user.person.try(:broker_role).try(:id)
+      broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_hbx_staff_role?
+      broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
-      bap = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
-      broker_agent_id = bap.try(:writing_agents).try(:first).try(:id) || bap.primary_broker_role_id
+      redirect_to new_broker_agencies_profile_path
+      return
     end
-    total_families = Family.by_writing_agent_id(broker_agent_id) 
+
+    total_families = broker_agency_profile.families
     @total = total_families.count
-    @families = total_families.page page_no
-    @family_count = 0
-    @staff = Person.where(:id.in => total_families.map(&:primary_applicant).map(&:person))
-    @page_alphabets = page_alphabets(@staff, "last_name")
-    if params[:page]
-      page_no = params[:page]
-      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page_no}/i }
-    end
-    if @q
-      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
-    end
-    @families.each{|f| @family_count +=1}
+    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.uniq.map(&:capitalize)
+    if page.present?
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
+    elsif @q
+       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
+    else
+      @families = total_families[0..20]
+     end
+
+    @family_count = @families.count
     respond_to do |format|
-      format.html { render "insured/families/index" }
       format.js {}
     end
   end

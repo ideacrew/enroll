@@ -144,6 +144,18 @@ class BrokerAgencyProfile
     end
   end
 
+  def linked_employees
+    employer_profiles = EmployerProfile.find_by_broker_agency_profile(self)
+    emp_ids = employer_profiles.map(&:id)
+    linked_employees = Person.where(:'employee_roles.employer_profile_id'.in => emp_ids)
+  end
+
+  def families
+    employee_families = linked_employees.map(&:primary_family).to_a
+    consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
+    families = (consumer_families + employee_families).uniq
+    families.sort_by{|f| f.primary_applicant.person.last_name}
+  end
   ## Class methods
   class << self
     def list_embedded(parent_list)
