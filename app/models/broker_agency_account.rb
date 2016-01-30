@@ -7,10 +7,10 @@ class BrokerAgencyAccount
   embedded_in :family
 
   # Begin date of relationship
-  field :start_on, type: Date
+  field :start_on, type: DateTime
   
   # End date of relationship
-  field :end_on, type: Date
+  field :end_on, type: DateTime
   field :updated_by, type: String
 
   # Broker agency representing ER
