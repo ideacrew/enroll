@@ -90,8 +90,13 @@ namespace :update_shop do
       employers
     end
 
-    employer_changed_count = 0
 
+    employer_feins = []
+    CSV.foreach("#{Rails.root.to_s}/Mar2016PassiveRenewals-GlueEnrollCountSame.csv") do |row|
+       employer_feins << row[0]
+    end
+    
+    employer_changed_count = 0
     employers.each do |name, fein|
         puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
@@ -99,6 +104,8 @@ namespace :update_shop do
           puts "  ** employer not found"
           next
         end
+
+        next unless employer_feins.include?(employer.fein)
 
         changed_count = 0
         family_missing = 0
