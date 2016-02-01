@@ -2,11 +2,7 @@
   <tr>
     <td><%= visit_type %></td>
     <% @qhps.each do |qhp|%>
-      <% if @details %>
-      <% service_visit = qhp.qhp_service_visits.all %>
-      <% else %>
       <% service_visit = qhp.qhp_service_visits.detect{|a| a.visit_type == visit_type} %>
-      <% end %>
       <% if service_visit.present? %>
         <td colspan="1"><%= service_visit.copay_in_network_tier_1 %></td>
         <td colspan="1"><%= service_visit.co_insurance_in_network_tier_1 %></td>
