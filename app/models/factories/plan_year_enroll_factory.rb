@@ -1,7 +1,7 @@
 module Factories
   class PlanYearEnrollFactory
 
-    attr_accessor :employer_profile, :start_on
+    attr_accessor :employer_profile, :start_on, :benefit_group_ids
 
     def enroll
       published_plan_years = @employer_profile.plan_years.where(:"start_on" => start_on).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
@@ -89,6 +89,33 @@ module Factories
 
       cancel_renewals(family)
       expire_previous_year_enrollments(family)
+    end
+
+    def waived_benefit_group_assignment(census_employee)
+      person = match_person(census_employee)
+      if person.blank?
+        return false
+      end
+
+      family = person.primary_family
+      if family.blank?
+        return false
+      end
+
+      enrollments = family.active_household.hbx_enrollments.where(:"effective_on".gte => @start_on)
+      return false if enrollments.enrolled.any?
+
+      if enrollments.waived.any?
+        active_assignment = census_employee.active_benefit_group_assignment
+        if active_assignment.present? &&  @benefit_group_ids.include?(active_assignment.benefit_group_id)
+          if active_assignment.may_waive_coverage?
+            active_assignment.waive_coverage!
+          end
+          return true
+        end
+      end
+      
+      return false
     end
 
     private
