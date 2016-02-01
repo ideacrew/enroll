@@ -9,6 +9,12 @@ module Factories
     def renew
       @employer_profile = employer_profile
 
+      if @employer_profile.may_enroll_employer?
+        @employer_profile.enroll_employer!
+      elsif @employer_profile.may_force_enroll?
+        @employer_profile.force_enroll!
+      end
+
       validate_employer_profile
 
       @active_plan_year = @employer_profile.active_plan_year
