@@ -6,8 +6,11 @@ class Person
 
   include Notify
   include UnsetableSparseFields
+  include FullStrippedNames
 
   extend Mongorder
+  validates_with Validations::DateRangeValidator
+
 
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
@@ -31,6 +34,7 @@ class Person
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
+  field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
 
@@ -174,6 +178,8 @@ class Person
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
+  scope :unverified_persons,        -> {Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending'])}
+  scope :matchable,                 ->(ssn, dob, last_name) { where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name: last_name) }
 
 
 #  ViewFunctions::Person.install_queries
@@ -189,6 +195,28 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+  end
+
+  def is_aqhp?
+    family = self.primary_family if self.primary_family
+    if family
+      check_households(family) && check_tax_households(family)
+    else
+      false
+    end
+  end
+
+  def check_households family
+    family.households.present? ? true : false
+  end
+
+  def check_tax_households family
+    family.households.first.tax_households.present? ? true : false
+  end
+
+  def completed_identity_verification?
+    return false unless user
+    user.identity_verified?
   end
 
   def consumer_fields_validations
@@ -369,7 +397,23 @@ class Person
   end
 
   def work_email
-    emails.detect { |adr| adr.kind == "home" }
+    emails.detect { |adr| adr.kind == "work" }
+  end
+
+  def work_phone
+    phones.detect { |phone| phone.kind == "work" } || main_phone
+  end
+
+  def main_phone
+    phones.detect { |phone| phone.kind == "main" }
+  end
+
+  def home_phone
+    phones.detect { |phone| phone.kind == "home" }
+  end
+
+  def mobile_phone
+    phones.detect { |phone| phone.kind == "mobile" }
   end
 
   def has_active_consumer_role?

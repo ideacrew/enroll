@@ -1,9 +1,12 @@
+require 'autoinc'
+
 class Family
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Sortable
+  include Mongoid::Autoinc
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -11,7 +14,9 @@ class Family
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
 
-  auto_increment :hbx_assigned_id, seed: 9999
+  field :hbx_assigned_id, type: Integer
+
+  increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
   field :e_status_code, type: String
@@ -64,6 +69,7 @@ class Family
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
+  index({"households.hbx_enrollments.kind" => 1})
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.terminated_on" => 1}, { sparse: true })
@@ -105,7 +111,8 @@ class Family
   scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-
+  scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
+  
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
@@ -130,6 +137,7 @@ class Family
   scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
 
   def update_family_search_collection
@@ -152,7 +160,8 @@ class Family
   end
 
   def active_household
-    households.detect { |household| household.is_active? }
+    # households.detect { |household| household.is_active? }
+    latest_household
   end
 
   def enrolled_benefits
@@ -278,6 +287,14 @@ class Family
     special_enrollment_periods.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def earliest_effective_shop_sep
+    special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def earliest_effective_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   # List of SEPs active for this Application Group today, or passed date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
@@ -315,6 +332,7 @@ class Family
     is_consent_applicant     = opts[:is_consent_applicant]  || false
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+
     if existing_family_member
       active_household.add_household_coverage_member(existing_family_member)
       existing_family_member.is_active = true
@@ -385,7 +403,7 @@ class Family
     existing_agency = current_broker_agency
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
     fire_broker_agency(existing_agency) if existing_agency
-    start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
+    start_on = Time.now
     broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     broker_agency_accounts.push(broker_agency_account)
     self.save

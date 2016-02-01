@@ -44,12 +44,15 @@ class Organization
   }
 
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
-  scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
-  scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})}
+  #scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
+  #scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})}
+  scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
+  scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
 
   scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
   scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
 
+  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
 
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
@@ -68,8 +71,6 @@ class Organization
     uniqueness: true
 
   validate :office_location_kinds
-
-
 
   index({ hbx_id: 1 }, { unique: true })
   index({ legal_name: 1 })
@@ -148,7 +149,7 @@ class Organization
   end
 
   def self.valid_carrier_names_filters
-    Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+    Rails.cache.fetch("carrier-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name
         carrier_names

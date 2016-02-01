@@ -41,6 +41,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
   end
 
   context "GET new" do
+    let(:census_employee) {FactoryGirl.build(:census_employee)}
     it "return http success" do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
@@ -68,6 +69,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
+    end
+
+    it "should get person" do
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id
+      expect(assigns(:person)).to eq person
     end
 
     context "individual" do
@@ -127,7 +134,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:update_current)
+      allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
       expect(response).to redirect_to(family_account_path)

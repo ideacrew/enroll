@@ -2,12 +2,16 @@ class CensusMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include UnsetableSparseFields
+  validates_with Validations::DateRangeValidator
+
   GENDER_KINDS = %W(male female)
 
   field :first_name, type: String
   field :middle_name, type: String
   field :last_name, type: String
   field :name_sfx, type: String
+
+  include StrippedNames
 
   field :encrypted_ssn, type: String
   field :dob, type: Date

@@ -128,6 +128,15 @@ describe HbxEnrollment do
       end
 
       context "scope" do
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,12,15))
+        end
+
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
         it "with current year" do
           family = blue_collar_families.first
           employee_role = family.primary_family_member.person.employee_roles.first
@@ -142,6 +151,7 @@ describe HbxEnrollment do
           enrollments = family.households.first.coverage_households.first.household.hbx_enrollments
           expect(enrollments.current_year).to eq [enrollment]
         end
+
       end
 
       context "and families either select plan or waive coverage" do
@@ -598,6 +608,23 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "coverage_year" do
+    let(:date){ TimeKeeper.date_of_record }
+    let(:plan_year){ PlanYear.new(start_on: date) }
+    let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
+    let(:plan){ Plan.new(active_year: date.year) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, kind: "employer_sponsored", plan: plan) }
+
+    it "should return plan year start on year when shop" do
+      expect(hbx_enrollment.coverage_year).to eq date.year
+    end
+
+    it "should return plan year when ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("")
+      expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.plan.active_year
+    end
+  end
+
   context "calculate_effective_on_from" do
     let(:date) {TimeKeeper.date_of_record}
     let(:family) { double(current_sep: double(effective_on:date), is_under_special_enrollment_period?: true) }
@@ -639,7 +666,278 @@ describe HbxProfile, "class methods", type: :model do
       end
     end
   end
+
 end
+
+describe HbxEnrollment, dbclean: :after_each do
+
+  context ".can_select_coverage?" do
+    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+
+    let(:middle_of_prev_year) { (TimeKeeper.date_of_record - 1.year) + 2.months }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+
+    let(:employee_role) {
+      person.employee_roles.create(
+        employer_profile: employer_profile,
+        hired_on: census_employee.hired_on,
+        census_employee_id: census_employee.id
+      )
+    }
+
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
+    let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
+    let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
+    let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+    let(:effective_date)         { plan_year_start_on }
+
+
+    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+                                                    py.benefit_groups = [blue, white]
+                                                    py.save
+                                                    py.publish!
+                                                    py
+                                                  }
+
+
+    let(:benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: plan_year.benefit_groups.first,
+        start_on: plan_year_start_on
+      })
+    }
+
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_date - 10.days,
+                                                    benefit_group_id: plan_year.benefit_groups.first.id,
+                                                    employee_role_id: employee_role.id,
+                                                    benefit_group_assignment_id: benefit_group_assignment.id
+                                                  )
+                                                }
+
+    before do 
+      allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+      allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+    end
+
+    context 'under open enrollment' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
+      end
+ 
+      it "should allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      end
+    end
+
+    context 'outside open enrollment' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on + 5.days)
+      end
+ 
+      it "should not allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+    end
+
+    context 'when its a new hire' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(calender_year, 3, 1), created_at: Date.new(calender_year, 2, 1), updated_at: Date.new(calender_year, 2, 1)) }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+      end
+
+      it "should allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      end
+    end
+
+    context 'when not a new hire' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+      end
+
+      it "should not allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+    end
+     
+    context 'when roster create present' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
+      end
+
+      it "should allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      end
+    end
+
+    context 'when roster update not present' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: middle_of_prev_year, updated_at: Date.new(calender_year, 5, 10)) }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
+      end 
+        
+      it "should not allow" do
+        expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+    end
+
+    context 'with QLE' do
+
+      let(:qle_date) { effective_date + 15.days }
+      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
+
+      let(:special_enrollment_period) { 
+        special_enrollment = shop_family.special_enrollment_periods.build({
+          qle_on: qle_date,
+          effective_on_kind: "first_of_month",
+        })
+        special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
+        special_enrollment.save
+        special_enrollment
+      }
+   
+      let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_date,
+                                                    enrollment_kind: "special_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_date - 10.days,
+                                                    benefit_group_id: plan_year.benefit_groups.first.id,
+                                                    employee_role_id: employee_role.id,
+                                                    benefit_group_assignment_id: benefit_group_assignment.id,
+                                                    special_enrollment_period_id: special_enrollment_period.id
+                                                  )
+                                                }
+
+      context 'under special enrollment period' do
+        it "should allow" do
+          expect(shop_enrollment.can_select_coverage?).to be_truthy
+        end
+      end
+
+      context 'outside special enrollment period' do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!( special_enrollment_period.end_on + 5.days )
+        end
+
+        it "should not allow" do
+          expect(shop_enrollment.can_select_coverage?).to be_falsey
+        end
+      end
+    end
+  end
+end
+
+context "Benefits are terminated" do
+  let(:effective_on_date)         { TimeKeeper.date_of_record.beginning_of_month }
+  let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
+  let!(:benefit_coverage_period)  { FactoryGirl.create(:benefit_coverage_period,
+                                        start_on: effective_on_date.beginning_of_year,
+                                        end_on: effective_on_date.end_of_year,
+                                        open_enrollment_start_on: effective_on_date.beginning_of_year - 1.month,
+                                        open_enrollment_end_on: effective_on_date.beginning_of_year + 1.month
+                                      )
+                                    }
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(effective_on_date.year, 6, 1))
+  end
+
+  context "Individual benefit" do
+    let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
+                                                    household: ivl_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "individual",
+                                                    submitted_at: effective_on_date - 10.days
+                                                  )
+                                                }
+    let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
+
+    it "should be open enrollment" do
+      expect(ivl_enrollment.is_open_enrollment?).to be_truthy
+    end
+
+    context "and coverage is terminated" do
+      before do
+        ivl_enrollment.terminate_benefit(TimeKeeper.date_of_record)
+      end
+
+      it "should have terminated date" do
+        expect(ivl_enrollment.terminated_on).to eq ivl_termination_date
+      end
+
+      it "should be in terminated state" do
+        expect(ivl_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+    end
+  end
+
+  context "SHOP benefit" do
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_on_date - 10.days,
+                                                    benefit_group_id: benefit_group.id
+                                                  )
+                                                }
+
+    let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
+
+
+    it "should be SHOP enrollment kind" do
+      expect(shop_enrollment.is_shop?).to be_truthy
+    end
+
+    context "and coverage is terminated" do
+      before do
+        shop_enrollment.terminate_benefit(TimeKeeper.date_of_record)
+      end
+
+      it "should have terminated date" do
+        expect(shop_enrollment.terminated_on).to eq shop_termination_date
+      end
+
+      it "should be in terminated state" do
+        expect(shop_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+    end
+  end
+end
+
+
+
+
 
 # describe HbxEnrollment, "#save", type: :model do
 #
@@ -846,3 +1144,54 @@ end
 #     end
 #   end
 # end
+
+describe HbxEnrollment, "given a set of broker accounts" do
+  let(:submitted_at) { Time.mktime(2008, 12, 13, 12, 34, 00) }
+  subject { HbxEnrollment.new(:submitted_at => submitted_at) }
+  let(:broker_agency_account_1) { double(:start_on => start_on_1, :end_on => end_on_1) }
+  let(:broker_agency_account_2) { double(:start_on => start_on_2, :end_on => end_on_2) }
+
+  describe "with both accounts active before the purchase, and the second one unterminated" do
+    let(:start_on_1) { submitted_at - 12.days }
+    let(:start_on_2) { submitted_at - 5.days }
+    let(:end_on_1) { nil }
+    let(:end_on_2) { nil }
+
+    it "should be able to select the applicable broker" do
+      expect(subject.select_applicable_broker_account([broker_agency_account_1,broker_agency_account_2])).to eq broker_agency_account_2
+    end
+  end
+
+  describe "with both accounts active before the purchase, and the later one terminated" do
+    let(:start_on_1) { submitted_at - 12.days }
+    let(:start_on_2) { submitted_at - 5.days }
+    let(:end_on_1) { nil }
+    let(:end_on_2) { submitted_at - 2.days }
+
+    it "should have no applicable broker" do
+      expect(subject.select_applicable_broker_account([broker_agency_account_1,broker_agency_account_2])).to eq nil
+    end
+  end
+
+  describe "with one account active before the purchase, and the other active after" do
+    let(:start_on_1) { submitted_at - 12.days }
+    let(:start_on_2) { submitted_at + 5.days }
+    let(:end_on_1) { nil }
+    let(:end_on_2) { nil }
+
+    it "should be able to select the applicable broker" do
+      expect(subject.select_applicable_broker_account([broker_agency_account_1,broker_agency_account_2])).to eq broker_agency_account_1
+    end
+  end
+
+  describe "with one account active before the purchase and terminated before the purchase, and the other active after" do
+    let(:start_on_1) { submitted_at - 12.days }
+    let(:start_on_2) { submitted_at + 5.days }
+    let(:end_on_1) { submitted_at - 3.days }
+    let(:end_on_2) { nil }
+
+    it "should have no applicable broker" do
+      expect(subject.select_applicable_broker_account([broker_agency_account_1,broker_agency_account_2])).to eq nil
+    end
+  end
+end

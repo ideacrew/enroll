@@ -1,16 +1,20 @@
+require 'autoinc'
+
 class TaxHousehold
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
   include Acapi::Notifiers
+  include Mongoid::Autoinc
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
 
   embedded_in :household
 
-  auto_increment :hbx_assigned_id, seed: 9999  # Create 'friendly' ID to publish for other systems
+  field :hbx_assigned_id, type: Integer
+  increments :hbx_assigned_id, seed: 9999
 
   field :allocated_aptc, type: Money, default: 0.00
   field :is_eligibility_determined, type: Boolean, default: false
@@ -29,6 +33,10 @@ class TaxHousehold
 
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  end
+
+  def current_csr_eligibility_kind
+    latest_eligibility_determination.csr_eligibility_kind
   end
 
   def current_max_aptc

@@ -7,7 +7,7 @@ class User
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
+         :recoverable, :rememberable, :trackable, :validatable, :timeoutable
 
 
   validate :password_complexity
@@ -38,7 +38,16 @@ class User
     # self.password = new_password
     # self.password_confirmation = new_password
     self.idp_verified = true
-    self.save!
+    begin
+      self.save!
+    rescue => e
+      message = "#{e.message}; "
+      message = message + "user: #{self}, "
+      message = message + "errors.full_messages: #{self.errors.full_messages}, "
+      message = message + "stacktrace: #{e.backtrace}"
+      log(message, {:severity => "error"})
+      raise e
+    end
   end
 
   # for i18L
@@ -55,6 +64,8 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+
+  ##RIDP
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String
   field :identity_final_decision_transaction_id, type: String
@@ -205,6 +216,14 @@ class User
     has_role?(:csr)
   end
 
+  def has_csr_subrole?
+    person && person.csr_role && !person.csr_role.cac
+  end
+
+  def has_cac_subrole?
+    person && person.csr_role && person.csr_role.cac
+  end
+
   def has_assister_role?
     has_role?(:assister)
   end
@@ -284,6 +303,14 @@ class User
   def identity_verified?
     return false if identity_final_decision_code.blank?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+  end
+
+  def ridp_by_payload!
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_description_text = "curam payload"
+    self.identity_verified_date = TimeKeeper.date_of_record
+    self.save!
   end
 
   def self.get_saml_settings

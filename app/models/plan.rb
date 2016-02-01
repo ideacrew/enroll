@@ -342,6 +342,10 @@ class Plan
     self.coverage_kind.downcase == "dental"
   end
 
+  def can_use_aptc?
+    metal_level != 'catastrophic'
+  end
+
   def ehb
     percent = read_attribute(:ehb)
     (percent && percent > 0) ? percent : 1

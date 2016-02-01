@@ -1,6 +1,6 @@
 development:
   # Configure available database sessions. (required)
-  sessions:
+  clients:
     # Defines the default session. (required)
     default:
       # Defines the name of the default database that Mongoid can connect to.
@@ -56,25 +56,23 @@ development:
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
 test:
-  sessions:
+  clients:
     default:
       database: enroll_test
       hosts:
         - localhost:27017
       options:
-        read: primary
         # In the test environment we lower the retries and retry interval to
         # low amounts for fast failures.
         max_retries: 1
         retry_interval: 0
 production:
-  sessions:
+  clients:
     default:
       database: enroll_production
       hosts:
         - localhost:27017
       options:
-        read: primary
         # In the test environment we lower the retries and retry interval to
         # low amounts for fast failures.
         max_retries: 1

@@ -87,6 +87,8 @@ class VlpDocument < Document
 
   field :comment, type: String
 
+  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
+
   validates :subject,
         inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
         allow_blank: false
@@ -100,7 +102,6 @@ class VlpDocument < Document
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
   validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
-
 
 
 

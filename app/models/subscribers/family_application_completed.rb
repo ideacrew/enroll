@@ -41,6 +41,13 @@ module Subscribers
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
       verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
       import_home_address(primary_person, verified_new_address)
+      if verified_family.broker_accounts.present?
+        newest_broker = verified_family.broker_accounts.max_by{ |broker| broker.start_on}
+        newest_broker_agency_account = family.broker_agency_accounts.max_by{ |baa| baa.start_on }
+        if !newest_broker_agency_account.present? || newest_broker.start_on > newest_broker_agency_account.start_on
+          update_broker_for_family(family, newest_broker.broker_npn)
+        end
+      end
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
       throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
@@ -89,6 +96,9 @@ module Subscribers
         consumer_role.is_state_resident = verified_verifications.is_lawfully_present
         consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
         consumer_role.save!
+        if consumer_role.person.user.present?
+          consumer_role.person.user.ridp_by_payload!
+        end
       rescue => e
         errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
         throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
@@ -120,6 +130,8 @@ module Subscribers
           end.first.relationship_uri.split('#').last
 
           if existing_person.present?
+            find_or_build_consumer_role(existing_person)
+            update_vlp_for_consumer_role(existing_person.consumer_role, verified_family_member)
             new_people << [existing_person, relationship, [verified_family_member.id]]
           else
             new_member = Person.new(
@@ -142,6 +154,19 @@ module Subscribers
         end
       end
       new_people
+    end
+
+    def update_broker_for_family(family, npn)
+      broker = BrokerRole.find_by_npn(npn)
+      if broker.present?
+        if broker.broker_agency_profile_id.present?
+          family.hire_broker_agency(broker.id)
+        else
+          throw(:processing_issue, "ERROR: Broker with npn: #{npn} has no broker agency profile id")
+        end
+      else
+        throw(:processing_issue, "ERROR: Failed to match broker with npn: #{npn}")
+      end
     end
 
     def find_or_build_consumer_role(person)

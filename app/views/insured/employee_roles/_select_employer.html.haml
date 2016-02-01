@@ -1,3 +1,19 @@
-.row
-  .col-md-12.col-sm-12.col-xs-12
+%h3 Healthcare Marketplace
+
+- @employment_relationships.each do |er|
+  %p
+    =er.employer_name
+    has added you as an employee. You're eligible for coverage starting
+    ="#{format_date er.eligible_for_coverage_on}."
     = render partial: "insured/employee_roles/employment_relationships"
+  = form_for(er, :url => insured_employee_index_path, :as => :employment_relationship, :method => :post) do |f|
+    = f.submit :class => "hidden", :id => "this-is-my-employer"
+    = f.hidden_field :first_name
+    = f.hidden_field :last_name
+    = f.hidden_field :middle_name
+    = f.hidden_field :name_pfx
+    = f.hidden_field :name_sfx
+    = f.hidden_field :gender
+    = f.hidden_field :hired_on
+    = f.hidden_field :eligible_for_coverage_on
+    = f.hidden_field :census_employee_id

@@ -24,7 +24,11 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-person-last-name/).set(@u.last_name :last_name1)
-  @browser.text_field(class: /interaction-field-control-person-name-sfx/).set("Jr")
+  @browser.p(text: /suffix/i).click
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.wait_until_present
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.li(text: /Jr./).click
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(@u.adult_dob)
   @browser.h1(class: /darkblue/).click
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn1)
@@ -283,8 +287,7 @@ When(/^CSR accesses the HBX portal$/) do
 end
 
 Then(/CSR should see the Agent Portal/) do
-  wait_and_confirm_text /Agent Messages/
-  wait_and_confirm_text /New Consumer Paper Application/
+  wait_and_confirm_text /a Trained Expert/
 end
 
 Then(/CSR opens the most recent Please Contact Message/) do
@@ -446,10 +449,9 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   household = person.primary_family.latest_household
 
   start_on = TimeKeeper.date_of_record + 3.months
-  end_on = TimeKeeper.date_of_record + 1.year
 
   if household.tax_households.blank?
-    household.tax_households.create(is_eligibility_determined: Date.current, allocated_aptc: 100, effective_starting_on: start_on, effective_ending_on: end_on, submitted_at: Date.current)
+    household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
     fm_id = person.primary_family.family_members.last.id
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
     household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)

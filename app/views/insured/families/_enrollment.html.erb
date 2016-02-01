@@ -3,7 +3,7 @@
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
-      <h4 class="bg-title"><%= plan.active_year %> <%= plan.coverage_kind %> Coverage
+      <h4 class="bg-title"><%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
         <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
       </h4>
       <hr>
@@ -15,7 +15,7 @@
           <div class="row">
             <div class="col-xs-9" style="padding-right: 0;">
               <div><%= display_carrier_logo(Maybe.new(plan).carrier_profile.legal_name.extract_value, {width: 110}) %></div>
-              <h4>
+              <h4 class="enrollment-name">
                 <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year}), remote: true %>
               </h4>
 
@@ -36,14 +36,6 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>
-                    <div class="enrollment-type info">
-                      <p>
-                        <label class="bullet-separator"><%= HbxProfile::ShortName %> ID:</label>
-                        <strong><%= Maybe.new(hbx_enrollment).subscriber.person.hbx_id.truncate(8, omission: "").upcase.extract_value %></strong>
-                      </p>
-                    </div>
-                  </td>
                   <% if hbx_enrollment.coverage_terminated? %>
                    <td>
                     <div class="enrollment-effective info">
@@ -61,7 +53,15 @@
                     </div>
                   </td>
                   <% end %>
-
+                  <% unless hide_policy_selected_date?(hbx_enrollment) %>
+                  <td>
+                    <div class="enrollment-created-at info">
+                      <label>Plan Selected:
+                      </label>
+                      <strong><%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)</strong>
+                    </div>
+                  </td>
+                  <% end %>
                 </tr>
                 <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
 
@@ -79,6 +79,14 @@
                 <% end %>
 
               </table>
+
+
+                <div class="enrollment-type info">
+                  <p>
+                    <label class="bullet-separator"><%= HbxProfile::ShortName %> ID:</label>
+                    <strong><%= hbx_enrollment.hbx_id %></strong>
+                  </p>
+                </div>
 
               <% names = hbx_enrollment.covered_members_first_names %>
               <% if names.present? %>

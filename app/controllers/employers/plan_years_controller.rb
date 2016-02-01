@@ -51,7 +51,18 @@ class Employers::PlanYearsController < ApplicationController
       end
 
       benefit_group.default = true
-      @employer_profile.save!
+      begin
+        @employer_profile.save!
+      rescue => e
+        message = "There was an error setting the default benefit group because the employer profile failed validation."
+        message = message + " employer_profile: #{@employer_profile}"
+        @employer_profile.plan_years.each do |plan_year|
+          message = message + " plan_year: #{plan_year}" unless plan_year.valid?
+        end
+        message = message + " stacktrace: #{e.backtrace}"
+        log(message, {:severity => "error"})
+        raise e
+      end
     end
   end
 

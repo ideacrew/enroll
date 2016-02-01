@@ -167,7 +167,6 @@ module Factories
       employee_role.new_census_employee = census_employee
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
-      employee_role.benefit_group_id = census_employee.active_benefit_group_assignment.benefit_group_id #TODO
     end
 
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
@@ -305,7 +304,21 @@ module Factories
 
     def self.save_all_or_delete_new(*list)
       objects_to_save = list.reject {|o| !o.changed?}
-      num_saved = objects_to_save.count { |o| o.save }
+      num_saved = objects_to_save.count do |o|
+        begin
+          o.save
+        rescue => e
+          error_message = {
+            :error => {
+              :message => "unable to save object in enrollment factory",
+              :object_kind => o.class.to_s,
+              :object_id => o.id.to_s
+            }
+          }
+          log(JSON.dump(error_message), {:severity => 'critical'})
+          raise e
+        end
+      end
       if num_saved < objects_to_save.count
         objects_to_save.each {|o| o.delete}
         false

@@ -44,6 +44,24 @@ class PlanYear
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
+  scope :by_date_range,     ->(begin_on, end_on) { where(:"start_on".gte => begin_on, :"start_on".lte => end_on) }
+  scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
+    where(
+      "$and" => [
+        {:aasm_state.in => PUBLISHED },
+        {"$or" => [
+          { :start_on => {"$gte" => begin_on, "$lte" => end_on }},
+          { :end_on => {"$gte" => begin_on, "$lte" => end_on }}
+        ]
+      }
+    ]
+    )
+  }
+
+  def overlapping_published_plan_years
+    self.employer_profile.plan_years.published_plan_years_within_date_range(self.start_on, self.end_on)
+  end
+
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
     self.employer_profile
@@ -471,6 +489,13 @@ class PlanYear
     state :ineligible     # Application is non-compliant for enrollment
     state :expired        # Non-published plans are expired following their end on date
 
+    event :activate, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
+    end
+
+    event :expire, :after => :record_transition do
+      transitions from: [:published, :enrolling, :enrolled, :active],  to: :expired,  :guard  => :can_be_expired?
+    end
 
     # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
@@ -551,12 +576,12 @@ class PlanYear
 
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
-      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published, :publish_pending], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
     event :enroll, :after => :record_transition do
-      transitions from: [:published, :enrolling], to: :enrolled
+      transitions from: [:published, :enrolling, :renewing_published], to: :enrolled
     end
 
     # Admin ability to reset renewing plan year application
@@ -566,7 +591,7 @@ class PlanYear
   end
 
   def revert_employer_profile_application
-    employer_profile.revert_application!
+    employer_profile.revert_application! if employer_profile.may_revert_application?
     record_transition
   end
 
@@ -624,6 +649,22 @@ private
     valid
   end
 
+  def can_be_expired?
+    if PUBLISHED.include?(aasm_state) && TimeKeeper.date_of_record >= end_on
+      true
+    else
+      false
+    end
+  end
+
+  def can_be_activated?
+    if (PUBLISHED + RENEWING_PUBLISHED_STATE).include?(aasm_state) && TimeKeeper.date_of_record >= start_on
+      true
+    else
+      false
+    end
+  end
+
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
@@ -677,6 +718,7 @@ private
   def open_enrollment_date_checks
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
+
     if start_on.day != 1
       errors.add(:start_on, "must be first day of the month")
     end

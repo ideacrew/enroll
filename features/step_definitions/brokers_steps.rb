@@ -257,9 +257,9 @@ Then(/^.+ sees employer census family created$/) do
 end
 
 Then(/^.+ should see the matched employee record form$/) do
-  @browser.dd(text: /Legal LLC/).wait_until_present
+  @browser.p(text: /Legal LLC/).wait_until_present
   screenshot("broker_employer_search_results")
-  expect(@browser.dd(text: /Legal LLC/).visible?).to be_truthy
+  expect(@browser.p(text: /Legal LLC/).visible?).to be_truthy
 end
 
 Then(/^Broker Assisted is a family$/) do
@@ -286,7 +286,7 @@ Then(/^.+ sees covered family members$/) do
 end
 
 Then(/^.+ choses a healthcare plan$/) do
-  wait_and_confirm_text(/Choose Healthcare/i)
+  wait_and_confirm_text(/Choose Plan/i)
   wait_and_confirm_text(/Apply/)
   plan = @browser.a(class: 'interaction-click-control-select-plan')
   plan.click

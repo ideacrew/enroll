@@ -1,0 +1,45 @@
+<% if @person && @person.primary_family && @person.primary_family.current_broker_agency.present? %>
+  <aside class="panel panel-default">
+      <section class="row">
+        <article class="col-xs-12">
+          <div>
+            <%= link_to brokers_insured_families_path do %>
+
+            <div class="col-xs-4">
+              <figure>
+                <figcaption>
+                  <h2 style="text-align: center;">
+                    <%= image_tag('icons/icon-expert.png') %>
+                  </h2>
+                  <span style="display: block; text-align: center; margin-top: 10%;">
+                    <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+                    <br/><br/>
+                  </span>
+                </figcaption>
+              </span>
+            </figure>
+          </div>
+          <% end %>
+          <div class="col-xs-8">
+            <div class="row">
+              <h4>
+                  Your Broker
+              </h4>
+              <span>
+                <small>
+                  <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
+                  <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %><br>
+                </small>
+                <small>
+                  <%= @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
+                  <%= @person.primary_family.current_broker_agency.writing_agent.person.phones.first %>
+                  <br/><br/>
+                </small>
+              </span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </aside>
+<% end %>

@@ -238,21 +238,39 @@ RSpec.describe Exchanges::HbxProfilesController do
     let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
-
+    let(:csr_role) { double("csr_role", cac: false)}
     before :each do
-      expect(controller).to receive(:find_hbx_profile)
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:csr_role).and_return(double("csr_role", cac: false))
       allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
-      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
-      get :family_index
     end
 
-    it "renders the 'famlies index' template" do
+    it "renders the 'families index' template for hbx_staff" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      get :family_index
       expect(response).to have_http_status(:success)
       expect(response).to render_template("insured/families/index")
+    end
+
+    it "renders the 'families index' template for csr" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      get :family_index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("insured/families/index")
+    end
+
+    it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:csr_role).and_return(false)
+      get :family_index
+      expect(response).to redirect_to(root_url)
+    end
+
+    it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:csr_role).and_return(double("csr_role", cac: true))
+      get :family_index
+      expect(response).to redirect_to(root_url)
     end
   end
 

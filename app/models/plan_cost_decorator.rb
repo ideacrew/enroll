@@ -1,21 +1,14 @@
 class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
+  include ShopPolicyCalculations
+
   def initialize(plan, member_provider, benefit_group, reference_plan, max_cont_cache = {})
     super(plan)
     @member_provider = member_provider
     @benefit_group = benefit_group
     @reference_plan = reference_plan
     @max_contribution_cache = max_cont_cache
-  end
-
-  def members
-    case member_provider.class
-    when HbxEnrollment
-      member_provider.hbx_enrollment_members
-    when CensusEmployee
-      [member_provider] + member_provider.census_dependents
-    end
   end
 
   def plan_year_start_on
@@ -27,22 +20,9 @@ class PlanCostDecorator < SimpleDelegator
     end
   end
 
-  def age_of(member)
-    case member.class
-    when HbxEnrollmentMember
-      member.age_on_effective_date
-    else
-      member.age_on(plan_year_start_on)
-    end
-  end
-
   def child_index(member)
     @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
     @children.index(member)
-  end
-
-  def benefit_relationship(person_relationship)
-    PlanCostDecorator.benefit_relationship(person_relationship)
   end
 
   def self.benefit_relationship(person_relationship)
@@ -83,45 +63,6 @@ class PlanCostDecorator < SimpleDelegator
     }[person_relationship]
   end
 
-  def relationship_for(member)
-    case member.class
-    when HbxEnrollmentMember
-      if member.is_subscriber?
-        "employee"
-      else
-        benefit_relationship(member.primary_relationship)
-      end
-    else
-      member.employee_relationship
-    end
-  end
-
-  def large_family_factor(member)
-    if age_of(member) > 20
-      1.0
-    else
-      if child_index(member) > 2
-        0.0
-      else
-        1.0
-      end
-    end
-  end
-
-  def relationship_benefit_for(member)
-    relationship =
-    case member.class
-    when HbxEnrollmentMember
-      (relationship(member))
-    else
-      if child_index(member) > 2
-        0.0
-      else
-        1.0
-      end
-    end
-  end
-
   def relationship_benefit_for(member)
     relationship = relationship_for(member)
     benefit_group.relationship_benefit_for(relationship)
@@ -132,57 +73,51 @@ class PlanCostDecorator < SimpleDelegator
     if relationship_benefit && relationship_benefit.offered?
       relationship_benefit.premium_pct
     else
-      0.0
+      0.00
     end
   end
 
   def reference_premium_for(member)
-    reference_plan.premium_for(plan_year_start_on, age_of(member)) * large_family_factor(member)
+    (reference_plan.premium_for(plan_year_start_on, age_of(member)) * large_family_factor(member)).round(2)
   rescue
-    0
+    0.00
   end
 
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
-      Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)
+      (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)).round(2)
     else
-      0.0
+      0.00
     end
   end
 
   def max_employer_contribution(member)
     return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.has_key?(member._id)
-    @max_contribution_cache[member._id] = (large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00
+    @max_contribution_cache[member._id] = ((large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00).round(2)
   end
 
   def employer_contribution_for(member)
-    [max_employer_contribution(member), premium_for(member)].min * large_family_factor(member)
+    ([max_employer_contribution(member), premium_for(member)].min * large_family_factor(member)).round(2)
   end
 
   def employee_cost_for(member)
-    if @benefit_group.present?
+    (if @benefit_group.present?
       premium_for(member) - employer_contribution_for(member)
     else
       __getobj__.premium_for(plan_year_start_on, age_of(member))
-    end * large_family_factor(member)
-  end
-
-  def total_premium
-    members.reduce(0) do |sum, member|
-      sum + premium_for(member)
-    end
+    end * large_family_factor(member)).round(2)
   end
 
   def total_employer_contribution
-    members.reduce(0) do |sum, member|
-      sum + employer_contribution_for(member)
-    end
+    (members.reduce(0.00) do |sum, member|
+      (sum + employer_contribution_for(member)).round(2)
+    end).round(2)
   end
 
   def total_employee_cost
-    members.reduce(0) do |sum, member|
-      sum + employee_cost_for(member)
-    end
+    (members.reduce(0.00) do |sum, member|
+      (sum + employee_cost_for(member)).round(2)
+    end).round(2)
   end
 end

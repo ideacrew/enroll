@@ -10,6 +10,7 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
   let(:hbx_enrollment) {  HbxEnrollment.new(plan:plan, employee_role: employee_role) }
 
   before :each do
+    allow(hbx_enrollment).to receive(:broker_agency_account).and_return(nil)
     allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
     allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end

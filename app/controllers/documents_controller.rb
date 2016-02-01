@@ -1,4 +1,5 @@
 class DocumentsController < ApplicationController
+  helper_method :sort_filter, :sort_direction
   before_action :set_doc, only: [:change_doc_status, :change_person_aasm_state]
   respond_to :html, :js
 
@@ -10,7 +11,8 @@ class DocumentsController < ApplicationController
   end
 
   def consumer_role_status
-    @unverified_persons=Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending']).to_a
+    docs_page_filter
+    search_box
     respond_to do |format|
       format.html { render partial: "index_consumer_role_status" }
       format.js {}
@@ -72,6 +74,32 @@ end
  def set_doc
   @doc_owner = Person.where(id: params[:person_id]).first
   @document = @doc_owner.consumer_role.vlp_documents.where(id: params[:doc_id]).first
+ end
+
+ def sort_filter
+   %w(first_name last_name created_at).include?(params[:sort]) ? params[:sort] : 'created_at'
+ end
+
+ def sort_direction
+   %w(asc desc).include?(params[:direction]) ? params[:direction] : 'desc'
+ end
+
+ def search_box
+   if params[:q]
+     @q = params[:q]
+     @unverified_persons = @unverified_persons.search(params[:q])
+   end
+ end
+
+ def docs_page_filter
+   case params[:sort]
+     when 'waiting'
+       @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+     when 'no_docs_uloaded'
+       @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+     else
+       @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+   end
  end
 
 end

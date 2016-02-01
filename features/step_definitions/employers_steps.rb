@@ -95,7 +95,13 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("John")
   @browser.text_field(class: /interaction-field-control-census-employee-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Doe")
-  @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
+  @browser.p(text: /suffix/i).click
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.wait_until_present
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.li(text: /Jr./).click
+  @browser.h1(text: /Add New Employee/i).click
+
   # @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
@@ -103,9 +109,9 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   @browser.radio(id: /radio_male/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
-  input_field = @browser.divs(class: /selectric-wrapper/).first
-  input_field.click
-  input_field.li(text: /Silver PPO Group/).click
+  @browser.p(text: /Silver PPO Group/i).click
+  @browser.li(text: /Silver PPO Group/).click
+
   # Address
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
@@ -181,9 +187,8 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
-  input_field = @browser.divs(class: /selectric-wrapper/).first
-  input_field.click
-  input_field.li(text: /Silver PPO Group/).click
+  @browser.p(text: /Silver PPO Group/i).click
+  @browser.li(text: /Silver PPO Group/).click
   select_state = @browser.divs(text: /GA/).last
   select_state.click
   scroll_then_click(@browser.li(text: /VA/))
@@ -383,7 +388,7 @@ When(/^.+ enters? combined filter in plan selection page$/) do
   # Platinum
   @browser.execute_script(
     'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose Healthcare/i)
+    @browser.element(:text => /Choose Plan/i)
   )
   @browser.checkbox(class: /interaction-choice-control-value-plan-metal-level-silver/).set(true)
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)

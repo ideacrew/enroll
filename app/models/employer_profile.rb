@@ -224,17 +224,13 @@ class EmployerProfile
 
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
-      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
-        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id)
-
+      orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
       orgs.collect(&:employer_profile)
     end
 
     def find_by_writing_agent(writing_agent)
       raise ArgumentError.new("expected BrokerRole") unless writing_agent.is_a?(BrokerRole)
-      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
-        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).cache.to_a
-
+      orgs = Organization.by_broker_role(writing_agent.id)
       orgs.collect(&:employer_profile)
     end
 

@@ -104,8 +104,11 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  # FIXME
-  IndividualEnrollmentDueDayOfMonth = 15
+  # IndividualEnrollmentDueDayOfMonth = 15
+  # Temporary change for Dec 2015 extension
+  IndividualEnrollmentDueDayOfMonth = 18
+  IndividualEnrollmentTerminationMinimum = 14.days
+
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,
@@ -138,6 +141,9 @@ class HbxProfile
 
   # Number of days preceeding effective date that an employee may submit a plan enrollment
   ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
+
+  # Number of days following effective date that employee may purchase plan
+  ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
 
   # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30

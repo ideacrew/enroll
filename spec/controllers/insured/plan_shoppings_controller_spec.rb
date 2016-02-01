@@ -114,6 +114,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:employee_role).and_return(double)
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
+      allow(enrollment).to receive(:is_special_enrollment?).and_return false
+      allow(enrollment).to receive(:can_select_coverage?).and_return(true)
     end
 
     it "returns http success" do
@@ -167,6 +169,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         sign_in(user)
         get :thankyou, id: "id", plan_id: "plan_id", elected_aptc: "50"
         expect(session[:elected_aptc]).to eq 50
+      end
+    end
+
+    context "for qualify_qle_notice" do
+      it "should get error msg" do
+        allow(enrollment).to receive(:can_select_coverage?).and_return false
+        sign_in(user)
+        get :thankyou, id: "id", plan_id: "plan_id"
+        expect(flash[:error]).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
+      end
+
+      it "should not get error msg" do
+        allow(enrollment).to receive(:can_select_coverage?).and_return true
+        sign_in(user)
+        get :thankyou, id: "id", plan_id: "plan_id"
+        expect(flash[:error]).to eq nil
       end
     end
   end
