@@ -92,6 +92,8 @@ module Factories
     end
 
     def waived_benefit_group_assignment(census_employee)
+      @count = 0
+
       person = match_person(census_employee)
       if person.blank?
         return false
@@ -110,8 +112,10 @@ module Factories
         if active_assignment.present? &&  @benefit_group_ids.include?(active_assignment.benefit_group_id)
           if active_assignment.may_waive_coverage?
             active_assignment.waive_coverage!
+            return true
+          else
+            puts "failed to waive....#{census_employee.full_name}"
           end
-          return true
         end
       end
       

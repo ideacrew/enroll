@@ -152,30 +152,34 @@ namespace :update_shop do
         assignments_created = 0
         waived_count = 0
         employer.census_employees.each do |ce| 
-          next unless ce.is_active?
+          begin
+            next unless ce.is_active?
 
-          if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
-            ce.active_benefit_group_assignment.update_attributes(is_active: false)
-          end
+            if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
+              ce.active_benefit_group_assignment.update_attributes(is_active: false)
+            end
 
-          renewal_factory = Factories::PlanYearEnrollFactory.new
-          renewal_factory.employer_profile = employer
-          renewal_factory.start_on = effective_date
-          renewal_factory.benefit_group_ids = benefit_group_ids
-          
-          if ce.active_benefit_group_assignment.blank?
-            renewal_factory.create_active_benefit_group_assignment
-            assignments_created += 1
-          end
+            renewal_factory = Factories::PlanYearEnrollFactory.new
+            renewal_factory.employer_profile = employer
+            renewal_factory.start_on = effective_date
+            renewal_factory.benefit_group_ids = benefit_group_ids
 
-          if renewal_factory.waived_benefit_group_assignment(ce)
-            waived_count += 1
+            if ce.active_benefit_group_assignment.blank?
+              ce.add_benefit_group_assignment(employer.active_plan_year.benefit_groups.first, effective_date)
+              ce.active_benefit_group_assignment.update_attributes(is_active: true)
+              assignments_created += 1
+            end
+
+            if renewal_factory.waived_benefit_group_assignment(ce)
+              waived_count += 1
+            end
+          rescue => e
+            puts "#{e.to_s} occured for #{ce.full_name}"
           end
         end
 
         puts "#{assignments_created} Census Employee benefit group assignments created"
         puts "#{waived_count} Census Employees waived"
-        puts "#{changed_count} census employee records updated"
         count += 1
       rescue => e
         puts e.to_s
