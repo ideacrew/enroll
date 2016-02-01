@@ -3,20 +3,20 @@ namespace :update_shop do
   task :plan_year_renewal => :environment do 
     changed_count = 0
 
-    employers = {
-      "Asia Pacific Offset, Inc" => "522041878",
-      "The Greene Family" => "113772594"
-    }
+    # employers = {
+    #   "Asia Pacific Offset, Inc" => "522041878",
+    #   "The Greene Family" => "113772594"
+    # }
 
-    # effective_date = Date.new(2015,2,1)
-    # organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
+    effective_date = Date.new(2015,4,1)
+    organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
-    # employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
-    #   employers[profile.legal_name] = profile.fein
-    #   employers
-    # end
+    employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
+      employers[profile.fein] = profile.legal_name
+      employers
+    end
    
-    employers.each do |name, fein|
+    employers.each do |fein, name|
       begin
         puts "Processing employer: #{name}"
         employer = EmployerProfile.find_by_fein(fein)
