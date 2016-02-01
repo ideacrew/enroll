@@ -2,22 +2,12 @@ $(document).ready( function() {
 
   // modal buttons
   $(document).on('click', '.modal .btn', function() {
-
     if ( $(this).hasClass('btn-more-details') ) {
-
       // referencePlanSummaryModal
       if ( $(this).closest('.modal').attr('id', 'referencePlanSummaryModal') ) {
-      };
-
+      }
     } else {
-      $(this).closest('.modal').find('.fa-spinner').remove();
-      $(this).closest('.modal').find('.modal-body').slideDown();
-      $(this).text('More Details');
-      $(this).removeClass('btn-less-details');
-      $(this).addClass('btn-more-details');
-
     }
-
   });
-
+  
 });
