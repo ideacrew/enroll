@@ -62,7 +62,7 @@ class Employers::PlanYearsController < ApplicationController
     hios_id = [] << params[:hios_id]
     @qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, params[:start_on], params[:coverage_kind])
     @visit_types = params[:coverage_kind] == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
-    @visit_types = @qhps.first.qhp_service_visits.map(&:visit_type) if @details.present?
+    @visit_types = @qhps.first.qhp_service_visits.map(&:visit_type) if params.has_key?(:details)
     respond_to do |format|
       format.js
     end
