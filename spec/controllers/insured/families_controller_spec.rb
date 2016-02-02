@@ -72,6 +72,7 @@ RSpec.describe Insured::FamiliesController do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(person).to receive(:addresses).and_return(addresses)
+      allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(consumer_role).to receive(:save!).and_return(true)
       session[:portal] = "insured/families"
     end
@@ -160,8 +161,13 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET manage_family" do
+    let(:employee_roles) { double }
+    let(:employee_role) { [double("EmployeeRole")] }
     before :each do
       allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(person).to receive(:has_multiple_roles?).and_return(true)
+      allow(employee_roles).to receive(:active).and_return([employee_role])
+      allow(family).to receive(:coverage_waived?).and_return(true)
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :manage_family
     end
@@ -177,6 +183,22 @@ RSpec.describe Insured::FamiliesController do
     it "should assign variables" do
       expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family_members)
+    end
+
+    it "assigns variable to change QLE to IVL flow" do
+      get :manage_family, market: "shop_market_events"
+      expect(assigns(:manually_picked_role)).to eq "shop_market_events"
+    end
+
+    it "assigns variable to change QLE to Employee flow" do
+      get :manage_family, market: "individual_market_events"
+      expect(assigns(:manually_picked_role)).to eq "individual_market_events"
+    end
+
+    it "doesn't assign the variable to show different flow for QLE" do
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      get :manage_family, market: "shop_market_events"
+      expect(assigns(:manually_picked_role)).to eq nil
     end
   end
 
@@ -226,6 +248,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:user).and_return(user)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:has_multiple_roles?).and_return(true)
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 

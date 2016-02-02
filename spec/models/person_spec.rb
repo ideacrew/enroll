@@ -298,6 +298,40 @@ describe Person do
           expect(person.has_active_consumer_role?).to eq false
         end
       end
+
+      context "has_multiple_roles?" do
+        let(:person) {FactoryGirl.build(:person)}
+        let(:employee_roles) {double(active: true)}
+        let(:consumer_role) {double(is_active?: true)}
+
+        it "returns true if person has consumer_role and employee_roles" do
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          allow(person).to receive(:employee_roles).and_return(employee_roles)
+
+          expect(person.has_multiple_roles?).to eq true
+        end
+
+        it "returns false if person has only consumer_role" do
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          allow(person).to receive(:employee_roles).and_return(nil)
+
+          expect(person.has_multiple_roles?).to eq false
+        end
+
+        it "returns false if person has only consumer_role" do
+          allow(person).to receive(:consumer_role).and_return(nil)
+          allow(person).to receive(:employee_roles).and_return(employee_roles)
+
+          expect(person.has_multiple_roles?).to eq false
+        end
+
+        it "returns false if person has no roles" do
+          allow(person).to receive(:consumer_role).and_return(nil)
+          allow(person).to receive(:employee_roles).and_return(nil)
+
+          expect(person.has_multiple_roles?).to eq false
+        end
+      end
     end
   end
 
