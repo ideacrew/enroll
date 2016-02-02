@@ -88,6 +88,7 @@ module Forms
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
         assign_person_address(person)
       end
+      family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
       true

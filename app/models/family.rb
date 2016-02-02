@@ -492,6 +492,12 @@ class Family
     latest_household.try(:enrolled_hbx_enrollments)
   end
 
+  def save_relevant_coverage_households
+    households.each do |household|
+      household.coverage_households.each{|hh| hh.save }
+    end
+  end
+
   def has_aptc_hbx_enrollment?
     enrollments = latest_household.hbx_enrollments.active rescue []
     enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
