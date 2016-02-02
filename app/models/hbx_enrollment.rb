@@ -285,7 +285,7 @@ class HbxEnrollment
   end
 
   def is_coverage_waived?
-    inactive?
+    inactive? || renewing_waived?
   end
 
   def is_shop?

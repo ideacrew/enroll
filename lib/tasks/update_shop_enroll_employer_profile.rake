@@ -3,7 +3,7 @@ namespace :update_shop do
   task :enroll_employer_profile => :environment do
     changed_count = 0
 
-    effective_date = Date.new(2016,1,1)
+    effective_date = Date.new(2016,2,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
@@ -11,6 +11,8 @@ namespace :update_shop do
       employers
     end
         
+    missing_family = 0
+    missing_person = 0
     employers.each do |fein, name|
       begin
         puts "Processing employer: #{name}"
@@ -24,6 +26,10 @@ namespace :update_shop do
         renewal_factory.employer_profile = employer
         renewal_factory.start_on = effective_date
         renewal_factory.enroll
+        
+        missing_family += renewal_factory.missing_family
+        missing_person += renewal_factory.missing_person
+
         changed_count += 1
       rescue => e
         puts e.to_s
@@ -31,6 +37,7 @@ namespace :update_shop do
     end
 
     puts "Processed #{employers.count} employers, renewed #{changed_count} employers"
+    puts "Total missing families #{missing_family} missing person #{missing_person}"
   end
 
   task :cancel_benefit_group_assignment => :environment do 
@@ -111,5 +118,81 @@ namespace :update_shop do
     end
 
     puts "Processed #{employers.count} employers, fixed #{changed_count} employers"
+  end
+
+  task :waived_benefit_group_assignment => :environment do 
+
+    effective_date = Date.new(2016,1,1)
+    organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
+
+    employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
+      employers[profile.fein] = profile.legal_name
+      employers
+    end
+
+    count = 0
+    employers.each do |fein, name|
+      begin
+
+        puts "Processing employer: #{name}"
+        employer = EmployerProfile.find_by_fein(fein)
+        if employer.blank?
+          puts "  ** employer not found"
+          next
+        end
+
+        next unless employer.active_plan_year.present?
+        next unless employer.active_plan_year.start_on == effective_date
+
+        published_plan_years = employer.plan_years.where(:"start_on" => effective_date).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
+
+        if published_plan_years.size == 0
+          next
+        end
+
+        if published_plan_years.size > 1
+          next
+        end
+
+        benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id)
+
+        assignments_created = 0
+        waived_count = 0
+        employer.census_employees.each do |ce| 
+          begin
+            next unless ce.is_active?
+
+            if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
+              ce.active_benefit_group_assignment.update_attributes(is_active: false)
+            end
+
+            renewal_factory = Factories::PlanYearEnrollFactory.new
+            renewal_factory.employer_profile = employer
+            renewal_factory.start_on = effective_date
+            renewal_factory.benefit_group_ids = benefit_group_ids
+
+            if ce.active_benefit_group_assignment.blank?
+              ce.add_benefit_group_assignment(employer.active_plan_year.benefit_groups.first, effective_date)
+              ce.active_benefit_group_assignment.update_attributes(is_active: true)
+              assignments_created += 1
+            end
+
+            if renewal_factory.waived_benefit_group_assignment(ce)
+              waived_count += 1
+            end
+          rescue => e
+            puts "#{e.to_s} occured for #{ce.full_name}"
+          end
+        end
+
+        puts "#{assignments_created} Census Employee benefit group assignments created"
+        puts "#{waived_count} Census Employees waived"
+        count += 1
+      rescue => e
+        puts e.to_s
+      end
+    end
+
+    puts "Processed #{employers.count} employers, fixed #{count} employers"
   end
 end

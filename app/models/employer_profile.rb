@@ -371,6 +371,9 @@ class EmployerProfile
       transitions from: [:registered, :eligible, :ineligible, :suspended, :binder_paid, :enrolled], to: :applicant
     end
 
+    event :force_enroll, :after => :record_transition do 
+      transitions from: [:applicant, :eligible, :registered], to: :enrolled
+    end
   end
 
   after_update :broadcast_employer_update
