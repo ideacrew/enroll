@@ -100,3 +100,20 @@ $(function () {
 		match_person();
 	});
 });
+
+var EmployeeRole = ( function( window, undefined ) {
+  function disableTerminateSubmit(hbx_id) {
+    var target = $('#terminate_confirm_' + hbx_id);
+    var terminate_reason = target.find('select.interaction-choice-control-terminate-reason').val();
+    if(terminate_reason == undefined || terminate_reason == ""){
+      target.find('.terminate_reason_submit').attr("disabled",true);
+    }else{
+      target.find('.terminate_reason_submit').attr("disabled",false);
+    }
+  }
+
+  return {
+    disableTerminateSubmit : disableTerminateSubmit,
+  };
+})( window );
+

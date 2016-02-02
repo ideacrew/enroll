@@ -7,6 +7,7 @@ RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_e
     assign :families, [family]
     assign :general_agency_profile, general_agency_profile
     assign :page_alphabets, ['A', 'B']
+    controller.request.path_parameters[:id] = general_agency_profile.id
     render template: "general_agencies/profiles/_families.html.erb"
   end
 

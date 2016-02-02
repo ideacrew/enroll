@@ -1,7 +1,7 @@
-Given(/Conversion Employer for (.*) exists with active and renewing plan year/) do |named_person|
+Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |kind, named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
-  employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source:'conversion', registered_on: TimeKeeper.date_of_record
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
   employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
     first_name: person[:first_name],
@@ -10,16 +10,19 @@ Given(/Conversion Employer for (.*) exists with active and renewing plan year/) 
     dob: person[:dob_date]
 
   open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
-  open_enrollment_end_on = open_enrollment_start_on.next_month + 12.days
-  start_on = open_enrollment_start_on + 2.months
+  open_enrollment_end_on = open_enrollment_start_on + 12.days
+  start_on = open_enrollment_start_on + 1.months
   end_on = start_on + 1.year - 1.day
 
+  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
+
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")

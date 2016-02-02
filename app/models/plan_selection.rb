@@ -36,7 +36,6 @@ class PlanSelection
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
     hbx_enrollment.select_coverage!
-    hbx_enrollment.propogate_selection
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)

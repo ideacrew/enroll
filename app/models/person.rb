@@ -9,7 +9,7 @@ class Person
   include FullStrippedNames
 
   extend Mongorder
-  validates_with Validations::DateRangeValidator
+#  validates_with Validations::DateRangeValidator
 
 
   GENDER_KINDS = %W(male female)

@@ -212,6 +212,7 @@ describe Person do
           expect(@person.is_active?).to eq false
         end
 
+=begin
         context "dob more than 110 years ago" do
           let(:dob){ 200.years.ago }
 
@@ -221,6 +222,7 @@ describe Person do
           end
 
         end
+=end
       end
 
       context "with invalid date values" do

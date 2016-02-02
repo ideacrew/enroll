@@ -377,6 +377,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
@@ -624,6 +625,29 @@ RSpec.describe Insured::FamiliesController do
       it "adds a message to person inbox" do
         expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
+    end
+  end
+end
+
+RSpec.describe Insured::FamiliesController do
+  describe "GET purchase" do
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    before :each do
+      allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+      allow(person).to receive(:primary_family).and_return(family)
+      sign_in(user)
+      get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
+    end
+
+    it "should get hbx_enrollment" do
+      expect(assigns(:enrollment)).to eq hbx_enrollment
+    end
+
+    it "should get terminate" do
+      expect(assigns(:terminate)).to eq 'terminate'
     end
   end
 end

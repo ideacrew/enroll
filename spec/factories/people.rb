@@ -7,6 +7,7 @@ FactoryGirl.define do
     # name_sfx 'Jr'
     dob "1972-04-04".to_date
     is_active true
+    gender "male"
 
     #association :employee_role, strategy: :build
 

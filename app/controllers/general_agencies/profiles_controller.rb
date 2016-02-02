@@ -56,11 +56,15 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
   def families
     page = params.permit([:page])[:page]
-    total_families = @general_agency_profile.families || []
+    @q = params.permit(:q)[:q]
 
+    total_families = @general_agency_profile.families
+    @total = total_families.count
     @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
+    elsif @q
+      @families = total_families.select {|v| v.primary_applicant.person.last_name =~ /^#{@q}/i}
     else
       @families = total_families[0..20]
     end

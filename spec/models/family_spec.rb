@@ -388,6 +388,68 @@ describe Family do
       expect(family.earliest_effective_sep).to eq @current_sep
     end
   end
+
+  context "latest_shop_sep" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    before do
+      @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
+      date1 = TimeKeeper.date_of_record - 20.days
+      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      family.special_enrollment_periods << @current_sep
+      date2 = TimeKeeper.date_of_record - 10.days
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      family.special_enrollment_periods << @another_current_sep
+    end
+
+    it "should return latest active sep" do
+      date3 = TimeKeeper.date_of_record - 200.days
+      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      family.special_enrollment_periods << sep
+      family.save
+      expect(@current_sep.is_active?).to eq true
+      expect(@another_current_sep.is_active?).to eq true
+      expect(sep.is_active?).to eq false
+      expect(family.latest_shop_sep).to eq @another_current_sep
+    end
+  end
+
+  context "terminate_date_for_shop_by_enrollment" do
+    it "without latest_shop_sep" do
+      expect(family.terminate_date_for_shop_by_enrollment).to eq TimeKeeper.date_of_record.end_of_month
+    end
+
+    context "with latest_shop_sep" do
+      let(:qlek) { FactoryGirl.build(:qualifying_life_event_kind, reason: 'death') }
+      let(:date) { TimeKeeper.date_of_record - 10.days }
+      let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date) }
+      let(:death_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date, qualifying_life_event_kind: qlek) }
+      let(:hbx) { HbxEnrollment.new }
+
+      it "normal sep" do
+        allow(family).to receive(:latest_shop_sep).and_return normal_sep
+        expect(family.terminate_date_for_shop_by_enrollment).to eq date.end_of_month
+      end
+
+      it "death sep" do
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
+        expect(family.terminate_date_for_shop_by_enrollment).to eq date
+      end
+
+      it "when original terminate date before hbx effective_on" do
+        allow(family).to receive(:latest_shop_sep).and_return normal_sep
+        allow(normal_sep).to receive(:qle_on).and_return date.end_of_month
+        allow(hbx).to receive(:effective_on).and_return (date.end_of_month)
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq (TimeKeeper.date_of_record.end_of_month)
+      end
+
+      it "when qle_on is less than hbx effective_on" do
+        effective_on = date + 10.days
+        allow(family).to receive(:latest_shop_sep).and_return normal_sep
+        allow(hbx).to receive(:effective_on).and_return effective_on
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq effective_on
+      end
+    end
+  end
 end
 
 describe "special enrollment periods" do
