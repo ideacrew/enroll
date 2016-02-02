@@ -22,6 +22,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
+
     set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
@@ -171,9 +172,8 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_multiple_roles?
       @manually_picked_role = params[:market] if params[:market]
       @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
-      @manually_picked_role=nil
     else
-      if @person.employee_roles.active.any?
+      if @person.employee_roles.active.present?
         @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
       else @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
