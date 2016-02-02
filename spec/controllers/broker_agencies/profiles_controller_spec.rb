@@ -233,4 +233,50 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:families).count).to eq(27)
     end
   end
+
+  describe "eligible_brokers" do
+
+    before :all do
+      org1 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization:org1, market_kind:'individual')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind:'individual', aasm_state:'active')
+
+      org2 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+
+      org3 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile3 = FactoryGirl.create(:broker_agency_profile, organization:org3, market_kind:'both')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
+
+    end
+
+    context "individual market user" do
+      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+
+      it "selects only 'individual' and 'both' market brokers" do
+        allow(subject).to receive(:current_user).and_return(user)
+        staff = subject.instance_eval{ eligible_brokers }
+
+        staff.each do |staff_person|
+         expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+        end
+      end
+    end
+
+    context "SHOP market user" do
+      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+
+      it "selects only 'shop' and 'both' market brokers" do
+        allow(subject).to receive(:current_user).and_return(user)
+        staff = subject.instance_eval{ eligible_brokers }
+
+        staff.each do |staff_person|
+          expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+        end
+      end
+    end
+  end
 end

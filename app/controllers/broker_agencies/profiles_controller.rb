@@ -88,8 +88,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def staff_index
     @q = params.permit(:q)[:q]
-    @staff = Person.where('broker_role.broker_agency_profile_id': {:$exists => true})
-    @staff = @staff.where(:'broker_role.aasm_state'=> 'active')
+    @staff = eligible_brokers
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
@@ -192,4 +191,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
     end
   end
+
+  def eligible_brokers
+    user_market_kind = current_user.has_consumer_role? ? "individual" : "shop"
+    staff = Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).any_in('broker_role.market_kind' => [user_market_kind, "both"])
+    staff.where(:'broker_role.aasm_state'=> 'active')
+  end
+
 end
