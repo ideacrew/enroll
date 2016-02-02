@@ -168,7 +168,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualifying_life_events = []
-    if @person.employee_roles.any?
+    if @person.employee_roles.active.any?
       @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
     else
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
