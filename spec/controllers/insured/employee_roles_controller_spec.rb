@@ -103,7 +103,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:addresses) { [address] }
     let(:employee_role) { double("EmployeeRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
     let(:family) { double("Family") }
-    let(:email){ double("Email", address: "test@example.com") }
+    let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
     it "should render edit template" do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
@@ -113,7 +113,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(census_employee).to receive(:address).and_return(address)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:primary_family).and_return(family)
-      allow(person).to receive(:emails).and_return([email])
+      allow(person).to receive(:emails=).and_return([email])
       allow(census_employee).to receive(:email).and_return(email)
       allow(email).to receive(:address=).and_return("test@example.com")
       allow(controller).to receive(:build_nested_models).and_return(true)
