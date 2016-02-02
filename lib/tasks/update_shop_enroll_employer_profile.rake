@@ -3,7 +3,7 @@ namespace :update_shop do
   task :enroll_employer_profile => :environment do
     changed_count = 0
 
-    effective_date = Date.new(2016,1,1)
+    effective_date = Date.new(2016,2,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
@@ -11,6 +11,8 @@ namespace :update_shop do
       employers
     end
         
+    missing_family = 0
+    missing_person = 0
     employers.each do |fein, name|
       begin
         puts "Processing employer: #{name}"
@@ -24,6 +26,10 @@ namespace :update_shop do
         renewal_factory.employer_profile = employer
         renewal_factory.start_on = effective_date
         renewal_factory.enroll
+        
+        missing_family += renewal_factory.missing_family
+        missing_person += renewal_factory.missing_person
+
         changed_count += 1
       rescue => e
         puts e.to_s
@@ -31,6 +37,7 @@ namespace :update_shop do
     end
 
     puts "Processed #{employers.count} employers, renewed #{changed_count} employers"
+    puts "Total missing families #{missing_family} missing person #{missing_person}"
   end
 
   task :cancel_benefit_group_assignment => :environment do 
