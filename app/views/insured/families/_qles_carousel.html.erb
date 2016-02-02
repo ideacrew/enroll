@@ -1,4 +1,12 @@
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
+  <% if !@manually_picked_role %>
+      <div>
+        <ul>
+          <li class="label"><%=	link_to "Employee", family_account_path(tab: 'home', market: "shop_market_events") %></li>
+          <li class="label"><%=	link_to "Individual", family_account_path(tab: 'home', market: "individual_market_events")  %></li>
+        </ul>
+      </div>
+  <% end %>
   <h5>TOP LIFE CHANGES</h5>
 
   <% if @qualifying_life_events %>

@@ -168,10 +168,16 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualifying_life_events = []
-    if @person.employee_roles.active.any?
-      @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+    if @person.has_multiple_roles?
+      @manually_picked_role = params[:market] if params[:market]
+      @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+      @manually_picked_role=nil
     else
+      if @person.employee_roles.active.any?
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+      else @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+      end
     end
   end
 
