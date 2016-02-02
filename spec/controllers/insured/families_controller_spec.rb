@@ -160,8 +160,13 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET manage_family" do
+    let(:employee_roles) { double }
+    let(:employee_role) { [double("EmployeeRole")] }
+
     before :each do
       allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(employee_roles).to receive(:active).and_return([employee_role])
+      allow(family).to receive(:coverage_waived?).and_return(true)
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :manage_family
     end
@@ -221,11 +226,15 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET find_sep" do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
+    let(:employee_roles) { double }
+    let(:employee_role) { [double("EmployeeRole")] }
 
     before :each do
       allow(person).to receive(:user).and_return(user)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(employee_roles).to receive(:active).and_return([employee_role])
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
