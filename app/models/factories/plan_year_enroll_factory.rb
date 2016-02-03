@@ -158,18 +158,23 @@ module Factories
         return false
       end
 
-      enrollments = family.active_household.hbx_enrollments.where(:"effective_on".gte => @start_on)
-      return false if enrollments.enrolled.any?
+      enrollments = family.active_household.hbx_enrollments.where(effective_on: (@start_on..@end_on)).shop_market
+      return false if enrollments.renewing.any?
+
+      active_assignment = census_employee.active_benefit_group_assignment
+      if active_assignment.blank?
+        active_assignment = census_employee.benefit_group_assignments.detect{|assignment| @benefit_group_ids.include?(assignment.benefit_group_id) }
+      end
+
+      if enrollments.enrolled.any?
+        active_assignment.begin_benefit
+        return false
+      end
 
       if enrollments.waived.any?
-        active_assignment = census_employee.active_benefit_group_assignment
-        if active_assignment.present? &&  @benefit_group_ids.include?(active_assignment.benefit_group_id)
-          if active_assignment.may_waive_coverage?
-            active_assignment.waive_coverage!
-            return true
-          else
-            puts "failed to waive....#{census_employee.full_name}"
-          end
+        if active_assignment.present?
+          active_assignment.waive_benefit
+          return true
         end
       end
       

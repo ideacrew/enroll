@@ -146,7 +146,7 @@ class BenefitGroupAssignment
 
   def make_active
     census_employee.benefit_group_assignments.each do |bg_assignment|
-      if bg_assignment.is_active? && bg_assignment.id != id
+      if bg_assignment.is_active? && bg_assignment.id != self.id
         bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
       end
     end
