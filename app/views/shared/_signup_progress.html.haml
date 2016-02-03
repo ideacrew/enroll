@@ -35,10 +35,10 @@
     Complete
 
 - if step == 4 && defined? url
-  = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'CONTINUE', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
 - elsif step == 2
   %span.btn.btn-primary.btn-br.btn-block#btn-continue
-    Continue
+    CONTINUE
 - elsif step == 5 || step == 2
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
     CONTINUE
@@ -49,7 +49,7 @@
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn-waive btn btn-round btn-trans' if @enrollment && @enrollment.employee_role.present?
 - elsif step == 7
-  = link_to 'Continue', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
 - else
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
     CONTINUE
