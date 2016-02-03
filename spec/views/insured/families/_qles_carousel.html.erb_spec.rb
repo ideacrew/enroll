@@ -5,6 +5,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
     QualifyingLifeEventKind.delete_all
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
+    assign(:person, FactoryGirl.create(:person))
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
     render "insured/families/qles_carousel"
   end
