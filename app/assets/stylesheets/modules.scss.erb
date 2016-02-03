@@ -1,3 +1,7 @@
+$primary-color: #007bc4;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+
 .module {
 	&.update-browser-warning {
 			color: #000;
@@ -32,5 +36,21 @@
 					background-position: left bottom;
 				}
 			}
+	}
+	&.market-selection {
+		padding: 0 15% 5%;
+		.btn-primary {
+			padding: 0;
+			font-size: auto;
+			font-size: 12px;
+			background-color: transparent;
+			border: solid 1px $primary-color;
+			&.active {
+				background-color: $primary-color;
+				a {
+					color: $primay-active-button-text-color;
+				}
+			}
+		}
 	}
 }
