@@ -1,5 +1,5 @@
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
-  <% if !@manually_picked_role %>
+  <% if !@manually_picked_role && @person.has_multiple_roles? %>
       <div>
         <ul>
           <li class="label"><%=	link_to "EMPLOYEE", family_account_path(tab: 'home', market: "shop_market_events") %></li> |
