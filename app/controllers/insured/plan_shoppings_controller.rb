@@ -66,7 +66,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-    
+
     if @enrollment.is_special_enrollment?
       sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
       @enrollment.update_current(special_enrollment_period_id: sep_id)
@@ -115,7 +115,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.propogate_waiver
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Successful"
     else
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), alert: "Waive Failure"
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Failure"
     end
   end
 
