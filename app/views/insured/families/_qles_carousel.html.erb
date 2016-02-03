@@ -1,5 +1,5 @@
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
-<% if !@manually_picked_role.nil? && @person.has_multiple_roles? %>
+<% if !@manually_picked_role && @person.has_multiple_roles? %>
     <div class="module market-selection">
         <div class="btn-group btn-group-justified">
           <div class="btn-group">
