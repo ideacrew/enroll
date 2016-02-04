@@ -29,7 +29,9 @@
               </tr>
               <tr>
                 <th>Languages:</th>
-                <td><%= broker_or_staff_role.broker_agency_profile.languages_spoken.to_sentence %></td>
+                <td>
+                  <%= broker_or_staff_role.broker_agency_profile.languages_spoken.map do |lang| lang.upcase end.to_sentence %>
+                </td>
               </tr>
               <tr>
                 <th>Office Locations:</th>
@@ -42,7 +44,7 @@
               </tr>
               <tr>
                 <th>Phone Number:</th>
-                <td><%= broker_or_staff_role.broker_agency_profile.phone %></td>
+                <td><%= broker_or_staff_role.broker_agency_profile.primary_broker_role.phone %></td>
               </tr>
               <tr>
                 <th>History</th>
