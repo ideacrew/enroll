@@ -106,21 +106,17 @@ module Factories
         end
       end
 
-      if enrolled_enrollments.size.zero?
-        renewing_enrollments.each do |hbx_enrollment|
-          if hbx_enrollment.effective_on <= TimeKeeper.date_of_record
-            hbx_enrollment.begin_coverage!
-            hbx_enrollment.is_coverage_waived? ? hbx_enrollment.benefit_group_assignment.waive_benefit : hbx_enrollment.benefit_group_assignment.begin_benefit
-          end
+      renewing_enrollments.each do |hbx_enrollment|
+        if hbx_enrollment.effective_on <= TimeKeeper.date_of_record
+          hbx_enrollment.begin_coverage!
+          hbx_enrollment.is_coverage_waived? ? hbx_enrollment.benefit_group_assignment.waive_benefit : hbx_enrollment.benefit_group_assignment.begin_benefit
         end
       end
 
-      if renewing_enrollments.size.zero?
-        enrolled_enrollments.each do |hbx_enrollment|
-          if hbx_enrollment.effective_on <= TimeKeeper.date_of_record
-            hbx_enrollment.begin_coverage!
-            hbx_enrollment.benefit_group_assignment.begin_benefit
-          end
+      enrolled_enrollments.each do |hbx_enrollment|
+        if hbx_enrollment.effective_on <= TimeKeeper.date_of_record
+          hbx_enrollment.begin_coverage!
+          hbx_enrollment.benefit_group_assignment.begin_benefit
         end
       end
 
