@@ -34,8 +34,6 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def create
-    debugger
-
     # failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
     if params[:person].present?
       @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
