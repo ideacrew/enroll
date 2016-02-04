@@ -489,7 +489,7 @@ module ApplicationHelper
   end
 
   def qualify_qle_notice
-    content_tag(:span, class: :alert) do
+    content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
