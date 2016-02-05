@@ -38,6 +38,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+    allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
+    allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:active).and_return([hbx_enrollment])
   end
 
   context "GET new" do
@@ -75,6 +78,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(assigns(:person)).to eq person
+    end
+
+    it "should get hbx_enrollment when has active hbx_enrollments" do
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id
+      expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
     end
 
     context "individual" do
