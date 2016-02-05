@@ -109,15 +109,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     id = params.permit(:id)[:id]
     page = params.permit([:page])[:page]
     if current_user.has_broker_role?
-      broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
     elsif current_user.has_hbx_staff_role?
-      broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
       redirect_to new_broker_agencies_profile_path
       return
     end
 
-    total_families = broker_agency_profile.families
+    total_families = @broker_agency_profile.families
     @total = total_families.count
     @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
@@ -126,7 +126,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
        @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
     else
       @families = total_families[0..20]
-     end
+    end
 
     @family_count = @families.count
     respond_to do |format|
