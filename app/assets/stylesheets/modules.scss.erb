@@ -37,20 +37,22 @@ $primary-bold: 600;
 				}
 			}
 	}
-	&.market-selection {
-		padding: 0 15% 5%;
-		.btn-primary {
-			padding: 0;
-			font-size: auto;
-			font-size: 12px;
-			background-color: transparent;
-			border: solid 1px $primary-color;
-			&.active {
-				background-color: $primary-color;
-				a {
-					color: $primay-active-button-text-color;
-				}
-			}
-		}
-	}
+  &.market-selection {
+    padding: 0 15% 5%;
+    .btn-primary {
+      padding: 4%;
+      font-size: auto;
+      font-size: 13px;
+      background-color: transparent;
+      border: solid 1px #ccc;
+      border-radius: 3px;
+      text-transform: capitalize;
+      &.active {
+        background-color: $primary-color;
+        a {
+          color: $primay-active-button-text-color;
+        }
+      }
+    }
+  }
 }
