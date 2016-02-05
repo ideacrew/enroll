@@ -156,9 +156,9 @@ And(/Individual again clicks on add member button/) do
   input_field.click
   input_field.li(text: /Child/).click
   @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).wait_while_present
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).fire_event("onclick")
+  @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
+  @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present
+  @browser.radio(id: /dependent_naturalized_citizen_false/).fire_event("onclick")
   @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
