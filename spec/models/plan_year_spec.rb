@@ -1818,3 +1818,29 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 end
+
+describe PlanYear, "which has the concept of export eligibility" do
+  ALL_STATES = PlanYear.aasm.states.map(&:name).map(&:to_s)
+  INVALID_EXPORT_STATES = PlanYear::INELIGIBLE_FOR_EXPORT_STATES
+  EXPORTABLE_STATES = ALL_STATES - INVALID_EXPORT_STATES
+
+  subject { PlanYear.new(:aasm_state => export_state) }
+
+  INVALID_EXPORT_STATES.each do |astate|
+    describe "in #{astate} state" do
+      let(:export_state) { astate}
+      it "is not eligible for export" do
+        expect(subject.eligible_for_export?).not_to eq true
+      end
+    end
+  end
+
+  EXPORTABLE_STATES.each do |astate|
+    describe "in #{astate} state" do
+      let(:export_state) { astate}
+      it "is not eligible for export" do
+        expect(subject.eligible_for_export?).to eq true
+      end
+    end
+  end
+end

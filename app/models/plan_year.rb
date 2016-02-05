@@ -10,6 +10,8 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -57,6 +59,11 @@ class PlanYear
     ]
     )
   }
+
+  def eligible_for_export?
+    return false if self.aasm_state.blank?
+    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+  end
 
   def overlapping_published_plan_years
     self.employer_profile.plan_years.published_plan_years_within_date_range(self.start_on, self.end_on)
