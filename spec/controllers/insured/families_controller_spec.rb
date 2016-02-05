@@ -165,32 +165,37 @@ RSpec.describe Insured::FamiliesController do
     let(:employee_role) { [double("EmployeeRole")] }
     before :each do
       allow(person).to receive(:employee_roles).and_return(employee_roles)
-      allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(employee_roles).to receive(:active).and_return([employee_role])
-      allow(family).to receive(:coverage_waived?).and_return(true)
       allow(family).to receive(:active_family_members).and_return(family_members)
-      get :manage_family
     end
 
     it "should be a success" do
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      get :manage_family
       expect(response).to have_http_status(:success)
     end
 
     it "should render manage family section" do
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      get :manage_family
       expect(response).to render_template("manage_family")
     end
 
     it "should assign variables" do
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      get :manage_family
       expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family_members)
     end
 
     it "assigns variable to change QLE to IVL flow" do
+      allow(person).to receive(:has_multiple_roles?).and_return(true)
       get :manage_family, market: "shop_market_events"
       expect(assigns(:manually_picked_role)).to eq "shop_market_events"
     end
 
     it "assigns variable to change QLE to Employee flow" do
+      allow(person).to receive(:has_multiple_roles?).and_return(true)
       get :manage_family, market: "individual_market_events"
       expect(assigns(:manually_picked_role)).to eq "individual_market_events"
     end
