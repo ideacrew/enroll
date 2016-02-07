@@ -22,6 +22,10 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
+
+#
+  qle:
+    with_in_sixty_days: 60
 #
   individual_market:
     monthly_enrollment_due_on: 15

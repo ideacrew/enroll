@@ -231,7 +231,7 @@ end
 When /^the broker login in$/ do
   visit '/'
   click_link 'Broker Agency Portal'
-  find('.interaction-click-control-sign-in-existing-account').click
+  find('.interaction-click-control-sign-in-existing-account', wait: 10).click
 
   fill_in "user[login]", with: "broker1@dc.gov"
   find('#user_login').set("broker1@dc.gov")
