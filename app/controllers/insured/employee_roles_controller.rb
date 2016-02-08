@@ -100,7 +100,6 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       end
     else
-      @person.addresses = @old_addresses
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
