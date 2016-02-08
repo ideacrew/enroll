@@ -22,8 +22,9 @@ module Factories
       shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
       return nil if shop_enrollments.any? {|enrollment| enrollment.effective_on >= employer.renewing_plan_year.start_on }
 
-      prev_plan_year_start = employer.renewing_plan_year.start_on - 1.year
-      prev_plan_year_end = employer.renewing_plan_year.start_on - 1.day
+      @plan_year_start_on = employer.renewing_plan_year.start_on
+      prev_plan_year_start = @plan_year_start_on - 1.year
+      prev_plan_year_end = @plan_year_start_on - 1.day
 
       shop_enrollments.reject! {|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
@@ -175,8 +176,21 @@ module Factories
         renewal_enrollment.waive_coverage 
       end
 
-      renewal_enrollment.hbx_enrollment_members = active_enrollment.hbx_enrollment_members
+      renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
       renewal_enrollment
+    end
+      
+    def clone_enrollment_members(active_enrollment)
+      hbx_enrollment_members = active_enrollment.hbx_enrollment_members
+      hbx_enrollment_members.reject!{|hbx_enrollment_member| !hbx_enrollment_member.is_covered_on?(@plan_year_start_on - 1.day)  }
+      hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
+        members << HbxEnrollmentMember.new({
+          applicant_id: hbx_enrollment_member.applicant_id,
+          eligibility_date: @plan_year_start_on,
+          coverage_start_on: @plan_year_start_on,
+          is_subscriber: hbx_enrollment_member.is_subscriber
+        })
+      end
     end
 
     # Validate enrollment membership against benefit package-covered relationships
