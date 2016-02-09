@@ -8,7 +8,7 @@
         <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-trans btn-br btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
       <% end %>
     </div>
-<% unless @employer_profile.plan_years.blank? %>
+<% unless @employer_profile.plan_years.blank? || @employer_profile.published_plan_year.present? %>
   <% if @employer_profile.renewing_plan_year.blank? || @employer_profile.active_plan_year.blank? %>
     <div class="col-xs-12">
       <h4>Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to create more than one benefit package and offer different benefits to different employees, select 'Add Plan Year'. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
