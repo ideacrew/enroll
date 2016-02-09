@@ -207,7 +207,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "qualify_qle_notice" do
     it "should return notice" do
-      expect(helper.qualify_qle_notice).to include('<span class="alert">')
       expect(helper.qualify_qle_notice).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
     end
   end
