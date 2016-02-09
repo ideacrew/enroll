@@ -8,6 +8,30 @@
 </div>
 <%= render "employers/plan_years/employee_costs_modal" %>
 <fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%= f.object.id.to_s %>">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h1>
+        Benefit Package - Set Up
+      </h1>
+      <div class="row row-form-wrapper no-buffer plan-title">
+        <div class="col-xs-12 form-group form-group-lg">
+          <!-- Offset :  -->
+          <label class="title">NAME YOUR BENEFIT PACKAGE</label>
+          <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
+          <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-xs-12 form-group form-group-lg">
+          <!-- Offset :  -->
+          <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
+          <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
+        </div>
+      </div>
+      <br/>
+      <br/>
+    </div>
+  </div>
 
   <div class="row health">
     <div class="col-xs-12" style="position: relative;">
@@ -28,23 +52,6 @@
     </div>
     <br class="clear"/>
     <br/>
-    <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="row row-form-wrapper no-buffer plan-title">
-        <div class="col-xs-12 form-group form-group-lg">
-          <!-- Offset :  -->
-          <label class="title">NAME YOUR BENEFIT PACKAGE</label>
-          <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
-          <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-xs-12 form-group form-group-lg">
-          <!-- Offset :  -->
-          <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
-          <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
-        </div>
-      </div>
-    </div>
     <div class="col-xs-12 offerings">
       <div class="row row-form-wrapper no-buffer heading">
         <div class="col-xs-12" id="offering_slider_header">
@@ -71,6 +78,8 @@
     </div>
     <% i = f.index %>
     <% if @plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).blank? %>
+      <br/>
+      <br/>
       <div class="row">
         <div class="col-xs-12 edit-add-dental b bt-n" style="display: block;">
           <div class="col-xs-1">
