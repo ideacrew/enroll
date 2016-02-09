@@ -99,7 +99,7 @@ class CensusEmployeeImport
     (4..@sheet.last_row).map do |i|
       row = Hash[[column_header_row, roster.row(i)].transpose]
       record = parse_row(row)
-      break if record[:employee_relationship].nil?
+
       if record[:termination_date].present?
         census_employee = terminate_employee(record)
       else
