@@ -87,7 +87,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $('.benefit-group-fields:last').find('.benefits-fields .slider, .dental-benefits-fields .slider').bootstrapSlider
     formatter: (value) ->
       return 'Contribution Percentage: ' + value + '%'
-  $('.benefit-group-fields:last').find('.benefits-fields .slider, .dental-benefits-fields .slider').on 'slide', (slideEvt) ->
+  $('.benefit-group-fields:last').find('.benefits-fields .slider, .dental-benefits-fields .slider').on 'slideStop', (slideEvt) ->
     $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr 'value', slideEvt.value
     $(this).closest('.form-group').find('.slide-label').text slideEvt.value + '%'
     return

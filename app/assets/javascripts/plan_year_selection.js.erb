@@ -270,7 +270,7 @@ ready = function() {
 
   });
 
-  $(".benefits-fields .slider").on("slide", function(slideEvt) {
+  $(".benefits-fields .slider").on("slideStop", function(slideEvt) {
     $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
     $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
 
@@ -312,9 +312,11 @@ ready = function() {
     // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
     $(document).on('change', 'input.premium-storage-input', function() {
       if ( $(this).hasClass('slider') ) {
-        var data = $(this).val();
-        $(this).closest('.form-group').find('input').val(data);
-        $(this).closest('.form-group').find('.slide-label').text(data + "%");
+        $(this).on("slideStop", function(slideEvt) {
+          var data = $(this).val();
+          $(this).closest('.form-group').find('input').val(data);
+          $(this).closest('.form-group').find('.slide-label').text(data + "%");
+        });
       } else if ( $(this).hasClass('hidden-param') )  {
         var hidden = parseInt($(this).val());
         var mySlider = $(this).closest('.form-group').find('input.slider');
