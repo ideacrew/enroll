@@ -252,6 +252,14 @@ describe Family, type: :model, dbclean: :after_each do
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
         expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
       end
+      it "broker agency profile is popular" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.hire_broker_agency(writing_agent.id)
+        mikes_family.hire_broker_agency(writing_agent.id)
+        expect(Family.by_broker_agency_profile_id(broker_agency_profile.id).count).to eq(2)
+        expect(Family.by_broker_agency_profile_id(broker_agency_profile2.id).count).to eq(0)
+      end
 
     end
 

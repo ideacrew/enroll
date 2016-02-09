@@ -148,4 +148,92 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     end
   end
+
+  context "is_lawful_presence_status_satisfied?" do
+    let(:consumer_role) {double}
+    let(:benefit_package) {FactoryGirl.create(:benefit_package)}
+    let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
+    let(:role) {FactoryGirl.create(:consumer_role_object)}
+    let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package)}
+    let(:person) {double}
+
+    context "consumer_role aasm_state is fully_verified" do
+      before :each do
+        role.aasm_state = "fully_verified"
+      end
+      it "returns true for verification_successful state" do
+        role.lawful_presence_determination.aasm_state = "verification_successful"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns true for verification_pending state" do
+        role.lawful_presence_determination.aasm_state = "verification_pending"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns true for verification outstanding" do
+        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns array with benefit_eligibility_element_group fields" do
+        array = ["_id", "market_places", "enrollment_periods", "family_relationships",
+                 "benefit_categories", "incarceration_status", "age_range", "citizenship_status",
+                 "residency_status", "ethnicity", "cost_sharing", "lawful_presence_status"]
+        expect(benefit_package.benefit_eligibility_element_group.class.fields.keys).to eq array
+      end
+
+      it "returns true if insured_eligible_for_benefit_rule satisfies all criteria" do
+        allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        expect(rule.satisfied?).to eq [true, []]
+      end
+    end
+
+    context "consumer_role aasm_state is NOT fully_verified" do
+      before :each do
+        role.aasm_state = "verifications_pending"
+      end
+      it "returns true for verification_successful state" do
+        role.lawful_presence_determination.aasm_state = "verification_successful"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns true for verification_pending state" do
+        role.lawful_presence_determination.aasm_state = "verification_pending"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns false for verification outstanding" do
+        role.person.created_at = TimeKeeper.date_of_record - 95.days
+        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq false
+      end
+
+      it "returns true for verification outstanding and account created less than 90 days ago" do
+        role.person.created_at = TimeKeeper.date_of_record - 80.days
+        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        expect(rule.is_lawful_presence_status_satisfied?).to eq true
+      end
+
+      it "returns false if insured_eligible_for_benefit_rule fails" do
+        allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+        role.person.created_at = TimeKeeper.date_of_record - 95.days
+        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        expect(rule.satisfied?).to eq [false, [["eligibility failed on lawful_presence_status"]]]
+      end
+    end
+
+    context "is citizenship status satisfied" do
+      it "returns false if person is not lawfully present" do
+        role.citizen_status = "not_lawfully_present_in_us"
+        expect(rule.is_citizenship_status_satisfied?).to eq false
+      end
+
+      it "returns true if person is lawfully present" do
+        role.citizen_status = "alien_lawfully_present"
+        expect(rule.is_citizenship_status_satisfied?).to eq true
+      end
+    end
+  end
 end

@@ -186,12 +186,25 @@ class ApplicationController < ActionController::Base
 
     append_after_action :clear_current_user
 
-    def set_current_person
+    def set_current_person(required: true)
       if current_user.try(:person).try(:agent?)
         @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
       else
         @person = current_user.person
       end
+      redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
+    end
+
+    def set_current_person_succeeded?
+      return true if @person
+      message = {}
+      message[:message] = 'Application Exception - person required'
+      message[:session_person_id] = session[:person_id]
+      message[:user_id] = current_user.id
+      message[:email] = current_user.email
+      message[:url] = request.original_url
+      log(message, :severity=>'error')
+      return false
     end
 
     def actual_user

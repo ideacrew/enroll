@@ -197,7 +197,7 @@ end
 
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
   let(:family_id) { double }
-  let(:family) { instance_double("Family") }
+  let(:family) { Family.new }
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
@@ -279,9 +279,10 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       subject.save
     end
 
-    it "should create a new family member" do
+    it "should create a new family member and call save_relevant_coverage_households" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
     end

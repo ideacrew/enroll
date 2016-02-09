@@ -69,6 +69,7 @@ class Family
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
+  index({"households.hbx_enrollments.kind" => 1})
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.terminated_on" => 1}, { sparse: true })
@@ -110,7 +111,8 @@ class Family
   scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-
+  scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
+  
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
@@ -135,6 +137,7 @@ class Family
   scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
 
   def update_family_search_collection
@@ -284,6 +287,14 @@ class Family
     special_enrollment_periods.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def earliest_effective_shop_sep
+    special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def earliest_effective_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   # List of SEPs active for this Application Group today, or passed date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
@@ -392,7 +403,7 @@ class Family
     existing_agency = current_broker_agency
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
     fire_broker_agency(existing_agency) if existing_agency
-    start_on = TimeKeeper.date_of_record.to_date.beginning_of_day
+    start_on = Time.now
     broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     broker_agency_accounts.push(broker_agency_account)
     self.save
@@ -479,6 +490,12 @@ class Family
 
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def save_relevant_coverage_households
+    households.each do |household|
+      household.coverage_households.each{|hh| hh.save }
+    end
   end
 
   def has_aptc_hbx_enrollment?

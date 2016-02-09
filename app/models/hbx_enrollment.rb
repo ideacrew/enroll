@@ -155,20 +155,44 @@ class HbxEnrollment
     )
   end
 
-  def self.by_hbx_id(policy_hbx_id)
-    families = Family.with_enrollment_hbx_id(policy_hbx_id)
-    households = families.flat_map(&:households)
-    households.flat_map(&:hbx_enrollments).select do |hbxe|
-      hbxe.hbx_id == policy_hbx_id
-    end
-  end
+  class << self
 
-  def self.update_individual_eligibilities_for(consumer_role)
-    found_families = Family.find_all_by_person(consumer_role.person)
-    found_families.each do |ff|
-      ff.households.each do |hh|
-        hh.hbx_enrollments.active.each do |he|
-          he.evaluate_individual_market_eligiblity
+    def by_hbx_id(policy_hbx_id)
+      families = Family.with_enrollment_hbx_id(policy_hbx_id)
+      households = families.flat_map(&:households)
+      households.flat_map(&:hbx_enrollments).select do |hbxe|
+        hbxe.hbx_id == policy_hbx_id
+      end
+    end
+
+    def advance_day(new_date)
+      
+      # #FIXME Families with duplicate renewals
+      families_with_effective_renewals_as_of(new_date).each do |family|
+        family.enrollments.renewing.each do |hbx_enrollment|
+          if hbx_enrollment.effective_on <= new_date
+            if census_employee = hbx_enrollment.census_employee
+              if census_employee.renewal_benefit_group_assignment.may_select_coverage?            
+                census_employee.renewal_benefit_group_assignment.select_coverage!
+              end
+            end
+            hbx_enrollment.begin_coverage!
+          end
+        end
+      end
+    end
+
+    def families_with_effective_renewals_as_of(new_date)
+      Family.by_enrollment_shop_market.by_enrollment_renewing.where({ :"households.hbx_enrollments.effective_on".lte => new_date }).limit(10)
+    end
+
+    def update_individual_eligibilities_for(consumer_role)
+      found_families = Family.find_all_by_person(consumer_role.person)
+      found_families.each do |ff|
+        ff.households.each do |hh|
+          hh.hbx_enrollments.active.each do |he|
+            he.evaluate_individual_market_eligiblity
+          end
         end
       end
     end
@@ -261,7 +285,7 @@ class HbxEnrollment
   end
 
   def is_coverage_waived?
-    inactive?
+    inactive? || renewing_waived?
   end
 
   def is_shop?
@@ -330,6 +354,7 @@ class HbxEnrollment
     end
   end
 
+
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
   end
@@ -351,6 +376,36 @@ class HbxEnrollment
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
 
+  def select_applicable_broker_account(broker_accounts)
+    last_broker_before_purchase = broker_accounts.select do |baa|
+      (baa.start_on < self.time_of_purchase)# &&
+    end.sort_by(&:start_on).last
+    return nil if last_broker_before_purchase.nil?
+    if  ((last_broker_before_purchase.end_on.blank?) || (last_broker_before_purchase.end_on >= self.time_of_purchase))
+      last_broker_before_purchase
+    else
+      nil
+    end
+  end
+
+  def shop_broker_agency_account
+    return nil if self.employer_profile.blank?
+    return nil if self.employer_profile.broker_agency_accounts.empty?
+    select_applicable_broker_account(self.employer_profile.broker_agency_accounts)
+  end
+
+  def broker_agency_account
+    return shop_broker_agency_account if is_shop?
+    return nil if family.broker_agency_accounts.empty?
+    select_applicable_broker_account(family.broker_agency_accounts)
+  end
+
+  def time_of_purchase
+    return submitted_at unless submitted_at.blank?
+    updated_at
+  end
+
+=begin
   def broker_agency_profile=(new_broker_agency_profile)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a? BrokerAgencyProfile
     self.broker_agency_profile_id = new_broker_agency_profile._id
@@ -361,7 +416,7 @@ class HbxEnrollment
     return @broker_agency_profile if defined? @broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
   end
-
+=end
   def has_broker_agency_profile?
     broker_agency_profile_id.present?
   end
@@ -512,9 +567,13 @@ class HbxEnrollment
     nil
   end
 
+
+  # census employees with hire date before open enrollments && eligible date is plan year start are not new hires...if eligible date is later then they should get new hire window
+  # census employees updated before open enrollment will not get new hire window
+
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     if qle
-      qle_effective_date = hbx_enrollment.family.earliest_effective_sep.effective_on
+      qle_effective_date = hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
@@ -540,7 +599,7 @@ class HbxEnrollment
         census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
@@ -707,6 +766,8 @@ class HbxEnrollment
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
 
+    state :coverage_expired
+
     state :inactive   # :after_enter inform census_employee
 
     state :auto_renewing
@@ -731,8 +792,8 @@ class HbxEnrollment
     end
 
     event :select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
-      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection
+      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+      transitions from: :auto_renewing, to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
     end
 
     event :transmit_coverage, :after => :record_transition do
@@ -790,6 +851,28 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
     end
+
+    event :begin_coverage, :after => :record_transition do
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified], to: :coverage_enrolled
+      transitions from: :renewing_waived, to: :inactive
+    end
+
+    event :expire_coverage, :after => :record_transition do
+      transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
+    end
+
+    event :cancel_coverage, :after => :record_transition do
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified], to: :coverage_canceled
+      transitions from: :renewing_waived, to: :inactive 
+    end
+  end
+
+  def can_be_expired?
+    if benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record
+      true
+    else
+      false
+    end
   end
 
   def decorated_hbx_enrollment
@@ -804,6 +887,42 @@ class HbxEnrollment
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+    end
+  end
+
+  def can_select_coverage?
+    if is_shop?
+      coverage_effective_date = nil
+      if special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
+        coverage_effective_date = special_enrollment_period.effective_on
+      elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+        coverage_effective_date = employee_role.coverage_effective_on
+      elsif benefit_group.is_open_enrollment?
+        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        if open_enrollment_effective_date < employee_role.coverage_effective_on
+          return false
+        end
+        coverage_effective_date = open_enrollment_effective_date
+      end
+
+      if coverage_effective_date.present?
+        benefit_group_assignment_valid?(coverage_effective_date)
+      else
+        false
+      end
+    else
+      true
+    end
+  end
+
+  private 
+
+  def benefit_group_assignment_valid?(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+      true
+    else
+      false
     end
   end
 end

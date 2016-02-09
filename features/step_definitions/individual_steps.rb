@@ -24,7 +24,11 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-person-last-name/).set(@u.last_name :last_name1)
-  @browser.text_field(class: /interaction-field-control-person-name-sfx/).set("Jr")
+  @browser.p(text: /suffix/i).click
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.wait_until_present
+  suffix = @browser.element(class: /selectric-scroll/)
+  suffix.li(text: /Jr./).click
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(@u.adult_dob)
   @browser.h1(class: /darkblue/).click
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn1)
@@ -152,9 +156,9 @@ And(/Individual again clicks on add member button/) do
   input_field.click
   input_field.li(text: /Child/).click
   @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).wait_while_present
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).fire_event("onclick")
+  @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
+  @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present
+  @browser.radio(id: /dependent_naturalized_citizen_false/).fire_event("onclick")
   @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present

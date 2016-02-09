@@ -319,6 +319,10 @@ module ApplicationHelper
     end
   end
 
+  def get_header_text(controller_name)
+      portal_display_name(controller_name)
+  end
+
   def can_register_new_account
     # Do this once we have invites working:
     # !params[:invitation_id].blank?
@@ -488,6 +492,19 @@ module ApplicationHelper
     'Confirm'
   end
 
+
+  def qualify_qle_notice
+    content_tag(:span, class: :alert) do
+      concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
+      concat link_to("Click here", find_sep_insured_families_path)
+      concat " to see if you qualify for a Special Enrollment period"
+    end
+  end
+
+  def disable_purchase?(disabled, hbx_enrollment)
+    disabled || !hbx_enrollment.can_select_coverage?
+  end
+
   def get_key_and_bucket(uri)
     splits = uri.split('#')
     key = splits.last
@@ -498,5 +515,23 @@ module ApplicationHelper
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "local"
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
+  end
+
+  def admin_docs_filter(filter_param, title = nil, style = nil)
+    direction = filter_param == sort_filter && sort_direction == 'asc' ? 'desc' : 'asc'
+    style = direction if style == 'admin_docs'
+    link_to title, consumer_role_status_documents_path(:sort => filter_param, :direction => direction), remote: true, class: style
+  end
+
+  def docs_waiting_for_review
+    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
+  end
+
+  def missing_docs
+    Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').count
+  end
+
+  def all_unverified
+    number_with_delimiter(@unverified_persons.count)
   end
 end

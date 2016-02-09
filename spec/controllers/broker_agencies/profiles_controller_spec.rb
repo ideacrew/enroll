@@ -188,4 +188,49 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:orgs)).to eq orgs
     end
   end
+
+  describe "family_index" do
+    before :all do
+      org = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization:org)
+      broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)
+      person = broker_role.person
+      @current_user = FactoryGirl.create(:user, person: person, roles: [:broker])
+      families = []
+      30.times.each do
+        family = FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(100000))
+        family.hire_broker_agency(broker_role.id)
+        families << family
+      end
+      families[0].primary_applicant.person.update_attributes!(last_name: 'Jones1')
+      families[1].primary_applicant.person.update_attributes!(last_name: 'Jones2')
+      families[2].primary_applicant.person.update_attributes!(last_name: 'Jones3')
+    end
+
+    it 'should render 21 familes' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(assigns(:families).count).to eq(21)
+      expect(assigns(:page_alphabets)).to include("J")
+      expect(assigns(:page_alphabets)).to include("S")
+    end
+
+    it "should render families starting with J" do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id, page: 'J'
+      expect(assigns(:families).count).to eq(3)
+    end
+
+    it "should render families named Smith" do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
+      expect(assigns(:families).count).to eq(27)
+    end
+  end
 end
