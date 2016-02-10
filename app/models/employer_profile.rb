@@ -19,6 +19,9 @@ class EmployerProfile
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
+  ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+  INACTIVE_STATES = ["suspended", "ineligible"]
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -52,8 +55,8 @@ class EmployerProfile
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :active,      ->{ any_in(aasm_state: ["applicant", "registered", "eligible", "binder_paid", "enrolled"]) }
-  scope :inactive,    ->{ any_in(aasm_state: ["suspended", "ineligible"]) }
+  scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
+  scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
   scope :all_renewing, ->{ Organization.all_employers_renewing }
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
@@ -143,9 +146,9 @@ class EmployerProfile
 
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
-    plan_year = find_plan_year_by_date(today)
-    # @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
-    @active_plan_year = plan_year if (plan_year && plan_year.is_published?)
+    if plan_year = plan_years.published_plan_years_by_date(today).first
+      @active_plan_year = plan_year
+    end
   end
 
   def latest_plan_year
@@ -162,10 +165,6 @@ class EmployerProfile
 
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
-  end
-
-  def find_plan_year_by_date(target_date)
-    plan_years.published.detect{ |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
   end
 
   def find_plan_year_by_effective_date(target_date)
@@ -242,18 +241,87 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def advance_day(new_date)
+    def organizations_with_open_enrollment_begin_or_end(new_date)
+      Organization.where( "$and" => [ 
+        {
+          "$or" => [
+            {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
+            {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day}
+          ]
+        }, 
+        { :"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE }
+      ])
+    end
 
-      # Employer activities that take place monthly - on first of month
-      if new_date.day == 1
-        orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
-        orgs.each do |org|
-          org.employer_profile.employer_profile_account.advance_billing_period!
-          if org.employer_profile.active_plan_year.present?
-            Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
-          end
+    def oranizations_with_plan_year_begin_or_end(new_date)
+      Organization.where( "$and" => [ 
+        { 
+          "$or" => [ 
+            {:"employer_profile.plan_years.start_on" => new_date}, 
+            {:"employer_profile.plan_years.end_on" => (new_date - 1.day)} 
+          ] 
+        },
+        { :"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE }
+      ])
+    end
+
+    def organizations_eligible_for_renewal(new_date)
+      months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
+
+      Organization.where(
+        "$and" => [
+          {:"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED },
+          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) }
+        ]
+      )
+    end
+
+    def advance_day(new_date)
+      open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+      organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
+        open_enrollment_factory.employer_profile = organization.employer_profile
+
+        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => new_date).any?
+          open_enrollment_factory.begin_open_enrollment
+        end
+
+        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on" => (new_date - 1.day)).any?
+          open_enrollment_factory.end_open_enrollment
+        end     
+      end
+
+      employer_enroll_factory = Factories::EmployerEnrollFactory.new
+      oranizations_with_plan_year_begin_or_end(new_date).each do |organization|
+        employer_enroll_factory.employer_profile = organization.employer_profile
+
+        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => new_date).any?
+          employer_enroll_factory.begin
+        end
+
+        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
+          employer_enroll_factory.end
         end
       end
+
+      plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
+      organizations_eligible_for_renewal(new_date).each do |organization|
+        plan_year_renewal_factory.employer_profile = organization.employer_profile
+          plan_year_renewal_factory.is_congress = false # TODO handle congress differently
+          plan_year_renewal_factory.renew
+        end
+      end
+
+
+      # Employer activities that take place monthly - on first of month
+      # if new_date.day == 1
+      #   orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
+      #   orgs.each do |org|
+      #     org.employer_profile.employer_profile_account.advance_billing_period!
+      #     if org.employer_profile.active_plan_year.present?
+      #       Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
+      #     end
+      #   end
+      # end
 
       # Find employers with events today and trigger their respective workflow states
       appeal_period = (Settings.
