@@ -82,7 +82,7 @@
             <i class="fa fa-trash-o fa-2x"></i>
             <% end %>
 
-            <td><%= census_employee.renewal_benefit_group_assignment.nil? ? "" : census_employee.renewal_benefit_group_assignment.aasm_state.humanize %></td>
+            <td><%= renewal_enrollment_state(census_employee) %></td>
 
           </td>
         </tr>

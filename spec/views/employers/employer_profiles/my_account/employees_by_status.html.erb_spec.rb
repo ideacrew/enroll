@@ -99,10 +99,11 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   end
 
   context "renewal enrollment state" do
+
+    let(:benefit_group_assignment) {BenefitGroupAssignment.new()}
+
     before do
-      benefit_group = BenefitGroup.new({plan_year: PlanYear.new()})
-      benefit_group_assignment = BenefitGroupAssignment.new()
-      allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
+      benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
     end
 
@@ -110,7 +111,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Renewal Enrollment Status/)
-      expect(rendered).to match(/Initialized/)
+      expect(rendered).to match(/#{benefit_group_assignment.aasm_state.humanize}/)
     end
   end
 
