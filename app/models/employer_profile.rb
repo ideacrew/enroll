@@ -306,22 +306,20 @@ class EmployerProfile
       plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
       organizations_eligible_for_renewal(new_date).each do |organization|
         plan_year_renewal_factory.employer_profile = organization.employer_profile
-          plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-          plan_year_renewal_factory.renew
-        end
+        plan_year_renewal_factory.is_congress = false # TODO handle congress differently
+        plan_year_renewal_factory.renew
       end
 
-
       # Employer activities that take place monthly - on first of month
-      # if new_date.day == 1
-      #   orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
-      #   orgs.each do |org|
-      #     org.employer_profile.employer_profile_account.advance_billing_period!
-      #     if org.employer_profile.active_plan_year.present?
-      #       Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
-      #     end
-      #   end
-      # end
+      if new_date.day == 1
+        orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
+        orgs.each do |org|
+          org.employer_profile.employer_profile_account.advance_billing_period!
+          if org.employer_profile.active_plan_year.present?
+            Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
+          end
+        end
+      end
 
       # Find employers with events today and trigger their respective workflow states
       appeal_period = (Settings.
