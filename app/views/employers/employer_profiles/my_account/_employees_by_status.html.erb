@@ -27,6 +27,8 @@
           <!--<th>Coverage Kind</th>-->
           <th>Enrollment Status (Coverage Kind)</th>
 
+          <th>Renewal Enrollment Status</th>
+
           <th>
           </th>
         </tr>
@@ -79,6 +81,8 @@
             <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
             <i class="fa fa-trash-o fa-2x"></i>
             <% end %>
+
+            <td><%= census_employee.renewal_benefit_group_assignment.nil? ? "" : census_employee.renewal_benefit_group_assignment.aasm_state.humanize %></td>
 
           </td>
         </tr>

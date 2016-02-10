@@ -97,4 +97,21 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       expect(rendered).to match /No results found/
     end
   end
+
+  context "renewal enrollment state" do
+    before do
+      benefit_group = BenefitGroup.new({plan_year: PlanYear.new()})
+      benefit_group_assignment = BenefitGroupAssignment.new()
+      allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
+      allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
+    end
+
+    it "should displays the renewal enrollment aasm state" do
+      assign(:census_employees, [census_employee1])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to match(/Renewal Enrollment Status/)
+      expect(rendered).to match(/Initialized/)
+    end
+  end
+
 end
