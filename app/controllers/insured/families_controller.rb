@@ -166,12 +166,11 @@ class Insured::FamiliesController < FamiliesController
       log(message, {:severity => "error"})
       raise e
     end
-
     @qualifying_life_events = []
-    if @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-    else
+    if @person.employee_roles.active.any?
       @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+    else
+      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
     end
   end
 
