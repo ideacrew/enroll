@@ -77,7 +77,6 @@ module Factories
         person = employee_relationship.match_person
 
         if person.blank?
-          @count += 1
           raise CensusEmployeeFactoryError, "No person match found!!"
         end
       else
