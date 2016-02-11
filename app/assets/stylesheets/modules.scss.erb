@@ -1,0 +1,78 @@
+$primary-color: #007bc4;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+
+.module {
+	&.employer-welcome {
+		.left-icon-section {
+			margin-bottom: 2.5%;
+			a {
+				cursor: pointer;
+				&:hover {
+					text-decoration: underline;
+				}
+				.fa {
+					color: #007bc4;
+				}
+			}
+			&.important {
+				margin-top: 7.5%;
+				.pdf-image {
+					img {
+						max-height: 80px;
+					}
+				}
+			}
+			h4 {
+				margin-top: 0;
+			}
+			.x-right.dn {
+				margin-bottom: 5%;
+			}
+			.icon-left-download {
+				padding: 10px 0;
+			}
+		}
+		.close-right {
+			.x {
+				img {
+					cursor: pointer;
+				}
+			}
+		}
+	}
+  &.market-selection {
+    padding: 0 15% 5%;
+    .btn-primary {
+      padding: 4%;
+      font-size: auto;
+      font-size: 13px;
+      background-color: transparent;
+      border: solid 1px #ccc;
+      border-radius: 3px;
+      text-transform: capitalize;
+      &.active {
+        background-color: $primary-color;
+        a {
+          color: $primay-active-button-text-color;
+        }
+      }
+    }
+  }
+	&.modal-footer {
+		.modal-sbc-link {
+			text-align: left;
+			position: relative;
+			.fa.fa-file-pdf-o {
+				margin: 2px auto auto 5px;
+			}
+			.sbc-text {
+				font-size: 14px;
+				margin-left: 10px;
+				position: absolute;
+				white-space: nowrap;
+				top: 10px;
+			}
+		}
+	}
+}
