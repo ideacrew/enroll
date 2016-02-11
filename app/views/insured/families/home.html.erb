@@ -18,6 +18,7 @@
       <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
       </div>
     <% end %>
+    <%= render 'employer_panel' if show_employer_panel?(@person, @hbx_enrollments) %>
     <%= render partial: 'shop_for_plans_widget' %>
     <%= render partial: 'apply_for_medicaid_widget' %>
 
