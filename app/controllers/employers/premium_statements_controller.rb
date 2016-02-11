@@ -6,6 +6,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
     @hbx_enrollments = @current_plan_year.hbx_enrollments.first(100) rescue []
+    @hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active? }
 
     # @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
@@ -26,7 +27,7 @@ private
         csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
         "Employee Premium", "Total Premium"]
         hbx_enrollments.each do |enrollment|
-          ee = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
+          ee = enrollment.census_employee
           next if ee.blank?
           csv << [  ee.full_name,
                     ee.ssn,
