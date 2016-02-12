@@ -18,20 +18,6 @@ When(/I use unique values/) do
   @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
 end
 
-Before "@watir" do
-  extend WatirScreenshots
-  @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
-  @browser.window.resize_to(1440, 900)
-  @screen_count = 0
-  @take_screens = ENV.has_key?("DISABLE_WATIR_SCREENSHOTS") ? false : true
-  @keep_browser_open = ENV.has_key?("KEEP_WATIR_BROWSERS_OPEN") ? true : false
-end
-
-After "@watir" do
-  @browser.close unless @keep_browser_open
-  @take_screens = false if @take_screens
-end
-
 def people
   return @a if defined?(@a)
   @a = {

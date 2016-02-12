@@ -129,7 +129,9 @@ end
 group :test do
   gem 'mongoid-rspec'
   gem 'watir'
-  gem 'cucumber-rails', '1.4.3', :require => false
+  gem 'cucumber-rails', '~> 1.4.2', :require => false
+  gem 'poltergeist'
+  gem 'capybara-screenshot'
   gem 'database_cleaner', '1.5.1'
   gem 'shoulda-matchers', '3.1.1'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
