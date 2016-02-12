@@ -113,7 +113,6 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         dental_reference_plan_id: double("id"),
         dental_reference_plan: reference_plan_1,
         dental_plan_option_kind: 'single_plan',
-        elected_dental_plan_ids: '1231313213123',
         elected_dental_plan_ids: [:dental_reference_plan_id, :dental_reference_plan_id]
 
 

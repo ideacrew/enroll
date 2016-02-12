@@ -505,7 +505,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
-    it "shouldn't see dental radio option" do
+    it "should see dental radio option" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('#coverage_kind_dental')
     end
@@ -529,6 +529,24 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('h3', text: 'Marketplace')
     end
+
+    context "consumer with both roles but employee isn't offering dental" do
+      let(:benefit_group_no_dental) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: '', elected_dental_plan_ids: []) }
+
+      it "dental option should have a class of dn" do
+        allow(employee_role).to receive(:benefit_group).and_return(benefit_group_no_dental)
+        render file: "insured/group_selection/new.html.erb"
+
+        expect(rendered).to have_selector('.n-radio-row.dn')
+      end
+
+      it "dental option should be visible" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to_not have_selector('.n-radio-row.dn')
+      end
+
+    end
+
   end
 
 end
