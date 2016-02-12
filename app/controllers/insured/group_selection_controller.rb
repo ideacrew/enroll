@@ -33,7 +33,7 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     elsif @market_kind == 'shop'
-      @hbx_enrollment = @family.active_household.hbx_enrollments.active.last unless @hbx_enrollment.present?
+      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.active.last unless @hbx_enrollment.present?
     end
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
