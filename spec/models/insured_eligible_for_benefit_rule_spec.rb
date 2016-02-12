@@ -203,7 +203,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
-      it "returns false for verification outstanding and account created more than 90 days ago" do
+      it "returns false for verification outstanding and event fired more than 90 days ago" do
         args = OpenStruct.new
         args.determined_at = TimeKeeper.date_of_record - 95.days
         args.vlp_authority = "dhs"
@@ -213,7 +213,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         expect(rule.is_lawful_presence_status_satisfied?).to eq false
       end
 
-      it "returns true for verification outstanding and account created less than 90 days ago" do
+      it "returns true for verification outstanding and event fired less than 90 days ago" do
         args = OpenStruct.new
         args.determined_at = TimeKeeper.date_of_record - 80.days
         args.vlp_authority = "dhs"
