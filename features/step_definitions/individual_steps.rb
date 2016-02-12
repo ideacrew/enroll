@@ -156,9 +156,9 @@ And(/Individual again clicks on add member button/) do
   input_field.click
   input_field.li(text: /Child/).click
   @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).wait_while_present
-  @browser.radio(id: /dependent_eligible_immigration_status_false/).fire_event("onclick")
+  @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
+  @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present
+  @browser.radio(id: /dependent_naturalized_citizen_false/).fire_event("onclick")
   @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
   @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
   @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
@@ -174,26 +174,20 @@ end
 
 And(/I click on continue button on group selection page/) do
   if !HbxProfile.current_hbx.under_open_enrollment?
-
     click_when_present(@browser.a(text: /Had a baby/))
-
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
-
+    click_when_present @browser.a(class: 'ui-state-default')
+    wait_and_confirm_text(/CONTINUE/)
     click_when_present @browser.a(class: 'interaction-click-control-continue')
-
     wait_and_confirm_text /SELECT EFFECTIVE ON KIND/i
-
     effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
-
     click_when_present(effective_field)
     effective_field.li(index: 1).click
-
     @browser.div(class: /success-info/).wait_until_present
     sleep 1
     @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).fire_event("onclick")
   end
-
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 

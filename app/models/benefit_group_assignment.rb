@@ -134,9 +134,24 @@ class BenefitGroupAssignment
     end
   end
 
-  def make_benefit_group_assignment_active
-    census_employee.reset_active_benefit_group_assignments(self)
-    update_attributes(is_active: true)
+  def waive_benefit
+    waive_coverage! if may_waive_coverage?
+    make_active
+  end
+
+  def begin_benefit
+    select_coverage! if may_select_coverage?
+    make_active
+  end
+
+  def make_active
+    census_employee.benefit_group_assignments.each do |bg_assignment|
+      if bg_assignment.is_active? && bg_assignment.id != self.id
+        bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
+      end
+    end
+
+    update_attributes(is_active: true) unless is_active?
   end
 
   private

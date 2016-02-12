@@ -4,6 +4,7 @@ RSpec.describe "insured/families/_qles_panel.html.erb" do
   before :each do
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
+    assign(:person, FactoryGirl.create(:person))
     render "insured/families/qles_panel"
   end
 
