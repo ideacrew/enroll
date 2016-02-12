@@ -40,7 +40,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
     allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
     allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:active).and_return([hbx_enrollment])
+    allow(hbx_enrollments).to receive_message_chain(:shop_market, :active){ [hbx_enrollment] }
   end
 
   context "GET new" do
