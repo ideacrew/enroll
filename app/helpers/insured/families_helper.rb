@@ -83,6 +83,7 @@ module Insured::FamiliesHelper
 
     show_panel = true
     employee_role = person.active_employee_roles.last
+    return false if employee_role.census_employee.present? && employee_role.census_employee.active_benefit_group_assignment.try(:coverage_selected?)
     if person.primary_family and person.primary_family.latest_household
       coverage_household = person.primary_family.latest_household.immediate_family_coverage_household
       hbx_enrollment = person.primary_family.latest_household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household) rescue nil
