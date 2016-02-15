@@ -57,7 +57,7 @@ class InsuredEligibleForBenefitRule
 
     cost_sharing = @benefit_package.cost_sharing
     csr_kind = tax_household.current_csr_eligibility_kind
-    return true if csr_kind.blank? or cost_sharing.blank?
+    return true if csr_kind.blank? || cost_sharing.blank?
     csr_kind == cost_sharing
   end
 
@@ -88,13 +88,13 @@ class InsuredEligibleForBenefitRule
   def is_residency_status_satisfied?
     return true if @benefit_package.residency_status.include?("any")
 
-    if @benefit_package.residency_status.include?("state_resident") and @role.present?
+    if @benefit_package.residency_status.include?("state_resident") && @role.present?
       person = @role.person
       return true if person.is_dc_resident?
 
       #TODO person can have more than one families
       person.families.last.family_members.active.each do |family_member|
-        if age_on_next_effective_date(family_member.dob) >= 19 and family_member.is_dc_resident?
+        if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
           return true
         end
       end
