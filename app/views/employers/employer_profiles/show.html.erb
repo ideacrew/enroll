@@ -57,12 +57,16 @@
       </article>
     </section>
   <% end %>
+  <% if @employer_profile.show_plan_year.present? %>
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
       <h3>Premium Billing Report</h3>
-        <% if @employer_profile.show_plan_year.present? %>
+         <% if TimeKeeper.date_of_record.to_date < @employer_profile.show_plan_year.start_on.to_date %>
+         <span><%= @employer_profile.show_plan_year.start_on.to_date.beginning_of_month %> - <%= @employer_profile.show_plan_year.start_on.to_date.end_of_month %></span>
+
+         <% elsif TimeKeeper.date_of_record.to_date >= @employer_profile.show_plan_year.start_on.to_date %>
           <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
-        <% end %>
+          <% end %>
         <br/>
         <br/>
         <table>
@@ -83,6 +87,8 @@
     </article>
   </section>
   <br/>
+  <% end %>
+
 
   <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
     <article>
