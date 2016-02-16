@@ -17,55 +17,41 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   describe "#show_employer_panel" do
     let(:person) {FactoryGirl.build(:person)}
     let(:employee_role) {FactoryGirl.build(:employee_role)}
-    let(:hbx_enrollment) {HbxEnrollment.new}
-    let(:hbx_enrollments) {double}
+    let(:census_employee) {FactoryGirl.build(:census_employee)}
     let(:person_with_employee_role) {FactoryGirl.create(:person, :with_employee_role)}
+    let(:benefit_group_assignment) {BenefitGroupAssignment.new()}
 
     it "should return false without person" do
-      expect(helper.show_employer_panel?(nil, [])).to eq false
+      expect(helper.show_employer_panel?(nil)).to eq false
     end
 
     it "should return false with person who has no active employee_role" do
       allow(person).to receive(:has_active_employee_role?).and_return false
-      expect(helper.show_employer_panel?(person, [])).to eq false
-    end
-
-    it "should return true with hbx_enrollments when it is not empty array" do
-      expect(helper.show_employer_panel?(person_with_employee_role, [1,2])).to eq true
+      expect(helper.show_employer_panel?(person)).to eq false
     end
 
     context "with person who has active_employee_roles" do
       before :each do
         allow(person).to receive(:has_active_employee_role?).and_return true
         allow(person).to receive(:active_employee_roles).and_return [employee_role]
+        allow(employee_role).to receive(:census_employee).and_return census_employee
       end
 
-      it "should return true without hbx_enrollments" do
-        expect(helper.show_employer_panel?(person, [])).to eq true
+      it "should return false when employee_role has active benefit group assignment" do
+        allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+        allow(benefit_group_assignment).to receive(:initialized?).and_return false
+        expect(helper.show_employer_panel?(person)).to eq false
       end
 
-      it "should return true with hbx_enrollments which has no shop_market" do
-        allow(hbx_enrollments).to receive(:shop_market).and_return []
-        expect(helper.show_employer_panel?(person, hbx_enrollments)).to eq true
-      end
+      context "when employee_role has active benefit_group_assignment which is not initialized" do
+        before do
+          allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+          allow(benefit_group_assignment).to receive(:initialized?).and_return true
+        end
 
-      it "should return false with hbx_enrollments which employee_role is include person's employee_role" do
-        f = FactoryGirl.create(:family, :with_primary_family_member)
-        hbx = FactoryGirl.create(:hbx_enrollment, household: f.latest_household)
-        hbx_enrollments = f.enrollments
-        per = f.primary_family_member.person
-        #allow(hbx_enrollments).to receive(:shop_market).and_return hbx_enrollments
-        #allow(hbx_enrollments).to receive(:class).and_return Mongoid::Criteria
-        #allow(hbx_enrollments).to receive(:entries).and_return [hbx_enrollment]
-        #allow(hbx_enrollment).to receive(:employee_role_id).and_return employee_role.id
-        expect(helper.show_employer_panel?(per, hbx_enrollments)).to eq false
-      end
-
-      it "should return true with hbx_enrollments which employee_role is not include person's employee_role" do
-        allow(hbx_enrollments).to receive(:shop_market).and_return hbx_enrollments
-        allow(hbx_enrollments).to receive(:entries).and_return [hbx_enrollment]
-        allow(hbx_enrollment).to receive(:employee_role_id).and_return "123"
-        expect(helper.show_employer_panel?(person, hbx_enrollments)).to eq true
+        it "should return false" do
+          expect(helper.show_employer_panel?(person)).to eq false
+        end
       end
     end
   end

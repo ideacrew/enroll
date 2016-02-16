@@ -78,21 +78,17 @@ module Insured::FamiliesHelper
     options
   end
 
-  def show_employer_panel?(person, hbx_enrollments)
-    return false if person.blank? or !person.has_active_employee_role?
+  def show_employer_panel?(person)
+    return false if person.blank? || !person.has_active_employee_role?
 
-    show_panel = true
     employee_role = person.active_employee_roles.last
-    if person.primary_family and person.primary_family.latest_household
+    return false if employee_role.census_employee.present? && employee_role.census_employee.active_benefit_group_assignment.present? && !employee_role.census_employee.active_benefit_group_assignment.initialized?
+
+    if person.primary_family.present? && person.primary_family.latest_household.present?
       coverage_household = person.primary_family.latest_household.immediate_family_coverage_household
       hbx_enrollment = person.primary_family.latest_household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household) rescue nil
-      show_panel = hbx_enrollment.can_select_coverage? if hbx_enrollment.present?
+      return hbx_enrollment.can_select_coverage? if hbx_enrollment.present?
     end
-
-    show_panel = show_panel && true if hbx_enrollments.blank? or (hbx_enrollments.class == Mongoid::Criteria and hbx_enrollments.shop_market.blank?)
-
-    show_panel = show_panel && !(hbx_enrollments.class == Mongoid::Criteria && hbx_enrollments.shop_market.entries.map(&:employee_role_id).include?(person.active_employee_roles.first.id))
-
-    show_panel
+    false
   end
 end
