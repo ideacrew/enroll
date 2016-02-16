@@ -453,11 +453,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.under_open_enrollment?
+    HbxProfile.current_hbx.try(:under_open_enrollment?)
   end
 
   def ivl_enrollment_effective_date
-    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+    HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
   def parse_ethnicity(value)

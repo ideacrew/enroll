@@ -153,34 +153,34 @@ end
 
 When(/^.+ enters? office location for (.+)$/) do |location|
   location = eval(location) if location.class == String
-  @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set(location[:address1])
-  @browser.text_field(class: /interaction-field-control-office-location-address-address-2/).set(location[:address2])
-  @browser.text_field(class: /interaction-field-control-office-location-address-city/).set(location[:city])
-  input_field = @browser.select(name: /state/).divs(xpath: "ancestor::div")[-2]
-  input_field.click
-  input_field.li(text: /#{location[:state]}/).click
-  @browser.text_field(class: /interaction-field-control-office-location-address-zip/).set(location[:zip])
-  @browser.text_field(class: /interaction-field-control-office-location-phone-area-code/).set(location[:phone_area_code])
-  @browser.text_field(class: /interaction-field-control-office-location-phone-number/).set(location[:phone_number])
-  @browser.text_field(class: /interaction-field-control-office-location-phone-extension/).set(location[:phone_extension])
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => location[:city]
+
+  find(:xpath, "//div[@class='selectric'][p[contains(text(), 'SELECT STATE')]]").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), '#{location[:state]}')]").click
+
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
 end
 
 When(/^(.+) creates? a new employer profile$/) do |named_person|
   employer = people[named_person]
-  @browser.text_field(name: "organization[first_name]").wait_until_present
-  @browser.text_field(name: "organization[first_name]").set(employer[:first_name])
-  @browser.text_field(name: "organization[last_name]").set(employer[:last_name])
-  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set(employer[:dob])
-  scroll_then_click(@browser.text_field(name: "organization[first_name]"))
+  fill_in 'organization[first_name]', :with => employer[:first_name]
+  fill_in 'organization[last_name]', :with => employer[:last_name]
+  fill_in 'jq_datepicker_ignore_organization[dob]', :with => employer[:dob]
 
-  @browser.text_field(name: "organization[legal_name]").set(employer[:legal_name])
-  @browser.text_field(name: "organization[dba]").set(employer[:dba])
-  @browser.text_field(name: "organization[fein]").set(employer[:fein])
-  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
-  input_field.click
-  input_field.li(text: /C Corporation/).click
+  find('#organization_legal_name').click
+  fill_in 'organization[legal_name]', :with => employer[:legal_name]
+  fill_in 'organization[dba]', :with => employer[:dba]
+  fill_in 'organization[fein]', :with => employer[:fein]
+
+  find('.selectric-interaction-choice-control-organization-entity-kind').click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
   step "I enter office location for #{default_office_location}"
-  scroll_then_click(@browser.button(class: "interaction-click-control-confirm"))
+  find('.interaction-click-control-confirm').click
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
@@ -239,30 +239,22 @@ Given(/^(.+) has not signed up as an HBX user$/) do |actor|
 end
 
 When(/^I visit the Employer portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /Employer Portal/).wait_until_present
-  @browser.a(text: /Employer Portal/).click
-  screenshot("employer_start")
+  visit "/"
+  page.click_link 'Employer Portal'
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
-  Watir::Wait.until(30) { @browser.element(text: /Welcome to DC Health Link. Your account has been created./).present? }
-  screenshot("employer_sign_up_welcome")
-  expect(@browser.element(text: /Welcome to DC Health Link. Your account has been created./).visible?).to be_truthy
+  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
 end
 
 Then(/^(?:.+) should click on employer portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /Employer Portal/).wait_until_present
-  @browser.a(text: /Employer Portal/).click
+  visit "/"
+  page.click_link 'Employer Portal'
 end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /employee portal/i).wait_until_present
-  screenshot("start")
-  scroll_then_click(@browser.a(text: /employee portal/i))
-  screenshot("employee_portal")
+  visit "/"
+  click_link 'Employee Portal'
 end
 
 Then(/^(?:.+) should be logged on as an unlinked employee$/) do
@@ -273,50 +265,38 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  sleep 2
-  scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
-  @browser.element(class: /interaction-click-control-logout/).wait_while_present
+  find('.interaction-click-control-logout').click
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
-  @browser.element(class: /interaction-click-control-continue/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should see the employee search page$/) do
-  @browser.text_field(class: /interaction-field-control-person-first-name/).wait_until_present
-  screenshot("employer_search")
-  expect(@browser.text_field(class: /interaction-field-control-person-first-name/).visible?).to be_truthy
+  expect(find('.interaction-field-control-person-first-name')).to be_visible
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /employee portal/i).wait_until_present
-  screenshot("start")
-  scroll_then_click(@browser.a(text: /employee portal/i))
-  @browser.button(text: "Create account").wait_until_present
+  click_button 'Create account'
 
   person = people[named_person]
 
-  @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  @browser.text_field(name: "user[email]").set(person[:email])
-  @browser.text_field(name: "user[password]").set(person[:password])
-  @browser.text_field(name: "user[password_confirmation]").set(person[:password])
-  screenshot("create_account")
-  scroll_then_click(@browser.input(value: "Create account"))
+  fill_in "user[email]", :with => person[:email]
+  fill_in "user[password_confirmation]", :with => person[:password]
+  fill_in "user[password]", :with => person[:password]
+  click_button "Create account"
 end
 
 When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   person = people[named_person]
-  @browser.text_field(class: /interaction-field-control-person-first-name/).set(person[:first_name])
-  @browser.text_field(name: "person[last_name]").set(person[:last_name])
-  @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set(person[:dob])
-  scroll_then_click(@browser.label(:text=> /FIRST NAME/))
-  @browser.text_field(name: "person[ssn]").set(person[:ssn])
-  @browser.radio(id: /radio_male/).fire_event("onclick")
-  screenshot("information_entered")
-  @browser.element(class: /interaction-click-control-continue/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+
+  fill_in 'person[first_name]', :with => person[:first_name]
+  fill_in 'person[last_name]', :with => person[:last_name]
+  fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
+  fill_in 'person[ssn]', :with => person[:ssn]
+  find(:xpath, '//label[@for="radio_male"]').click
+
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should not see the matched employee record form$/) do
@@ -332,41 +312,30 @@ end
 
 # TODO: needs to be merged
 Then(/^.+ should see the matching employee record form$/) do
-  @browser.element(text: /Turner Agency/).wait_until_present
-  screenshot("employer_search_results")
-  expect(@browser.element(text: /Turner Agency/).visible?).to be_truthy
+  expect(page).to have_content('Turner Agency')
 end
 
 When(/^.+ accepts? the matched employer$/) do
-  scroll_then_click(@browser.label(text: /Enroll in Employer-Sponsored Benefits/i))
-  @browser.element(id: /btn-continue/).fire_event("onclick")
-  @browser.input(name: "person[emails_attributes][0][address]").wait_until_present
-  screenshot("update_personal_info")
+  click_button 'This is my employer'
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   person = people[named_person]
-  scroll_then_click(@browser.element(class: /interaction-click-control-click-here/))
-  @browser.button(class: /interaction-click-control-close/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-close/))
-  @browser.button(class: /interaction-click-control-close/).wait_while_present
+  find('.interaction-click-control-click-here').click
+  find('.interaction-click-control-close').click
 
-  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][address_1]"))
-  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][address_2]"))
-  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][city]"))
-  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][zip]"))
+  find("#person_addresses_attributes_0_address_1").click
+  find("#person_addresses_attributes_0_address_2").click
+  find("#person_addresses_attributes_0_city").click
+  find("#person_addresses_attributes_0_zip").click
 
-  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set(person[:home_phone])
-  scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
-  screenshot("personal_info_complete")
-  @browser.button(id: /btn-continue/).wait_until_present
-  scroll_then_click(@browser.button(id: /btn-continue/))
+  fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
+
+  find("#btn-continue").click
 end
 
 Then(/^.+ should see the dependents page$/) do
-  @browser.a(text: /Add Member/).wait_until_present
-  screenshot("dependents_page")
-  expect(@browser.a(text: /Add Member/).visible?).to be_truthy
+  expect(page).to have_content('Add Member')
 end
 
 When(/^.+ clicks? edit on baby Soren$/) do
@@ -385,9 +354,7 @@ When(/^.+ clicks? delete on baby Soren$/) do
 end
 
 Then(/^.+ should see (.*) dependents*$/) do |n|
-  n = n.to_i
-  expect(@browser.li(class: "dependent_list", index: n)).not_to exist
-  expect(@browser.li(class: "dependent_list", index: n - 1)).to exist
+  expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
 When(/^.+ clicks? Add Member$/) do
@@ -421,26 +388,19 @@ When(/^.+ clicks? confirm member$/) do
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
-  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
+  find('#btn-continue').click
 end
 
 Then(/^.+ should see the group selection page$/) do
-  @browser.form(action: /insured\/group_selection/).wait_until_present
-  screenshot("group_selection")
+  expect(page).to have_css('form')
 end
 
 When(/^.+ clicks? continue on the group selection page$/) do
-  @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).wait_until_present
-  @browser.execute_script("$('.interaction-click-control-continue').trigger('click')")
-  #scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
+  find('#btn-continue').click
 end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
-  @browser.element(text: /Filter Results/i).wait_until_present
-  # @browser.h3(text: /Select a Plan/).wait_until_present
-  screenshot("plan_shopping_welcome")
-  expect(@browser.element(text: /Choose Plan/i).visible?).to be_truthy
-  # expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
+  expect(page).to have_content('Choose Plan')
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -449,41 +409,28 @@ end
 
 
 Then(/^.+ should see the list of plans$/) do
-  @browser.a(text: /Select/).wait_until_present
-  screenshot("plan_shopping")
+  expect(page).to have_link('Select')
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  @browser.execute_script(
-    'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose Plan/)
-  )
-  @browser.element(text: /Choose Plan/).wait_until_present
-  click_when_present(@browser.a(text: /Select Plan/))
+  click_link 'Select Plan'
 end
 
 Then(/^.+ should see the coverage summary page$/) do
-  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
-  screenshot("summary_page")
-  expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
+  expect(page).to have_content('Confirm Your Plan Selection')
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  # @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
-  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-confirm/))
+  find('.interaction-click-control-confirm').click
 end
 
 Then(/^.+ should see the receipt page$/) do
-  @browser.element(class: /interaction-click-control-continue/).wait_until_present
-  screenshot("receipt_page")
-  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
-  @browser.element(class: /interaction-click-control-continue/).click
+  expect(page).to have_content('Enrollment Submitted')
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should see the "my account" page$/) do
-  wait_and_confirm_text(/My DC Health Link/)
-  screenshot("my_account")
+  expect(page).to have_content('My DC Health Link')
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do
@@ -542,8 +489,7 @@ When(/^Employer publishes a plan year$/) do
 end
 
 When(/^.+ should see a published success message$/) do
-  @browser.element(text: /plan year successfully published/i).wait_until_present
-  expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
+  expect(find('.alert')).to have_content('Plan Year successfully published')
 end
 
 When(/^.+ goes to to home tab$/) do
@@ -565,13 +511,11 @@ When(/^.+ should see a published success message without employee$/) do
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
-  @browser.a(class: /interaction-click-control-add-new-employee/).click
+  find('.interaction-click-control-add-new-employee').click
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
-  @browser.a(text: /#{tab_name}/).wait_until_present
-  scroll_then_click(@browser.a(text: /#{tab_name}/))
+  find(:xpath, "//nav[@class='row']/ul/li[contains(., '#{tab_name}')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
