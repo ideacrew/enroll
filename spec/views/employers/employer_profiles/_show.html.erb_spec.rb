@@ -30,14 +30,13 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
     expect(rendered).to have_selector('h3', text: 'Premium Billing Report')
   end
 
-  it "should display premium billing reports for first billed month if current date before coverage on" do
+  it "should have active plan year but not display premium billings report" do
     allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record + 3.years)
     @tab = 'home'
     render template: "employers/employer_profiles/show"
     y = TimeKeeper.date_of_record + 3.years
     year = y.year
-    expect(rendered).to match(/#{year}/)
-    expect(rendered).to have_selector('h3', text: 'Premium Billing Report')
+    expect(rendered).to_not have_selector('h3', text: 'Premium Billing Report')
   end
 
 end
