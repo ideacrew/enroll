@@ -35,8 +35,16 @@
                     </div>
                   </td>
                 </tr>
-                <tr>
+
                   <% if hbx_enrollment.coverage_terminated? %>
+                  <tr>
+                  <td>
+                    <div class="enrollment-effective info">
+                      <label>Effective date:
+                      </label>
+                      <strong><%= hbx_enrollment.effective_on %></strong>
+                    </div>
+                  </td>
                    <td>
                     <div class="enrollment-effective info">
                       <label>Coverage end:
@@ -44,6 +52,7 @@
                       <strong><%= hbx_enrollment.terminated_on %></strong>
                     </div>
                   </td>
+                </tr>
                   <% else %>
                   <td>
                     <div class="enrollment-effective info">
