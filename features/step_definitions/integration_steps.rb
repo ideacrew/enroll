@@ -534,8 +534,9 @@ When(/^Employer publishes a plan year$/) do
   # click_when_present(start_on)
   start_on = @browser.li(text: /SELECT START ON/i)
   click_when_present(start_on.parent().lis()[1])
-  click_when_present(@browser.element(class: /change-plan/))
+  click_when_present(@browser.element(class: /change-dental-reference-plan/))
   select_plan_option = @browser.ul(class: /nav-tabs/)
+  select_plan_option.li(text: /By metal level/i).click
   select_plan_option.li(text: /By carrier/i).click
   carriers_tab = @browser.div(class: /carriers-tab/)
   @browser.element(text: /edit your plan offering/i).wait_until_present
@@ -543,6 +544,12 @@ When(/^Employer publishes a plan year$/) do
   plans_tab = @browser.div(class: /reference-plans/)
   @browser.element(text: /select your reference plan/i).wait_until_present
   plans_tab.labels.last.fire_event('onclick')
+  ## comment these out temporaryily
+  # @browser.as(class: /view-summary/)[1].fire_event('onclick')
+  # @browser.td(text: /Not Applicable/).wait_until_present
+  # summary_modal = @browser.element(id: "referencePlanSummaryModal")
+  # summary_modal.button(class: /close/).fire_event("onclick")
+  # sleep(3)
   click_when_present(@browser.button(class: /interaction-click-control-save-plan-year/))
   @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))

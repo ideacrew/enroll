@@ -147,16 +147,8 @@
       </thead>
 
       <tbody>
+        <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
 
-        <% qhp.qhp_service_visits.each do |service_visit| %>
-          <% if service_visit.present? %>
-            <tr>
-              <td style="text-align: left;"><%= service_visit.visit_type %></td>
-              <td><%= service_visit.copay_in_network_tier_1 %></td>
-              <td><%= service_visit.co_insurance_in_network_tier_1.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
-            </tr>
-          <% end %>
-        <% end %>
         <tr>
           <td></td>
           <td colspan="3" class="text-center">

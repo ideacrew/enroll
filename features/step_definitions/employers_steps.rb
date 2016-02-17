@@ -348,7 +348,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   # benefit_groups.last.text_fields.first.set("Gold HMO")
   # @browser.text_fields(name: /relationship_benefits_attributes/).set(55)
 
-  @browser.button(class: /interaction-click-control-create-plan-year/).click
+  @browser.button(class: /interaction-click-control-create-plan-year/).fire_event("onclick")
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
@@ -459,7 +459,7 @@ Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
 end
 
 Then(/^.+ should see a plan year successfully saved message$/) do
-  @browser.element( text: /coverage - benefits you offer/i).wait_until_present
+  @browser.element( text: /Benefits - Coverage you offer/i).wait_until_present
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end

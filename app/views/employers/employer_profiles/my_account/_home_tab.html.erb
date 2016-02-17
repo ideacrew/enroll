@@ -119,39 +119,19 @@
             </p>
           </td>
         </tr>
-        <tr>
-          <td>
-            <header>Plans By</header>
-          </td>
-          <td>
-            <p>
-              <% if bg.plan_option_kind == "single_carrier" %>
-              All plans from a single carrier
-              <% elsif bg.plan_option_kind == "metal_level" %>
-              All Plans from a given metal level
-              <% elsif bg.plan_option_kind == "single_plan" %>
-              A single plan
-              <% end %>
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <header>Reference Plan</header>
-          </td>
-          <td>
-            <p>
-              <%= bg.reference_plan.name %>
-            </p>
-          </td>
-        </tr>
-
       </table>
-      <br>
       <div class="panel benefitgroup referenceplan home">
-
+        <% if bg.dental_reference_plan_id.present? %>
+          <h5 class="bg-title">Health</h5>
+        <% end%>
       <table>
         <tr>
+          <th>
+            <header>Reference Plan</header>
+          </th>
+          <th>
+            <header>Carrier</header>
+          </th>
           <th>
             <header>Type</header>
           </th>
@@ -159,13 +139,23 @@
             <header>Metallic Level</header>
           </th>
           <th>
-            <header>Carrier</header>
+            <header>ID</header>
           </th>
           <th>
-            <header>ID</header>
+            <header>Plans By</header>
           </th>
         </tr>
         <tr>
+          <td>
+            <p>
+              <%= bg.reference_plan.name.try(:upcase) %>
+            </p>
+          </td>
+          <td>
+            <p>
+              <%= bg.reference_plan.carrier_profile.legal_name %>
+            </p>
+          </td>
           <td>
             <p>
               <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
@@ -177,16 +167,89 @@
             </p>
           </td>
           <td>
-            <p>
-              <%= bg.reference_plan.carrier_profile.legal_name %>
+            <p><%= bg.reference_plan_id %>
             </p>
           </td>
           <td>
-            <p><%= bg.reference_plan_id %>
+            <p>
+              <% if bg.plan_option_kind == "single_carrier" %>
+              All Plans From A Single Carrier
+              <% elsif bg.plan_option_kind == "metal_level" %>
+              All Plans From A Given Metal Level
+              <% elsif bg.plan_option_kind == "single_plan" %>
+              A Single Plan
+              <% end %>
             </p>
           </td>
         </tr>
       </table>
+      <% if bg.dental_reference_plan_id.present? %>
+
+      <h5 class="bg-title">Dental</h5>
+  <table>
+    <tr>
+      <th>
+        <header>Reference Plan</header>
+      </th>
+      <th>
+        <header>Carrier</header>
+      </th>
+      <th>
+        <header>Type</header>
+      </th>
+      <th>
+        <header>Metallic Level</header>
+      </th>
+      <th>
+        <header>ID</header>
+      </th>
+      <th>
+        <header>Plans By</header>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p>
+          <%= bg.dental_reference_plan.name %>
+        </p>
+      </td>
+      <td>
+        <p>
+          <%= bg.dental_reference_plan.carrier_profile.legal_name %>
+        </p>
+      </td>
+      <td>
+        <p>
+          <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
+        </p>
+      </td>
+      <td>
+        <p>
+          <%= bg.dental_reference_plan.metal_level.titleize %>
+        </p>
+      </td>
+
+      <td>
+        <p><%= bg.dental_reference_plan.id %>
+        </p>
+      </td>
+      <td>
+        <p>
+          <% if bg.dental_plan_option_kind == "single_carrier" %>
+          All Plans From A Single Carrier
+          <% elsif bg.dental_plan_option_kind == "single_plan" %>
+            <% if bg.elected_dental_plan_ids.count < 13 %>
+              Custom
+            <% else %>
+              All Plans
+            <% end %>
+          <% end %>
+        </p>
+      </td>
+    </tr>
+  </table>
+  <% end %>
+
     </div>
     </div>
     <div class="plan-details" style="display: none;">
@@ -194,12 +257,19 @@
       <table>
         <tr>
           <th>Offered</th>
-          <th>Employer contribution</th>
+          <th>Employer <% if bg.dental_reference_plan_id.present? %>Health <% end %>Contribution</th>
+          <% if bg.dental_reference_plan_id.present? %>
+            <th>Employer Dental Contribution</th>
+          <% end %>
         </tr>
-        <% bg.relationship_benefits.each do |rb| %>
+        <% bg.relationship_benefits.each_with_index do |rb, i| %>
         <tr>
           <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-          <td><strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong></td>
+          <td><strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong></td>
+          <% if bg.dental_reference_plan_id.present? %>
+            <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
+          <% end %>
+
         </tr>
         <% end %>
       </table>

@@ -312,6 +312,7 @@ end
 
 Then(/^click continue again$/) do
   wait_and_confirm_text /continue/i
+  sleep(1)
   scroll_then_click(@browser.a(text: /continue/i))
 end
 

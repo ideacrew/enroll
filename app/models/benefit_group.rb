@@ -19,6 +19,7 @@ class BenefitGroup
   field :title, type: String, default: ""
   field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
+  field :dental_plan_option_kind, type: String
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
 
@@ -40,6 +41,11 @@ class BenefitGroup
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
+  # Employer dental plan_ids
+  field :dental_relationship_benefits_attributes_time, type: BSON::ObjectId, default: 0
+  field :dental_reference_plan_id, type: BSON::ObjectId
+  field :elected_dental_plan_ids, type: Array, default: []
+
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
@@ -52,7 +58,12 @@ class BenefitGroup
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
-  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
+  embeds_many :dental_relationship_benefits, cascade_callbacks: true
+  accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  field :carrier_for_elected_dental_plan, type: BSON::ObjectId
+
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan, :carrier_for_elected_dental_plan
 
   #TODO add following attributes: :title,
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
@@ -102,6 +113,11 @@ class BenefitGroup
   def reference_plan
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def dental_reference_plan
+    return @dental_reference_plan if defined? @dental_reference_plan
+    @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
   end
 
   def is_open_enrollment?
@@ -175,21 +191,37 @@ class BenefitGroup
     @elected_plans = new_plans
   end
 
+  def elected_dental_plans=(new_plans)
+    return unless new_plans.present?
+    self.elected_dental_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+
+    # set_bounding_cost_plans
+    @elected_dental_plans = new_plans
+  end
+
+
   def elected_plans
     return @elected_plans if defined? @elected_plans
     @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
-  def decorated_elected_plans(member_provider)
-    max_contribution_cache = Hash.new
-    elected_plans.collect(){|plan| decorated_plan(plan, member_provider, max_contribution_cache)}
+  def elected_dental_plans
+    return @elected_dental_plans if defined? @elected_dental_plans
+    @elected_dental_plans ||= Plan.where(:id => {"$in" => elected_dental_plan_ids}).to_a
   end
 
-  def decorated_plan(plan, member_provider, max_contribution_cache = {})
+  def decorated_elected_plans(member_provider, coverage_kind="")
+    max_contribution_cache = Hash.new
+    get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
+    ref_plan = (coverage_kind == "health" ? reference_plan : dental_reference_plan)
+    get_elected_plans.collect(){|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
+  end
+
+  def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
     else
-      PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
+      PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
   end
 
@@ -252,6 +284,9 @@ class BenefitGroup
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.relationship_benefits.build(relationship: relationship, offered: true)
+    end
+    self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
@@ -337,6 +372,14 @@ class BenefitGroup
     end
   end
 
+  def elected_dental_plans_by_option_kind
+    if dental_plan_option_kind == "single_carrier"
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+    else
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
+    end
+  end
+
   def effective_title_by_offset
     case effective_on_offset
     when 0
@@ -375,7 +418,7 @@ private
 
   def eligible_on(date_of_hire)
     if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire 
+      date_of_hire
     else
       doh_with_offset = date_of_hire + effective_on_offset.days
       doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month

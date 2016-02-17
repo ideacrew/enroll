@@ -23,6 +23,7 @@
  *= require new
  *= require text_styles
  *= require brokers
+ *= require modules
  *= require insured
  *= require sprites
  *= require modules
@@ -56,6 +57,32 @@
   border-radius: 6px;
  }
 
+ .bn {
+   border: none;
+ }
+ .b {
+   border: solid 1px #d5d5d5;
+ }
+ .inv {
+   visibility: hidden;
+ }
+ .m-center {
+   margin: auto;
+ }
+ .modal-body-swap {
+   position: relative;
+   padding: 15px;
+   display: none;
+ }
+ .fa-center {
+   &.fa-spinner {
+     position: relative;
+     left: 50%;
+     margin-left: -14px;
+     display: inline-block;
+     padding: 15px 0;
+   }
+ }
  .btn, button {
    &.btn-trans {
      border: solid 1px #b2b2b2;

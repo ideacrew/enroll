@@ -102,22 +102,17 @@
                     Health
                   </label>
                 </div>
-
-
-            <% if (@employer_profile.present? || @person.has_active_employee_role?) && !@person.has_active_consumer_role? %>
-            <% else %>
-
-              <div class="n-radio-row">
-                <label class="n-radio" for="coverage_kind_dental">
-                  <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
-                  <span class="n-radio">
-                  </span>
-                  Dental
-                </label>
-              </div>
-
-
-            <% end %>
+                <% if can_shop_shop?(@person) && (@employee_role.benefit_group.dental_reference_plan_id.blank? || can_shop_shop?(@person) && @employee_role.benefit_group.dental_reference_plan_id.blank?) %>
+                <% else %>
+                  <div class="n-radio-row">
+                    <label class="n-radio" for="coverage_kind_dental">
+                      <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
+                      <span class="n-radio">
+                      </span>
+                      Dental
+                    </label>
+                  </div>
+                <% end %>
               </div>
           </div>
 
@@ -147,7 +142,7 @@
             <% if @hbx_enrollment.present? and (@hbx_enrollment.coverage_selected? or @hbx_enrollment.auto_renewing?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.may_terminate_coverage? %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
