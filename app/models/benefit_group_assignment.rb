@@ -172,14 +172,14 @@ class BenefitGroupAssignment
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
 
-    # if coverage_selected?
-    #   self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
-    # end
+    if coverage_selected?
+      self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
+    end
 
-    # if hbx_enrollment.present?
-    #   self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-    #   self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
-    # end
+    if hbx_enrollment.present?
+      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
+    end
   end
 
   def date_guards
