@@ -277,38 +277,40 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
-      organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
-        open_enrollment_factory.employer_profile = organization.employer_profile
+      if Rails.env.to_s != 'test'
+        open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+        organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
+          open_enrollment_factory.employer_profile = organization.employer_profile
 
-        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => new_date).any?
-          open_enrollment_factory.begin_open_enrollment
+          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => new_date).any?
+            open_enrollment_factory.begin_open_enrollment
+          end
+
+          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on" => (new_date - 1.day)).any?
+            open_enrollment_factory.end_open_enrollment
+          end     
         end
 
-        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on" => (new_date - 1.day)).any?
-          open_enrollment_factory.end_open_enrollment
-        end     
-      end
+        employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        oranizations_with_plan_year_begin_or_end(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
 
-      employer_enroll_factory = Factories::EmployerEnrollFactory.new
-      oranizations_with_plan_year_begin_or_end(new_date).each do |organization|
-        employer_enroll_factory.employer_profile = organization.employer_profile
+          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => new_date).any?
+            employer_enroll_factory.begin
+          end
 
-        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => new_date).any?
-          employer_enroll_factory.begin
+          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
+            employer_enroll_factory.end
+          end
         end
 
-        if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
-          employer_enroll_factory.end
-        end
-      end
-
-      plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
-      organizations_eligible_for_renewal(new_date).each do |organization|
-        plan_year_renewal_factory.employer_profile = organization.employer_profile
+        plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
+        organizations_eligible_for_renewal(new_date).each do |organization|
+          plan_year_renewal_factory.employer_profile = organization.employer_profile
         plan_year_renewal_factory.is_congress = false # TODO handle congress differently
         plan_year_renewal_factory.renew
       end
+    end
 
       # Employer activities that take place monthly - on first of month
       if new_date.day == 1
