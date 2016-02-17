@@ -57,7 +57,7 @@ class Employers::PlanYearsController < ApplicationController
     @details = params[:details]
     @reference_plan_id = params[:ref_plan_id]
     @start_on = params[:start_on]
-    @plan = Plan.find(@reference_plan_id)
+    @plan = Plan.find(@reference_plan_id) unless @reference_plan_id == nil
     @coverage_kind = params[:coverage_kind]
     @hios_id = params[:hios_id]
     hios_id = [] << params[:hios_id]
