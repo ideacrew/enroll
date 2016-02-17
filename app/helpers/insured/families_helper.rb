@@ -78,10 +78,9 @@ module Insured::FamiliesHelper
     options
   end
 
-  def show_employer_panel?(employee_role)
+  def newhire_enrollment_eligible?(employee_role)
     return false if employee_role.blank? || employee_role.census_employee.blank?
-    return false if employee_role.census_employee.newhire_enrollment_ineligible?
 
-    employee_role.person.can_select_coverage?(employee_role)
+    employee_role.census_employee.newhire_enrollment_eligible? && employee_role.person.can_select_coverage?(employee_role)
   end
 end

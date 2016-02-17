@@ -304,8 +304,8 @@ class CensusEmployee < CensusMember
     return true
   end
 
-  def newhire_enrollment_ineligible?
-    active_benefit_group_assignment.present? && !active_benefit_group_assignment.initialized?
+  def newhire_enrollment_eligible?
+    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
   end
 
   class << self

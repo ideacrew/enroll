@@ -752,29 +752,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "newhire_enrollment_ineligible" do
+  context "newhire_enrollment_eligible" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-
-    it "should return false without active_benefit_group_assignment" do
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return nil
-      expect(census_employee.newhire_enrollment_ineligible?).to eq false
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+    before do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
 
-    context "with active_benefit_group_assignment" do
-      let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
-      before do
-        allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-      end
+    it "should return true when active_benefit_group_assignment is initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return true
+      expect(census_employee.newhire_enrollment_eligible?).to eq true
+    end
 
-      it "should return false when active_benefit_group_assignment is initialized" do
-        allow(benefit_group_assignment).to receive(:initialized?).and_return true
-        expect(census_employee.newhire_enrollment_ineligible?).to eq false
-      end
-
-      it "should return true when active_benefit_group_assignment is not initialized" do
-        allow(benefit_group_assignment).to receive(:initialized?).and_return false
-        expect(census_employee.newhire_enrollment_ineligible?).to eq true
-      end
+    it "should return false when active_benefit_group_assignment is not initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return false
+      expect(census_employee.newhire_enrollment_eligible?).to eq false
     end
   end
 
