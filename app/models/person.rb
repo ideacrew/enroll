@@ -428,6 +428,10 @@ class Person
     employee_roles.present? ? employee_roles.active : []
   end
 
+  def has_multiple_roles?
+    consumer_role.present? && employee_roles.present?
+  end
+
   def residency_eligible?
     no_dc_address and no_dc_address_reason.present?
   end

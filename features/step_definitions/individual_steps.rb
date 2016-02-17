@@ -174,26 +174,20 @@ end
 
 And(/I click on continue button on group selection page/) do
   if !HbxProfile.current_hbx.under_open_enrollment?
-
     click_when_present(@browser.a(text: /Had a baby/))
-
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
-
+    click_when_present @browser.a(class: 'ui-state-default')
+    wait_and_confirm_text(/CONTINUE/)
     click_when_present @browser.a(class: 'interaction-click-control-continue')
-
     wait_and_confirm_text /SELECT EFFECTIVE ON KIND/i
-
     effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
-
     click_when_present(effective_field)
     effective_field.li(index: 1).click
-
     @browser.div(class: /success-info/).wait_until_present
     sleep 1
     @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).fire_event("onclick")
   end
-
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 

@@ -5,6 +5,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
     QualifyingLifeEventKind.delete_all
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
+    assign(:person, FactoryGirl.create(:person))
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
     render "insured/families/qles_carousel"
   end
@@ -36,5 +37,32 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
     expect(rendered).to have_selector("a.qle-menu-item[data-toggle='tooltip']", count: 10)
     expect(rendered).to have_selector("a.qle-menu-item", count: 11)
     expect(rendered).to have_selector("a[data-is-self-attested='true']")
+  end
+
+  it "shouldn't display Employee button for person without multiple roles" do
+    expect(rendered).not_to match(/Employee/)
+  end
+
+  it "shouldn't display Individual button for person without multiple roles" do
+    expect(rendered).not_to match(/Individual/)
+  end
+
+  context "QLE buttons for person with both roles" do
+    before :each do
+      assign(:multiroles, true)
+      render "insured/families/qles_carousel"
+    end
+
+    it "contain buttons group for QLE roles" do
+      expect(rendered).to have_selector('div.market-selection')
+    end
+
+    it "should have Employee button for person with multiple roles" do
+      expect(rendered).to match(/Employee/)
+    end
+
+    it "should have Individual button for person with multiple roles" do
+      expect(rendered).to match(/Individual/)
+    end
   end
 end
