@@ -6,6 +6,10 @@
   </div>
 </div>
 <div id='account-detail'>
+  <% @person.active_employee_roles.each do |employee_role|%>
+    <%= render 'employer_panel' if show_employer_panel?(employee_role) %>
+  <% end %>
+
   <div class="my-account-page col-xs-12">
     <h1>My DC Health Link</h1>
   </div>
@@ -18,10 +22,8 @@
       <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
       </div>
     <% end %>
-    <%= render 'employer_panel' if show_employer_panel?(@person) %>
     <%= render partial: 'shop_for_plans_widget' %>
     <%= render partial: 'apply_for_medicaid_widget' %>
-
 
   </div>
   <div class="col-md-4 right-column">

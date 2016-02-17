@@ -316,6 +316,15 @@ class Person
     @primary_family ||= Family.find_by_primary_applicant(self)
   end
 
+  def can_select_coverage?(employee_role)
+    if primary_family.present? && primary_family.latest_household.present?
+      coverage_household = primary_family.latest_household.immediate_family_coverage_household
+      hbx_enrollment = primary_family.latest_household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household) rescue nil
+      return hbx_enrollment.can_select_coverage? if hbx_enrollment.present?
+    end
+    false
+  end
+
   def families
     Family.find_all_by_person(self)
   end

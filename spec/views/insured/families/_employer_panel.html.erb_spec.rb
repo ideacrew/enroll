@@ -13,7 +13,11 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
   end
 
   it "should have carousel-qles area" do
-    expect(rendered).to have_selector('div.employer-panel')
+    expect(rendered).to have_selector('div.alert-notice')
+  end
+
+  it "should have close link" do
+    expect(rendered).to have_selector('a.close')
   end
 
   it "should have employer name" do

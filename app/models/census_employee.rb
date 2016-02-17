@@ -304,6 +304,10 @@ class CensusEmployee < CensusMember
     return true
   end
 
+  def newhire_enrollment_ineligible?
+    active_benefit_group_assignment.present? && !active_benefit_group_assignment.initialized?
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc

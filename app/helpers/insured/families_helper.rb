@@ -78,17 +78,10 @@ module Insured::FamiliesHelper
     options
   end
 
-  def show_employer_panel?(person)
-    return false if person.blank? || !person.has_active_employee_role?
+  def show_employer_panel?(employee_role)
+    return false if employee_role.blank? || employee_role.census_employee.blank?
+    return false if employee_role.census_employee.newhire_enrollment_ineligible?
 
-    employee_role = person.active_employee_roles.last
-    return false if employee_role.census_employee.present? && employee_role.census_employee.active_benefit_group_assignment.present? && !employee_role.census_employee.active_benefit_group_assignment.initialized?
-
-    if person.primary_family.present? && person.primary_family.latest_household.present?
-      coverage_household = person.primary_family.latest_household.immediate_family_coverage_household
-      hbx_enrollment = person.primary_family.latest_household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household) rescue nil
-      return hbx_enrollment.can_select_coverage? if hbx_enrollment.present?
-    end
-    false
+    employee_role.person.can_select_coverage?(employee_role)
   end
 end

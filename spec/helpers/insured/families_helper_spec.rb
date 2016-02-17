@@ -19,38 +19,40 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:employee_role) {FactoryGirl.build(:employee_role)}
     let(:census_employee) {FactoryGirl.build(:census_employee)}
     let(:person_with_employee_role) {FactoryGirl.create(:person, :with_employee_role)}
-    let(:benefit_group_assignment) {BenefitGroupAssignment.new()}
 
-    it "should return false without person" do
+    it "should return false without employee_role" do
       expect(helper.show_employer_panel?(nil)).to eq false
     end
 
-    it "should return false with person who has no active employee_role" do
-      allow(person).to receive(:has_active_employee_role?).and_return false
-      expect(helper.show_employer_panel?(person)).to eq false
+    it "should return false with employee_role who has no census_employee" do
+      allow(employee_role).to receive(:census_employee).and_return nil
+      expect(helper.show_employer_panel?(employee_role)).to eq false
     end
 
-    context "with person who has active_employee_roles" do
+    context "with employee_role who has census_employee" do
       before :each do
-        allow(person).to receive(:has_active_employee_role?).and_return true
-        allow(person).to receive(:active_employee_roles).and_return [employee_role]
         allow(employee_role).to receive(:census_employee).and_return census_employee
       end
 
-      it "should return false when employee_role has active benefit group assignment" do
-        allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-        allow(benefit_group_assignment).to receive(:initialized?).and_return false
-        expect(helper.show_employer_panel?(person)).to eq false
+      it "should return false when census_employee is newhire_enrollment_ineligible" do
+        allow(census_employee).to receive(:newhire_enrollment_ineligible?).and_return true
+        expect(helper.show_employer_panel?(employee_role)).to eq false
       end
 
-      context "when employee_role has active benefit_group_assignment which is not initialized" do
+      context "when census_employee is not newhire_enrollment_ineligible" do
         before do
-          allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-          allow(benefit_group_assignment).to receive(:initialized?).and_return true
+          allow(census_employee).to receive(:newhire_enrollment_ineligible?).and_return false
+          allow(employee_role).to receive(:person).and_return person
         end
 
-        it "should return false" do
-          expect(helper.show_employer_panel?(person)).to eq false
+        it "should return false when person can not select coverage" do
+          allow(person).to receive(:can_select_coverage?).and_return false
+          expect(helper.show_employer_panel?(employee_role)).to eq false
+        end
+
+        it "should return true when person can select coverage" do
+          allow(person).to receive(:can_select_coverage?).and_return true
+          expect(helper.show_employer_panel?(employee_role)).to eq true
         end
       end
     end
