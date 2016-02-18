@@ -22,7 +22,7 @@
         Please select one of the following options to continue:
       </p>
       <div class="disagree_placeholder_text" style="display: none">
-        <%= "Please contact #{HbxProfile::CallCenterName}: #{HbxProfile::CallCenterPhoneNumber} for more information" %>
+        <%= "Please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number} for more information" %>
       </div>
       <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -52,7 +52,7 @@
     $(".interaction-choice-control-value-agreement-disagree").click(function(){
       $(".interaction-click-control-continue").attr("disabled", true);
         // $(".disagree_placeholder_text").show();
-        alert("Please contact DC Health Link at <%= HbxProfile::CallCenterPhoneNumber %> for more info");
+        alert("Please contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %> for more info");
       });
   });
 </script>

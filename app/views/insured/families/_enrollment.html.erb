@@ -36,6 +36,16 @@
                   </td>
                 </tr>
                 <tr>
+
+                  <td>
+                    <div class="enrollment-type info">
+                      <p>
+                        <label class="bullet-separator"><%= Settings.site.short_name %> ID:</label>
+                        <strong><%= Maybe.new(hbx_enrollment).subscriber.person.hbx_id.truncate(8, omission: "").upcase.extract_value %></strong>
+                      </p>
+                    </div>
+                  </td>
+
                   <% if hbx_enrollment.coverage_terminated? %>
                    <td>
                     <div class="enrollment-effective info">

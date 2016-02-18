@@ -255,6 +255,21 @@ class Household
     enrollment
   end
 
+  def delete_hbx_enrollment(hbx_enrollment_id)
+    hbx_enrollment = hbx_enrollments.detect {hbx_enrollment_id}
+    if hbx_enrollment.present?
+      benefit_group_assignment = hbx_enrollment.benefit_group_assignment
+
+      if benefit_group_assignment.present?
+        benefit_group_assignment.destroy! && hbx_enrollment.destroy!
+      else
+        hbx_enrollment.destroy!
+      end
+    else
+      return false
+    end
+  end
+
   def remove_family_member(member)
     coverage_households.each do |c_household|
       c_household.remove_family_member(member)

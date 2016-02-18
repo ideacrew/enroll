@@ -43,10 +43,10 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
     end
 
 
+
     it "should display broker widget for consumer" do
       expect(rendered).to have_selector('h4', "Your Broker")
     end
-
   end
 
 end
