@@ -113,6 +113,10 @@ class EmployeeRole
     self.is_active
   end
 
+  def can_select_coverage?
+    hired_on + 60.days >= TimeKeeper.date_of_record
+  end
+
   class << self
     def klass
       self.to_s.underscore

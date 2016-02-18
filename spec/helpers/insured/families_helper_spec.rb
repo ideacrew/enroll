@@ -42,16 +42,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       context "when census_employee is newhire_enrollment_eligible" do
         before do
           allow(census_employee).to receive(:newhire_enrollment_eligible?).and_return true
-          allow(employee_role).to receive(:person).and_return person
         end
 
         it "should return false when person can not select coverage" do
-          allow(person).to receive(:can_select_coverage?).and_return false
+          allow(employee_role).to receive(:can_select_coverage?).and_return false
           expect(helper.newhire_enrollment_eligible?(employee_role)).to eq false
         end
 
         it "should return true when person can select coverage" do
-          allow(person).to receive(:can_select_coverage?).and_return true
+          allow(employee_role).to receive(:can_select_coverage?).and_return true
           expect(helper.newhire_enrollment_eligible?(employee_role)).to eq true
         end
       end
