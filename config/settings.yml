@@ -24,6 +24,8 @@ aca:
 #
   individual_market:
     monthly_enrollment_due_on: 15
+    verification_outstanding_window:
+      days: 180
 #
     open_enrollment:
       benefit_year_2016:

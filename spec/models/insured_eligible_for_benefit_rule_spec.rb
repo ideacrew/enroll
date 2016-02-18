@@ -95,7 +95,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       expect(rule.is_residency_status_satisfied?).to eq false
     end
 
-    describe "include state_resident" do 
+    describe "include state_resident" do
       let(:family_member) {double}
       let(:family) {double(family_members: double(active: [family_member]))}
       let(:person) {double(families: [family])}
@@ -103,7 +103,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       let(:benefit_package) {double}
 
       before :each do
-        allow(benefit_package).to receive(:residency_status).and_return ["state_resident", "other"] 
+        allow(benefit_package).to receive(:residency_status).and_return ["state_resident", "other"]
       end
 
       it "return true if is dc resident" do
@@ -150,7 +150,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "is_lawful_presence_status_satisfied?" do
-    let(:consumer_role) {double}
     let(:benefit_package) {FactoryGirl.create(:benefit_package)}
     let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
     let(:role) {FactoryGirl.create(:consumer_role_object)}
@@ -204,21 +203,29 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
-      it "returns false for verification outstanding" do
-        role.person.created_at = TimeKeeper.date_of_record - 95.days
-        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+      it "returns false for verification outstanding and event fired more than the outstanding verification window" do
+        args = OpenStruct.new
+        args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
+        args.vlp_authority = "dhs"
+        role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
+        role.deny_lawful_presence!(args)
+        role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq false
       end
 
-      it "returns true for verification outstanding and account created less than 90 days ago" do
-        role.person.created_at = TimeKeeper.date_of_record - 80.days
-        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+      it "returns true for verification outstanding and event fired less than the outstanding verification window" do
+        args = OpenStruct.new
+        args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days - 10.days)
+        args.vlp_authority = "dhs"
+        role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
+        role.deny_lawful_presence!(args)
+        role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
       it "returns false if insured_eligible_for_benefit_rule fails" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
-        role.person.created_at = TimeKeeper.date_of_record - 95.days
+        role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [false, [["eligibility failed on lawful_presence_status"]]]
       end
