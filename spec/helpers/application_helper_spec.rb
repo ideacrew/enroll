@@ -85,7 +85,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#is_readonly" do
-    # let(:user){FactoryGirl.create(:user)}
     let(:user) { double("User") }
     let(:census_employee) { double("CensusEmployee") }
     before do

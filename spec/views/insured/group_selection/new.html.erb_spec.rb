@@ -315,6 +315,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(view).to receive(:is_under_open_enrollment?).and_return(true)
     end
 
     it "should display title" do

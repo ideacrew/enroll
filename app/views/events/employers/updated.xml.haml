@@ -19,6 +19,6 @@
     %brokers
       = render :partial => "events/employers/broker_agency_account", :collection => employer.broker_agency_accounts
     %plan_years
-      = render :partial => "events/employers/plan_year", :collection => employer.plan_years
+      = render :partial => "events/employers/plan_year", :collection => employer.plan_years.select(&:eligible_for_export?)
     %employer_census_families
   = render :partial => "events/shared/versioned_resource", :object => employer

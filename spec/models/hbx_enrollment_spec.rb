@@ -835,6 +835,10 @@ describe HbxEnrollment, dbclean: :after_each do
                                                 }
 
       context 'under special enrollment period' do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!( special_enrollment_period.end_on - 5.days )
+        end
+
         it "should allow" do
           expect(shop_enrollment.can_select_coverage?).to be_truthy
         end
