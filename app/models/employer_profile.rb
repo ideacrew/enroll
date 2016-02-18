@@ -277,7 +277,7 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      if Rails.env.to_s != 'test'
+      if false
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
         organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
           open_enrollment_factory.employer_profile = organization.employer_profile
@@ -307,10 +307,10 @@ class EmployerProfile
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
-        plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-        plan_year_renewal_factory.renew
+          plan_year_renewal_factory.is_congress = false # TODO handle congress differently
+          plan_year_renewal_factory.renew
+        end
       end
-    end
 
       # Employer activities that take place monthly - on first of month
       if new_date.day == 1
