@@ -415,64 +415,65 @@ end
 
 describe EmployeeRole, dbclean: :after_each do
 
-  context ".is_under_open_enrollment?" do
+  let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
 
-    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    let(:calender_year) { TimeKeeper.date_of_record.year }
-    let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+  let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
+  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-
-    let(:employee_role) {
-      person.employee_roles.create(
-        employer_profile: employer_profile,
-        hired_on: census_employee.hired_on,
-        census_employee_id: census_employee.id
+  let(:employee_role) {
+    person.employee_roles.create(
+      employer_profile: employer_profile,
+      hired_on: census_employee.hired_on,
+      census_employee_id: census_employee.id
       )
-    }
+  }
 
-    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
-    let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-    let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
-    let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+  let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
+  let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
+  let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
+  let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
 
-    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
-                                                      start_on: plan_year_start_on,
-                                                      end_on: plan_year_end_on,
-                                                      open_enrollment_start_on: open_enrollment_start_on,
-                                                      open_enrollment_end_on: open_enrollment_end_on,
-                                                      employer_profile: employer_profile
-                                                    )
+  let!(:plan_year) { 
 
-                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-                                                    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
-                                                    py.benefit_groups = [blue, white]
-                                                    py.save
-                                                    py.publish!
-                                                    py
-                                                  }
+    py = FactoryGirl.create(:plan_year,
+      start_on: plan_year_start_on,
+      end_on: plan_year_end_on,
+      open_enrollment_start_on: open_enrollment_start_on,
+      open_enrollment_end_on: open_enrollment_end_on,
+      employer_profile: employer_profile
+      )
+
+    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+    py.benefit_groups = [blue, white]
+    py.save
+    py.publish!
+    py
+  }
 
 
-    let(:benefit_group_assignment) {
-      BenefitGroupAssignment.create({
-        census_employee: census_employee,
-        benefit_group: plan_year.benefit_groups.first,
-        start_on: plan_year_start_on
+  let(:benefit_group_assignment) {
+    BenefitGroupAssignment.create({
+      census_employee: census_employee,
+      benefit_group: plan_year.benefit_groups.first,
+      start_on: plan_year_start_on
       })
-    }
+  }
 
-    before do 
-      allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-    end
+  before do 
+    allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
+    allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+  end
 
+  context ".is_under_open_enrollment?" do
     context 'when under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
       end
- 
+
       it "should return true" do
         expect(employee_role.is_under_open_enrollment?).to be_truthy
       end
@@ -482,13 +483,14 @@ describe EmployeeRole, dbclean: :after_each do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on + 5.days)
       end
- 
+
       it "should return false" do
         expect(employee_role.is_under_open_enrollment?).to be_falsey
       end
     end
+  end
 
-
+  context ".is_eligible_to_enroll_without_qle?" do
     context 'when new hire open enrollment period available' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
 
@@ -497,7 +499,7 @@ describe EmployeeRole, dbclean: :after_each do
       end
 
       it "should return true" do 
-        expect(employee_role.is_under_open_enrollment?).to be_truthy
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
       end
     end
 
@@ -510,7 +512,7 @@ describe EmployeeRole, dbclean: :after_each do
       end
 
       it "should return true" do 
-        expect(employee_role.is_under_open_enrollment?).to be_truthy
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
       end
     end
 
@@ -522,7 +524,7 @@ describe EmployeeRole, dbclean: :after_each do
       end
 
       it "should return false" do 
-        expect(employee_role.is_under_open_enrollment?).to be_falsey
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_falsey
       end
     end
   end

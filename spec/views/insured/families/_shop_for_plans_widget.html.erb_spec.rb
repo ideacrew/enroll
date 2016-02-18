@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
   let(:employee_role) { FactoryGirl.build(:employee_role) }
+  let(:census_employee) { FactoryGirl.build(:census_employee) }
   let(:hbx_enrollments) {double}
   let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
   let(:current_user) { FactoryGirl.create(:user)}
@@ -51,16 +52,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   end
 
   context "action path" do
+    let(:benefit_group) { double }
+    let(:new_hire_enrollment_period) { TimeKeeper.date_of_record..(TimeKeeper.date_of_record + 30.days) }
+ 
     before :each do
       assign :person, person
       assign :employee_role, employee_role
       assign :hbx_enrollments, []
       sign_in(current_user)
-
     end
 
     it "should action to new insured group selection path" do
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("a[href='/insured/group_selections/new?employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
@@ -68,6 +72,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
 
     it "should action to find sep insured families path" do
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
+      allow(benefit_group).to receive(:new_hire_enrollment_period).and_return(new_hire_enrollment_period)
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(view).to receive(:is_under_open_enrollment?).and_return(false)
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("a[href='/insured/families/find_sep?employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")

@@ -13,9 +13,10 @@
 Shop for Plans
 </button>
         <% else %>
+        
         <% action_path = new_insured_group_selection_path %>
-        <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-        <% action_path = find_sep_insured_families_path %>
+        <% if !is_under_open_enrollment? && !@employee_role.try(:is_eligible_to_enroll_without_qle?)  %>
+        <% action_path = find_sep_insured_families_path unless current_user.has_consumer_role? %>
         <% end %>
 
         <%= form_tag action_path, method: :get do %>

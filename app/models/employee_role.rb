@@ -74,9 +74,11 @@ class EmployeeRole
   end
 
   def is_under_open_enrollment?
-    return false if employer_profile.blank?
-    return true if employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-    is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
+    employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def is_eligible_to_enroll_without_qle?
+    is_under_open_enrollment? || is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
   end
 
   def new_census_employee=(new_census_employee)
