@@ -1,3 +1,5 @@
+<% @broker_applicants = @broker_applicants.sort_by do |broker_applicant| broker_applicant.broker_role.latest_transition_time end.reverse if @status == 'applicant'%>
+
 if ($("#broker_applicants_roster").length > 0) {
   $('#broker_applicants').html("<%= escape_javascript(render "shared/brokers/applicants", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status)) %>");
 }
