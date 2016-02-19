@@ -16,8 +16,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :hbx_enrollments, hbx_enrollments
       sign_in(current_user)
       allow(current_user).to receive(:has_employee_role?).and_return(true)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
       render "insured/families/shop_for_plans_widget"
-
     end
 
     it 'should have title' do
@@ -47,7 +47,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should have link without change_plan" do
-      expect(rendered).to have_selector("a[href='/insured/group_selections/new?employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
+      expect(rendered).to have_selector("a[href='/insured/consumer_role/search?build_consumer_role=true']")
     end
   end
 
@@ -63,22 +63,22 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should action to new insured group selection path" do
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       render "insured/families/shop_for_plans_widget"
-      expect(rendered).to have_selector("a[href='/insured/group_selections/new?employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
+      expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
     end
 
     it "should action to find sep insured families path" do
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
-      allow(benefit_group).to receive(:new_hire_enrollment_period).and_return(new_hire_enrollment_period)
-      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       allow(view).to receive(:is_under_open_enrollment?).and_return(false)
       render "insured/families/shop_for_plans_widget"
-      expect(rendered).to have_selector("a[href='/insured/families/find_sep?employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
+      expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
     end
   end
 end
