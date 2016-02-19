@@ -111,16 +111,22 @@ function validateEditPlanYear() {
   editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
   editselectedplan = $('input.ref-plan');
 
-  editbgtitles.each(function() {
-    editplantitle = $(this).val();
-    if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"editplantitle\"" + ']').size() < 2 ) {
-      editvalidatedbgtitles = true;
-      editvalidated = true;
-    } else {
-      editvalidatedbgtitles = false;
-      editvalidated = false;
 
-      return;
+  editbgtitles.each(function() {
+    if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
+
+    } else {
+      editplantitle = $(this).val();
+      if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"editplantitle\"" + ']').size() < 2 ) {
+        editvalidatedbgtitles = true;
+        editvalidated = true;
+      } else {
+        $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+        editvalidatedbgtitles = false;
+        editvalidated = false;
+
+        return false;
+      }
     }
   });
   if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
@@ -128,16 +134,19 @@ function validateEditPlanYear() {
     editvalidated = true;
   } else {
     editbgemployeepremiums.each(function() {
+      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
 
-      if ( parseInt($(this).val() ) >= parseInt(50) ) {
-        editvalidatedbgemployeepremiums = true
-        editvalidated = true;
       } else {
-        $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
-        editvalidatedbgemployeepremiums = false;
-        editvalidated = false;
-        return false;
+        if ( parseInt($(this).val() ) >= parseInt(50) ) {
+          editvalidatedbgemployeepremiums = true
+          editvalidated = true;
+        } else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          editvalidatedbgemployeepremiums = false;
+          editvalidated = false;
+          return false;
 
+        }
       }
     });
   }
@@ -147,6 +156,9 @@ function validateEditPlanYear() {
     editvalidated = true;
   } else {
     editbgemployeepremiums.each(function() {
+      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
+
+      } else {
 
       if ( parseInt($(this).val() ) >= parseInt(50) ) {
         editvalidatedbgemployeepremiums = true
@@ -159,24 +171,63 @@ function validateEditPlanYear() {
         return false;
 
       }
+    }
     });
   }
 
-  $('.reference-steps').each(function() {
-    if ( $(this).is(':visible') && $(this).find('input:checked').length >= 3) {
-      console.log('valid');
-      editvalidatedreferenceplanselections = true
-      editvalidated = true;
-    } else if ( $(this).is(':hidden')) {
-        editvalidatedreferenceplanselections = true
+  $('.benefit-group-fields').each(function() {
+    if ( $(this).hasClass('edit-additional') ) {
+
+    } else {
+    if ( $(this).find('.reference-steps').is(':first') ) {
+      if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
+        console.log('valid');
+       editvalidatedreferenceplanselections = true
         editvalidated = true;
+      } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
+          editvalidatedreferenceplanselections = true
+          editvalidated = true;
+      }
+        else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+          editvalidatedreferenceplanselections = false
+          editvalidated = false;
+          return false;
+      }
+    } else {
+      if ( $(this).find('.reference-steps:last').find('.edit-add-dental').length ) {
+        if ( $('.edit-add-dental').is(':hidden') ) {
+          if ( $(this).find('.reference-steps:last').find('.plan-options').is(':hidden') && $(this).find('.reference-steps:last').find('.nav-tabs').is(':hidden') && $(this).find('.reference-steps:last').find('.dental-reference-plans').is(':hidden')) {
+            console.log('valid');
+            editvalidatedreferenceplanselections = true
+            editvalidated = true;
+          } else if ( $(this).find('.reference-steps:last').is(':hidden')) {
+              editvalidatedreferenceplanselections = true
+              editvalidated = true;
+          }
+            else {
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+              editvalidatedreferenceplanselections = false
+              editvalidated = false;
+              return false;
+          }
+        }
+
+      } else {
+        if ( $(this).find('.reference-steps:last').find('.plan-options').is(':hidden') && $(this).find('.reference-steps:last').find('.nav-tabs').is(':hidden') && $(this).find('.reference-steps:last').find('.dental-reference-plans').is(':hidden')) {
+          editvalidatedreferenceplanselections = true
+          editvalidated = true;
+        }   else {
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+              editvalidatedreferenceplanselections = false
+              editvalidated = false;
+              return false;
+        }
+      }
+
+
     }
-      else {
-        $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
-        editvalidatedreferenceplanselections = false
-        editvalidated = false;
-        return false;
-    }
+  }
 
   });
 
@@ -188,12 +239,9 @@ function validateEditPlanYear() {
     } else {
       $('.interaction-click-control-save-plan-year').addClass('disabled');
     }
-
-
-
-
+    $('[data-toggle="tooltip"]').tooltip();
+    $("[data-toggle='tooltip']").tooltip();
 }
-
 
 function validatePlanYear() {
   bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');

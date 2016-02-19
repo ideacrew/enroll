@@ -318,6 +318,7 @@ ready = function() {
           $(this).closest('.form-group').find('.slide-label').text(data + "%");
           if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
             validateEditPlanYear();
+
           } else {
             validatePlanYear();
           }
@@ -367,6 +368,12 @@ ready = function() {
       });
 
     $(document).on('change', '.nav-tabs li input', function() {
+      if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        validateEditPlanYear();
+
+      } else {
+        validatePlanYear();
+      }
       if ( $(this).closest('.nav').parent().hasClass('health') ) {
         nav = '.health';
       } else {
@@ -400,6 +407,12 @@ ready = function() {
 
     $(document).on('click', '.plan-options a', function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
+        if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+          validateEditPlanYear();
+
+        } else {
+          validatePlanYear();
+        }
         if ( $(this).closest('.plan-options').parent().hasClass('health') ) {
           nav = '.health';
           console.log(nav);
