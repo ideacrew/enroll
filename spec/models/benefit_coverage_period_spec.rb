@@ -177,11 +177,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
               end
             end
           end
-
+          #  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
           context "and termination is outside open enrollment" do
             let(:offset_period)                 { 40 }
             let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
-            let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
+            let(:earliest_termination_date)     { after_open_enrollment_end_on }
 
               it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
                 expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
