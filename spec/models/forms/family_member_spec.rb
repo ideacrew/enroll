@@ -351,6 +351,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   describe "when updated" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(subject).to receive(:assign_person_address).and_return true
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end

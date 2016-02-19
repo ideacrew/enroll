@@ -116,6 +116,9 @@
             <%= render 'shared/consumer_home_address_fields', f: f %>
           </div>
         </div>
+      <% elsif @person.has_active_employee_role? %>
+        <%= f.hidden_field :same_with_primary, value: 'false' %>
+        <%= render 'shared/home_address_fields', f: f %>
       <% end %>
 
       <%= f.hidden_field :family_id %>

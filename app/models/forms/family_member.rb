@@ -74,9 +74,9 @@ module Forms
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
-          assign_person_address(existing_person)
           family_member.family.build_consumer_role(family_member)
         end
+        assign_person_address(existing_person)
         family_member.save!
         self.id = family_member.id
         return true
@@ -86,8 +86,8 @@ module Forms
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
-        assign_person_address(person)
       end
+      assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
@@ -248,6 +248,7 @@ module Forms
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
         return false unless assign_person_address(family_member.person)
       end
+      assign_person_address(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true
