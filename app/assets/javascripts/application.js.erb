@@ -198,7 +198,7 @@ function validateEditPlanYear() {
 function validatePlanYear() {
   bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
   bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-  referenceplanselections = $('.reference-plan input[type=radio]:checked');
+  referenceplanselections = $('.health .reference-plan input[type=radio]:checked');
 
   bgtitles.each(function() {
     plantitle = $(this).val();
@@ -207,7 +207,6 @@ function validatePlanYear() {
       validated = true;
 
     } else {
-      alert(123);
       $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
       validatedbgtitles = false;
       validated = false;
@@ -259,10 +258,28 @@ function validatePlanYear() {
     } else {
       $('.interaction-click-control-create-plan-year').addClass('disabled');
     }
-
+    $('[data-toggle="tooltip"]').tooltip();
+    $("[data-toggle='tooltip']").tooltip();
 
 
 }
+
+// disabled enter key submitting disabeld forms in firefox -- add this to any element in the page onKeyPress="return disableEnterKey(event)"
+function disableEnterKey(e)
+{
+var key;
+if(window.event)
+key = window.event.keyCode;     //IE
+else
+key = e.which;     //firefox
+if(key == 13)
+return false;
+else
+return true;
+}
+
+
+
 
 
 
@@ -383,8 +400,6 @@ $(document).ready(function () {
 
 
 
-  $('[data-toggle="tooltip"]').tooltip();
-  $("[data-toggle=popover]").popover();
 
   $('a.back').click(function(){
     parent.history.back();
@@ -964,3 +979,8 @@ $(document).on('click', '.interaction-click-control-cancel, .interaction-click-c
 $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
 })
+
+$('[data-toggle="tooltip"]').tooltip();
+$("[data-toggle='tooltip']").tooltip();
+
+$("[data-toggle=popover]").popover();

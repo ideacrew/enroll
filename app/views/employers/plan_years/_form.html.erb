@@ -56,7 +56,8 @@
 
 
               <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
-                <button class="btn btn-primary pull-right btn-br mtz disabled" type="submit">
+              <% button_tooltip = @plan_year.persisted? ? 'Click here to save your plan year' : 'Click here to create your plan year' %>
+                <button class="btn btn-primary pull-right btn-br btn-right mtz disabled plan-year-primary" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>">
                   <%= "#{button_name}".html_safe %>
                 </button> &nbsp;&nbsp;
               <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-trans pull-right' %>
