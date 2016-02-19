@@ -113,9 +113,7 @@ function validateEditPlanYear() {
 
 
   editbgtitles.each(function() {
-    if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
 
-    } else {
       editplantitle = $(this).val();
       if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"editplantitle\"" + ']').size() < 2 ) {
         editvalidatedbgtitles = true;
@@ -127,14 +125,14 @@ function validateEditPlanYear() {
 
         return false;
       }
-    }
+
   });
   if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
     editvalidatedbgemployeepremiums = true;
     editvalidated = true;
   } else {
     editbgemployeepremiums.each(function() {
-      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
+      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
 
       } else {
         if ( parseInt($(this).val() ) >= parseInt(50) ) {
@@ -156,7 +154,7 @@ function validateEditPlanYear() {
     editvalidated = true;
   } else {
     editbgemployeepremiums.each(function() {
-      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') ) {
+      if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
 
       } else {
 
@@ -177,7 +175,20 @@ function validateEditPlanYear() {
 
   $('.benefit-group-fields').each(function() {
     if ( $(this).hasClass('edit-additional') ) {
-
+      if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
+        console.log('valid');
+       editvalidatedreferenceplanselections = true
+        editvalidated = true;
+      } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
+          editvalidatedreferenceplanselections = true
+          editvalidated = true;
+      }
+        else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+          editvalidatedreferenceplanselections = false
+          editvalidated = false;
+          return false;
+      }
     } else {
     if ( $(this).find('.reference-steps').is(':first') ) {
       if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
