@@ -121,6 +121,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(email).to receive(:address=).and_return("test@example.com")
       allow(controller).to receive(:build_nested_models).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:has_csr_subrole?).and_return(false)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
