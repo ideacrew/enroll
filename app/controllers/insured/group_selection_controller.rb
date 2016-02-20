@@ -32,7 +32,7 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
-    elsif @market_kind == 'shop'
+    elsif @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
       @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.active.last unless @hbx_enrollment.present?
     end
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?

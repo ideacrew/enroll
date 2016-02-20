@@ -80,10 +80,16 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(assigns(:person)).to eq person
     end
 
-    it "should get hbx_enrollment when has active hbx_enrollments" do
+    it "should get hbx_enrollment when has active hbx_enrollments and in qle flow" do
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle'
+      expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
+    end
+
+    it "should not get hbx_enrollment when has active hbx_enrollments and not in qle flow" do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
-      expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
+      expect(assigns(:hbx_enrollment)).not_to eq hbx_enrollment
     end
 
     context "individual" do
