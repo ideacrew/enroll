@@ -22,6 +22,18 @@
                 <td><%= broker_or_staff_role.broker_agency_profile.legal_name %></td>
               </tr>
               <tr>
+                <th>Market Kinds: </th>
+                  <td>
+                    <%= broker_or_staff_role.broker_agency_profile.try(:market_kind).try(:capitalize) %>
+                  </td>
+              </tr>
+              <tr>
+                <th>Languages:</th>
+                <td>
+                  <%= broker_or_staff_role.broker_agency_profile.languages_spoken.map do |lang| lang.upcase end.to_sentence %>
+                </td>
+              </tr>
+              <tr>
                 <th>Office Locations:</th>
                 <td>
                     <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
@@ -31,10 +43,8 @@
                 </td>
               </tr>
               <tr>
-                <th>Market Kinds: </th>
-                  <td>
-                    <%= broker_or_staff_role.broker_agency_profile.try(:market_kind).try(:capitalize) %>
-                  </td>
+                <th>Phone Number:</th>
+                <td><%= broker_or_staff_role.broker_agency_profile.phone %></td>
               </tr>
               <tr>
                 <th>History</th>
