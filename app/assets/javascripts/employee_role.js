@@ -1,12 +1,18 @@
 $(document).ready(function() {
 	$('#new_person_wrapper #btn-continue').on('click', function() {
-		if ( $('#employee-sponsored-benefits').is(':checked') ) {
-			$('#new_employment_relationship').submit();
-		} else {
-			$('.new_person:last').submit();
+		if ( $('.select_employer input').is(':checked') ) {
+				alert($(this).hasClass('employer_sponsored'));
+			}
 		}
+
+		// if ( $('.select_employer input:checked').length ) {
+		// 	var id = $('.select_employer input:checked').attr('id')
+		// 	$('#new_employement_relationship').submit();
+		// } else {
+		// 	$('.new_person:last').submit();
+		// }
 	});
-});
+});1
 
 function displayEmployeeRoleSearch() {
 	$("#overlay").css("display", "none");
