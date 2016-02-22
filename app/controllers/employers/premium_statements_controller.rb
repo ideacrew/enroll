@@ -5,10 +5,9 @@ class Employers::PremiumStatementsController < ApplicationController
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
-    @hbx_enrollments = @current_plan_year.hbx_enrollments.first(100) rescue []
-    @hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active? }
-
-    # @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
+    @hbx_enrollments = @current_plan_year.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.end_of_month).select{|enrollment|
+      enrollment.census_employee.is_active?
+    }.first(100)
 
     respond_to do |format|
       format.html
