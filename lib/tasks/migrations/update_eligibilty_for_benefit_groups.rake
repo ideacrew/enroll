@@ -24,19 +24,22 @@ namespace :migrations do
   task :update_employer_benefit_eligibility_rule => :environment do
 
     count = 0
+    line = 0
     CSV.foreach("#{Rails.root.to_s}/ERs_with_doh_effective.csv") do |row|
       next if row[2] == 'FEIN'
       fein = row[2].gsub('-', '')
-      employer_profile = EmployerProfile.find_by_fein(fein)
-      next if employer_profile.blank?
-      published_plan_years = employer_profile.plan_years.any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
-      published_plan_years.each do |plan_year|
-        next if plan_year.start_on >= Date.new(2015,11,1)
-        plan_year.benefit_groups.each do |benefit_group|
-          if !(benefit_group.effective_on_kind == 'date_of_hire' && benefit_group.effective_on_offset == 0)
-            puts "updating #{employer_profile.legal_name}"
-            benefit_group.update_attributes(effective_on_kind: 'date_of_hire', effective_on_offset: 0)
-            count += 1
+
+      Organization.where(fein: fein).each do |organization|
+        employer_profile = organization.employer_profile
+        published_plan_years = employer_profile.plan_years.any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
+        published_plan_years.each do |plan_year|
+          next if plan_year.start_on >= Date.new(2015,11,1)
+          plan_year.benefit_groups.each do |benefit_group|
+            if !(benefit_group.effective_on_kind == 'date_of_hire' && benefit_group.effective_on_offset == 0)
+              puts "updating #{employer_profile.legal_name}"
+              benefit_group.update_attributes(effective_on_kind: 'date_of_hire', effective_on_offset: 0)
+              count += 1
+            end
           end
         end
       end
@@ -49,28 +52,27 @@ namespace :migrations do
   task :query_wrong_doh_employers => :environment do
 
     doh_feins = []
-    count  = 0
     CSV.foreach("#{Rails.root.to_s}/ERs_with_doh_effective.csv") do |row|
-      next if row[2] == 'FEIN'
+      next if row[2] == 'FEIN'  
       doh_feins << row[2].gsub('-', '')
     end
 
     Organization.exists(:employer_profile => true).each do |org|
       employer_profile = org.employer_profile
-      next if doh_feins.include?(employer_profile.fein)
+      if doh_feins.include?(employer_profile.fein)
+        next
+      end
 
       published_plan_years = employer_profile.plan_years.any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
       published_plan_years.each do |plan_year|
         next if plan_year.start_on >= Date.new(2015,11,1)
         plan_year.benefit_groups.each do |benefit_group|
-          if benefit_group.effective_on_kind == 'date_of_hire'
-            puts employer_profile.legal_name.inspect
-            count += 1
+          if benefit_group.effective_on_kind != 'first_of_month'
+            puts "updating #{employer_profile.legal_name}"
+            benefit_group.update_attributes(effective_on_kind: 'first_of_month')
           end
         end
       end
     end
-
-    puts count
   end
 end
