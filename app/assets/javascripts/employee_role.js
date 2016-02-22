@@ -1,7 +1,11 @@
 $(document).ready(function() {
 	$('#new_person_wrapper #btn-continue').on('click', function() {
 		if ( $('.select_employer input').is(':checked') ) {
-				alert($(this).hasClass('employer_sponsored'));
+			if ( $('.select_employer input:checked').hasClass('.employer_sponsored') ) {
+				var id = $('.select_employer input:checked').attr('id');
+				alert(id);
+			} else {
+				$('.new_person:last').submit();
 			}
 		}
 
@@ -12,7 +16,7 @@ $(document).ready(function() {
 		// 	$('.new_person:last').submit();
 		// }
 	});
-});1
+});
 
 function displayEmployeeRoleSearch() {
 	$("#overlay").css("display", "none");
