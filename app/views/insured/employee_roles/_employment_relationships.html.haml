@@ -1,10 +1,10 @@
 .n-radio-row
-  %label.n-radio{ :for=>"employee-sponsored-benefits#{er}" }
-    %input.n-radio{ :type=>"radio", :class=> "employer-sponsored", :id=>"employee-sponsored-benefits#{er}", :name=>"healthcare-marketplace" }
+  %label.n-radio{ :for=>"new_employee-sponsored-benefits#{er.object_id}" }
+    %input.n-radio{ :type=>"radio", :class=> "employer-sponsored", :id=>"new_employee-sponsored-benefits#{er.object_id}", :name=>"healthcare-marketplace" }
     %span.n-radio
     ="Enroll as an employee of #{er.employer_name} with coverage starting #{format_date er.eligible_for_coverage_on}."
-= form_for(er, :url => insured_employee_index_path, :as => :employment_relationship, :method => :post) do |f|
-  = f.submit :class => "hidden", :id => "this-is-my-employer#{er}"
+= form_for(er, :url => insured_employee_index_path, :as => :employment_relationship, :html => {:class => "new_employee-sponsored-benefits#{er.object_id}"}, :method => :post) do |f|
+  = f.submit :class => "hidden", :id => "employee-sponsored-benefits#{er.object_id}"
   = f.hidden_field :first_name
   = f.hidden_field :last_name
   = f.hidden_field :middle_name

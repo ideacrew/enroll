@@ -1,7 +1,7 @@
 %h3 Healthcare Marketplace
 
 %p
-  .n-radio-group.select_employer
+  .n-radio-group.select-employer
     - @employment_relationships.each do |er|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er}
 

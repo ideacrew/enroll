@@ -1,20 +1,13 @@
 $(document).ready(function() {
 	$('#new_person_wrapper #btn-continue').on('click', function() {
-		if ( $('.select_employer input').is(':checked') ) {
-			if ( $('.select_employer input:checked').hasClass('.employer_sponsored') ) {
-				var id = $('.select_employer input:checked').attr('id');
-				alert(id);
+		if ( $('.select-employer input').is(':checked') ) {
+			if ( $('.select-employer input:checked').hasClass('employer-sponsored') ) {
+				var form_class = $('.select-employer input:checked').attr('id');
+				$('form.'+form_class).submit();
 			} else {
 				$('.new_person:last').submit();
 			}
 		}
-
-		// if ( $('.select_employer input:checked').length ) {
-		// 	var id = $('.select_employer input:checked').attr('id')
-		// 	$('#new_employement_relationship').submit();
-		// } else {
-		// 	$('.new_person:last').submit();
-		// }
 	});
 });
 
