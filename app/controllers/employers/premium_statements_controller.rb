@@ -5,9 +5,8 @@ class Employers::PremiumStatementsController < ApplicationController
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
-    @hbx_enrollments = @current_plan_year.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.end_of_month).select{|enrollment|
-      enrollment.census_employee.is_active?
-    }.first(100)
+    valid_enrollments_for_billing_month = @current_plan_year.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.end_of_month)
+    @hbx_enrollments = valid_enrollments_for_billing_month.select{|enrollment| enrollment.census_employee.is_active?}.first(100)
 
     respond_to do |format|
       format.html

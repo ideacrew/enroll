@@ -64,14 +64,15 @@ class PlanYear
     id_list = benefit_groups.collect(&:_id).uniq
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
-      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
     }).limit(100)
 
     families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments
-                      .where(:benefit_group_id.in => id_list)
-                      .where(:"effective_on".lte => month_end)
-                      .where(:"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)).to_a
+      enrollments += family.active_household.hbx_enrollments.where({
+        :benefit_group_id.in => id_list,
+        :"effective_on".lte => month_end,
+        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+      }).to_a
     end
   end
 
