@@ -1,3 +1,54 @@
+$(document).ready(function() {
+  if ('input.typeahead') {
+    var employers = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('legal_name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        prepare: function (query, settings) {
+          settings.type = "POST";
+          settings.data = { q: query };
+          return settings;
+        },
+        url: '/employers/search'
+      }
+    });
+
+    // initialize the bloodhound suggestion engine
+    employers.initialize();
+    // instantiate the typeahead UI
+    $('input.typeahead').typeahead({
+      hint: false,
+      minLength: 2
+    },{
+      display: 'legal_name',
+      name: 'employers',
+      source: employers.ttAdapter()
+    });
+
+    $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
+      console.log(arguments);
+      $('input#employer_id').val(suggestion._id);
+      $('input#organization_legal_name').val(suggestion.legal_name);
+      $('input#organization_dba').val(suggestion.dba);
+      $('input#organization_fein').val(suggestion.fein);
+      $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).selectric('refresh');
+
+      var primary_office = suggestion.office_locations.find(function(element, index, array) { return element.is_primary });
+      if (primary_office) {
+        $('input#organization_office_locations_attributes_0_address_attributes_address_1').val(primary_office.address.address_1);
+        $('input#organization_office_locations_attributes_0_address_attributes_address_2').val(primary_office.address.address_2);
+        $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city);
+        $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).selectric('refresh');
+        $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip);
+
+        $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code)
+        $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number)
+        $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension)
+      }
+    });
+  }
+});
+
 $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){

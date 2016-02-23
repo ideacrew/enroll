@@ -155,6 +155,7 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
+    post 'search', to: 'employers#search'
     root 'employer_profiles#new'
 
     resources :premium_statements, :only => [:show]
