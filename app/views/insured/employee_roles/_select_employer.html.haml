@@ -2,8 +2,8 @@
 
 %p
   .n-radio-group.select-employer
-    - @employment_relationships.each do |er|
-      = render partial: "insured/employee_roles/employment_relationships", locals: {er: er}
+    - @employment_relationships.each_with_index do |er, index|
+      = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
 
     .n-radio-row
       %label.n-radio{ :for=>"individual-benefits" }
