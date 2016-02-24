@@ -19,10 +19,12 @@ namespace :migrations do
 
     employers.each do |fein, termination_date|
       organizations = Organization.where(fein: fein)
+
       if organizations.size > 1
         puts "found more than 1 for #{legal_name}"
       end
 
+      puts "Processing #{organizations.first.legal_name}"
       termination_date = Date.strptime(termination_date, "%m/%d/%Y")
 
       organizations.each do |organization|
