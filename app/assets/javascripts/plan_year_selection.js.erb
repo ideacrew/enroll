@@ -67,12 +67,14 @@ ready = function() {
       $(this).closest('.row').fadeOut();
       $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
       $(this).closest('.benefit-group-fields').find('.dental .nav-tabs input').removeProp("checked");
-      $(this).closest('.benefit-group-fields').find('.dental h1:first').text('Dental - Add Benefit Package');
+      $(this).closest('.benefit-group-fields').find('.dental h1:first').html('Dental - Add Benefit Package <i class="fa fa-trash-o pull-right" style="margin-top: 10px;" data-toggle="tooltip" title="Remove"></i>');
       $(this).closest('.benefit-group-fields').find('.dental .currently-offered').text("Select which plans your employees will choose from.");
       $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
       $(this).closest('.benefit-group-fields').find('.dental .edit-offering').show();
       $(this).closest('.benefit-group-fields').find('.dental .reference-steps').show();
       $(this).closest('.benefit-group-fields').find('.dental:first').slideDown();
+      $("[data-toggle='tooltip']").tooltip();
+
     });
 
     // get dental carrier names

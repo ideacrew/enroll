@@ -43,7 +43,6 @@ $(document).on 'click', 'form .add_fields', (event) ->
       url: url
     return
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
-  $('.benefit-group-fields:last .edit-add-dental').remove();
   $('.benefit-group-fields:last').data 'time', time
   $('.benefit-group-fields:last .dental-relationship-benefits-attributes-time').val time
 
@@ -75,7 +74,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
     return
 
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
-    
+    $('.benefit-group-fields:last .edit-add-dental').hide();
     $('.benefit-group-fields:last').attr 'custom', false
     $('.benefit-group-fields:last').addClass 'edit-additional'
     $('.benefit-group-fields:last .edit-offering, .benefit-group-fields:last .reference-steps .cancel-plan-change').remove()
