@@ -59,16 +59,22 @@
       </div>
     </div>
 
-    <% address = get_address_from_dependent(dependent) %>
-    <% if address.present? %>
+    <% addresses = get_address_from_dependent(dependent) %>
+    <% addresses.each do |address| %>
       <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-6 col-sm-6 no-pd">
+        <div class="col-md-2 col-sm-2 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">KIND</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.kind.capitalize %></span>
+          </div>
+        </div>
+        <div class="col-md-5 col-sm-5 no-pd">
           <div class="form-group form-group-lg">
             <label class="static_label label-floatlabel">ADDRESS LINE 1</label>
             <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_1 %></span>
           </div>
         </div>
-        <div class="col-md-6 col-sm-6 no-pd">
+        <div class="col-md-5 col-sm-5 no-pd">
           <div class="form-group form-group-lg">
             <label class="static_label label-floatlabel">ADDRESS LINE 2</label>
             <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_2 %></span>

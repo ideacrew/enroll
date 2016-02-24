@@ -21,7 +21,7 @@ describe "insured/family_members/_dependent.html.erb" do
   end
 
   it "should have address" do
-    allow(view).to receive(:get_address_from_dependent).with(dependent).and_return address
+    allow(view).to receive(:get_address_from_dependent).with(dependent).and_return [address]
     render "insured/family_members/dependent", dependent: dependent, person: person
     expect(rendered).to have_selector("label", text: 'ADDRESS LINE 1')
     expect(rendered).to have_selector("label", text: 'ADDRESS LINE 2')

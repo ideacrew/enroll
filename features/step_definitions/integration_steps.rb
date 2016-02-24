@@ -420,12 +420,12 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
   input_field.li(text: /Child/).click
-  @browser.text_field(name: 'dependent[addresses][address_1]').set('623a Spalding Ct')
-  @browser.text_field(name: 'dependent[addresses][city]').set('Washington')
+  @browser.text_field(name: 'dependent[addresses][0][address_1]').set('623a Spalding Ct')
+  @browser.text_field(name: 'dependent[addresses][0][city]').set('Washington')
   input_field = @browser.select(name: /state/).divs(xpath: "ancestor::div")[-2]
   input_field.click
   input_field.li(text: /DC/).click
-  @browser.text_field(name: 'dependent[addresses][zip]').set('20001')
+  @browser.text_field(name: 'dependent[addresses][0][zip]').set('20001')
   @browser.radio(id: /radio_female/).fire_event("onclick")
 end
 

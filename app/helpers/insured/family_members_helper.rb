@@ -17,11 +17,11 @@ module Insured::FamilyMembersHelper
 
   def get_address_from_dependent(dependent)
     if dependent.class == FamilyMember
-      dependent.person.home_address
+      dependent.person.addresses
     else
-      dependent.family_member.person.home_address
+      dependent.family_member.person.addresses
     end
   rescue
-    nil
+    []
   end
 end
