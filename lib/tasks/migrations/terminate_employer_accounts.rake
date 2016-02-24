@@ -52,8 +52,6 @@ namespace :migrations do
               hbx_enrollment.update_attributes(:terminated_on => termination_date)
               hbx_enrollment.terminate_coverage!
               hbx_enrollment.propogate_terminate(termination_date)
-            else
-              puts "hbx enrollment #{hbx_enrollment.aasm_state}"
             end
           end
   
