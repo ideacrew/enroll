@@ -67,6 +67,7 @@ private
       message[:email] = current_user.email
       message[:url] = request.original_url
       log(message, :severity=>'error')
+      redirect_to "/500.html"
     end
   end
 

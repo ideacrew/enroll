@@ -13,6 +13,7 @@ RSpec.describe FamiliesController do
         expect(severity[:severity]).to eq('error')
         expect(msg[:message]).to eq('@family was set to nil')
       end
+      expect(subject).to receive(:redirect_to).with("/500.html")
       subject.instance_eval{set_family}
     end
 
