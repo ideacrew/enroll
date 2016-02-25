@@ -15,9 +15,13 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
 
 
   if ( $('.benefit-group-fields').length > 1 ) {
-    $('.benefit-group-fields:last .elected-plans-tab .reference-plan input[type=checkbox]').each(function() {
+    $('.benefit-group-fields .elected-plans-tab .reference-plan input[type=checkbox]').each(function() {
       var name = $(this).attr('name');
       var new_name = name.replace("[0]", "["+$(this).closest('.benefit-group-fields').data('time')+"]");
+      if ( $(this).closest('.benefit-group-fields').data('time') == undefined ) {
+        benefit_groups = $(this).closest('.benefit-group-fields');
+        var new_name = name.replace("[0]", "["+$('.benefit-group-fields').index( benefit_groups )+"]");
+      }
       $(this).attr('name', new_name);
     });
   }

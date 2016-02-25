@@ -10,10 +10,13 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .row:first").hide();
 $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
-// hide dental section when editing benefit groups with no dental plan
-$('.edit-add-dental').closest('.benefit-group-fields').find('.dental:first').hide();
+
 // show dental config links
 $("#<%= @location_id %> .dental-config-links").show();
+
+if ( $("#<%= @location_id %> .edit-add-dental").is(':hidden') ) {
+    $("#<%= @location_id %> .select-dental-plan").show();
+};
 
 $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   // clear dental plan form
@@ -29,7 +32,7 @@ $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   $("#<%= @location_id %> .dental-plan-offering, #<%= @location_id %> .reference-steps .dental:first").show();
   $("#<%= @location_id %> .select-dental-plan").prev().show();
   validateEditPlanYear();
-
+  $("#<%= @location_id %> .edit-add-dental, #<%= @location_id %> .dental .nav-tabs").show();
 
 });
 // make summary links

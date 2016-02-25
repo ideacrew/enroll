@@ -77,11 +77,10 @@
     <div class="health selected-plan row" style="display: none;">
     </div>
     <% i = f.index %>
-    <% if (@plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).blank?) || @plan_year.new_record == true %>
       <br/>
       <br/>
       <div class="row">
-        <div class="col-xs-12 edit-add-dental b bt-n" style="<% if @plan_year.new_record == true %>display: none;<% else %>display: block;<% end %>">
+        <div class="col-xs-12 edit-add-dental b bt-n" style="<% if (@plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).present?) || @plan_year.new_record == true %>display: none;<% else %>display: block;<% end %>">
           <div class="col-xs-1">
           </div>
           <div class="col-xs-10">
@@ -92,7 +91,6 @@
           </div>
         </div>
       </div>
-    <% end %>
     <div class="select-dental-plan dental row" style="display: none;">
       <br/>
       <br/>
