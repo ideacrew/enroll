@@ -34,6 +34,15 @@ class LawfulPresenceDetermination
     end
   end
 
+  def latest_denial_date
+    responses = (ssa_responses.to_a + vlp_responses.to_a)
+    if self.verification_outstanding? && responses.present?
+      responses.max_by(&:received_at).received_at
+    else
+      nil
+    end
+  end
+
   def start_determination_process(requested_start_date)
     if should_use_ssa?
       start_ssa_process

@@ -62,6 +62,9 @@ RSpec.describe Insured::FamiliesController do
   describe "GET home" do
     before :each do
       allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+
+      allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
+      allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
@@ -74,6 +77,14 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(consumer_role).to receive(:save!).and_return(true)
+
+      allow(family).to receive(:_id).and_return(true)
+      allow(hbx_enrollments).to receive(:_id).and_return(true)
+      allow(hbx_enrollments).to receive(:each).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:reject).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:map).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
+
       session[:portal] = "insured/families"
     end
 
