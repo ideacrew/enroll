@@ -22,7 +22,19 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    @person = Forms::ConsumerCandidate.new
+
+    if params.permit(:build_consumer_role)[:build_consumer_role].present?
+      person = Person.find(session[:person_id])
+
+      @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
+      @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
+      @person_params[:dob] = person.dob.strftime("%Y-%m-%d")
+
+      @person = Forms::ConsumerCandidate.new(@person_params)
+    else
+      @person = Forms::ConsumerCandidate.new
+    end
+
     respond_to do |format|
       format.html
     end
@@ -31,6 +43,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
+
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     respond_to do |format|
