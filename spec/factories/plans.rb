@@ -39,3 +39,35 @@ FactoryGirl.define do
 
 
 end
+
+FactoryGirl.define do 
+  factory(:plan_template, {class: Plan}) do
+    name "Some plan name"
+    carrier_profile_id { BSON::ObjectId.new }
+    sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-01" }
+    active_year Date.today.year
+    metal_level { ["bronze","silver","gold","platinum"].shuffle.sample }
+
+    trait :shop_health do
+      market "shop"
+      coverage_kind "health"
+    end
+    trait :ivl_health do
+      market "individual"
+      coverage_kind "health"
+    end
+    trait :shop_dental do
+      market "shop"
+      coverage_kind "dental"
+      metal_level "dental"
+    end
+    trait :ivl_dental do
+      market "individual"
+      coverage_kind "dental"
+      metal_level "dental"
+    end
+    trait :unoffered do
+      sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-00" }
+    end
+  end
+end

@@ -6,63 +6,55 @@ describe Plan do
       let(:carrier_id) { BSON::ObjectId.new }
 
       let(:shop_variant_health_plan) do
-        Plan.new({
-          :name => "An ivl health plan",
-          :hios_id => "AHEALTHHIOSID-00",
-          :active_year => 2014,
-          :coverage_kind => "health",
-          :metal_level => "bronze",
-          :market => "individual",
-          :carrier_profile_id => carrier_id
-        })
+        FactoryGirl.build(
+          :plan_template,
+          :shop_health, :unoffered,
+          {
+            :carrier_profile_id => carrier_id,
+            :active_year => 2014
+          })
       end
 
       let(:ivl_health_plan) do
-        Plan.new({
-          :name => "An ivl health plan",
-          :hios_id => "AHEALTHHIOSID-01",
-          :active_year => 2014,
-          :coverage_kind => "health",
-          :metal_level => "bronze",
-          :market => "individual",
-          :carrier_profile_id => carrier_id
-        })
+        FactoryGirl.build(
+          :plan_template,
+          :ivl_health,
+          {
+            :carrier_profile_id => carrier_id,
+            :active_year => 2014
+          })
       end
 
       let(:ivl_dental_plan) do
-        Plan.new({
-          :name => "An ivl health plan",
-          :hios_id => "AHEALTHHIOSID-01",
+        FactoryGirl.build(
+          :plan_template,
+          :ivl_dental,
+          {
           :active_year => 2014,
-          :coverage_kind => "dental",
-          :metal_level => "dental",
-          :market => "individual",
           :carrier_profile_id => carrier_id
-        })
+          }
+        )
       end
 
       let(:shop_health_plan) do
-        Plan.new({
-          :name => "A shop health plan",
-          :hios_id => "AHEALTHHIOSID-01",
-          :active_year => 2014,
-          :coverage_kind => "health",
-          :metal_level => "bronze",
-          :market => "shop",
-          :carrier_profile_id => carrier_id
-        })
+        FactoryGirl.build(
+          :plan_template,
+          :shop_health,
+          {
+            :carrier_profile_id => carrier_id,
+            :active_year => 2014
+          })
       end
 
       let(:shop_dental_plan) do
-        Plan.new({
-          :name => "A shop dental plan",
-          :hios_id => "ADENTALHIOSID-01",
+        FactoryGirl.build(
+          :plan_template,
+          :shop_dental,
+          {
           :active_year => 2014,
-          :coverage_kind => "dental",
-          :metal_level => "dental",
-          :market => "shop",
           :carrier_profile_id => carrier_id
-        })
+          }
+        )
       end
 
       subject { Plan.valid_shop_health_plans("carrier", carrier_id, 2014) } 
