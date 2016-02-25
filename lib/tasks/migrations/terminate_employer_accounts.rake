@@ -59,6 +59,17 @@ namespace :migrations do
           plan_year.terminate! if plan_year.may_terminate?    
         end
 
+        organization.employer_profile.census_employees.non_terminated.each do |census_employee|
+          if census_employee.employee_role_linked?
+            census_employee.employee_role.delete
+            census_employee.update_attributes(:aasm_state => 'eligible', :employee_role_id => nil)
+          end
+
+          if census_employee.active_benefit_group_assignment.present?
+            census_employee.active_benefit_group_assignment.update_attributes(:is_active => false)
+          end
+        end
+
         organization.employer_profile.revert_application! if organization.employer_profile.may_revert_application?
       end
     end
