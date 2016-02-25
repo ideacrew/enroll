@@ -74,7 +74,7 @@ class EmployeeRole
   end
 
   def is_under_open_enrollment?
-    employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    employer_profile.show_plan_year && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def is_eligible_to_enroll_without_qle?
@@ -82,6 +82,8 @@ class EmployeeRole
   end
 
   def has_new_hire_enrollment_period?(enrollment_date = TimeKeeper.date_of_record)
+    return false if benefit_group.blank?
+    
     new_hire_period = benefit_group.new_hire_enrollment_period(new_census_employee.hired_on)
     if enrollment_date < new_hire_period.min || new_hire_period.cover?(enrollment_date)
       return true 
