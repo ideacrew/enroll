@@ -65,7 +65,7 @@ class PlanYear
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
       :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
-    }).limit(100)
+    }).limit(100) # limit census employees to 100 due to performance reasons
 
     families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where({
