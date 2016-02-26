@@ -257,6 +257,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
       it "selects only 'individual' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)
+        controller.instance_variable_set(:@person, person)
         staff = subject.instance_eval{ eligible_brokers }
 
         staff.each do |staff_person|
@@ -271,6 +272,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
       it "selects only 'shop' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)
+        controller.instance_variable_set(:@person, person)
         staff = subject.instance_eval{ eligible_brokers }
 
         staff.each do |staff_person|
