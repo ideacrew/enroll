@@ -14,7 +14,7 @@ class ShopNotices::ShopPdfNotice < Notice
       url: "www.dhs.dc.gov",
       phone: "(855) 532-5465",
       fax: "(855) 532-5465",
-      email: "info@dchealthlink.com",
+      email: "#{Settings.contant_center.email_address}",
       address: PdfTemplates::NoticeAddress.new({
         street_1: "100 K ST NE",
         street_2: "Suite 100",
@@ -55,4 +55,4 @@ class ShopNotices::ShopPdfNotice < Notice
       zip: primary_address.zip
       })
   end
-end 
+end

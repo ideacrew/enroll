@@ -74,6 +74,14 @@ class HbxEnrollmentMember
     )
   end
 
+  def is_covered_on?(coverage_date)
+    if coverage_end_on.present? && coverage_end_on < coverage_date
+      false
+    else
+      true
+    end
+  end
+
   private
 
   def end_date_gt_start_date

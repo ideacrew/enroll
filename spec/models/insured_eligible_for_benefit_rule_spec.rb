@@ -205,7 +205,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "returns false for verification outstanding and event fired more than the outstanding verification window" do
         args = OpenStruct.new
-        args.determined_at = TimeKeeper.date_of_record - (InsuredEligibleForBenefitRule::INDIVIDUAL_VERIFICATION_OUTSTANDING_WINDOW + 10.days)
+        args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         args.vlp_authority = "dhs"
         role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
         role.deny_lawful_presence!(args)
@@ -215,7 +215,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "returns true for verification outstanding and event fired less than the outstanding verification window" do
         args = OpenStruct.new
-        args.determined_at = TimeKeeper.date_of_record - (InsuredEligibleForBenefitRule::INDIVIDUAL_VERIFICATION_OUTSTANDING_WINDOW - 10.days)
+        args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days - 10.days)
         args.vlp_authority = "dhs"
         role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
         role.deny_lawful_presence!(args)
@@ -225,7 +225,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "returns false if insured_eligible_for_benefit_rule fails" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
-        role.person.created_at = TimeKeeper.date_of_record - (InsuredEligibleForBenefitRule::INDIVIDUAL_VERIFICATION_OUTSTANDING_WINDOW + 10.days)
+        role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [false, [["eligibility failed on lawful_presence_status"]]]
       end

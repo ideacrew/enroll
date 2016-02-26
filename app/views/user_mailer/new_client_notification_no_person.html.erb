@@ -1,6 +1,6 @@
 <p>
-  Congratulations! You have been selected as the new <%= role %> for <%= name %> effective <%=TimeKeeper.date_of_record %>.  Your DC Health Link account will be updated to reflect this assignment and provide you access to <%= first_name %>'s account.
+  Congratulations! You have been selected as the new <%= role %> for <%= name %> effective <%=TimeKeeper.date_of_record %>.  Your <%= Settings.site.short_name %> account will be updated to reflect this assignment and provide you access to <%= first_name %>'s account.
 </p>
 <p>
-  To view information on all of your clients, please log in to your account at <a ref='www.DCHealthLink.com'> www.DCHealthLink.com </a>  If you have any questions, contact <%= HbxProfile::CallCenterName %> at <%= HbxProfile::CallCenterPhoneNumber %>.
+  To view information on all of your clients, please log in to your account at <a href="<%= Settings.site.home_url %>"><%= Settings.site.short_name %><a/>. If you have any questions, contact <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>.
 </p>
