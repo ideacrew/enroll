@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
 
+    log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 

@@ -18,9 +18,11 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
       wa.emails = [
         FactoryGirl.build(:email, kind: "work")
       ]
+
       wa.phones = [
         FactoryGirl.build(:phone, kind: "home")
       ]
+
       wa.save
       f
     end
@@ -32,11 +34,9 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
       render 'insured/families/consumer_brokers_widget'
     end
 
-
     it "should display broker widget for consumer" do
       expect(rendered).to have_selector('h4', "Your Broker")
     end
-
   end
 
 end

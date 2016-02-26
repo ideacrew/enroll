@@ -746,6 +746,10 @@ class HbxEnrollment
     end
   end
 
+  def can_terminate_coverage?
+    may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({
@@ -829,7 +833,7 @@ class HbxEnrollment
     state :unverified
     state :enrolled_contingent
 
-    event :advance_date, :after => :record_transition  do
+    event :advance_date, :after => :record_transition do
     end
 
     event :renew_enrollment, :after => :record_transition do
@@ -860,6 +864,14 @@ class HbxEnrollment
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
+    # event :cancel_coverage, :after => :record_transition do
+    #   transitions from: :coverage_selected, to: :coverage_canceled, after: :propogate_terminate
+    #   transitions from: :auto_renewing, to: :coverage_canceled, after: :propogate_terminate
+    #   transitions from: :renewing_coverage_selected, to: :coverage_canceled, after: :propogate_terminate
+    #   transitions from: :enrolled_contingent, to: :coverage_canceled, after: :propogate_terminate
+    #   transitions from: :unverified, to: :coverage_canceled, after: :propogate_terminate
+    #   transitions from: :coverage_enrolled, to: :coverage_canceled, after: :propogate_terminate
+    # end
 
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled

@@ -66,7 +66,7 @@ class BenefitSponsorship
 # Shopping time range
 # Benefit effective time range: can exceed one year
 # Issuer begin date
-# Issuer end date -- 
+# Issuer end date --
 
 # Employer
 # Effective start on date: Dec 1, 2015
@@ -103,8 +103,8 @@ class BenefitSponsorship
       #   {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
       #   {:"employer_profile.workflow_state_transitions".elem_match => {
       #       "$and" => [
-      #         {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-      #         {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+      #         {:transition_at.gte => (new_date.beginning_of_day - Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial)},
+      #         {:transition_at.lte => (new_date.end_of_day - Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial)},
       #         {:to_state => "ineligible"}
       #       ]
       #     }
