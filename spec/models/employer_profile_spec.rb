@@ -113,12 +113,15 @@ describe EmployerProfile, dbclean: :after_each do
     end
 
     context "and employer submits a valid plan year application with tomorrow as start open enrollment" do
-      before do
-        TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
-        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
-        plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      before do        
+        plan_year = employer_profile.plan_years.first
         plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
+        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
+        plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 10.days
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
+
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month - 1)
+
         plan_year.publish!
       end
 
@@ -220,7 +223,7 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
   ) }
 
   before do
-    plan_year.publish!
+    plan_year.update_attributes({:aasm_state => 'published'})
   end
 
   it "should not find the linkable family when given a different ssn" do
@@ -415,7 +418,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       end
       def p0; Person.new(**params); end
       before do
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
       end
 
       it "should return an instance of CensusEmployee" do
@@ -483,7 +486,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
           census_employee.benefit_group_assignments = [benefit_group_assignment]
           census_employee.save
         end
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
       end
     end
 
