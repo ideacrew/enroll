@@ -401,7 +401,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       it "and should provide relevant warnings" do 
         expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/You may not publish plan year after due date #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
       end
 
       it "and plan year should be in publish pending state" do
@@ -580,7 +580,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevant warnings" do 
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/You may not publish plan year after due date #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
         end
 
         it "and plan year should be in publish pending state" do

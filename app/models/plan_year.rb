@@ -200,7 +200,7 @@ class PlanYear
     end
 
     if !is_publish_date_valid?
-      errors.merge!({publish: "You may not publish plan year after due date #{due_date_for_publish.strftime("%m-%d-%Y")}"})
+      errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
     errors
