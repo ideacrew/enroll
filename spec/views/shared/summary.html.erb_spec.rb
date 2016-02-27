@@ -42,6 +42,11 @@ describe "shared/_summary.html.erb" do
     expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
   end
 
+  it "should have provider_directory_url and rx_formulary_url" do
+    expect(rendered).to have_selector("a[href='#{mock_plan.provider_directory_url}']")
+    expect(rendered).to have_selector("a[href='#{mock_plan.rx_formulary_url}']")
+  end
+
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
     expect(rendered).to include('Summary of Benefits and Coverage')
   end
