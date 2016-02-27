@@ -44,6 +44,27 @@
           <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
         <% end %>
       </tr>
+
+      <tr>
+        <th></th>
+        <% qhps.each do |qhp|%>
+          <th colspan="2">
+            <% if qhp.plan.nationwide %>
+              <%= link_to "PROVIDER DIRECTORY URL", qhp.plan.provider_directory_url, target: "_blank"%>
+            <% end %>
+          </th>
+        <% end %>
+      </tr>
+
+      <tr>
+        <th></th>
+        <% qhps.each do |qhp|%>
+          <th colspan="2">
+            <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank"%>
+          </th>
+        <% end %>
+      </tr>
+
       <tr>
         <th>PLAN BENEFITS <br> (In Network)</th>
         <% qhps.each do |qhp|%>

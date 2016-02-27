@@ -50,6 +50,10 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :dc_in_network, type: Boolean # DC In-Network or not
 
+  # Fields for provider direcotry and rx formulary url
+  field :provider_directory_url, type: String
+  field :rx_formulary_url, type: String
+
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
