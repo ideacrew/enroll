@@ -17,6 +17,8 @@ describe "shared/_summary.html.erb" do
       :total_premium => 0,
       :total_employer_contribution => 0,
       :total_employee_cost => 0,
+      :rx_formulary_url => "http://www.example.com",
+      :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
