@@ -36,7 +36,7 @@ class Insured::FamiliesController < FamiliesController
 
     @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
 
-    @employee_role = @person.employee_roles.active.first
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     respond_to do |format|
       format.html
@@ -69,6 +69,8 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
@@ -176,8 +178,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
   def check_employee_role
-    @employee_role = @person.employee_roles.try(:first)
+    @employee_role = @person.active_employee_roles.first
   end
 
   def init_qualifying_life_events
