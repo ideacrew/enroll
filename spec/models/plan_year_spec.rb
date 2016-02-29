@@ -1710,7 +1710,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       obj.class.find(obj.id)
     end
 
-    let!(:plan_year) { FactoryGirl.create(:plan_year, start_on: Date.new(2015,11,1) ) } #Make it pick the same reference plan
+    let!(:plan_year) { FactoryGirl.create(:plan_year, start_on: Date.new(2015,10,1) ) } #Make it pick the same reference plan
     let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, title: "blue collar benefit group", plan_year: plan_year) }
     let!(:employer_profile) { plan_year.employer_profile }
     let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "white collar benefit group") }
