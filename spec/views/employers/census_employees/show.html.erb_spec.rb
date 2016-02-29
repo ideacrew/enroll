@@ -5,7 +5,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:benefit_group_assignment) { double(benefit_group: benefit_group) }
   let(:benefit_group) {double(title: "plan name")}
-  let(:hbx_enrollment) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [])}
+  let(:hbx_enrollment) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [], coverage_kind: 'health')}
+  let(:hbx_enrollment_two) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [], coverage_kind: 'dental')}
   let(:plan) {double(total_premium: 10, total_employer_contribution: 20, total_employee_cost:30)}
   let(:user) { FactoryGirl.create(:user) }
 
@@ -15,23 +16,29 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
     assign(:hbx_enrollment, hbx_enrollment)
+    assign(:hbx_enrollments, [hbx_enrollment])
     assign(:benefit_group, benefit_group)
     assign(:plan, plan)
+    assign(:active_benefit_group_assignment, benefit_group_assignment)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+    allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(hbx_enrollment)
+    allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
+    allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
+    allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
+
   end
 
-  it "should show the plan" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
+  it "should not show the plan" do
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(nil)
-
+    assign(:hbx_enrollments, nil)
     render template: "employers/census_employees/show.html.erb"
-    expect(rendered).to match /Plan/
-    expect(rendered).to have_selector('p', text: 'Benefit Group: plan name')
+    expect(rendered).to_not match /Plan/
+    expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
   it "should show waiver" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Coverage Waived/
@@ -68,9 +75,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(false)
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(census_employee).to receive(:employee_role).and_return(double(hired_on: Date.new, effective_on: Date.new))
-
     render template: "employers/census_employees/show.html.erb"
-    expect(rendered).to match /ELIGIBLE FOR COVERAGE/
+    expect(rendered).to match /Eligible for Coverage/i
   end
 
   context "dependents" do

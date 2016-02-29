@@ -166,13 +166,13 @@ class HbxEnrollment
     end
 
     def advance_day(new_date)
-      
+
       # #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
         family.enrollments.renewing.each do |hbx_enrollment|
           if hbx_enrollment.effective_on <= new_date
             if census_employee = hbx_enrollment.census_employee
-              if census_employee.renewal_benefit_group_assignment.may_select_coverage?            
+              if census_employee.renewal_benefit_group_assignment.may_select_coverage?
                 census_employee.renewal_benefit_group_assignment.select_coverage!
               end
             end
@@ -309,7 +309,7 @@ class HbxEnrollment
       self.terminated_on = benefit_group.termination_effective_on_for(submitted_on)
     else
       bcp = BenefitCoveragePeriod.find_by_date(effective_on)
-      self.terminated_on = bcp.termination_effective_on_for(submitted_on)      
+      self.terminated_on = bcp.termination_effective_on_for(submitted_on)
     end
     terminate_coverage!
   end
@@ -451,8 +451,8 @@ class HbxEnrollment
   end
 
   def coverage_period_date_range
-    is_shop? ? 
-      benefit_group.plan_year.start_on..benefit_group.plan_year.start_on : 
+    is_shop? ?
+      benefit_group.plan_year.start_on..benefit_group.plan_year.start_on :
       benefit_coverage_period.start_on..benefit_coverage_period.end_on
   end
 
@@ -578,7 +578,7 @@ class HbxEnrollment
       new_hire_effective_date = employee_role.coverage_effective_on
     else
       open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-      
+
       if open_enrollment_effective_date < employee_role.coverage_effective_on
         new_hire_enrollment_period = employee_role.benefit_group.new_hire_enrollment_period(employee_role.new_census_employee.hired_on)
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.first} to enroll for coverage."
@@ -850,7 +850,7 @@ class HbxEnrollment
 
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified], to: :coverage_canceled
-      transitions from: :renewing_waived, to: :inactive 
+      transitions from: :renewing_waived, to: :inactive
     end
   end
 
@@ -902,7 +902,7 @@ class HbxEnrollment
     end
   end
 
-  private 
+  private
 
   def benefit_group_assignment_valid?(coverage_effective_date)
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
