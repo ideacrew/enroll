@@ -781,6 +781,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "has_active_health_coverage?" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+
+    it "should return false without benefit_group_assignment" do
+      expect(census_employee.has_active_health_coverage?).to be_falsey
+    end
+
+    context "with active benefit_group_assignment" do
+      before do
+        census_employee.add_benefit_group_assignment(benefit_group)
+      end
+
+      it "should return false without hbx_enrollment" do
+        expect(census_employee.active_benefit_group_assignment.hbx_enrollment).to eq nil
+        expect(census_employee.has_active_health_coverage?).to be_falsey
+      end
+
+      it "should return true when has health hbx_enrollment" do
+        census_employee.active_benefit_group_assignment.hbx_enrollment = hbx_enrollment
+        expect(census_employee.has_active_health_coverage?).to be_truthy
+      end
+
+      it "should return false when has dental hbx_enrollment" do
+        hbx_enrollment.coverage_kind = 'dental'
+        census_employee.active_benefit_group_assignment.hbx_enrollment = hbx_enrollment
+        expect(census_employee.has_active_health_coverage?).to be_falsey
+      end
+    end
+  end
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}

@@ -290,7 +290,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.size
+    enrolled.count { |e| e.has_active_health_coverage? }
   end
 
   def enrollment_ratio
