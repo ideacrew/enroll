@@ -428,6 +428,10 @@ class Person
     employee_roles.present? ? employee_roles.active : []
   end
 
+  def has_multiple_roles?
+    consumer_role.present? && employee_roles.present?
+  end
+
   def residency_eligible?
     no_dc_address and no_dc_address_reason.present?
   end
@@ -640,8 +644,8 @@ class Person
   end
 
   def create_inbox
-    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
-    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
   end

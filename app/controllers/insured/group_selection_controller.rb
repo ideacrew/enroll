@@ -1,7 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
-  
+
   def select_market(person, params)
     return params[:market_kind] if params[:market_kind].present?
     if params[:employee_role_id].present? || (@person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?))
@@ -60,6 +60,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
+    hbx_enrollment.generate_hbx_signature
 
     @family.hire_broker_agency(current_user.person.broker_role.try(:id))
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)

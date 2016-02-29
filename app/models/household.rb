@@ -4,7 +4,7 @@ class Household
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
+  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild}
 
   embedded_in :family
 
@@ -253,6 +253,21 @@ class Household
     )
     enrollment.save
     enrollment
+  end
+
+  def delete_hbx_enrollment(hbx_enrollment_id)
+    hbx_enrollment = hbx_enrollments.detect {hbx_enrollment_id}
+    if hbx_enrollment.present?
+      benefit_group_assignment = hbx_enrollment.benefit_group_assignment
+
+      if benefit_group_assignment.present?
+        benefit_group_assignment.destroy! && hbx_enrollment.destroy!
+      else
+        hbx_enrollment.destroy!
+      end
+    else
+      return false
+    end
   end
 
   def remove_family_member(member)

@@ -84,6 +84,10 @@ describe Household, "given a coverage household with a dependent" do
     end
   end
 
+  it "ImmediateFamily should have stepchild" do
+    expect(Household::ImmediateFamily.include?('stepchild')).to eq true
+  end
+
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
   #   let(:hbx_enrollments) { [mock_hbx_enrollment] }

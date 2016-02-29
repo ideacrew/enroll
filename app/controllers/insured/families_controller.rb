@@ -9,11 +9,34 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
 
-    @hbx_enrollments = @family.enrollments.order(effective_on: :desc, coverage_kind: :desc) || []
+    log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
+
+    @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+
+    @enrollment_filter = @family.enrollments_for_display
+
+    @waived_enrollment_filter = @family.waivers_for_display
+
+    valid_display_enrollments = Array.new
+    @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
+
+    valid_display_waived_enrollments = Array.new
+    @waived_enrollment_filter.each  { |e| valid_display_waived_enrollments.push e['hbx_enrollment']['_id'] }
+
+
     log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
-    @waived = @family.coverage_waived?
+
+
+    # Filter out enrollments for display only
+    @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
+    @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
+
+    unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
+
+    @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
+
     @employee_role = @person.employee_roles.active.first
     @tab = params['tab']
     respond_to do |format|
@@ -22,6 +45,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
+
     set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
@@ -166,13 +190,19 @@ class Insured::FamiliesController < FamiliesController
       log(message, {:severity => "error"})
       raise e
     end
-
     @qualifying_life_events = []
-    if @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+    if @person.has_multiple_roles?
+      @multiroles = @person.has_multiple_roles?
+      @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
+      @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
     else
-      @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+      if @person.employee_roles.active.present?
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+      else @person.consumer_role.present?
+      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+      end
     end
+
   end
 
   def check_for_address_info

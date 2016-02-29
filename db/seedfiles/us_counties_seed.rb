@@ -320,7 +320,7 @@ puts "::: Creating US Counties:::"
     UsCounty.create({ state_postal_code: "DE", state_fips_code: "10", county_fips_code: "10001", county_name: "Kent County", fips_class_code: "H1"})
     UsCounty.create({ state_postal_code: "DE", state_fips_code: "10", county_fips_code: "10003", county_name: "New Castle County", fips_class_code: "H1"})
     UsCounty.create({ state_postal_code: "DE", state_fips_code: "10", county_fips_code: "10005", county_name: "Sussex County", fips_class_code: "H1"})
-    UsCounty.create({ state_postal_code: "DC", state_fips_code: "11", county_fips_code: "11001", county_name: "District of Columbia", fips_class_code: "H6"})
+    UsCounty.create({ state_postal_code: "DC", state_fips_code: "11", county_fips_code: "11001", county_name: "#{Settings.aca.state_name}", fips_class_code: "H6"})
     UsCounty.create({ state_postal_code: "FL", state_fips_code: "12", county_fips_code: "12001", county_name: "Alachua County", fips_class_code: "H1"})
     UsCounty.create({ state_postal_code: "FL", state_fips_code: "12", county_fips_code: "12003", county_name: "Baker County", fips_class_code: "H1"})
     UsCounty.create({ state_postal_code: "FL", state_fips_code: "12", county_fips_code: "12005", county_name: "Bay County", fips_class_code: "H1"})

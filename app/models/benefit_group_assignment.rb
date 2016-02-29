@@ -103,6 +103,7 @@ class BenefitGroupAssignment
     state :coverage_selected
     state :coverage_waived
     state :coverage_terminated
+    state :coverage_void
     state :coverage_renewing
     state :coverage_expired
 
@@ -121,6 +122,7 @@ class BenefitGroupAssignment
     end
 
     event :terminate_coverage do
+      transitions from: :initialized, to: :coverage_void
       transitions from: :coverage_selected, to: :coverage_terminated
       transitions from: :coverage_renewing, to: :coverage_terminated
     end
@@ -130,13 +132,28 @@ class BenefitGroupAssignment
     end
 
     event :delink_coverage do
-      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated], to: :initialized, after: :propogate_delink
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
     end
   end
 
-  def make_benefit_group_assignment_active
-    census_employee.reset_active_benefit_group_assignments(self)
-    update_attributes(is_active: true)
+  def waive_benefit
+    waive_coverage! if may_waive_coverage?
+    make_active
+  end
+
+  def begin_benefit
+    select_coverage! if may_select_coverage?
+    make_active
+  end
+
+  def make_active
+    census_employee.benefit_group_assignments.each do |bg_assignment|
+      if bg_assignment.is_active? && bg_assignment.id != self.id
+        bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
+      end
+    end
+
+    update_attributes(is_active: true) unless is_active?
   end
 
   private
@@ -146,20 +163,23 @@ class BenefitGroupAssignment
   end
 
   def propogate_delink
-    self.hbx_enrollment_id = nil
+    if hbx_enrollment.present?
+      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
+    end
+    # self.hbx_enrollment_id = nil
   end
 
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
 
-    # if coverage_selected?
-    #   self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
-    # end
+    if coverage_selected?
+      self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
+    end
 
-    # if hbx_enrollment.present?
-    #   self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-    #   self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
-    # end
+    if hbx_enrollment.present?
+      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
+    end
   end
 
   def date_guards

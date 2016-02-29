@@ -7,12 +7,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                               title: "Entered into a legal domestic partnership",
                               action_kind: "add_benefit",
                               reason: "domestic_partnership",
-                              edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
-                              market_kind: "shop", 
+                              edi_code: "33-ENTERING DOMESTIC PARTNERSHIP",
+                              market_kind: "shop",
                               effective_on_kinds: ["first_of_month"],
                               pre_event_sep_in_days: 0,
-                              post_event_sep_in_days: 30, 
-                              is_self_attested: true, 
+                              post_event_sep_in_days: 30,
+                              is_self_attested: true,
                               ordinal_position: 20,
                               event_kind_label: 'Date of domestic partnership',
                               tool_tip: "Enroll or add a family member due to a new domestic partnership"
@@ -25,7 +25,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                               market_kind: "individual",
                               event_kind_label: "Date of birth",
                               reason: "birth",
-                              edi_code: "02-BIRTH", 
+                              edi_code: "02-BIRTH",
                               ordinal_position: 10,
                               effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
                               pre_event_sep_in_days: 0,
@@ -42,21 +42,21 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
                               market_kind: "individual",
                               ordinal_position: 50,
                               reason: "lost_access_to_mec",
-                              edi_code: "33-LOST ACCESS TO MEC", 
+                              edi_code: "33-LOST ACCESS TO MEC",
                               effective_on_kinds: ["first_of_next_month"],
                               pre_event_sep_in_days: 60,
                               post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
                               is_self_attested: true
                             )
                           }
-                          
+
   let(:qle_on)         { Date.current }
 
   let(:valid_params){
     {
       family: family,
       qualifying_life_event_kind: ivl_qle,
-      effective_on_kind: "first_of_next_month", 
+      effective_on_kind: "first_of_next_month",
       qle_on: qle_on,
     }
   }
@@ -126,7 +126,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     context "and QLE is reported before end of SEP" do
       let(:today)                           { TimeKeeper.date_of_record }
-      let(:monthly_enrollment_deadline)     { today.beginning_of_month + HbxProfile::IndividualEnrollmentDueDayOfMonth.days - 1.day }
+      let(:monthly_enrollment_deadline)     { today.beginning_of_month + Settings.aca.individual_market.monthly_enrollment_due_on.days - 1.day }
 
       let(:qle_on_date)                     { today.beginning_of_month }
 
@@ -140,10 +140,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
       context "and 'effective on kind' is 'first of month' and date reported is before the deadline for current month" do
         let(:reporting_date)  { pre_enrollment_deadline_date }
-        
+
         before do
           TimeKeeper.set_date_of_record_unprotected!(reporting_date)
-          ivl_qle_sep.effective_on_kind = "first_of_month" 
+          ivl_qle_sep.effective_on_kind = "first_of_month"
         end
 
         it "the effective date should be first of month immediately following current date" do
@@ -154,9 +154,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       context "and 'effective on kind' is 'first of month' and date reported is after the monthly deadline" do
         let(:reporting_date)  { post_enrollment_deadline_date }
 
-        before do 
+        before do
           TimeKeeper.set_date_of_record_unprotected!(reporting_date)
-          ivl_qle_sep.effective_on_kind = "first_of_month" 
+          ivl_qle_sep.effective_on_kind = "first_of_month"
         end
 
         it "the effective date is first of next month following QLE date" do
@@ -169,7 +169,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
         before do
           TimeKeeper.set_date_of_record_unprotected!(reporting_date)
-          ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+          ivl_qle_sep.effective_on_kind = "first_of_next_month"
         end
 
         it "the effective date should be first of month following current date" do
@@ -182,7 +182,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
         before do
           TimeKeeper.set_date_of_record_unprotected!(reporting_date)
-          ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+          ivl_qle_sep.effective_on_kind = "first_of_next_month"
         end
 
         it "the effective date should be first of month following current date" do
@@ -209,7 +209,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(reporting_date)
-        ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+        ivl_qle_sep.effective_on_kind = "first_of_next_month"
       end
 
       it "the effective date should be in the past: first of month following the lapsed date" do
@@ -311,8 +311,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         it "should set effective date to date of event when date of event is not beginning of month" do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
-          sep.qle_on = TimeKeeper.date_of_record - 40.days
-          expect(sep.effective_on).to eq ((TimeKeeper.date_of_record-40.days).end_of_month + 1.day)
+          qle_on = TimeKeeper.date_of_record.end_of_month - 10.days
+          sep.qle_on = qle_on
+          expect(sep.effective_on).to eq (qle_on.end_of_month + 1.day)
         end
 
         it "should set effective date to date of event when date of event is beginning of month" do

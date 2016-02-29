@@ -5,15 +5,11 @@ module Forms
      end
 
      def carrier_plans_for(c_profile_id)
-       Rails.cache.fetch("plans-for-carrier-#{c_profile_id.to_s}-at-#{start_on.year}", expires_in: 2.hour) do
-         ::Plan.valid_shop_health_plans("carrier", c_profile_id, start_on.year).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
-       end
+       ::Plan.valid_shop_health_plans("carrier", c_profile_id, start_on.year).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
      end
 
      def metal_level_plans_for(metal_level)
-       Rails.cache.fetch("plans-for-metal-level-#{metal_level}-at-#{start_on.year}", expires_in: 2.hour) do
-         ::Plan.valid_shop_health_plans("metal_level", metal_level, start_on.year).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
-       end
+       ::Plan.valid_shop_health_plans("metal_level", metal_level, start_on.year).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
      end
 
      def self.model_name

@@ -667,6 +667,34 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "can_terminate_coverage?" do
+    let(:hbx_enrollment) {HbxEnrollment.new(
+                            kind: 'employer_sponsored',
+                            aasm_state: 'coverage_selected',
+                            effective_on: TimeKeeper.date_of_record - 10.days
+                          )}
+    it "should return false when may not terminate_coverage" do
+      hbx_enrollment.aasm_state = 'inactive'
+      expect(hbx_enrollment.can_terminate_coverage?).to eq false
+    end
+
+    context "when may_terminate_coverage is true" do
+      before :each do
+        hbx_enrollment.aasm_state = 'coverage_selected'
+      end
+
+      it "should return true" do
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record - 10.days
+        expect(hbx_enrollment.can_terminate_coverage?).to eq true
+      end
+
+      it "should return false" do
+        hbx_enrollment.effective_on = TimeKeeper.date_of_record + 10.days
+        expect(hbx_enrollment.can_terminate_coverage?).to eq false
+      end
+    end
+  end
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -674,7 +702,9 @@ describe HbxEnrollment, dbclean: :after_each do
   context ".can_select_coverage?" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
 
-    let(:middle_of_prev_year) { (TimeKeeper.date_of_record - 1.year) + 2.months }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+
+    let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
@@ -687,7 +717,6 @@ describe HbxEnrollment, dbclean: :after_each do
     }
 
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:calender_year) { TimeKeeper.date_of_record.year }
     let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
     let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
     let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
@@ -835,6 +864,10 @@ describe HbxEnrollment, dbclean: :after_each do
                                                 }
 
       context 'under special enrollment period' do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!( special_enrollment_period.end_on - 5.days )
+        end
+
         it "should allow" do
           expect(shop_enrollment.can_select_coverage?).to be_truthy
         end

@@ -22,7 +22,19 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    @person = Forms::ConsumerCandidate.new
+
+    if params.permit(:build_consumer_role)[:build_consumer_role].present?
+      person = Person.find(session[:person_id])
+
+      @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
+      @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
+      @person_params[:dob] = person.dob.strftime("%Y-%m-%d")
+
+      @person = Forms::ConsumerCandidate.new(@person_params)
+    else
+      @person = Forms::ConsumerCandidate.new
+    end
+
     respond_to do |format|
       format.html
     end
@@ -31,6 +43,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
+
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     respond_to do |format|
@@ -48,7 +61,7 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { redirect_to SamlInformation.account_recovery_url }
-        else 
+        else
           unless params[:persisted] == "true"
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
 
@@ -85,6 +98,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+
     if !session[:already_has_consumer_role] == true
       begin
         @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
@@ -101,9 +115,15 @@ class Insured::ConsumerRolesController < ApplicationController
         return
       end
     else
+
       @person= Person.find(session[:person_id])
       @person.user = current_user
       @person.save
+
+      # 3717 - Person has consumer role but no family document as a result of previously consumer role added as dependent
+      # Attempt to create new family
+      family = Factories::EnrollmentFactory.build_family(@person, [])
+
     end
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"

@@ -1,6 +1,6 @@
 <div class="home top-pd">
-  <h1><strong>Welcome to <%= HbxProfile::ShortName %></strong></h1>
-  <h3>DC's Online Health Insurance Marketplace</h3><br><br>
+  <h1><strong>Welcome to <%= "#{Settings.site.short_name}" %></strong></h1>
+  <h3><%= "#{Settings.site.byline}" %></h3><br><br>
   <% if user_signed_in? %>
     <strong>
     	Welcome <%= current_user.email %>
