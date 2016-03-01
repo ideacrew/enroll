@@ -249,11 +249,11 @@ class EmployerProfile
             {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day}
           ]
         }, 
-        { :"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE }
+        { :"employer_profile.plan_years.aasm_state".in => PlanYear::RENEWING + PlanYear::PUBLISHED }
       ])
     end
 
-    def oranizations_with_plan_year_begin_or_end(new_date)
+    def organizations_with_plan_year_begin_or_end(new_date)
       Organization.where( "$and" => [ 
         { 
           "$or" => [ 
@@ -271,16 +271,25 @@ class EmployerProfile
       Organization.where(
         "$and" => [
           {:"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED },
-          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) }
+          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) - 1.year }
         ]
       )
     end
 
     def advance_day(new_date)
-      if false
+      if !Rails.env.test?
+
+        plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
+        organizations_eligible_for_renewal(new_date).each do |organization|
+          plan_year_renewal_factory.employer_profile = organization.employer_profile
+          plan_year_renewal_factory.is_congress = false # TODO handle congress differently
+          plan_year_renewal_factory.renew
+        end
+
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
         organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
           open_enrollment_factory.employer_profile = organization.employer_profile
+          open_enrollment_factory.date = new_date
 
           if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => new_date).any?
             open_enrollment_factory.begin_open_enrollment
@@ -288,12 +297,13 @@ class EmployerProfile
 
           if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on" => (new_date - 1.day)).any?
             open_enrollment_factory.end_open_enrollment
-          end     
+          end
         end
 
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        oranizations_with_plan_year_begin_or_end(new_date).each do |organization|
+        organizations_with_plan_year_begin_or_end(new_date).each do |organization|
           employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.date = new_date
 
           if organization.employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => new_date).any?
             employer_enroll_factory.begin
@@ -302,13 +312,6 @@ class EmployerProfile
           if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
             employer_enroll_factory.end
           end
-        end
-
-        plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
-        organizations_eligible_for_renewal(new_date).each do |organization|
-          plan_year_renewal_factory.employer_profile = organization.employer_profile
-          plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-          plan_year_renewal_factory.renew
         end
       end
 
@@ -397,8 +400,8 @@ class EmployerProfile
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
     state :binder_paid, :after_enter => :notify_binder_paid
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
-    # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
-    state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
+  # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
+  state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
     state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
 
     event :advance_date do
