@@ -277,7 +277,7 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      if true
+      if !Rails.env.test?
 
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|

@@ -73,6 +73,10 @@ module Factories
           @logger.debug "Renewal failed for #{ce.full_name} due to #{e.to_s}"
         end
       end
+
+      if plan_years_for_oe.renewing.any?
+        plan_years_for_oe.renewing.first.advance_date!
+      end
     end
 
     def end_open_enrollment
