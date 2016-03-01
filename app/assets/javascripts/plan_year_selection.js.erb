@@ -311,6 +311,7 @@ ready = function() {
       var change = $(this).val();
       $('#plan_year_fte_count').val(change);
     });
+
     // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
     $(document).on('change', 'input.premium-storage-input', function() {
       if ( $(this).hasClass('slider') ) {
@@ -320,10 +321,19 @@ ready = function() {
           $(this).closest('.form-group').find('.slide-label').text(data + "%");
           if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
             validateEditPlanYear();
-
           } else {
             validatePlanYear();
           }
+          if ( $(this).closest('.health').length > 0 ) {
+          } else {
+            var coverage_type = '.dental';
+            var location_id = $(this).parents('.benefit-group-fields').attr('id');
+            console.log(location_id);
+            console.log(coverage_type);
+            calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
+          }
+
+
         });
       } else if ( $(this).hasClass('hidden-param') )  {
         var hidden = parseInt($(this).val());
@@ -335,14 +345,12 @@ ready = function() {
       }
     });
 
-
     $(document).on('click', '.nav-tabs li label', function() {
       if ( $(this).closest('.nav').parent().hasClass('health') ) {
         nav = '.health';
         $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
         $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
         $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').hide();
-
       } else {
         nav = '.dental';
         $(this).closest('.benefit-group-fields').find('.dental-reference-plans').hide();
@@ -516,6 +524,7 @@ $(document).on('click', '.reference-plan input[type=radio] + label', function() 
         var coverage_type = '.health';
       } else {
         var coverage_type = '.dental';
+
       }
       var location_id = $(this).parents('.benefit-group-fields').attr('id');
       console.log(location_id);
@@ -617,8 +626,6 @@ function calcEmployerContributions(url, location, coverage_type) {
         "offered": false
       }
     }
-
-
     $.ajax({
       type: "GET",
       url: url,
