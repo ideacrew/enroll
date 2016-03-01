@@ -139,6 +139,7 @@ class InsuredEligibleForBenefitRule
   private
 
   def is_verification_satisfied?
+    return true if Settings.aca.individual_market.verification_outstanding_window.days == 0
     !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, Settings.aca.individual_market.verification_outstanding_window.days).try(:>, TimeKeeper.date_of_record))
   end
 
