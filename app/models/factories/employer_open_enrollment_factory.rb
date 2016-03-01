@@ -21,7 +21,7 @@ module Factories
       end
 
       if plan_years_for_oe.published.any?
-        plan_years_for_oe.published.first.advance_date!
+        plan_years_for_oe.published.first.advance_date! if plan_years_for_oe.published.first.may_advance_date?
         return
       end
 
@@ -75,7 +75,7 @@ module Factories
       end
 
       if plan_years_for_oe.renewing.any?
-        plan_years_for_oe.renewing.first.advance_date!
+        plan_years_for_oe.renewing.first.advance_date! if plan_years_for_oe.renewing.first.may_advance_date?
       end
     end
 

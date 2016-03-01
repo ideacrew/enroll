@@ -23,7 +23,7 @@ module Factories
         renewal_enrollment = renewal_enrollments.first
 
         if valid_enrollment?(hbx_enrollment, renewal_enrollment)
-          hbx_enrollment.begin_coverage!
+          hbx_enrollment.begin_coverage! if hbx_enrollment.may_begin_coverage?
           hbx_enrollment.benefit_group_assignment.begin_benefit
           renewal_enrollment.cancel_coverage!
         else
