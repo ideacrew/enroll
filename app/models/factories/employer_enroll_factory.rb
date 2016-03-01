@@ -3,8 +3,24 @@ module Factories
 
     attr_accessor :employer_profile, :date
 
+    def initialize
+      @logger = Logger.new("#{Rails.root}/log/employer_enroll_factory_logfile.log")
+    end
+
     def begin
-      current_plan_year = @employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => @date || TimeKeeper.date_of_record).first
+      @logger.debug "Processing #{employer_profile.legal_name}"
+      published_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => @date || TimeKeeper.date_of_record)
+
+      if published_plan_years.size > 1
+        @logger.debug "Found more than 1 published plan year for #{employer_profile.legal_name}"
+      end
+
+      if published_plan_years.empty?
+        @logger.debug "Published plan year missing for #{employer_profile.legal_name}."
+        return
+      end
+
+      current_plan_year = published_plan_years.first
 
       census_employee_factory = Factories::CensusEmployeeFactory.new
       census_employee_factory.plan_year = current_plan_year
@@ -15,12 +31,17 @@ module Factories
           census_employee_factory.begin_coverage
 
         rescue Exception => e
-          puts "Exception #{e.inspect} occured for #{census_employee.full_name}"
+          @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
         end
       end
 
-      current_plan_year.advance_date! if current_plan_year.may_advance_date?
-      @employer_profile.advance_date! if @employer_profile.may_advance_date?
+      current_plan_year.activate! if current_plan_year.may_activate?
+
+      if @employer_profile.may_enroll_employer?
+        @employer_profile.enroll_employer!
+      elsif @employer_profile.may_force_enroll?
+        @employer_profile.force_enroll!
+      end
 
       create_active_benefit_group_assignments(current_plan_year.benefit_groups)
     end
@@ -28,20 +49,22 @@ module Factories
     def end
       expiring_plan_year = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => ((@date || TimeKeeper.date_of_record) - 1.day)).first
 
-      census_employee_factory = Factories::CensusEmployeeFactory.new
-      census_employee_factory.plan_year = expiring_plan_year
+      if expiring_plan_year
+        census_employee_factory = Factories::CensusEmployeeFactory.new
+        census_employee_factory.plan_year = expiring_plan_year
 
-      @employer_profile.census_employees.non_terminated.each do |census_employee|
-        begin
-          census_employee_factory.census_employee = census_employee
-          census_employee_factory.end_coverage
+        @employer_profile.census_employees.non_terminated.each do |census_employee|
+          begin
+            census_employee_factory.census_employee = census_employee
+            census_employee_factory.end_coverage
 
-        rescue Exception => e
-          puts "Exception #{e.inspect} occured for #{census_employee.full_name}"
+          rescue Exception => e
+            @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
+          end
         end
-      end
 
-      expiring_plan_year.advance_date! if expiring_plan_year.may_advance_date?
+        expiring_plan_year.expire! if expiring_plan_year.may_expire?
+      end
     end
 
     def create_active_benefit_group_assignments(benefit_groups)
