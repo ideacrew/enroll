@@ -23,6 +23,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
     @organization = Forms::BrokerAgencyProfile.new
 
     respond_to do |format|
+      format.html { render 'new' }
       format.js
     end
   end
