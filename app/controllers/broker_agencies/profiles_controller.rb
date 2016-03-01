@@ -93,9 +93,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.select do |person| person.last_name =~ /^#{page_no}/i end
+      @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      @staff = @staff.select do |person| person.last_name == @q end
+      @staff = @staff.where(last_name: @q)
     end
   end
 
@@ -194,9 +194,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def eligible_brokers
-    Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').select do |person|
-      [person_market_kind, "both"].include? person.broker_role.broker_agency_profile.market_kind
-    end
+    Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').any_in(:'broker_role.market_kind'=>[person_market_kind, "both"])
   end
 
   def person_market_kind
