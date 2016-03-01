@@ -1,7 +1,7 @@
 module Factories
   class EmployerOpenEnrollmentFactory
 
-    attr_accessor :employer_profile, :date
+    attr_accessor :employer_profile, :date, :plan_year_start_on
 
     def initialize
       @logger = Logger.new("#{Rails.root}/log/employer_open_enrollment_factory_logfile.log")
@@ -20,25 +20,27 @@ module Factories
         return
       end
 
-      if plan_years_for_oe.published.any?
-        plan_years_for_oe.published.first.advance_date! if plan_years_for_oe.published.first.may_advance_date?
-        return
+      published_plan_year = plan_years_for_oe.published.first
+      published_plan_year.advance_date! if published_plan_year && published_plan_year.may_advance_date?
+    end
+
+    def process_family_enrollment_renewals
+      @logger.debug "Processing enrollment renewals for #{employer_profile.legal_name}"
+
+      default_benefit_group = @employer_profile.default_benefit_group
+      renewing_group = @employer_profile.renewing_plan_year.benefit_groups.first
+
+      if default_benefit_group.blank? && @employer_profile.plan_years.published.any?
+        default_benefit_group = @employer_profile.plan_years.published.first.benefit_groups.first
       end
 
-      default_benefit_group = employer_profile.default_benefit_group
-      renewing_group = employer_profile.renewing_plan_year.benefit_groups.first
-
-      if default_benefit_group.blank? && employer_profile.plan_years.published.any?
-        default_benefit_group = employer_profile.plan_years.published.first.benefit_groups.first
-      end
-
-      employer_profile.census_employees.exists("benefit_group_assignments" => false).each do |ce|
+      @employer_profile.census_employees.exists("benefit_group_assignments" => false).each do |ce|
         ce.add_benefit_group_assignment(default_benefit_group, default_benefit_group.start_on)
         ce.add_renew_benefit_group_assignment(renewing_group)
         ce.save!
       end
 
-      employer_profile.census_employees.non_terminated.each do |ce|
+      @employer_profile.census_employees.non_terminated.each do |ce|
         begin
           @logger.debug "renewing: #{ce.full_name}"
           person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
@@ -49,7 +51,7 @@ module Factories
               last_name: ce.last_name,
               ssn: ce.ssn, 
               dob: ce.dob,
-              employer_profile: employer_profile,
+              employer_profile: @employer_profile,
               gender: ce.gender,
               hired_on: ce.hired_on
               })
@@ -62,7 +64,7 @@ module Factories
             factory = Factories::FamilyEnrollmentRenewalFactory.new
             factory.family = family
             factory.census_employee = ce
-            factory.employer = employer_profile
+            factory.employer = @employer_profile
             if factory.renew
               @logger.debug " renewed: #{ce.full_name}"
             end
@@ -74,8 +76,10 @@ module Factories
         end
       end
 
-      if plan_years_for_oe.renewing.any?
-        plan_years_for_oe.renewing.first.advance_date! if plan_years_for_oe.renewing.first.may_advance_date?
+      current_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => @plan_year_start_on)
+      renewing_plan_year = current_plan_years.renewing_published_state.first
+      if current_plan_years.size == 1 && renewing_plan_year.present?
+        renewing_plan_year.advance_date! if renewing_plan_year && renewing_plan_year.may_advance_date?
       end
     end
 

@@ -249,7 +249,7 @@ class EmployerProfile
             {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day}
           ]
         }, 
-        { :"employer_profile.plan_years.aasm_state".in => PlanYear::RENEWING + PlanYear::PUBLISHED }
+        { :"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING }
       ])
     end
 
@@ -278,7 +278,6 @@ class EmployerProfile
 
     def advance_day(new_date)
       if !Rails.env.test?
-
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
@@ -311,6 +310,17 @@ class EmployerProfile
 
           if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
             employer_enroll_factory.end
+          end
+        end
+
+        if new_date.day == 1
+          effective_date = Date.new(new_date.year - 1, new_date.month + 1, 1)
+          open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+          Organization.all_employers_by_plan_year_start_on(effective_date).each do |organization|
+            open_enrollment_factory.employer_profile = organization.employer_profile
+            open_enrollment_factory.date = new_date
+            open_enrollment_factory.plan_year_start_on = effective_date + 1.year
+            open_enrollment_factory.process_family_enrollment_renewals
           end
         end
       end
