@@ -4,6 +4,7 @@ module Factories
     attr_accessor :census_employee, :plan_year
 
     def begin_coverage
+
       if selected_enrollments.size > 1
         raise CensusEmployeeFactoryError, "More then one active enrollment selected for the coverage year"
       end
@@ -17,25 +18,41 @@ module Factories
         return
       end
 
-      valid_enrollment = selected_enrollments.first
+      if selected_enrollments.size == 1 && renewal_enrollments.size == 1
+        hbx_enrollment = selected_enrollments.first
+        renewal_enrollment = renewal_enrollments.first
 
-      if valid_enrollment.present?
-        renewal_enrollments.first.cancel_coverage!
-      else
-        valid_enrollment = renewal_enrollments.first
+        if valid_enrollment?(hbx_enrollment, renewal_enrollment)
+          hbx_enrollment.begin_coverage! if hbx_enrollment.may_begin_coverage?
+          hbx_enrollment.benefit_group_assignment.begin_benefit
+          renewal_enrollment.cancel_coverage!
+        else
+          raise PlanYearPublishFactoryError, "Hbx enrollment can't be enrolled updated_at #{hbx_enrollment.updated_at.strftime('%m-%d-%Y')}"
+        end
       end
-      
-      valid_enrollment.advance_date! if valid_enrollment.may_advance_date?
 
-      # TODO: handle case where enrollment effective_on is on future date
-      valid_enrollment.is_coverage_waived? ? valid_enrollment.benefit_group_assignment.waive_benefit : valid_enrollment.benefit_group_assignment.begin_benefit
+      hbx_enrollment = selected_enrollments.first
+      hbx_enrollment = renewal_enrollments.first if hbx_enrollment.blank?
+
+      if hbx_enrollment.effective_on <= TimeKeeper.date_of_record
+        hbx_enrollment.begin_coverage! if hbx_enrollment.may_begin_coverage?
+        if hbx_enrollment.benefit_group_assignment.present?
+          hbx_enrollment.is_coverage_waived? ? hbx_enrollment.benefit_group_assignment.waive_benefit : hbx_enrollment.benefit_group_assignment.begin_benefit
+        end
+      end
+    end
+
+    def valid_enrollment?(hbx_enrollment, renewal_enrollment)
+      hbx_enrollment.effective_on == renewal_enrollment.effective_on && hbx_enrollment.effective_on <= TimeKeeper.date_of_record
     end
 
     def end_coverage
-      enrollments.each do |enrollment|
-        enrollment.advance_date! if enrollment.may_advance_date?
-        enrollment.benefit_group_assignment.expire_coverage! if enrollment.benefit_group_assignment.may_expire_coverage!
-        enrollment.benefit_group_assignment.update_attributes(is_active: false) if enrollment.benefit_group_assignment.is_active?
+      prev_year_enrollments = family_record.active_household.hbx_enrollments.where(:"effective_on".lt => @plan_year.start_on).shop_market
+      prev_year_enrollments.enrolled.each do |hbx_enrollment|
+        hbx_enrollment.expire_coverage! if hbx_enrollment.may_expire_coverage?
+        benefit_group_assignment = hbx_enrollment.benefit_group_assignment
+        benefit_group_assignment.expire_coverage! if benefit_group_assignment.may_expire_coverage?
+        benefit_group_assignment.update_attributes(is_active: false) if benefit_group_assignment.is_active?
       end
     end
 
