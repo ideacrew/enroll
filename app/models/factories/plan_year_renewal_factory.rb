@@ -6,8 +6,16 @@ module Factories
 
     attr_accessor :employer_profile, :is_congress
 
+
+    def initialize
+      @logger = Logger.new("#{Rails.root}/log/plan_year_renewal_factory_logfile.log")
+    end
+
     def renew
       @employer_profile = employer_profile
+      @logger.debug "processing #{employer_profile.legal_name}"
+
+      begin
 
       if @employer_profile.may_enroll_employer?
         @employer_profile.enroll_employer!
@@ -65,9 +73,13 @@ module Factories
           "Error(s): \n #{@renewal_plan_year.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n" \
           "Unable to save renewal plan year: #{@renewal_plan_year.inspect}"
       end
+    rescue Exception => e
+      @logger.debug e.inspect
+    end
     end
 
   private
+
     def validate_employer_profile
       if @employer_profile.plan_years.renewing.any?
         raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} already renewed"

@@ -1423,9 +1423,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and sufficient time has passed, and the employer is renewing application" do
-      let(:plan_year_renewal_factory) { Factories::PlanYearRenewalFactory.new(employer_profile: employer_profile) }
+      let(:plan_year_renewal_factory) { Factories::PlanYearRenewalFactory.new }
 
       before do
+        plan_year_renewal_factory.employer_profile = employer_profile
         TimeKeeper.set_date_of_record_unprotected!(coverage_effective_date + 1.year - 3.months)
         plan_year_renewal_factory.renew
       end
