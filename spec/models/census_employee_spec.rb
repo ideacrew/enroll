@@ -261,21 +261,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                         end
 
-                        context "and employee is terminated" do
-                          let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
-                          let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
+                        context "and employee is terminated and reported by employer on timely basis" do
+                          let(:earliest_retro_coverage_termination_date)    { (TimeKeeper.date_of_record.advance(
+                                                                                  Settings.
+                                                                                  aca.
+                                                                                  shop_market.
+                                                                                  retroactive_coverage_termination_maximum.
+                                                                                  to_hash)
+                                                                                ).end_of_month
+                                                                              }
+                          let(:earliest_valid_employment_termination_date)  { earliest_retro_coverage_termination_date.beginning_of_month }
+                          let(:invalid_employment_termination_date) { earliest_valid_employment_termination_date - 1.day }
+                          let(:invalid_coverage_termination_date)   { invalid_employment_termination_date.end_of_month }
 
-                          it "transition to termination should be valid" do
-                            expect(initial_census_employee.may_terminate_employee_role?).to be_truthy
-                          end
 
-                          context "and the termination date exceeds the HBX maximum" do
-                            before { initial_census_employee.terminate_employment(invalid_termination_date) }
+                          context "and the employment termination is reported later after max retroactive date" do
 
-                            context "and the user is employer rep" do
-                              it "transition to terminated state should fail" do
-                                expect{initial_census_employee.terminate_employment!(invalid_termination_date)}.to raise_error CensusEmployeeError
-                              end
+                            before { initial_census_employee.terminate_employment!(invalid_employment_termination_date) }
+
+                            it "calculated coverage termination date should preceed the valid coverage termination date" do
+                              expect(invalid_coverage_termination_date).to be < earliest_retro_coverage_termination_date
+                            end
+
+                            it "is in terminated state" do
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should have the correct employment termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).employment_terminated_on).to eq invalid_employment_termination_date
+                            end
+
+                            it "should have the earliest coverage termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).coverage_terminated_on).to eq earliest_retro_coverage_termination_date
                             end
 
                             context "and the user is HBX admin" do
@@ -283,12 +300,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                             end
                           end
 
-                          context "and the termination date is within the HBX maximum" do
-                            before { initial_census_employee.terminate_employment!(valid_termination_date) }
+                          context "and the termination date is within the retroactive reporting time period" do
+                            before { initial_census_employee.terminate_employment!(earliest_valid_employment_termination_date) }
 
-                            it "is should transition to terminated state" do
-                              expect(initial_census_employee.employment_terminated?).to be_truthy
+                            it "is in terminated state" do
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
                             end
+
+                            it "should have the correct employment termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).employment_terminated_on).to eq earliest_valid_employment_termination_date
+                            end
+
+                            it "should have the earliest coverage termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).coverage_terminated_on).to eq earliest_retro_coverage_termination_date
+                            end
+
 
                             context "and the terminated employee is rehired" do
                               let!(:rehire)   { initial_census_employee.replicate_for_rehire }
@@ -326,8 +352,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
               end
 
             end
-
           end
+
+          context "and employer is renewing" do
+          end
+
         end
       end
     end

@@ -1,4 +1,5 @@
 class BrokerAgencies::InboxesController < InboxesController
+  include Acapi::Notifiers
 
   def new
     @inbox_provider_name = 'HBX Admin.'
@@ -12,6 +13,7 @@ class BrokerAgencies::InboxesController < InboxesController
     @inbox_provider = @broker_agency_provider
     @inbox_provider_name = @inbox_provider.try(:legal_name) 
     @inbox_to_name = "HBX Admin"
+    log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
     @new_message = @inbox_provider.inbox.messages.build
   end
 

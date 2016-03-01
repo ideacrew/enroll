@@ -61,7 +61,7 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { redirect_to SamlInformation.account_recovery_url }
-        else 
+        else
           unless params[:persisted] == "true"
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
 
@@ -98,6 +98,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+
     if !session[:already_has_consumer_role] == true
       begin
         @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
@@ -114,9 +115,15 @@ class Insured::ConsumerRolesController < ApplicationController
         return
       end
     else
+
       @person= Person.find(session[:person_id])
       @person.user = current_user
       @person.save
+
+      # 3717 - Person has consumer role but no family document as a result of previously consumer role added as dependent
+      # Attempt to create new family
+      family = Factories::EnrollmentFactory.build_family(@person, [])
+
     end
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"

@@ -12,6 +12,7 @@ class CensusEmployee < CensusMember
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
+  field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
 
   # Employer for this employee
@@ -227,9 +228,9 @@ class CensusEmployee < CensusMember
     email.address
   end
 
-  def terminate_employment(terminated_on)
+  def terminate_employment(employment_terminated_on)
     begin
-      terminate_employment!(terminated_on)
+      terminate_employment!(employment_terminated_on)
     rescue
       nil
     else
@@ -237,31 +238,56 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def terminate_employment!(terminated_on)
-    unless self.may_terminate_employee_role?
-      (employee_role.present? && employee_role.hbx_id.present?) ? ee_id = "(ee role id: #{self.employee_role.hbx_id})" : ee_id = "(census id: #{self.id})"
-      active_benefit_group_assignment.present? ? bga_status = "#{active_benefit_group_assignment.aasm_state.tr('_', ' ')}. " : bga_status = "no benefit group assigned. "
-      message =  "Unable to terminate employee.  Employment status: #{aasm_state.tr('_', ' ')}. "\
-        "Coverage status: #{bga_status} #{ee_id}"
+  def terminate_employment!(employment_terminated_on)
+    if may_terminate_employee_role?
+
+      if active_benefit_group_assignment.present?
+        unless active_benefit_group_assignment.may_terminate_coverage?
+          message = "Error terminating employee #{full_name}, unable to terminate benefit group assignment"
+          Rails.logger.error { message }
+          raise CensusEmployeeError, message
+        end
+      end
+
+      if renewal_benefit_group_assignment.present?
+        unless renewal_benefit_group_assignment.may_terminate_coverage?
+          message = "Error terminating employee #{full_name}, unable to terminate renewal benefit group assignment"
+          Rails.logger.error { message }
+          raise CensusEmployeeError, message
+        end
+      end
+
+      self.employment_terminated_on = employment_terminated_on
+      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+
+      active_benefit_group_assignment.terminate_coverage! if active_benefit_group_assignment.present?
+      renewal_benefit_group_assignment.terminate_coverage! if renewal_benefit_group_assignment.present?
+      terminate_employee_role!
+
+    else
+      message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
       Rails.logger.error { message }
       raise CensusEmployeeError, message
     end
 
-    self.employment_terminated_on = terminated_on.to_date.end_of_day
-
-    # Coverage termination date may not exceed HBX max
-    reported_coverage_term_on = self.employment_terminated_on.end_of_month
-    max_coverage_term_on = (TimeKeeper.date_of_record.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
-    coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
-
-    if active_benefit_group_assignment.try(:may_terminate_coverage?)
-      if active_benefit_group_assignment.hbx_enrollment.try(:may_terminate_coverage?)
-        active_benefit_group_assignment.hbx_enrollment.terminate_coverage!
-      end
-    end
-
-    terminate_employee_role
     self
+  end
+
+  def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
+
+    employment_based_date = employment_termination_date.end_of_month
+    submitted_based_date  = TimeKeeper.date_of_record.
+                              advance(Settings.
+                                          aca.
+                                          shop_market.
+                                          retroactive_coverage_termination_maximum
+                                          .to_hash
+                                        ).end_of_month
+
+    # if current_user.has_hbx_staff_role?
+    # end
+
+    [employment_based_date, submitted_based_date].max
   end
 
   def is_active?
