@@ -31,7 +31,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     FactoryGirl.create(:benefit_group_assignment,
       benefit_group: benefit_group,
       census_employee: census_employee,
-      start_on: Date.today - 40.days
+      start_on: TimeKeeper.date_of_record
     )
   }
 
