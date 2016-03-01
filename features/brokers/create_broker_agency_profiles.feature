@@ -108,5 +108,3 @@ Feature: Create Primary Broker and Broker Agency
         # And Primary Broker clicks on purchase button on the coverage summary page
         # And Primary Broker should see the receipt page
         Then Primary Broker logs out
-
-

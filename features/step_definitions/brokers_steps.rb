@@ -5,8 +5,8 @@ When(/^.+ visits the HBX Broker Registration form$/) do
 end
 
  When(/^Primary Broker clicks on New Broker Agency Tab$/) do
-  @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).fire_event("onclick")
+  # @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).wait_until_present
+  # @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).fire_event("onclick")
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
@@ -37,12 +37,11 @@ And(/^.+ enters broker agency information$/) do
   practice_area = @browser.div(class: /selectric-interaction-choice-control-broker-agency-practice-area/)
   practice_area.click
   practice_area.li(text: /Small Business Marketplace ONLY/).click
-
-  language_multi_select = @browser.element(class: "language_multi_select").element(class: "multiselect")
-  language_multi_select.wait_until_present
-  language_multi_select.click
-  @browser.checkbox(:value => 'bn').set
-  @browser.checkbox(:value => 'fr').set
+  # language_multi_select = @browser.element(class: "language_multi_select").element(class: "multiselect")
+  # language_multi_select.wait_until_present
+  # language_multi_select.click
+  # @browser.checkbox(:value => 'bn').set
+  # @browser.checkbox(:value => 'fr').set
 
   @browser.checkbox(:name => "organization[working_hours]").set
   @browser.checkbox(:name => "organization[accept_new_clients]").set
