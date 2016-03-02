@@ -401,11 +401,14 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:person) { double(primary_family: family)}
       let(:family) { double }
       let(:enrollment) {
-        household.create_hbx_enrollment_from(
+        enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
-          benefit_package: benefit_package
+          benefit_package: benefit_package,
+          qle: true
         )
+        enrollment.save
+        enrollment
       }
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
@@ -420,7 +423,10 @@ describe HbxEnrollment, dbclean: :after_all do
           allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
           allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
           allow(consumer_role).to receive(:person).and_return(person)
+          allow(coverage_household).to receive(:household).and_return household
+          allow(household).to receive(:family).and_return family
           allow(family).to receive(:is_under_special_enrollment_period?).and_return false
+          allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
           allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
         end
 
@@ -444,11 +450,16 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       context "when in special enrollment" do
+        let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
         before :each do
           allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
           allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
           allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
           allow(consumer_role).to receive(:person).and_return(person)
+          allow(coverage_household).to receive(:household).and_return household
+          allow(household).to receive(:family).and_return family
+          allow(family).to receive(:current_sep).and_return sep
+          allow(family).to receive(:current_special_enrollment_periods).and_return [sep]
           allow(family).to receive(:is_under_special_enrollment_period?).and_return true
           allow(enrollment).to receive(:enrollment_kind).and_return "special_enrollment"
         end
@@ -532,11 +543,15 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) {double}
       let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
+      let(:family) {FactoryGirl.build(:family)}
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return benefit_coverage_period
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
+        allow(coverage_household).to receive(:household).and_return household
+        allow(household).to receive(:family).and_return family
+        allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
         @enrollment = household.create_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
@@ -592,6 +607,8 @@ describe HbxProfile, "class methods", type: :model do
       allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
       allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(household).to receive(:family).and_return family
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
     end
 
     it "when qle is false" do
@@ -602,9 +619,13 @@ describe HbxProfile, "class methods", type: :model do
 
     it "when qle is true" do
       allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      allow(household).to receive(:family).and_return family
       enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: true)
       expect(enrollment.enrollment_kind).to eq "special_enrollment"
+    end
+
+    it "when qle is false and is not uder opent enrollment period" do
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return false
+      expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error
     end
   end
 
