@@ -16,7 +16,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       page_no = cur_page_no(@page_alphabets.first)
       @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
     else
-      @broker_applicants = @people.to_a.first(20)
+      @broker_applicants = @people.order_by(:'broker_role.latest_transition_time' => 'desc').to_a.first(20)
     end
 
     respond_to do |format|
