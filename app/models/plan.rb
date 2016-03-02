@@ -174,7 +174,7 @@ class Plan
         carrier_profile_id: carrier_profile_id,
         active_year: year,
         market: "shop",
-        hios_id: /-01$/,
+        hios_id: { "$not" => /-00$/ },
         metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
       )
   }
@@ -371,8 +371,8 @@ class Plan
     end
 
     def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
-        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).to_a
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
+        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
       end
     end
 

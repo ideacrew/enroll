@@ -734,3 +734,31 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     end
   end
 end
+
+describe Factories::EnrollmentFactory, "with an exisiting consumer role" do
+
+  context ".build_family" do
+    let(:subject) { Factories::EnrollmentFactory }
+    let(:person) { FactoryGirl.create(:person)}
+
+    it "should add a family to a person without one" do
+      subject.build_family(person,[])
+      expect(person.primary_family).to be_truthy
+    end
+
+  end
+
+  context ".build_family with existing family" do
+    let(:subject) { Factories::EnrollmentFactory }
+    let(:person) { original_family.person}
+    let(:original_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    it "should return primary family" do
+      original_family = subject.build_family(person,[])
+      expect(original_family).to eq(person.primary_family)
+    end
+
+  end
+
+
+end
