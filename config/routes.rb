@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :orphans, only: [:index, :show, :destroy]
   end
 
-  resources :saml, only: :index do
+  resources :saml, only: [] do
     collection do
       post :login
       get :logout

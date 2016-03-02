@@ -113,6 +113,26 @@ class Organization
          { name: "active_broker_accounts_writing_agent" })
   before_save :generate_hbx_id
 
+
+  default_scope -> {order("legal_name ASC")}
+
+  scope :employer_by_hbx_id, ->(employer_id) {
+    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
+  }
+
+  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
+  scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
+
+  scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
+  scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
+
+
+  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
+  scope :all_employers_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
+  scope :all_employers_enrolled,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
+
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
   end
