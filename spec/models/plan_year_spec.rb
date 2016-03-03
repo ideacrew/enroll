@@ -1423,9 +1423,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and sufficient time has passed, and the employer is renewing application" do
-      let(:plan_year_renewal_factory) { Factories::PlanYearRenewalFactory.new(employer_profile: employer_profile) }
+      let(:plan_year_renewal_factory) { Factories::PlanYearRenewalFactory.new }
 
       before do
+        plan_year_renewal_factory.employer_profile = employer_profile
         TimeKeeper.set_date_of_record_unprotected!(coverage_effective_date + 1.year - 3.months)
         plan_year_renewal_factory.renew
       end
@@ -1710,8 +1711,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       obj.class.find(obj.id)
     end
 
-    let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, title: "blue collar benefit group") }
-    let!(:plan_year) { blue_collar_benefit_group.plan_year }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, start_on: Date.new(2015,10,1) ) } #Make it pick the same reference plan
+    let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, title: "blue collar benefit group", plan_year: plan_year) }
     let!(:employer_profile) { plan_year.employer_profile }
     let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "white collar benefit group") }
     let!(:blue_collar_large_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
@@ -1726,9 +1727,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let!(:white_collar_small_family_dependents) { FactoryGirl.create_list(:census_dependent, 2, census_employee: white_collar_small_family_employee) }
     let!(:white_collar_no_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
     let!(:white_collar_employees) { [white_collar_large_family_employee, white_collar_small_family_employee, white_collar_no_family_employee]}
+    #Whoever did these by hand is hardcore.
+    let(:estimated_monthly_max_cost) { 2154.18 }
+    let(:estimated_min_employee_cost) { 100.10 }
+    let(:estimated_max_employee_cost) { 1121.10 }
 
     before do
-
       blue_collar_employees.each do |ce|
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: blue_collar_benefit_group)
       end
@@ -1739,22 +1743,22 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "should have an estimated monthly max cost" do
       Caches::PlanDetails.load_record_cache!
-      expect(p(blue_collar_benefit_group).monthly_employer_contribution_amount).to be_within(0.01).of(2154.18)
+      expect(p(blue_collar_benefit_group).monthly_employer_contribution_amount).to be_within(0.01).of(estimated_monthly_max_cost)
     end
 
     it "should have an estimated min employee cost" do
       Caches::PlanDetails.load_record_cache!
-      expect(p(blue_collar_benefit_group).monthly_min_employee_cost).to be_within(0.01).of(100.10)
+      expect(p(blue_collar_benefit_group).monthly_min_employee_cost).to be_within(0.01).of(estimated_min_employee_cost)
     end
 
     it "should have an estimated max employee cost" do
       Caches::PlanDetails.load_record_cache!
-      expect(p(blue_collar_benefit_group).monthly_max_employee_cost).to be_within(0.01).of(1121.10)
+      expect(p(blue_collar_benefit_group).monthly_max_employee_cost).to be_within(0.01).of(estimated_max_employee_cost)
     end
   end
 
 
-  context 'published_plan_years_within_date_range scope' do 
+  context 'published_plan_years_within_date_range scope' do
 
     let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
     let(:valid_fte_count)                 { 5 }
@@ -1782,7 +1786,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context 'when plan year start date overlaps with published plan year' do
-      it 'should return plan year' do 
+      it 'should return plan year' do
         employer_profile.plan_years[1].publish!
         current_plan_year = employer_profile.plan_years.first
         expect(employer_profile.plan_years[0].overlapping_published_plan_years.any?).to be_truthy
@@ -1812,7 +1816,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         old_plan_year.publish!
       end
 
-      it 'should return plan year' do 
+      it 'should return plan year' do
         expect(employer_profile.plan_years[0].overlapping_published_plan_years.any?).to be_falsey
       end
     end
