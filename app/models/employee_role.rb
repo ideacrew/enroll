@@ -127,8 +127,7 @@ class EmployeeRole
   end
 
   def is_active?
-    # self.is_active
-    employee_role.census_employee && employee_role.census_employee.is_active?
+    census_employee && census_employee.is_active?
   end
 
   class << self
