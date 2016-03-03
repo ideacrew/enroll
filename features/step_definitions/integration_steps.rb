@@ -316,7 +316,7 @@ Then(/^.+ should see the matching employee record form$/) do
 end
 
 When(/^.+ accepts? the matched employer$/) do
-  click_button 'This is my employer'
+  find(:xpath, "//span[contains(., 'Continue')]").click
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|

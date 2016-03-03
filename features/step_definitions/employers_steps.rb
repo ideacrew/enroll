@@ -93,7 +93,8 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   fill_in 'census_employee[first_name]', with: 'John'
   fill_in 'census_employee[middle_name]', with: 'K'
   fill_in 'census_employee[last_name]', with: 'Doe'
-  fill_in 'census_employee[name_sfx]', with: 'Jr'
+  find(:xpath, "//p[contains(., 'SUFFIX')]").click
+  find(:xpath, "//li[contains(., 'Jr.')]").click
 
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
