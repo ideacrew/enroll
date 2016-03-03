@@ -28,7 +28,7 @@ RSpec.describe "insured/families/_qle_detail.html.erb" do
 
   it "should have error message" do
     expect(rendered).to have_selector(".error-info.hidden")
-    expect(rendered).to have_content "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify."
+    expect(rendered).to have_content "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at #{Settings.contact_center.phone_number} to give us more information so we can see if you qualify."
   end
 
   it "should not have csr-form" do

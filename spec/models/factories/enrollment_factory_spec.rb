@@ -31,7 +31,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     FactoryGirl.create(:benefit_group_assignment,
       benefit_group: benefit_group,
       census_employee: census_employee,
-      start_on: Date.today - 40.days
+      start_on: TimeKeeper.date_of_record
     )
   }
 
@@ -733,4 +733,32 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
       expect(Factories::EnrollmentFactory.construct_consumer_role(ua_params,user)).not_to be
     end
   end
+end
+
+describe Factories::EnrollmentFactory, "with an exisiting consumer role" do
+
+  context ".build_family" do
+    let(:subject) { Factories::EnrollmentFactory }
+    let(:person) { FactoryGirl.create(:person)}
+
+    it "should add a family to a person without one" do
+      subject.build_family(person,[])
+      expect(person.primary_family).to be_truthy
+    end
+
+  end
+
+  context ".build_family with existing family" do
+    let(:subject) { Factories::EnrollmentFactory }
+    let(:person) { original_family.person}
+    let(:original_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    it "should return primary family" do
+      original_family = subject.build_family(person,[])
+      expect(original_family).to eq(person.primary_family)
+    end
+
+  end
+
+
 end

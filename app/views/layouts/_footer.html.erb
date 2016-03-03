@@ -1,17 +1,17 @@
 <footer class="footer-wrapper">
   <div class="container">
     <div class="row">
-      <div class="col-md-6"><p>© 2015 DC Health Link. All Rights Reserved.</p></div>
+      <div class="col-md-6"><p><%= copyright_notice %></p></div>
       <div class="col-md-6">
-        <ul class="list-unstylesd list-inline pull-right">
+        <ul class="list-unstyled list-inline pull-right">
           <li>
             <!-- <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a> -->
           </li>
           <li>
-            <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;<%= HbxProfile::CallCenterPhoneNumber %></a>
+            <%= image_tag 'icons/phone.png' %> &nbsp;<%= link_to Settings.contact_center.phone_number, "tel:#{Settings.contact_center.phone_number}" %>
           </li>
           <li>
-            <a href="#"><%= image_tag 'icons/mail.png' %> &nbsp;info@dchealthlink.com</a>
+            <%= image_tag 'icons/mail.png' %> &nbsp;<%= mail_to Settings.contact_center.email_address %>
           </li>
           <li>
             <a href="#"><%= image_tag 'icons/message.png' %> &nbsp;FAQs</a>

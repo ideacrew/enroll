@@ -665,5 +665,6 @@ And(/I select three plans to compare/) do
 end
 
 And(/I should not see any plan which premium is 0/) do
+  @browser.h2s(class: "plan-premium")[1].wait_until_present
   expect(@browser.h2s(class: "plan-premium", text: "$0.00").count).to eq 0
 end

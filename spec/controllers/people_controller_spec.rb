@@ -14,7 +14,6 @@ RSpec.describe PeopleController do
 
   let(:vlp_document){FactoryGirl.build(:vlp_document)}
 
-
   it "GET new" do
     sign_in(user)
     get :new
@@ -25,6 +24,9 @@ RSpec.describe PeopleController do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
     let(:consumer_role_attributes) { consumer_role.attributes.to_hash}
     let(:person_attributes) { person.attributes.to_hash}
+    let(:employee_roles) { person.employee_roles }
+    let(:census_employee_id) {employee_roles[0].census_employee_id}
+
     let(:email_attributes) { {"0"=>{"kind"=>"home", "address"=>"test@example.com"}}}
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
         "1"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
@@ -73,6 +75,7 @@ RSpec.describe PeopleController do
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
         person_attributes[:consumer_role_attributes] = consumer_role_attributes
 
+    
         post :update, id: person.id, person: person_attributes
         expect(response).to redirect_to(personal_insured_families_path)
         expect(assigns(:person)).not_to be_nil

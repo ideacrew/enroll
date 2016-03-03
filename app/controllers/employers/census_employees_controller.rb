@@ -87,7 +87,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if benefit_group_id.present?
         flash[:notice] = "Census Employee is successfully updated."
       else
-        flash[:notice] = "Note: new employee cannot enroll on #{HbxProfile::ShortName} until they are assigned a benefit group. "
+        flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
       redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')

@@ -1,7 +1,7 @@
 module PortalHeaderHelper
   def portal_display_name(controller)
     if current_user.nil?
-      link_to "Welcome to the District's Health Insurance Marketplace", "#"
+      Settings.site.header_message
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path
     elsif current_user.person.try(:broker_role)
@@ -17,7 +17,7 @@ module PortalHeaderHelper
     elsif current_user.try(:has_employer_staff_role?)
       link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.employer_staff_roles.first.employer_profile_id)
     else
-      link_to "Welcome to the District's Health Insurance Marketplace", "#"
+      Settings.site.header_message
     end
   end
 

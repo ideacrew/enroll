@@ -106,7 +106,7 @@ describe EmployerProfile, dbclean: :after_each do
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
     let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-    let(:min_non_owner_count )  { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum }
+    let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
 
     it "should initialize in applicant status" do
       expect(employer_profile.applicant?).to be_truthy
@@ -574,6 +574,17 @@ describe EmployerProfile, "when a binder premium is credited" do
     employer.binder_credited
     ActiveSupport::Notifications.unsubscribe(event_subscriber)
     expect(@employer_id).to eq hbx_id
+  end
+end
+
+
+
+describe EmployerProfile, "renewals" do
+
+  context "new employers should not be selected" do
+  end
+
+  context "terminated employers should not be selected" do 
   end
 end
 
