@@ -1,5 +1,4 @@
 class InsuredEligibleForBenefitRule
-  INDIVIDUAL_VERIFICATION_OUTSTANDING_WINDOW = 180.days
 
   # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
 
@@ -140,7 +139,7 @@ class InsuredEligibleForBenefitRule
   private
 
   def is_verification_satisfied?
-    !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, INDIVIDUAL_VERIFICATION_OUTSTANDING_WINDOW).try(:>, TimeKeeper.date_of_record))
+    !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, Settings.aca.individual_market.verification_outstanding_window.days).try(:>, TimeKeeper.date_of_record))
   end
 
   def is_person_vlp_verified?

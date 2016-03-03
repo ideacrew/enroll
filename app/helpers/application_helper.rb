@@ -1,5 +1,9 @@
 module ApplicationHelper
 
+  def copyright_notice
+    raw("&copy; #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.")
+  end
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
@@ -465,7 +469,7 @@ module ApplicationHelper
   def incarceration_cannot_purchase(family_member)
     pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
     name=family_member.try(:first_name) || ''
-    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{HbxProfile::ShortName}.<br/> Other family members may still be eligible to enroll."
+    "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
   end
 
   def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
@@ -488,8 +492,9 @@ module ApplicationHelper
     'Confirm'
   end
 
+
   def qualify_qle_notice
-    content_tag(:span, class: :alert) do
+    content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"

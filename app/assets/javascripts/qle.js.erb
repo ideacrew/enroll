@@ -11,7 +11,7 @@ $(function () {
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
 
-    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> to give us more information so we can see if you qualify.";
+    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 

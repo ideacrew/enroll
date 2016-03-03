@@ -54,7 +54,7 @@ describe ::Forms::PlanYearForm, "when newly created" do
       end
 
       it "should not include dental" do
-        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).to include(@excluded_coverage_kind_plan)
+        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_coverage_kind_plan)
       end
 
       it "should not include individual" do
@@ -76,7 +76,7 @@ describe ::Forms::PlanYearForm, "when newly created" do
       end
 
       it "should not include dental" do
-        expect(plan_year_form.metal_level_plans_for("silver")).to include(@excluded_coverage_kind_plan)
+        expect(plan_year_form.metal_level_plans_for("silver")).not_to include(@excluded_coverage_kind_plan)
       end
 
       it "should not include individual" do

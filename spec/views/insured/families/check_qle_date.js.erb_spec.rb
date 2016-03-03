@@ -61,7 +61,7 @@ describe "insured/families/check_qle_date.js.erb" do
 
       it "should match qle block notice" do
         expect(rendered).to match /We need a bit of additional information to redetermine your eligibility/
-        expect(rendered).to match /Please call us at 1-855-532-5465/
+        expect(rendered).to match /Please call us at #{Settings.contact_center.phone_number}/
         expect(rendered).to match /Acknowledge/
       end
     end
@@ -76,7 +76,7 @@ describe "insured/families/check_qle_date.js.erb" do
 
     it "should match error notcie" do
       expect(render).to match /The date you submitted does not qualify for special enrollment/
-      expect(render).to match /Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465/
+      expect(render).to match /Please double check the date or contact DC Health Link's Customer Care Center: #{Settings.contact_center.phone_number}/
     end
   end
 end
