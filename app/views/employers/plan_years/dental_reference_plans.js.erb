@@ -48,7 +48,6 @@ $('#<%= @location_id %> .dental-plan-offering').hide();
 $('#<%= @location_id %> .reference-steps .dental:first').hide();
 $('#<%= @location_id %> .elected-plans-tab input:not(:checked)').each(function() {
     var plan_value = $(this).attr('value');
-    console.log(plan_value);
     $('#<%= @location_id %> .dental-reference-plans input[value="'+plan_value+'"]').closest('.col-xs-4').hide();
   });
 <% end %>

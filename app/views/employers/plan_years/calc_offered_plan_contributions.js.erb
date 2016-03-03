@@ -97,7 +97,6 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
    if (reference_plan_id == "" || reference_plan_id == undefined) {
      return
    }
-   console.log(reference_plan_id+" "+coverage_type+" "+location_id);
    calcEmployerContributions($('a#employee_costs_link').attr('href'), location_id, coverage_type);
  });
 

@@ -176,7 +176,6 @@ function validateEditPlanYear() {
   $('.benefit-group-fields').each(function() {
     if ( $(this).hasClass('edit-additional') ) {
       if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
-        console.log('valid');
        editvalidatedreferenceplanselections = true
         editvalidated = true;
       } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
@@ -192,7 +191,6 @@ function validateEditPlanYear() {
     } else {
     if ( $(this).find('.reference-steps').is(':first') ) {
       if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
-        console.log('valid');
        editvalidatedreferenceplanselections = true
         editvalidated = true;
       } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
@@ -209,7 +207,6 @@ function validateEditPlanYear() {
       if ( $(this).find('.reference-steps:last').find('.edit-add-dental').length ) {
         if ( $('.edit-add-dental').is(':hidden') ) {
           if ( $(this).find('.reference-steps:last').find('.plan-options').is(':hidden') && $(this).find('.reference-steps:last').find('.nav-tabs').is(':hidden') && $(this).find('.reference-steps:last').find('.dental-reference-plans').is(':hidden')) {
-            console.log('valid');
             editvalidatedreferenceplanselections = true
             editvalidated = true;
           } else if ( $(this).find('.reference-steps:last').is(':hidden')) {
@@ -553,16 +550,6 @@ $(document).ready(function () {
     $(this).prev().removeClass("active");
     $("img.arrow_active").remove();
   });
-
-  // Progress Bar
-  // $(document).on('click', '#btn-continue', function() {
-  //   console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
-
-  //   if($('#btn-search-employer').length) $('#btn-search-employer').click();
-  //   else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
-  //   else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
-  //   else if($('#btn_select_plan_continue').length) $('#btn_select_plan_continue').click();
-  // });
 
   // Employer Registration
   $('.employer_step2').click(function() {

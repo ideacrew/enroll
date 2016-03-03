@@ -105,7 +105,6 @@ ready = function() {
         if (reference_plan_id == "" || reference_plan_id == undefined) {
           return
         }
-        console.log(location_id + "," + reference_plan_id);
         calcEmployerContributions($('a#edit_employee_costs_link, a#employee_costs_link').attr('href'), location_id);
       })
 
@@ -177,10 +176,8 @@ ready = function() {
           }).get();
 
         }
-        console.log(premium_pcts);
-        console.log(reference_plan_id);
+
         var plan_option_kind = $("#"+location+ " " + coverage_type +" .nav-tabs input[type=radio]:checked").val();
-        console.log(plan_option_kind);
         var location_id = location;
 
         if (reference_plan_id == "" || reference_plan_id == undefined) {
@@ -328,8 +325,6 @@ ready = function() {
           } else {
             var coverage_type = '.dental';
             var location_id = $(this).parents('.benefit-group-fields').attr('id');
-            console.log(location_id);
-            console.log(coverage_type);
             calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
           }
 
@@ -425,14 +420,12 @@ ready = function() {
         }
         if ( $(this).closest('.plan-options').parent().hasClass('health') ) {
           nav = '.health';
-          console.log(nav);
           $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
           $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
           $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
         } else {
           nav = '.dental';
-          console.log(nav);
           $(this).closest('.benefit-group-fields').find('.dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').hide();
           $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
           $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').fadeOut();
@@ -442,7 +435,6 @@ ready = function() {
 
         if ($(this).find('input[type=radio]').is(':checked')) {
         } else {
-          console.log(nav);
           if ( nav == '.health' ) {
             $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
             $(this).closest('.benefit-group-fields').find(".reference-plans").show();
@@ -527,8 +519,6 @@ $(document).on('click', '.reference-plan input[type=radio] + label', function() 
 
       }
       var location_id = $(this).parents('.benefit-group-fields').attr('id');
-      console.log(location_id);
-      console.log(coverage_type);
       calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
     });
   });
