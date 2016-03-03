@@ -90,10 +90,10 @@ module Insured::FamiliesHelper
   end
 
   def disable_make_changes_button?(hbx_enrollment)
-    if hbx_enrollment.employee_role.blank?
+    if hbx_enrollment.census_employee.blank?
       return false
     else
-      if hbx_enrollment.employee_role.is_under_open_enrollment?
+      if hbx_enrollment.census_employee.employee_role.is_under_open_enrollment?
         return false
       else
         return true
