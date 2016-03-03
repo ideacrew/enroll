@@ -154,7 +154,7 @@ class EmployerProfile
   end
 
   def show_plan_year
-    renewing_plan_year || active_plan_year || published_plan_year
+    renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
   def plan_year_drafts
@@ -176,7 +176,7 @@ class EmployerProfile
   end
 
   def renewing_published_plan_year
-    plan_years.published.first
+    plan_years.renewing_published_state.first
   end
 
   def renewing_plan_year
