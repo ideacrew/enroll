@@ -198,7 +198,7 @@ class Insured::FamiliesController < FamiliesController
       @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
       @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
     else
-      if @person.employee_roles.active.present?
+      if @person.active_employee_roles.present?
         @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
       else @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
@@ -210,7 +210,7 @@ class Insured::FamiliesController < FamiliesController
   def check_for_address_info
     if @person.has_active_employee_role?
       if @person.addresses.blank?
-        redirect_to edit_insured_employee_path(@person.employee_roles.active.first)
+        redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
