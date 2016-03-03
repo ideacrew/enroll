@@ -30,6 +30,13 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
     expect(rendered).to have_selector('h3', text: 'Premium Billing Report')
   end
 
+  it "shouldn't display premium billing reports widget" do
+    @tab = 'home'
+    allow(plan_year).to receive(:aasm_state).and_return("renewing_draft")
+    render template: "employers/employer_profiles/show"
+    expect(rendered).to_not have_selector('h3', text: 'Premium Billing Report')
+  end
+
   it "should have active plan year but not display premium billings report" do
     allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record + 3.years)
     @tab = 'home'

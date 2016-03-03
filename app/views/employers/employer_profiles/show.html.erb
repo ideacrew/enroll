@@ -57,7 +57,7 @@
       </article>
     </section>
   <% end %>
-  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) %>
+  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
       <h3>Premium Billing Report</h3>
