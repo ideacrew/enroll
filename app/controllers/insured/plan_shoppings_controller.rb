@@ -121,6 +121,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
       if waived_enrollment.save!
         hbx_enrollment = waived_enrollment
+        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
       end
     end
 
