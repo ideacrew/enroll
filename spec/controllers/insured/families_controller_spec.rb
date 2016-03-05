@@ -2,17 +2,20 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamiliesController do
   context "set_current_user with no person" do
-    let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com') }
-    let(:person) {nil}
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:person) { FactoryGirl.create(:person) }
 
     before :each do
-      allow(user).to receive(:person).and_return(person)
       sign_in user
     end
 
     it "should log the error" do
-      expect(subject).to receive(:log)
+      expect(subject).to receive(:log) do |msg, severity|
+        expect(severity[:severity]).to eq('error')
+        expect(msg[:message]).to eq('@family was set to nil')
+      end
       get :home
+      expect(response).to redirect_to("/500.html")
     end
 
     it "should redirect" do
