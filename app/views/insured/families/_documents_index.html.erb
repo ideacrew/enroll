@@ -1,16 +1,56 @@
-<div class="documents-table">
- <div class="table-responsive">
-   <% unless @person.has_consumer_role? %>
-       <h4>No results found</h4>
-   <% else %>
-     <% @family_members.each do |member|%>
-       <h3> <%= member.person.first_name %>. Verification status: <%= show_consumer_role_state(member.person.consumer_role) %></h3>
-         <% if member.person.consumer_role.aasm_state == "fully_verified" %>
-           <%= render partial: "verified_documents", locals: { member: member} %>
-         <% else %>
-           <%= render partial: "unverified_documents", locals: { member: member}%>
-         <% end %>
-     <% end %>
-   <% end %>
- </div>
-</div>
+<% accordion_element = 0 %>
+  <% unless @person.has_consumer_role? %>
+      <h4>No results found</h4>
+  <% else %>
+    <!-- Verification TABLE -->
+    <div class="col-md-12">
+      <!-- Verification table HEADER  -->
+      <div class="row module verification-dashboard header">
+        <div class="col-md-3 text-center">
+          <h5><strong>FAMILY MEMBER</strong></h5>
+        </div>
+        <div class="col-md-2 text-center">
+          <h5><strong>PERSON VERIFICATION STATUS</strong></h5>
+        </div>
+        <div class="col-md-2 text-center">
+          <h5><strong>VERIFICATION TYPE</strong></h5>
+        </div>
+        <div class="col-md-2 text-center">
+          <h5><strong>VERIFICATION STATUS</strong></h5>
+        </div>
+        <div class="col-md-2 text-center">
+          <h5><strong>REMAINING TIME</strong></h5>
+        </div>
+        <div class="col-md-1 text-center">
+          <h5><strong>DOC</strong></h5>
+        </div>
+      </div>
+      <!-- >>>>> verification table header  -->
+
+      <!-- Verification table BODY  -->
+      <% @family_members.each do |member|%>
+          <% accordion_element += 1 %>
+
+            <div class="accordion" id="docs-accordion">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="module accordion-toggle" data-toggle="collapse" data-parent="#docs-accordion" href="#docs_accordion<%=accordion_element%>">
+                    <%= render partial: "verification_table", locals: {member: member} %>
+                  </a>
+                </div>
+
+                <div id="docs_accordion<%=accordion_element%>" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <%= render partial: "documents_table", locals: {member: member} %>
+                  </div>
+                </div>
+              </div>
+            </div>
+      <% end %>
+      <!-- >>>>> verification table body  -->
+    </div>
+    <!-- >>>>> verification table -->
+  <% end %>
+
+
+
