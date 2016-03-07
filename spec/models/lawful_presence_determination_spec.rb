@@ -7,6 +7,14 @@ describe LawfulPresenceDetermination do
   let(:person_id) { consumer_role.person.id }
   let(:payload) { "lsjdfioennnklsjdfe" }
 
+  describe "in a verification pending state with no responses" do
+    it "returns nil for latest response date" do
+      found_person = Person.find(person_id)
+      lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
+      expect(lawful_presence_determination.latest_denial_date).not_to be_truthy
+    end
+  end
+
   describe "being given an ssa response which fails" do
     it "should have the ssa response document" do
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
@@ -14,6 +22,18 @@ describe LawfulPresenceDetermination do
       found_person = Person.find(person_id)
       ssa_response = found_person.consumer_role.lawful_presence_determination.ssa_responses.first
       expect(ssa_response.body).to eq payload
+    end
+
+    it "returns the latest received response date" do
+      args = OpenStruct.new
+      args.determined_at = TimeKeeper.datetime_of_record - 1.month
+      args.vlp_authority = "dhs"
+      consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: payload})
+      consumer_role.deny_lawful_presence!(args)
+      consumer_role.person.save!
+      found_person = Person.find(person_id)
+      lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
+      expect(lawful_presence_determination.latest_denial_date).to be_within(1.second).of(TimeKeeper.datetime_of_record - 1.month)
     end
   end
 
@@ -24,6 +44,18 @@ describe LawfulPresenceDetermination do
       found_person = Person.find(person_id)
       vlp_response = found_person.consumer_role.lawful_presence_determination.vlp_responses.first
       expect(vlp_response.body).to eq payload
+    end
+
+    it "returns the latest received response date" do
+      args = OpenStruct.new
+      args.determined_at = TimeKeeper.datetime_of_record - 1.month
+      args.vlp_authority = "dhs"
+      consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: args.determined_at, body: payload})
+      consumer_role.deny_lawful_presence!(args)
+      consumer_role.person.save!
+      found_person = Person.find(person_id)
+      lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
+      expect(lawful_presence_determination.latest_denial_date).to be_within(1.second).of(TimeKeeper.datetime_of_record - 1.month)
     end
   end
 end
@@ -36,7 +68,7 @@ describe LawfulPresenceDetermination do
 
     it "should invoke the ssa workflow event when asked to begin the lawful presence process" do
       expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
-      subject.start_determination_process(requested_start_date)   
+      subject.start_determination_process(requested_start_date)
     end
   end
 

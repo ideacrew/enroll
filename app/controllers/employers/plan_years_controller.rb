@@ -198,7 +198,7 @@ class Employers::PlanYearsController < ApplicationController
 
         flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
-    elsif @employer_profile.plan_years.published.include?(@plan_year) && @plan_year.may_revert_application?
+    elsif @employer_profile.plan_years.include?(@plan_year) && @plan_year.may_revert_application?
       @plan_year.revert_application
       if @plan_year.save
         flash[:notice] = "Plan Year successfully reverted from published to applicant."
@@ -239,7 +239,7 @@ class Employers::PlanYearsController < ApplicationController
   def force_publish
     plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     plan_year.force_publish!
-    flash[:error] = "As submitted, this application is ineligible for coverage under the #{HbxProfile::ShortName} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
+    flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 

@@ -4,6 +4,8 @@ class BenefitGroup
 
   embedded_in :plan_year
 
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
+
   PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 30, 60]
@@ -51,8 +53,6 @@ class BenefitGroup
 
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
-
-  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
   #TODO add following attributes: :title,
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
@@ -226,12 +226,12 @@ class BenefitGroup
   def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
     new_hire_effective_date = new_hire_effective_on(date_of_hire)
 
-    lower_limit = (new_hire_effective_date - HbxProfile::ShopMaximumEnrollmentPeriodBeforeEligibilityInDays)
-    upper_limit = (new_hire_effective_date + HbxProfile::ShopMaximumEnrollmentPeriodAfterEligibilityInDays)
+    lower_limit = (new_hire_effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
+    upper_limit = (new_hire_effective_date + Settings.aca.shop_market.latest_enroll_after_effective_on.days)
 
     # Length of time that EE may enroll following correction to Census Employee Identifying info
     if date_of_roster_entry && (date_of_roster_entry > new_hire_effective_date)
-      date_of_roster_entry..(date_of_roster_entry + HbxProfile::ShopMinimumEnrollmentPeriodAfterRosterEntryInDays)
+      date_of_roster_entry..(date_of_roster_entry + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
     else
       lower_limit..upper_limit
     end
@@ -279,7 +279,7 @@ class BenefitGroup
 
   def self.find(id)
     organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
-    benefit_groups = organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
+    organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
       bg.id == id
     end.first
   end
@@ -327,13 +327,16 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
-    case self.plan_option_kind
+    case plan_option_kind
     when "single_plan"
-      Plan.where(id: self.reference_plan_id).first
+      Plan.where(id: reference_plan_id).first
     when "single_carrier"
-      Plan.valid_shop_health_plans("carrier", self.carrier_for_elected_plan, self.start_on.year)
+      if carrier_for_elected_plan.blank?
+        @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
+      end
+      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", self.metal_level_for_elected_plan, self.start_on.year)
+      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
     end
   end
 
@@ -375,7 +378,7 @@ private
 
   def eligible_on(date_of_hire)
     if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire 
+      date_of_hire
     else
       doh_with_offset = date_of_hire + effective_on_offset.days
       doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month
@@ -384,6 +387,19 @@ private
 
   def first_of_month_effective_on_for(date_of_hire)
     [plan_year.start_on, eligible_on(date_of_hire)].max
+  end
+
+  def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
+
+    # Length of time prior to effective date that EE may purchase plan
+    Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days
+
+    # Length of time following effective date that EE may purchase plan
+    Settings.aca.shop_market.latest_enroll_after_effective_on.days
+
+    # Length of time that EE may enroll following correction to Census Employee Identifying info
+    Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days
+
   end
 
   # Non-congressional
@@ -422,8 +438,12 @@ private
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
 
-    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
-      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+    # all employee contribution < 50% for 1/1 employers
+    if start_on.month == 1 && start_on.day == 1
+    else
+      if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
+        self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+      end
     end
   end
 

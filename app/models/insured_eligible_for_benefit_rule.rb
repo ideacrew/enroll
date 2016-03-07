@@ -115,7 +115,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_lawful_presence_status_satisfied?
-    is_verification_outstanding? || is_person_vlp_verified? || is_person_created_less_than_90_days_ago?
+    is_verification_satisfied? || is_person_vlp_verified?
   end
 
   def determination_results
@@ -138,15 +138,12 @@ class InsuredEligibleForBenefitRule
 
   private
 
-  def is_verification_outstanding?
-    @role.lawful_presence_determination.aasm_state == "verification_outstanding" ? false : true
+  def is_verification_satisfied?
+    return true if Settings.aca.individual_market.verification_outstanding_window.days == 0
+    !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, Settings.aca.individual_market.verification_outstanding_window.days).try(:>, TimeKeeper.date_of_record))
   end
 
   def is_person_vlp_verified?
     @role.aasm_state == "fully_verified" ? true : false
-  end
-
-  def is_person_created_less_than_90_days_ago?
-    (@role.person.created_at + 90.days) > TimeKeeper.date_of_record
   end
 end

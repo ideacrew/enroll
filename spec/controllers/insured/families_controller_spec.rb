@@ -2,17 +2,20 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamiliesController do
   context "set_current_user with no person" do
-    let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com') }
-    let(:person) {nil}
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:person) { FactoryGirl.create(:person) }
 
     before :each do
-      allow(user).to receive(:person).and_return(person)
       sign_in user
     end
 
     it "should log the error" do
-      expect(subject).to receive(:log)
+      expect(subject).to receive(:log) do |msg, severity|
+        expect(severity[:severity]).to eq('error')
+        expect(msg[:message]).to eq('@family was set to nil')
+      end
       get :home
+      expect(response).to redirect_to("/500.html")
     end
 
     it "should redirect" do
@@ -62,6 +65,9 @@ RSpec.describe Insured::FamiliesController do
   describe "GET home" do
     before :each do
       allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+
+      allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
+      allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
@@ -74,6 +80,14 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(consumer_role).to receive(:save!).and_return(true)
+
+      allow(family).to receive(:_id).and_return(true)
+      allow(hbx_enrollments).to receive(:_id).and_return(true)
+      allow(hbx_enrollments).to receive(:each).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:reject).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:map).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
+
       session[:portal] = "insured/families"
     end
 

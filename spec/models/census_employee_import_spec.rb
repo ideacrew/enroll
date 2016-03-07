@@ -46,4 +46,30 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.load_imported_census_employees.first.address.present?).to be_truthy
     end
   end
+
+  context "relationship field is empty" do
+
+    let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 2.xlsx') }
+    let(:file) {
+      double("", :tempfile => tempfile)
+    }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:sheet) {
+      Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
+    }
+    let(:subject) {
+      CensusEmployeeImport.new({file: file, employer_profile: employer_profile})
+    }
+
+    it "should not add the 2nd employee/dependent (as relationship is missing)" do
+      expect(subject.save).to be_falsey
+      expect(subject.load_imported_census_employees.count).to eq(1) # 1 employee + no dependents
+      expect(subject.load_imported_census_employees.first).to be_a CensusEmployee
+      expect(subject.load_imported_census_employees.first.census_dependents.count).to eq(0)
+    end
+
+    it "should not save successfully" do
+      expect(subject.save).to be_falsey
+    end
+  end
 end

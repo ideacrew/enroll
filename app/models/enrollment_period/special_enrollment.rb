@@ -8,7 +8,7 @@ class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
   field :qualifying_life_event_kind_id, type: BSON::ObjectId
 
   # Date Qualifying Life Event occurred
-  field :qle_on, type: Date   
+  field :qle_on, type: Date
 
   # Date coverage starts
   field :effective_on_kind, type: String
@@ -105,7 +105,7 @@ private
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+    if @reference_date.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else
       @earliest_effective_date.next_month.end_of_month + 1.day
@@ -119,7 +119,7 @@ private
       calculate_effective_on_for_moved_qle
     else
       @earliest_effective_date.end_of_month + 1.day
-    end    
+    end
   end
 
   def fixed_first_of_next_month_effective_date
