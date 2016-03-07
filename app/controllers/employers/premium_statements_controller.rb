@@ -4,15 +4,7 @@ class Employers::PremiumStatementsController < ApplicationController
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
-
-    billing_report_date = TimeKeeper.date_of_record.next_month
-    @current_plan_year = @employer_profile.find_plan_year_by_effective_date(billing_report_date)
-    if @current_plan_year.blank?
-      billing_report_date = TimeKeeper.date_of_record
-      @current_plan_year = @employer_profile.find_plan_year_by_effective_date(billing_report_date)
-    end
-    valid_hbx_enrollments_by_billing_month = @current_plan_year.hbx_enrollments_by_month(billing_report_date) if @current_plan_year.present?
-    @hbx_enrollments = valid_hbx_enrollments_by_billing_month.select{|enrollment| enrollment.census_employee.is_active?}.first(100)
+    @current_plan_year, @hbx_enrollments = @employer_profile.premium_billing_plan_year_and_enrollments
 
     respond_to do |format|
       format.html
@@ -23,7 +15,7 @@ class Employers::PremiumStatementsController < ApplicationController
     end
   end
 
-private
+  private
 
   def csv_for(hbx_enrollments)
     (output = "").tap do
