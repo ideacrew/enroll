@@ -198,9 +198,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def person_market_kind
-    if @person.user.has_consumer_role?
+    if @person.has_active_consumer_role?
       "individual"
-    elsif @person.user.has_employee_role?
+    elsif @person.has_active_employee_role?
       "shop"
     end
   end
