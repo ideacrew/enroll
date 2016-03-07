@@ -73,7 +73,7 @@ class PlanYear
     )
   }
 
-  def hbx_enrollments_by_month(month_end)
+  def hbx_enrollments_by_month(date)
     id_list = benefit_groups.collect(&:_id).uniq
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
@@ -81,11 +81,11 @@ class PlanYear
     }).limit(100) # limit census employees to 100 due to performance reasons
 
     families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where({
+      enrollments << family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
-        :"effective_on".lte => month_end,
+        :"effective_on".lte => date.end_of_month,
         :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
-      }).to_a
+      }).order_by(:'submitted_at'.desc).first
     end
   end
 
