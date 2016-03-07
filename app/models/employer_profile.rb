@@ -173,7 +173,7 @@ class EmployerProfile
     end
   end
 
-  
+
   def premium_billing_plan_year_and_enrollments
     billing_report_date = TimeKeeper.date_of_record.next_month
     current_plan_year = find_plan_year_by_effective_date(billing_report_date)
@@ -184,7 +184,7 @@ class EmployerProfile
     end
 
     if current_plan_year.present?
-      hbx_enrollments = current_plan_year.hbx_enrollments_by_month(billing_report_date)
+      hbx_enrollments = current_plan_year.hbx_enrollments_by_month(billing_report_date).compact
       hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 

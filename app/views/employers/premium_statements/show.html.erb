@@ -4,6 +4,9 @@
 <div class="col-xs-12 premium-reports-tab">
   <div class="row no-buffer">
     <% calender_month = TimeKeeper.date_of_record.next_month %>
+    <% if @current_plan_year.present? && !(@current_plan_year.start_on..@current_plan_year.end_on).cover?(calender_month) %>
+       <% calender_month = TimeKeeper.date_of_record %>
+    <% end %>
     <h1>Premium Billing Report <%= calender_month.beginning_of_month %> - <%= calender_month.end_of_month %>
 
   </div>
