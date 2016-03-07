@@ -198,7 +198,7 @@ class Employers::PlanYearsController < ApplicationController
 
         flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
-    elsif @employer_profile.plan_years.published.include?(@plan_year) && @plan_year.may_revert_application?
+    elsif @employer_profile.plan_years.include?(@plan_year) && @plan_year.may_revert_application?
       @plan_year.revert_application
       if @plan_year.save
         flash[:notice] = "Plan Year successfully reverted from published to applicant."
