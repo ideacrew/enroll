@@ -3,6 +3,7 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include AgencyProfile
 
   embedded_in :organization
 
@@ -74,7 +75,7 @@ class BrokerAgencyProfile
   def family_clients
     return unless (MARKET_KINDS - ["shop"]).include?(market_kind)
     return @family_clients if defined? @family_clients
-    @family_clients = Family.find_by_broker_agency_profile(self.id)
+    @family_clients = Family.by_broker_agency_profile_id(self.id)
   end
 
   # has_one primary_broker_role
