@@ -135,15 +135,6 @@
           <th>
             <header>Type</header>
           </th>
-          <th>
-            <header>Metallic Level</header>
-          </th>
-          <th>
-            <header>ID</header>
-          </th>
-          <th>
-            <header>Plans By</header>
-          </th>
         </tr>
         <tr>
           <td>
@@ -161,6 +152,19 @@
               <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
             </p>
           </td>
+        </tr>
+        <tr>
+          <th>
+            <header>Metallic Level</header>
+          </th>
+          <th>
+            <header>ID</header>
+          </th>
+          <th>
+            <header>Plans By</header>
+          </th>
+        </tr>
+        <tr>
           <td>
             <p>
               <%= bg.reference_plan.metal_level.titleize %>
@@ -184,7 +188,6 @@
         </tr>
       </table>
       <% if bg.dental_reference_plan_id.present? %>
-
       <h5 class="bg-title">Dental</h5>
   <table>
     <tr>
@@ -196,15 +199,6 @@
       </th>
       <th>
         <header>Type</header>
-      </th>
-      <th>
-        <header>Metallic Level</header>
-      </th>
-      <th>
-        <header>ID</header>
-      </th>
-      <th>
-        <header>Plans By</header>
       </th>
     </tr>
     <tr>
@@ -223,6 +217,19 @@
           <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
         </p>
       </td>
+    </tr>
+    <tr>
+      <th>
+        <header>Metallic Level</header>
+      </th>
+      <th>
+        <header>ID</header>
+      </th>
+      <th>
+        <header>Plans By</header>
+      </th>
+    </tr>
+    <tr>
       <td>
         <p>
           <%= bg.dental_reference_plan.metal_level.titleize %>
