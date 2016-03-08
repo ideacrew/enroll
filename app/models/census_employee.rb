@@ -115,8 +115,9 @@ class CensusEmployee < CensusMember
     start_on..end_on
   end
 
+  # TODO: eligibility rule different for active and renewal plan years
   def earliest_effective_date
-    benefit_group_assignment = active_benefit_group_assignment || published_benefit_group_assignment
+    benefit_group_assignment = renewal_benefit_group_assignment || published_benefit_group_assignment
     benefit_group_assignment.benefit_group.effective_on_for(hired_on)
   end
 

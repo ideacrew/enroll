@@ -43,10 +43,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     }
   }
 
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
-  end
-
   context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
@@ -861,4 +857,65 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   #   end
   #
   # end
+
+  context '.new_hire_enrollment_period' do
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+    end
+
+    context 'when hired_on date is in the past' do 
+      it 'should return census employee created date as new hire enrollment period start date' do 
+        expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.created_at
+      end
+    end
+
+    context 'when hired_on date is in the future' do
+      let(:hired_on){ TimeKeeper.date_of_record + 14.days }
+
+      it 'should return hired_on date as new hire enrollment period start date' do
+        expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.hired_on
+      end
+    end 
+
+    context 'when earliest effective date is in future more than 30 days from current date' do 
+
+      it 'should return earliest_effective_date as new hire enrollment period end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq plan_year.start_on
+      end
+    end
+
+    context 'when earliest effective date less than 30 days from current date' do
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return 30 days from new hire enrollment period start as end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq census_employee.new_hire_enrollment_period.min + 30.days
+      end
+    end
+  end
+
+  context '.earliest_effective_date' do
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.publish!
+    end
+
+    it 'should return earliest effective date' do 
+      expect(census_employee.earliest_effective_date).to eq plan_year.start_on
+    end
+  end
 end
