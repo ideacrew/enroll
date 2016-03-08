@@ -109,6 +109,17 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def new_hire_enrollment_period
+    start_on = [hired_on, created_at].max
+    end_on = [start_on + 30.days, earliest_effective_date].max
+    start_on..end_on
+  end
+
+  def earliest_effective_date
+    benefit_group_assignment = active_benefit_group_assignment || published_benefit_group_assignment
+    benefit_group_assignment.benefit_group.effective_on_for(hired_on)
+  end
+
   # def first_name=(new_first_name)
   #   write_attribute(:first_name, new_first_name)
   #   set_autocomplete_slug

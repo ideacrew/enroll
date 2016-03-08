@@ -214,29 +214,6 @@ class BenefitGroup
     end
   end
 
-  def new_hire_effective_on(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      date_of_hire
-    when "first_of_month"
-      eligible_on(date_of_hire)
-    end
-  end
-
-  def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
-    new_hire_effective_date = new_hire_effective_on(date_of_hire)
-
-    lower_limit = (new_hire_effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
-    upper_limit = (new_hire_effective_date + Settings.aca.shop_market.latest_enroll_after_effective_on.days)
-
-    # Length of time that EE may enroll following correction to Census Employee Identifying info
-    if date_of_roster_entry && (date_of_roster_entry > new_hire_effective_date)
-      date_of_roster_entry..(date_of_roster_entry + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
-    else
-      lower_limit..upper_limit
-    end
-  end
-
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
