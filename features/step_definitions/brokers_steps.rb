@@ -256,11 +256,11 @@ Then(/^.+ sees employer census family created$/) do
   wait_and_confirm_text(/successfully created/)
 end
 
-Then(/^.+ should see the matched employee record form$/) do
-  @browser.p(text: /Legal LLC/).wait_until_present
-  screenshot("broker_employer_search_results")
-  expect(@browser.p(text: /Legal LLC/).visible?).to be_truthy
-end
+#Then(/^.+ should see the matched employee record form$/) do
+#  @browser.p(text: /Legal LLC/).wait_until_present
+#  screenshot("broker_employer_search_results")
+#  expect(@browser.p(text: /Legal LLC/).visible?).to be_truthy
+#end
 
 Then(/^Broker Assisted is a family$/) do
   wait_and_confirm_text(/Broker Assisted/)

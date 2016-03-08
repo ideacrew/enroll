@@ -25,6 +25,7 @@ def people
       first_name: "Soren",
       last_name: "White",
       dob: "08/13/1979",
+      dob_date: "13/08/1979".to_date,
       ssn: "670991234",
       home_phone: "2025551234",
       email: 'soren@dc.gov',
@@ -76,12 +77,12 @@ def people
     "John Doe" => {
       first_name: "John",
       last_name: "Doe#{rand(1000)}",
-      dob: @u.adult_dob,
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
       legal_name: "Turner Agency, Inc",
       dba: "Turner Agency, Inc",
-      fein: @u.fein,
-      ssn: @u.ssn,
-      email: @u.email,
+      fein: defined?(@u) ? @u.fein : '123123123',
+      ssn: defined?(@u) ? @u.ssn : "761234567",
+      email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
 
     },
@@ -151,14 +152,30 @@ def default_office_location
   }
 end
 
+Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date]
+
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
+  employee.add_benefit_group_assignment benefit_group, 2.days.ago
+end
+
 When(/^.+ enters? office location for (.+)$/) do |location|
   location = eval(location) if location.class == String
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => location[:city]
 
-  find(:xpath, "//div[@class='selectric'][p[contains(text(), 'SELECT STATE')]]").click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), '#{location[:state]}')]").click
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'SELECT STATE')]]").click
+  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
 
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
@@ -185,18 +202,16 @@ end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
-  @browser.goto("http://localhost:3000/")
+
+  visit "/"
   portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
-  @browser.a(class: portal_class).wait_until_present
-  @browser.a(class: portal_class).click
-  @browser.element(class: /interaction-click-control-sign-in-existing-account/).wait_until_present
-  @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
-  sleep 2
-  @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
-  @browser.text_field(class: /interaction-field-control-user-password/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
-  @browser.element(class: /interaction-click-control-sign-in/).click
+  find("a.#{portal_class}").click
+  find('.interaction-click-control-sign-in-existing-account').click
+
+  fill_in "user[email]", :with => person[:email]
+  find('#user_email').set(person[:email])
+  fill_in "user[password]", :with => person[:password]
+  find('.interaction-click-control-sign-in').click
 end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
@@ -276,6 +291,10 @@ Then(/^.+ should see the employee search page$/) do
   expect(find('.interaction-field-control-person-first-name')).to be_visible
 end
 
+Given(/^(.*) visits the employee portal$/) do |named_person|
+  visit "/insured/employee/search"
+end
+
 When(/^(.*) creates an HBX account$/) do |named_person|
   click_button 'Create account'
 
@@ -300,14 +319,12 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
 end
 
 Then(/^.+ should not see the matched employee record form$/) do
-  @browser.element(class: /fa-exclamation-triangle/).wait_until_present
-  expect(@browser.element(class: /interaction-click-control-this-is-my-employer/).exists?).to be_falsey
+  find('.fa-exclamation-triangle')
+  expect(page).to_not have_css('.interaction-click-control-this-is-my-employer')
 end
 
 Then(/^Employee should see the matched employee record form$/) do
-  @browser.p(text: /Acme Inc\./).wait_until_present
-  screenshot("employer_search_results")
-  expect(@browser.p(text: /Acme Inc\./).visible?).to be_truthy
+  expect(page).to have_content('Acme Inc.')
 end
 
 # TODO: needs to be merged
@@ -358,33 +375,25 @@ Then(/^.+ should see (.*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  scroll_then_click(@browser.a(text: /Add Member/))
-  @browser.button(text: /Confirm Member/i).wait_until_present
+  click_link "Add Member"
 end
 
 Then(/^.+ should see the new dependent form$/) do
-  expect(@browser.button(text: /Confirm Member/i).visible?).to be_truthy
+  expect(page).to have_content('Confirm Member')
 end
 
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
-  @browser.text_field(name: 'dependent[first_name]').set('Cynthia')
-  @browser.text_field(name: 'dependent[last_name]').set('White')
-  @browser.text_field(name: 'jq_datepicker_ignore_dependent[dob]').set('01/15/2011')
-  input_field = @browser.div(class: /selectric-wrapper/)
-  input_field.click
-  input_field.li(text: /Child/).click
-  @browser.text_field(name: 'dependent[addresses][0][address_1]').set('623a Spalding Ct')
-  @browser.text_field(name: 'dependent[addresses][0][city]').set('Washington')
-  input_field = @browser.select(name: /state/).divs(xpath: "ancestor::div")[-2]
-  input_field.click
-  input_field.li(text: /DC/).click
-  @browser.text_field(name: 'dependent[addresses][0][zip]').set('20001')
-  @browser.radio(id: /radio_female/).fire_event("onclick")
+  fill_in 'dependent[first_name]', with: 'Cynthia'
+  fill_in 'dependent[last_name]', with: 'White'
+  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
+  find(:xpath, "//p[@class='label'][contains(., 'RELATION')]").click
+  find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
+  find(:xpath, "//label[@for='radio_female']").click
 end
 
 When(/^.+ clicks? confirm member$/) do
-  scroll_then_click(@browser.button(text: /Confirm Member/i))
-  @browser.button(text: /Confirm Member/i).wait_while_present
+  click_button 'Confirm Member'
+  expect(page).to have_link('Add Member')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
@@ -465,27 +474,9 @@ Then(/^.+ can purchase a plan$/) do
 end
 
 When(/^Employer publishes a plan year$/) do
-  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
-  click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
-  @browser.element(class: /interaction-choice-control-plan-year-start-on/).wait_until_present
-  @browser.element(class: /interaction-choice-control-plan-year-start-on/).click
-  # start_on = @browser.p(text: /SELECT START ON/i)
-  # click_when_present(start_on)
-  start_on = @browser.li(text: /SELECT START ON/i)
-  click_when_present(start_on.parent().lis()[1])
-  click_when_present(@browser.element(class: /change-plan/))
-  select_plan_option = @browser.ul(class: /nav-tabs/)
-  select_plan_option.li(text: /By carrier/i).click
-  carriers_tab = @browser.div(class: /carriers-tab/)
-  @browser.element(text: /edit your plan offering/i).wait_until_present
-  carriers_tab.as[1].fire_event("onclick")
-  plans_tab = @browser.div(class: /reference-plans/)
-  @browser.element(text: /select your reference plan/i).wait_until_present
-  plans_tab.labels.last.fire_event('onclick')
-  click_when_present(@browser.button(class: /interaction-click-control-save-plan-year/))
-  @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
-  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
-  click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
+  find('.interaction-click-control-benefits').click
+
+  find('.interaction-click-control-publish-plan-year').click
 end
 
 When(/^.+ should see a published success message$/) do
@@ -601,6 +592,6 @@ And(/I select three plans to compare/) do
 end
 
 And(/I should not see any plan which premium is 0/) do
-  @browser.h2s(class: "plan-premium")[1].wait_until_present
-  expect(@browser.h2s(class: "plan-premium", text: "$0.00").count).to eq 0
+  find('h2.plan-premium')
+  expect(find('h2.plan-premium')).to have_content("$0.00")
 end

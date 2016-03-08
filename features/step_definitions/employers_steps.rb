@@ -279,15 +279,20 @@ And(/^.+ should see a button to create new plan year$/) do
   find('a.interaction-click-control-add-plan-year').click
 end
 
-And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
+And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   plan = FactoryGirl.create :plan_with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 
-  find('.selectric-interaction-choice-control-plan-year-start-on').click
-  find('li.interaction-choice-control-plan-year-start-on-1').click
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
 
   find('.interaction-field-control-plan-year-fte-count').click
 
-  fill_in "plan_year[fte_count]", :with => "235"
+  if amount_of_fte == "low"
+    fill_in "plan_year[fte_count]", :with => "3"
+  else
+    fill_in "plan_year[fte_count]", :with => "235"
+  end
+
   fill_in "plan_year[pte_count]", :with => "15"
   fill_in "plan_year[msp_count]", :with => "3"
 
