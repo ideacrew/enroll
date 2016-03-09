@@ -60,10 +60,9 @@ class Insured::FamiliesController < FamiliesController
   def brokers
     @tab = params['tab']
 
-    if @person.employee_roles.present?
-      @employee_role = @person.employee_roles.try(:first)
+    if @person.active_employee_roles.present?
+      @employee_role = @person.active_employee_roles.first
     end
-
   end
 
   def find_sep

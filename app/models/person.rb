@@ -429,7 +429,7 @@ class Person
   end
 
   def has_multiple_roles?
-    consumer_role.present? && employee_roles.present?
+    consumer_role.present? && active_employee_roles.present?
   end
 
   def residency_eligible?

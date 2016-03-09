@@ -73,7 +73,7 @@ Shop for Plans
             <% else %>
                You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
                <div id="shop-for-plans-widget">
-               <%= link_to 'Enroll', search_insured_consumer_role_index_path(build_consumer_role: true), method: :get, class: "btn btn-default pull-right" %>                 
+               <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
                </div>
             <% end %>
           </div>
