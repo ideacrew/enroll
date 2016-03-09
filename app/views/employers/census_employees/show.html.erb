@@ -25,14 +25,16 @@
           </p>
         </div>
       </div>
-      <div class="col-xs-6">
-        <h4>Address</h4>
-        <div class="form-border">
-          <% if address.present? %>
-          <%= address.to_html %>
-          <% end %>
+      
+      <% if address.present? %>
+        <div class="col-xs-6">
+          <h4>Address</h4>
+          <div class="form-border">
+            <%= address.to_html %>
+          </div>
         </div>
-      </div>
+      <% end %>
+
     </div>
     <div class="row">
       <% if !@hbx_enrollments.blank? %>

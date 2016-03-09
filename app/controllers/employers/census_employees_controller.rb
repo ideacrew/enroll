@@ -169,8 +169,9 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @benefit_group_assignment = @census_employee.active_benefit_group_assignment
+    @benefit_group_assignment = @census_employee.active_benefit_group_assignment if @census_employee.employee_role.present?
     @hbx_enrollments = @benefit_group_assignment.hbx_enrollments(@census_employee) unless @benefit_group_assignment.blank?
+    @hbx_enrollments = @hbx_enrollments.select{ |e| e[:aasm_state] == "coverage_selected" }.partition { |e| e.coverage_kind == "health" }.flatten unless @benefit_group_assignment.blank?
     @benefit_group = @benefit_group_assignment.try(:benefit_group)
     # reference_plan = @benefit_group.try(:reference_plan)
     #@plan = @hbx_enrollment && @hbx_enrollment.decorated_hbx_enrollment
