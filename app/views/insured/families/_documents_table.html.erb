@@ -1,7 +1,7 @@
 <!-- Documents Table -->
 <div class="col-md-12">
   <!-- Docs Uploading menu -->
-    <%= render "docs_uploading_menu" %>
+    <%= render partial: "docs_uploading_menu", locals: {member: member} %>
   <!-- >>>>>> docs uploading menu -->
 
   <!-- Documents Table HEADER -->
@@ -34,18 +34,22 @@
           <% if vlp_doc.identifier.present? %>
               <% key = vlp_doc.identifier.split('#').last %>
               <%= link_to("/insured/verification_documents/download/#{key}", class: "download") do %>
-                  <i class="fa fa-download"></i>
+                  <i class="fa fa-cloud-download documents"></i>
               <% end %>
           <% end %>
         </div>
         <div class="col-md-2 text-center">
-          <h5>Verification status</h5>
+          <h5><%= vlp_doc.status %></h5>
         </div>
         <div class="col-md-2 text-center">
-          <h5>Data submitted</h5>
+          <% if vlp_doc.identifier.present? %>
+            <%= vlp_doc.updated_at.strftime("%d, %b, %Y") %>
+          <% end %>
         </div>
         <div class="col-md-1 text-center">
-          <h5>Delete</h5>
+          <%= link_to document_path(vlp_doc, :person => member.person.id), method: :delete do %>
+            <i class="fa fa-trash-o documents"></i>
+          <% end %>
         </div>
       </div>
       <!-- >>>>> documents table body -->

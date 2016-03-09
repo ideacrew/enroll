@@ -315,7 +315,7 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
-  resources :documents, only: [:index, :update] do
+  resources :documents, only: [:index, :update, :destroy] do
     collection do
       get :consumer_role_status
       put :change_doc_status

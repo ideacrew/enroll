@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
   helper_method :sort_filter, :sort_direction
   before_action :set_doc, only: [:change_doc_status, :change_person_aasm_state]
+  before_action :set_person, only: [:index, :new_comment]
   respond_to :html, :js
 
   def download
@@ -20,13 +21,11 @@ class DocumentsController < ApplicationController
   end
 
  def index
-   @person = Person.find(params[:person_id])
    @person_documents = @person.consumer_role.vlp_documents
    mark_as_reviewed
  end
 
  def new_comment
-   @person = Person.find(params[:person_id])
    @document = @person.consumer_role.vlp_documents.where(id: params[:doc_id]).first
  end
 
@@ -35,6 +34,13 @@ class DocumentsController < ApplicationController
    @document = @person.consumer_role.vlp_documents.where(id: params[:person][:vlp_document][:id]).first
    @document.update_attributes(:comment => params[:person][:vlp_document][:comment])
  end
+
+def destroy
+  person = Person.find(params[:person])
+  doc = person.consumer_role.vlp_documents.find(params[:id])
+  doc.delete
+  redirect_to documents_index_insured_families_path
+end
 
  def mark_as_reviewed
    @person_documents.each do |doc|
@@ -75,6 +81,10 @@ end
   @doc_owner = Person.where(id: params[:person_id]).first
   @document = @doc_owner.consumer_role.vlp_documents.where(id: params[:doc_id]).first
  end
+
+def set_person
+  @person = Person.find(params[:person_id])
+end
 
  def sort_filter
    %w(first_name last_name created_at).include?(params[:sort]) ? params[:sort] : 'created_at'
