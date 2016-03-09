@@ -100,7 +100,6 @@ class Insured::ConsumerRolesController < ApplicationController
   def build
     set_current_person(required: false)
     build_person_params
-    binding.pry
     render 'match'
   end
 
