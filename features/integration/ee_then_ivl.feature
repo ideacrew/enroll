@@ -1,4 +1,4 @@
-@watir @screenshots @no-database-cleaner 
+@watir @screenshots @no-database-cleaner
 Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
@@ -25,14 +25,14 @@ Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
     Then Megan sees the Your Information page
     When Megan continues
     When Megan enters person search data
-    
+
     When Megan sees the Fantastic page
     When Megan continues
     When Megan enters demographic information
     When Megan continues again
     Then Megan sees the Verify Identity page
     When Megan logs out
-    
+
     When Megan visits the Consumer Portal
     When Megan signs in
 
@@ -59,7 +59,7 @@ Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
       And I select a plan on plan shopping page
       And Megan clicks on the purchase button on the confirmation page
       When I click on continue on qle confirmation page
-      And I should see the individual home page      
+      And I should see the individual home page
     Then Megan logs out
 
     When Megan visits the Employee portal

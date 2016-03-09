@@ -152,6 +152,14 @@ def default_office_location
   }
 end
 
+Given(/^Hbx Admin exists$/) do
+  person = people['Hbx Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile
+  plan = FactoryGirl.create :plan_with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+end
+
 Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
@@ -216,37 +224,26 @@ end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   person = people[named_person]
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
-  @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
-  screenshot("create_census_employee")
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set(person[:first_name])
-  @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set(person[:last_name])
-  @browser.text_field(name: "jq_datepicker_ignore_census_employee[dob]").set(person[:dob])
-  #@browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
-  @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set(person[:ssn])
-  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
-  @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.text_field(name: "jq_datepicker_ignore_census_employee[hired_on]").set((Time.now-1.week).strftime('%m/%d/%Y'))
-  #@browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
-  @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
-  input_field = @browser.divs(class: /selectric-wrapper/).first
-  input_field.click
-  click_when_present(input_field.lis()[1])
-  # Address
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
-  select_state = @browser.divs(text: /SELECT STATE/).last
-  select_state.click
-  scroll_then_click(@browser.li(text: /GA/))
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
-  email_kind = @browser.divs(text: /SELECT KIND/).last
-  email_kind.click
-  @browser.li(text: /home/).click
-  @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("broker.assist@dc.gov")
-  screenshot("broker_create_census_employee_with_data")
-  @browser.element(class: /interaction-click-control-create-employee/).click
+  fill_in 'census_employee[first_name]', :with => person[:first_name]
+  fill_in 'census_employee[last_name]', :with => person[:last_name]
+  fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
+  fill_in 'census_employee[ssn]', :with => person[:ssn]
+
+  find(:xpath, '//label[@for="radio_male"]').click
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
+  find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
+
+  fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
+  fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
+  fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
+  find(:xpath, '//p[@class="label"][contains(., "SELECT STATE")]').click
+  find(:xpath, '//div[div/p[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
+  fill_in 'census_employee[address_attributes][zip]', :with => '30228'
+  find(:xpath, '//p[@class="label"][contains(., "SELECT KIND")]').click
+  find(:xpath, '//div[div/p[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
+
+  fill_in 'census_employee[email_attributes][address]', with: 'broker.assist@dc.gov'
+  find('.interaction-click-control-create-employee').click
 end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
@@ -497,8 +494,7 @@ And(/^.+ should see the premium billings report$/) do
 end
 
 When(/^.+ should see a published success message without employee$/) do
-  @browser.element(text: /You have 0 non-owner employees on your roster/).wait_until_present
-  expect(@browser.element(text: /You have 0 non-owner employees on your roster/).visible?).to be_truthy
+  expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 
 When(/^.+ clicks? on the add employee button$/) do
@@ -506,7 +502,7 @@ When(/^.+ clicks? on the add employee button$/) do
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
-  find(:xpath, "//nav[@class='row']/ul/li[contains(., '#{tab_name}')]").click
+  find(:xpath, "//li[contains(., '#{tab_name}')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
