@@ -112,7 +112,7 @@ class CensusEmployee < CensusMember
   def new_hire_enrollment_period
     start_on = [hired_on, created_at].max
     end_on = [start_on + 30.days, earliest_eligible_date].max
-    start_on..end_on
+    (start_on.beginning_of_day)..(end_on.end_of_day)
   end
 
   # TODO: eligibility rule different for active and renewal plan years

@@ -620,38 +620,55 @@ class HbxEnrollment
     nil
   end
 
-  def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
+  def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
     if employee_role.can_enroll_as_new_hire?
-      new_hire_effective_date = employee_role.coverage_effective_on
+      employee_role.coverage_effective_on
     elsif qle
-      qle_effective_date = hbx_enrollment.family.earliest_effective_shop_sep.effective_on
+      hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     else
-      open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-
-      if open_enrollment_effective_date < employee_role.coverage_effective_on
-        new_hire_enrollment_period = employee_role.census_employee.new_hire_enrollment_period
-        raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.first} to enroll for coverage."
-      elsif !employee_role.is_under_open_enrollment?
-        raise "You may not enroll until you're eligible under an enrollment period"
+      active_plan_year = employee_role.employer_profile.show_plan_year
+      if active_plan_year.blank?
+        raise "Unable to find employer-sponsored benefits."
       end
+      if !employee_role.is_under_open_enrollment?
+        raise "You may not enroll until you're eligible under an enrollment period."
+      end
+      employee_role.employer_profile.show_plan_year.start_on
     end
+  end
 
-    effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
+  def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
+    # if employee_role.can_enroll_as_new_hire?
+    #   new_hire_effective_date = employee_role.coverage_effective_on
+    # elsif qle
+    #   qle_effective_date = hbx_enrollment.family.earliest_effective_shop_sep.effective_on
+    # else
+    #   open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
 
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
-    if plan_year.blank?
+    #   if open_enrollment_effective_date < employee_role.coverage_effective_on
+    #     new_hire_enrollment_period = employee_role.census_employee.new_hire_enrollment_period
+    #     raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.first} to enroll for coverage."
+    #   elsif !employee_role.is_under_open_enrollment?
+    #     raise "You may not enroll until you're eligible under an enrollment period"
+    #   end
+    # end
+    # effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
+
+    effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
+    if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+
+      census_employee = employee_role.census_employee
+      benefit_group_assignment = plan_year.is_renewing? ?
+      census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
+
+      if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+        raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+      end
+
+      return benefit_group_assignment.benefit_group, benefit_group_assignment
+    else
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
-
-    census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ?
-        census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
-
-    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
-    end
-
-    return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
