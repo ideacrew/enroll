@@ -644,8 +644,8 @@ class PlanYear
   end
 
   def accept_application
-    transition_success = employer_profile.application_accepted!
-    send_employee_invites if transition_success
+    transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
+    send_employee_invites if transition_success && !is_renewing?
   end
 
   def decline_application

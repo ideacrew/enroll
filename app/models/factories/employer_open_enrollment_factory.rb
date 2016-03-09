@@ -9,7 +9,7 @@ module Factories
 
     def begin_open_enrollment
       @logger.debug "Starting open enrollment for #{employer_profile.legal_name}"
-      plan_years_for_oe = employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => @date)
+      plan_years_for_oe = employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on".gte => @date)
 
       if plan_years_for_oe.empty?
         return
@@ -20,7 +20,7 @@ module Factories
         return
       end
 
-      published_plan_year = plan_years_for_oe.published.first
+      published_plan_year = plan_years_for_oe.first
       published_plan_year.advance_date! if published_plan_year && published_plan_year.may_advance_date?
     end
 
