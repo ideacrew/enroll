@@ -328,6 +328,14 @@ class BenefitGroup
     end
   end
 
+  def eligible_on(date_of_hire)
+    if effective_on_kind == "date_of_hire" || (effective_on_offset == 0 && date_of_hire.day == 1)
+      date_of_hire
+    else
+      (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+    end
+  end
+
 private
 
   def set_congress_defaults
@@ -351,15 +359,6 @@ private
 
   def date_of_hire_effective_on_for(date_of_hire)
     [plan_year.start_on, date_of_hire].max
-  end
-
-  def eligible_on(date_of_hire)
-    if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire
-    else
-      doh_with_offset = date_of_hire + effective_on_offset.days
-      doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month
-    end
   end
 
   def first_of_month_effective_on_for(date_of_hire)

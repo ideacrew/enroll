@@ -111,14 +111,14 @@ class CensusEmployee < CensusMember
 
   def new_hire_enrollment_period
     start_on = [hired_on, created_at].max
-    end_on = [start_on + 30.days, earliest_effective_date].max
+    end_on = [start_on + 30.days, earliest_eligible_date].max
     start_on..end_on
   end
 
   # TODO: eligibility rule different for active and renewal plan years
-  def earliest_effective_date
+  def earliest_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || published_benefit_group_assignment
-    benefit_group_assignment.benefit_group.effective_on_for(hired_on)
+    benefit_group_assignment.benefit_group.eligible_on(hired_on)
   end
 
   # def first_name=(new_first_name)

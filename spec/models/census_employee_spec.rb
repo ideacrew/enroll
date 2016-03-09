@@ -884,9 +884,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end 
 
     context 'when earliest effective date is in future more than 30 days from current date' do 
+      let(:hired_on){ TimeKeeper.date_of_record }
 
-      it 'should return earliest_effective_date as new hire enrollment period end date' do 
-        expect(census_employee.new_hire_enrollment_period.max).to eq plan_year.start_on
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return earliest_eligible_date as new hire enrollment period end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq (hired_on + 60.days).end_of_month + 1.day
       end
     end
 
@@ -903,7 +910,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context '.earliest_effective_date' do
+  context '.earliest_eligible_date' do
+    let(:hired_on){ TimeKeeper.date_of_record }
+
+    let(:plan_year) do
+      py = FactoryGirl.create(:plan_year)
+      bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+      PlanYear.find(py.id)
+    end
 
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
@@ -911,11 +925,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     before do
       census_employee.benefit_group_assignments = [benefit_group_assignment]
       census_employee.save!
-      benefit_group.plan_year.publish!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
     end
 
     it 'should return earliest effective date' do 
-      expect(census_employee.earliest_effective_date).to eq plan_year.start_on
+      expect(census_employee.earliest_eligible_date).to eq (hired_on + 60.days).end_of_month + 1.day
     end
   end
 end
