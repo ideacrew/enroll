@@ -312,7 +312,8 @@ class Employers::PlanYearsController < ApplicationController
   def employee_costs
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
-
+    @location_id = params[:location_id]
+    @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan

@@ -60,8 +60,9 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
         $(this).attr('href', url+"&location_id="+newLocationId);
       });
       validateEditPlanYear();
-
     });
+    plan_count = $('#<%= @location_id %> .dent.plan-count').text();
+    $('#<%= @location_id %> .dental .dental-config-reference-selection').text('Currently Offering: '+plan_count+' Plans')
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
       $(this).closest('.selected-plan').hide();
@@ -92,12 +93,13 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
    } else {
      var coverage_type = '.dental';
      var reference_plan_id = $("#<%= @location_id %> .dental .dental-ref-plan").val();
+     var plan_count = parseInt($("#<%= @location_id %> .dent.plan-count").text());
    }
 
    if (reference_plan_id == "" || reference_plan_id == undefined) {
      return
    }
-   calcEmployerContributions($('a#employee_costs_link').attr('href'), location_id, coverage_type);
+   calcEmployerContributions($('a#employee_costs_link').attr('href'), location_id, coverage_type, plan_count);
  });
 
 } else {

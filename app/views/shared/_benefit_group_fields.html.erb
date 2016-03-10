@@ -77,6 +77,15 @@
     <div class="health selected-plan row" style="display: none;">
     </div>
     <% i = f.index %>
+    <span class="dent plan-count" style="display: none;">
+    <% if i < 50 %>
+      <% if @plan_year.benefit_groups[i].elected_dental_plan_ids.count == 13 %>
+        All
+      <% else %>
+        <% @plan_year.benefit_groups[i].elected_dental_plan_ids.count %>
+      <% end %>
+    <% end %>
+    </span>
       <br/>
       <br/>
       <div class="row">
