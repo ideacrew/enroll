@@ -176,7 +176,6 @@ class Family
 
   def enrollments
     return [] if  latest_household.blank?
-    debugger
     latest_household.hbx_enrollments.show_enrollments
 
   end
