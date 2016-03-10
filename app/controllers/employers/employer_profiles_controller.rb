@@ -99,19 +99,10 @@ class Employers::EmployerProfilesController < ApplicationController
       when 'inbox'
 
       else
-        @current_plan_year = @employer_profile.show_plan_year
-
-        if @current_plan_year.present? && @current_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-          @additional_required_participants_count = @current_plan_year.additional_required_participants_count
-
-          #FIXME commeted out for performance test
-          enrollments = @current_plan_year.hbx_enrollments
-          if enrollments.size < 100
-            @premium_amt_total = enrollments.map(&:total_premium).sum
-            @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-            @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-          end
-        end
+        @current_plan_year, enrollments = @employer_profile.premium_billing_plan_year_and_enrollments
+        @premium_amt_total   = enrollments.map(&:total_premium).sum
+        @employee_cost_total = enrollments.map(&:total_employee_cost).sum
+        @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
       end
     end
   end

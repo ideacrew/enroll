@@ -188,7 +188,7 @@ class EmployerProfile
       hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
-    return current_plan_year, hbx_enrollments
+    return current_plan_year, hbx_enrollments || []
   end
 
   def find_plan_year(id)

@@ -60,9 +60,11 @@
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
       <h3>Premium Billing Report</h3>
-        <% if @employer_profile.published_plan_year.present? %>
-          <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
-        <% end %>
+    <% calender_month = TimeKeeper.date_of_record.next_month %>
+    <% if @current_plan_year.present? && !(@current_plan_year.start_on..@current_plan_year.end_on).cover?(calender_month) %>
+       <% calender_month = TimeKeeper.date_of_record %>
+    <% end %>
+    <span><%= calender_month.beginning_of_month %> - <%= calender_month.end_of_month %></span>
         <br/>
         <br/>
         <table>
