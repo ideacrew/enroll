@@ -157,6 +157,7 @@ class BrokerAgencyProfile
     families = (consumer_families + employee_families).uniq
     families.sort_by{|f| f.primary_applicant.person.last_name}
   end
+
   ## Class methods
   class << self
     def list_embedded(parent_list)

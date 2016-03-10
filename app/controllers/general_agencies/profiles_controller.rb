@@ -50,15 +50,25 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def update_staff
-    if params['decline']
+    if params['approve']
+      @staff.approve!
+      @staff.general_agency_profile.approve! if @staff.general_agency_profile.may_approve?
+      flash[:notice] = "Staff approved."
+    elsif params['deny']
+      @staff .deny!
+      flash[:notice] = "Staff denied."
+    elsif params['decertify']
+      @staff.decertify!
+      flash[:notice] = "Staff decertified."
+    elsif params['accept']
+      @staff.general_agency_accept!
+      flash[:notice] = "Staff accepted successfully."
+    elsif params['decline']
       @staff.general_agency_decline!
       flash[:notice] = "Staff declined."
     elsif params['terminate']
       @staff.general_agency_terminate!
       flash[:notice] = "Staff terminated."
-    else
-      @staff.general_agency_accept!
-      flash[:notice] = "Staff accepted successfully."
     end
 
     redirect_to general_agencies_profile_path(@staff.general_agency_profile)

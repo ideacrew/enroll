@@ -15,6 +15,7 @@ module Forms
     validates :email, :email => true, :allow_blank => false
 
     validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid"
+    validate :validate_duplicate_npn
 
     class OrganizationAlreadyMatched < StandardError; end
 
@@ -23,7 +24,7 @@ module Forms
     end
 
     def add_staff_role
-      person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new()
+      person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({:npn => self.npn})
     end
 
     def save(current_user=nil)
@@ -174,6 +175,12 @@ module Forms
         :working_hours => working_hours,
         :accept_new_clients => accept_new_clients
       }
+    end
+
+    def validate_duplicate_npn
+      if Person.where("general_agency_staff_roles.npn" => npn).any?
+        errors.add(:base, "NPN has already been claimed by another general agency staff. Please contact HBX-Customer Service - Call (855) 532-5465.")
+      end
     end
 
     def check_existing_organization

@@ -104,6 +104,10 @@ class GeneralAgencyProfile
     employer_clients.present? ? employer_clients.count : 0
   end
 
+  def current_state
+    aasm_state.humanize.titleize
+  end
+
   class << self
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.general_agency_profile }
