@@ -108,7 +108,7 @@
         <% end%>
         <table>
           <tr>
-            <th>
+            <th colspan="2">
               <header>Reference Plan</header>
             </th>
             <th>
@@ -121,14 +121,11 @@
               <header>Metallic Level</header>
             </th>
             <th>
-              <header>ID</header>
-            </th>
-            <th>
               <header>Plans By</header>
             </th>
           </tr>
           <tr>
-            <td>
+            <td colspan="2">
               <p>
                 <%= bg.reference_plan.name.try(:upcase) %>
               </p>
@@ -146,10 +143,6 @@
             <td>
               <p>
                 <%= bg.reference_plan.metal_level.titleize %>
-              </p>
-            </td>
-            <td>
-              <p><%= bg.reference_plan_id %>
               </p>
             </td>
             <td>
@@ -176,7 +169,7 @@
         <h5 class="bg-title">Dental</h5>
         <table>
           <tr>
-            <th>
+            <th colspan="2">
               <header>Reference Plan</header>
             </th>
             <th>
@@ -189,14 +182,11 @@
               <header>Metallic Level</header>
             </th>
             <th>
-              <header>ID</header>
-            </th>
-            <th>
               <header>Plans By</header>
             </th>
           </tr>
           <tr>
-            <td>
+            <td colspan="2">
               <p>
                 <%= bg.dental_reference_plan.name %>
               </p>
@@ -214,11 +204,6 @@
             <td>
               <p>
                 <%= bg.dental_reference_plan.metal_level.titleize %>
-              </p>
-            </td>
-
-            <td>
-              <p><%= bg.dental_reference_plan.id %>
               </p>
             </td>
             <td>
