@@ -1,10 +1,5 @@
 controller = Events::PoliciesController.new
 
-vs = VitalSign.new(
-  start_at: DateTime.new(2015,10,27,23,43,0,'-4'),
-  end_at: DateTime.new(2015,11,2,23,55,0,'-4')
-)
-
 PropertiesSlug = Struct.new(:reply_to, :headers)
 
 ConnectionSlug = Struct.new(:policy_id) do
@@ -26,8 +21,24 @@ ConnectionSlug = Struct.new(:policy_id) do
   end
 end
 
-CSV.foreach("effective_date_changes.csv", headers: true) do |row|
-   pid, *rest = row.fields
-   properties_slug = PropertiesSlug.new("", {:policy_id => pid})
-   controller.resource(ConnectionSlug.new(pid), "", properties_slug, "")
+hbx_ids = File.read("policies_to_pull.txt").split("\n").map(&:strip)
+
+hbx_ids.each do |pid|
+  pol = HbxEnrollment.by_hbx_id(pid).first
+  if pol.nil?
+    raise "NO SUCH POLICY #{pid}"
+  end
+  if pol.plan.blank?
+    puts "No plan for policy ID #{pid}: plan ID #{pol.plan_id}"
+#  elsif pol.subscriber.nil?
+#    puts "No subscriber for Policy ID #{pid}"
+  else
+    properties_slug = PropertiesSlug.new("", {:policy_id => pid})
+    begin 
+    controller.resource(ConnectionSlug.new(pid), "", properties_slug, "")
+    rescue => e
+      puts pid.inspect
+      puts e.backtrace.inspect
+    end
+  end
 end
