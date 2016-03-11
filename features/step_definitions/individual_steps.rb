@@ -181,7 +181,7 @@ And(/I click on continue button on group selection page/) do
     wait_and_confirm_text(/CONTINUE/)
     click_when_present @browser.a(class: 'interaction-click-control-continue')
     wait_and_confirm_text /SELECT EFFECTIVE DATE/i
-    effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE KIND/i)
+    effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE DATE/i)
     click_when_present(effective_field)
     effective_field.li(index: 1).click
     @browser.div(class: /success-info/).wait_until_present
