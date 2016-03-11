@@ -692,9 +692,11 @@ class HbxEnrollment
       if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
-      else
+      elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
         enrollment.enrollment_kind = "open_enrollment"
+      else
+        raise "You may not enroll until you're eligible under an enrollment period"
       end
     else
       raise "either employee_role or consumer_role is required"
