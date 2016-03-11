@@ -31,13 +31,12 @@ module Factories
       @plan_year_end_on   = @active_plan_year.end_on + 1.year
 
       open_enrollment_start_on = @plan_year_start_on - 2.months
-      open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+      open_enrollment_end_on = ((@plan_year_start_on - 1.month).year, (@plan_year_start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
 
       # # Set renewal open enrollment period
       # open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
       #                                      @active_plan_year.open_enrollment_end_on.month,
       #                                      1)
-
       # open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
       #                                    @active_plan_year.open_enrollment_end_on.month,
       #                                    Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
