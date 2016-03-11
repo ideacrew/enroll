@@ -975,7 +975,58 @@ class HbxEnrollment
     end
   end
 
-  private
+  def eligibility_event_kind
+    if (enrollment_kind == "special_enrollment")
+      if special_enrollment_period.blank?
+        return "unknown_sep"
+      end 
+      return special_enrollment_period.qualifying_life_event_kind.reason
+    end
+    return "open_enrollment" if !is_shop?
+    new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
+  end
+
+  def check_for_renewal_event_kind
+    if RENEWAL_STATUSES.include?(self.aasm_state) || was_in_renewal_status?
+      return "passive_renewal"
+    end
+    "open_enrollment"
+  end
+
+  def was_in_renewal_status?
+    workflow_state_transitions.any? do |wst|
+      RENEWAL_STATUSES.include?(wst.from_state.to_s)
+    end
+  end
+
+  def eligibility_event_date
+    if is_special_enrollment?
+      return nil if special_enrollment_period.nil?
+      return special_enrollment_period.qle_on
+    end
+    return nil if !is_shop?
+    new_hire_enrollment_for_shop? ? benefit_group_assignment.census_employee.hired_on : nil
+  end
+
+  def eligibility_event_has_date?
+    if is_special_enrollment?
+      return false if special_enrollment_period.nil?
+      return true
+    end
+    return false unless is_shop?
+    new_hire_enrollment_for_shop?
+  end
+
+  def new_hire_enrollment_for_shop?
+    return false if is_special_enrollment?
+    return false unless is_shop?
+    shopping_plan_year = benefit_group.plan_year
+    purchased_at = submitted_at.blank? ? created_at : submitted_at
+    return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
+    !(shopping_plan_year.start_on == effective_on)
+  end
+
+  private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)

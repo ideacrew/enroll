@@ -1249,3 +1249,162 @@ describe HbxEnrollment, "given a set of broker accounts" do
     end
   end
 end
+
+describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'" do
+  subject { HbxEnrollment.new({:enrollment_kind => "special_enrollment"}) }
+
+  it "should NOT be a shop new hire" do
+    expect(subject.new_hire_enrollment_for_shop?).to eq false
+  end
+
+  describe "and given a special enrollment period, with a reason of 'birth'" do
+    let(:qle_on) { Date.today }
+
+    before :each do
+      allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
+        :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
+        :qle_on => qle_on
+      ))
+    end
+
+    it "should have the eligibility event date of the qle_on" do
+      expect(subject.eligibility_event_date).to eq qle_on
+    end
+
+    it "should have eligibility_event_kind of 'birth'" do
+      expect(subject.eligibility_event_kind).to eq "birth"
+    end
+  end
+
+end
+
+describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
+  subject { HbxEnrollment.new({:enrollment_kind => "open_enrollment"}) }
+
+  it "should not have an eligibility event date" do
+    expect(subject.eligibility_event_has_date?).to eq false
+  end
+
+  describe "in the IVL market" do
+    before :each do
+      subject.kind = "unassisted_qhp"
+    end
+
+    it "should not have an eligibility event date" do
+      expect(subject.eligibility_event_has_date?).to eq false
+    end
+
+    it "should NOT be a shop new hire" do
+      expect(subject.new_hire_enrollment_for_shop?).to eq false
+    end
+
+    it "should have eligibility_event_kind of 'open_enrollment'" do
+      expect(subject.eligibility_event_kind).to eq "open_enrollment"
+    end
+  end
+
+  describe "in the SHOP market, purchased outside of open enrollment" do
+    let(:reference_date) { Date.today }
+    let(:open_enrollment_start) { reference_date - 15.days }
+    let(:open_enrollment_end) { reference_date - 5.days }
+    let(:purchase_time) { Time.now - 20.days }
+    let(:hired_on) { reference_date - 21.days }
+
+    before :each do
+      subject.kind = "employer_sponsored"
+      subject.submitted_at = purchase_time
+      subject.benefit_group_assignment = BenefitGroupAssignment.new({
+        :census_employee => CensusEmployee.new({
+          :hired_on => hired_on
+        })
+      })
+      subject.benefit_group = BenefitGroup.new({
+        :plan_year => PlanYear.new({
+           :open_enrollment_start_on => open_enrollment_start,
+           :open_enrollment_end_on => open_enrollment_end
+        })
+      })
+    end
+    it "should have an eligibility event date" do
+      expect(subject.eligibility_event_has_date?).to eq true
+    end
+
+    it "should be a shop new hire" do
+      expect(subject.new_hire_enrollment_for_shop?).to eq true
+    end
+
+    it "should have eligibility_event_kind of 'new_hire'" do
+      expect(subject.eligibility_event_kind).to eq "new_hire"
+    end
+
+    it "should have the eligibility event date of hired_on" do
+      expect(subject.eligibility_event_date).to eq hired_on 
+    end
+  end
+
+  describe "in the SHOP market, purchased during open enrollment" do
+    let(:reference_date) { Time.now }
+    let(:coverage_start) { (reference_date + 15.days).to_date }
+    let(:open_enrollment_start) { (reference_date - 15.days).to_date }
+    let(:open_enrollment_end) { (reference_date - 5.days).to_date }
+    let(:purchase_time) { (reference_date - 5.days).midnight + 200.minutes }
+    let(:hired_on) { (reference_date - 21.days).to_date }
+
+    before :each do
+      subject.kind = "employer_sponsored"
+      subject.submitted_at = purchase_time
+      subject.benefit_group_assignment = BenefitGroupAssignment.new({
+        :census_employee => CensusEmployee.new({
+          :hired_on => hired_on
+        })
+      })
+      subject.benefit_group = BenefitGroup.new({
+        :plan_year => PlanYear.new({
+           :open_enrollment_start_on => open_enrollment_start,
+           :open_enrollment_end_on => open_enrollment_end,
+           :start_on => coverage_start
+        })
+      })
+    end
+
+    describe "when coverage start is the same as the plan year" do
+      before(:each) do
+        subject.effective_on = coverage_start
+      end
+
+      it "should NOT have an eligibility event date" do
+        expect(subject.eligibility_event_has_date?).to eq false
+      end
+
+      it "should NOT be a shop new hire" do
+        expect(subject.new_hire_enrollment_for_shop?).to eq false
+      end
+
+      it "should have eligibility_event_kind of 'open_enrollment'" do
+        expect(subject.eligibility_event_kind).to eq "open_enrollment"
+      end
+    end
+
+    describe "when coverage start is the different from the plan year" do
+      before(:each) do
+        subject.effective_on = coverage_start + 12.days
+      end
+
+      it "should have an eligibility event date" do
+        expect(subject.eligibility_event_has_date?).to eq true
+      end
+
+      it "should be a shop new hire" do
+        expect(subject.new_hire_enrollment_for_shop?).to eq true
+      end
+
+      it "should have eligibility_event_kind of 'new_hire'" do
+        expect(subject.eligibility_event_kind).to eq "new_hire"
+      end
+
+      it "should have the eligibility event date of hired_on" do
+        expect(subject.eligibility_event_date).to eq hired_on 
+      end
+    end
+  end
+end
