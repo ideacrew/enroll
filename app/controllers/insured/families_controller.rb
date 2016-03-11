@@ -117,6 +117,11 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @person.primary_family.family_members.active
   end
 
+  def verification
+    @time_to = Time.now + 90.days
+    @family_members = @person.primary_family.family_members.active
+  end
+
   def document_upload #changed
     @person_family = @person.primary_family.family_members
   end

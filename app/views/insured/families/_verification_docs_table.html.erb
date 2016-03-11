@@ -1,0 +1,26 @@
+<tr class="collapse dn" id="<%= member.id %>">
+  <td colspan="6" class="td-container">
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <% member.person.consumer_role.vlp_documents.each_with_index do |vlp_doc, i | %>
+            <tr class="<% if i == 0 %>bt-n<% elsif i+1 == member.person.consumer_role.vlp_documents.count %>bb<% end %>">
+              <td>
+                <%= vlp_doc.subject %>
+                &nbsp;
+                    <span class="label label-<%=doc_status_label(vlp_doc)%>"><%= vlp_doc.status %></span>
+              </td>
+              <td class="table-functions">
+                <% if vlp_doc.identifier.present? %>
+                    <% key = vlp_doc.identifier.split('#').last %>
+                    <%= link_to("/insured/verification_documents/download/#{key}") do %>
+                        <i class="fa fa-download fa-lg" data-toggle="tooltip" title="Download"></i>
+                    <% end %>
+                <% end %>
+                <i class="fa fa-trash-o fa-lg" data-toggle="tooltip" title="Delete"></i>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+  </td>
+</tr>

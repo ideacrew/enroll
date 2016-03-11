@@ -55,38 +55,117 @@ $primary-bold: 600;
       }
     }
   }
-  &.verification-dashboard {
-    border-bottom: 2px solid #7e8994;
-    background-color: #FFFFFF;
-    padding: 2px;
-  }
-  &.documents-dashboard {
-    border-bottom: 2px solid rgba(102, 108, 118, 0.42);
-    border-left: 2px solid rgba(102, 108, 118, 0.42);
-    border-right: 2px solid rgba(102, 108, 118, 0.42);
-    background-color: #E3E3E3;
-    padding: 2px;
-  }
-  &.doc_upload {
-    background-color: #E3E3E3;
-    border-left: 2px solid rgba(102, 108, 118, 0.42);
-    border-right: 2px solid rgba(102, 108, 118, 0.42);
+  &.ivl-documents-table {
+    margin-top: 1.25%;
+    .table {
+      width: 100%;
+      .thead-default {
+        tr {
+          background-color: #fff;
+          th {
+            text-align: center;
+            vertical-align: middle;
+          }
+        }
+      }
+      tbody {
+        tr {
+          &.top {
+            &.even {
+              background-color: #ffffff !important;
+              &:hover {
+                background-color: #f5f5f5 !important;
+              }
+            }
+          }
+          &.dn {
+            &:hover {
+              background-color: transparent;
+            }
+            td.td-container {
+              padding: 0px 12px;
+              .table-responsive {
+                overflow: visible;
+              }
+            }
+            table {
+              &.table {
+                background-color: #fff;
+                margin: 0 0 12px;
+                tr {
+                  &.bt-n {
+                    td {
+                      border-top: none !important;
+                    }
+                  }
+                  &.bb {
+                    td {
+                      border-bottom: 1px solid #ddd;
+                    }
+                  }
+                  td {
+                    padding: 10px 12px;
+                    .fa {
+                      &.fa-download {
+                        color: #b7b7b7;
+                        &:hover {
+                          color: #23527c;
+                        }
+                      }
+                    }
+                  }
+                }
+                .upload {
+
+                  td.td-container {
+                    padding: 6px 12px 30px;
+                  }
+                }
+              }
+            }
+          }
+          td {
+            vertical-align: middle;
+            &.table-functions {
+              text-align: right;
+              .fa {
+                cursor: pointer;
+                display: inline-block;
+                color: #b7b7b7;
+                margin-left: 5px;
+              }
+            }
+          }
+          &:hover {
+            td {
+              &.table-functions {
+                .fa {
+                  &:hover {
+                    color: #23527c;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  &.header_doc_table {
-    background-color: rgba(65, 62, 71, 0.54);
-    color: #fbfdff;
+  &.demo-up {
+    border: 0 !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 150px;
+    text-overflow: "";
+    border-radius: 15px;
+    padding: 0px;
+    margin: 0px;
   }
+}
+.doc-upload-file{
+  font-size: 10px;
+}
 
-  &.accordion-toggle {
-    color:#000000;
-  }
-}
-.documents {
-  &.fa-cloud-download {
-    color: #6F6F6F;
-  }
-  &.fa-trash-o {
-    color: #6F6F6F;
-  }
-}
+
+

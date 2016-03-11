@@ -534,4 +534,23 @@ module ApplicationHelper
   def all_unverified
     number_with_delimiter(@unverified_persons.count)
   end
+
+  def options_for_select_with_style
+    options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS)
+  end
+
+  def doc_status_label(doc)
+    case doc.status
+      when "not submitted"
+        "warning"
+      when "downloaded"
+        "default"
+      when "in review"
+        "info"
+      when "verified"
+        "success"
+      else
+        "danger"
+    end
+  end
 end
