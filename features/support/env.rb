@@ -11,6 +11,8 @@ require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 
+Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
+
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
 
