@@ -564,7 +564,7 @@ Then(/^.+ should see the current plan year$/) do
 end
 
 And(/^.+ should see the premium billings report$/) do
-  # expect(@browser.h3(text: /Premium Billing Report/i).visible?).to be_truthy
+  # expect(@browser.h3(text: /Enrollment Report/i).visible?).to be_truthy
 end
 
 When(/^.+ should see a published success message without employee$/) do
