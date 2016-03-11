@@ -27,7 +27,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     else
       flash[:error] = "File not uploaded"
     end
-    redirect_to documents_index_insured_families_path
+    redirect_to verification_insured_families_path
 
   end
 

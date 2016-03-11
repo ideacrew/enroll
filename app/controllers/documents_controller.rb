@@ -39,7 +39,7 @@ def destroy
   person = Person.find(params[:person])
   doc = person.consumer_role.vlp_documents.find(params[:id])
   doc.delete
-  redirect_to documents_index_insured_families_path
+  redirect_to verification_insured_families_path
 end
 
  def mark_as_reviewed
