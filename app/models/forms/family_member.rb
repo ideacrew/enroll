@@ -112,7 +112,7 @@ module Forms
         end
       else
         current_address = person.try(:home_address)
-        if addresses["address_1"].blank? and addresses["city"].blank?
+        if addresses["address_1"].blank? && addresses["city"].blank?
           current_address.destroy if current_address.present?
           return true
         end
@@ -255,7 +255,7 @@ module Forms
 
 
     def relationship_validation
-      return if family.blank? or family.family_members.blank?
+      return if family.blank? || family.family_members.blank?
 
       relationships = Hash.new
       family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}

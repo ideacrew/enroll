@@ -7,7 +7,7 @@ module Employers::EmployerHelper
     return "" if census_employee.blank?
 
     enrollment_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
-    if enrollment_state.present? and enrollment_state != "initialized"
+    if enrollment_state.present? && enrollment_state != "initialized"
       enrollment_state.humanize
     else
       ""

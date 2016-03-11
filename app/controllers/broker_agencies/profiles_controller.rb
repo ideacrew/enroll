@@ -83,7 +83,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def sanitize_broker_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
+      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
   end
 
