@@ -525,7 +525,7 @@ class PlanYear
 
     state :renewing_draft
     state :renewing_published
-    state :renewing_enrolling
+    state :renewing_enrolling, :after_enter => :trigger_passive_renewals
     state :renewing_enrolled
     state :renewing_publish_pending
 
@@ -547,7 +547,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
+      # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
@@ -638,6 +638,15 @@ class PlanYear
     end
   end
 
+
+  def trigger_passive_renewals
+    open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+    open_enrollment_factory.employer_profile = self.employer_profile
+    open_enrollment_factory.date = TimeKeeper.date_of_record
+    open_enrollment_factory.renewing_plan_year = self
+    open_enrollment_factory.process_family_enrollment_renewals
+  end
+
   def revert_employer_profile_application
     employer_profile.revert_application! if employer_profile.may_revert_application?
     record_transition
@@ -653,7 +662,7 @@ class PlanYear
   end
 
   def ratify_enrollment
-    employer_profile.enrollment_ratified!
+    employer_profile.enrollment_ratified! if employer_profile.may_enrollment_ratified?
   end
 
   def deny_enrollment
