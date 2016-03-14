@@ -1,16 +1,25 @@
 class GeneralAgencies::ProfilesController < ApplicationController
-  skip_before_action :require_login, only: [:new_agency, :create]
-  skip_before_action :authenticate_me!, only: [:new_agency, :create]
+  skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create]
+  skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_general_agency_profile, only: [:show, :edit, :update, :employers, :families, :staffs]
+  before_action :find_general_agency_profile, only: [:show, :edit, :update, :employers, :families, :staffs, :agency_messages]
   before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
+  before_action :check_general_agency_staff_role, only: [:new]
+
+  def new
+    @organization = ::Forms::GeneralAgencyProfile.new
+  end
 
   def index
     @general_agency_profiles = GeneralAgencyProfile.all
   end
 
   def new_agency
+    @organization = ::Forms::GeneralAgencyProfile.new
+  end
+
+  def new_agency_staff
     @organization = ::Forms::GeneralAgencyProfile.new
   end
 
@@ -27,11 +36,12 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
   def show
     @provider = current_user.person
+    @staff_role = current_user.has_general_agency_staff_role?
     @id=params[:id]
   end
 
   def employers
-    @employers = @general_agency_profile.employer_clients
+    @employers = @general_agency_profile.employer_clients || []
   end
 
   def families
@@ -70,6 +80,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
       @staff.general_agency_terminate!
       flash[:notice] = "Staff terminated."
     end
+    send_secure_message_to_general_agency(@staff) if @staff.agency_pending?
 
     redirect_to general_agencies_profile_path(@staff.general_agency_profile)
   end
@@ -77,6 +88,22 @@ class GeneralAgencies::ProfilesController < ApplicationController
   def messages
     @sent_box = true
     @provider = current_user.person
+  end
+
+  def agency_messages
+    @sent_box = true
+  end
+
+  def inbox
+    @sent_box = true
+    id = params["id"]||params['profile_id']
+    @general_agency_provider = GeneralAgencyProfile.find(id)
+    @folder = (params[:folder] || 'Inbox').capitalize
+    if current_user.person._id.to_s == id
+      @provider = current_user.person
+    else
+      @provider = @general_agency_provider
+    end
   end
 
   private
@@ -101,15 +128,32 @@ class GeneralAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def check_general_agency_staff_role
+    if current_user.has_general_agency_staff_role?
+      redirect_to general_agencies_profile_path(id: current_user.person.general_agency_staff_roles.last.general_agency_profile_id)
+    else
+      flash[:notice] = "You don't have a General Agency Profile associated with your Account!! Please register your General Agency first."
+    end
+  end
+
   def general_agency_profile_params
     params.require(:organization).permit(
       :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba,
       :fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
-      :working_hours, :accept_new_clients,
+      :working_hours, :accept_new_clients, :general_agency_profile_id, :applicant_type,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension]
       ]
     )
+  end
+
+  def send_secure_message_to_general_agency(staff_role)
+    hbx_admin = HbxProfile.all.first
+    general_agency = staff_role.general_agency_profile
+
+    subject = "Received new general agency - #{staff_role.person.full_name}"
+    body = "<br><p>Following are staff details<br>Staff Name : #{staff_role.person.full_name}<br>Staff NPN  : #{staff_role.npn}</p>"
+    secure_message(hbx_admin, general_agency, subject, body)
   end
 end

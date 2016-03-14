@@ -167,6 +167,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
           if employer_profile.present?
             employer_profile.fire_general_agency
             employer_profile.save
+            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Fire')
           end
         end
         notice = "Fire these employers successful."
@@ -176,6 +177,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
           if employer_profile.present?
             employer_profile.hire_general_agency(general_agency_profile)
             employer_profile.save
+            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
           end
         end
         notice = "Assign successful."
@@ -188,6 +190,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     employer_profile.fire_general_agency
     employer_profile.save
+    send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Fire')
     redirect_to broker_agencies_profile_path(@broker_agency_profile)
   end
 
@@ -257,5 +260,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     elsif @person.has_active_employee_role?
       "shop"
     end
+  end
+
+  def send_general_agency_assign_msg(general_agency, employer_profile, status)
+    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name}"
+    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
+    secure_message(@broker_agency_profile, general_agency, subject, body)
   end
 end

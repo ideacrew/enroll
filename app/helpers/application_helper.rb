@@ -302,6 +302,8 @@ module ApplicationHelper
       broker_agencies_inbox_path(provider, message_id: message.id)
     when "HbxProfile"
       exchanges_inbox_path(provider, message_id: message.id)
+    when "GeneralAgencyProfile"
+      general_agencies_inbox_path(provider, message_id: message.id)
     end
   end
 
@@ -317,6 +319,8 @@ module ApplicationHelper
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
       inbox_insured_families_path(profile_id: provider.id, folder: folder)
+    when "GeneralAgencyProfile"
+      inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 

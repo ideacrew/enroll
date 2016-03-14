@@ -3,7 +3,7 @@ module Forms
     include ActiveModel::Validations
     include Validations::Email
 
-    attr_accessor :general_agency_profile
+    attr_accessor :general_agency_profile, :applicant_type, :general_agency_profile_id
     attr_accessor :market_kind, :languages_spoken, :email
     attr_accessor :working_hours, :accept_new_clients, :home_page
     include NpnField
@@ -43,10 +43,15 @@ module Forms
 
       person.save!
       add_staff_role
-      organization = create_or_find_organization
-      self.general_agency_profile = organization.general_agency_profile
-      self.general_agency_profile.save!
-      person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
+      if only_staff_role?
+        gener_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
+        person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
+      else
+        organization = create_or_find_organization
+        self.general_agency_profile = organization.general_agency_profile
+        self.general_agency_profile.save!
+        person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
+      end
       true
     end
 
@@ -72,6 +77,10 @@ module Forms
       end
 
       self.person.add_work_email(email)
+    end
+
+    def only_staff_role?
+      self.applicant_type == 'staff'
     end
 
     def create_or_find_organization
