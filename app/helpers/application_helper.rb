@@ -418,8 +418,6 @@ module ApplicationHelper
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
-       #binding.pry
-
         concat(content_tag(:div, class: 'progress-val') do
           concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)
           concat content_tag(:strong, (options[:minimum] == false) ? eligible : '', data: {value: "#{eligible}"}, class: 'pull-right')
