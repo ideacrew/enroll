@@ -272,7 +272,8 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find('.interaction-click-control-logout').click
+  click_link "LOGOUT"
+  visit "/"
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
@@ -521,48 +522,44 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
 end
 
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
-  sleep 3
-  click_when_present(@browser.a(text: /#{qle_event}/))
+  click_link "#{qle_event}"
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
-  @browser.element(text: /Choose Coverage for your Household/i).wait_until_present
-  expect(@browser.element(text: /Choose Coverage for your Household/i).visible?).to be_truthy
-  scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
+  click_link "Continue"
+  click_button "Shop for new plan"
 end
 
 When(/^I click on continue on qle confirmation page$/) do
-  @browser.element(text: /Enrollment Submitted/i).wait_until_present
-  expect(@browser.element(text: /Enrollment Submitted/i).visible?).to be_truthy
+  expect(page).to have_content "Enrollment Submitted"
   screenshot("qle_confirm")
-  click_when_present(@browser.a(text: /go to my account/i))
+  click_link "GO TO MY ACCOUNT"
 end
 
 
 When(/^I select a future qle date$/) do
-  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
-  sleep(1)
+  expect(page).to have_content "Married"
   screenshot("future_qle_date")
-  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record + 5.days).strftime("%m/%d/%Y")
+  click_link "CONTINUE"
 end
 
 Then(/^I should see not qualify message$/) do
-  wait_and_confirm_text /The date you submitted does not qualify for special enrollment/i
-  expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
+  expect(page).to have_content "The date you submitted does not qualify for special enrollment"
   screenshot("not_qualify")
 end
 
 When(/^I select a past qle date$/) do
-  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today - 5).strftime("%m/%d/%Y"))
-  sleep(1)
+  expect(page).to have_content "Married"
   screenshot("past_qle_date")
-  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  click_link "CONTINUE"
 end
 
 Then(/^I should see confirmation and continue$/) do
-  expect(@browser.element(text: /Based on the information you entered, you may be eligible/i).visible?).to be_truthy
+  expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
+  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
 end
 
 Then(/^I should see the dependents and group selection page$/) do
@@ -582,22 +579,20 @@ Then(/^I should see the dependents and group selection page$/) do
 end
 
 And(/I select three plans to compare/) do
-  # sleep 3
-  @browser.a(text: /Select Plan/).wait_until_present
-  compare_options = @browser.spans(class: 'checkbox-custom-label', text: "Compare")
-  if compare_options.count > 3
-    compare_options[0].click
-    compare_options[1].click
-    compare_options[2].click
-    click_when_present(@browser.a(text: "COMPARE PLANS"))
-    @browser.h1(text: /Choose Plan - Compare Selected Plans/).wait_until_present
-    expect(@browser.elements(:class => "plan_comparison").size).to eq 3
-    @browser.button(text: 'Close').wait_until_present
-    @browser.button(text: 'Close').click
+  expect(page).to have_content("Select Plan")
+  if page.all("span.checkbox-custom-label").count > 3
+    #modal plan data for IVL not really seeded in.
+    page.all("span.checkbox-custom-label")[0].click
+    page.all("span.checkbox-custom-label")[1].click
+    page.all("span.checkbox-custom-label")[2].click
+    find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    expect(page).to have_content("Choose Plan - Compare Selected Plans")
+    find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
   end
 end
 
 And(/I should not see any plan which premium is 0/) do
-  find('h2.plan-premium')
-  expect(find('h2.plan-premium')).to have_content("$0.00")
+  page.all("h2.plan-premium").each do |premium|
+    expect(premium).not_to have_content("$0.00")
+  end
 end

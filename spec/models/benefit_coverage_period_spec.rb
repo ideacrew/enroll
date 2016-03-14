@@ -2,18 +2,14 @@ require 'rails_helper'
 
 RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
-  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship) }
+  let(:hbx_profile)               { FactoryGirl.create(:hbx_profile) }
+  let(:benefit_sponsorship)       { hbx_profile.benefit_sponsorship }
   let(:title)                     { "My new enrollment period" }
   let(:service_market)            { "individual" }
   let(:start_on)                  { Date.new(2015,10,1).beginning_of_year }
   let(:end_on)                    { Date.new(2015,10,1).end_of_year }
   let(:open_enrollment_start_on)  { Date.new(2015,10,1).beginning_of_year - 2.months }
   let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
-  let(:benefit_packages) do
-    bp = FactoryGirl.build(:benefit_package)
-    bpeg = FactoryGirl.build(:benefit_eligibility_element_group, benefit_package: bp)
-    bp.to_a
-  end
 
   let(:valid_params){
       {
@@ -23,8 +19,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         start_on: start_on,
         end_on: end_on,
         open_enrollment_start_on: open_enrollment_start_on,
-        open_enrollment_end_on: open_enrollment_end_on,
-        benefit_packages: benefit_packages
+        open_enrollment_end_on: open_enrollment_end_on
       }
     }
 
@@ -75,7 +70,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         context "and a second lowest cost silver plan is specified" do
           let(:silver_plan) { FactoryGirl.create(:plan, metal_level: "silver") }
           let(:bronze_plan) { FactoryGirl.create(:plan, metal_level: "bronze") }
-          let(:benefit_package) { FactoryGirl.create(:benefit_package) }
+          let(:benefit_package) { double }
 
           context "and a silver plan is provided" do
             it "should set/get the assigned silver plan" do

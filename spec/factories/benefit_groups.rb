@@ -17,6 +17,10 @@ FactoryGirl.define do
     reference_plan_id {FactoryGirl.create(:plan_with_premium_tables)._id}
     elected_plan_ids { [ self.reference_plan_id ]}
     employer_max_amt_in_cents 1000_00
+
+    trait :premiums_for_2015 do
+      reference_plan_id {FactoryGirl.create(:plan_with_premium_tables, :premiums_for_2015 )._id}
+    end
   end
 
   trait :invalid_employee_relationship_benefit do
