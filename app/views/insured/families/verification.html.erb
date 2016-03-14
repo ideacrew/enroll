@@ -25,7 +25,7 @@
               <th>Person <br>Verification Status</th>
               <th>Verification Type</th>
               <th>Upload Documents</th>
-              <th>Show</th>
+              <th></th>
             </tr>
             </thead>
             <tbody>
@@ -37,27 +37,40 @@
                   <td>
                     <%= show_consumer_role_state(member.person.consumer_role) %>
                   </td>
-                  <td>
+                  <td colspan="2">
+                    <table class="sub-table">
+
                     <% member.person.verification_types.each do |verif_type| %>
+                    <tr>
+                        <td>
                         <%= verif_type %>
+                        &nbsp;
                         <% ver = [1,2].sample %>
                         <% if ver == 1 %>
-                          <span class="label label-danger pull-right">Outstanding</span>
+                          <span class="label label-danger">Outstanding</span>
                         <% else %>
-                          <span class="label label-success pull-right">&nbsp;&nbsp;&nbsp; Verified &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                          <span class="label label-success">&nbsp;&nbsp;&nbsp; Verified &nbsp;&nbsp;&nbsp;&nbsp;</span>
                         <% end %>
                         <br/>
+                        </td>
+                        <td>
+                          <%= render partial: "verification_upload", locals: {member: member} %>
+                        </td>
+                      </tr>
                     <% end %>
+                    </table>
                   </td>
-                  <td>
-                    <% member.person.verification_types.each do |docs| %>
-                        <%= render partial: "verification_upload", locals: {member: member} %>
-                        <br/>
-                    <% end %>
-                  </td>
+
                   <td class="table-functions">
                     <a data-toggle="collapse" href="#<%= member.id %>" aria-expanded="false" aria-controls="<%= member.id %>">
-                      <%= '<i class="fa fa-caret-down fa-2x" data-toggle="tooltip" title="View Documents"></i>'.html_safe if member.person.consumer_role.vlp_documents.present? %>
+                      <span>
+                        <span class="function-text">
+                        View Documents
+                        </span>
+
+                        <%= '<i class="fa fa-caret-down fa-lg" data-toggle="tooltip" title="View Documents"></i>'.html_safe if member.person.consumer_role.vlp_documents.present? %>
+
+                      </span>
                     </a>
                   </td>
                 </tr>
