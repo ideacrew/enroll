@@ -136,6 +136,7 @@ group :test do
   gem 'shoulda-matchers', '3.1.1'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
+  gem 'warden'
 end
 
 group :production do
