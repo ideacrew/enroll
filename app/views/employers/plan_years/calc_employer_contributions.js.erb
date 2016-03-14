@@ -58,6 +58,7 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
 
    $('#<%= @location_id %> .select-dental-plan h4 .starter:first + span').show();
    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+    $('#<%= @location_id %> <%= @coverage_type %> #edit_employer_cost_info_btn').fadeIn();
     $('#<%= @location_id %> <%= @coverage_type %> .reference-steps > div:first').hide();
     $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').show();
     $('#<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan').on('click', function() {
