@@ -1,16 +1,5 @@
-require 'watir'
 require 'pry'
 # load Rails.root + "db/seeds.rb"
-module WatirScreenshots
-  def screenshot(name = nil)
-    if @take_screens
-      shot_count = @screen_count.to_s.rjust(3, "0")
-      f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
-      @browser.screenshot.save("tmp/#{f_name}.png")
-      @screen_count = @screen_count + 1
-    end
-  end
-end
 
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
@@ -224,6 +213,7 @@ end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   person = people[named_person]
+  screenshot("create_census_employee")
   fill_in 'census_employee[first_name]', :with => person[:first_name]
   fill_in 'census_employee[last_name]', :with => person[:last_name]
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
@@ -243,6 +233,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   find(:xpath, '//div[div/p[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
 
   fill_in 'census_employee[email_attributes][address]', with: 'broker.assist@dc.gov'
+  screenshot("broker_create_census_employee_with_data")
   find('.interaction-click-control-create-employee').click
 end
 
@@ -253,15 +244,19 @@ end
 When(/^I visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
+  screenshot("employer_start")
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  screenshot("employer_sign_up_welcome")
 end
 
 Then(/^(?:.+) should click on employer portal$/) do
   visit "/"
+  screenshot("start")
   page.click_link 'Employer Portal'
+  screenshot("employee_portal")
 end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
@@ -270,7 +265,7 @@ When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
 end
 
 Then(/^(?:.+) should be logged on as an unlinked employee$/) do
-    screenshot("logged_in_welcome")
+  screenshot("logged_in_welcome")
   @browser.a(href: /consumer\/employee\/search/).wait_until_present
   screenshot("logged_in_welcome")
   expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
@@ -286,6 +281,7 @@ end
 
 Then(/^.+ should see the employee search page$/) do
   expect(find('.interaction-field-control-person-first-name')).to be_visible
+  screenshot("employer_search")
 end
 
 Given(/^(.*) visits the employee portal$/) do |named_person|
@@ -293,6 +289,7 @@ Given(/^(.*) visits the employee portal$/) do |named_person|
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
+  screenshot("start")
   click_button 'Create account'
 
   person = people[named_person]
@@ -300,6 +297,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   fill_in "user[email]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
+  screenshot("create_account")
   click_button "Create account"
 end
 
@@ -312,6 +310,7 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   fill_in 'person[ssn]', :with => person[:ssn]
   find(:xpath, '//label[@for="radio_male"]').click
 
+  screenshot("information_entered")
   find('.interaction-click-control-continue').click
 end
 
@@ -322,14 +321,17 @@ end
 
 Then(/^Employee should see the matched employee record form$/) do
   expect(page).to have_content('Acme Inc.')
+  screenshot("employer_search_results")
 end
 
 # TODO: needs to be merged
 Then(/^.+ should see the matching employee record form$/) do
   expect(page).to have_content('Turner Agency')
+  screenshot("employer_search_results")
 end
 
 When(/^.+ accepts? the matched employer$/) do
+  screenshot("update_personal_info")
   find(:xpath, "//span[contains(., 'Continue')]").click
 end
 
@@ -345,11 +347,13 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
 
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
+  screenshot("personal_info_complete")
   find("#btn-continue").click
 end
 
 Then(/^.+ should see the dependents page$/) do
   expect(page).to have_content('Add Member')
+  screenshot("dependents_page")
 end
 
 When(/^.+ clicks? edit on baby Soren$/) do
@@ -394,6 +398,7 @@ When(/^.+ clicks? confirm member$/) do
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
+  screenshot("group_selection")
   find('#btn-continue').click
 end
 
@@ -407,6 +412,7 @@ end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
   expect(page).to have_content('Choose Plan')
+  screenshot("plan_shopping_welcome")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -416,6 +422,7 @@ end
 
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')
+  screenshot("plan_shopping")
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
@@ -424,6 +431,7 @@ end
 
 Then(/^.+ should see the coverage summary page$/) do
   expect(page).to have_content('Confirm Your Plan Selection')
+  screenshot("summary_page")
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
@@ -432,11 +440,13 @@ end
 
 Then(/^.+ should see the receipt page$/) do
   expect(page).to have_content('Enrollment Submitted')
+  screenshot("receipt_page")
   find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should see the "my account" page$/) do
   expect(page).to have_content('My DC Health Link')
+  screenshot("my_account")
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do

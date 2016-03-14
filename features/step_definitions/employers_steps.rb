@@ -137,12 +137,14 @@ Then(/^.+ should see a form to enter information about employee, address and dep
 
   find(:xpath, "//label[@for='#{name.gsub('[', '_').gsub(']', '').gsub('first_name', 'gender_female')}']").click
 
+  screenshot("create_census_employee_with_data")
   click_button "Create Employee"
 end
 
 And(/^.+ should see employer census family created success message$/) do
   expect(find('.alert')).to have_content('successfully')
   expect(page).to have_content('John K Doe Jr')
+  screenshot("employer_census_new_family_success_message")
 end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
@@ -187,6 +189,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   find(:xpath, "//div[@id='dependent_info']//div[@class='selectric']/p[@class='label']").click
   find(:xpath, "//div[@id='dependent_info']//li[contains(., 'Child')]").click
 
+  screenshot("update_census_employee_with_data")
   click_button 'Update Employee'
 end
 
@@ -276,6 +279,7 @@ end
 
 
 And(/^.+ should see a button to create new plan year$/) do
+  screenshot("employer_plan_year")
   find('a.interaction-click-control-add-plan-year').click
 end
 
@@ -285,6 +289,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
   find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
 
+  screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
 
   if amount_of_fte == "low"
