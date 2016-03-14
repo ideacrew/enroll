@@ -18,9 +18,9 @@ $('#referencePlanSummaryModal .modal-footer .btn-less-details').on('click', func
 });
 
 $('.modal-body-swap').show();
-$('#referencePlanSummaryModal').find('.modal-title').text('Reference Plan Details (More Details)');
+$('#referencePlanSummaryModal').find('.modal-title').text('<%= @plan.name %> (<%= @plan.carrier_profile.legal_name %>) - More Details');
 <% else %>
-$('#referencePlanSummaryModal').find('.modal-title').text('Reference Plan Details');
+$('#referencePlanSummaryModal').find('.modal-title').text('<%= @plan.name %> (<%= @plan.carrier_profile.legal_name %>) - Details');
 
 <% end %>
 $('#referencePlanSummaryModal').modal('show');
