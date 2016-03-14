@@ -231,7 +231,10 @@
           All Plans From A Single Carrier
           <% elsif bg.dental_plan_option_kind == "single_plan" %>
             <% if bg.elected_dental_plan_ids.count < 13 %>
-              Custom
+              Custom (<%= bg.elected_dental_plans.count %> Plans)
+              <br/>
+              <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
+
             <% else %>
               All Plans
             <% end %>
@@ -240,6 +243,9 @@
       </td>
     </tr>
   </table>
+  <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
+    <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
+  <% end %>
   <% end %>
 
     </div>
