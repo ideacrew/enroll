@@ -122,6 +122,8 @@ class BenefitGroup
     @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
   end
 
+
+
   def is_open_enrollment?
     plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
@@ -200,7 +202,6 @@ class BenefitGroup
     # set_bounding_cost_plans
     @elected_dental_plans = new_plans
   end
-
 
   def elected_plans
     return @elected_plans if defined? @elected_plans

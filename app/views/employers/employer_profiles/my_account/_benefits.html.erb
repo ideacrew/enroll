@@ -25,7 +25,7 @@
   </div>
   <% if @plan_years.present? %>
 
-  <% @plan_years.each do |plan_year| %>
+  <% @plan_years.each_with_index do |plan_year, pi| %>
   <div class="row no-buffer plan-year">
     <h3>
       <% if plan_year.draft? || plan_year.renewing_draft? %>
@@ -38,7 +38,7 @@
       <strong><%= plan_year.aasm_state.to_s.humanize.upcase %> Plan Year for <%= plan_year.start_on.to_date.year%></strong>
     </h3>
 
-    <% plan_year.benefit_groups.each do |bg| %>
+    <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
     <% next if bg.reference_plan_id.blank? %>
     <% if bg.default == true %>
       <% active = 'active' %>
@@ -212,8 +212,11 @@
                 All Plans From A Single Carrier
                 <% elsif bg.dental_plan_option_kind == "single_plan" %>
                   <% if bg.elected_dental_plan_ids.count < 13 %>
-                    Custom
-                  <% else %>
+                  Custom (<%= bg.elected_dental_plans.count %> Plans)
+                  <br/>
+                  <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
+
+                    <% else %>
                     All Plans
                   <% end %>
                 <% end %>
@@ -222,6 +225,32 @@
           </tr>
         </table>
   </div>
+  <% if bg.elected_dental_plan_ids.count < 13 %>
+
+  <div id="electedDentalPlans_<%=bg.id%>" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h3 class="modal-title">Offered Plans - <%= bg.title %> (Dental)</h3>
+        </div>
+        <div class="modal-body">
+          <p>
+          <% bg.elected_dental_plans.each do |p| %>
+          <h4>
+            <%= p.provider %> - <%= p.name %>
+          </h4>
+          <% end %>
+          </p>
+          <ul class="application-warnings"></ul>
+        </div>
+        <div class="modal-footer">
+          <%= link_to 'Close', '', :class => 'btn btn-trans', data: { dismiss: "modal"} %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
   <% end %>
   <br class="clear"/>
 
