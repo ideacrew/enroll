@@ -20,7 +20,14 @@
         </thead>
         <% @general_agency_profiles.each do |general_agency_profile| %>
           <tbody>
-            <td><%= link_to general_agency_profile.legal_name, general_agencies_profile_path(general_agency_profile) %></td>
+            <td id="ga-<%= general_agency_profile.id %>">
+              <%= link_to general_agency_profile.legal_name, general_agencies_profile_path(general_agency_profile) %>
+              <% if @broker_role.present? %>
+                <%= link_to favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
+                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true"></span>
+                <% end %>
+              <% end %>
+            </td>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
             <td><%= general_agency_profile.entity_kind.titleize %></td>

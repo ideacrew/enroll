@@ -266,6 +266,9 @@ Rails.application.routes.draw do
         get :new_broker_agency
         get :search_broker_agency
       end
+      member do
+        get :favorite
+      end
     end
   end
 

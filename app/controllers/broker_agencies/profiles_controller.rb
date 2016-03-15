@@ -143,7 +143,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def general_agency_index
-    @general_agency_profiles = GeneralAgencyProfile.all
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
   end
 
   def assign
@@ -154,7 +155,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.by_broker_role(broker_role_id)
     end
     @employers = @orgs.map {|o| o.employer_profile}
-    @general_agency_profiles = GeneralAgencyProfile.all
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
   end
 
   def update_assign

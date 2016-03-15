@@ -117,6 +117,15 @@ class GeneralAgencyProfile
       list_embedded Organization.exists(general_agency_profile: true).order_by([:legal_name]).to_a
     end
 
+    def all_by_broker_role(broker_role)
+      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue []
+      if favorite_general_agency_ids.present?
+        all.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
+      else
+        all
+      end
+    end
+
     def first
       all.first
     end

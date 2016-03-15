@@ -34,6 +34,25 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
     @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
 
+  def favorite
+    @broker_role = BrokerRole.find(params[:id])
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
+    if @broker_role.present? && @general_agency_profile.present?
+      favorite_general_agencies = @broker_role.search_favorite_general_agencies(@general_agency_profile.id)
+      if favorite_general_agencies.present?
+        favorite_general_agencies.destroy_all
+        @favorite_status = false
+      else
+        @broker_role.favorite_general_agencies.create(general_agency_profile_id: @general_agency_profile.id)
+        @favorite_status = true
+      end
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def create
     # failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
     if params[:person].present?

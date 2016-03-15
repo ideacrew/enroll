@@ -11,7 +11,6 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   let(:organization) {FactoryGirl.create(:organization)}
   let(:market_kind) {"both"}
   let(:bad_market_kind) {"commodities"}
-  let(:primary_general_agency_role) { FactoryGirl.create(:general_agency_role) }
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
 
   describe ".new" do
@@ -20,7 +19,6 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
         organization: organization,
         market_kind: market_kind,
         entity_kind: "s_corporation",
-        primary_general_agency_role: primary_general_agency_role
       }
     end
 
