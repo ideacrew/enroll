@@ -5,7 +5,7 @@ module Etl::Csv
     PROVIDER_TYPE_KINDS = %w(broker)
     PRACTICE_AREA_KINDS = {
                             "Small Business Insurance Only" => "shop",
-                            "Individual and Family Insurance Only" => "individual", 
+                            "Individual and Family Insurance Only" => "individual",
                             "Both" => "both"
                           }
     NAME_SUFFIX_KINDS = %w(jr sr ii iii iv clu ltcp cfp mhsa chfc)
@@ -88,7 +88,7 @@ module Etl::Csv
       person.save!
 
       built_broker_role = person.broker_role
-      
+
       broker_agency_profile = built_broker_role.broker_agency_profile || BrokerAgencyProfile.new
       built_broker_agency_profile = assign_broker_agency_profile_attributes(broker_agency_profile, record)
       built_broker_agency_profile.save!
@@ -108,7 +108,7 @@ module Etl::Csv
 
 
     def assign_broker_role_attributes(person, record)
-      
+
       fax     = Phone.new(kind: "fax", full_phone_number: record[:fax_number] )
       mobile  = Phone.new(kind: "mobile", full_phone_number: record[:mobile_phone] )
       direct  = Phone.new(kind: "work", full_phone_number: record[:direct_phone] )
@@ -161,7 +161,7 @@ module Etl::Csv
               ),
             phone: Phone.new(
                 kind: "work",
-                full_phone_number: record[:work_phone] || record[:direct_phone], 
+                full_phone_number: record[:work_phone] || record[:direct_phone],
                 extension: record[:work_phone_extension]
               ),
             is_primary: true
@@ -170,8 +170,8 @@ module Etl::Csv
         fein = get_next_fein
 
         organization = Organization.new(
-            legal_name: record[:organization_name] || "#{record[:provider_name][:first_name]} #{record[:provider_name][:last_name]}", 
-            fein: fein, 
+            legal_name: record[:organization_name] || "#{record[:provider_name][:first_name]} #{record[:provider_name][:last_name]}",
+            fein: fein,
             home_page: record[:web_url],
             office_locations: [office_location]
           )
@@ -183,7 +183,7 @@ module Etl::Csv
             aasm_state: "is_approved"
           )
       end
-# binding.pry
+
       raise StandardError, "BrokerAgency is invalid for NPN: #{record[:npn]}" unless broker_agency_profile.valid?
       raise StandardError, "BrokerAgency organization is invalid for NPN: #{record[:npn]}: #{broker_agency_profile.organization.errors.full_messages.inspect}" unless broker_agency_profile.organization.valid?
       broker_agency_profile
@@ -231,7 +231,7 @@ module Etl::Csv
             {first_name: full_name[0], middle_name: full_name[1], last_name: full_name[2], name_sfx: full_name[3]}
           else
             {first_name: full_name[0] + " " + full_name[1], middle_name: full_name[2], last_name: full_name[3]}
-          end   
+          end
       end
     end
 

@@ -110,7 +110,7 @@ class BenefitCoveragePeriod
 
     end
   end
- 
+
   def earliest_effective_date
     if TimeKeeper.date_of_record.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
       effective_date = TimeKeeper.date_of_record.end_of_month + 1.day
@@ -142,15 +142,19 @@ class BenefitCoveragePeriod
 
     def find(id)
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
-      organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
+      organizations.size > 0 ? all.select{ |bcp| bcp.id == id }.first : nil
     end
 
     def find_by_date(date)
       organizations = Organization.where(
         :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.start_on".lte => date,
         :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.end_on".gte => date)
-
-      organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
+      if organizations.size > 0
+        bcps = organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods
+        bcps.select{ |bcp| bcp.start_on <= date && bcp.end_on >= date }.first
+      else
+        nil
+      end
     end
 
     def all
