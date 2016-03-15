@@ -31,6 +31,7 @@ describe Household, "given a coverage household with a dependent" do
       allow(consumer_role).to receive(:person).and_return(person)
       allow(family).to receive(:is_under_special_enrollment_period?).and_return false
       allow(household).to receive(:family).and_return(family)
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
       allow(coverage_household).to receive(:household).and_return(household)
     end
 

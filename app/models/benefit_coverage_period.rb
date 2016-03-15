@@ -99,8 +99,15 @@ class BenefitCoveragePeriod
         end
       end
     else
-      # Open Enrollment has ended, return earliest allowed date
-      date + HbxProfile::IndividualEnrollmentTerminationMinimum
+      dateOfTermMin   = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
+      if (date < dateOfTermMin)
+        # If selected date is less than 14 days from today, add 14 days to todays date and that is the termination date.
+        TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
+      else
+        # If selected date is greater than or equal to 14 days from today, the selected date itself is the termination date.
+        date
+      end
+
     end
   end
  

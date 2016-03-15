@@ -45,7 +45,9 @@ describe Forms::FamilyMember do
   context "initialize" do
     let(:dependent) {Forms::FamilyMember.new}
     it "should initialize address" do
-      expect(dependent.addresses.class).to eq Address
+      expect(dependent.addresses.class).to eq Array
+      expect(dependent.addresses.count).to eq 2
+      expect(dependent.addresses.first.class).to eq Address
     end
 
     it "should initialize same_with_primary" do
@@ -147,7 +149,7 @@ describe Forms::FamilyMember do
       end
 
       context "if address_1 is blank and city is blank" do 
-        let(:addresses) { {"address_1" => "", "city" => ""} }
+        let(:addresses) { {"0" => {"kind"=> 'home', "address_1" => "", "city" => ""}} }
 
         before :each do 
           allow(person).to receive(:home_address).and_return addr3
@@ -166,22 +168,26 @@ describe Forms::FamilyMember do
       end
 
       context "if address_1 is blank or city is not blank" do 
-        let(:addresses) { {"address_1" => "", "city" => "not blank"} }
+        let(:addresses) { {"0"=>{"kind"=>"home", "address_1" => "", "city" => "not blank"}} }
+        let(:address) {{"kind"=>"home", "address_1" => "", "city" => "not blank"}}
 
         before :each do 
           allow(person).to receive(:home_address).and_return addr3
+          allow(person).to receive(:has_mailing_address?).and_return false
           allow(employee_dependent).to receive(:addresses).and_return(addresses)
+          allow(addresses).to receive(:values).and_return [address]
+          addresses.each do |key, addr|
+            addr.define_singleton_method(:permit!) {true}
+          end
         end
 
         it "call update when current address present " do
-          addresses.define_singleton_method(:permit!) {true}
 
           expect(addr3).to receive(:update).and_return true
           employee_dependent.assign_person_address(person) 
         end
 
         it "call new when current address blank" do 
-          addresses.define_singleton_method(:permit!) {true} 
           allow(person).to receive(:home_address).and_return nil 
 
           _addresses = double(new: {})
@@ -325,6 +331,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
     allow(family_member).to receive(:citizen_status)
+    allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
   end
 
@@ -351,6 +358,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   describe "when updated" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(subject).to receive(:assign_person_address).and_return true
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end

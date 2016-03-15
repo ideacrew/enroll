@@ -31,7 +31,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     FactoryGirl.create(:benefit_group_assignment,
       benefit_group: benefit_group,
       census_employee: census_employee,
-      start_on: Date.today - 40.days
+      start_on: TimeKeeper.date_of_record
     )
   }
 
@@ -112,7 +112,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     before do
       census_employee.census_dependents = [census_dependent]
       census_employee.save
-      plan_year.publish!
+      plan_year.update_attributes({:aasm_state => 'published'})
     end
 
     context "and no prior person exists" do
@@ -185,7 +185,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         @person = FactoryGirl.create(:person,
                                      valid_person_params.except(:user).merge(dob: census_employee.dob,
                                                                              ssn: census_employee.ssn))
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
         @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
       end
 
@@ -235,7 +235,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         @family = Family.new.build_from_person(@person)
         @family.person_id = @person.id
         @hbx_enrollment = FactoryGirl.create(:hbx_enrollment, household: @family.active_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment)
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
         benefit_group_assignment.hbx_enrollment = @hbx_enrollment
         benefit_group_assignment.select_coverage!
         @employee_role, @family2 = Factories::EnrollmentFactory.add_employee_role(**params)
@@ -278,7 +278,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         census_employee.benefit_group_assignments = [benefit_group_assignment]
         census_employee.save
 
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
 
         valid_person_params = {
           user: @user,
@@ -313,7 +313,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         census_employee_2.benefit_group_assignments = [benefit_group_assignment_2]
         census_employee_2.save
 
-        plan_year_2.publish!
+        plan_year_2.update_attributes({:aasm_state => 'published'})
 
         @second_params = { employer_profile: employer_profile_2 }.merge(valid_person_params).merge(valid_employee_params)
         @second_employee_role, @second_census_employee = Factories::EnrollmentFactory.add_employee_role(**@second_params)
@@ -364,7 +364,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           plan_year.save
           census_employee.benefit_group_assignments = [benefit_group_assignment]
           census_employee.save
-          PlanYear.find(plan_year.id).publish!
+          PlanYear.find(plan_year.id).update_attributes({:aasm_state => 'published'})
         end
 
         it "should not raise" do
@@ -414,7 +414,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           plan_year.save
           census_employee.benefit_group_assignments = [benefit_group_assignment]
           census_employee.save
-          PlanYear.find(plan_year.id).publish!
+          PlanYear.find(plan_year.id).update_attributes({:aasm_state => 'published'})
         end
 
         it 'should not raise' do
@@ -496,7 +496,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           plan_year.save
           census_employee.benefit_group_assignments = [benefit_group_assignment]
           census_employee.save
-          PlanYear.find(plan_year.id).publish!
+          PlanYear.find(plan_year.id).update_attributes({:aasm_state => 'published'})
         end
 
         it "should not raise" do

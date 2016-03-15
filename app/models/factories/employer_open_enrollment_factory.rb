@@ -1,7 +1,7 @@
 module Factories
   class EmployerOpenEnrollmentFactory
 
-    attr_accessor :employer_profile, :date, :plan_year_start_on
+    attr_accessor :employer_profile, :date, :renewing_plan_year
 
     def initialize
       @logger = Logger.new("#{Rails.root}/log/employer_open_enrollment_factory_logfile.log")
@@ -9,10 +9,23 @@ module Factories
 
     def begin_open_enrollment
       @logger.debug "Starting open enrollment for #{employer_profile.legal_name}"
-      plan_years_for_oe = employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => @date)
+      plan_years_for_oe = employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on".gte => @date)
 
-      if plan_years_for_oe.empty?
+      if plan_years_for_oe.size > 1
+        @logger.debug "Error: found more than one published plan year for #{employer_profile.legal_name}"
         return
+      end
+
+      published_plan_year = plan_years_for_oe.first
+      if published_plan_year && published_plan_year.may_advance_date?
+        published_plan_year.advance_date!
+      end
+    end
+
+    def end_open_enrollment
+      @logger.debug "Ending open enrollment for #{employer_profile.legal_name}"
+      plan_years_for_oe = employer_profile.plan_years.published_or_renewing_published.select do |py|
+        py.open_enrollment_end_on < @date && py.start_on > @date
       end
 
       if plan_years_for_oe.size > 1
@@ -20,7 +33,7 @@ module Factories
         return
       end
 
-      published_plan_year = plan_years_for_oe.published.first
+      published_plan_year = plan_years_for_oe.first
       published_plan_year.advance_date! if published_plan_year && published_plan_year.may_advance_date?
     end
 
@@ -28,7 +41,7 @@ module Factories
       @logger.debug "Processing enrollment renewals for #{employer_profile.legal_name}"
 
       default_benefit_group = @employer_profile.default_benefit_group
-      renewing_group = @employer_profile.renewing_plan_year.benefit_groups.first
+      renewing_group = @renewing_plan_year.benefit_groups.first
 
       if default_benefit_group.blank? && @employer_profile.plan_years.published.any?
         default_benefit_group = @employer_profile.plan_years.published.first.benefit_groups.first
@@ -65,6 +78,7 @@ module Factories
             factory.family = family
             factory.census_employee = ce
             factory.employer = @employer_profile
+            factory.renewing_plan_year = @renewing_plan_year
             if factory.renew
               @logger.debug " renewed: #{ce.full_name}"
             end
@@ -75,15 +89,6 @@ module Factories
           @logger.debug "Renewal failed for #{ce.full_name} due to #{e.to_s}"
         end
       end
-
-      current_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => @plan_year_start_on)
-      renewing_plan_year = current_plan_years.renewing_published_state.first
-      if current_plan_years.size == 1 && renewing_plan_year.present?
-        renewing_plan_year.advance_date! if renewing_plan_year && renewing_plan_year.may_advance_date?
-      end
-    end
-
-    def end_open_enrollment
     end
   end
 end
