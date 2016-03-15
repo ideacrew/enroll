@@ -144,7 +144,7 @@ class Insured::FamiliesController < FamiliesController
       plan = @enrollment.try(:plan)
       if @enrollment.is_shop?
         @benefit_group = @enrollment.benefit_group
-        @reference_plan = @benefit_group.reference_plan
+        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
 
         if @benefit_group.is_congress
           @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
