@@ -17,6 +17,8 @@ describe "shared/_comparison.html.erb" do
       :nationwide => true,
       :deductible => 0,
       :total_premium => 100,
+      :rx_formulary_url => "http://www.example.com",
+      :provider_directory_url => "http://www.example1.com",
       :total_employer_contribution => 20,
       :total_employee_cost => 30,
       :id => "1234234234",
@@ -84,6 +86,11 @@ describe "shared/_comparison.html.erb" do
 
   it "should have print link" do
     expect(rendered).to have_selector('button', text: 'Print')
+  end
+
+  it "should have provider_directory_url and rx_formulary_url links" do
+    expect(rendered).to match(/#{mock_plan.rx_formulary_url}/)
+    expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
   end
 
   it "should have title and other text" do

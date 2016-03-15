@@ -17,6 +17,8 @@ describe "shared/_summary.html.erb" do
       :total_premium => 0,
       :total_employer_contribution => 0,
       :total_employee_cost => 0,
+      :rx_formulary_url => "http://www.example.com",
+      :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
@@ -38,6 +40,11 @@ describe "shared/_summary.html.erb" do
 
   it "should have a link to download the sbc pdf" do
     expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+  end
+
+  it "should have provider_directory_url and rx_formulary_url" do
+    expect(rendered).to have_selector("a[href='#{mock_plan.provider_directory_url}']")
+    expect(rendered).to have_selector("a[href='#{mock_plan.rx_formulary_url}']")
   end
 
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
