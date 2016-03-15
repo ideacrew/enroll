@@ -183,7 +183,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
           #       expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
           #     end
           # end
-              
+
             context "and termination is outside open enrollment" do
                 let(:todays_date) { TimeKeeper.date_of_record }
                 let(:lessThanTerminationMinimum)    { todays_date + 8.days }
@@ -202,7 +202,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
                   expect(benefit_coverage_period.termination_effective_on_for(greaterThanTermnationMinimum)).to eq(greaterThanTermnationMinimum)
                 end
             end
-          
+
         end
       end
     end
@@ -214,9 +214,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:c2) {FactoryGirl.create(:consumer_role)}
     let(:member1) {double(person: double(consumer_role: c1))}
     let(:member2) {double(person: double(consumer_role: c2))}
-    let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
-    let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
-    let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
+    let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+    let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
+    let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
     let(:plan4) { FactoryGirl.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}

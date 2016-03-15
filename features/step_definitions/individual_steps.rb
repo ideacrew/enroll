@@ -1,15 +1,9 @@
-<<<<<<< Updated upstream
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :ivl_2015_benefit_package)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual") #pull out for sep
   Caches::PlanDetails.load_record_cache!
-=======
-When(/^\w+ visits? the Insured portal$/) do
-  visit '/'
-  click_link 'Consumer/Family Portal'
->>>>>>> Stashed changes
   screenshot("individual_start")
 end
 
@@ -56,7 +50,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="person_us_citizen_true"]').click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
-<<<<<<< Updated upstream
+
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
@@ -66,37 +60,16 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
-=======
-
-  fill_in 'person[addresses_attributes][0][address_1]', with: "4900 USAA BLVD"
-  fill_in 'person[addresses_attributes][0][address_2]', with: "Suite 220"
-  fill_in 'person[addresses_attributes][0][city]', with: "Washington"
-
-  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'GA')]]").click
-  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'DC')]").click
-
-  fill_in 'person[addresses_attributes][0][zip]', with: "20002"
-  fill_in 'person[phones_attributes][0][full_phone_number]', with: "1110009999"
-  fill_in 'person[emails_attributes][0][address]', with: @u.find(:email1)
->>>>>>> Stashed changes
   screenshot("personal_form")
 end
 
 When(/Individual clicks on Save and Exit/) do
-<<<<<<< Updated upstream
   find(:xpath, '//*[@id="new_person_wrapper"]/div/div[2]/ul[2]/li[2]/a').trigger('click') #overlapping li element wat?
 end
 
 Then (/Individual resumes enrollment/) do
   visit '/'
   click_link 'Consumer/Family Portal'
-=======
-  find('.interaction-click-control-save---exit').click
-end
-
-When(/^\w+ clicks? on continue button$/) do
-  find('.interaction-click-control-continue').click
->>>>>>> Stashed changes
 end
 
 Then (/Individual sees previously saved address/) do
@@ -111,7 +84,6 @@ Then(/Individual agrees to the privacy agreeement/) do
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
-<<<<<<< Updated upstream
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
@@ -124,28 +96,6 @@ end
 Then(/\w+ should see the dependents form/) do
   expect(page).to have_content('Add Member')
   screenshot("dependents")
-=======
-  puts 'check logs'
-  sleep 2
-  find('.interaction-click-control-continue').click
-  sleep 5
-  find(:xpath, '//label[@for="agreement_agree"]').click
-  find('.interaction-click-control-continue').click
-  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).wait_until_present
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_c"]').click
-  find('.interaction-click-control-submit').click
-  screenshot("identify_verification")
-  find('.interaction-click-control-override-identity-verification')
-  screenshot("override")
-  find('.interaction-click-control-override-identity-verification').click
-end
-
-Then(/\w+ should see the dependents form/) do
-  find(:xpath, '//a[contains(., "Add Member")]')
-  screenshot("dependents")
-  click_link 'Add Member'
->>>>>>> Stashed changes
 end
 
 And(/Individual clicks on add member button/) do

@@ -381,7 +381,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     before do
-      plan_year_with_benefit_group.update_attributes(:aasm_state => 'renewing_draft') 
+      plan_year_with_benefit_group.update_attributes(:aasm_state => 'renewing_draft')
     end
 
     it "plan year should be in renewing_draft state" do
@@ -390,7 +390,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "and plan year is published after the publish due date" do
 
-      before do 
+      before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_with_benefit_group.due_date_for_publish + 1.day)
         plan_year_with_benefit_group.publish!
       end
@@ -399,7 +399,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         expect(plan_year_with_benefit_group.is_application_valid?).to be_falsey
       end
 
-      it "and should provide relevant warnings" do 
+      it "and should provide relevant warnings" do
         expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
         expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
       end
@@ -410,16 +410,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and plan year is published before publish due date" do
-      before do 
+      before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_with_benefit_group.due_date_for_publish.beginning_of_day)
         plan_year_with_benefit_group.publish!
       end
 
-      it "application should be valid" do 
+      it "application should be valid" do
         expect(plan_year_with_benefit_group.is_application_valid?).to be_truthy
       end
 
-      it "and plan year should be in publish state" do 
+      it "and plan year should be in publish state" do
         expect(plan_year_with_benefit_group.aasm_state).to eq "renewing_enrolling"
       end
     end
@@ -569,7 +569,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and plan year is published after the publish due date" do
 
-        before do 
+        before do
           TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.due_date_for_publish + 1.day)
           workflow_plan_year_with_benefit_group.publish!
         end
@@ -578,7 +578,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
         end
 
-        it "and should provide relevant warnings" do 
+        it "and should provide relevant warnings" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
         end
@@ -589,12 +589,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and plan year is published before publish due date" do
-        before do 
+        before do
           TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.due_date_for_publish.beginning_of_day)
           workflow_plan_year_with_benefit_group.publish!
         end
 
-        it "application should be valid" do 
+        it "application should be valid" do
           expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_truthy
         end
 
@@ -1457,10 +1457,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "and a published plan year application is reset to unpublished state", :dbclean => :after_all do
     let(:coverage_effective_date)   { TimeKeeper.date_of_record.end_of_month + 1.day }
-    let(:renewal_health_plan)       { FactoryGirl.create(:plan_with_premium_tables,
+    let(:renewal_health_plan)       { FactoryGirl.create(:plan, :with_premium_tables,
                                                           coverage_kind: "health",
                                                           active_year: coverage_effective_date.year.to_i + 1) }
-    let(:current_health_plan)       { FactoryGirl.create(:plan_with_premium_tables,
+    let(:current_health_plan)       { FactoryGirl.create(:plan, :with_premium_tables,
                                                           coverage_kind: "health",
                                                           active_year: (coverage_effective_date - 1.day).year.to_i,
                                                           renewal_plan_id: renewal_health_plan.id) }

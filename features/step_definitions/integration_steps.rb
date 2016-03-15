@@ -146,7 +146,7 @@ Given(/^Hbx Admin exists$/) do
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile
-  plan = FactoryGirl.create :plan_with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
 Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|

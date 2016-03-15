@@ -25,7 +25,7 @@ FactoryGirl.define do
                                                               open_enrollment_end_on: Date.new(2015,12,31)
         )
 
-        ivl_plan = FactoryGirl.create :plan_with_premium_tables, market: 'individual', coverage_kind: 'health', deductible: 1000, metal_level: "silver", csr_variant_id: "01"
+        ivl_plan = FactoryGirl.create :plan, :with_premium_tables, market: 'individual', coverage_kind: 'health', deductible: 1000, metal_level: "silver", csr_variant_id: "01"
 
         ivl_2015_benefit_package = FactoryGirl.create(:benefit_package,
                                                       benefit_coverage_period: ivl_2015_benefit_coverage_period,
