@@ -169,7 +169,7 @@ class Insured::ConsumerRolesController < ApplicationController
     #authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
 
-    if update_vlp_documents(@consumer_role, 'person') and @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+    if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}

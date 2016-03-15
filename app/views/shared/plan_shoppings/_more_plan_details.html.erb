@@ -3,7 +3,7 @@
   <span class="ttu lg twelve">Coverage For:</span>
   <strong><%= @person.full_name %></strong> <% if @person.has_consumer_role? %><% else %> (employee) <% end %>+
   <strong><%= @hbx_enrollment.try(:humanized_dependent_summary) %> dependent(s)</strong>&nbsp;&nbsp;
-  <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+  <% if @market_kind == 'shop' && @coverage_kind == 'health' %>
   Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
   <% end %>
   <span class="ttu lg twelve">Plans:</span>
