@@ -938,7 +938,8 @@ class HbxEnrollment
       if benefit_group.is_congress #is_a? BenefitGroupCongress
         PlanCostDecoratorCongress.new(plan, self, benefit_group)
       else
-        PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+        reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
+        PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
       end
     elsif plan.present? && consumer_role.present?
       UnassistedPlanCostDecorator.new(plan, self)
