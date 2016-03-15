@@ -288,7 +288,19 @@ class Family
   end
 
   def earliest_effective_shop_sep
-    special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+    #special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+
+    seps = special_enrollment_periods.shop_market.order_by(:effective_on.asc).select{|sep| sep.is_active?}
+    employee_role = primary_applicant.person.active_employee_roles.first
+    valid_shop_sep = seps.detect{ |sep| employee_role.employer_profile.plan_years.published_plan_years_by_date(sep.effective_on).any? }
+    
+    if !seps.blank? && valid_shop_sep.blank?
+      seps.last.effective_on =  employee_role.employer_profile.published_plan_year.start_on
+      seps.last.effective_on_kind = "first_of_month" #since the start_on for a plan year is always first of the month.
+      seps.last.save!
+      return seps.last 
+    end
+    valid_shop_sep
   end
 
   def earliest_effective_ivl_sep
