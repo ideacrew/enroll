@@ -89,9 +89,6 @@ class VlpDocument < Document
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
-  validates :subject,
-        inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
-        allow_blank: false
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
   validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true

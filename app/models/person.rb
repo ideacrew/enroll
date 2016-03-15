@@ -347,7 +347,7 @@ class Person
     if self.us_citizen
       verification_types << "Citizenship"
     else
-      verification_types << "Immigration"
+      verification_types << "Immigration status"
     end
     verification_types
   end

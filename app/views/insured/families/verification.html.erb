@@ -56,7 +56,7 @@
                         <td>
                           <%= render partial: "verification_upload", locals: {member: member} %>
                         </td>
-                      </tr>
+                    </tr>
                     <% end %>
                     </table>
                   </td>
@@ -65,7 +65,7 @@
                     <a data-toggle="collapse" href="#<%= member.id %>" aria-expanded="false" aria-controls="<%= member.id %>">
                       <span>
                         <span class="function-text">
-                        View Documents
+                        Documents
                         </span>
 
                         <%= '<i class="fa fa-caret-down fa-lg" data-toggle="tooltip" title="View Documents"></i>'.html_safe if member.person.consumer_role.vlp_documents.present? %>

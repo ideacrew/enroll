@@ -375,17 +375,6 @@ class ConsumerRole
     end
   end
 
-  def find_document_to_download(subject)
-    subject_doc = vlp_documents.detect do |documents|
-      documents.subject.eql?(subject)
-    end
-    if subject_doc && !subject_doc.identifier
-      subject_doc
-    else
-      vlp_documents.build({subject:subject})
-    end
-  end
-
   def latest_active_tax_household_with_year(year)
     person.primary_family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e

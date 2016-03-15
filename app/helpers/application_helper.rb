@@ -535,8 +535,9 @@ module ApplicationHelper
     number_with_delimiter(@unverified_persons.count)
   end
 
-  def options_for_select_with_style
-    options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS)
+  # info popover list of the documents types that consumer can upload as vlp_document
+  def info_pop_up
+    VlpDocument::VLP_DOCUMENT_KINDS
   end
 
   def doc_status_label(doc)
