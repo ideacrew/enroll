@@ -761,15 +761,18 @@ describe HbxEnrollment, dbclean: :after_each do
     )}
 
 
-  before do 
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 45.days)        
+
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
     allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
   end
 
   context ".effective_date_for_enrollment" do
-    context 'with new hire' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record.beginning_of_month ) }
+    context 'when new hire' do
+
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record.beginning_of_month, created_at: TimeKeeper.date_of_record ) }
 
       it 'should return new hire effective date' do
         expect(employee_role.can_enroll_as_new_hire?).to be_truthy
@@ -777,7 +780,7 @@ describe HbxEnrollment, dbclean: :after_each do
       end 
     end
 
-    context 'with QLE' do
+    context 'when QLE' do
       let(:qle_date) { effective_date + 15.days }
       let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
 
@@ -791,7 +794,7 @@ describe HbxEnrollment, dbclean: :after_each do
         special_enrollment
       }
 
-      before do 
+      before do
         allow(shop_family).to receive(:earliest_effective_shop_sep).and_return(special_enrollment_period)
       end
 
@@ -800,20 +803,46 @@ describe HbxEnrollment, dbclean: :after_each do
       end 
     end
 
-    context 'for open enrollment' do
-      it 'should return open enrollment effective date' do 
-      end 
+    context 'when under open enrollment' do
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
+      end
+
+      it 'should return open enrollment effective date' do
+        expect(HbxEnrollment.effective_date_for_enrollment(employee_role, shop_enrollment, false)).to eq plan_year_start_on
+      end
+    end
+
+    context 'when plan year not present' do 
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on - 1.day)
+        plan_year.update_attributes(:aasm_state => 'draft')
+      end  
+
+      it 'should raise error' do
+        expect { HbxEnrollment.effective_date_for_enrollment(employee_role, shop_enrollment, false) }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when plan year not under open enrollment' do 
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on - 1.day)
+      end  
+
+      it 'should raise error' do
+        expect { HbxEnrollment.effective_date_for_enrollment(employee_role, shop_enrollment, false) }.to raise_error(RuntimeError)
+      end
     end
   end
 
   context ".employee_current_benefit_group" do
-    context 'under open enrollment' do
+    context 'when under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
       end
 
-      it "should allow" do
-        expect(shop_enrollment.can_select_coverage?).to be_truthy
+      it "should return benefit group and assignment" do
+        expect(HbxEnrollment.employee_current_benefit_group(employee_role, shop_enrollment, false)).to eq [plan_year.benefit_groups.first, benefit_group_assignment]
       end
     end
   end

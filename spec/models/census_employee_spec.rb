@@ -871,7 +871,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context 'when hired_on date is in the past' do 
       it 'should return census employee created date as new hire enrollment period start date' do 
-        expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.created_at
+        expect(census_employee.new_hire_enrollment_period.min).to eq (census_employee.created_at.beginning_of_day)
       end
     end
 
@@ -893,7 +893,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it 'should return earliest_eligible_date as new hire enrollment period end date' do 
-        expect(census_employee.new_hire_enrollment_period.max).to eq (hired_on + 60.days).end_of_month + 1.day
+        expect(census_employee.new_hire_enrollment_period.max).to eq ((hired_on + 60.days).end_of_month + 1.day).end_of_day
       end
     end
 
@@ -905,7 +905,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it 'should return 30 days from new hire enrollment period start as end date' do 
-        expect(census_employee.new_hire_enrollment_period.max).to eq census_employee.new_hire_enrollment_period.min + 30.days
+        expect(census_employee.new_hire_enrollment_period.max).to eq (census_employee.new_hire_enrollment_period.min + 30.days).end_of_day
       end
     end
   end
