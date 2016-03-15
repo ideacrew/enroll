@@ -1,5 +1,4 @@
 $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 dental select-reference'></div>");
-//$('#.dental-reference-plans').before("<div class='col-xs-12 dental select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @dental_plans.count %> Plans</strong> </span></h4><br/></div>");
 <% if @nav_option == 'custom' %>
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
     $('#<%= @location_id %> .dental .nav-tabs label:contains("By carrier")').on('click', function() {

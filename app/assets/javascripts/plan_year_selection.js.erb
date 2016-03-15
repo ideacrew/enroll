@@ -153,6 +153,8 @@ ready = function() {
       });
 
       function calcOfferedPlanContributions(url, location, coverage_type) {
+        var benefit_group_index = $("#"+location).data('benefit-group-index');
+
         if ( coverage_type == '.health' ) {
           var reference_plan_id = $('#'+location+' .health .ref-plan').val();
 
@@ -235,7 +237,8 @@ ready = function() {
             "relation_benefits": relation_benefits,
             "location_id": location_id,
             "is_edit": is_edit,
-            "coverage_type": coverage_type
+            "coverage_type": coverage_type,
+            "benefit_group_index": benefit_group_index
           }
         }).done(function() {
         });
@@ -534,6 +537,14 @@ function calcEmployerContributions(url, location, coverage_type) {
   var coverage_type = coverage_type;
   var plan_option_kind = $("#"+location+" "+ coverage_type +" .nav-tabs input[type=radio]:checked").val();
   var location_id = location;
+  var benefit_group_index = $("#"+location).data('benefit-group-index');
+
+  var elected_dental_plans = $("#"+location+" .elected-plans-tab input[type=checkbox]:checked");
+  var elected_plan_ids = []
+  elected_dental_plans.each(function() {
+    elected_plan_ids.push($(this).val());
+  });
+
 
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 ) {
 
@@ -626,7 +637,9 @@ function calcEmployerContributions(url, location, coverage_type) {
         "plan_option_kind": plan_option_kind,
         "relation_benefits": relation_benefits,
         "coverage_type": coverage_type,
-        "location_id": location_id
+        "location_id": location_id,
+        "benefit_group_index": benefit_group_index,
+        "elected_plan_ids": elected_plan_ids
 
       }
     }).done(function() {

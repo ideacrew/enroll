@@ -163,6 +163,23 @@ class BenefitGroup
       end
     end
 
+    set_lowest_and_highest(plans)
+  end
+
+  def set_bounding_cost_dental_plans
+    return if reference_plan_id.nil?
+
+    if plan_option_kind == "single_plan"
+      plans = elected_dental_plans
+    elsif plan_option_kind == "single_carrier"
+      plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+    end
+
+    set_lowest_and_highest(plans)
+  end
+
+
+  def set_lowest_and_highest(plans)
     if plans.size > 0
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 

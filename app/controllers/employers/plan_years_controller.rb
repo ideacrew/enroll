@@ -310,17 +310,33 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def employee_costs
+    @benefit_group_index = params[:benefit_group_index].to_i
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
     @location_id = params[:location_id]
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[0].reference_plan = @plan
-    @plan_year.benefit_groups[0].plan_option_kind = params[:plan_option_kind]
+    @plan_year.benefit_groups[@benefit_group_index].reference_plan = @plan
+    @plan_year.benefit_groups[@benefit_group_index].plan_option_kind = params[:plan_option_kind]
 
-    @benefit_group = @plan_year.benefit_groups[0]
-    @benefit_group.set_bounding_cost_plans
+    @benefit_group = @plan_year.benefit_groups[@benefit_group_index]
+    @benefit_group.set_bounding_cost_plans if @coverage_type == '.health'
+
+    if @coverage_type == '.dental'
+      if @plan_option_kind == 'single_plan'
+        if params[:elected_plan_ids].present?
+          @benefit_group.elected_dental_plan_ids = params[:elected_plan_ids]
+        else
+          benefit_group_id = @location_id.match(/^benefit-group-(.+)$/i)[1]
+          plan_year = @employer_profile.plan_years.detect{|py| py.benefit_groups.where(:id => benefit_group_id).present? }
+          benefit_group = plan_year.benefit_groups.detect{|bg| bg.id.to_s == benefit_group_id}
+          @benefit_group.elected_dental_plan_ids = benefit_group.elected_dental_plan_ids
+        end
+      end
+
+      @benefit_group.set_bounding_cost_dental_plans
+    end
 
     @benefit_group_costs = build_employee_costs_for_benefit_group
   end
@@ -343,7 +359,7 @@ class Employers::PlanYearsController < ApplicationController
       costs = {
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
       }
-      if !@benefit_group.single_plan_type?
+      if !@benefit_group.single_plan_type? || @coverage_type == '.dental'
         costs.merge!({
           lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan),
           highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)

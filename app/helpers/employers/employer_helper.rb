@@ -14,18 +14,24 @@ module Employers::EmployerHelper
     end
   end
 
-  def render_plan_offerings(benefit_group)
-
-    return "1 Plan Only" if benefit_group.single_plan_type?
-
+  def render_plan_offerings(benefit_group, coverage_type)
     reference_plan = benefit_group.reference_plan
-    if benefit_group.plan_option_kind == "single_carrier"
-      plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
+    if coverage_type == ".dental" && benefit_group.single_plan_type?
+      plan_count = benefit_group.elected_dental_plan_ids.count
+      "#{plan_count} Plans"
+    elsif coverage_type == ".dental" && benefit_group.plan_option_kind == "single_carrier"
+      plan_count = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
       "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
     else
-      plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
-      "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
-  end
+      return "1 Plan Only" if benefit_group.single_plan_type?
+      if benefit_group.plan_option_kind == "single_carrier"
+        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
+        "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
+      else
+        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
+        "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
+      end
+    end
   end
 
 
