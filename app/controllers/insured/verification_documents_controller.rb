@@ -8,27 +8,25 @@ class Insured::VerificationDocumentsController < ApplicationController
     @doc_errors = []
     doc_params = {:subject => params[:document]}
     @docs_owner = find_docs_owner(params[:family_member])
-
-
-    if params.permit![:file]
-      doc_uri = Aws::S3Storage.save(file_path, 'id-verification')
-
-      if doc_uri.present?
-        if update_vlp_documents(doc_params, file_name, doc_uri)
-          flash[:notice] = "File Saved"
+    if params[:file]
+      params[:file].each do |file|
+        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
+        if doc_uri.present?
+          if update_vlp_documents(doc_params, file_name(file), doc_uri)
+            flash[:notice] = "File Saved"
+          else
+            flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+            redirect_to(:back)
+            return
+          end
         else
-          flash[:error] = "Could not save file. " + @doc_errors.join(". ")
-          redirect_to(:back)
-          return
+          flash[:error] = "Could not save file"
         end
-      else
-        flash[:error] = "Could not save file"
       end
     else
       flash[:error] = "File not uploaded"
     end
     redirect_to verification_insured_families_path
-
   end
 
   def download
@@ -53,16 +51,16 @@ class Insured::VerificationDocumentsController < ApplicationController
     @person.consumer_role
   end
 
-  def file_path
-    params.permit(:file)[:file].tempfile.path
+  def file_path(file)
+    file.tempfile.path
   end
 
-  def file_name
-    params.permit![:file].original_filename
+  def file_name(file)
+    file.original_filename
   end
 
   def find_docs_owner(id)
-    @person.primary_family.family_members.where(id:id).first.person
+    @person.primary_family.family_members.find(id).person
   end
 
   def update_vlp_documents(doc_params, title, file_uri)
