@@ -142,35 +142,31 @@ class Employers::EmployerProfilesController < ApplicationController
   def edit
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-    @employer = @employer_profile.match_employer(current_user)
-    @employer_contact = @employer_profile.staff_roles.first
-
-    if @employer_contact.try(:emails)
-      @employer_contact.emails.any? ? @employer_contact_email = @employer_contact.emails.first : @employer_contact_email = @employer_contact.user.email
-    else
-      @employer_contact_email = @employer_contact.user.email
-    end
-
-    @current_user_is_hbx_staff = current_user.has_hbx_staff_role?
-    @current_user_is_broker = current_user.has_broker_agency_staff_role?
+    @staff = Person.staff_for_employer_including_pending(@employer_profile)
+    @add_staff = params[:add_staff]
   end
 
   def create
+
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
     organization_saved = false
     begin
-      organization_saved = @organization.save(current_user)
+      organization_saved, pending = @organization.save(current_user, params[:employer_id])
     rescue Exception => e
       flash[:error] = e.message
       render action: "new"
       return
     end
-
     if organization_saved
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
-        redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
+        if pending
+          flash[:notice] = 'Your Employer Staff application is pending'
+          render action: 'new'
+        else
+          redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
+        end  
       end
     else
       render action: "new"
@@ -184,10 +180,9 @@ class Employers::EmployerProfilesController < ApplicationController
 
     #save duplicate office locations as json in case we need to refresh
     @organization_dup = @organization.office_locations.as_json
-
     @employer_profile = @organization.employer_profile
     @employer = @employer_profile.match_employer(current_user)
-    if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
+    if (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
       @organization.assign_attributes(organization_profile_params)
 
       #clear office_locations, don't worry, we will recreate
@@ -297,8 +292,8 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def check_employer_staff_role
-    if current_user.has_employer_staff_role?
-      redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id, :tab => "home")
+    if current_user.person && current_user.person.has_active_employer_staff_role?
+      redirect_to employers_employer_profile_path(:id => current_user.person.active_employer_staff_roles.first.employer_profile_id, :tab => "home")
     end
   end
 
@@ -338,6 +333,13 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def check_access_to_organization
+    id = params.permit(:id)[:id]
+    organization = Organization.find(id)
+    policy = ::AccessPolicies::EmployerProfile.new(current_user)
+    policy.authorize_edit(organization.employer_profile, self)
+  end
+
   def find_employer
     id_params = params.permit(:id, :employer_profile_id)
     id = id_params[:id] || id_params[:employer_profile_id]
@@ -351,10 +353,6 @@ class Employers::EmployerProfilesController < ApplicationController
       :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
     )
   end
-
-
-
-
 
   def employer_profile_params
     params.require(:organization).permit(

@@ -49,6 +49,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:has_active_employer_staff_role?).and_return(false)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
@@ -63,6 +64,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:has_active_employer_staff_role?).and_return(true)
+      allow(person).to receive(:active_employer_staff_roles).and_return([double("employer_staff_role", employer_profile_id: 77)])
       sign_in(user)
       get :new
       expect(response).to have_http_status(:redirect)

@@ -29,7 +29,6 @@ $(document).ready(function() {
       if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
         $('#office_locations_buttons a.btn').removeAttr('disabled');
         $('input#employer_id').val("");
-        $('input#organization_legal_name').val("").removeAttr('readonly');
         $('input#organization_dba').val("").removeAttr('readonly');
         $('input#organization_fein').val("").removeAttr('readonly');
         $('select#organization_entity_kind').val("").removeAttr('disabled').selectric('refresh');
@@ -50,7 +49,6 @@ $(document).ready(function() {
       console.log(arguments);
       $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
       $('input#employer_id').val(suggestion._id);
-      $('input#organization_legal_name').val(suggestion.legal_name).attr('readonly', 'readonly');
       $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
       $('input#organization_fein').val(suggestion.fein).attr('readonly', 'readonly');
       $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
