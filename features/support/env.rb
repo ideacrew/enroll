@@ -74,6 +74,8 @@ Capybara.register_driver :poltergeist do |app|
       :debug => false,
       :phantomjs_options => ['--load-images=no', '--disk-cache=false'],
       :inspector => true,
+      :window_size => [1280,720],
+      :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
   }
   Capybara::Poltergeist::Driver.new(app, options)
 end
