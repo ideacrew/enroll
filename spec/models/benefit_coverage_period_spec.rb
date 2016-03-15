@@ -177,16 +177,37 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
               end
             end
           end
+          #  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
+          # context "and termination is outside open enrollment" do
+          #   let(:offset_period)                 { 40 }
+          #   let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
+          #   let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
-          context "and termination is outside open enrollment" do
-            let(:offset_period)                 { 40 }
-            let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
-            let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
-              it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
-                expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
-              end
-          end
+          #     it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
+          #       expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
+          #     end
+          # end
+              
+            context "and termination is outside open enrollment" do
+                let(:todays_date) { TimeKeeper.date_of_record }
+                let(:lessThanTerminationMinimum)    { todays_date + 8.days }
+                let(:equalToTerminationMinimum)     { todays_date + HbxProfile::IndividualEnrollmentTerminationMinimum }
+                let(:greaterThanTermnationMinimum)  { todays_date + 23.days }
+
+                it "termination date should be set to (today + TerminationMinumum days) if selected date is less than (today + TerminationMinumum days)" do
+                  expect(benefit_coverage_period.termination_effective_on_for(lessThanTerminationMinimum)).to eq(equalToTerminationMinimum)
+                end
+
+                it "termination date should be set to the date selected if selected date is equal to (today + TerminationMinumum days)" do
+                  expect(benefit_coverage_period.termination_effective_on_for(equalToTerminationMinimum)).to eq(equalToTerminationMinimum)
+                end
+
+                it "termination date should be set to the date selected if selected date is greater than (today + TerminationMinumum days)" do
+                  expect(benefit_coverage_period.termination_effective_on_for(greaterThanTermnationMinimum)).to eq(greaterThanTermnationMinimum)
+                end
+            end
+          
         end
       end
     end

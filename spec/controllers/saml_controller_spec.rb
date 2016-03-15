@@ -91,4 +91,27 @@ RSpec.describe SamlController do
       end
     end
   end
+
+  describe "GET navigate_to_assistance" do
+
+    context "logged on user" do
+      let(:user) { FactoryGirl.create(:user, last_portal_visited: family_account_path, oim_id: '00001')}
+
+      it "should redirect user to curam URL" do
+        sign_in user
+        allow(::IdpAccountManager).to receive(:update_navigation_flag).with(user.oim_id, user.email, ::IdpAccountManager::CURAM_NAVIGATION_FLAG)
+        get :navigate_to_assistance
+        expect(response).to redirect_to(SamlInformation.curam_landing_page_url)
+      end
+    end
+
+    context "user not logged on" do
+      it "should redirect user to login URL" do
+        allow(controller).to receive(:current_user).and_return(false)
+        get :navigate_to_assistance
+        expect(response).to redirect_to(SamlInformation.iam_login_url)
+      end
+    end
+  end
+
 end

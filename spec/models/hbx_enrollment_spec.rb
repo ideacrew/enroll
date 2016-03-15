@@ -401,11 +401,14 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:person) { double(primary_family: family)}
       let(:family) { double }
       let(:enrollment) {
-        household.create_hbx_enrollment_from(
+        enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
-          benefit_package: benefit_package
+          benefit_package: benefit_package,
+          qle: true
         )
+        enrollment.save
+        enrollment
       }
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
@@ -420,7 +423,10 @@ describe HbxEnrollment, dbclean: :after_all do
           allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
           allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
           allow(consumer_role).to receive(:person).and_return(person)
+          allow(coverage_household).to receive(:household).and_return household
+          allow(household).to receive(:family).and_return family
           allow(family).to receive(:is_under_special_enrollment_period?).and_return false
+          allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
           allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
         end
 
@@ -444,11 +450,16 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       context "when in special enrollment" do
+        let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
         before :each do
           allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
           allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
           allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
           allow(consumer_role).to receive(:person).and_return(person)
+          allow(coverage_household).to receive(:household).and_return household
+          allow(household).to receive(:family).and_return family
+          allow(family).to receive(:current_sep).and_return sep
+          allow(family).to receive(:current_special_enrollment_periods).and_return [sep]
           allow(family).to receive(:is_under_special_enrollment_period?).and_return true
           allow(enrollment).to receive(:enrollment_kind).and_return "special_enrollment"
         end
@@ -532,11 +543,15 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) {double}
       let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
+      let(:family) {FactoryGirl.build(:family)}
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return benefit_coverage_period
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
+        allow(coverage_household).to receive(:household).and_return household
+        allow(household).to receive(:family).and_return family
+        allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
         @enrollment = household.create_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
@@ -592,6 +607,8 @@ describe HbxProfile, "class methods", type: :model do
       allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
       allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(household).to receive(:family).and_return family
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
     end
 
     it "when qle is false" do
@@ -602,9 +619,13 @@ describe HbxProfile, "class methods", type: :model do
 
     it "when qle is true" do
       allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      allow(household).to receive(:family).and_return family
       enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: true)
       expect(enrollment.enrollment_kind).to eq "special_enrollment"
+    end
+
+    it "when qle is false and is not uder opent enrollment period" do
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return false
+      expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error
     end
   end
 
@@ -736,7 +757,7 @@ describe HbxEnrollment, dbclean: :after_each do
                                                     white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
                                                     py.benefit_groups = [blue, white]
                                                     py.save
-                                                    py.publish!
+                                                    py.update_attributes({:aasm_state => 'published'})
                                                     py
                                                   }
 
@@ -1225,6 +1246,165 @@ describe HbxEnrollment, "given a set of broker accounts" do
 
     it "should have no applicable broker" do
       expect(subject.select_applicable_broker_account([broker_agency_account_1,broker_agency_account_2])).to eq nil
+    end
+  end
+end
+
+describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'" do
+  subject { HbxEnrollment.new({:enrollment_kind => "special_enrollment"}) }
+
+  it "should NOT be a shop new hire" do
+    expect(subject.new_hire_enrollment_for_shop?).to eq false
+  end
+
+  describe "and given a special enrollment period, with a reason of 'birth'" do
+    let(:qle_on) { Date.today }
+
+    before :each do
+      allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
+        :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
+        :qle_on => qle_on
+      ))
+    end
+
+    it "should have the eligibility event date of the qle_on" do
+      expect(subject.eligibility_event_date).to eq qle_on
+    end
+
+    it "should have eligibility_event_kind of 'birth'" do
+      expect(subject.eligibility_event_kind).to eq "birth"
+    end
+  end
+
+end
+
+describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
+  subject { HbxEnrollment.new({:enrollment_kind => "open_enrollment"}) }
+
+  it "should not have an eligibility event date" do
+    expect(subject.eligibility_event_has_date?).to eq false
+  end
+
+  describe "in the IVL market" do
+    before :each do
+      subject.kind = "unassisted_qhp"
+    end
+
+    it "should not have an eligibility event date" do
+      expect(subject.eligibility_event_has_date?).to eq false
+    end
+
+    it "should NOT be a shop new hire" do
+      expect(subject.new_hire_enrollment_for_shop?).to eq false
+    end
+
+    it "should have eligibility_event_kind of 'open_enrollment'" do
+      expect(subject.eligibility_event_kind).to eq "open_enrollment"
+    end
+  end
+
+  describe "in the SHOP market, purchased outside of open enrollment" do
+    let(:reference_date) { Date.today }
+    let(:open_enrollment_start) { reference_date - 15.days }
+    let(:open_enrollment_end) { reference_date - 5.days }
+    let(:purchase_time) { Time.now - 20.days }
+    let(:hired_on) { reference_date - 21.days }
+
+    before :each do
+      subject.kind = "employer_sponsored"
+      subject.submitted_at = purchase_time
+      subject.benefit_group_assignment = BenefitGroupAssignment.new({
+        :census_employee => CensusEmployee.new({
+          :hired_on => hired_on
+        })
+      })
+      subject.benefit_group = BenefitGroup.new({
+        :plan_year => PlanYear.new({
+           :open_enrollment_start_on => open_enrollment_start,
+           :open_enrollment_end_on => open_enrollment_end
+        })
+      })
+    end
+    it "should have an eligibility event date" do
+      expect(subject.eligibility_event_has_date?).to eq true
+    end
+
+    it "should be a shop new hire" do
+      expect(subject.new_hire_enrollment_for_shop?).to eq true
+    end
+
+    it "should have eligibility_event_kind of 'new_hire'" do
+      expect(subject.eligibility_event_kind).to eq "new_hire"
+    end
+
+    it "should have the eligibility event date of hired_on" do
+      expect(subject.eligibility_event_date).to eq hired_on 
+    end
+  end
+
+  describe "in the SHOP market, purchased during open enrollment" do
+    let(:reference_date) { Time.now }
+    let(:coverage_start) { (reference_date + 15.days).to_date }
+    let(:open_enrollment_start) { (reference_date - 15.days).to_date }
+    let(:open_enrollment_end) { (reference_date - 5.days).to_date }
+    let(:purchase_time) { (reference_date - 5.days).midnight + 200.minutes }
+    let(:hired_on) { (reference_date - 21.days).to_date }
+
+    before :each do
+      subject.kind = "employer_sponsored"
+      subject.submitted_at = purchase_time
+      subject.benefit_group_assignment = BenefitGroupAssignment.new({
+        :census_employee => CensusEmployee.new({
+          :hired_on => hired_on
+        })
+      })
+      subject.benefit_group = BenefitGroup.new({
+        :plan_year => PlanYear.new({
+           :open_enrollment_start_on => open_enrollment_start,
+           :open_enrollment_end_on => open_enrollment_end,
+           :start_on => coverage_start
+        })
+      })
+    end
+
+    describe "when coverage start is the same as the plan year" do
+      before(:each) do
+        subject.effective_on = coverage_start
+      end
+
+      it "should NOT have an eligibility event date" do
+        expect(subject.eligibility_event_has_date?).to eq false
+      end
+
+      it "should NOT be a shop new hire" do
+        expect(subject.new_hire_enrollment_for_shop?).to eq false
+      end
+
+      it "should have eligibility_event_kind of 'open_enrollment'" do
+        expect(subject.eligibility_event_kind).to eq "open_enrollment"
+      end
+    end
+
+    describe "when coverage start is the different from the plan year" do
+      before(:each) do
+        subject.effective_on = coverage_start + 12.days
+      end
+
+      it "should have an eligibility event date" do
+        expect(subject.eligibility_event_has_date?).to eq true
+      end
+
+      it "should be a shop new hire" do
+        expect(subject.new_hire_enrollment_for_shop?).to eq true
+      end
+
+      it "should have eligibility_event_kind of 'new_hire'" do
+        expect(subject.eligibility_event_kind).to eq "new_hire"
+      end
+
+      it "should have the eligibility event date of hired_on" do
+        expect(subject.eligibility_event_date).to eq hired_on 
+      end
     end
   end
 end

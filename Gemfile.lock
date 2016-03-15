@@ -558,4 +558,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

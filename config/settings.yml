@@ -27,7 +27,7 @@ aca:
     # Temporary change for Dec 2015 extension
     monthly_enrollment_due_on: 18
     verification_outstanding_window:
-      days: 180
+      days: 0
 #
     open_enrollment:
       benefit_year_2016:

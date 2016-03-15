@@ -198,7 +198,7 @@ class Employers::EmployerProfilesController < ApplicationController
       employer_attributes = employer_params
       employer_attributes["dob"] = DateTime.strptime(employer_attributes["dob"], '%m/%d/%Y').try(:to_date)
 
-      if @organization.update_attributes(employer_profile_params) and @employer.update_attributes(employer_attributes)
+      if @organization.update_attributes(employer_profile_params) && @employer.update_attributes(employer_attributes)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -371,9 +371,9 @@ class Employers::EmployerProfilesController < ApplicationController
   def sanitize_employer_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
+      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
       office_locations = params[:organization][:office_locations_attributes]
-      if office_locations and office_locations[key]
+      if office_locations && office_locations[key]
         params[:organization][:office_locations_attributes][key][:is_primary] = (office_locations[key][:address_attributes][:kind] == 'primary')
       end
     end

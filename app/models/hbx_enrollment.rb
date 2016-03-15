@@ -522,7 +522,7 @@ class HbxEnrollment
   end
 
   def update_hbx_enrollment_members_premium(decorated_plan)
-    return if decorated_plan.blank? and hbx_enrollment_members.blank?
+    return if decorated_plan.blank? && hbx_enrollment_members.blank?
 
     hbx_enrollment_members.each do |member|
       #TODO update applied_aptc_amount error like hbx_enrollment
@@ -586,7 +586,7 @@ class HbxEnrollment
   def inactive_pre_hbx(pre_hbx_id)
     return if pre_hbx_id.blank?
     pre_hbx = HbxEnrollment.find(pre_hbx_id)
-    if self.consumer_role.present? and self.consumer_role_id == pre_hbx.consumer_role_id
+    if self.consumer_role.present? && self.consumer_role_id == pre_hbx.consumer_role_id
       pre_hbx.update_current(is_active: false, changing: false)
     end
   end
@@ -603,13 +603,13 @@ class HbxEnrollment
 
     case market_kind
     when 'shop'
-      if qle and family.is_under_special_enrollment_period?
+      if qle && family.is_under_special_enrollment_period?
         family.current_sep.effective_on
       else
         benefit_group.effective_on_for(employee_role.hired_on)
       end
     when 'individual'
-      if qle and family.is_under_special_enrollment_period?
+      if qle && family.is_under_special_enrollment_period?
         family.current_sep.effective_on
       else
         benefit_sponsorship.current_benefit_period.earliest_effective_date
@@ -689,12 +689,14 @@ class HbxEnrollment
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      if qle and enrollment.family.is_under_special_enrollment_period?
+      if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
-      else
+      elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
         enrollment.enrollment_kind = "open_enrollment"
+      else
+        raise "You may not enroll until you're eligible under an enrollment period"
       end
     else
       raise "either employee_role or consumer_role is required"
@@ -973,7 +975,58 @@ class HbxEnrollment
     end
   end
 
-  private
+  def eligibility_event_kind
+    if (enrollment_kind == "special_enrollment")
+      if special_enrollment_period.blank?
+        return "unknown_sep"
+      end 
+      return special_enrollment_period.qualifying_life_event_kind.reason
+    end
+    return "open_enrollment" if !is_shop?
+    new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
+  end
+
+  def check_for_renewal_event_kind
+    if RENEWAL_STATUSES.include?(self.aasm_state) || was_in_renewal_status?
+      return "passive_renewal"
+    end
+    "open_enrollment"
+  end
+
+  def was_in_renewal_status?
+    workflow_state_transitions.any? do |wst|
+      RENEWAL_STATUSES.include?(wst.from_state.to_s)
+    end
+  end
+
+  def eligibility_event_date
+    if is_special_enrollment?
+      return nil if special_enrollment_period.nil?
+      return special_enrollment_period.qle_on
+    end
+    return nil if !is_shop?
+    new_hire_enrollment_for_shop? ? benefit_group_assignment.census_employee.hired_on : nil
+  end
+
+  def eligibility_event_has_date?
+    if is_special_enrollment?
+      return false if special_enrollment_period.nil?
+      return true
+    end
+    return false unless is_shop?
+    new_hire_enrollment_for_shop?
+  end
+
+  def new_hire_enrollment_for_shop?
+    return false if is_special_enrollment?
+    return false unless is_shop?
+    shopping_plan_year = benefit_group.plan_year
+    purchased_at = submitted_at.blank? ? created_at : submitted_at
+    return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
+    !(shopping_plan_year.start_on == effective_on)
+  end
+
+  private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)

@@ -241,28 +241,43 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def organizations_with_open_enrollment_begin_or_end(new_date)
-      Organization.where( "$and" => [ 
-        {
-          "$or" => [
-            {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-            {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day}
-          ]
-        }, 
-        { :"employer_profile.plan_years.aasm_state".in => PlanYear::RENEWING + PlanYear::PUBLISHED }
-      ])
+    def organizations_for_open_enrollment_begin(new_date)
+      Organization.where(:"employer_profile.plan_years" => 
+          { :$elemMatch => { 
+           :"open_enrollment_start_on".lte => new_date, 
+           :"open_enrollment_end_on".gte => new_date,
+           :"aasm_state".in => ['published', 'renewing_published']
+         }
+      })
     end
 
-    def organizations_with_plan_year_begin_or_end(new_date)
-      Organization.where( "$and" => [ 
-        { 
-          "$or" => [ 
-            {:"employer_profile.plan_years.start_on" => new_date}, 
-            {:"employer_profile.plan_years.end_on" => (new_date - 1.day)} 
-          ] 
-        },
-        { :"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE }
-      ])
+    def organizations_for_open_enrollment_end(new_date)
+      Organization.where(:"employer_profile.plan_years" => 
+          { :$elemMatch => { 
+           :"open_enrollment_end_on".lt => new_date,
+           :"start_on".gt => new_date,
+           :"aasm_state".in => ['published', 'renewing_published', 'enrolling', 'renewing_enrolling']
+         }
+      })
+    end
+
+    def organizations_for_plan_year_begin(new_date)
+      Organization.where(:"employer_profile.plan_years" => 
+        { :$elemMatch => { 
+          :"start_on".lte => new_date,
+          :"end_on".gt => new_date,
+          :"aasm_state".in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE - ['active'])
+        }
+      })
+    end
+
+    def organizations_for_plan_year_end(new_date)
+      Organization.where(:"employer_profile.plan_years" => 
+        { :$elemMatch => { 
+          :"end_on".lt => new_date,
+          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
+        }
+      })
     end
 
     def organizations_eligible_for_renewal(new_date)
@@ -278,7 +293,6 @@ class EmployerProfile
 
     def advance_day(new_date)
       if !Rails.env.test?
-
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
@@ -287,32 +301,30 @@ class EmployerProfile
         end
 
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
-        organizations_with_open_enrollment_begin_or_end(new_date).each do |organization|
+        open_enrollment_factory.date = new_date
+
+        organizations_for_open_enrollment_begin(new_date).each do |organization|
           open_enrollment_factory.employer_profile = organization.employer_profile
-          open_enrollment_factory.date = new_date
-
-          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_start_on" => new_date).any?
-            open_enrollment_factory.begin_open_enrollment
-          end
-
-          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"open_enrollment_end_on" => (new_date - 1.day)).any?
-            open_enrollment_factory.end_open_enrollment
-          end
+          open_enrollment_factory.begin_open_enrollment
         end
 
-        employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        organizations_with_plan_year_begin_or_end(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.date = new_date
-
-          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => new_date).any?
-            employer_enroll_factory.begin
-          end
-
-          if organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => (new_date - 1.day)).any?
-            employer_enroll_factory.end
-          end
+        organizations_for_open_enrollment_end(new_date).each do |organization|
+          open_enrollment_factory.employer_profile = organization.employer_profile
+          open_enrollment_factory.end_open_enrollment
         end
+
+        # employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        # employer_enroll_factory.date = new_date
+
+        # organizations_for_plan_year_begin(new_date).each do |organization|
+        #   employer_enroll_factory.employer_profile = organization.employer_profile
+        #   employer_enroll_factory.begin
+        # end
+
+        # organizations_for_plan_year_end(new_date).each do |organization|
+        #   employer_enroll_factory.employer_profile = organization.employer_profile
+        #   employer_enroll_factory.end
+        # end
       end
 
       # Employer activities that take place monthly - on first of month
