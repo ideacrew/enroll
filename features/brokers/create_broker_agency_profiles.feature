@@ -1,4 +1,3 @@
-@screenshots
 Feature: Create Primary Broker and Broker Agency
   In order for Brokers to help individuals and SHOP employees
   The Primary Broker must create and manage an account on the HBX for their organization.

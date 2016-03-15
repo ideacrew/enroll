@@ -323,6 +323,7 @@ end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
   expect(page).to have_content('Plan Year successfully created')
+  screenshot("employer_plan_year_success_message")
 end
 
 When(/^.+ enters filter in plan selection page$/) do

@@ -1,5 +1,5 @@
 Before do |scenario|
-  @count = 1
+  @count = 0
   case scenario
   when Cucumber::RunningTestCase::ScenarioOutlineExample
     @scenario_name = scenario.scenario_outline.name.downcase.gsub(' ', '_')

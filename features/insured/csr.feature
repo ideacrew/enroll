@@ -1,4 +1,3 @@
-@js @screenshots
 Feature: CSR finishes shopping for Individual
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
