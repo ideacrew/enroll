@@ -78,7 +78,7 @@ class EmployeeRole
   end
 
   def is_eligible_to_enroll_without_qle?
-    is_under_open_enrollment? || census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+    is_under_open_enrollment? || census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record) || census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
   end
 
   def new_census_employee=(new_census_employee)
