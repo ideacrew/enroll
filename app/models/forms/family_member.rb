@@ -15,7 +15,7 @@ module Forms
     #include Validations::USDate.on(:date_of_birth)
 
     def initialize(*attributes)
-      @addresses = Address.new(kind: 'home')
+      @addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
       @same_with_primary = "true"
       super
     end
@@ -74,9 +74,9 @@ module Forms
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
-          assign_person_address(existing_person)
           family_member.family.build_consumer_role(family_member)
         end
+        assign_person_address(existing_person)
         family_member.save!
         self.id = family_member.id
         return true
@@ -86,8 +86,8 @@ module Forms
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
-        assign_person_address(person)
       end
+      assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
@@ -111,17 +111,30 @@ module Forms
           person.save
         end
       else
-        current_address = person.try(:home_address)
-        if addresses["address_1"].blank? and addresses["city"].blank?
-          current_address.destroy if current_address.present?
-          return true
-        end
-        if current_address.present?
-          current_address.update(addresses.permit!)
-        else
-          person.addresses.create(addresses.permit!)
+        home_address = person.home_address rescue nil
+        mailing_address = person.has_mailing_address? ? person.mailing_address : nil
+
+        addresses.each do |key, address|
+          current_address = case address["kind"]
+                            when "home"
+                              home_address
+                            when "mailing"
+                              mailing_address
+                            else
+                              next
+                            end
+          if address["address_1"].blank? && address["city"].blank?
+            current_address.destroy if current_address.present?
+            next
+          end
+          if current_address.present?
+            current_address.update(address.permit!)
+          else
+            person.addresses.create(address.permit!)
+          end
         end
       end
+      true
     rescue => e
       false
     end
@@ -171,11 +184,12 @@ module Forms
     def self.find(family_member_id)
       found_family_member = ::FamilyMember.find(family_member_id)
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
-      address = if has_same_address_with_primary
+      home_address = if has_same_address_with_primary
                   Address.new(kind: 'home')
                 else
                   found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
                 end
+      mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
 
       record = self.new({
         :relationship => found_family_member.primary_relationship,
@@ -199,7 +213,7 @@ module Forms
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
-        :addresses => address
+        :addresses => [home_address, mailing_address]
       })
     end
 
@@ -248,6 +262,7 @@ module Forms
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
         return false unless assign_person_address(family_member.person)
       end
+      assign_person_address(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true
@@ -255,7 +270,7 @@ module Forms
 
 
     def relationship_validation
-      return if family.blank? or family.family_members.blank?
+      return if family.blank? || family.family_members.blank?
 
       relationships = Hash.new
       family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}

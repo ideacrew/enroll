@@ -19,6 +19,8 @@ class PlanYear
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
 
+  field :terminated_on, type: Date
+
   field :imported_plan_year, type: Boolean, default: false
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -182,6 +184,18 @@ class PlanYear
     application_eligibility_warnings.blank? ? true : false
   end
 
+  def due_date_for_publish
+    if employer_profile.plan_years.renewing.any?
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::RenewingEmployerPlanYearPublishDueDayOfMonth)
+    else
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::InitialEmployerPlanYearPublishDueDayOfMonth)
+    end
+  end
+
+  def is_publish_date_valid?
+    TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day
+  end
+
   # Check plan year for violations of model integrity relative to publishing
   def application_errors
     errors = {}
@@ -204,6 +218,10 @@ class PlanYear
 
     if open_to_publish?
       errors.merge!({publish: "You may only have one published plan year at a time"})
+    end
+
+    if !is_publish_date_valid?
+      errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
     errors
@@ -290,7 +308,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.size
+    enrolled.count { |e| e.has_active_health_coverage? }
   end
 
   def enrollment_ratio
@@ -507,8 +525,9 @@ class PlanYear
 
     state :renewing_draft
     state :renewing_published
-    state :renewing_enrolling
+    state :renewing_enrolling, :after_enter => :trigger_passive_renewals
     state :renewing_enrolled
+    state :renewing_publish_pending
 
     state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated     # Coverage under this application is terminated
@@ -528,7 +547,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
+      # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
@@ -549,7 +568,10 @@ class PlanYear
       transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
-      transitions from: :renewing_draft, to: :renewing_published
+      transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Returns plan to draft state for edit
@@ -616,14 +638,23 @@ class PlanYear
     end
   end
 
+
+  def trigger_passive_renewals
+    open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+    open_enrollment_factory.employer_profile = self.employer_profile
+    open_enrollment_factory.date = TimeKeeper.date_of_record
+    open_enrollment_factory.renewing_plan_year = self
+    open_enrollment_factory.process_family_enrollment_renewals
+  end
+
   def revert_employer_profile_application
     employer_profile.revert_application! if employer_profile.may_revert_application?
     record_transition
   end
 
   def accept_application
-    transition_success = employer_profile.application_accepted!
-    send_employee_invites if transition_success
+    transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
+    send_employee_invites if transition_success && !is_renewing?
   end
 
   def decline_application
@@ -631,7 +662,7 @@ class PlanYear
   end
 
   def ratify_enrollment
-    employer_profile.enrollment_ratified!
+    employer_profile.enrollment_ratified! if employer_profile.may_enrollment_ratified?
   end
 
   def deny_enrollment
@@ -694,7 +725,7 @@ private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
-    when "published", "draft", "renewing_published"
+    when "published", "draft", "renewing_published", "renewing_draft"
       today >= open_enrollment_start_on
     when "enrolling", "renewing_enrolling"
       today.end_of_day >= open_enrollment_end_on

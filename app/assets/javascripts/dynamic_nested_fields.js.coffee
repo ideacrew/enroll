@@ -62,13 +62,13 @@ $(document).on 'click', 'form .add_fields', (event) ->
       plan_year_id: plan_year_id
       location_id: location_id
     url: dental_target_url
+    
   # match health with dental offering selections
   $('.health .offerings input[type=checkbox]').on 'change', ->
     checkedValue = $(this).closest('label').find('span').find('p').text()
     if $(this).is(':checked')
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains(' + checkedValue + ')').closest('label').find('input[type=checkbox]').removeProp 'disabled', false
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains(' + checkedValue + ')').closest('label').find('input[type=checkbox]').trigger 'click'
-      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains(' + checkedValue + ')').closest('label').find('input[type=checkbox]').prop 'disabled'
     else
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains(' + checkedValue + ')').closest('label').find('input[type=checkbox]').removeProp 'checked'
     return

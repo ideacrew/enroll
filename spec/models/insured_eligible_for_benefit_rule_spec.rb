@@ -210,7 +210,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
         role.deny_lawful_presence!(args)
         role.person.save!
-        expect(rule.is_lawful_presence_status_satisfied?).to eq false
+        expect(rule.is_lawful_presence_status_satisfied?).to eq (Settings.aca.individual_market.verification_outstanding_window.days == 0)
       end
 
       it "returns true for verification outstanding and event fired less than the outstanding verification window" do
@@ -227,7 +227,8 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
-        expect(rule.satisfied?).to eq [false, [["eligibility failed on lawful_presence_status"]]]
+        error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]
+        expect(rule.satisfied?).to eq [(Settings.aca.individual_market.verification_outstanding_window.days == 0), error_msg]
       end
     end
 
