@@ -1,7 +1,8 @@
-@watir @screenshots @no-database-cleaner
+@screenshots
 Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
+    Given a plan year, with premium tables, exists
     Given Company Tronics is created with benefits
     #Given Tronics clicks on the Employees tab
     #Given Tronics clicks on the add employee button
@@ -26,7 +27,6 @@ Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
     When Megan continues
     When Megan enters person search data
 
-    When Megan sees the Fantastic page
     When Megan continues
     When Megan enters demographic information
     When Megan continues again

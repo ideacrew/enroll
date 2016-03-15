@@ -1,9 +1,15 @@
+<<<<<<< Updated upstream
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :ivl_2015_benefit_package)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual") #pull out for sep
   Caches::PlanDetails.load_record_cache!
+=======
+When(/^\w+ visits? the Insured portal$/) do
+  visit '/'
+  click_link 'Consumer/Family Portal'
+>>>>>>> Stashed changes
   screenshot("individual_start")
 end
 
@@ -50,6 +56,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="person_us_citizen_true"]').click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+<<<<<<< Updated upstream
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
@@ -59,16 +66,37 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
+=======
+
+  fill_in 'person[addresses_attributes][0][address_1]', with: "4900 USAA BLVD"
+  fill_in 'person[addresses_attributes][0][address_2]', with: "Suite 220"
+  fill_in 'person[addresses_attributes][0][city]', with: "Washington"
+
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'GA')]]").click
+  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'DC')]").click
+
+  fill_in 'person[addresses_attributes][0][zip]', with: "20002"
+  fill_in 'person[phones_attributes][0][full_phone_number]', with: "1110009999"
+  fill_in 'person[emails_attributes][0][address]', with: @u.find(:email1)
+>>>>>>> Stashed changes
   screenshot("personal_form")
 end
 
 When(/Individual clicks on Save and Exit/) do
+<<<<<<< Updated upstream
   find(:xpath, '//*[@id="new_person_wrapper"]/div/div[2]/ul[2]/li[2]/a').trigger('click') #overlapping li element wat?
 end
 
 Then (/Individual resumes enrollment/) do
   visit '/'
   click_link 'Consumer/Family Portal'
+=======
+  find('.interaction-click-control-save---exit').click
+end
+
+When(/^\w+ clicks? on continue button$/) do
+  find('.interaction-click-control-continue').click
+>>>>>>> Stashed changes
 end
 
 Then (/Individual sees previously saved address/) do
@@ -83,6 +111,7 @@ Then(/Individual agrees to the privacy agreeement/) do
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
+<<<<<<< Updated upstream
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
@@ -95,6 +124,28 @@ end
 Then(/\w+ should see the dependents form/) do
   expect(page).to have_content('Add Member')
   screenshot("dependents")
+=======
+  puts 'check logs'
+  sleep 2
+  find('.interaction-click-control-continue').click
+  sleep 5
+  find(:xpath, '//label[@for="agreement_agree"]').click
+  find('.interaction-click-control-continue').click
+  @browser.label(for: /interactive_verification_questions_attributes_0_response_id_a/).wait_until_present
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_c"]').click
+  find('.interaction-click-control-submit').click
+  screenshot("identify_verification")
+  find('.interaction-click-control-override-identity-verification')
+  screenshot("override")
+  find('.interaction-click-control-override-identity-verification').click
+end
+
+Then(/\w+ should see the dependents form/) do
+  find(:xpath, '//a[contains(., "Add Member")]')
+  screenshot("dependents")
+  click_link 'Add Member'
+>>>>>>> Stashed changes
 end
 
 And(/Individual clicks on add member button/) do
@@ -276,33 +327,31 @@ Then(/^click continue again$/) do
 end
 
 Given(/^\w+ visits the Employee portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /employee portal/i).wait_until_present
+  visit '/'
+  click_link 'Employee Portal'
   screenshot("start")
-  scroll_then_click(@browser.a(text: /employee portal/i))
-  @browser.button(text: "Create account").wait_until_present
+  click_button 'Create account'
 end
 
 Then(/^(\w+) creates a new account$/) do |person|
-  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email 'email' + person)
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
-  scroll_then_click(@browser.input(value: "Create account"))
+  find('.interaction-click-control-create-account').click
+  fill_in 'user[email]', with: (@u.email 'email' + person)
+  fill_in 'user[password]', with: "aA1!aA1!aA1!"
+  fill_in 'user[password_confirmation]', with: "aA1!aA1!aA1!"
+  click_button 'Create account'
 end
 
 When(/^\w+ clicks continue$/) do
-  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+  find('.interaction-click-control-continue').click
 end
 
 When(/^\w+ selects Company match for (\w+)$/) do |company|
-  @browser.dd(text: /#{company}/).wait_until_present
-  expect(@browser.dd(text: /#{company}/).visible?).to be_truthy
-  scroll_then_click(@browser.input(value: /This is my employer/))
+  expect(page).to have_content(company)
+  find('#btn-continue').click
 end
 
 When(/^\w+ sees the (.*) page$/) do |title|
-  wait_and_confirm_text /#{title}/
+  expect(page).to have_content(title)
 end
 
 When(/^\w+ visits the Consumer portal$/i) do
@@ -310,12 +359,11 @@ When(/^\w+ visits the Consumer portal$/i) do
 end
 
 When(/^(\w+) signs in$/) do |person|
-  wait_and_confirm_text /Sign in/i
-  scroll_then_click(@browser.a(text: /Sign In/i))
-  @browser.h1(text: /Sign In/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.find 'email' + person)
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  scroll_then_click(@browser.input(value: "Sign in"))
+  click_link 'Sign In Existing Account'
+  fill_in 'user[email]', with: (@u.find 'email' + person)
+  find('#user_email').set(@u.find 'email' + person)
+  fill_in 'user[password]', with: "aA1!aA1!aA1!"
+  click_button 'Sign in'
 end
 
 Given(/^Company Tronics is created with benefits$/) do
@@ -331,29 +379,25 @@ end
 Then(/^(\w+) enters person search data$/) do |insured|
   step "#{insured} sees the Personal Information page"
   person = people[insured]
-  @browser.text_field(name: "person[first_name]").wait_until_present
-  @browser.text_field(name: "person[first_name]").set(person[:first_name])
-  @browser.text_field(name: "person[last_name]").set(person[:last_name])
-  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(person[:dob])
-  @browser.text_field(name: "person[first_name]").click
-  @browser.text_field(name: "person[ssn]").set(person[:ssn])
-  @browser.radio(id: /radio_female/).fire_event("onclick")
-  @browser.button(text: /continue/i).fire_event("onclick")
+  fill_in "person[first_name]", with: person[:first_name]
+  fill_in "person[last_name]", with: person[:last_name]
+  fill_in "jq_datepicker_ignore_person[dob]", with: person[:dob]
+  fill_in "person[ssn]", with: person[:ssn]
+  find(:xpath, '//label[@for="radio_female"]').click
+  click_button 'CONTINUE'
 end
 
 Then(/^\w+ continues$/) do
-  wait_and_confirm_text /Continue/i
-  @browser.a(text: /Continue/i).fire_event("onclick")
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^\w+ continues again$/) do
-  wait_and_confirm_text /Continue/i
-  @browser.button(text: /Continue/i).fire_event("onclick")
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^\w+ enters demographic information$/) do
   step "Individual should see a form to enter personal information"
-  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("user#{rand(1000)}@example.com")
+  fill_in 'person[emails_attributes][0][address]', with: "user#{rand(1000)}@example.com"
 end
 
 And(/^\w+ is an Employee$/) do

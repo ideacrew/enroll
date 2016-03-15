@@ -16,8 +16,7 @@ FactoryGirl.define do
 
     # association :premium_tables, strategy: :build
 
-    factory :plan_with_premium_tables do
-
+    trait :with_premium_tables do
       transient do
         premium_tables_count 48
       end
@@ -25,6 +24,7 @@ FactoryGirl.define do
       after(:create) do |plan, evaluator|
         create_list(:premium_table, evaluator.premium_tables_count, plan: plan)
       end
+<<<<<<< Updated upstream
 
       trait :premiums_for_2015 do
         after :create do |plan, evaluator|
@@ -32,6 +32,11 @@ FactoryGirl.define do
         end
       end
     end
+=======
+    end
+
+    factory :plan_with_premium_tables, traits: [ :with_premium_tables ]
+>>>>>>> Stashed changes
   end
 
   factory :premium_table do
@@ -39,6 +44,7 @@ FactoryGirl.define do
     start_on  TimeKeeper.date_of_record.beginning_of_year
     end_on  TimeKeeper.date_of_record.beginning_of_year.next_year - 1.day
     cost {(age * 1001.00) / 100.00}
+<<<<<<< Updated upstream
 
     after :create do |pt|
       metal_hash = {
@@ -49,6 +55,8 @@ FactoryGirl.define do
       }
       pt.update_attribute(:cost, (pt.age * 1001.00) / metal_hash[:"#{pt.plan.metal_level}"] )
     end
+=======
+>>>>>>> Stashed changes
   end
 end
 
