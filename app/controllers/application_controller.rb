@@ -159,7 +159,7 @@ class ApplicationController < ActionController::Base
     end
 
     def page_alphabets(source, field)
-      if fields = field.split(".") and fields.count > 1
+      if (fields = field.split(".")) && fields.count > 1
         word_arr = source.map do |s|
           fields.each do |f|
             s = s.send(f)

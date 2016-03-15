@@ -13,7 +13,7 @@ class Products::QhpController < ApplicationController
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
-    if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
+    if @market_kind == 'employer_sponsored' && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       @reference_plan = @coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan
@@ -48,7 +48,7 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-    if @market_kind == 'employer_sponsored' and (@coverage_kind == 'health' || @coverage_kind == "dental")
+    if @market_kind == 'employer_sponsored' && (@coverage_kind == 'health' || @coverage_kind == "dental")
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan
       if @benefit_group.is_congress

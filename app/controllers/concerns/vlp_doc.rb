@@ -17,7 +17,7 @@ module VlpDoc
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
-      elsif source == 'dependent' and dependent.present?
+      elsif source == 'dependent' && dependent.present?
         add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
       end
       return false
@@ -30,7 +30,7 @@ module VlpDoc
       document.update_attributes(vlp_doc_attribute)
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, document)
-      elsif source == 'dependent' and dependent.present?
+      elsif source == 'dependent' && dependent.present?
         add_document_errors_to_dependent(dependent, document)
       end
       return document.errors.blank?

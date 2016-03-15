@@ -61,6 +61,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       sign_in user
       @request.env['HTTP_REFERER'] = ''
       allow(person).to receive(:has_active_consumer_role?).and_return false
+      allow(person).to receive(:has_active_employee_role?).and_return true
       assign :person, person
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -84,6 +85,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
       expect(rendered).to have_selector("option", text: 'RELATION *')
+    end
+
+    it "should have address info area" do
+      expect(rendered).to have_selector('#address_info')
+      expect(rendered).to match /Home Address/
     end
   end
 end
