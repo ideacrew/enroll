@@ -111,7 +111,7 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params[:waiver_reason]
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+    if hbx_enrollment.may_waive_coverage? && waiver_reason.present? && hbx_enrollment.valid?
       hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
       hbx_enrollment.propogate_waiver
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"

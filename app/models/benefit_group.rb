@@ -441,14 +441,14 @@ private
     # all employee contribution < 50% for 1/1 employers
     if start_on.month == 1 && start_on.day == 1
     else
-      if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
+      if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
         self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
       end
     end
   end
 
   def check_offered_for_employee
-    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
+    if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
       self.errors.add(:relationship_benefits, "employee must be offered")
     end
   end

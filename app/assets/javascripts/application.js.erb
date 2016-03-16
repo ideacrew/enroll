@@ -33,7 +33,7 @@
 //= require plan_year_selection
 //= require bootstrap-slider
 //= require_tree .
-  
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -261,7 +261,6 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 // reveal published plan years benefit groups
 $(document).ready(function () {
-
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {
@@ -413,18 +412,6 @@ $(document).ready(function () {
       iteration= (iteration+1) %functions.length
     })
   }
-
-  $(document).on('click', '#address_info + span.form-action', function(){
-    if ($(this).text() == "Add Mailing Address"){
-      $(this).text('Remove Mailing Address');
-      $('.row-form-wrapper.mailing-div').show();
-    }else if ($(this).text() == "Remove Mailing Address"){
-      $(this).text('Add Mailing Address');
-      $('.mailing-div').hide();
-      $(".mailing-div input[type='text']").val("");
-      $('.mailing-div .label-floatlabel').hide();
-    }
-  });
 
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
@@ -919,3 +906,15 @@ $(document).on('click', '.interaction-click-control-cancel, .interaction-click-c
 $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
 })
+
+$(document).on('click', '#address_info + span.form-action', function(){
+  if ($(this).text() == "Add Mailing Address"){
+    $(this).text('Remove Mailing Address');
+    $('.row-form-wrapper.mailing-div').show();
+  }else if ($(this).text() == "Remove Mailing Address"){
+    $(this).text('Add Mailing Address');
+    $('.mailing-div').hide();
+    $(".mailing-div input[type='text']").val("");
+    $('.mailing-div .label-floatlabel').hide();
+  }
+});

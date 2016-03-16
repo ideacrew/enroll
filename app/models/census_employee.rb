@@ -97,7 +97,7 @@ class CensusEmployee < CensusMember
   end
 
   def update_hbx_enrollment_effective_on_by_hired_on
-    if employee_role.present? and hired_on != employee_role.hired_on
+    if employee_role.present? && hired_on != employee_role.hired_on
       employee_role.set(hired_on: hired_on)
       enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
       enrollments.each do |enrollment|
@@ -325,7 +325,7 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? or (person.present? and person.has_active_employee_role?)
+    return false if person.blank? || (person.present? && person.has_active_employee_role?)
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
   end
@@ -418,13 +418,13 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
-    if employment_terminated_on and employment_terminated_on <= hired_on
+    if employment_terminated_on && employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before hiring date")
     end
   end
 
   def check_coverage_terminated_on
-    if employment_terminated_on and employment_terminated_on <= TimeKeeper.date_of_record - 60.days
+    if employment_terminated_on && employment_terminated_on <= TimeKeeper.date_of_record - 60.days
       errors.add(:base, "Employee termination must be within the past 60 days")
     end
   end

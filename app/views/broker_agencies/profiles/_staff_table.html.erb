@@ -5,6 +5,8 @@
     <tr style='display: table; width: 600px; table-layout:fixed;'>
       <td style="padding: 3px"><%= staff.first_name + ' ' + staff.last_name %></td>
       <td style="padding: 3px"><%= BrokerAgencyProfile.find(staff.broker_role.broker_agency_profile_id).legal_name %></td>
+      <td style="padding: 3px"><% market_kind = staff.broker_role.market_kind %>
+        <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %> Market</td>
       <td style="padding: 3px; width:35px"><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'> Help </a></td>
    </tr>
   <% end %>
