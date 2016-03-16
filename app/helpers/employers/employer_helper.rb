@@ -14,6 +14,17 @@ module Employers::EmployerHelper
     end
   end
 
+  def coverage_kind(census_employee=nil)
+    return kind if census_employee.blank?
+    enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)
+    if enrolled.present? && enrolled != "initialized" 
+      kind = census_employee.active_benefit_group_assignment.hbx_enrollment.coverage_kind
+    else
+      kind = ""
+    end  
+    return kind.capitalize
+  end  
+
   def render_plan_offerings(benefit_group, coverage_type)
     reference_plan = benefit_group.reference_plan
     if coverage_type == ".dental" && benefit_group.single_plan_type?
