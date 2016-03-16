@@ -43,7 +43,6 @@ $(document).on 'click', 'form .add_fields', (event) ->
       url: url
     return
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
-  alert(time);
   $('.benefit-group-fields:last').data 'time', time
   $('.benefit-group-fields:last').attr 'data-benefit-group-index', $('.benefit-group-fields').length - 1
   $('.benefit-group-fields:last .dental-relationship-benefits-attributes-time').val time
