@@ -197,7 +197,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.carriers-tab a').click
   find('.reference-plans label').click
 
-  find('.interaction-click-control-create-plan-year').click
+  find('.interaction-click-control-create-plan-year').trigger('click')
 
   find('.alert-notice')
   find('.interaction-click-control-benefits').click

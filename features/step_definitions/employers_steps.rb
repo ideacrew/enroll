@@ -318,7 +318,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find('.carriers-tab a').click
   find('.reference-plans label').click
 
-  find('.interaction-click-control-create-plan-year').click
+  find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
