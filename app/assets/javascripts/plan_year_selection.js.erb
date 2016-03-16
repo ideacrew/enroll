@@ -535,15 +535,18 @@ $(document).on("click", ".reference_plan_info h4 span", function() {
 
 function calcEmployerContributions(url, location, coverage_type) {
   var coverage_type = coverage_type;
+
   var plan_option_kind = $("#"+location+" "+ coverage_type +" .nav-tabs input[type=radio]:checked").val();
   var location_id = location;
   var benefit_group_index = $("#"+location).data('benefit-group-index');
-
-  var elected_dental_plans = $("#"+location+" .elected-plans-tab input[type=checkbox]:checked");
-  var elected_plan_ids = []
-  elected_dental_plans.each(function() {
-    elected_plan_ids.push($(this).val());
-  });
+  alert(benefit_group_index);
+  if ( coverage_type == '.dental' ) {
+    var elected_dental_plans = $("#"+location+" .elected-plans-tab input[type=checkbox]:checked");
+    var elected_plan_ids = []
+    elected_dental_plans.each(function() {
+      elected_plan_ids.push($(this).val());
+    });
+  }
 
 
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1 ) {

@@ -43,7 +43,9 @@ $(document).on 'click', 'form .add_fields', (event) ->
       url: url
     return
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time
+  alert(time);
   $('.benefit-group-fields:last').data 'time', time
+  $('.benefit-group-fields:last').attr 'data-benefit-group-index', $('.benefit-group-fields').length - 1
   $('.benefit-group-fields:last .dental-relationship-benefits-attributes-time').val time
 
   $('.benefit-group-fields:last .elected-plans-tab .reference-plan input[checkbox]').each ->
@@ -62,7 +64,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
       plan_year_id: plan_year_id
       location_id: location_id
     url: dental_target_url
-    
+
   # match health with dental offering selections
   $('.health .offerings input[type=checkbox]').on 'change', ->
     checkedValue = $(this).closest('label').find('span').find('p').text()

@@ -154,17 +154,18 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def calc_employer_contributions
-
+    @benefit_group_index = params[:benefit_group_index].to_i
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[0].reference_plan = @plan
+    debugger
+    @plan_year.benefit_groups[@benefit_group_index].reference_plan = @plan
 
-    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
-    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
-    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost
+    @employer_contribution_amount = @plan_year.benefit_groups[@benefit_group_index].monthly_employer_contribution_amount
+    @min_employee_cost = @plan_year.benefit_groups[@benefit_group_index].monthly_min_employee_cost
+    @max_employee_cost = @plan_year.benefit_groups[@benefit_group_index].monthly_max_employee_cost
   end
 
   def calc_offered_plan_contributions
