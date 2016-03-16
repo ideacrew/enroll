@@ -539,7 +539,6 @@ function calcEmployerContributions(url, location, coverage_type) {
   var plan_option_kind = $("#"+location+" "+ coverage_type +" .nav-tabs input[type=radio]:checked").val();
   var location_id = location;
   var benefit_group_index = $("#"+location).data('benefit-group-index');
-  alert(benefit_group_index);
   if ( coverage_type == '.dental' ) {
     var elected_dental_plans = $("#"+location+" .elected-plans-tab input[type=checkbox]:checked");
     var elected_plan_ids = []

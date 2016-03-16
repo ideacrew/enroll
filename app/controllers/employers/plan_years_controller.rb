@@ -160,12 +160,11 @@ class Employers::PlanYearsController < ApplicationController
     @coverage_type = params[:coverage_type]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    debugger
-    @plan_year.benefit_groups[@benefit_group_index].reference_plan = @plan
+    @plan_year.benefit_groups[0].reference_plan = @plan
 
-    @employer_contribution_amount = @plan_year.benefit_groups[@benefit_group_index].monthly_employer_contribution_amount
-    @min_employee_cost = @plan_year.benefit_groups[@benefit_group_index].monthly_min_employee_cost
-    @max_employee_cost = @plan_year.benefit_groups[@benefit_group_index].monthly_max_employee_cost
+    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
+    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
+    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost
   end
 
   def calc_offered_plan_contributions
@@ -318,10 +317,10 @@ class Employers::PlanYearsController < ApplicationController
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[@benefit_group_index].reference_plan = @plan
-    @plan_year.benefit_groups[@benefit_group_index].plan_option_kind = params[:plan_option_kind]
+    @plan_year.benefit_groups[0].reference_plan = @plan
+    @plan_year.benefit_groups[0].plan_option_kind = params[:plan_option_kind]
 
-    @benefit_group = @plan_year.benefit_groups[@benefit_group_index]
+    @benefit_group = @plan_year.benefit_groups[0]
     @benefit_group.set_bounding_cost_plans if @coverage_type == '.health'
 
     if @coverage_type == '.dental'
