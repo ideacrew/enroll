@@ -82,7 +82,7 @@
       <% if @plan_year.benefit_groups[i].elected_dental_plan_ids.count == 13 %>
         All
       <% else %>
-        <% @plan_year.benefit_groups[i].elected_dental_plan_ids.count %>
+        <%= @plan_year.benefit_groups[i].elected_dental_plan_ids.count %>
       <% end %>
     <% end %>
     </span>
