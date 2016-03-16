@@ -1,13 +1,35 @@
 require "rails_helper"
 
 RSpec.describe "employers/census_employees/show.html.erb" do
+  let(:plan){ FactoryGirl.create(:plan) }
+  let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:household){ FactoryGirl.create(:household, family: family) }
+  let(:person){ Person.new(first_name: "first name", last_name: "last_name", dob: 20.years.ago) }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:plan_year){ FactoryGirl.create(:plan_year) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:benefit_group_assignment) { double(benefit_group: benefit_group) }
-  let(:benefit_group) {double(title: "plan name")}
-  let(:hbx_enrollment) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [], coverage_kind: 'health')}
-  let(:hbx_enrollment_two) {double(waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [], coverage_kind: 'dental')}
-  let(:plan) {double(total_premium: 10, total_employer_contribution: 20, total_employee_cost:30)}
+  let(:relationship_benefit){ RelationshipBenefit.new(relationship: "employee") }
+  let(:benefit_group) {BenefitGroup.new(title: "plan name", relationship_benefits: [relationship_benefit], plan_year: plan_year )}
+  let(:benefit_group_assignment) { BenefitGroupAssignment.new(benefit_group: benefit_group) }
+  let(:reference_plan){ double("Reference Plan") }
+  let(:address){ Address.new(address_1: "1111 spalding ct", address_2: "apt 444", city: "atlanta", state: "ga", zip: "30338") }
+  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  # let(:hbx_enrollment) {double("HbxEnrollment1",waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: 'health')}
+  let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
+    household: household,
+    benefit_group: benefit_group,
+    hbx_enrollment_members: [hbx_enrollment_member],
+    coverage_kind: "health" )
+  }
+  let(:hbx_enrollment_two){ FactoryGirl.create(:hbx_enrollment,
+    household: household,
+    benefit_group: benefit_group,
+    hbx_enrollment_members: [hbx_enrollment_member],
+    coverage_kind: "dental" )
+  }
+  # let(:hbx_enrollment_two) {double("HbxEnrollment2",waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: 'dental')}
+  # let(:plan) {double(total_premium: 10, total_employer_contribution: 20, total_employee_cost:30)}
+  let(:decorated_hbx_enrollment) { PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, hbx_enrollment.plan) }
   let(:user) { FactoryGirl.create(:user) }
 
   before(:each) do
@@ -20,12 +42,19 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     assign(:benefit_group, benefit_group)
     assign(:plan, plan)
     assign(:active_benefit_group_assignment, benefit_group_assignment)
+    allow(hbx_enrollment_member).to receive(:person).and_return(person)
+    allow(hbx_enrollment_member).to receive(:primary_relationship).and_return("self")
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-    allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(hbx_enrollment)
+    allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(decorated_hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
+  end
 
+  it "should show the address of census employee" do
+    allow(census_employee).to receive(:address).and_return(address)
+    render template: "employers/census_employees/show.html.erb"
+    expect(rendered).to match /.*#{address.address_1}.*#{address.address_2}.*#{address.city}.*#{address.state}.*#{address.zip}/
   end
 
   it "should not show the plan" do
@@ -49,7 +78,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
     render template: "employers/census_employees/show.html.erb"
-    expect(rendered).to match /Waiver Reason: this is reason/
+    expect(rendered).to match /Waiver Reason: this is the reason/
   end
 
   it "should show plan name" do
@@ -58,7 +87,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
     render template: "employers/census_employees/show.html.erb"
-    expect(rendered).to match /Plan Name: hbx enrollment plan name/
+    expect(rendered).to match /#{hbx_enrollment.plan.name}/
   end
 
   it "should show plan cost" do
