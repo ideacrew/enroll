@@ -124,6 +124,7 @@ class Organization
   }
 
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  scope :has_general_agency_profile, ->{ exists(general_agency_profile: true) }
   scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
   scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
 

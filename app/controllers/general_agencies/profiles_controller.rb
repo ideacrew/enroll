@@ -1,6 +1,6 @@
 class GeneralAgencies::ProfilesController < ApplicationController
-  skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create]
-  skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create]
+  skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
+  skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
   before_action :find_general_agency_profile, only: [:show, :edit, :update, :employers, :families, :staffs, :agency_messages]
@@ -23,12 +23,22 @@ class GeneralAgencies::ProfilesController < ApplicationController
     @organization = ::Forms::GeneralAgencyProfile.new
   end
 
+  def search_general_agency
+    orgs = Organization.has_general_agency_profile.or({legal_name: /#{params[:general_agency_search]}/i}, {"fein" => /#{params[:general_agency_search]}/i})
+
+    @general_agency_profiles = orgs.present? ? orgs.map(&:general_agency_profile) : []
+  end
+
   def create
     @organization = ::Forms::GeneralAgencyProfile.new(general_agency_profile_params)
     @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
     if @organization.save
       flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-      redirect_to general_agency_registration_path
+      if @organization.only_staff_role?
+        redirect_to new_agency_staff_general_agencies_profiles_path
+      else
+        redirect_to general_agency_registration_path
+      end
     else
       render "new_agency"
     end
@@ -60,17 +70,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def update_staff
-    if params['approve']
-      @staff.approve!
-      @staff.general_agency_profile.approve! if @staff.general_agency_profile.may_approve?
-      flash[:notice] = "Staff approved."
-    elsif params['deny']
-      @staff .deny!
-      flash[:notice] = "Staff denied."
-    elsif params['decertify']
-      @staff.decertify!
-      flash[:notice] = "Staff decertified."
-    elsif params['accept']
+    if params['accept']
       @staff.general_agency_accept!
       flash[:notice] = "Staff accepted successfully."
     elsif params['decline']
@@ -80,7 +80,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
       @staff.general_agency_terminate!
       flash[:notice] = "Staff terminated."
     end
-    send_secure_message_to_general_agency(@staff) if @staff.agency_pending?
+    send_secure_message_to_general_agency(@staff) if @staff.active?
 
     redirect_to general_agencies_profile_path(@staff.general_agency_profile)
   end

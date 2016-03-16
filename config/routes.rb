@@ -278,6 +278,7 @@ Rails.application.routes.draw do
     resources :profiles do
       collection do
         get :new_agency_staff
+        get :search_general_agency
         get :new_agency
         get :messages
         get :agency_messages

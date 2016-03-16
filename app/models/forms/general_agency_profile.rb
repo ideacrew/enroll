@@ -28,11 +28,12 @@ module Forms
     end
 
     def save(current_user=nil)
-      return false unless valid?
-
       begin
+        unless only_staff_role?
+          return false unless valid?
+          check_existing_organization
+        end
         match_or_create_person
-        check_existing_organization
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
         return false
@@ -44,7 +45,7 @@ module Forms
       person.save!
       add_staff_role
       if only_staff_role?
-        gener_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
+        general_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
         person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
       else
         organization = create_or_find_organization

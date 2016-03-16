@@ -7,7 +7,7 @@ class GeneralAgencyStaffRole
   embedded_in :person
   field :npn, type: String
   field :general_agency_profile_id, type: BSON::ObjectId
-  field :aasm_state, type: String, default: "applicant"
+  field :aasm_state, type: String, default: "general_agency_pending"
   embeds_many :workflow_state_transitions, as: :transitional
 
   associated_with_one :general_agency_profile, :general_agency_profile_id, "GeneralAgencyProfile"
@@ -21,17 +21,10 @@ class GeneralAgencyStaffRole
     allow_blank: false
 
   aasm do
-    state :applicant, initial: true
+    state :general_agency_pending, initial: true
     state :active
-    state :denied
-    state :decertified
-    state :general_agency_pending
     state :general_agency_declined
     state :general_agency_terminated
-
-    event :approve, :after => [:record_transition] do
-      transitions from: :applicant, to: :general_agency_pending
-    end
 
     event :general_agency_accept, :after => [:record_transition, :send_invitation] do 
       transitions from: :general_agency_pending, to: :active
@@ -44,22 +37,6 @@ class GeneralAgencyStaffRole
     event :general_agency_terminate, :after => :record_transition do 
       transitions from: :active, to: :general_agency_terminated
     end
-
-    event :deny, :after => :record_transition do
-      transitions from: :applicant, to: :denied
-    end
-
-    event :decertify, :after => :record_transition  do
-      transitions from: :active, to: :decertified
-    end
-
-    event :reapply, :after => :record_transition  do
-      transitions from: [:applicant, :decertified, :denied, :general_agency_declined], to: :applicant
-    end  
-
-    event :transfer, :after => :record_transition  do
-      transitions from: [:active, :general_agency_pending, :general_agency_terminated], to: :applicant
-    end  
   end
 
   def send_invitation
@@ -68,10 +45,6 @@ class GeneralAgencyStaffRole
 
   def current_state
     aasm_state.humanize.titleize
-  end
-
-  def applicant?
-    aasm_state == 'applicant'
   end
 
   def active?
