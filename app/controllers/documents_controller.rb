@@ -61,7 +61,8 @@ end
 
 
 def change_person_aasm_state
-  @doc_owner.consumer_role.update_attributes(:aasm_state => params[:state])
+  @doc_owner.consumer_role.import!
+  @doc_owner.consumer_role.save
   respond_to do |format|
          format.html {redirect_to exchanges_hbx_profiles_root_path, notice: "Person Verification Status Updated"}
          end

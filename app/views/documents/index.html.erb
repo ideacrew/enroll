@@ -3,7 +3,7 @@
 <div class="container">
   <h2><%= @person.first_name %>  <%= @person.last_name %> Document Verification Page</h2>
   <% if !@person_documents.empty? && @person_documents.all? {|doc| doc.status == "verified"}%>
-    <%= link_to "Click to complete verification", change_person_aasm_state_documents_path(:person_id => @person.id, :state => "fully_verified"),
+    <%= link_to "Click to complete verification", change_person_aasm_state_documents_path(:person_id => @person.id),
     method: :put, class: "btn btn-danger", data: { confirm: 'Person will be completely verified. Click OK to continue.' }%><br><br>
   <% end %>
   <div class="documents-table">
