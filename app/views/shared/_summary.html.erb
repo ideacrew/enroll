@@ -105,8 +105,8 @@
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
               </div>
               <div class="col-xs-4">
-                <% if @plan.rx_formulary_url.present? %>
-                  <%#= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
+                <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
+                  <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
                 <% end %>
               </div>
               <div class="col-xs-4">
