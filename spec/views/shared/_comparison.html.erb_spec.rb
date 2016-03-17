@@ -22,8 +22,9 @@ describe "shared/_comparison.html.erb" do
       :total_employer_contribution => 20,
       :total_employee_cost => 30,
       :id => "1234234234",
+      :coverage_kind => "health",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "A Plan Name")}
   let(:mock_qhps) {[mock_qhp]}

@@ -21,6 +21,7 @@ describe "shared/_summary.html.erb" do
       :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
       :id => "1234234234",
+      :coverage_kind => "health",
       :sbc_file => "THE SBC FILE.PDF",
       :can_use_aptc? => true,
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
