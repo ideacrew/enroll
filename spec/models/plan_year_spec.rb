@@ -1929,6 +1929,85 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
+
+
+  context '.hbx_enrollments_by_month' do 
+    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+
+    let(:employee_role) {
+      person.employee_roles.create(
+        employer_profile: employer_profile,
+        hired_on: census_employee.hired_on,
+        census_employee_id: census_employee.id
+      )
+    }
+
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+    let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
+    let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
+    let(:effective_date)         { plan_year_start_on }
+
+    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py.update_attributes({:aasm_state => 'published'})
+                                                    py
+                                                  }
+
+    let(:benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: plan_year.benefit_groups.first,
+        start_on: plan_year_start_on
+      })
+    }
+
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "health",
+      effective_on: effective_date,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 10.days,
+      benefit_group_id: plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id
+      )
+    }
+
+    context " when enrollments present with enrolled or renewing state" do 
+      before do
+        shop_enrollment.update_attributes(:'aasm_state' => 'auto_renewing')
+      end
+
+      it 'should return the enrollments' do
+        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq [shop_enrollment]
+      end
+    end
+
+
+    context " when enrollments are waived" do
+      before do
+        shop_enrollment.update_attributes(:'aasm_state' => 'renewing_waived')
+      end
+
+      it 'should not return waived enrollments' do 
+        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq []
+      end
+    end
+  end
 end
 
 describe PlanYear, "which has the concept of export eligibility" do
