@@ -331,9 +331,7 @@ class CensusEmployee < CensusMember
   end
 
   def has_active_health_coverage?
-    active_benefit_group_assignment.present? &&
-      active_benefit_group_assignment.hbx_enrollment.present? &&
-      active_benefit_group_assignment.hbx_enrollment.coverage_kind == 'health'
+    HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(active_benefit_group_assignment.id).present?
   end
 
   class << self
