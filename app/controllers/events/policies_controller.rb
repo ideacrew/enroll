@@ -10,7 +10,7 @@ module Events
       if !policy.nil?
         begin
           response_payload = render_to_string "events/hbx_enrollment/policy", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
-          reply_with(connection, reply_to, policy_id, "200", response_payload)
+          reply_with(connection, reply_to, policy_id, "200", response_payload, policy.eligibility_event_kind)
         rescue Exception => e
           reply_with(
             connection,
@@ -28,16 +28,20 @@ module Events
       end
     end
 
-    def reply_with(connection, reply_to, policy_id, return_status, body)
+    def reply_with(connection, reply_to, policy_id, return_status, body, eligibility_event_kind = nil)
+      headers = { 
+              :return_status => return_status,
+              :policy_id => policy_id
+      }
+      if !eligibility_event_kind.blank?
+        headers[:eligibility_event_kind] = eligibility_event_kind
+      end
       with_response_exchange(connection) do |ex|
         ex.publish(
           body,
           {
             :routing_key => reply_to,
-            :headers => {
-              :return_status => return_status,
-              :policy_id => policy_id
-            }
+            :headers => headers
           }
         )
       end
