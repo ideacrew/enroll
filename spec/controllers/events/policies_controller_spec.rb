@@ -35,6 +35,34 @@ describe Events::PoliciesController do
       end
     end
 
+    describe "for a policy which cannot be properly rendered" do
+      let(:found_policys) { [policy] }
+      let(:exception) { Exception.new("Some exception") }
+      let(:exception_backtrace) { ["some error message on a line"] }
+
+      before :each do
+        allow(controller).to receive(:render_to_string).with(
+          "events/hbx_enrollment/policy", {:formats => ["xml"], :locals => {
+            :hbx_enrollment => policy
+          }}).and_raise(exception)
+        allow(exception).to receive(:backtrace).and_return(exception_backtrace)
+      end
+
+      it "should send out a message to the bus with the error code and exception" do
+        expect(exchange).to receive(:publish).with(JSON.dump({
+           exception: exception.inspect,
+           backtrace: exception_backtrace.inspect 
+          }), {
+          :routing_key => reply_to_key,
+          :headers => {
+            :policy_id => policy_id,
+            :return_status => "500"
+          }       
+        })
+        controller.resource(connection, di, props, "")
+      end
+    end
+
     describe "for a policy which doesn't exist" do
       let(:found_policys) { [] }
 
