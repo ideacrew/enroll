@@ -39,7 +39,11 @@ def destroy
   person = Person.find(params[:person])
   doc = person.consumer_role.vlp_documents.find(params[:id])
   doc.delete
-  redirect_to verification_insured_families_path
+  respond_to do |format|
+    format.html { redirect_to verification_insured_families_path }
+    format.js
+  end
+
 end
 
  def mark_as_reviewed
@@ -54,7 +58,8 @@ end
  def change_doc_status
    @document.update_attributes(:status => params[:status])
    respond_to do |format|
-          format.html {redirect_to documents_path(:person_id => @doc_owner.id), notice: "Document Status Updated"}
+          format.html {redirect_to verification_insured_families_path, notice: "Document Status Updated"}
+          format.js
           end
  end
 

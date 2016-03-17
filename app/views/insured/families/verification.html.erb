@@ -1,7 +1,6 @@
 <% content_for :navigation do %>
     <%= render 'navigation' %>
 <% end %>
-
 <h2>Family Verification Dashboard</h2>
 <div class="col-xs-12 documents-tab">
   <% unless @person.has_consumer_role? %>
@@ -9,12 +8,15 @@
   <% else %>
       <br/>
       <div class="row">
-        <div class="col-md-7">
-          <h4>Enrollment group verification status: <%= "??????" %></h4>
-        </div>
-        <div class="col-md-5">
-          <h4>Verification due date: <%= "???????" %></h4>
-        </div>
+        <% if unverified?(@person) %>
+          <div class="col-md-7">
+            <h4>Enrollment group verification status: <%= coverage_household_verification %></h4>
+            <%= link_to "Send all documents for review", "#", class: "btn btn-success", data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+          </div>
+          <div class="col-md-5">
+            <h4>Verification due date: <%= verification_due_date %></h4>
+          </div>
+        <% end %>
       </div>
       <div class="module ivl-documents-table panel">
         <div class="table-responsive">
@@ -38,7 +40,7 @@
                   <%= show_consumer_role_state(member.person.consumer_role) %>
                 </td>
                 <td colspan="2">
-                  <% if unverified?(member) %>
+                  <% if unverified?(member.person) %>
                     <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
                   <% end %>
                 </td>
@@ -54,7 +56,9 @@
                   </a>
                 </td>
               </tr>
-                <%= render partial: "insured/families/verification/verification_docs_table", locals: {member: member} %>
+                <div id="verification_docs_table">
+                  <%= render partial: "insured/families/verification/verification_docs_table", locals: {member: member} %>
+                </div>
             <% end %>
             </tbody>
           </table>

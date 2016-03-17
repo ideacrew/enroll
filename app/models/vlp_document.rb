@@ -17,10 +17,15 @@ class VlpDocument < Document
     ]
 
   #list of the documents consumer can provide to verify SSN
-  SSN_DOCUMENTS_KINDS = ["Social Security Card", "US Passport"]
+  SSN_DOCUMENTS_KINDS = ['US Passport', 'Social Security Card',]
 
   #list of the documents consumer can provide to verify Citizenship
-  CITIZENSHIP_DOCUMENTS_KINDS = ["Certificate of Citizenship", "Naturalization Certificate"]
+  CITIZENSHIP_DOCUMENTS_KINDS = [
+      'US Passport',
+      'Social Security Card',
+      'Certification of Birth Abroad (issued by the U.S. Department of State Form FS-545)',
+      'Original or certified copy of a birth certificate'
+  ]
 
   #list of the documents user can provide to verify Immigration status
   VLP_DOCUMENT_KINDS = [

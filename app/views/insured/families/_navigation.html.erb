@@ -13,7 +13,10 @@
     </li>
     <li <%= menu_tab_class(@tab, 'verification') %>>
       <%= link_to verification_insured_families_path(tab: 'verification') do %>
-        Verification <span class="badge message-unread">outstanding</span>
+        Verification
+        <% unless enrollment_group_verified?(@person) %>
+          <span class="badge message-unread">outstanding</span>
+        <% end %>
       <% end %>
     </li>
     <li <%= menu_tab_class(@tab, 'messages') %>>

@@ -1,12 +1,12 @@
 <table class="sub-table">
-  <% member.person.verification_types.each do |verif_type| %>
+  <% member.person.verification_types.each do |v_type| %>
       <tr>
         <td>
-          <%= verif_type %> &nbsp;<span class="label label-<%=verification_type_class%>">Outstanding</span>
+          <%= v_type %> &nbsp;<span class="label label-<%=verification_type_class(v_type)%>"><%= verification_type_status(v_type) %></span>
         </td>
 
         <td>
-          <%= render partial: 'insured/families/verification/verification_upload', locals: {member: member, verif_type: verif_type} %>
+          <%= render partial: 'insured/families/verification/verification_upload', locals: {member: member, v_type: v_type} %>
         </td>
       </tr>
   <% end %>

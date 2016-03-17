@@ -3,22 +3,30 @@
     <div class="table-responsive">
       <table class="table table-sm">
         <% member.person.consumer_role.vlp_documents.each_with_index do |vlp_doc, i | %>
-            <tr class="<% if i == 0 %>bt-n<% elsif i+1 == member.person.consumer_role.vlp_documents.count %>bb<% end %>">
-              <% if vlp_doc.identifier.present? %>
-                <td>
-                  <% key = vlp_doc.identifier.split('#').last %>
-                  <%= link_to vlp_doc.subject, "/insured/verification_documents/download/#{key}" %>&nbsp;
-                      <span class="label label-<%=doc_status_label(vlp_doc)%>"><%= vlp_doc.status %></span>
-                </td>
-                <td class="table-functions">
-                  <% if vlp_doc.status != "verified" %>
-                    <%= link_to document_path(vlp_doc, :person => member.person.id), method: :delete do %>
-                        <i class="fa fa-trash-o fa-lg" data-toggle="tooltip" title="Delete"></i>
-                    <% end %>
+          <tr class="<% if i == 0 %>bt-n<% elsif i+1 == member.person.consumer_role.vlp_documents.count %>bb<% end %>" id="doc_table_row_<%=vlp_doc.id%>">
+            <% if vlp_doc.identifier.present? %>
+              <td>
+                <% key = vlp_doc.identifier.split('#').last %>
+                <%= link_to vlp_doc.subject, "/insured/verification_documents/download/#{key}" %>&nbsp;
+                    <span class="label label-<%=doc_status_label(vlp_doc)%>"><%= vlp_doc.status %></span>
+              </td>
+          <!-- HBX admin inclusion -->
+            <% if current_user.has_hbx_staff_role? %>
+              <td>
+                <%=  link_to "Accept", change_doc_status_documents_path(:person_id => @person.id, :doc_id => vlp_doc.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs", remote: true%>
+                <%=  link_to "Reject", change_doc_status_documents_path(:person_id => @person.id, :doc_id => vlp_doc.id, :status => "rejected"), method: :put, class: "btn btn-danger btn-xs", remote: true%>
+              </td>
+            <% end %>
+          <!-- >>>> hbx admin inclusion -->
+              <td class="table-functions">
+                <% if vlp_doc.status != "verified" %>
+                  <%= link_to document_path(vlp_doc, :person => member.person.id), method: :delete, remote: true do %>
+                      <i class="fa fa-trash-o fa-lg" data-toggle="tooltip" title="Delete"></i>
                   <% end %>
-                </td>
-              <% end %>
-            </tr>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
         <% end %>
       </table>
     </div>

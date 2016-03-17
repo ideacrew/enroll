@@ -19,8 +19,15 @@ module VerificationHelper
   end
 
   # info popover list of the documents types that consumer can upload as vlp_document
-  def info_pop_up
-    VlpDocument::VLP_DOCUMENT_KINDS.join('; ')
+  def info_pop_up(type)
+    case type
+      when 'SSN'
+        VlpDocument::SSN_DOCUMENTS_KINDS.join('; ')
+      when 'Citizenship'
+        VlpDocument::CITIZENSHIP_DOCUMENTS_KINDS.join('; ')
+      when 'Immigration status'
+        VlpDocument::VLP_DOCUMENT_KINDS.join('; ')
+    end
   end
 
   def doc_status_label(doc)
@@ -38,15 +45,34 @@ module VerificationHelper
     end
   end
 
-  def verification_type
-
+  def verification_type_status(type)
+    case type
+      when 'SSN'
+        @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
+      when 'Citizenship'
+        @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
+      when 'Immigration status'
+        @person.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
+    end
   end
 
-  def verification_type_class
-    "danger"
+  def verification_type_class(type)
+    verification_type_status(type) == "verified" ? "success" : "danger"
   end
 
-  def unverified?(member)
-    true if member.person.consumer_role.aasm_state != "fully_verified"
+  def unverified?(person)
+    true if person.consumer_role.aasm_state != "fully_verified"
+  end
+
+  def enrollment_group_verified?(person)
+    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"}
+  end
+
+  def coverage_household_verification
+    "???????"
+  end
+
+  def verification_due_date
+    @person.consumer_role.lawful_presence_determination.latest_denial_date.try(:+, 90.days).try(:>, TimeKeeper.date_of_record) || (TimeKeeper.date_of_record + 90.days)
   end
 end
