@@ -22,13 +22,19 @@ describe Events::PoliciesController do
 
     describe "for an existing policy" do
       let(:found_policys) { [policy] }
+      let(:eligibility_event_kind) { "some event like open enrollment maybe?" }
+
+      before :each do
+        allow(policy).to receive(:eligibility_event_kind).and_return(eligibility_event_kind)
+      end
 
       it "should send out a message to the bus with the rendered policy object" do
         expect(exchange).to receive(:publish).with(rendered_template, {
           :routing_key => reply_to_key,
           :headers => {
             :policy_id => policy_id,
-            :return_status => "200"
+            :return_status => "200",
+            :eligibility_event_kind => eligibility_event_kind
           }       
         })
         controller.resource(connection, di, props, "")
