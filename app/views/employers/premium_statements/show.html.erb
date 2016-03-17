@@ -4,8 +4,7 @@
 <div class="col-xs-12 premium-reports-tab">
   <div class="row no-buffer">
      <% plan_year, billing_date = @employer_profile.billing_plan_year %>
-      <% if billing_date.present? %>
-
+      <% if plan_year.present? && billing_date.present? %>
     <h1>Enrollment Report <%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></h1>
     <% end %>
 
