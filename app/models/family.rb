@@ -507,7 +507,7 @@ class Family
     #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
     eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
 
-    if eligibility_determinations.present? and has_aptc_hbx_enrollment?
+    if eligibility_determinations.present? && has_aptc_hbx_enrollment?
       self.set(status: "aptc_block")
     end
   end
@@ -523,7 +523,7 @@ class Family
     return true if status == "aptc_block"
 
     #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    #if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
+    #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
     #  true
     #else
     #  false

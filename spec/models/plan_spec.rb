@@ -439,10 +439,10 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "individual_plans" do
-      let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
-      let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
-      let(:plan4) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+      let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
+      let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
+      let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
       let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
 
       before :each do

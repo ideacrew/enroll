@@ -2,17 +2,27 @@ require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
+  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
     let(:person) {double(has_active_consumer_role?: false)}
-
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
       assign(:benefit_group, benefit_group)
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
+      assign(:hbx_enrollment, hbx_enrollment)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+    end
+
+    it 'should display estimate your costs link' do
+      expect(rendered).to have_selector('a', text: /find your doctor/i)
+    end
+
+    it 'should display find your doctor link' do
+      expect(rendered).to have_selector('a', text: /estimate your costs/i)
     end
 
     it 'should display filter selections' do
@@ -41,6 +51,12 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:benefit_group, benefit_group)
       allow(person).to receive(:has_active_consumer_role?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
+      assign(:hbx_enrollment, hbx_enrollment)
+
+    end
+
+    it 'should display find your doctor link' do
+      expect(rendered).to_not have_selector('a', text: /estimate your costs/i)
     end
 
     it "should display metal level filters if plan_option_kind is single_carrier" do
@@ -74,15 +90,15 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
   context "with consumer_role and tax_household" do
     let(:person) {double(has_active_consumer_role?: true)}
-    let(:hbx_enrollment) {double(id: '123')}
+
 
     before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
       assign(:person, person)
       assign(:carriers, Array.new)
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
-      assign(:hbx_enrollment, hbx_enrollment)
       assign(:tax_household, true)
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
@@ -117,9 +133,9 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
   context "with consumer_role but without tax_household" do
     let(:person) {double(has_active_consumer_role?: true)}
-    let(:hbx_enrollment) {double(id: '123')}
 
     before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
       assign(:person, person)
       assign(:carriers, Array.new)
       assign(:max_total_employee_cost, 1000)

@@ -5,9 +5,9 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
   let(:active_plan_year_start_on) { renewal_start_date + 3.months - 1.year }
   let(:active_benefit_group_one)  { FactoryGirl.build(:benefit_group, title: "BG 1") }
   let(:active_benefit_group_two)  { FactoryGirl.build(:benefit_group, title: "BG 2") }
-  let(:active_plan_year)          { FactoryGirl.build(:plan_year, 
+  let(:active_plan_year)          { FactoryGirl.build(:plan_year,
                                       start_on: active_plan_year_start_on,
-                                      benefit_groups: [active_benefit_group_one, active_benefit_group_two]) 
+                                      benefit_groups: [active_benefit_group_one, active_benefit_group_two])
                                     }
   let(:employer_profile)          { FactoryGirl.create(:employer_profile, plan_years: [active_plan_year]) }
 
@@ -19,7 +19,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
 
   context "An Employer is registered on the Exchange" do
     context "and renewal application is invalid" do
- 
+
       context "because employer profile primary address isn't in-state" do
         # let(:alien_address) { OfficeLocation.new(is_primary = true,
         #                         Address.new(
@@ -32,7 +32,6 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         #                         )
         #                       }
         # before do
-        #   # binding.pry
         #   employer_profile.office_locations = [alien_address]
         # end
 
@@ -117,6 +116,6 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
       context "and the employer's premium billing account is behind" do
       end
     end
-    
+
   end
 end

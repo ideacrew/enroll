@@ -23,7 +23,7 @@
     .vertical-line-progress
     Complete
 
-- if step == 3 and !no_purchase
+- if step == 3 && !no_purchase
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), :class => "btn btn-lg btn-primary btn-br btn-block #{'disabled' if @market_kind == 'individual'}", id: 'btn-continue', :method => :post
   %ul.list-unstyled.list-right-section
     %li

@@ -118,7 +118,7 @@ module Forms
     def office_locations_attributes=(attrs)
       @office_locations = []
       attrs.each_pair do |k, att_set|
-        att_set.delete('phone_attributes') if att_set["phone_attributes"].present? and att_set["phone_attributes"]["number"].blank?
+        att_set.delete('phone_attributes') if att_set["phone_attributes"].present? && att_set["phone_attributes"]["number"].blank?
         @office_locations << OfficeLocation.new(att_set)
       end
       @office_locations

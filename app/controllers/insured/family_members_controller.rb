@@ -44,7 +44,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
-    if @dependent.save and update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
+    if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
         format.html { render 'show' }
@@ -94,7 +94,7 @@ class Insured::FamilyMembersController < ApplicationController
     @dependent = Forms::FamilyMember.find(params.require(:id))
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
 
-    if @dependent.update_attributes(params.require(:dependent)) and update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

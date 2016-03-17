@@ -142,7 +142,6 @@ private
   end
 
   def first_of_month_effective_date
-# binding.pry
     if @reference_date.day <= Settings.aca.individual_market.monthly_enrollment_due_on
     # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
@@ -158,7 +157,7 @@ private
       calculate_effective_on_for_moved_qle
     else
       is_shop? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
-    end    
+    end
   end
 
   def first_of_next_month_effective_date_for_individual
