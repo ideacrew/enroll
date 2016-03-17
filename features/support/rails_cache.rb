@@ -1,3 +1,3 @@
-Before('@clear-rails-cache') do
+Before do
   Rails.cache.clear
 end
