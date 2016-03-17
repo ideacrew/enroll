@@ -9,6 +9,7 @@ describe "shared/_comparison.html.erb" do
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
   let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [mock_member, mock_member], :id => "3241251524", plan: mock_plan) }
   let(:mock_plan) { double("Plan",
+      :coverage_kind => "health",
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,

@@ -301,14 +301,23 @@ class BenefitGroup
     relationship_benefits.where(relationship: relationship).first
   end
 
+  def dental_relationship_benefit_for(relationship)
+    dental_relationship_benefits.where(relationship: relationship).first
+  end
+
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.relationship_benefits.build(relationship: relationship, offered: true)
     end
+  end
+
+  def build_dental_relationship_benefits
     self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
+
+
 
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
     [

@@ -1,4 +1,6 @@
+initial_summary_link = $('#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary a').attr('href');
 $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/plan_details")).html_safe %>")
+$('#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary a').attr('href');
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
@@ -130,8 +132,20 @@ $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection
 
 
 // make view summary link
-var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .reference-plan input:checked').closest('.reference-plan').find('.view-summary').attr('href');
-$('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
+if ( $("#<%= @location_id %> <%= @coverage_type %> label:contains('Custom')").closest('li').find('input').is(':checked') ) {
+  if ( $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href') == undefined ) {
+    var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href');
+    $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
+  } else {
+    $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', initial_summary_link+"&link=link");
+  }
+} else {
+  if ( $('#<%= @location_id %> <%= @coverage_type %> .reference-plan input:checked').closest('.reference-plan').find('.view-summary').attr('href') == undefined ) {
+    $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', initial_summary_link+"&link=link");
+  } else {
+  }
+}
+
 
      $("#<%= @location_id %> <%= @coverage_type %> #employer_cost_info_btn .btn, #<%= @location_id %> <%= @coverage_type %> #edit_employer_cost_info_btn").click(function(){
       var location_id = $(this).parents('.benefit-group-fields').attr('id');
