@@ -86,7 +86,8 @@ function showOnly(selected) {
     data: {
       'target_id': target_id,
       'target_type': target_type,
-      'vlp_doc_target': vlp_doc_target
+      'vlp_doc_target': vlp_doc_target,
+      'vlp_doc_subject': selected
     },
   });
 }
