@@ -49,9 +49,9 @@ module Listeners
         criteria = extract_criteria(headers)
         exclusions = extract_exclusions(headers, payload)
         policy_ids = criteria.call(exclusions)
-        reponse_payload = JSON.dump(policy_ids)
+        response_payload = JSON.dump(policy_ids)
         with_response_exchange(connection) do |ex|
-          ex.publish(policy_ids, {:routing_key => reply_to, :headers => { :return_status => "200" }})
+          ex.publish(response_payload, {:routing_key => reply_to, :headers => { :return_status => "200" }})
         end
         channel.acknowledge(delivery_info.delivery_tag, false)
       end
@@ -69,12 +69,7 @@ module Listeners
     end
 
     def all_outstanding_shop(exclusion_list)
-      qs = Queries::PolicyAggregationPipeline.new
-      qs.filter_to_shop.filter_to_active.with_effective_date({"$gt" => Date.new(2015,1,31)}).eliminate_family_duplicates
-      enroll_pol_ids = []
-      qs.evaluate.each do |r|
-        enroll_pol_ids << r['hbx_id']
-      end
+      enroll_pol_ids = ::Queries::NamedPolicyQueries.all_outstanding_shop
       enroll_pol_ids - exclusion_list
     end
 
