@@ -14,9 +14,11 @@ ConnectionSlug = Struct.new(:policy_id) do
   def close
   end
 
-  def publish(payload, headers)
-    File.open(File.join("policy_cvs", "#{policy_id}.xml"), 'w') do |f|
-      f.puts payload
+  def publish(payload, properties)
+    if properties[:headers][:return_status] == "200"
+      File.open(File.join("policy_cvs", "#{policy_id}.xml"), 'w') do |f|
+        f.puts payload
+      end
     end
   end
 end
@@ -30,12 +32,12 @@ hbx_ids.each do |pid|
   end
   if pol.plan.blank?
     puts "No plan for policy ID #{pid}: plan ID #{pol.plan_id}"
-#  elsif pol.subscriber.nil?
-#    puts "No subscriber for Policy ID #{pid}"
+    #  elsif pol.subscriber.nil?
+    #    puts "No subscriber for Policy ID #{pid}"
   else
     properties_slug = PropertiesSlug.new("", {:policy_id => pid})
     begin 
-    controller.resource(ConnectionSlug.new(pid), "", properties_slug, "")
+      controller.resource(ConnectionSlug.new(pid), "", properties_slug, "")
     rescue => e
       puts pid.inspect
       puts e.backtrace.inspect
