@@ -164,7 +164,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "get employers" do
     let(:broker_role) {FactoryGirl.build(:broker_role)}
     let(:person) {double("person", broker_role: broker_role)}
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 

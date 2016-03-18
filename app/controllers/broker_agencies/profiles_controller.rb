@@ -4,6 +4,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :find_hbx_profile, only: [:index]
   before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer]
   before_action :set_current_person, only: [:staff_index]
+  before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -140,6 +141,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
     @employer_profiles = @organizations.map {|o| o.employer_profile}
+
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
   end
 
   def general_agency_index
@@ -223,6 +227,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def redirect_to_show(broker_agency_profile_id)
+    redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
+  end
+
   private
 
   def find_hbx_profile
@@ -268,5 +276,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name}"
     body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
     secure_message(@broker_agency_profile, general_agency, subject, body)
+  end
+
+  def check_general_agency_profile_permissions_assign
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_assign(self, @broker_agency_profile)
   end
 end

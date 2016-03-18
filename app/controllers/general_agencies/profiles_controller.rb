@@ -1,14 +1,14 @@
 class GeneralAgencies::ProfilesController < ApplicationController
   skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
   skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
-  before_action :check_admin_staff_role, only: [:index]
-  before_action :find_hbx_profile, only: [:index]
+  #before_action :find_hbx_profile, only: [:index]
   before_action :find_general_agency_profile, only: [:show, :edit, :update, :employers, :families, :staffs, :agency_messages]
   before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
-  before_action :check_general_agency_staff_role, only: [:new]
+  before_action :check_general_agency_profile_permissions_index, only: [:index]
+  before_action :check_general_agency_profile_permissions_new, only: [:new]
 
   def new
-    @organization = ::Forms::GeneralAgencyProfile.new
+    flash[:notice] = "You don't have a General Agency Profile associated with your Account!! Please register your General Agency first."
   end
 
   def index
@@ -106,6 +106,14 @@ class GeneralAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def redirect_to_show(general_agency_profile_id)
+    redirect_to general_agencies_profile_path(id: general_agency_profile_id)
+  end
+
+  def redirect_to_new
+    redirect_to new_general_agencies_profile_path
+  end
+
   private
   def find_general_agency_profile
     @general_agency_profile = GeneralAgencyProfile.find(params[:id])
@@ -119,21 +127,14 @@ class GeneralAgencies::ProfilesController < ApplicationController
     @staff = GeneralAgencyStaffRole.find(params[:id])
   end
 
-  def check_admin_staff_role
-    if current_user.has_hbx_staff_role? || current_user.has_csr_role?
-    elsif current_user.has_general_agency_staff_role?
-      redirect_to general_agencies_profile_path(:id => current_user.person.general_agency_staff_roles.first.general_agency_profile_id)
-    else
-      redirect_to new_broker_agencies_profile_path
-    end
+  def check_general_agency_profile_permissions_index
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_index(self)
   end
 
-  def check_general_agency_staff_role
-    if current_user.has_general_agency_staff_role?
-      redirect_to general_agencies_profile_path(id: current_user.person.general_agency_staff_roles.last.general_agency_profile_id)
-    else
-      flash[:notice] = "You don't have a General Agency Profile associated with your Account!! Please register your General Agency first."
-    end
+  def check_general_agency_profile_permissions_new
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_new(self)
   end
 
   def general_agency_profile_params

@@ -60,27 +60,6 @@ class GeneralAgencyProfile
     Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(self.id))
   end
 
-  # has_many active general_agency_roles
-  #def active_general_agency_roles
-  #  @active_general_agency_roles = GeneralAgencyRole.find_active_by_broker_agency_profile(self)
-  #end
-
-  ## has_many candidate_general_agency_roles
-  #def candidate_general_agency_roles
-  #  @candidate_general_agency_roles = GeneralAgencyRole.find_candidates_by_broker_agency_profile(self)
-  #end
-
-  ## has_many inactive_general_agency_roles
-  #def inactive_general_agency_roles
-  #  # return @inactive_general_agency_roles if defined? @inactive_general_agency_roles
-  #  @inactive_general_agency_roles = GeneralAgencyRole.find_inactive_by_broker_agency_profile(self)
-  #end
-
-  # alias for general_agency_roles
-  #def writing_agents
-  #  active_general_agency_roles
-  #end
-
   def legal_name
     organization.legal_name
   end
