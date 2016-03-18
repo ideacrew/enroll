@@ -46,14 +46,13 @@ $(document).ready(function() {
     });
 
     $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
-      console.log(arguments);
+
       $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
       $('input#employer_id').val(suggestion._id);
       $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
       $('input#organization_fein').val(suggestion.fein).attr('readonly', 'readonly');
       $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
-
-      var primary_office = suggestion.office_locations.find(function(element, index, array) { return element.is_primary });
+      var primary_office = suggestion.office_locations[0]
       if (primary_office) {
         $('select#organization_office_locations_attributes_0_address_attributes_kind').val(primary_office.address.kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
         $('input#organization_office_locations_attributes_0_address_attributes_address_1').val(primary_office.address.address_1).attr('readonly', 'readonly');

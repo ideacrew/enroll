@@ -43,7 +43,6 @@ Feature: Employer Profile
     And Sarah decides to Update Business information
     Then Point of Contact count is 1
     Then Sarah logs out
-    Then show elapsed time
 
   Scenario: A new person asks for a staff role at an existing company
     Given Hannah is a person
@@ -65,7 +64,8 @@ Feature: Employer Profile
 Scenario: A new person creates a new company
     Given NewGuy is a user with no person who goes to the Employer Portal
     Given NewGuy enters first, last, dob and contact info
-    Given NewGuy enters the Primary Office Location info
+    Given a FEIN for a new company
+    Given NewGuy enters Employer Information
     Then NewGuy becomes an Employer
     When NewGuy decides to Update Business information
     Then Point of Contact count is 1
@@ -73,8 +73,8 @@ Scenario: A new person creates a new company
 Scenario: A new person claims an existing unclaimed company
    Given NewGuy is a user with no person who goes to the Employer Portal
     Given NewGuy enters first, last, dob and contact info
-    Given NewGuy enters the Primary Office Location info
-    Given The unclaimed company already exists
+    Given a FEIN for an existing company
+    Given NewGuy enters Employer Information
     Then NewGuy becomes an Employer
     When NewGuy decides to Update Business information
     Then Point of Contact count is 1

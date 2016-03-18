@@ -1,15 +1,6 @@
-<% if @current_user_is_hbx_staff || @current_user_is_broker %>
-    <div class="pull-right">
-        <h5><%="Contact name: #{@employer_contact.first_name} #{@employer_contact.last_name}" %></h5>
-        <h5><%="Contact email: #{@employer_contact_email}" %></h5>
-    </div>
-<% end %>
-
 <div class="col-xs-12 employer-edit-tab">
-<h1>Business Info</h1>
-    <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(id: @organization.id), method: :put} do |f| %>
+    <h1>Business Info</h1>
 
-      <%#= render "shared/error_messages", object: f.object %>
       <% if @organization.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -77,8 +68,7 @@
             <% end if @staff%>
           </table>
         </div>
-      </div>
-     
+
     <% if @add_staff == 'yes' %>
         <%= form_for @organization,{as: :organization, url: employers_employer_staff_roles_path(id: @employer_profile.id), method: :post} do |f| %>
             <div>
@@ -108,8 +98,6 @@
           <br>
           <%= link_to 'Add Employer Staff Role', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-trans pull-left col-12' %>
           <br/><br><br>
-
-
           <div class="">
             <h4> Employer Information</h4>
             <div class="row no-buffer row-form-wrapper">
@@ -135,10 +123,7 @@
               </button> &nbsp;&nbsp;
             </div>
           </div>
-
+      <% end %>
     <% end %>
-
-  
-  <% end %>
 
 </div>

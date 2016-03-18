@@ -1,4 +1,4 @@
-class Employers::EmployerProfilesController < ApplicationController
+class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form]
@@ -6,8 +6,8 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
+  before_action :check_access_to_organization, only: [:edit]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
-
   layout "two_column", except: [:new]
 
   def index
@@ -189,11 +189,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @organization.assign_attributes(:office_locations => [])
       @organization.save(validate: false)
 
-      #Fix issue 3770. Make sure DOB is in correct format
-      employer_attributes = employer_params
-      employer_attributes["dob"] = DateTime.strptime(employer_attributes["dob"], '%m/%d/%Y').try(:to_date)
-
-      if @organization.update_attributes(employer_profile_params) && @employer.update_attributes(employer_attributes)
+      if @organization.update_attributes(employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -245,10 +241,6 @@ class Employers::EmployerProfilesController < ApplicationController
     end
 
 
-  end
-
-  def redirect_to_new
-    redirect_to new_employers_employer_profile_path
   end
 
   def redirect_to_first_allowed

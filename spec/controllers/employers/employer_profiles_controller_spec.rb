@@ -550,14 +550,15 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to be_redirect
       end
     end
-    it "should update person info" do
-      allow(user).to receive(:save).and_return(true)
-      sign_in(user)
-      expect(Organization).to receive(:find)
-      put :update, id: organization.id, first_name: "test", organization: organization_params
-      expect(person.first_name).to eq "test"
-      expect(response).to be_redirect
-    end
+    # Refs #3898 Person information cannot be updated!
+    #it "should update person info" do
+    #  allow(user).to receive(:save).and_return(true)
+    #  sign_in(user)
+    #  expect(Organization).to receive(:find)
+    #  put :update, id: organization.id, first_name: "test", organization: organization_params
+    #  expect(person.first_name).to eq "test"
+    #  expect(response).to be_redirect
+    #end
   end
 
   #describe "DELETE destroy" do
