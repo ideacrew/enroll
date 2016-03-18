@@ -63,12 +63,12 @@
         <div class="row top-row no-border">
           <div class="col-xs-12 text-center broker_approve_deny_btn">
             <% if current_user.has_hbx_staff_role? %>
-              <% if @staff.may_general_agency_accept? %>
-                <%= submit_tag 'Accept', name: 'accept', class: "btn btn-primary btn-br interaction-click-control-broker-accept" %>
-              <% elsif @staff.may_general_agency_decline? %>
-                <%= submit_tag 'Decline', name: 'decline', class: "btn btn-primary btn-br interaction-click-control-general-decline" %>
-              <% elsif @staff.may_general_agency_terminate? %>
-                <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary btn-br interaction-click-control-general-terminate" %>
+              <% if @staff.may_approve? %>
+                <%= submit_tag 'Approve', name: 'approve', class: "btn btn-primary btn-br interaction-click-control-broker-accept" %>
+              <% elsif @staff.may_deny? %>
+                <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary btn-br interaction-click-control-general-decline" %>
+              <% elsif @staff.may_decertify? %>
+                <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary btn-br interaction-click-control-general-terminate" %>
               <% end %>
             <% end %>
           </div>

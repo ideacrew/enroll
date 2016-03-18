@@ -5,6 +5,15 @@ class GeneralAgencyProfile
   include AASM
   include AgencyProfile
 
+  # for market_kind
+  MARKET_KINDS = %W[individual shop both]
+  MARKET_KINDS_OPTIONS = {
+    "Individual & Family Marketplace ONLY" => "individual",
+    "Small Business Marketplace ONLY" => "shop",
+    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+  }
+
+
   field :entity_kind, type: String
   field :market_kind, type: String
   field :corporate_npn, type: String

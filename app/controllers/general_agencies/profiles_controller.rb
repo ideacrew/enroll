@@ -24,7 +24,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def search_general_agency
-    orgs = Organization.has_general_agency_profile.or({legal_name: /#{params[:general_agency_search]}/i}, {"fein" => /#{params[:general_agency_search]}/i})
+    orgs = Organization.search_by_general_agency(params[:general_agency_search])
 
     @general_agency_profiles = orgs.present? ? orgs.map(&:general_agency_profile) : []
   end
@@ -70,15 +70,15 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def update_staff
-    if params['accept']
-      @staff.general_agency_accept!
-      flash[:notice] = "Staff accepted successfully."
-    elsif params['decline']
-      @staff.general_agency_decline!
-      flash[:notice] = "Staff declined."
-    elsif params['terminate']
-      @staff.general_agency_terminate!
-      flash[:notice] = "Staff terminated."
+    if params['approve']
+      @staff.approve!
+      flash[:notice] = "Staff approved successfully."
+    elsif params['deny']
+      @staff.deny!
+      flash[:notice] = "Staff deny."
+    elsif params['decertify']
+      @staff.decertify!
+      flash[:notice] = "Staff decertify."
     end
     send_secure_message_to_general_agency(@staff) if @staff.active?
 

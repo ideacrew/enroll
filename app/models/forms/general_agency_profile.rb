@@ -51,7 +51,7 @@ module Forms
         organization = create_or_find_organization
         self.general_agency_profile = organization.general_agency_profile
         self.general_agency_profile.save!
-        person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
+        person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: self.general_agency_profile.id })
       end
       true
     end

@@ -7,7 +7,7 @@ class GeneralAgencyStaffRole
   embedded_in :person
   field :npn, type: String
   field :general_agency_profile_id, type: BSON::ObjectId
-  field :aasm_state, type: String, default: "general_agency_pending"
+  field :aasm_state, type: String, default: "applicant"
   embeds_many :workflow_state_transitions, as: :transitional
 
   associated_with_one :general_agency_profile, :general_agency_profile_id, "GeneralAgencyProfile"
@@ -21,22 +21,29 @@ class GeneralAgencyStaffRole
     allow_blank: false
 
   aasm do
-    state :general_agency_pending, initial: true
+    state :applicant, initial: true
     state :active
+    state :denied
+    state :decertified
     state :general_agency_declined
     state :general_agency_terminated
 
-    event :general_agency_accept, :after => [:record_transition, :send_invitation] do 
-      transitions from: :general_agency_pending, to: :active
+    event :approve, :after => [:record_transition, :send_invitation] do
+      transitions from: :applicant, to: :active
     end
 
-    event :general_agency_decline, :after => :record_transition do 
-      transitions from: :general_agency_pending, to: :general_agency_declined
+    event :deny, :after => :record_transition  do
+      transitions from: :applicant, to: :denied
     end
 
-    event :general_agency_terminate, :after => :record_transition do 
-      transitions from: :active, to: :general_agency_terminated
+    event :decertify, :after => :record_transition  do
+      transitions from: :active, to: :decertified
     end
+
+    # Attempt to achieve or return to good standing with HBX
+    event :reapply, :after => :record_transition  do
+      transitions from: [:applicant, :decertified, :denied], to: :applicant
+    end  
   end
 
   def send_invitation
@@ -47,12 +54,12 @@ class GeneralAgencyStaffRole
     aasm_state.humanize.titleize
   end
 
-  def active?
-    aasm_state == 'active'
+  def applicant?
+    aasm_state == 'applicant'
   end
 
-  def agency_pending?
-    aasm_state == 'general_agency_pending'
+  def active?
+    aasm_state == 'active'
   end
 
   def email

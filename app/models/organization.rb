@@ -150,6 +150,10 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
+  def self.search_by_general_agency(search_content)
+    Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
+  end
+
   def self.default_search_order
     [[:legal_name, 1]]
   end
