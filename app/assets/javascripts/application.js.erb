@@ -33,7 +33,7 @@
 //= require plan_year_selection
 //= require bootstrap-slider
 //= require_tree .
-  
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -78,7 +78,7 @@ $(document).on('page:update', function(){
 
 
   } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
-    validatePlanYear()
+    validatePlanYear();
 
     $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
       validatePlanYear();
@@ -122,19 +122,24 @@ function getCarrierPlans(ep, ci) {
         return;
       }
     });
-    editbgemployeepremiums.each(function() {
+    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+      editvalidatedbgemployeepremiums = true;
+      editvalidated = true;
+    } else {
+      editbgemployeepremiums.each(function() {
 
-      if ( parseInt($(this).val() ) >= parseInt(50) ) {
-        editvalidatedbgemployeepremiums = true
-        editvalidated = true;
+        if ( parseInt($(this).val() ) >= parseInt(50) ) {
+          editvalidatedbgemployeepremiums = true
+          editvalidated = true;
+        } else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          editvalidatedbgemployeepremiums = false;
+          editvalidated = false;
+          return false;
 
-      } else {
-        editvalidatedbgemployeepremiums = false;
-        editvalidated = false;
-
-        return;
-      }
-    });
+        }
+      });
+    }
 
     if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
       editvalidatedreferenceplanselections = true
@@ -185,19 +190,22 @@ function getCarrierPlans(ep, ci) {
           return;
         }
       });
-      bgemployeepremiums.each(function() {
-
-        if ( parseInt($(this).val() ) >= parseInt(50) ) {
-          validatedbgemployeepremiums = true
-          validated = true;
-
-        } else {
-          validatedbgemployeepremiums = false;
-          validated = false;
-
-          return;
-        }
-      });
+      if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+        validatedbgemployeepremiums = true;
+        validated = true;
+      } else {
+        bgemployeepremiums.each(function() {
+          if ( parseInt($(this).val()) >= parseInt(50) ) {
+            validatedbgemployeepremiums = true;
+            validated = true;
+          } else {
+            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+            validatedbgemployeepremiums = false;
+            validated = false;
+            return false;
+          }
+        });
+      }
 
       if ( referenceplanselections.length != $('.benefit-group-fields').length ) {
         validatedreferenceplanselections = false
@@ -253,7 +261,6 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 // reveal published plan years benefit groups
 $(document).ready(function () {
-
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {
@@ -405,18 +412,6 @@ $(document).ready(function () {
       iteration= (iteration+1) %functions.length
     })
   }
-
-  $(document).on('click', '#address_info + span.form-action', function(){
-    if ($(this).text() == "Add Mailing Address"){
-      $(this).text('Remove Mailing Address');
-      $('.row-form-wrapper.mailing-div').show();
-    }else if ($(this).text() == "Remove Mailing Address"){
-      $(this).text('Add Mailing Address');
-      $('.mailing-div').hide();
-      $(".mailing-div input[type='text']").val("");
-      $('.mailing-div .label-floatlabel').hide();
-    }
-  });
 
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
@@ -911,3 +906,15 @@ $(document).on('click', '.interaction-click-control-cancel, .interaction-click-c
 $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
 })
+
+$(document).on('click', '#address_info + span.form-action', function(){
+  if ($(this).text() == "Add Mailing Address"){
+    $(this).text('Remove Mailing Address');
+    $('.row-form-wrapper.mailing-div').show();
+  }else if ($(this).text() == "Remove Mailing Address"){
+    $(this).text('Add Mailing Address');
+    $('.mailing-div').hide();
+    $(".mailing-div input[type='text']").val("");
+    $('.mailing-div .label-floatlabel').hide();
+  }
+});

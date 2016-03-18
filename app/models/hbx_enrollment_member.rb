@@ -27,6 +27,10 @@ class HbxEnrollmentMember
     hbx_enrollment.family if hbx_enrollment.present?
   end
 
+  def covered?
+    (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
+  end
+
   def family_member
     self.hbx_enrollment.household.family.family_members.detect do |fm|
       fm.id == applicant_id
@@ -72,6 +76,14 @@ class HbxEnrollmentMember
       applicant_id: coverage_household_member.family_member_id,
       is_subscriber: coverage_household_member.is_subscriber
     )
+  end
+
+  def is_covered_on?(coverage_date)
+    if coverage_end_on.present? && coverage_end_on < coverage_date
+      false
+    else
+      true
+    end
   end
 
   private

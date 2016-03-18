@@ -91,8 +91,8 @@ class FinancialStatement
           daily_income = income_deduction.amount_in_cents / (working_days_in_year)
       end
 
-      income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" or income_deduction.start_date.blank?
-      income_deduction.end_date   = TimeKeeper.date_of_record.end_of_year if income_deduction.end_date.to_s.eql? "01-01-0001" or income_deduction.end_date.blank?
+      income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" || income_deduction.start_date.blank?
+      income_deduction.end_date   = TimeKeeper.date_of_record.end_of_year if income_deduction.end_date.to_s.eql? "01-01-0001" || income_deduction.end_date.blank?
       years = (income_deduction.start_date.year..income_deduction.end_date.year)
 
       years.to_a.each do |year|

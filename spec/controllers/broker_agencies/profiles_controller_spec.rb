@@ -191,14 +191,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "family_index" do
     before :all do
-      org = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
-      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization:org)
+      org = FactoryGirl.create(:organization)
+      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: org)
       broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)
       person = broker_role.person
       @current_user = FactoryGirl.create(:user, person: person, roles: [:broker])
       families = []
       30.times.each do
-        family = FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(100000))
+        family = FactoryGirl.create(:family, :with_primary_family_member)
         family.hire_broker_agency(broker_role.id)
         families << family
       end
@@ -231,6 +231,54 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
       expect(assigns(:families).count).to eq(27)
+    end
+  end
+
+  describe "eligible_brokers" do
+
+    before :all do
+      org1 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization:org1, market_kind:'individual')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind:'individual', aasm_state:'active')
+
+      org2 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+
+      org3 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+      broker_agency_profile3 = FactoryGirl.create(:broker_agency_profile, organization:org3, market_kind:'both')
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
+
+    end
+
+    context "individual market user" do
+      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+
+      it "selects only 'individual' and 'both' market brokers" do
+        allow(subject).to receive(:current_user).and_return(user)
+        controller.instance_variable_set(:@person, person)
+        staff = subject.instance_eval{ eligible_brokers }
+
+        staff.each do |staff_person|
+         expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+        end
+      end
+    end
+
+    context "SHOP market user" do
+      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+
+      it "selects only 'shop' and 'both' market brokers" do
+        allow(subject).to receive(:current_user).and_return(user)
+        controller.instance_variable_set(:@person, person)
+        staff = subject.instance_eval{ eligible_brokers }
+
+        staff.each do |staff_person|
+          expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+        end
+      end
     end
   end
 end

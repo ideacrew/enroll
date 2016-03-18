@@ -99,7 +99,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         let(:found_person) { [] }
         let(:person){ double("Person") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
-        before :each do 
+        before :each do
           post :match, :person => person_parameters
         end
 
@@ -122,8 +122,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         end
       end
 
-      context "when match employer" do 
-        before :each do 
+      context "when match employer" do
+        before :each do
           allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
@@ -131,7 +131,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           post :match, :person => person_parameters
         end
 
-        it "render employee role match tempalte" do 
+        it "render employee role match tempalte" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template('insured/employee_roles/match')
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
@@ -152,6 +152,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
     end
   end
+
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     before(:each) do
@@ -163,7 +164,11 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       post :create, person: person_params
       expect(response).to have_http_status(:redirect)
     end
+
+
   end
+
+
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     before(:each) do
@@ -191,29 +196,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       get :edit, id: "test"
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
-    end
-  end
-
-  describe "GET immigration_document_options" do
-
-    it "render javascript template" do
-      sign_in
-      xhr :get, :immigration_document_options, format: :js
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template(:immigration_document_options)
-    end
-
-    context "when object type Person" do
-      let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
-      before(:each) do
-        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
-        allow(consumer_role).to receive(:person).and_return(person)
-      end
-      it "object has correct class" do
-        post :create, person: person_params
-        type = person.class.to_s
-        expect(type).to eq("Person")
-      end
     end
   end
 
@@ -263,32 +245,47 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
 
   context "GET immigration_document_options" do
-    let(:family_member) {FamilyMember.new}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:params) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
+    let(:family_member) {FactoryGirl.create(:person, :with_consumer_role)}
     before :each do
       sign_in user
     end
 
-    it "should get person" do
+    context "target type is Person" do
+      before :each do
+        allow(Person).to receive(:find).and_return person
+        xhr :get, 'immigration_document_options', params, format: :js
+      end
+      it "should get person" do
+        expect(response).to have_http_status(:success)
+        expect(assigns(:target)).to eq person
+      end
+
+      it "assign vlp_doc_target from params" do
+        expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+      end
+
+      it "assign country of citizenship based on vlp document" do
+        expect(assigns(:country)).to eq "Ukraine"
+      end
+    end
+
+    context "target type is family member" do
+      xit "should get FamilyMember" do
+        allow(Forms::FamilyMember).to receive(:find).and_return family_member
+        xhr :get, 'immigration_document_options', {target_type: 'Forms::FamilyMember', target_id: "id", vlp_doc_target: "vlp doc", format: :js}
+        expect(response).to have_http_status(:success)
+        expect(assigns(:target)).to eq family_member
+        expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+      end
+    end
+
+    it "render javascript template" do
       allow(Person).to receive(:find).and_return person
-      xhr :get, 'immigration_document_options', {target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", format: :js}
+      xhr :get, 'immigration_document_options', params, format: :js
       expect(response).to have_http_status(:success)
-      expect(assigns(:target)).to eq person
-      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
-    end
-
-    it "should get FamilyMember" do
-      allow(Forms::FamilyMember).to receive(:find).and_return family_member
-      xhr :get, 'immigration_document_options', {target_type: 'Forms::FamilyMember', target_id: "id", vlp_doc_target: "vlp doc", format: :js}
-      expect(response).to have_http_status(:success)
-      expect(assigns(:target)).to eq family_member
-      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
-    end
-
-    it "should get FamilyMember" do
-      xhr :get, 'immigration_document_options', {target_type: 'Forms::FamilyMember', vlp_doc_target: "vlp doc", format: :js}
-      expect(response).to have_http_status(:success)
-      expect(assigns(:target).class).to eq Forms::FamilyMember
-      expect(assigns(:vlp_doc_target)).to eq "vlp doc"
+      expect(response).to render_template(:immigration_document_options)
     end
   end
 

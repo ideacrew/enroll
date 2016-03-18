@@ -13,7 +13,9 @@ $(document).on 'click', 'form .add_fields', (event) ->
 
   update_delete_buttons()
   applyJQDatePickers()
-  validatePlanYear()
+
+  if $('#plan_year_start_on').length
+    validatePlanYear()
 
 
   $('.benefit-group-fields:last').attr 'id', 'benefit-group-' + time

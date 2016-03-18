@@ -4,7 +4,8 @@ describe Family, "with 2 policies", :dbclean => :after_each do
   let(:family) { FactoryGirl.build(:family) }
   let(:primary) { FactoryGirl.create(:consumer_role) }
   let(:plan) { FactoryGirl.create(:plan) }
-  let(:benefit_package) { FactoryGirl.create(:benefit_package) }
+  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
 
   before :each do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 12, 15))

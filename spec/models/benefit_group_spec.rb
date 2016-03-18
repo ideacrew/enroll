@@ -8,7 +8,6 @@ describe BenefitGroup, dbclean: :after_each do
         FactoryGirl.create(:census_employee, employer_profile: employer_profile)
       end.sort_by(&:id)
     end
-
     context "and a plan year exists" do
       let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
 
@@ -33,6 +32,17 @@ describe BenefitGroup, dbclean: :after_each do
             date_of_hire = Date.new(2015, 1, 31)
             expected_effective = Date.new(2015, 4, 1)
             expect(benefit_group.effective_on_for(date_of_hire)).to eq expected_effective
+          end
+        end
+      end
+
+      context "starting on 1/1/xxxx" do
+        let(:start_plan_year) {Date.new(2015, 1, 1)}
+        context "and a benefit_group_exists" do
+          let(:benefit_group) { FactoryGirl.create(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+
+          it "is true" do
+            expect(benefit_group.save).to be_truthy
           end
         end
       end
@@ -400,11 +410,11 @@ describe BenefitGroup, type: :model do
       let(:organization)            { FactoryGirl.create(:organization) }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
       let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile) }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile_1) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
       let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile)
+          FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice])
         plans
@@ -446,7 +456,7 @@ describe BenefitGroup, type: :model do
     let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
 
     context "and employer contribution for employee" do
-      let(:minimum_contribution) { HbxProfile::ShopEmployerContributionPercentMinimum }
+      let(:minimum_contribution) { Settings.aca.shop_market.employer_contribution_percent_minimum }
       let(:invalid_minimum_contribution) { minimum_contribution - 1 }
 
       context "when the start_on of plan year is Jan 1" do
@@ -566,7 +576,7 @@ describe BenefitGroup, type: :model do
       context "when employer picked 'Date of Hire'" do
         let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "date_of_hire")}
 
-        context "when doh is a past date" do 
+        context "when doh is a past date" do
           let(:doh) { Date.new(2015, 8, 1)}
 
           it "should return plan year start on" do
@@ -579,15 +589,15 @@ describe BenefitGroup, type: :model do
 
           it "should return plan year start on" do
             expect(benefit_group.effective_on_for(doh)).to eq start_plan_year
-          end 
+          end
         end
 
-        context "when doh is a future date" do 
+        context "when doh is a future date" do
           let(:doh) { Date.new(2016, 1, 1)}
 
           it "should return date of hire" do
             expect(benefit_group.effective_on_for(doh)).to eq doh
-          end   
+          end
         end
       end
 
@@ -615,10 +625,10 @@ describe BenefitGroup, type: :model do
 
           it "should return date of hire" do
             expect(benefit_group.effective_on_for(doh)).to eq doh
-          end 
+          end
         end
 
-        context "when doh is a future date other than first of month" do 
+        context "when doh is a future date other than first of month" do
           let(:doh) { Date.new(2016, 2, 15)}
 
           it "should return first of next month from date of hire" do

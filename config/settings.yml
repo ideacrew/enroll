@@ -1,0 +1,86 @@
+#
+site:
+  short_name: "DC Health Link"
+  byline: "DC's Online Health Insurance Marketplace"
+  long_name: ""
+  copyright_period: "2013-2015"
+  header_message: "Welcome to the District's Health Insurance Marketplace"
+  logo_file_name: "logo.png"
+  home_url: "https://www.dchealthlink.com/"
+
+  social_media:
+    facebook_url: ""
+#
+contact_center:
+  name: "DC Health Link's Customer Care Center"
+  phone_number: "1-855-532-5465"
+  tty_number: "1-855-532-5465"
+  alt_phone_number: "1-855-532-LINK"
+  email_address: "info@dchealthlink.com"
+#
+aca:
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
+#
+  individual_market:
+    # IndividualEnrollmentDueDayOfMonth = 15
+    # Temporary change for Dec 2015 extension
+    monthly_enrollment_due_on: 18
+    verification_outstanding_window:
+      days: 0
+#
+    open_enrollment:
+      benefit_year_2016:
+        start_on: <%= Date.new(2015,11,1) %>
+        end_on: <%= Date.new(2016,1,31) %>
+
+  shop_market:
+    small_market_employee_count_maximum: 50
+    employer_contribution_percent_minimum: 50
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
+    non_owner_participation_count_minimum: 1
+    binder_payment_due_on: 15
+
+    earliest_enroll_prior_to_effective_on:
+      days: -30
+    latest_enroll_after_effective_on:
+      days: 30
+    latest_enroll_after_employee_roster_correction_on:
+      days: 30
+
+    retroactive_coverage_termination_maximum:
+      days: -60
+
+    initial_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      appeal_period_after_application_denial:
+        days: 30
+      # After submitting an ineligible plan year application, time period an Employer must wait
+      ineligible_period_after_application_denial:
+        days: 90
+
+    renewal_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      monthly_open_enrollment_end_on: 13
+
+    benefit_period:
+      length_minimum:
+        year: 1
+      length_maximum:
+        year: 1
+
+    open_enrollment:
+      monthly_start_on: 1
+      monthly_end_on: 10
+
+      minimum_length:
+        days: 5
+      maximum_length:
+        months: 2
+
+
+
+#   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+#   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth

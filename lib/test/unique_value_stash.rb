@@ -1,5 +1,5 @@
 module UniqueValueStash
-  class UniqueValues 
+  class UniqueValues
     def initialize
       @unique_values = {}
     end
@@ -18,12 +18,17 @@ module UniqueValueStash
       unique_date
     end
     def last_name key=nil
-      unique_last_name = "Wei#{rand(100000)}"
-      @unique_values[key] = unique_last_name if key 
-      unique_last_name   
+      unique_last_name = "Last#{rand(100000)}"
+      @unique_values[key] = unique_last_name if key
+      unique_last_name
+    end
+    def first_name key=nil
+      unique_first_name = "First#{rand(100000)}"
+      @unique_values[key] = unique_first_name if key
+      unique_first_name
     end
     def email key=nil
-      unique_email = "Trey#{rand(100000)}@example.com"
+      unique_email = "email#{rand(100000)}@email.com"
       @unique_values[key] = unique_email if key
       unique_email
     end
@@ -32,6 +37,6 @@ module UniqueValueStash
     end
     def fein key=nil
       number 9, key
-    end   
+    end
   end
 end
