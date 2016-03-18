@@ -82,7 +82,7 @@ class EmployerProfile
   end
 
   def staff_roles #managing profile staff
-    Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
+    Person.staff_for_employer(self)
   end
 
   def match_employer(current_user)

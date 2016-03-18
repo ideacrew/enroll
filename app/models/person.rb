@@ -520,7 +520,8 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      #where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      staff_for_employer(employer_profile)
     end
 
     def match_existing_person(personish)
@@ -559,7 +560,7 @@ class Person
 
     def staff_for_employer(employer_profile)
       staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
-      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.aasm_state == 'is_active'}.map(&:person)
+      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
     end
 
     def staff_for_employer_including_pending(employer_profile)
