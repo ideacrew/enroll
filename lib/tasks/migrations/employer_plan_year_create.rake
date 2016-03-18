@@ -18,14 +18,32 @@ namespace :migrations do
       })
 
       new_plan_year.save!
+      new_plan_year.update_attributes({:aasm_state => 'active'})
       add_benefit_groups(prev_plan_year, new_plan_year, employer_profile)
     end
-
     
     plan_year_create.call Organization.where(:legal_name => 'ACE').first
     plan_year_create.call Organization.where(:legal_name => /JSP Companies/i).first
     plan_year_create.call Organization.where(:legal_name => /Colapinto LLP/i).first
     plan_year_create.call Organization.where(:legal_name => /Preventive Measures of/i).first
+
+
+    new_plan_year_create = Proc.new do |organization|
+      puts "Processing #{organization.legal_name}"
+
+      employer_profile = organization.employer_profile
+      new_plan_year = employer_profile.plan_years.build({
+        start_on: Date.new(2015, 11, 1),
+        end_on: Date.new(2015, 11, 1) + 1.year - 1.day,
+        open_enrollment_start_on: Date.new(2015, 10, 1),
+        open_enrollment_end_on: Date.new(2015, 10, 10)
+      })
+
+      new_plan_year.save!
+    end
+
+    new_plan_year_create.call Organization.where(:legal_name => /Civic Nation/i).first
+    new_plan_year_create.call Organization.where(:legal_name => /Association of Proposal Management Professionals/i).first
   end
 end
 
