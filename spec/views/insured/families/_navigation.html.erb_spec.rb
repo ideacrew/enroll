@@ -14,6 +14,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   let(:employer_profile){ instance_double("EmployerProfile") }
   let(:broker_agency_profile){ instance_double("BrokerAgencyProfile") }
   let(:inbox){ instance_double("Inbox") }
+  let(:active_family_members){ instance_double("ActiveFamilyMembers")}
   def family_member
     random_value = rand(999_999_999)
     instance_double(
@@ -30,6 +31,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     allow(person).to receive(:has_active_employee_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
     allow(inbox).to receive(:unread_messages).and_return(3)
+    allow(view).to receive(:enrollment_group_verified?).and_return(true)
     allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
     allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
     assign(:person, person)

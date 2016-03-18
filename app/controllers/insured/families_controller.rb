@@ -113,17 +113,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def documents_index #changed
-    @time_to = Time.now + 90.days
-    @family_members = @person.primary_family.family_members.active
+
   end
 
   def verification
     @time_to = Time.now + 90.days
     @family_members = @person.primary_family.family_members.active
-  end
-
-  def document_upload #changed
-    @person_family = @person.primary_family.family_members
   end
 
   def check_qle_date

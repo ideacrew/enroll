@@ -14,12 +14,6 @@ RSpec.describe "insured/families/documents_index.html.erb" do
     expect(rendered).to have_selector('h1', text: 'Documents')
   end
 
-  it "should display the link of upload document" do
-    allow(person).to receive(:consumer_role).and_return(double)
-    render file: "insured/families/documents_index.html.erb"
-    expect(rendered).to have_selector('a', text: 'Upload Document')
-  end
-
   it "should not display the link of upload document" do
     allow(person).to receive(:consumer_role).and_return(nil)
     render file: "insured/families/documents_index.html.erb"

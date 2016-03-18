@@ -14,6 +14,4 @@
       <%= link_to "Download Tax Documents", 'https://www.dchealthlink.com/individuals/tax-documents', class: "btn btn-primary btn-br pull-right", target: '_blank' if @person.try(:consumer_role).present? %>
     </div>
   </div>
-  <h4 class="starter">We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
-  <%= render partial: "documents_index" %>
 </div>
