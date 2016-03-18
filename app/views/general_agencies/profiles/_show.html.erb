@@ -1,0 +1,24 @@
+<div class="container bottom-pd">
+  <h3>General Agency : <%= @general_agency_profile.legal_name %></h3>
+
+  <div class="table-border table-responsive">
+    <table class="table">
+      <thead>
+        <th>Legal Name</th>
+        <th>dba</th>
+        <th>Fein</th>
+        <th>Entity Kind</th>
+        <th>Market Kind</th>
+      </thead>
+      <tbody>
+        <td><%= @general_agency_profile.legal_name %></td>
+        <td><%= @general_agency_profile.dba %></td>
+        <td><%= @general_agency_profile.fein %></td>
+        <td><%= @general_agency_profile.entity_kind.titleize %></td>
+        <td><%= @general_agency_profile.market_kind.titleize %></td>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render "office_locations", office_locations: @general_agency_profile.organization.office_locations %>
+</div>
