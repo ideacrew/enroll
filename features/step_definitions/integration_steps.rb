@@ -192,6 +192,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
+  #TODO bombs on selectric scroll sometimes...
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
   step "I enter office location for #{default_office_location}"
@@ -344,6 +345,7 @@ When(/^.+ accepts? the matched employer$/) do
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
+  # Sometimes bombs due to overlapping modal
   person = people[named_person]
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
@@ -560,7 +562,9 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  click_link "CONTINUE"
+  within '#qle-date-chose' do
+    click_link "CONTINUE"
+  end
 end
 
 Then(/^I should see confirmation and continue$/) do
