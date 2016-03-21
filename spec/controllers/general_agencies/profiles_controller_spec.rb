@@ -155,4 +155,61 @@ RSpec.describe GeneralAgencies::ProfilesController do
       expect(assigns[:staffs]).to eq general_agency_profile.general_agency_staff_roles
     end
   end
+
+  describe "GET messages" do
+    before(:each) do
+      sign_in(user)
+      xhr :get, :messages
+    end
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the messages template" do
+      expect(response).to render_template("messages")
+    end
+
+    it "should get provider" do
+      expect(assigns(:provider)).to eq person
+    end
+  end
+
+  describe "GET agency_messages" do
+    before(:each) do
+      sign_in(user)
+      xhr :get, :agency_messages, id: general_agency_profile.id
+    end
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the agency_messages template" do
+      expect(response).to render_template("agency_messages")
+    end
+  end
+
+  describe "GET inbox" do
+    before(:each) do
+      sign_in(user)
+      xhr :get, :inbox, id: general_agency_profile.id
+    end
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the inbox template" do
+      expect(response).to render_template("inbox")
+    end
+
+    it "should get general_agency_profile" do
+      expect(assigns(:general_agency_provider)).to eq general_agency_profile
+    end
+
+    it "should get provider" do
+      expect(assigns(:provider)).to eq general_agency_profile
+    end
+  end
 end
