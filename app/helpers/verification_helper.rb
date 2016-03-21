@@ -46,14 +46,11 @@ module VerificationHelper
   end
 
   def verification_type_status(type)
-    case type
-      when 'SSN'
+     if type == 'SSN' || type == 'Citizenship'
         @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
-      when 'Citizenship'
-        @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
-      when 'Immigration status'
+     elsif type == 'Immigration status'
         @person.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
-    end
+     end
   end
 
   def verification_type_class(type)
