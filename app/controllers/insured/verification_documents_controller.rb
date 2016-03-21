@@ -6,13 +6,12 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def upload
     @doc_errors = []
-    doc_params = {:subject => params[:document]}
     @docs_owner = find_docs_owner(params[:family_member])
     if params[:file]
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if update_vlp_documents(doc_params, file_name(file), doc_uri)
+          if update_vlp_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
@@ -63,9 +62,9 @@ class Insured::VerificationDocumentsController < ApplicationController
     @person.primary_family.family_members.find(id).person
   end
 
-  def update_vlp_documents(doc_params, title, file_uri)
+  def update_vlp_documents(title, file_uri)
     document = @docs_owner.consumer_role.vlp_documents.build
-    success = document.update_attributes(doc_params.merge({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"}))
+    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end

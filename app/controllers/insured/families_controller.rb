@@ -112,12 +112,11 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
   end
 
-  def documents_index #changed
+  def documents_index
 
   end
 
   def verification
-    @time_to = Time.now + 90.days
     @family_members = @person.primary_family.family_members.active
   end
 

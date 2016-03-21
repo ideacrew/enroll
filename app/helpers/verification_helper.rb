@@ -46,14 +46,11 @@ module VerificationHelper
   end
 
   def verification_type_status(type)
-    case type
-      when 'SSN'
+     if type == 'SSN' || type == 'Citizenship'
         @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
-      when 'Citizenship'
-        @person.consumer_role.is_state_resident? ? "verified" : "outstanding"
-      when 'Immigration status'
+     elsif type == 'Immigration status'
         @person.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
-    end
+     end
   end
 
   def verification_type_class(type)
@@ -74,5 +71,9 @@ module VerificationHelper
 
   def verification_due_date
     @person.consumer_role.lawful_presence_determination.latest_denial_date.try(:+, 90.days).try(:>, TimeKeeper.date_of_record) || (TimeKeeper.date_of_record + 90.days)
+  end
+
+  def member_has_uploaded_docs(member)
+    true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
   end
 end

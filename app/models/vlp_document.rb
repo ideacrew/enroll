@@ -97,6 +97,9 @@ class VlpDocument < Document
   # document verification status ::VlpDocument::VLP_DOCUMENT_KINDS
   field :status, type: String, default: "not submitted"
 
+  # verification type this document can support: SSN, Citizenship, Immigration status
+  field :verification_type, default: "Citizenship"
+
   field :comment, type: String
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
