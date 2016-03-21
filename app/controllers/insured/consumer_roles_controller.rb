@@ -148,14 +148,18 @@ class Insured::ConsumerRolesController < ApplicationController
   def immigration_document_options
     if params[:target_type] == "Person"
       @target = Person.find(params[:target_id])
+      vlp_docs = @target.consumer_role.vlp_documents
     elsif params[:target_type] == "Forms::FamilyMember"
       if params[:target_id].present?
         @target = Forms::FamilyMember.find(params[:target_id])
+        vlp_docs = @target.family_member.person.consumer_role.vlp_documents
       else
         @target = Forms::FamilyMember.new
       end
     end
     @vlp_doc_target = params[:vlp_doc_target]
+    vlp_doc_subject = params[:vlp_doc_subject]
+    @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
   end
 
   def edit
@@ -169,7 +173,7 @@ class Insured::ConsumerRolesController < ApplicationController
     #authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
 
-    if update_vlp_documents(@consumer_role, 'person') and @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+    if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}

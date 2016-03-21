@@ -20,10 +20,10 @@ RSpec.describe Employers::PremiumStatementsController do
   let(:hbx_enrollments) { [
     double("HbxEnrollment",
       plan: plan,
-      humanized_dependent_summary: 2,
+      humanized_members_summary: 2,
       total_employer_contribution: 200,
       total_employee_cost: 781.2,
-      total_premium: 981.2
+      total_premium: 981.2,
       )] }
 
   let(:census_employee) {
@@ -41,8 +41,12 @@ RSpec.describe Employers::PremiumStatementsController do
     before do
       allow(user).to receive(:person).and_return(person)
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-      allow(employer_profile).to receive(:published_plan_year).and_return(current_plan_year)
+      allow(employer_profile).to receive(:premium_billing_plan_year_and_enrollments).and_return([current_plan_year, hbx_enrollments])
       allow(current_plan_year).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(census_employee).to receive(:is_active?).and_return(true)
+      hbx_enrollments.each do |hbx_enrollment|
+        allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      end
     end
 
     it "should return contribution" do
@@ -56,7 +60,7 @@ RSpec.describe Employers::PremiumStatementsController do
     before do
       allow(user).to receive(:person).and_return(person)
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-      allow(employer_profile).to receive(:published_plan_year).and_return(current_plan_year)
+      allow(employer_profile).to receive(:premium_billing_plan_year_and_enrollments).and_return([current_plan_year, hbx_enrollments])
       allow(current_plan_year).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       @hbx_enrollment = hbx_enrollments.first
       employee_role = employee_roles.first
@@ -64,7 +68,10 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(subscriber).to receive(:person).and_return(person)
       allow(person).to receive(:employee_roles).and_return(employee_roles)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(census_employee).to receive(:is_active?).and_return(true)
+      allow(@hbx_enrollment).to receive(:census_employee).and_return(census_employee)
     end
+
     it "returns a text/csv content type" do
       sign_in(user)
       xhr :get, :show, id: "test", format: :csv
@@ -82,7 +89,7 @@ RSpec.describe Employers::PremiumStatementsController do
       expect(response.body).to have_content(/#{census_employee.published_benefit_group.title}/)
       expect(response.body).to have_content(/#{@hbx_enrollment.plan.name}/)
       expect(response.body).to have_content(/#{@hbx_enrollment.plan.carrier_profile.legal_name}/)
-      expect(response.body).to have_content(/#{@hbx_enrollment.humanized_dependent_summary}/)
+      expect(response.body).to have_content(/#{@hbx_enrollment.humanized_members_summary}/)
       expect(response.body).to have_content(/#{@hbx_enrollment.total_employer_contribution}/)
       expect(response.body).to have_content(/#{@hbx_enrollment.total_employee_cost}/)
       expect(response.body).to have_content(/#{@hbx_enrollment.total_premium}/)

@@ -4,6 +4,7 @@ FactoryGirl.define do
     receipt_number "abc4567890123"
     expiration_date Date.today
     issuing_country "USA"
+    country_of_citizenship "Ukraine"
     passport_number "123456"
     subject VlpDocument::VLP_DOCUMENT_KINDS[0] #I-327 (Reentry Permit) and validates on :alien_number
   end
