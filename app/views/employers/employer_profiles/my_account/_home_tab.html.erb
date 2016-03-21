@@ -100,9 +100,9 @@
         </header>
       </section>
       <section class="col-xs-6">
-        <header class="row">
+        <!--<header class="row">
           <a class="details" onclick="$(this).closest('.benefitgroup').next().toggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
-        </header>
+        </header>-->
       </section>
       <table>
         <tr>
@@ -120,158 +120,200 @@
           </td>
         </tr>
       </table>
-      <div class="panel benefitgroup referenceplan home">
-        <% if bg.dental_reference_plan_id.present? %>
-          <h5 class="bg-title">Health</h5>
-        <% end%>
-      <table>
-        <tr>
-          <th>
-            <header>Reference Plan</header>
-          </th>
-          <th>
-            <header>Carrier</header>
-          </th>
-          <th>
-            <header>Type</header>
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <%= bg.reference_plan.name.try(:upcase) %>
-            </p>
-          </td>
-          <td>
-            <p>
-              <%= bg.reference_plan.carrier_profile.legal_name %>
-            </p>
-          </td>
-          <td>
-            <p>
-              <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <th>
-            <header>Metal Level</header>
-          </th>
-          <th>
-            <header>Plans By</header>
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <%= bg.reference_plan.metal_level.titleize %>
-            </p>
-          </td>
-          <td>
-            <p>
-              <% if bg.plan_option_kind == "single_carrier" %>
-              All Plans From A Single Carrier
-              <% elsif bg.plan_option_kind == "metal_level" %>
-              All Plans From A Given Metal Level
-              <% elsif bg.plan_option_kind == "single_plan" %>
-              A Single Plan
-              <% end %>
-            </p>
-          </td>
-        </tr>
-      </table>
-      <% if bg.dental_reference_plan_id.present? %>
-      <h5 class="bg-title">Dental</h5>
-  <table>
-    <tr>
-      <th>
-        <header>Reference Plan</header>
-      </th>
-      <th>
-        <header>Carrier</header>
-      </th>
-      <th>
-        <header>Type</header>
-      </th>
-    </tr>
-    <tr>
-      <td>
-        <p>
-          <%= bg.dental_reference_plan.name %>
-        </p>
-      </td>
-      <td>
-        <p>
-          <%= bg.dental_reference_plan.carrier_profile.legal_name %>
-        </p>
-      </td>
-      <td>
-        <p>
-          <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
-        </p>
-      </td>
-    </tr>
-    <tr>
-      <th>
-        <header>Metal Level</header>
-      </th>
-      <th>
-        <header>Plans By</header>
-      </th>
-    </tr>
-    <tr>
-      <td>
-        <p>
-          <%= bg.dental_reference_plan.metal_level.titleize %>
-        </p>
-      </td>
-      <td>
-        <p>
-          <% if bg.dental_plan_option_kind == "single_carrier" %>
-          All Plans From A Single Carrier
-          <% elsif bg.dental_plan_option_kind == "single_plan" %>
-            <% if bg.elected_dental_plan_ids.count < 13 %>
-              Custom (<%= bg.elected_dental_plans.count %> Plans)
-              <br/>
-              <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
 
-            <% else %>
-              All Plans
+    </div>
+    
+
+    <div class="plan-details panel benefitgroup col-xs-12" style="display: true;"> 
+
+        <div class="panel benefitgroup referenceplan home">
+            <% if bg.dental_reference_plan_id.present? %>
+            <h5 class="bg-title">Health</h5>
+          <% end%>
+        <table>
+          <tr>
+            <th>
+              <header>Reference Plan</header>
+            </th>
+            <th>
+              <header>Carrier</header>
+            </th>
+            <th>
+              <header>Type</header>
+            </th>
+          </tr>
+          <tr>
+            <td>
+              <p>
+                <%= bg.reference_plan.name.try(:upcase) %>
+              </p>
+            </td>
+            <td>
+              <p>
+                <%= bg.reference_plan.carrier_profile.legal_name %>
+              </p>
+            </td>
+            <td>
+              <p>
+                <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <th>
+              <header>Metal Level</header>
+            </th>
+            <th>
+              <header>Plans By</header>
+            </th>
+          </tr>
+          <tr>
+            <td>
+              <p>
+                <%= bg.reference_plan.metal_level.titleize %>
+              </p>
+            </td>
+            <td>
+              <p>
+                <% if bg.plan_option_kind == "single_carrier" %>
+                All Plans From A Single Carrier
+                <% elsif bg.plan_option_kind == "metal_level" %>
+                All Plans From A Given Metal Level
+                <% elsif bg.plan_option_kind == "single_plan" %>
+                A Single Plan
+                <% end %>
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <div style ="align:right;">
+          <button id = "showhidebutton" href="#collapse-health-<%=bg.id%>" class="nav-toggle">
+              View Details 
+              <a><i class="fa fa-chevron-down fa-lg"></i></a>
+          </button> 
+        </div>
+      
+        <!--Health plan collapsible: start -->
+        <div id="collapse-health-<%=bg.id%>" style="display:none">
+          <div class="col-xs-12 package-offering">
+          <table>
+            <tr>
+              <th>Offered</th>
+              <th>Employer <% if bg.dental_reference_plan_id.present? %>Health <% end %>Contribution</th>
+            </tr>
+            <% bg.relationship_benefits.each_with_index do |rb, i| %>
+            <tr>
+              <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+              <td><strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong></td>
+            </tr>
             <% end %>
-          <% end %>
-        </p>
-      </td>
-    </tr>
-  </table>
-  <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
-    <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
-  <% end %>
-  <% end %>
+          </table>
+          </div>
+        </div>
+        <!--Dental plan collapsible: end -->
+        <br class="clear"/>
+        <hr />
 
-    </div>
-    </div>
-    <div class="plan-details" style="display: none;">
-    <div class="col-xs-12 package-offering">
-      <table>
-        <tr>
-          <th>Offered</th>
-          <th>Employer <% if bg.dental_reference_plan_id.present? %>Health <% end %>Contribution</th>
-          <% if bg.dental_reference_plan_id.present? %>
-            <th>Employer Dental Contribution</th>
-          <% end %>
-        </tr>
-        <% bg.relationship_benefits.each_with_index do |rb, i| %>
-        <tr>
-          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-          <td><strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong></td>
-          <% if bg.dental_reference_plan_id.present? %>
-            <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
+        <% if bg.dental_reference_plan_id.present? %>
+          <h5 class="bg-title">Dental</h5>
+          <table>
+            <tr>
+              <th>
+                <header>Reference Plan</header>
+              </th>
+              <th>
+                <header>Carrier</header>
+              </th>
+              <th>
+                <header>Type</header>
+              </th>
+            </tr>
+            <tr>
+              <td>
+                <p>
+                  <%= bg.dental_reference_plan.name %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <%= bg.dental_reference_plan.carrier_profile.legal_name %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <header>Metal Level</header>
+              </th>
+              <th>
+                <header>Plans By</header>
+              </th>
+            </tr>
+            <tr>
+              <td>
+                <p>
+                  <%= bg.dental_reference_plan.metal_level.titleize %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <% if bg.dental_plan_option_kind == "single_carrier" %>
+                  All Plans From A Single Carrier
+                  <% elsif bg.dental_plan_option_kind == "single_plan" %>
+                    <% if bg.elected_dental_plan_ids.count < 13 %>
+                      Custom (<%= bg.elected_dental_plans.count %> Plans)
+                      <br/>
+                      <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
+
+                    <% else %>
+                      All Plans
+                    <% end %>
+                  <% end %>
+                </p>
+              </td>
+            </tr>
+          </table>
+
+        <div>
+          <button id = "showhidebutton" href="#collapse-dental-<%=bg.id%>" class="nav-toggle">
+              View Details 
+              <a><i class="fa fa-chevron-down fa-lg"></i></a>
+          </button> 
+        </div>
+      
+        <!—Dental plan collapsible: start -->
+        <div id="collapse-dental-<%=bg.id%>" style="display:none">
+          <div class="col-xs-12 package-offering">
+            <table>
+              <tr>
+                <th>Offered</th>
+                <th>Employer Dental Contribution</th>
+              </tr>
+              <% bg.relationship_benefits.each_with_index do |rb, i| %>
+              <tr>
+                <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td> 
+                <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
+              </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+        <!--Dental plan collapsible: end -->
+
+
+          <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
+            <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
           <% end %>
 
-        </tr>
-        <% end %>
-      </table>
+    <% end %>
     </div>
+
+    <% if bg.dental_reference_plan_id.present? %><br class="clear"/><hr /><%end%>
 
     <div class="panel benefitgroup col-xs-12 referenceplan home est">
 
