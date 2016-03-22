@@ -7,7 +7,6 @@ describe "shared/_summary.html.erb" do
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
   let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [], :id => "3241251524", :shopping? => true, plan: mock_plan, coverage_kind: 'health') }
   let(:mock_plan) { double("Plan",
-      :coverage_kind => "health",
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,
@@ -37,27 +36,53 @@ describe "shared/_summary.html.erb" do
     assign :person, person
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
-    render "shared/summary", :qhp => mock_qhp_cost_share_variance
   end
 
-  it "should have a link to download the sbc pdf" do
-    expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+  context "with no provider_directory_url and rx_formulary_urls " do
+
+    before :each do
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+    end
+
+    it "should have a link to download the sbc pdf" do
+      expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+    end
+
+    it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
+      expect(rendered).to include('Summary of Benefits and Coverage')
+    end
+
+    it "should not have 'having a baby'" do
+      expect(rendered).not_to have_selector("h4", text: "Having a Baby")
+    end
+
+    it "should not have 'managing type diabetes'" do
+      expect(rendered).not_to have_selector("h4", text: "Managing Type 2 Diabetes")
+    end
   end
 
-  it "should have provider_directory_url and rx_formulary_url" do
-    expect(rendered).to have_selector("a[href='#{mock_plan.provider_directory_url}']")
-    expect(rendered).to have_selector("a[href='#{mock_plan.rx_formulary_url}']")
-  end
+  context "provider_directory_url and rx_formulary_url" do
 
-  it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
-    expect(rendered).to include('Summary of Benefits and Coverage')
-  end
+    it "should have rx formulary url coverage_kind = health" do
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to match(/#{mock_plan.rx_formulary_url}/)
+    end
 
-  it "should not have 'having a baby'" do
-    expect(rendered).not_to have_selector("h4", text: "Having a Baby")
-  end
+    it "should not have rx_formulary_url coverage_kind = dental" do
+      allow(mock_plan).to receive(:coverage_kind).and_return("dental")
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to_not match(/#{mock_plan.rx_formulary_url}/)
+    end
 
-  it "should not have 'managing type diabetes'" do
-    expect(rendered).not_to have_selector("h4", text: "Managing Type 2 Diabetes")
+    it "should have provider directory url if nationwide = true" do
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
+    end
+
+    it "should not have provider directory url if nationwide = false" do
+      allow(mock_plan).to receive(:nationwide).and_return(false)
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
+    end
   end
 end

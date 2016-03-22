@@ -147,8 +147,8 @@ puts "*"*80
 
 puts "*"*80
 puts "importing provider_directory_urls and rx_formulary_urls for plans"
-system "bundle exec rake import:provider_and_rx_formulay_url"
-puts "importing provider_directory_urls and rx_formulary_urls for plans"
+system "bundle exec rake import:provider_and_rx_formulary_url"
+puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
 puts "*"*80
 
 puts "*"*80

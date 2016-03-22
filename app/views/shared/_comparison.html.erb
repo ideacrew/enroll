@@ -60,7 +60,7 @@
         <th></th>
         <% qhps.each do |qhp|%>
           <th colspan="2">
-            <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
+            <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
               <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
             <% end %>
           </th>
