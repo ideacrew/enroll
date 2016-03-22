@@ -82,7 +82,7 @@ class EmployerProfile
   end
 
   def staff_roles #managing profile staff
-    Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
+    Person.staff_for_employer(self)
   end
 
   def match_employer(current_user)
@@ -171,6 +171,36 @@ class EmployerProfile
     (plan_years.published + plan_years.renewing_published_state).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
+  end
+
+  def billing_plan_year
+    billing_report_date = TimeKeeper.date_of_record.next_month
+    plan_year = find_plan_year_by_effective_date(billing_report_date)
+
+    if plan_year.blank?
+      plan_year = plan_years.published.detect{|py| py.start_on > billing_report_date }
+      billing_report_date = plan_year.start_on if plan_year
+    end
+    
+    if plan_year.blank?
+      billing_report_date = TimeKeeper.date_of_record
+      plan_year = find_plan_year_by_effective_date(billing_report_date)
+    end
+
+    return plan_year, billing_report_date
+  end
+
+
+  def premium_billing_plan_year_and_enrollments
+    plan_year, billing_report_date = billing_plan_year
+    hbx_enrollments = []
+
+    if plan_year.present?
+      hbx_enrollments = plan_year.hbx_enrollments_by_month(billing_report_date).compact
+      hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
+    end
+
+    return plan_year, hbx_enrollments
   end
 
   def find_plan_year(id)

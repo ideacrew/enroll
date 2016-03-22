@@ -5,7 +5,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:employee_role) { FactoryGirl.build(:employee_role) }
   let(:census_employee) { FactoryGirl.build(:census_employee) }
   let(:hbx_enrollments) {double}
-  let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let(:current_user) { FactoryGirl.create(:user)}
 
 
@@ -15,6 +15,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :employee_role, employee_role
       assign :hbx_enrollments, hbx_enrollments
       sign_in(current_user)
+      allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(current_user).to receive(:has_employee_role?).and_return(true)
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       render "insured/families/shop_for_plans_widget"
@@ -54,7 +56,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   context "action path" do
     let(:benefit_group) { double }
     let(:new_hire_enrollment_period) { TimeKeeper.date_of_record..(TimeKeeper.date_of_record + 30.days) }
- 
+
     before :each do
       assign :person, person
       assign :employee_role, employee_role

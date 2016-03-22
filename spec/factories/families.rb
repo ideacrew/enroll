@@ -7,7 +7,7 @@ FactoryGirl.define do
     updated_at "user"
 
     trait :with_primary_family_member do
-      family_members { [FactoryGirl.build(:family_member, family: self, is_primary_applicant: true)] }
+      family_members { [FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person)] }
     end
   end
 end

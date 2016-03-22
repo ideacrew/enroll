@@ -538,16 +538,12 @@ describe HbxEnrollment, dbclean: :after_all do
 
     context "inactive_pre_hbx" do
       let(:consumer_role) {FactoryGirl.create(:consumer_role)}
-      let(:benefit_package) {FactoryGirl.create(:benefit_package)}
-      let(:benefit_coverage_period) {FactoryGirl.build(:benefit_coverage_period)}
-      let(:hbx_profile) {double}
-      let(:benefit_sponsorship) {double}
+      let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+      let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
       let(:family) {FactoryGirl.build(:family)}
       before :each do
-        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return benefit_coverage_period
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
         allow(coverage_household).to receive(:household).and_return household
         allow(household).to receive(:family).and_return family
@@ -783,7 +779,7 @@ describe HbxEnrollment, dbclean: :after_each do
                                                   )
                                                 }
 
-    before do 
+    before do
       allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
@@ -793,7 +789,7 @@ describe HbxEnrollment, dbclean: :after_each do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
       end
- 
+
       it "should allow" do
         expect(shop_enrollment.can_select_coverage?).to be_truthy
       end
@@ -803,7 +799,7 @@ describe HbxEnrollment, dbclean: :after_each do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on + 5.days)
       end
- 
+
       it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
@@ -830,7 +826,7 @@ describe HbxEnrollment, dbclean: :after_each do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
     end
-     
+
     context 'when roster create present' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
 
@@ -848,8 +844,8 @@ describe HbxEnrollment, dbclean: :after_each do
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
-      end 
-        
+      end
+
       it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
@@ -860,7 +856,7 @@ describe HbxEnrollment, dbclean: :after_each do
       let(:qle_date) { effective_date + 15.days }
       let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
 
-      let(:special_enrollment_period) { 
+      let(:special_enrollment_period) {
         special_enrollment = shop_family.special_enrollment_periods.build({
           qle_on: qle_date,
           effective_on_kind: "first_of_month",
@@ -869,7 +865,7 @@ describe HbxEnrollment, dbclean: :after_each do
         special_enrollment.save
         special_enrollment
       }
-   
+
       let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
                                                     household: shop_family.latest_household,
                                                     coverage_kind: "health",
@@ -910,13 +906,8 @@ end
 context "Benefits are terminated" do
   let(:effective_on_date)         { TimeKeeper.date_of_record.beginning_of_month }
   let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
-  let!(:benefit_coverage_period)  { FactoryGirl.create(:benefit_coverage_period,
-                                        start_on: effective_on_date.beginning_of_year,
-                                        end_on: effective_on_date.end_of_year,
-                                        open_enrollment_start_on: effective_on_date.beginning_of_year - 1.month,
-                                        open_enrollment_end_on: effective_on_date.beginning_of_year + 1.month
-                                      )
-                                    }
+  let!(:hbx_profile)               { FactoryGirl.create(:hbx_profile) }
+
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(effective_on_date.year, 6, 1))
   end

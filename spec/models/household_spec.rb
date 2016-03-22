@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Household, "given a coverage household with a dependent" do
+describe Household, "given a coverage household with a dependent", :dbclean => :after_each do
   let(:family_member) { FamilyMember.new }
   let(:coverage_household_member) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
   let(:coverage_household) { CoverageHousehold.new(:coverage_household_members => [coverage_household_member]) }
@@ -16,18 +16,16 @@ describe Household, "given a coverage household with a dependent" do
     expect(subject.enrolled_hbx_enrollments).to eq []
   end
 
-  context "new_hbx_enrollment_from" do 
+  context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:person) { double(primary_family: family)}
     let(:family) { double }
-    let(:benefit_package) {FactoryGirl.create(:benefit_package)}
-    let(:hbx) {double(benefit_sponsorship: double(earliest_effective_date: TimeKeeper.date_of_record, current_benefit_period: bcp))}
-    let(:bcp) {double(earliest_effective_date: TimeKeeper.date_of_record)}
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:coverage_household) {CoverageHousehold.new}
     let(:household) {Household.new}
 
-    before do 
-      allow(HbxProfile).to receive(:current_hbx).and_return(hbx)
+    before do
       allow(consumer_role).to receive(:person).and_return(person)
       allow(family).to receive(:is_under_special_enrollment_period?).and_return false
       allow(household).to receive(:family).and_return(family)
@@ -35,16 +33,16 @@ describe Household, "given a coverage household with a dependent" do
       allow(coverage_household).to receive(:household).and_return(household)
     end
 
-    it "should build hbx enrollment" do 
+    it "should build hbx enrollment" do
       subject.new_hbx_enrollment_from(
         consumer_role: consumer_role,
         coverage_household: coverage_household,
-        benefit_package: benefit_package, 
+        benefit_package: benefit_package,
         qle: false
       )
     end
   end
-  
+
   context "latest_active_tax_household_with_year" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:household) {FactoryGirl.create(:household, family: family)}

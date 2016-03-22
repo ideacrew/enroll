@@ -40,7 +40,7 @@ class Insured::GroupSelectionController < ApplicationController
       family: @family,
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
-      benefit_sponsorship: HbxProfile.current_hbx.benefit_sponsorship)
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
   end
 
   def create

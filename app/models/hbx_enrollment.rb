@@ -482,6 +482,10 @@ class HbxEnrollment
     hbx_enrollment_members.count - 1
   end
 
+  def humanized_members_summary
+    hbx_enrollment_members.count{|member| member.covered? }
+  end
+
   def phone_number
     if plan.present?
       phone = plan.try(:carrier_profile).try(:organization).try(:primary_office_location).try(:phone)
