@@ -62,7 +62,7 @@ module VerificationHelper
   end
 
   def enrollment_group_verified?(person)
-    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"}
+    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"} if person.has_consumer_role?
   end
 
   def coverage_household_verification
