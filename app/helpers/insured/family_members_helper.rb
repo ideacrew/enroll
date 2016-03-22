@@ -14,4 +14,14 @@ module Insured::FamilyMembersHelper
       { :remote => true, method: :post, :url => insured_family_members_path, :as => :dependent }
     end
   end
+
+  def get_address_from_dependent(dependent)
+    if dependent.class == FamilyMember
+      dependent.person.addresses
+    else
+      dependent.family_member.person.addresses
+    end
+  rescue
+    []
+  end
 end

@@ -42,7 +42,7 @@
 
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%#= f.select :employee_relationship, options_for_select(CensusDependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
-          <% if f.object.dob.present? and (f.object.dob + 26.years > TimeKeeper.date_of_record) %>
+          <% if f.object.dob.present? && (f.object.dob + 26.years > TimeKeeper.date_of_record) %>
             <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_under_26"]] %>
           <% else %>
             <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_26_and_over"]] %>

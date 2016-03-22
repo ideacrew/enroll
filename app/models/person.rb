@@ -326,7 +326,7 @@ class Person
 
   def age_on(date)
     age = date.year - dob.year
-    if date.month < dob.month or (date.month == dob.month and date.day < dob.day)
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
       age - 1
     else
       age
@@ -392,6 +392,10 @@ class Person
     addresses.detect { |adr| adr.kind == "mailing" } || home_address
   end
 
+  def has_mailing_address?
+    addresses.any? { |adr| adr.kind == "mailing" }
+  end
+
   def home_email
     emails.detect { |adr| adr.kind == "home" }
   end
@@ -437,8 +441,8 @@ class Person
   end
 
   def is_dc_resident?
-    return false if no_dc_address == true and no_dc_address_reason.blank?
-    return true if no_dc_address == true and no_dc_address_reason.present?
+    return false if no_dc_address == true && no_dc_address_reason.blank?
+    return true if no_dc_address == true && no_dc_address_reason.present?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
