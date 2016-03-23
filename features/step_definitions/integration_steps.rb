@@ -193,7 +193,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[fein]', :with => employer[:fein]
 
   #TODO bombs on selectric scroll sometimes...
-  find('.selectric-interaction-choice-control-organization-entity-kind').click
+  find('.selectric-interaction-choice-control-organization-entity-kind p.label').trigger 'click'
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
   step "I enter office location for #{default_office_location}"
   fill_in 'organization[email]', :with => Forgery('email').address

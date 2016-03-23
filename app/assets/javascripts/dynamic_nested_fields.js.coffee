@@ -18,6 +18,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
     validatePlanYear()
 
 
+
   # get all dental plan options for all plans option or for elected dental plans
   $('span:contains("Select Reference Plan"), label.elected_plan:contains("Custom")').on 'click', ->
     `var url`
@@ -57,7 +58,8 @@ $(document).on 'click', 'form .add_fields', (event) ->
   dental_target_url = $('a#generate-dental-carriers-and-plans').attr('href')
   plan_year_id = $('a#generate-dental-carriers-and-plans').data('planYearId')
   location_id = $('.benefit-group-fields:last').attr('id')
-  active_year = $('#plan_year_start_on').val().substr(0, 4)
+  if $('#plan_year_start_on').length
+    active_year = $('#plan_year_start_on').val().substr(0, 4)
   $.ajax
     type: 'GET'
     data:
@@ -109,6 +111,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
       calcEmployerContributions $('a#calc_employer_contributions_link').data('href'), location_id, coverage_type
       return
     return
+
 
   start_on = $('#plan_year_start_on').val()
   if start_on

@@ -68,13 +68,15 @@ $(document).on('page:update', function(){
   //validate plan year create for title, referencce plan, and premium Percentage
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
     $('.interaction-click-control-save-plan-year').removeClass('disabled');
-    validateEditPlanYear()
+    validateEditPlanYear();
     //validate plan year create for title, referencce plan, and premium Percentage
     $(document).on('change','.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
       validateEditPlanYear();
+
     });
     $(document).on('change','.reference-plan input', function() {
       validateEditPlanYear();
+
     });
 
 
