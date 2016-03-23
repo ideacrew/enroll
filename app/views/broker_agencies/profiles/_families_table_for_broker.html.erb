@@ -1,10 +1,7 @@
 <div id= 'message_form'></div>
 <div id="inbox_provider_form" class="table-responsive">
-  <table class="table table-condensed">
+<table id="example" class="table table-lockbox table-striped table-bordered dataTable">
     <thead>
-      <tr>
-        <th colspan="6">Primary Applicant</th>
-      </tr>
       <tr>
         <th>Name</th>
         <th>SSN</th>
@@ -14,8 +11,7 @@
         <th>Registered?</th>
         <th>Consumer?</th>
         <th>Employee?</th>
-        <th></th>
-        <th></th>
+
       </tr>
     </thead>
     <tbody>
@@ -25,7 +21,7 @@
 
       <tr id="family_<%= family.id %>">
         <td >
-          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> <br/>
+          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> 
         </td>
         <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
         <td><%= format_date(pp.dob) %></td>
@@ -34,11 +30,26 @@
         <td><%= pp.user.present? ? "Yes" : "No" %></td>
         <td class='consumer_role_present'><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
         <td class='employee_role_present'><%= pp.employee_roles.present?  ? "Yes" : "No" %></td>
-        <td class='unblock'>
-          <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
-        </td>
       </tr>
       <% end %>
     </tbody>
   </table>
+
+
+<style type="text/css">
+  table.dataTable.select tbody tr,
+  table.dataTable thead th:first-child {
+     cursor: pointer;
+  }
+</style>
+
+<script type="text/javascript">
+  // $("#example").dataTable({"iDisplayLength": 10, "bLengthChange": false, "bFilter": false, "bSort": false });
+  $("#example").DataTable();
+</script>
+
+
+
+
+
 </div>

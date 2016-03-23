@@ -2,15 +2,6 @@
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
 <div class="container">
-  <h3 class="title-inline">Families</h3>
-  <div class="form-inline button-group-wrapper families_search_div">
-    <div class="input-group search-wp">
-      <%= render 'shared/search', url: family_index_broker_agencies_profiles_path, q: @q, placeholder: "Last Name", remote: true %>
-    </div>
-  </div>
-</div>
-
-<div class="container">
   <div id="families">
     <%= render "families_table_for_broker", families: @families%>
   </div>
