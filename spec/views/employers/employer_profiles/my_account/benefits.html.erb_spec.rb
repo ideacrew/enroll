@@ -20,7 +20,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     render "employers/employer_profiles/my_account/benefits"
     expect(rendered).to match(/Benefits - Coverage You Offer/)
     plan_year.benefit_groups.first.relationship_benefits.map(&:premium_pct).each do |pct|
-      expect(rendered).to have_selector("td", text: "#{pct.to_i}%")
+      expect(rendered).to match "#{pct.to_i}"
     end
   end
 
