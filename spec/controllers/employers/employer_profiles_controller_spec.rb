@@ -190,7 +190,8 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:last_portal_visited=).and_return("true")
         allow(user).to receive(:save).and_return(true)
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-        allow(employer_profile).to receive(:premium_billing_plan_year_and_enrollments).and_return([plan_year, [hbx_enrollment]])
+        allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
+        allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
   
         sign_in(user)
       end

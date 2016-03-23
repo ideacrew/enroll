@@ -4,7 +4,7 @@ class Employers::PremiumStatementsController < ApplicationController
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
-    @current_plan_year, @hbx_enrollments = @employer_profile.premium_billing_plan_year_and_enrollments
+    @hbx_enrollments = @employer_profile.enrollments_for_billing
 
     respond_to do |format|
       format.html
