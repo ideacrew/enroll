@@ -8,7 +8,7 @@
   <div class="row">
     <div class="col-md-12">
     <div class="table-border table-responsive">
-      <table class="table">
+      <table id="employers_table" class="table table-lockbox table-striped table-bordered dataTable">
       <% if @broker_agency_profiles.present? %>
         <thead>
           <th>Legal Name</th>
@@ -37,3 +37,10 @@
    </div>
   </div>
 </div>
+
+
+
+<script type="text/javascript">
+  // $("#example").dataTable({"iDisplayLength": 10, "bLengthChange": false, "bFilter": false, "bSort": false });
+  $("#employers_table").DataTable();
+</script>
