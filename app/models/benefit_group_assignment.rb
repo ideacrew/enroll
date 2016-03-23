@@ -96,6 +96,11 @@ class BenefitGroupAssignment
     end
   end
 
+  def active_hbx_enrollments(census_employee)
+    hbx_enrollments = self.hbx_enrollments(census_employee) unless self.blank?
+    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" }.partition { |e| e.coverage_kind == "health" }.flatten unless self.blank?
+  end
+
   def end_benefit(end_on)
     return if coverage_waived?
     self.coverage_end_on = end_on
