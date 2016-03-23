@@ -1,5 +1,5 @@
 <div class="table-responsive">
-  <table id="employers_tables" class="table table-striped table-bordered">  
+  <table id="employers_dataTable" class="table table-striped table-bordered">  
 
     <thead>
       <tr>
@@ -48,8 +48,9 @@
 
 <script>
   $(document).ready(function() {
-    $('#employers_tables').DataTable( {
-      } );
-  } );
+    $('#employers_dataTable').DataTable( {
+      "order": [[ 1, "asc" ]]
+    } );
+} );
 </script>
 
