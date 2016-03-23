@@ -57,6 +57,7 @@
       </article>
     </section>
   <% end %>
+  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
@@ -64,7 +65,6 @@
 
       <h3>Enrollment Report</h3>
       <span><%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></span>
-
         <br/>
         <br/>
         <table>
@@ -86,6 +86,8 @@
     <% end %>
   </section>
   <br/>
+  <% end %>
+
 
   <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
     <article>
