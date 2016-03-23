@@ -313,18 +313,18 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        # employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        # employer_enroll_factory.date = new_date
+        employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        employer_enroll_factory.date = new_date
 
-        # organizations_for_plan_year_begin(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.begin
-        # end
+        organizations_for_plan_year_begin(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.begin
+        end
 
-        # organizations_for_plan_year_end(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.end
-        # end
+        organizations_for_plan_year_end(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.end
+        end
       end
 
       # Employer activities that take place monthly - on first of month
