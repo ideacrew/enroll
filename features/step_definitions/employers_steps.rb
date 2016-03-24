@@ -402,3 +402,47 @@ Then(/^.+ should see employee cost modal for current plan year$/) do
   expect(page).to have_css('h4.modal-title')
   find('.close').click
 end
+
+
+module EmployeeWorld
+  def owner(*traits)
+    attributes = traits.extract_options!
+    @owner ||= FactoryGirl.create :user, *traits, attributes
+  end
+
+  def employer(*traits)
+    attributes = traits.extract_options!
+    @employer ||= FactoryGirl.create :employer, *traits, attributes
+  end
+
+  def employees(*traits)
+    attributes = traits.extract_options!
+    @employees ||= FactoryGirl.create_list :census_employee, 5, *traits, attributes
+    # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
+  end
+end
+World(EmployeeWorld)
+
+Given /^an employer exists$/ do
+  owner :with_family, :employer, organization: employer
+end
+
+When /^they visit the Employee Roster$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
+end
+
+When /^click on one of their employees$/ do
+  click_link employees.first.full_name
+end
+
+Given /^the employer has employees$/ do
+  employees employer_profile: employer.employer_profile
+end
+
+Given /^the employer is logged in$/ do
+  login_as owner, scope: :user
+end
+
+Then /^they should see that employee's details$/ do
+  expect(page).to have_content(employees.first.dob.strftime('%m/%d/%Y'))
+end
