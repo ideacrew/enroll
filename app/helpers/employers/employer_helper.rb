@@ -15,14 +15,14 @@ module Employers::EmployerHelper
   end
 
   def coverage_kind(census_employee=nil)
-    return kind if census_employee.blank?
+    return "" if census_employee.blank?
     enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)
-    if enrolled.present? && enrolled != "initialized" 
-      kind = census_employee.active_benefit_group_assignment.hbx_enrollment.coverage_kind
+    if enrolled.present? && enrolled != "initialized"  
+      kind = census_employee.employee_role.person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.uniq.join(", ")
     else
       kind = ""
     end  
-    return kind.capitalize
+    return kind.titleize
   end  
 
   def render_plan_offerings(benefit_group, coverage_type)
