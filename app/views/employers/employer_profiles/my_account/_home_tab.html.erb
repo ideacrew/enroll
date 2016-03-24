@@ -127,96 +127,150 @@
     <div class="plan-details panel benefitgroup col-xs-12" style="display: true;"> 
 
         <div class="panel benefitgroup referenceplan home">
-            <% if bg.dental_reference_plan_id.present? %>
-            <h5 class="bg-title">Health</h5>
-          <% end%>
-        <table>
-          <tr>
-            <th>
-              <header>Reference Plan</header>
-            </th>
-            <th>
-              <header>Carrier</header>
-            </th>
-            <th>
-              <header>Type</header>
-            </th>
-          </tr>
-          <tr>
-            <td>
-              <p>
-                <%= bg.reference_plan.name.try(:upcase) %>
-              </p>
-            </td>
-            <td>
-              <p>
-                <%= bg.reference_plan.carrier_profile.legal_name %>
-              </p>
-            </td>
-            <td>
-              <p>
-                <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <th>
-              <header>Metal Level</header>
-            </th>
-            <th>
-              <header>Plans By</header>
-            </th>
-          </tr>
-          <tr>
-            <td>
-              <p>
-                <%= bg.reference_plan.metal_level.titleize %>
-              </p>
-            </td>
-            <td>
-              <p>
-                <% if bg.plan_option_kind == "single_carrier" %>
-                All Plans From A Single Carrier
-                <% elsif bg.plan_option_kind == "metal_level" %>
-                All Plans From A Given Metal Level
-                <% elsif bg.plan_option_kind == "single_plan" %>
-                A Single Plan
-                <% end %>
-              </p>
-            </td>
-          </tr>
-        </table>
+          
+          <!--Health Plan Summary: start-->
+          <div>
+            <div style="float:right">
+              <button id = "showhidebutton" href="#collapse-health-<%=bg.id%>" class="nav-toggle">
+                View Details 
+                <a><i class="fa fa-chevron-down fa-lg"></i></a>
+              </button> 
+            </div>
+            <div style="float:left">
+              <% if bg.dental_reference_plan_id.present? %>
+                <h5 class="bg-title">Health</h5>
+              <% end%>
+            </div>
+          </div>
 
-        <div style ="align:right;">
-          <button id = "showhidebutton" href="#collapse-health-<%=bg.id%>" class="nav-toggle">
-              View Details 
-              <a><i class="fa fa-chevron-down fa-lg"></i></a>
-          </button> 
-        </div>
-      
-        <!--Health plan collapsible: start -->
-        <div id="collapse-health-<%=bg.id%>" style="display:none">
-          <div class="col-xs-12 package-offering">
+
           <table>
             <tr>
-              <th>Offered</th>
-              <th>Employer <% if bg.dental_reference_plan_id.present? %>Health <% end %>Contribution</th>
+              <th>
+                <header>Reference Plan</header>
+              </th>
+              <th>
+                <header>Carrier</header>
+              </th>
+              <th>
+                <header>Type</header>
+              </th>
             </tr>
-            <% bg.relationship_benefits.each_with_index do |rb, i| %>
             <tr>
-              <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-              <td><strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong></td>
+              <td>
+                <p>
+                  <%= bg.reference_plan.name.try(:upcase) %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <%= bg.reference_plan.carrier_profile.legal_name %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
+                </p>
+              </td>
             </tr>
-            <% end %>
+            <tr>
+              <th>
+                <header>Metal Level</header>
+              </th>
+              <th>
+                <header>Plans By</header>
+              </th>
+            </tr>
+            <tr>
+              <td>
+                <p>
+                  <%= bg.reference_plan.metal_level.titleize %>
+                </p>
+              </td>
+              <td>
+                <p>
+                  <% if bg.plan_option_kind == "single_carrier" %>
+                  All Plans From A Single Carrier
+                  <% elsif bg.plan_option_kind == "metal_level" %>
+                  All Plans From A Given Metal Level
+                  <% elsif bg.plan_option_kind == "single_plan" %>
+                  A Single Plan
+                  <% end %>
+                </p>
+              </td>
+            </tr>
           </table>
+          <!--Health Plan Summary: end-->
+
+          <!--Health plan collapsible: start -->
+          <div id="collapse-health-<%=bg.id%>" style="display:none">
+            
+              <!--Health Contributions: start-->
+              <div class="col-xs-12 package-offering">
+              <table>
+                <tr>
+                  <th>Offered</th>
+                  <th>Employer <% if bg.dental_reference_plan_id.present? %>Health <% end %>Contribution</th>
+                </tr>
+                <% bg.relationship_benefits.each_with_index do |rb, i| %>
+                <tr>
+                  <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+                  <td><strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong></td>
+                </tr>
+                <% end %>
+              </table>
+              </div>
+              <!--Health Contributions: end-->
+
+              <!--Health Estimated Cost: start-->
+              <div class="panel benefitgroup col-xs-12 referenceplan home est">
+                <div class="plan-details">
+                  <div class="col-xs-4">
+                    <span>Employer Estimated Maximum Monthly Cost</span>
+                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
+                  </div>
+                  <div class="col-xs-8">
+                    <table>
+                      <tr>
+                        <th colspan="2"></th>
+                        <th>Min</th>
+                        <th>Max</th>
+                      </tr>
+                      <tr>
+                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                        <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
+                        <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!--Health Estimated Cost: end-->
+
           </div>
-        </div>
-        <!--Dental plan collapsible: end -->
+          <!--Health plan collapsible: end -->
+
+
         <br class="clear"/>
         <hr />
 
         <% if bg.dental_reference_plan_id.present? %>
-          <h5 class="bg-title">Dental</h5>
+          
+          <!--Dental Plan Summary: start-->
+          <div>
+            <div style="float:right">
+              <button id = "showhidebutton" href="#collapse-dental-<%=bg.id%>" class="nav-toggle">
+                  View Details 
+                  <a><i class="fa fa-chevron-down fa-lg"></i></a>
+              </button> 
+            </div>
+            <div style="float:left">
+              <h5 class="bg-title">Dental</h5>
+            </div>
+          </div>
+          
+          <div></div>  
+
           <table>
             <tr>
               <th>
@@ -278,32 +332,55 @@
               </td>
             </tr>
           </table>
-
-        <div>
-          <button id = "showhidebutton" href="#collapse-dental-<%=bg.id%>" class="nav-toggle">
-              View Details 
-              <a><i class="fa fa-chevron-down fa-lg"></i></a>
-          </button> 
-        </div>
+          <!--Dental Plan Summary: end-->
       
-        <!—Dental plan collapsible: start -->
-        <div id="collapse-dental-<%=bg.id%>" style="display:none">
-          <div class="col-xs-12 package-offering">
-            <table>
-              <tr>
-                <th>Offered</th>
-                <th>Employer Dental Contribution</th>
-              </tr>
-              <% bg.relationship_benefits.each_with_index do |rb, i| %>
-              <tr>
-                <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td> 
-                <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
-              </tr>
-              <% end %>
-            </table>
+          <!—Dental plan collapsible: start -->
+          <div id="collapse-dental-<%=bg.id%>" style="display:none">
+            
+            <!--Dental Contributions: start -->
+            <div class="col-xs-12 package-offering">
+              <table>
+                <tr>
+                  <th>Offered</th>
+                  <th>Employer Dental Contribution</th>
+                </tr>
+                <% bg.relationship_benefits.each_with_index do |rb, i| %>
+                <tr>
+                  <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td> 
+                  <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
+                </tr>
+                <% end %>
+              </table>
+            </div>
+            <!--Dental Contributions: end -->
+
+            <!--Dental Estimated Cost: start-->
+            <div class="panel benefitgroup col-xs-12 referenceplan home est">
+              <div class="plan-details">
+                <div class="col-xs-4">
+                  <span>Employer Estimated Maximum Monthly Cost</span>
+                  <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                </div>
+                <div class="col-xs-8">
+                  <table>
+                    <tr>
+                      <th colspan="2"></th>
+                      <th>Min</th>
+                      <th>Max</th>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                      <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
+                      <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!--Dental Estimated Cost: end-->
+
           </div>
-        </div>
-        <!--Dental plan collapsible: end -->
+          <!--Dental plan collapsible: end -->
 
 
           <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
@@ -311,37 +388,10 @@
           <% end %>
 
     <% end %>
-    </div>
-
-    <% if bg.dental_reference_plan_id.present? %><br class="clear"/><hr /><%end%>
-
-    <div class="panel benefitgroup col-xs-12 referenceplan home est">
-
-      <div class="plan-details">
-        <div class="col-xs-4">
-          <span>Employer Estimated Maximum Monthly Cost</span>
-          <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
-        </div>
-        <div class="col-xs-8">
-          <table>
-            <tr>
-              <th colspan="2"></th>
-              <th>Min</th>
-              <th>Max</th>
-            </tr>
-            <tr>
-              <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-              <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
-              <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-            </tr>
+    </div>  <!--end of div with class="panel benefitgroup referenceplan home"-->
 
 
-
-          </table>
-        </div>
-      </div>
-    </div>
-    </div>
+    </div>  <!--end of div with class="plan-details panel benefitgroup col-xs-12"-->
 
     <% end %>
     <% else %>

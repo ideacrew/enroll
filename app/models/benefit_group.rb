@@ -112,6 +112,12 @@ class BenefitGroup
     @reference_plan = new_reference_plan
   end
 
+  def dental_reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.dental_reference_plan_id = new_reference_plan._id
+    @dental_reference_plan = new_reference_plan
+  end
+
   def reference_plan
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
@@ -169,9 +175,9 @@ class BenefitGroup
   def set_bounding_cost_dental_plans
     return if reference_plan_id.nil?
 
-    if plan_option_kind == "single_plan"
+    if dental_plan_option_kind == "single_plan"
       plans = elected_dental_plans
-    elsif plan_option_kind == "single_carrier"
+    elsif dental_plan_option_kind == "single_carrier"
       plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
     end
 
@@ -348,26 +354,39 @@ class BenefitGroup
     end.first
   end
 
+
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+      if plan.coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+      end
       pcd.total_employer_contribution
     end.sum
   end
 
-  def monthly_min_employee_cost
+  def monthly_min_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      if coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      end
       pcd.total_employee_cost
     end.min
   end
 
-  def monthly_max_employee_cost
+  def monthly_max_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      if coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      end
       pcd.total_employee_cost
     end.max
   end

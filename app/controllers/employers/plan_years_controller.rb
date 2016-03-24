@@ -160,14 +160,22 @@ class Employers::PlanYearsController < ApplicationController
     @coverage_type = params[:coverage_type]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[0].reference_plan = @plan
 
-    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
-    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
-    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost
+    coverage_type = 'health'
+    if @coverage_type == '.dental'
+      @plan_year.benefit_groups[0].dental_reference_plan = @plan
+      coverage_type = 'dental'
+    else
+      @plan_year.benefit_groups[0].reference_plan = @plan
+    end
+
+    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount(@plan)
+    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost(coverage_type)
+    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost(coverage_type)
   end
 
   def calc_offered_plan_contributions
+
     @is_edit = params[:is_edit]
     @location_id = params[:location_id]
     @coverage_type = params[:coverage_type]
@@ -178,12 +186,19 @@ class Employers::PlanYearsController < ApplicationController
     @hios_id = @plan.hios_id
 
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[0].reference_plan = @plan
+    # @plan_year.benefit_groups[0].reference_plan = @plan
 
+    coverage_type = 'health'
+    if @coverage_type == '.dental'
+      @plan_year.benefit_groups[0].dental_reference_plan = @plan
+      coverage_type = 'dental'
+    else
+      @plan_year.benefit_groups[0].reference_plan = @plan
+    end
 
-    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
-    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
-    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost
+    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount(@plan)
+    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost(coverage_type)
+    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost(coverage_type)
   end
 
   def edit
@@ -322,13 +337,12 @@ class Employers::PlanYearsController < ApplicationController
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
-    @plan_year.benefit_groups[0].reference_plan = @plan
-    @plan_year.benefit_groups[0].plan_option_kind = params[:plan_option_kind]
-
+ 
     @benefit_group = @plan_year.benefit_groups[0]
-    @benefit_group.set_bounding_cost_plans if @coverage_type == '.health'
 
     if @coverage_type == '.dental'
+      @plan_year.benefit_groups[0].dental_reference_plan = @plan
+      @plan_year.benefit_groups[0].dental_plan_option_kind = params[:plan_option_kind]
       if @plan_option_kind == 'single_plan'
 
         if params[:elected_plan_ids].present?
@@ -341,6 +355,10 @@ class Employers::PlanYearsController < ApplicationController
         end
       end
       @benefit_group.set_bounding_cost_dental_plans
+    else
+      @plan_year.benefit_groups[0].reference_plan = @plan
+      @plan_year.benefit_groups[0].plan_option_kind = params[:plan_option_kind]
+      @benefit_group.set_bounding_cost_plans
     end
     @benefit_group_costs = build_employee_costs_for_benefit_group
   end
@@ -359,21 +377,30 @@ class Employers::PlanYearsController < ApplicationController
   private
 
   def build_employee_costs_for_benefit_group
+    plan = @benefit_group.reference_plan
+    plan = @benefit_group.dental_reference_plan if @coverage_type == '.dental'
+
+
     employee_costs = @plan_year.employer_profile.census_employees.active.inject({}) do |census_employees, employee|
+
+     
       costs = {
-        ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
+        ref_plan_cost: @benefit_group.employee_cost_for_plan(employee, plan)
       }
+
       if !@benefit_group.single_plan_type? || @coverage_type == ".dental"
         costs.merge!({
           lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan),
           highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)
           })
       end
+
       census_employees[employee.id] = costs
       census_employees
     end
+
     employee_costs.merge!({
-      ref_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount,
+      ref_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(plan),
       lowest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.lowest_cost_plan),
       highest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.highest_cost_plan)
       })
