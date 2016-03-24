@@ -68,6 +68,12 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_consumer_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+    end
+  end
+
   trait :with_family do
     after :create do |user|
       FactoryGirl.create :person, :with_family, :user => user

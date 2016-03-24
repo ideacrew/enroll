@@ -2,7 +2,7 @@ module Factories
   class CensusEmployeeFactory
 
     attr_accessor :census_employee, :plan_year
-    
+
     trait :general_agency do
         ignore do
           general_agency_traits []

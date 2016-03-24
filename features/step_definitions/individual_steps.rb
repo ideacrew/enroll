@@ -188,6 +188,35 @@ And(/I should see the individual home page/) do
   # click_link "My DC Health Link"
 end
 
+Then(/^Individual edits a dependents address$/) do
+  click_link 'Add Member'
+end
+
+Then(/^Individual fills in the form$/) do
+  fill_in 'dependent[first_name]', :with => (@u.first_name :first_name)
+  fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
+  fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
+  fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
+  find('.house .selectric p.label').trigger 'click'
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
+  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
+  find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+end
+
+Then(/^Individual ads address for dependent$/) do
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
+  fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
+  fill_in 'dependent[addresses][0][city]', :with => 'Washington'
+  find('#address_info .selectric p.label').trigger 'click'
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
+  fill_in 'dependent[addresses][0][zip]', :with => "20002"
+  click_button 'Confirm Member'
+  find('#btn-continue').click
+end
+
 And(/I click to see my Secure Purchase Confirmation/) do
   wait_and_confirm_text /Messages/
   @browser.link(text: /Messages/).click
