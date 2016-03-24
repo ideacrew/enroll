@@ -160,7 +160,11 @@ class EmployerProfile
   end
 
   def show_plan_year
-    renewing_published_plan_year || active_plan_year || published_plan_year
+    if renewing_published_plan_year && renewing_published_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+      renewing_published_plan_year
+    else
+      active_plan_year || published_plan_year || renewing_published_plan_year
+    end
   end
 
   def plan_year_drafts
@@ -178,20 +182,27 @@ class EmployerProfile
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
     if plan_year.blank?
-      plan_year = plan_years.published.detect{|py| py.start_on > billing_report_date }
-      billing_report_date = plan_year.start_on if plan_year
+      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+        billing_report_date = plan_year.start_on
+      end
     end
-    
+
     if plan_year.blank?
-      billing_report_date = TimeKeeper.date_of_record
-      plan_year = find_plan_year_by_effective_date(billing_report_date)
+      if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
+        billing_report_date = TimeKeeper.date_of_record
+      end
+    end
+
+    if plan_year.blank? 
+      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+        billing_report_date = plan_year.start_on
+      end
     end
 
     return plan_year, billing_report_date
   end
 
-
-  def premium_billing_plan_year_and_enrollments
+  def enrollments_for_billing
     plan_year, billing_report_date = billing_plan_year
     hbx_enrollments = []
 
@@ -200,7 +211,7 @@ class EmployerProfile
       hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
-    return plan_year, hbx_enrollments
+    hbx_enrollments
   end
 
   def find_plan_year(id)

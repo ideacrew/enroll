@@ -54,7 +54,7 @@ FactoryGirl.define do
   end
 
   trait :employer do
-    ignore do
+    transient do
       organization {}
     end
 

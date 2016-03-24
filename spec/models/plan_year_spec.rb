@@ -865,7 +865,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                       ee.active_benefit_group_assignment.select_coverage
                       ee.save
                     end
-                    allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+                    allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment_id).and_return [hbx_enrollment]
                   end
 
                   it "should include all eligible employees" do

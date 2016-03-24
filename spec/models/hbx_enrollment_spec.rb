@@ -1329,7 +1329,7 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
     end
 
     it "should have the eligibility event date of hired_on" do
-      expect(subject.eligibility_event_date).to eq hired_on 
+      expect(subject.eligibility_event_date).to eq hired_on
     end
   end
 
@@ -1394,8 +1394,54 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
       end
 
       it "should have the eligibility event date of hired_on" do
-        expect(subject.eligibility_event_date).to eq hired_on 
+        expect(subject.eligibility_event_date).to eq hired_on
       end
+    end
+  end
+end
+
+describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :after_all do
+  include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
+
+  context "shop_market without dental health minimal requirement calculation " do
+    attr_reader :enrollment, :household, :coverage_household
+    before :all do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      @enrollment = household.create_hbx_enrollment_from(
+        employee_role: mikes_employee_role,
+        coverage_household: coverage_household,
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
+      )
+    end
+
+    it "should return the hbx_enrollments with the benefit group assignment" do
+      id = enrollment.benefit_group_assignment_id
+      enrollment.aasm_state = 'coverage_selected'
+      enrollment.save
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      expect(rs).to include enrollment
+    end
+
+    it "should be empty while the enrollment is not health and status is not showing" do
+      enrollment.aasm_state = 'shopping'
+      enrollment.save
+      id = enrollment.benefit_group_assignment_id
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      expect(rs).to be_empty
+    end
+
+    it "should not return the hbx_enrollments while the enrollment is dental and status is not showing" do
+      enrollment.coverage_kind = 'dental'
+      enrollment.save
+      id = enrollment.benefit_group_assignment_id
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      expect(rs).to be_empty
     end
   end
 end
