@@ -418,8 +418,6 @@ module ApplicationHelper
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
-       #binding.pry
-
         concat(content_tag(:div, class: 'progress-val') do
           concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)
           concat content_tag(:strong, (options[:minimum] == false) ? eligible : '', data: {value: "#{eligible}"}, class: 'pull-right')
@@ -453,11 +451,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.under_open_enrollment?
+    HbxProfile.current_hbx.try(:under_open_enrollment?)
   end
 
   def ivl_enrollment_effective_date
-    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+    HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
   def parse_ethnicity(value)

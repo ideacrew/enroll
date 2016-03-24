@@ -151,6 +151,73 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
+
+  context ".premium_billing_plan_year_and_enrollments" do 
+
+    context 'when plan year for next month present' do
+
+      context 'renewing' do 
+        let(:current_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
+        let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'renewing_published') }
+        let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [current_plan_year, renewing_plan_year]) }
+       
+        before do
+          employer_profile.save!
+        end
+
+        it 'should return plan year' do 
+           plan_year, enrollments = employer_profile.premium_billing_plan_year_and_enrollments
+           expect(plan_year).to eq renewing_plan_year
+        end
+      end
+
+      context 'not renewing' do 
+        let(:current_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'published') }
+        let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [current_plan_year]) }
+
+        before do
+          employer_profile.save!
+        end
+
+        it 'should return plan year' do
+          plan_year, enrollments = employer_profile.premium_billing_plan_year_and_enrollments
+          expect(plan_year).to eq current_plan_year        
+        end
+      end
+    end
+
+    context 'when plan year for next month not present' do
+
+      context 'and active plan year present' do 
+        let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
+        let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [active_plan_year]) }
+
+        before do
+          employer_profile.save!
+        end
+
+        it 'should return active plan year' do 
+          plan_year, enrollments = employer_profile.premium_billing_plan_year_and_enrollments
+          expect(plan_year).to eq active_plan_year
+        end
+      end
+
+      context 'and active plan year not present' do 
+        let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.prev_month.end_of_month, aasm_state: 'published') }
+        let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [active_plan_year]) }
+
+        before do
+          employer_profile.save!
+        end
+
+        it 'should return active plan year' do 
+          plan_year, enrollments = employer_profile.premium_billing_plan_year_and_enrollments
+          expect(plan_year).to be_nil
+        end
+      end
+    end
+  end
+
   context "has hired a broker" do
   end
 
@@ -355,7 +422,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       let(:owner_person) { instance_double("Person")}
 
       it "should return an array of persons" do
-        allow(Person).to receive(:find_all_staff_roles_by_employer_profile).with(employer_profile).and_return([owner_person])
+        allow(Person).to receive(:staff_for_employer).with(employer_profile).and_return([owner_person])
         expect(employer_profile.staff_roles).to include(owner_person)
       end
     end

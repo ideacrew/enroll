@@ -33,7 +33,7 @@
 //= require plan_year_selection
 //= require bootstrap-slider
 //= require_tree .
-  
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -261,7 +261,6 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 // reveal published plan years benefit groups
 $(document).ready(function () {
-
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {
@@ -800,7 +799,7 @@ $(document).on('click', ".interaction-click-control-add-plan-year", function() {
 $(document).on('change', "#plan_year_start_on", function() {
   if ($('.recommend #notice h4').text() == "Loading Suggested Dates...") {
     return false;
-  };
+  }
 
   var start_on_date = $(this).val();
   if(start_on_date != "") {
@@ -811,7 +810,7 @@ $(document).on('change', "#plan_year_start_on", function() {
       data:{start_on: start_on_date},
       url: target_url
     });
-  };
+  }
 });
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_start_on", function() {
@@ -820,7 +819,7 @@ $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_s
     $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4>Open Enrollment Start Date: Invalid date format!</h4></div>");
   } else {
     $('.recommend #notice').html("");
-  };
+  }
 });
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_end_on", function() {
@@ -829,17 +828,17 @@ $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_e
     $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4>Open Enrollment End Date: Invalid date format!</h4></div>");
   } else {
     $('.recommend #notice').html("");
-  };
+  }
 });
 
 
 $(document).on('click', 'tr .show_msg', function() {
-  $(this).parent().parent().addClass('msg-inbox-read')
-})
+  $(this).parent().parent().addClass('msg-inbox-read');
+});
 $(document).on('click', '.btn-danger', function() {
   var unread = $('.message-badge').text();
   $('.message-unread').html(unread);
-})
+});
 
 $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   if($(this).val() == undefined || $(this).val() == ""){
@@ -847,7 +846,7 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }else{
     $('#waiver_reason_submit').attr("disabled",false);
   }
-})
+});
 
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
@@ -864,7 +863,7 @@ $(document).on('click', '#terms_check_thank_you', function() {
   }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
-})
+});
 
 $(document).on('blur keyup', 'input.thank_you_field', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
@@ -885,28 +884,28 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
       }
     }
   }
-})
+});
 $(document).on('keyup', ".new_person #person_ssn", function(){
-  $(".new_person input#person_no_ssn").prop('checked', false)
-})
+  $(".new_person input#person_no_ssn").prop('checked', false);
+});
 $(document).on('change', ".new_person #person_no_ssn", function(){
-  if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change')  }
-})
+  if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change');  }
+});
 
 $(document).on('keyup', ".new_dependent #dependent_ssn", function(){
-  $(".new_dependent input#dependent_no_ssn").prop('checked', false)
-})
+  $(".new_dependent input#dependent_no_ssn").prop('checked', false);
+});
 $(document).on('change', ".new_dependent #dependent_no_ssn", function(){
-  if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change')  }
-})
+  if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change');  }
+});
 
 $(document).on('click', '.interaction-click-control-cancel, .interaction-click-control-confirm-member, .fa-times', function(){
   $('.fa-pencil').show();
-})
+});
 
 $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
-})
+});
 
 $(document).on('click', '#address_info + span.form-action', function(){
   if ($(this).text() == "Add Mailing Address"){

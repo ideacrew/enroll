@@ -45,9 +45,9 @@ ready = function() {
 
       function calcOfferedPlanContributions(url, location) {
         var reference_plan_id = $('#'+location+' .ref-plan').val();
-        console.log(reference_plan_id);
+        // console.log(reference_plan_id);
         var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
-        console.log(plan_option_kind);
+        // console.log(plan_option_kind);
         var location_id = location;
 
         if (reference_plan_id == "" || reference_plan_id == undefined) {
