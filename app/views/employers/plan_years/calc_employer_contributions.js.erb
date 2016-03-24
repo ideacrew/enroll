@@ -133,16 +133,24 @@ $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection
 
 // make view summary link
 if ( $("#<%= @location_id %> <%= @coverage_type %> label:contains('Custom')").closest('li').find('input').is(':checked') ) {
-  if ( $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href') == undefined ) {
+  if ( $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href') != undefined ) {
     var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href');
     $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
   } else {
     $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', initial_summary_link+"&link=link");
   }
 } else {
-  if ( $('#<%= @location_id %> <%= @coverage_type %> .reference-plan input:checked').closest('.reference-plan').find('.view-summary').attr('href') == undefined ) {
-    $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', initial_summary_link+"&link=link");
+  if ( '<%= @coverage_type %>' == '.health' ) {
+    var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .reference-plan input:checked').closest('.reference-plan').find('.view-summary').attr('href');
+    $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
+
   } else {
+    if ( $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href') == undefined && !$("<%= @location_id %> <%= @coverage_type %> label:contains('By carrier')").closest('li').find('input').is(':checked') == true ) {
+      $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', initial_summary_link+"&link=link");
+    } else {
+      var summaryLink = $('#<%= @location_id %> <%= @coverage_type %> .dental-reference-plans input:checked').closest('.reference-plan').find('.view-summary').attr('href');
+      $('#<%= @location_id %> <%= @coverage_type %>-view-summary a').attr('href', summaryLink+"&link=link");
+    }
   }
 }
 
