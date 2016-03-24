@@ -163,7 +163,7 @@ class EmployerProfile
     if renewing_published_plan_year && renewing_published_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
       renewing_published_plan_year
     else
-      active_plan_year || published_plan_year
+      active_plan_year || published_plan_year || renewing_published_plan_year
     end
   end
 
