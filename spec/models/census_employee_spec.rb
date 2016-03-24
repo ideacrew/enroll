@@ -787,6 +787,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
 
     it "should return false without benefit_group_assignment" do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
       expect(census_employee.has_active_health_coverage?).to be_falsey
     end
 
@@ -796,19 +797,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return false without hbx_enrollment" do
-        expect(census_employee.active_benefit_group_assignment.hbx_enrollment).to eq nil
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment_id).and_return []
         expect(census_employee.has_active_health_coverage?).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
-        census_employee.active_benefit_group_assignment.hbx_enrollment = hbx_enrollment
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment_id).and_return [hbx_enrollment]
         expect(census_employee.has_active_health_coverage?).to be_truthy
-      end
-
-      it "should return false when has dental hbx_enrollment" do
-        hbx_enrollment.coverage_kind = 'dental'
-        census_employee.active_benefit_group_assignment.hbx_enrollment = hbx_enrollment
-        expect(census_employee.has_active_health_coverage?).to be_falsey
       end
     end
   end
