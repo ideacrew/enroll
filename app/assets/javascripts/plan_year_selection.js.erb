@@ -226,20 +226,39 @@ ready = function() {
           var is_edit = false;
         }
 
+        // var benefits = {
+        //   "relation_benefits": relation_benefits
+        // }
+        //
+        // if (coverage_type == '.dental') {
+        //   benefits = {
+        //     "dental_relation_benefits": relation_benefits
+        //   }
+        // }
+        //
+        // console.log(benefits)
+
+        var data = {
+          "start_on": $("#plan_year_start_on").val(),
+          "reference_plan_id": reference_plan_id,
+          "plan_option_kind": plan_option_kind,
+          "location_id": location_id,
+          "is_edit": is_edit,
+          "coverage_type": coverage_type,
+          "benefit_group_index": benefit_group_index
+        }
+
+        if (coverage_type == '.dental') {
+          data["dental_relation_benefits"] = relation_benefits
+        }else {
+          data["relation_benefits"] = relation_benefits
+        }
+
         $.ajax({
           type: "GET",
           url: url,
           dataType: 'script',
-          data: {
-            "start_on": $("#plan_year_start_on").val(),
-            "reference_plan_id": reference_plan_id,
-            "plan_option_kind": plan_option_kind,
-            "relation_benefits": relation_benefits,
-            "location_id": location_id,
-            "is_edit": is_edit,
-            "coverage_type": coverage_type,
-            "benefit_group_index": benefit_group_index
-          }
+          data: data
         }).done(function() {
         });
       }
@@ -629,21 +648,29 @@ function calcEmployerContributions(url, location, coverage_type) {
         "offered": false
       }
     }
+
+    var data = {
+      "start_on": $("#plan_year_start_on").val(),
+      "reference_plan_id": reference_plan_id,
+      "plan_option_kind": plan_option_kind,
+      "location_id": location_id,
+      "coverage_type": coverage_type,
+      "benefit_group_index": benefit_group_index,
+      "elected_plan_ids": elected_plan_ids
+    }
+
+    if (coverage_type == '.dental') {
+      data["dental_relation_benefits"] = relation_benefits
+    }else {
+      data["relation_benefits"] = relation_benefits
+    }
+
+
     $.ajax({
       type: "GET",
       url: url,
       dataType: 'script',
-      data: {
-        "start_on": $("#plan_year_start_on").val(),
-        "reference_plan_id": reference_plan_id,
-        "plan_option_kind": plan_option_kind,
-        "relation_benefits": relation_benefits,
-        "coverage_type": coverage_type,
-        "location_id": location_id,
-        "benefit_group_index": benefit_group_index,
-        "elected_plan_ids": elected_plan_ids
-
-      }
+      data: data
     }).done(function() {
     });
 

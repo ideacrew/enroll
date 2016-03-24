@@ -171,12 +171,15 @@ class Employers::PlanYearsController < ApplicationController
     @is_edit = params[:is_edit]
     @location_id = params[:location_id]
     @coverage_type = params[:coverage_type]
+
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
 
     @plan = Plan.find(params[:reference_plan_id])
     @hios_id = @plan.hios_id
+
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
+
 
     @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
     @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
@@ -327,6 +330,7 @@ class Employers::PlanYearsController < ApplicationController
 
     if @coverage_type == '.dental'
       if @plan_option_kind == 'single_plan'
+
         if params[:elected_plan_ids].present?
           @benefit_group.elected_dental_plan_ids = params[:elected_plan_ids]
         else
@@ -336,10 +340,8 @@ class Employers::PlanYearsController < ApplicationController
           @benefit_group.elected_dental_plan_ids = benefit_group.elected_dental_plan_ids
         end
       end
-
       @benefit_group.set_bounding_cost_dental_plans
     end
-
     @benefit_group_costs = build_employee_costs_for_benefit_group
   end
 
@@ -361,7 +363,7 @@ class Employers::PlanYearsController < ApplicationController
       costs = {
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
       }
-      if !@benefit_group.single_plan_type? || @coverage_type == '.dental'
+      if !@benefit_group.single_plan_type? || @coverage_type == ".dental"
         costs.merge!({
           lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan),
           highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)
@@ -425,7 +427,8 @@ class Employers::PlanYearsController < ApplicationController
            "title"=>"2015 Employer Benefits",
            # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
            "reference_plan_id" => params[:reference_plan_id],
-           "relationship_benefits_attributes" => params[:relation_benefits]
+           "relationship_benefits_attributes" => params[:relation_benefits],
+           "dental_relationship_benefits_attributes" => params[:dental_relation_benefits]
         }
       }
     }
