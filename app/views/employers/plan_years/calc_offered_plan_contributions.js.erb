@@ -61,9 +61,9 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
       });
       validateEditPlanYear();
     });
-    if ( !$("<%= @location_id %> <%= @coverage_type %> label:contains('By carrier')").closest('li').find('input').is(':checked') == false ) {
+    if ( '<%= @plan_option_kind %>' == 'single_plan' ) {
       plan_count = $('#<%= @location_id %> .dent.plan-count').text();
-      $('#<%= @location_id %> .dental .dental-config-reference-selection').text('Currently Offering: '+plan_count+' Plans')
+      $('#<%= @location_id %> .dental .dental-config-reference-selection').text('Currently Offering: '+plan_count+' Plans');
     }
 
   } else {

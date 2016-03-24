@@ -171,7 +171,7 @@ class Employers::PlanYearsController < ApplicationController
     @is_edit = params[:is_edit]
     @location_id = params[:location_id]
     @coverage_type = params[:coverage_type]
-
+    @plan_option_kind = params[:plan_option_kind]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
 
     @plan = Plan.find(params[:reference_plan_id])
