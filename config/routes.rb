@@ -112,6 +112,8 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'purchase'
         get 'family'
+        get 'upload_notice_form'
+        post 'upload_notice'
       end
 
       resources :people do
