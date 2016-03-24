@@ -182,6 +182,41 @@ class Insured::FamiliesController < FamiliesController
     @family.set(status: "aptc_unblock")
   end
 
+  # manually uploads a notice for a person
+  def upload_notice
+
+    if params.permit![:file]
+      doc_uri = Aws::S3Storage.save(file_path, 'notices')
+
+      if doc_uri.present?
+        notice_document = Document.new({ title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+                                         format: file_content_type })
+        begin
+          @person.documents << notice_document
+          @person.save!
+          flash[:notice] = "File Saved"
+          redirect_to(:back)
+          return
+        rescue => e
+          flash[:error] = "Could not save file. "
+          redirect_to(:back)
+          return
+        end
+      else
+        flash[:error] = "Could not save file"
+        redirect_to(:back)
+      end
+    else
+      flash[:error] = "File not uploaded"
+      redirect_to(:back)
+    end
+  end
+
+  # displays the form to upload a notice for a person
+  def upload_notice_form
+    @notices = @person.documents.where(subject: 'notice')
+  end
+
   private
 
   def check_employee_role
@@ -231,5 +266,17 @@ class Insured::FamiliesController < FamiliesController
       changing_hbxs = hbxs.changing
       changing_hbxs.update_all(changing: false) if changing_hbxs.present?
     end
+  end
+
+  def file_path
+    params.permit(:file)[:file].tempfile.path
+  end
+
+  def file_name
+    params.permit![:file].original_filename
+  end
+
+  def file_content_type
+    params.permit![:file].content_type
   end
 end

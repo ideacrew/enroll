@@ -11,6 +11,7 @@
       </h4>
     </div>
     <div class="col-xs-4">
+      <%= link_to "Upload Notices", upload_notice_form_insured_families_path, class: "btn btn-primary btn-br pull-right", target: '_blank' if current_user.has_hbx_staff_role? %>
       <%= link_to "Download Tax Documents", 'https://www.dchealthlink.com/individuals/tax-documents', class: "btn btn-primary btn-br pull-right", target: '_blank' if @person.try(:consumer_role).present? %>
       <%= link_to "Upload Document", document_upload_insured_families_path, class: "btn btn-primary btn-br pull-right" if @person.try(:consumer_role).present? %>
     </div>
