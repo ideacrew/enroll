@@ -36,7 +36,7 @@ class Insured::VerificationDocumentsController < ApplicationController
       send_data Aws::S3Storage.find(uri), download_options(document)
     else
       flash[:error] = "File does not exist or you are not authorized to access it."
-      redirect_to documents_index_insured_families_path
+      redirect_to verification_insured_families_path
     end
   end
 

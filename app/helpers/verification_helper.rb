@@ -7,7 +7,7 @@ module VerificationHelper
   end
 
   def docs_waiting_for_review
-    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
+    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded']).count
   end
 
   def missing_docs
@@ -36,8 +36,6 @@ module VerificationHelper
         "warning"
       when "downloaded"
         "default"
-      when "in review"
-        "info"
       when "verified"
         "success"
       else
@@ -75,5 +73,14 @@ module VerificationHelper
 
   def member_has_uploaded_docs(member)
     true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
+  end
+
+  def documents_count(person)
+    person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
+  end
+
+  def due_date(person)
+    time = (Time.now + SecureRandom.random_number(10).days)
+    time.strftime("%m/%d/%Y")
   end
 end

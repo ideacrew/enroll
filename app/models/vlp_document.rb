@@ -46,7 +46,7 @@ class VlpDocument < Document
       "Other (With I-94 Number)"
     ]
 
-    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'in review', 'verified', 'rejected']
+    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'verified', 'rejected']
 
     COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
 		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",

@@ -1,9 +1,11 @@
 <div class="row">
+  <% if current_user.has_consumer_role? %>
   <div class="col-md-2">
     <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="<%= info_pop_up(v_type) %>">
       <i class="fa fa-info-circle fa-1x"></i>
     </button>
   </div>
+  <% end %>
   <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
       <%= hidden_field_tag 'family_member', member.id  %>
       <%= hidden_field_tag 'verification_type', v_type  %>

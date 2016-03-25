@@ -1,0 +1,25 @@
+<% if current_user && current_user.has_hbx_staff_role? %>
+    <%= link_to "#verif-#{person.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "comment-#{person.id}" } do %>
+        <%= button_tag "Complete verification for #{person.first_name}", class:"btn btn-danger btn-sm" %>
+    <% end %>
+    <!-- Admin comment form -->
+    <div class="collapse" id="verif-<%=person.id%>">
+      <div class="col-md-12 module verif-type">
+        <%= form_tag update_individual_documents_path, multipart: true, method: :post do %>
+            <%= hidden_field_tag 'person_id', person.id  %>
+            <%= radio_button_tag 'citizenship', 'us_citizen' %>
+            <%= label_tag 'US Citizen', nil, class:"module verif-type" %>
+            <%= radio_button_tag 'citizenship', 'lawful_permanent_resident' %>
+            <%= label_tag 'Lawful Permanent Resident', nil, class:"module verif-type" %>
+            <%= radio_button_tag 'citizenship', 'alien_lawfully_present' %>
+            <%= label_tag 'Alien Lawfully Present', nil, class:"module verif-type" %>
+            <div>
+              <%= submit_tag "Verify Person", class: "btn btn-default btn-xs" %>
+            </div>
+        <% end %>
+      </div>
+    </div>
+    <!-- >>>>>> admin comment form -->
+
+
+<% end %>
