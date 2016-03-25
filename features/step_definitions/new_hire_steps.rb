@@ -31,8 +31,9 @@ Then(/Employee tries to purchase another plan/) do
   step "When Employee clicks on Confirm button on the coverage summary page"
   step "Then Employee should see receipt page with employer name and plan details"
   step "When Employee clicks on Continue button on receipt page"
-  # step "Then Employee should see the \"my account\" page"
+  sleep 1
   step "Then Employee should see my account page"
+
 end
 
 When(/When Employee clicks \"Shop for Plans\" on my account page/) do
