@@ -276,6 +276,10 @@ class Household
     end
   end
 
+  def enrolled_including_waived_hbx_enrollments
+    hbx_enrollments.coverage_selected_and_waived
+  end
+
   def enrolled_hbx_enrollments
     hbx_enrollments.enrolled
   end

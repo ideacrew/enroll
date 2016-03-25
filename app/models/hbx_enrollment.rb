@@ -1,4 +1,4 @@
-require 'ostruct'
+  require 'ostruct'
 
 class HbxEnrollment
   include Mongoid::Document
@@ -33,6 +33,8 @@ class HbxEnrollment
       "enrolled_contingent",
       "unverified"
     ]
+
+  SELECTED_AND_WAIVED = ["coverage_selected", "inactive"]
 
   TERMINATED_STATUSES = ["coverage_terminated", "unverified"]
   CANCELED_STATUSES = ["coverage_canceled"]
@@ -127,6 +129,7 @@ class HbxEnrollment
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector]) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
+  scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED)}
 
   embeds_many :workflow_state_transitions, as: :transitional
 
