@@ -587,7 +587,7 @@ class EmployerProfile
   def self.update_status_to_binder_paid(employer_profile_ids)
     employer_profile_ids.each do |id|
       empr = self.find(id)
-      empr.update_attribute(:aasm_state => "binder_paid")
+      empr.update_attribute(:aasm_state, "binder_paid")
     end
   end
 
