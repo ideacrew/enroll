@@ -15,9 +15,9 @@ module Employers::EmployerHelper
   end
 
   def coverage_kind(census_employee=nil)
-    return "" if census_employee.blank?
+    return "" if census_employee.blank? || census_employee.employee_role.blank?
     enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)
-    if enrolled.present? && enrolled != "initialized"  
+    if enrolled.present? && enrolled != "initialized" 
       kind = census_employee.employee_role.person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.uniq.join(", ")
     else
       kind = ""
