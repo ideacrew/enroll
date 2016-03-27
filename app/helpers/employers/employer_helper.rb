@@ -5,23 +5,32 @@ module Employers::EmployerHelper
 
   def enrollment_state(census_employee=nil)
     return "" if census_employee.blank? || census_employee.employee_role.blank?
-    
+
     enrollment_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
     if enrollment_state.present? && enrollment_state != "initialized"
       #enrollment_state.humanize
-      status = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map{|a| "#{a.aasm_state} (#{a.plan.coverage_kind})"}
-      status = status.map(&:inspect).join(', ').gsub('"','')
+      begin
+        status = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map{|a| "#{a.aasm_state} (#{a.plan.coverage_kind})"}
+        status = status.uniq.map(&:inspect).join(', ').gsub('"','').gsub("inactive", "coverage_waived") # since, coverage_waived=>{inactive, renewing_waived}
+      rescue
+        status = ""
+      end
     else
       status = ""
     end
     return status.titleize
   end
 
+
   def coverage_kind(census_employee=nil)
     return "" if census_employee.blank? || census_employee.employee_role.blank?
     enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)
-    if enrolled.present? && enrolled != "initialized" 
-      kind = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.uniq.join(", ")
+    if enrolled.present? && enrolled != "initialized"
+      begin 
+        kind = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.uniq.join(", ")
+      rescue
+        kind = ""
+      end
     else
       kind = ""
     end  
