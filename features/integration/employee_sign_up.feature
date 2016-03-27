@@ -18,7 +18,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         Then Soren White logs out
 
   Scenario: New employee with existing person
-    Given Employer for Soren White exists with a published plan year
+    Given Employer for Soren White exists with a published health plan year
         And Employee has not signed up as an HBX user
         And Soren White visits the employee portal
         When Soren White creates an HBX account
