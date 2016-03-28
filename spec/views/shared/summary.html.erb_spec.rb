@@ -77,6 +77,7 @@ describe "shared/_summary.html.erb" do
     it "should have provider directory url if nationwide = true" do
       render "shared/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
+      expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
     it "should not have provider directory url if nationwide = false" do
