@@ -172,7 +172,17 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
-    @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      if @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind == ( "csr_94" || "csr_87" || "csr_73" )
+        silver_plans, non_silver_plans = @plans.partition{|a| a.metal_level == "silver"}
+        standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
+        @plans = standard_plans + non_standard_plans + non_silver_plans
+      else
+        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+      end
+    else
+      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
