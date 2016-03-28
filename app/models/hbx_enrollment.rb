@@ -129,7 +129,7 @@ class HbxEnrollment
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector]) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
-  scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED)}
+  scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
 
   embeds_many :workflow_state_transitions, as: :transitional
 

@@ -84,28 +84,17 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       # Tests the sort and reverse. Always want 'Health' before 'Dental' 
       it " when coverage kind is 'health, dental' " do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([health_enrollment, dental_enrollment])
+        allow(primary_family).to receive(:enrolled_including_waived_hbx_enrollments).and_return([health_enrollment, dental_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Health, Dental"
       end
 
       # Tests the sort and reverse. Always want 'Health' before 'Dental'
       it " when coverage kind is 'dental, health' " do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([dental_enrollment, health_enrollment])
+        allow(primary_family).to receive(:enrolled_including_waived_hbx_enrollments).and_return([dental_enrollment, health_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Health, Dental"
       end
 
-      # Tests the uniqueness
-      it " when coverage kind is 'health, health' " do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([health_enrollment, health_enrollment])
-        expect(helper.coverage_kind(census_employee)).to eq "Health"
-      end
-
-      # Tests the uniqueness
-      it " when coverage kind is 'dental, dental' " do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([dental_enrollment, dental_enrollment])
-        expect(helper.coverage_kind(census_employee)).to eq "Dental"
-      end
-
+     
     end
 
 
