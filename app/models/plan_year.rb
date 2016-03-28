@@ -90,7 +90,7 @@ class PlanYear
 
       enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
       enrollments << valid_enrollments.where({:coverage_kind => 'dental'}).first
-    end
+    end.compact
   end
 
   def eligible_for_export?

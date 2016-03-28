@@ -2002,10 +2002,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       )
     }
 
+    before do
+      allow(shop_family.active_household).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment]) 
+    end
+
 
     context " when enrollments present with enrolled or renewing state" do 
       before do
-        shop_enrollment.update_attributes(:'aasm_state' => 'auto_renewing')
+        health_enrollment.update_attributes(:'aasm_state' => 'auto_renewing')
       end
 
       it 'should return both health and dental enrollments' do
