@@ -121,7 +121,8 @@ module Importers
         :office_locations => map_office_locations,
         :employer_profile => EmployerProfile.new({
           :broker_agency_accounts => assign_brokers,
-          :entity_kind => "c_corporation"
+          :entity_kind => "c_corporation",
+          :converted_from_carrier_at => Time.now
         })
       })
       save_result = new_organization.save
