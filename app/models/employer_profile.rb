@@ -17,6 +17,9 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  field :converted_from_carrier_at, type: DateTime, default: nil
+  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
+
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
@@ -720,6 +723,10 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+  def conversion_employer?
+    !self.converted_from_carrier_at.blank?
   end
 
 private
