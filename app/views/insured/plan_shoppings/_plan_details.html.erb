@@ -75,7 +75,7 @@
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
           <% if tax_household = current_user.person.primary_family.active_household.latest_active_tax_household.present? %>
-            <% if tax_household.eligibility_determination.csr_eligibility_kind == ( "csr_94" || "csr_87" || "csr_73" ) && plan.metal_level != "silver" %>
+            <% if tax_household.current_csr_eligibility_kind == ( "csr_94" || "csr_87" || "csr_73" ) && plan.metal_level != "silver" %>
               <%= link_to "Select Plan", "javascript:void(0)", class: 'btn btn-trans pull-right btn-right', data: {'toggle': 'modal', 'target': '#csrEligibleReminder'} %> &nbsp;
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
               <% else %>
