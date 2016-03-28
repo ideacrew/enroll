@@ -16,6 +16,9 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  field :converted_from_carrier_at, type: DateTime, default: nil
+  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
+
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
@@ -631,6 +634,10 @@ class EmployerProfile
 
   def notify_binder_paid
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
+  end
+
+  def conversion_employer?
+    !self.converted_from_carrier_at.blank?
   end
 
 private
