@@ -163,6 +163,7 @@ Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   employee.add_benefit_group_assignment benefit_group, 2.days.ago
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
 end
 

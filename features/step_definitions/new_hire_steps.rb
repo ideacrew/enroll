@@ -12,8 +12,30 @@ Given(/I set the eligibility rule to (.*)/) do |rule|
     })
 end
 
-Given(/the Employee has current hire on date/) do 
-  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => Date.today)
+Given(/I reset employee to future enrollment window/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes({
+    :created_at => (TimeKeeper.date_of_record - 15.days),
+    :hired_on => TimeKeeper.date_of_record
+  })
+end
+
+Given(/Employee new hire enrollment window is closed/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes({
+    :created_at => (TimeKeeper.date_of_record - 45.days),
+    :hired_on => (TimeKeeper.date_of_record - 45.days)
+  })
+end
+
+And(/Employee has current hired on date/) do 
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
+end
+
+And(/Employee has past hired on date/) do 
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record - 1.year)
+end
+
+And(/Employee has future hired on date/) do 
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record + 15.days)
 end
 
 def expected_effective_on
@@ -21,39 +43,70 @@ def expected_effective_on
   employee.active_employee_roles.first.coverage_effective_on
 end
 
-Then(/Employee tries to purchase another plan/) do
-  step "When Employee clicks \"Shop for Plans\" on my account page"
-  step "When Employee clicks shop for new plan on the group selection page"
-  step "Then Employee should see the list of plans"
-  step "And I should not see any plan which premium is 0"
-  step "When Employee selects a plan on the plan shopping page" 
-  step "Then Employee should see coverage summary page with employer name and plan details"
-  step "When Employee clicks on Confirm button on the coverage summary page"
-  step "Then Employee should see receipt page with employer name and plan details"
-  step "When Employee clicks on Continue button on receipt page"
-  sleep 1
-  step "Then Employee should see my account page"
-
+Then(/Employee tries to complete purchase of another plan/) do
+  step "Employee clicks \"Shop for Plans\" on my account page"
+  step "Employee clicks continue on the group selection page"
+  step "Employee should see the list of plans"
+  step "I should not see any plan which premium is 0"
+  step "Employee selects a plan on the plan shopping page" 
+  step "Employee should see coverage summary page with employer name and plan details"
+  step "Employee clicks on Confirm button on the coverage summary page"
+  step "Employee should see receipt page with employer name and plan details"
+  step "Employee clicks on Continue button on receipt page"
 end
 
-When(/When Employee clicks \"Shop for Plans\" on my account page/) do
+When(/Employee clicks \"Shop for Plans\" on my account page/) do
   find('.interaction-click-control-shop-for-plans').click
 end
 
-When(/When Employee clicks shop for new plan on the group selection page/) do 
-  find('.interaction-click-control-shop-for-new-plan').click
+When(/Employee clicks continue on the group selection page/) do
+  if find_all('.interaction-click-control-continue').any?
+    find('.interaction-click-control-continue').click
+  else
+    find('.interaction-click-control-shop-for-new-plan').click
+  end
 end
 
-Then(/Then Employee should see (.*) page with employer name and plan details/) do |page|
+Then(/Employee should see (.*) page with employer name and plan details/) do |page|
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
 end
 
-When(/When Employee clicks on Continue button on receipt page/) do 
+When(/Employee clicks on Continue button on receipt page/) do 
   find('.interaction-click-control-continue').click
 end
 
-When(/Then Employee should see my account page/) do
+Then(/Employee should see \"my account\" page with enrollment/) do
+  sleep 1
+  enrollment = first('.hbx-enrollment-panel')
+  enrollment.find('.enrollment-effective', text: expected_effective_on.strftime("%m/%d/%Y"))
+  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
+end
+
+Then(/Employee should see \"not yet eligible\" error message/) do 
+  screenshot("new_hire_not_yet_eligible_exception")
+  find('.alert', text: "You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
+  visit '/families/home'
+end
+
+Then(/Employee should see \"may not enroll until eligible\" error message/) do 
+  screenshot("new_hire_not_eligible_exception")
+  find('.alert', text: "You may not enroll until you're eligible under an enrollment period.")
+  visit '/families/home'
+end
+
+When(/Employee enters Qualifying Life Event/) do
+  first("#carousel-qles a").click
+  expect(page).to have_content "Married"
+  screenshot("future_qle_date")
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  click_link "CONTINUE"
+  click_button "Continue"
+end
+
+When(/Employee clicks continue on the family members page/) do 
+  click_link('btn_household_continue')
+  sleep 1
 end
 
