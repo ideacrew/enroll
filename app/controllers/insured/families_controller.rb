@@ -1,6 +1,7 @@
 class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
+  include ApplicationHelper
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -182,7 +183,7 @@ class Insured::FamiliesController < FamiliesController
     @family.set(status: "aptc_unblock")
   end
 
-  # manually uploads a notice for a person
+  # admin manually uploads a notice for person
   def upload_notice
 
     if params.permit![:file]
@@ -194,6 +195,9 @@ class Insured::FamiliesController < FamiliesController
         begin
           @person.documents << notice_document
           @person.save!
+
+          send_notice_upload_notifications(notice_document)
+
           flash[:notice] = "File Saved"
           redirect_to(:back)
           return
@@ -278,5 +282,24 @@ class Insured::FamiliesController < FamiliesController
 
   def file_content_type
     params.permit![:file].content_type
+  end
+
+  def send_notice_upload_notifications(notice)
+    notice_upload_email
+    notice_upload_secure_message(notice)
+  end
+
+  def notice_upload_email
+    UserMailer.notice_uploaded_notification(@person).deliver_now
+  end
+
+  def notice_upload_secure_message(notice)
+    key, bucket = get_key_and_bucket(notice.identifier)
+    subject = "New Notice Available"
+    body = "<br>You can download the notice by clicking this link " +
+            "<a href=" + "#{document_download_path(bucket, key)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
+    @person.save!
   end
 end

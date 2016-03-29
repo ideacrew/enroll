@@ -485,5 +485,20 @@ RSpec.describe Insured::FamiliesController do
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
     end
+
+    context "notice_upload_secure_message" do
+
+      let(:notice) {Document.new({ title: "file_name", creator: "hbx_staff", subject: "notice", identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+                                   format: "file_content_type" })}
+
+      before do
+        allow(@controller).to receive(:document_download_path).with("bucket", "key").and_return("/path/")
+        @controller.send(:notice_upload_secure_message, notice)
+      end
+
+      it "adds a message to person inbox" do
+        expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
+      end
+    end
   end
 end
