@@ -60,7 +60,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should have a 'not eligible'" do
-      expect(rendered).to have_selector('td', text: 'ineligible relationship')
+      expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.')
     end
 
   end
