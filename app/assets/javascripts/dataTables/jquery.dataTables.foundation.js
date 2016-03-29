@@ -41,7 +41,7 @@ var DataTable = $.fn.dataTable;
 
 
 $.extend( DataTable.ext.classes, {
-	sWrapper:    "dataTables_wrapper dt-foundation",
+	sWrapper:    "module dataTables_wrapper dt-foundation",
 	sProcessing: "dataTables_processing panel"
 } );
 
@@ -51,7 +51,7 @@ $.extend( true, DataTable.defaults, {
 	dom:
 		"<''<'small-6 columns'l><'small-6 columns'f>r>"+
 		"t"+
-		"<''<'small-6 columns'i><'small-6 columns'p>>",
+		"<''<'small-12 columns'i><'small-12 columns'p>>",
 	renderer: 'foundation'
 } );
 

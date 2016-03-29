@@ -1,6 +1,6 @@
 
 
-  <table id="employers_dataTable" class="table table-striped table-bordered dataTable module">  
+  <table id="employers_dataTable" class="table table-striped table-bordered dataTable">
     <thead>
       <tr>
         <th>HBX Acct</th>
@@ -51,6 +51,9 @@
     $('#employers_dataTable').DataTable( {
       "order": [[ 1, "asc" ]]
     } );
+    $('select').on('selectric-init', function(element){
+      $('.selectric').closest('label').after('<span></span>');
+      $('.selectric').closest('.small-6').find('span:first').text(' Entries shown')
+});
 } );
 </script>
-
