@@ -88,4 +88,8 @@ module Insured::FamiliesHelper
       true
     end
   end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  end
 end

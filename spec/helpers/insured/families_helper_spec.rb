@@ -59,4 +59,12 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
   end
+
+  describe "has_writing_agent?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+
+    it "should return false" do
+      expect(helper.has_writing_agent?(employee_role)).to eq false
+    end
+  end
 end
