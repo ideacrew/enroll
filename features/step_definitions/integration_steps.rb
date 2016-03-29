@@ -95,6 +95,10 @@ def people
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "CSR" => {
+      email: "sherry.buckner@dc.gov",
+      password: 'aA1!aA1!aA1!'
+    }
   }
 end
 
