@@ -1,2 +1,13 @@
 setTabContent("<%= escape_javascript render "families"%>")
 set_active_ontab("#families-tab");
+
+$(document).ready(function() {
+    $('#families_dataTable').DataTable( {
+      "order": [[ 0, "asc" ]]
+    } );
+    $('select').on('selectric-init', function(element){
+	  $('.selectric').closest('.small-6').find('span').remove();
+      $('.selectric').closest('label').after('<span></span>');
+      $('.selectric').closest('.small-6').find('span:first').text(' Entries Shown')
+});
+} );

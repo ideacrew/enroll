@@ -1,26 +1,18 @@
 <% model_class = Family %>
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
-<div class="container">
-	<div id="families">
-		<h3 class="title-inline">Families</h3>
-	</div>
-</div>
+<div class = 'container'>
 
-<div class="container">
-	<div id="families">
+   <div class = 'row'>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h3 class="title-inline">Families</h3>
+    </div>
+  </div>
+
+  <div class = 'row'>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     	<%= render "families_table_for_broker", families: @families%>
-  	</div>
-  		<%= render 'shared/alph_paginate_remote', url: family_index_broker_agencies_profiles_path, alphs: @page_alphabets, all: family_index_broker_agencies_profiles_path %>
-
+  	 </div>
 </div>
-
-<style type="text/css">
-  table.dataTable.select tbody tr,
-    table.dataTable thead th:first-child {
-    cursor: pointer;
-  }
-}
-</style>
 
      

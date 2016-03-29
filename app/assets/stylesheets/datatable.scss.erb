@@ -1,5 +1,5 @@
 .module {
-  &#employers_dataTable_wrapper {
+  &#employers_dataTable_wrapper, &#families_dataTable_wrapper {
     .small-6 {
       width: 50%;
       &:first-of-type {
@@ -9,7 +9,11 @@
           position: relative;
           p {
             position:relative;
-            top: -5px;
+            &.label {
+            top: 4px;
+            height: auto !important;
+            line-height: normal !important;
+          }
           }
           .button {
             top: -6px;
@@ -17,7 +21,7 @@
         }
         span {
           position:relative;
-          top: -5px;
+          top: 5px;
           left: 8px;
         }
       }
