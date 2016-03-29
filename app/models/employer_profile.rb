@@ -16,8 +16,8 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  field :converted_from_carrier_at, type: DateTime, default: nil
-  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
+#  field :converted_from_carrier_at, type: DateTime, default: nil
+#  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
