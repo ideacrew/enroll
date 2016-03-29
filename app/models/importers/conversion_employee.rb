@@ -22,7 +22,8 @@ module Importers
       :default_hire_date
 
       (1..8).to_a.each do |num|
-        attr_reader "dep_#{num}_ssn".to_sym, "dep_#{num}_dob".to_sym, "dep_#{num}_gender".to_sym
+        attr_reader "dep_#{num}_ssn".to_sym, "dep_#{num}_dob".to_sym,
+          "dep_#{num}_gender".to_sym, "dep_#{num}_relationship".to_sym
       end
       (1..8).to_a.each do |num|
         attr_accessor "dep_#{num}_name_first".to_sym,
@@ -34,8 +35,7 @@ module Importers
           "dep_#{num}_address_2".to_sym,
           "dep_#{num}_city".to_sym,
           "dep_#{num}_state".to_sym,
-          "dep_#{num}_zip".to_sym,
-          "dep_#{num}_relationship".to_sym
+          "dep_#{num}_zip".to_sym
       end
 
       validate :validate_fein
@@ -51,11 +51,11 @@ module Importers
       end
 
       def hire_date=(val)
-        @hire_date = val.blank? ? nil : (self.dob.strftime("%m/%d/%Y") rescue nil)
+        @hire_date = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
       end
 
       def subscriber_dob=(val)
-        @subscriber_dob = val.blank? ? nil : (self.dob.strftime("%m/%d/%Y") rescue nil)
+        @subscriber_dob = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
       end
 
       def subscriber_gender=(val)
@@ -72,8 +72,12 @@ module Importers
             @dep_#{num}_gender = Maybe.new(val).strip.downcase.extract_value
           end
 
+          def dep_#{num}_relationship=(val)
+            @dep_#{num}_relationship = Maybe.new(val).strip.downcase.extract_value
+          end
+
           def dep_#{num}_dob=(val)
-            @dep_#{num}_dob = val.blank? ? nil : (self.dob.strftime("%m/%d/%Y") rescue nil)
+            @dep_#{num}_dob = val.blank? ? nil : (Date.strptime(val, ("%m/%d/%Y")) rescue nil)
           end
         RUBYCODE
       end
