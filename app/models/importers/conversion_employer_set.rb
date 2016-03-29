@@ -92,7 +92,6 @@ module Importers
     def import!
       @out_csv << HEADERS
       self.send(row_iterator)
-      @out_csv.close
     end
 
     def process_csv_rows

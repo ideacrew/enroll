@@ -38,7 +38,16 @@ module Importers
     end
 
     def fein=(val)
-      @fein = Maybe.new(val).strip.gsub(/\D/, "").extract_value
+      if val.blank?               
+        @fein = nil
+      else                                              
+        stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")       
+        if (stripped_value == "000000000")                                      
+          @fein = nil
+        else
+          @fein = stripped_value
+        end
+      end 
     end
 
     def broker_npn=(val)
@@ -122,7 +131,7 @@ module Importers
         :employer_profile => EmployerProfile.new({
           :broker_agency_accounts => assign_brokers,
           :entity_kind => "c_corporation"#,
-#          :converted_from_carrier_at => Time.now
+        #          :converted_from_carrier_at => Time.now
         })
       })
       save_result = new_organization.save

@@ -154,7 +154,7 @@ module Importers
 "Dep8 Zip",
 "Dep8 Relationship",
 "Import Status",
-"Import Details",
+"Import Details"
     ]
 
     ROW_MAPPING = [
@@ -167,6 +167,7 @@ module Importers
       :ignore,
       :hire_date,
       :benefit_begin_date,
+      :ignore,
       :ignore,
       :ignore,
       :ignore,
@@ -325,7 +326,6 @@ module Importers
     def import!
       @out_csv << HEADERS
       self.send(row_iterator)
-      @out_csv.close
     end
 
     def process_csv_rows

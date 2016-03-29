@@ -47,7 +47,16 @@ module Importers
       end
 
       def subscriber_ssn=(val)
-        @subscriber_ssn = Maybe.new(val).strip.gsub(/\D/, "").extract_value
+        if val.blank?
+          @subscriber_ssn = nil
+        else
+          stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
+          if (stripped_value == "000000000")
+            @subscriber_ssn = nil
+          else
+            @subscriber_ssn = stripped_value
+          end
+        end
       end
 
       def hire_date=(val)
@@ -65,7 +74,16 @@ module Importers
       (1..8).to_a.each do |num|
         class_eval(<<-RUBYCODE)
           def dep_#{num}_ssn=(val)
-            @dep_#{num}_ssn = Maybe.new(val).strip.gsub(/\D/, "").extract_value
+            if val.blank?
+              @dep_#{num}_ssn = nil
+            else
+              stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
+              if (stripped_value == "000000000")
+                @dep_#{num}_ssn = nil
+              else
+                @dep_#{num}_ssn = stripped_value
+              end
+            end
           end
 
           def dep_#{num}_gender=(val)
@@ -96,10 +114,10 @@ module Importers
         state = subscriber_state
         zip = subscriber_zip
         attr_hash = {
-         first_name: first_name,
-         last_name: last_name,
-         dob: dob,
-         gender: gender
+          first_name: first_name,
+          last_name: last_name,
+          dob: dob,
+          gender: gender
         }
         if hire_date.blank?
           attr_hash[:hired_on] = default_hire_date
@@ -113,7 +131,7 @@ module Importers
           attr_hash[:ssn] = ssn
         end
         unless email.blank?
-          attr_hash[:email] = Email.new(:kind => work, :address => email)
+          attr_hash[:email] = Email.new(:kind => "work", :address => email)
         end
         unless address_1.blank?
           addy_attr = {
@@ -143,11 +161,11 @@ module Importers
           return nil
         end
         attr_hash = {
-         first_name: first_name,
-         last_name: last_name,
-         dob: dob,
-         employee_relationship: relationship,
-         gender: gender
+          first_name: first_name,
+          last_name: last_name,
+          dob: dob,
+          employee_relationship: relationship,
+          gender: gender
         }
         unless middle_name.blank?
           attr_hash[:middle_name] = middle_name
@@ -165,7 +183,16 @@ module Importers
       end
 
       def fein=(val)
-        @fein = Maybe.new(val).strip.gsub(/\D/, "").extract_value
+        if val.blank?
+          @fein = nil
+        else
+          stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
+          if (stripped_value == "000000000")
+            @fein = nil
+          else
+            @fein = stripped_value
+          end                                                                                                 
+        end
       end
 
       def validate_fein
