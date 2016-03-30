@@ -223,7 +223,9 @@ end
 
 Then(/Individual asks for help$/) do
   find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  sleep 1
   click_link "Help from a Customer Service Representative"
+  sleep 1
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
