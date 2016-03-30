@@ -46,9 +46,26 @@ describe "shared/_comparison.html.erb" do
     assign :hbx_enrollment, mock_hbx_enrollment
   end
 
-  context "with no rx_formulary_url and provider urls" do
+  context "with no rx_formulary_url and provider urls for coverage_kind = dental" do
 
     before :each do
+      assign :coverage_kind, "dental"
+      render "shared/comparison", :qhps => mock_qhps
+    end
+
+    it "should not have coinsurance text" do
+      expect(rendered).not_to have_selector('th', text: 'COINSURANCE')
+    end
+
+    it "should not have copay text" do
+      expect(rendered).not_to have_selector('th', text: 'CO-PAY')
+    end
+  end
+
+  context "with no rx_formulary_url and provider urls for coverage_kind = health" do
+
+    before :each do
+      assign :coverage_kind, "health"
       render "shared/comparison", :qhps => mock_qhps
     end
 

@@ -141,43 +141,44 @@
       </div>
     </div>
   </div>
+  <% if @coverage_kind == "health" %>
+    <div class="details">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th width="30%">SERVICES YOU MAY NEED</th>
+            <th width="40%">YOUR COST AT PARTICIPATING PROVIDER </th>
+            <th width="30%">(IN-NETWORK)</th>
+          </tr>
+          <tr>
+            <th>&nbsp;</th>
+            <th>CO-PAY</th>
+            <th>COINSURANCE</th>
+          </tr>
+        </thead>
 
-  <div class="details">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th width="30%">SERVICES YOU MAY NEED</th>
-          <th width="40%">YOUR COST AT PARTICIPATING PROVIDER </th>
-          <th width="30%">(IN-NETWORK)</th>
-        </tr>
-        <tr>
-          <th>&nbsp;</th>
-          <th>CO-PAY</th>
-          <th>COINSURANCE</th>
-        </tr>
-      </thead>
+        <tbody>
+          <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
 
-      <tbody>
-        <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
-
-        <tr>
-          <td></td>
-          <td colspan="3" class="text-center">
-            <% if @hbx_enrollment.shopping?%>
-              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-            <% else %>
-              <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
-            <% end %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <% if @hbx_enrollment.shopping?%>
-      <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-trans all-plans' %>
-      <br/>
-      <br/>
-    <% end %>
-  </div>
+          <tr>
+            <td></td>
+            <td colspan="3" class="text-center">
+              <% if @hbx_enrollment.shopping?%>
+                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+              <% else %>
+                <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <% if @hbx_enrollment.shopping? %>
+    <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-trans all-plans' %>
+    <br/>
+    <br/>
+  <% end %>
 <% else %>
   No Plan found
 <% end %>
