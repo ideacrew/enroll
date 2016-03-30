@@ -13,6 +13,7 @@
         <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
       </div>
     <% else %>
+
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
@@ -25,76 +26,35 @@
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
-          <div class="module group-selection-table">
-            <div class="table-responsive table-border health">
-              <table class="table table-wrapper table-condensed group-selection-tbl">
-                <tbody>
-                  <% offered_relationship_benefits = @employee_role.present? && @employee_role.benefit_group.present? && @employee_role.benefit_group.relationship_benefits.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
-                  %>
-                  <% show_residency_alert = false %>
-                  <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
-                      <% is_coverage = @employee_role.present? && offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
-                        is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
 
-                        if @market_kind == 'individual'
-                          #TEMPORARY CODE DO NOT COPY   TODO
-                            role = family_member.person.consumer_role
-                            rule = InsuredEligibleForBenefitRule.new(role, @benefit)
-                            is_coverage, errors = rule.satisfied?
-                            show_residency_alert = !rule.is_residency_status_satisfied? if show_residency_alert == false
-                            errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
-                        end
-                          #TEMPORARY CODE DO NOT COPY  TODO
-                        %>
-                    <tr class="<%='ineligible_row' unless is_coverage%>">
-                      <td width="20">
-                        <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
-                      </td>
-                      <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
-                      <td><%= "This dependent is ineligible for employer-sponsored health coverage."  if !is_coverage && @market_kind == 'shop'  %></td>
-                      <td><%= raw(errors.join(', ')) if errors.present? && @market_kind == 'individual'  %></td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && (!@employee_role.benefit_group.dental_reference_plan_id.blank? || !@employee_role.benefit_group.elected_dental_plan_ids.blank? ) %>
-            <div class="module group-selection-table dn">
-              <div class="table-responsive table-border dental">
-              <table class="table table-wrapper table-condensed group-selection-tbl">
-                <tbody>
-                  <% offered_relationship_benefits = @employee_role.present? && @employee_role.benefit_group.present? && @employee_role.benefit_group.dental_relationship_benefits.present? ? @employee_role.benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship) : nil
-                  %>
-                  <% show_residency_alert = false %>
-                  <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
-                      <% is_coverage = @employee_role.present? && offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
-                        is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
-
-                        if @market_kind == 'individual'
-                          #TEMPORARY CODE DO NOT COPY   TODO
-                            role = family_member.person.consumer_role
-                            rule = InsuredEligibleForBenefitRule.new(role, @benefit)
-                            is_coverage, errors = rule.satisfied?
-                            show_residency_alert = !rule.is_residency_status_satisfied? if show_residency_alert == false
-                            errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
-                        end
-                          #TEMPORARY CODE DO NOT COPY  TODO
-                        %>
-                    <tr class="<%='ineligible_row' unless is_coverage%>">
-                      <td width="20">
-                        <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
-                      </td>
-                      <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
-                      <td><%= "This dependent is ineligible for employer-sponsored dental coverage."  if !is_coverage && @market_kind == 'shop'  %></td>
-                      <td><%= raw(errors.join(', ')) if errors.present? && @market_kind == 'individual'  %></td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
+          <% if can_shop_shop?(@person) %>
+            <div id="shop-coverage-household" class="<%= 'dn' if @market_kind == 'individual' %>">
+              <div class="module group-selection-table health">
+                <div class="table-responsive table-border">
+                  <%= render 'coverage_household', :coverage_kind => 'health' %>
+                </div>
+              </div>
+              <% if @employee_role.benefit_group.is_offering_dental? %>
+                <div class="module group-selection-table dn dental">
+                  <div class="table-responsive table-border">
+                    <%= render 'coverage_household', :coverage_kind => 'dental' %>
+                  </div>
+                </div>
+              <% end %>
             </div>
           <% end %>
+
+          <% if can_shop_individual?(@person) %>
+            <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
+              <div class="module group-selection-table">
+                <div class="table-responsive table-border health">
+                  <%= render 'ivl_coverage_household' %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+
           <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
                 <h3>Marketplace</h3>
@@ -116,17 +76,18 @@
                   </div>
                 <% end %>
               </div>
-
             </div>
           <% elsif can_shop_shop?(@person) %>
-	    <%= hidden_field_tag 'market_kind', 'shop' %>
-	  <% elsif can_shop_individual?(@person) %>
-	    <%= hidden_field_tag 'market_kind', 'individual' %>
-      <% else %>
-      <% if @market_kind.present? %>
-        <%= hidden_field_tag 'market_kind', @market_kind %>
-        <% end %>
+	           <%= hidden_field_tag 'market_kind', 'shop' %>
+	        <% elsif can_shop_individual?(@person) %>
+	           <%= hidden_field_tag 'market_kind', 'individual' %>
+          <% else %>
+            <% if @market_kind.present? %>
+              <%= hidden_field_tag 'market_kind', @market_kind %>
+            <% end %>
           <% end %>
+
+
           <div id="coverage_kinds" class='row no-buffer'>
               <h3>Benefit Type</h3>
 
@@ -139,62 +100,15 @@
                     Health
                   </label>
                 </div>
-                <% if can_shop_both_markets?(@person) && @employee_role.present? %>
-                  <% if can_shop_individual?(@person) && ( @employee_role.benefit_group.dental_reference_plan_id.blank? || @employee_role.benefit_group.elected_dental_plan_ids.blank? ) %>
-                    <script>
-                    (function () {
-                      $('#market_kind_shop').on('change', function() {
-                        if ( $('#market_kind_shop').is(':checked') ) {
-                          $("#coverage_kind_health").prop("checked", true);
 
-                          $(".n-radio-row.dn").slideUp();
-                        }
-                      });
-                      })();
-
-                    </script>
-                      <div class="n-radio-row dn">
-                        <label class="n-radio" for="coverage_kind_dental">
-                          <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
-                          <span class="n-radio">
-                          </span>
-                          Dental
-                        </label>
-                      </div>
-                    <% elsif can_shop_shop?(@person) && ( @employee_role.benefit_group.dental_reference_plan_id.blank? || @employee_role.benefit_group.elected_dental_plan_ids.blank? ) %>
-                    <% else %>
-                      <div class="n-radio-row">
-                        <label class="n-radio" for="coverage_kind_dental">
-                          <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
-                          <span class="n-radio">
-                          </span>
-                          Dental
-                        </label>
-                      </div>
-                    <% end %>
-                    <% elsif can_shop_individual?(@person) %>
-                      <div class="n-radio-row">
-                        <label class="n-radio" for="coverage_kind_dental">
-                          <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
-                          <span class="n-radio">
-                          </span>
-                          Dental
-                        </label>
-                      </div>
-                    <% elsif can_shop_shop?(@person) && @employee_role.present? %>
-                      <% if @employee_role.present? && ( @employee_role.benefit_group.dental_reference_plan_id.blank? || @employee_role.benefit_group.elected_dental_plan_ids.blank? ) %>
-                      <% else %>
-                      <div class="n-radio-row">
-                        <label class="n-radio" for="coverage_kind_dental">
-                          <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
-                          <span class="n-radio">
-                          </span>
-                          Dental
-                        </label>
-                      </div>
-                    <% end%>
-                  <% end %>
-
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_both_markets?(@person) && !@employee_role.benefit_group.is_offering_dental? && @market_kind != 'individual' %>">
+                  <label class="n-radio" for="coverage_kind_dental">
+                    <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
+                    <span class="n-radio">
+                    </span>
+                    Dental
+                  </label>
+                </div>
               </div>
           </div>
 
@@ -270,7 +184,9 @@
     });
   }
 })
-$(document).ready(function() {
+
+
+function setGroupSelectionHandlers(){
   $('.group-selection-table .dental input').removeProp('checked');
 
   if ( $('#market_kind_shop').is(':checked') ) {
@@ -280,36 +196,59 @@ $(document).ready(function() {
     if ( $('#market_kind_shop').is(':checked') ) {
     } else {
       $('#coverage_kind_dental').closest('.n-radio-row').slideDown();
-
     }
   })
-  $('#market_kind_shop').on('change', function() {
-    if ( $('#coverage_kind_dental').is(':checked') ) {
 
-      $("#coverage_kind_health").prop("checked", true);
-      $(".n-radio-row.dn").slideUp();
-    }
-  });
-  <% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && (!@employee_role.benefit_group.dental_reference_plan_id.blank? || !@employee_role.benefit_group.elected_dental_plan_ids.blank? ) %>
-  $('#coverage_kind_dental').on('change', function() {
-    if ( $('#coverage_kind_dental').is(':checked') ) {
-      $('.group-selection-table .health').closest('.group-selection-table').hide();
-      $('.group-selection-table .dental').closest('.group-selection-table').show();
-      $('.group-selection-table .health input').removeProp('checked');
-      $('.group-selection-table .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    };
-  });
-
-  $('#coverage_kind_health').on('change', function() {
-    if ( $('#coverage_kind_health').is(':checked') ) {
-      $('.group-selection-table .dental').closest('.group-selection-table').hide();
-      $('.group-selection-table .health').closest('.group-selection-table').show();
-      $('.group-selection-table .dental input').removeProp('checked');
-      $('.group-selection-table .health tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    };
-  });
+<% if can_shop_both_markets?(@person) %>
+  <% if @market_kind == 'individual' %>
+    $('#market_kind_individual').prop("checked", true);
   <% end %>
 
+  $('#market_kind_shop').on('change', function() {
+    <% if !@employee_role.benefit_group.is_offering_dental? %>
+      $('#dental-radio-button').hide();
+    <% end %>
+    $('#shop-coverage-household').show();
+    $('#ivl-coverage-household').hide();
+    $('#ivl-coverage-household input').removeProp('checked');
 
+    if ($('#coverage_kind_health').is(':checked')) {
+      $('#shop-coverage-household .health tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+    }
+    if ($('#coverage_kind_dental').is(':checked')) {
+      $('#shop-coverage-household .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+    }
+  });
+
+  $('#market_kind_individual').on('change', function() {
+    $('#dental-radio-button').show();
+    $('#ivl-coverage-household').show();
+    $('#shop-coverage-household').hide();
+    $('#shop-coverage-household input').removeProp('checked');
+    $('#ivl-coverage-household tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+  });
+<% end %>
+
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.benefit_group.is_offering_dental? %>
+
+  $('#coverage_kind_health').on('change', function() {
+    $('#shop-coverage-household .health').show();
+    $('#shop-coverage-household .health tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+    $('#shop-coverage-household .dental').hide();
+    $('#shop-coverage-household .dental input').removeProp('checked');
+  });
+  
+  $('#coverage_kind_dental').on('change', function() {
+    $('#shop-coverage-household .dental').show();
+    $('#shop-coverage-household .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+    $('#shop-coverage-household .health').hide();
+    $('#shop-coverage-household .health input').removeProp('checked');
+  });
+<% end %>
+}
+
+$(document).ready(function() {
+ setGroupSelectionHandlers();
 });
+
 </script>
