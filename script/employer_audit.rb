@@ -31,11 +31,6 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	end
 end
 
-## b. In a separate tab(s), please include the roster information for each group including
-## i. Employee Name
-## ii. Employee hire date
-## iii. Date added to roster
-## iv. Whether employee waived coverage or selected a plan
 CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 	csv << ["Employer Name", "Employer FEIN", "Employee Name", "Hire Date", "Date Added to Roster", "Coverage State"]
 	all_employers.each do |employer|
