@@ -76,11 +76,13 @@ FactoryGirl.define do
       market "shop"
       coverage_kind "dental"
       metal_level "dental"
+      dental_level "high"
     end
     trait :ivl_dental do
       market "individual"
       coverage_kind "dental"
       metal_level "dental"
+      dental_level "high"
     end
     trait :unoffered do
       sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-00" }

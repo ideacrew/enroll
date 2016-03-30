@@ -8,6 +8,7 @@ class Plan
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
+  DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
 
   field :hbx_id, type: Integer
@@ -53,6 +54,9 @@ class Plan
   # Fields for provider direcotry and rx formulary url
   field :provider_directory_url, type: String
   field :rx_formulary_url, type: String
+
+  # for dental plans only, metal level -> high/low values
+  field :dental_level, type: String
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -111,6 +115,12 @@ class Plan
      in: METAL_LEVEL_KINDS,
      message: "%{value} is not a valid metal level kind"
   }
+
+  validates :dental_level,
+   inclusion: {
+     in: DENTAL_METAL_LEVEL_KINDS,
+     message: "%{value} is not a valid dental metal level kind"
+  }, if: Proc.new{|a| a.active_year.present? && a.active_year > 2015 && a.coverage_kind == "dental" } # we do not check for 2015 plans because, they are already imported with metal_level="dental"
 
   validates :market,
    allow_blank: false,

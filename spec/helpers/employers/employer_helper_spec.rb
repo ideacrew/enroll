@@ -8,7 +8,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
     let(:benefit_group_assignment) { double }
     let(:person) {double}
     let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:dental_plan) { FactoryGirl.create(:plan, coverage_kind: "dental") }
+    let(:dental_plan) { FactoryGirl.create(:plan, coverage_kind: "dental", dental_level: "high" ) }
     let(:health_plan) { FactoryGirl.create(:plan, coverage_kind: "health") }
     let(:dental_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
@@ -20,7 +20,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                               employee_role_id: employee_role.id,
                                               plan: health_plan
                                             )}
-     
+
     before do
       allow(benefit_group_assignment).to receive(:aasm_state).and_return("coverage_selected")
       allow(census_employee).to receive(:employee_role).and_return(employee_role)
@@ -28,7 +28,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       allow(employee_role).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(primary_family)
     end
-      
+
     context "return enrollment state for census_employee" do
 
       it "with nil" do
@@ -66,7 +66,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
 
     context "return coverage kind for a census_employee" do
-      
+
 
       it " when coverage kind is nil " do
         expect(helper.coverage_kind(nil)).to eq ""
@@ -76,13 +76,13 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([health_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Health"
       end
-      
+
       it " when coverage kind is 'dental' " do
         allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([dental_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Dental"
       end
 
-      # Tests the sort and reverse. Always want 'Health' before 'Dental' 
+      # Tests the sort and reverse. Always want 'Health' before 'Dental'
       it " when coverage kind is 'health, dental' " do
         allow(primary_family).to receive(:enrolled_including_waived_hbx_enrollments).and_return([health_enrollment, dental_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Health, Dental"
@@ -94,7 +94,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         expect(helper.coverage_kind(census_employee)).to eq "Health, Dental"
       end
 
-     
+
     end
 
 
