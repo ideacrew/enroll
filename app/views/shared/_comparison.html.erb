@@ -45,7 +45,7 @@
         <% end %>
       </tr>
 
-      <% if qhps.map(&:plan).map(&:nationwide).compact.present? %>
+      <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
