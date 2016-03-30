@@ -328,7 +328,11 @@ Rails.application.routes.draw do
     collection do
       put :change_person_aasm_state
       get :show_docs
-      post :update_individual
+      put :update_individual
+      get :enrollment_verification
+      put :enrollment_docs_state
+      put :extend_due_date
+      get :fed_hub_request
     end
   end
 

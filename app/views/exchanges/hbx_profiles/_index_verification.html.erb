@@ -1,16 +1,11 @@
-<h2>Families with outstanding verification</h2><br>
 <div class="row container">
-  <p>
-    <i class="fa fa-refresh fa-spin" style="color:green"></i> Review in progress&nbsp&nbsp
-    <i class="fa fa-times-circle" style="color:red"></i> No valid documents&nbsp&nbsp
-    <i class="fa fa-file"></i> New documents uploaded
-  </p>
   <div class="form-inline button-group-wrapper">
     <div class="input-group search-wp">
       <%= render 'shared/search', url: verification_index_exchanges_hbx_profiles_path, q: @q, placeholder: "First/Last Name, SSN", remote: true %>
     </div>
   </div>
 </div>
+<%= paginate @families, :remote => true %>
 <div class="module ivl-documents-table panel">
   <div class="table-responsive">
     <table class="table table-striped table-hover table-sm">
@@ -34,30 +29,22 @@
           <td><%= person.hbx_id %></td>
           <td><%= person.first_name %></td>
           <td><%= person.last_name %></td>
-          <td><%= documents_count(person) %></td>
+          <td class="text-center"><%= documents_count(person) %></td>
           <td>
-            <%= due_date(person) %>
-            <%= link_to "#" do %>
-              <i class="fa fa-clock-o"> extend</i>
+            <%= verification_due_date(person) %>
+            <%= link_to extend_due_date_documents_path(:person_id => person.id), method: :put do %>
+              <br><i class="fa fa-clock-o"></i>&nbsp;+ 30 days
             <% end %>
           </td>
           <td>
-            <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
-                <i class="fa fa-file"></i>
-            <% elsif person.consumer_role.vlp_documents.where(status:"verified").count > 0 %>
-                <i class="fa fa-refresh fa-spin" style="color:green"></i>
-            <% elsif %>
-                <i class="fa fa-times-circle" style="color:red"></i>
-            <% end %>
+            <%= family.active_household.hbx_enrollments.first.review_status %>
           </td>
           <td>
-            <%= link_to show_docs_documents_path(:person_id => person.id) do %>
-              <i class="fa fa-pencil-square-o"></i>
-            <% end %>
+            <%= link_to "Review", show_docs_documents_path(:person_id => person.id, :status => "in review"), class:"btn btn-#{review_button_class(family)} btn-xs"%>
           </td>
-          <td>
-            <%= link_to "#" do %>
-                <i class="fa fa-paper-plane"> FedHub</i>
+          <td class="text-center">
+            <%= link_to fed_hub_request_documents_path(:person_id => person.id) do%>
+                <i class="fa fa-share-square-o"></i>&nbsp;FedHub
             <% end %>
           </td>
         </tr>
@@ -67,3 +54,4 @@
     </table>
   </div>
 </div>
+<%= paginate @families, :remote => true %>

@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
-  helper_method :sort_filter, :sort_direction
-  before_action :set_document, only: [:destroy, :update, :comment]
+  before_action :set_document, only: [:destroy, :update]
+  before_action :set_person, only: [:enrollment_docs_state, :extend_due_date, :update_individual, :fed_hub_request, :enrollment_verification]
   respond_to :html, :js
 
   def download
@@ -11,19 +11,69 @@ class DocumentsController < ApplicationController
   end
 
   def update_individual
-    person = Person.find(params[:person_id])
-    person.consumer_role.import! verification_attr
+    @person.consumer_role.import! verification_attr
     respond_to do |format|
       format.html { redirect_to :back }
     end
+  end
+
+  def enrollment_verification
+    @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
+      enrollment.evaluate_individual_market_eligiblity
+    end
+    respond_to do |format|
+      format.html {
+        flash[:success] = "Enrollment group was completely verified."
+        redirect_to :back
+      }
+      format.js
+    end
+  end
+
+  def fed_hub_request
+    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    respond_to do |format|
+      format.html {
+        flash[:success] = "Request was sent to FedHub."
+        redirect_to :back
+      }
+      format.js
+    end
+  end
+
+  def enrollment_docs_state
+    @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
+      enrollment.update_attributes(:review_status => params[:docs_status])
+    end
+    flash[:success] = "Your documents were sent for verification."
+    redirect_to :back
   end
 
   def show_docs
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
       set_current_person
+      @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
+        enrollment.update_attributes(:review_status => params[:status])
+      end
     end
     redirect_to verification_insured_families_path
+  end
+
+  def extend_due_date
+      if @person.consumer_role.special_verification_period
+        @person.consumer_role.special_verification_period += 30.days
+      elsif @person.consumer_role.lawful_presence_determination.try(:latest_denial_date)
+        @person.consumer_role.special_verification_period = person.consumer_role.lawful_presence_determination.latest_denial_date + 120.days
+      else
+        @person.consumer_role.special_verification_period = TimeKeeper.date_of_record + 120.days
+      end
+    if @person.save!
+      flash[:success] = "Updated successfully."
+    else
+      flash[:notice] = "The due date can't be updated."
+    end
+    redirect_to :back
   end
 
   def destroy
@@ -37,7 +87,8 @@ class DocumentsController < ApplicationController
 
   def update
     if params[:comment]
-      @document.update_attributes(:status => params[:status], :comment => params[:person][:vlp_document][:comment])
+      @document.update_attributes(:status => params[:status],
+                                  :comment => params[:person][:vlp_document][:comment])
     else
       @document.update_attributes(:status => params[:status])
     end
@@ -57,34 +108,12 @@ class DocumentsController < ApplicationController
   end
 
   def set_document
-    @person = Person.find(params[:person_id])
+    set_person
     @document = @person.consumer_role.vlp_documents.find(params[:id])
   end
 
-  def sort_filter
-    %w(first_name last_name created_at).include?(params[:sort]) ? params[:sort] : 'created_at'
-  end
-
-  def sort_direction
-    %w(asc desc).include?(params[:direction]) ? params[:direction] : 'desc'
-  end
-
-  def search_box
-    if params[:q]
-      @q = params[:q]
-      @unverified_persons = @unverified_persons.search(params[:q])
-    end
-  end
-
-  def docs_page_filter
-    case params[:sort]
-      when 'waiting'
-        @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-      when 'no_docs_uloaded'
-        @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-      else
-        @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-    end
+  def set_person
+    @person = Person.find(params[:person_id])
   end
 
   def verification_attr
@@ -94,5 +123,4 @@ class DocumentsController < ApplicationController
        :citizen_status => params[:citizenship]
                    })
   end
-
 end
