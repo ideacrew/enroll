@@ -17,7 +17,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   let(:bad_market_kind) {"commodities"}
   let(:primary_broker_role) { FactoryGirl.create(:broker_role) }
 
-  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid practice area"}
 
 
   describe ".new" do

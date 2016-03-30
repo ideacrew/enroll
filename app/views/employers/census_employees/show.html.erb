@@ -48,7 +48,7 @@
           <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
             <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
             <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
-          <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
+          <% if @census_employee.employee_role.try(:present?) && employee_role = @census_employee.employee_role %>
             <p>HIRED: <%= employee_role.try(:hired_on) %></p>
             <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
           <% end %>
@@ -56,7 +56,7 @@
           <% end %>
 
         </div>
-        <% if @plan.present? and @hbx_enrollment.present? and @plan.class != OpenStruct %>
+        <% if @plan.present? && @hbx_enrollment.present? && @plan.class != OpenStruct %>
 
         <div class="table-border table-responsive">
           <table class="table table-striped">

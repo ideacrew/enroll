@@ -19,7 +19,7 @@ module Factories
 
       return nil if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
-      shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+      shop_enrollments  = @family.active_household.hbx_enrollments.enrolled.shop_market + @family.active_household.hbx_enrollments.waived
       return nil if shop_enrollments.any? {|enrollment| enrollment.effective_on >= @renewing_plan_year.start_on }
 
       @plan_year_start_on = @renewing_plan_year.start_on
@@ -29,11 +29,10 @@ module Factories
       shop_enrollments.reject! {|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
 
-      if shop_enrollments.empty?
+      if shop_enrollments.compact.empty?
         renew_waived_enrollment
       else
-        
-        active_enrollment = shop_enrollments.sort_by{|e| e.created_at}.last
+        active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
 
         # shop_enrollments.each do |active_enrollment|
           # next unless active_enrollment.currently_active?

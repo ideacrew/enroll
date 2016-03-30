@@ -822,7 +822,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one ivl open enrollment period" do
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
@@ -850,7 +850,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one shop and one ivl open enrollment period" do
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
     let!(:benefit_group) do
       bg = FactoryGirl.create(:benefit_group)
@@ -908,7 +908,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "multiple shop and one ivl open enrollment periods" do
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
     let!(:benefit_group) do
       bg = FactoryGirl.create(:benefit_group)
@@ -1090,7 +1090,7 @@ describe Family, 'coverage_waived?' do
   before :each do
     allow(hbx_enrollments).to receive(:any?).and_return(true)
     allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:waived).and_return([]) 
+    allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(family).to receive(:latest_household).and_return household
   end
 
@@ -1104,7 +1104,7 @@ describe Family, 'coverage_waived?' do
   end
 
   it "return true" do
-    allow(hbx_enrollments).to receive(:waived).and_return([hbx_enrollment]) 
+    allow(hbx_enrollments).to receive(:waived).and_return([hbx_enrollment])
     expect(family.coverage_waived?).to eq true
   end
 end
