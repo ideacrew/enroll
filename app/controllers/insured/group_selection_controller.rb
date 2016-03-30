@@ -4,9 +4,9 @@ class Insured::GroupSelectionController < ApplicationController
 
   def select_market(person, params)
     return params[:market_kind] if params[:market_kind].present?
-    if params[:employee_role_id].present? || (@person.try(:has_active_employee_role?) && !@person.try(:has_active_consumer_role?))
+    if @person.try(:has_active_employee_role?)
       'shop'
-    elsif !@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)
+    elsif @person.try(:has_active_consumer_role?)
       'individual'
     else
       nil
