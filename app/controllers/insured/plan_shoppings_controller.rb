@@ -175,9 +175,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.primary_family.active_household.latest_active_tax_household.present?
       csr_eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
       if EligibilityDetermination::CSR_KINDS.include? csr_eligibility_kind && csr_eligibility_kind != "csr_100"
-        silver_plans, non_silver_plans = @plans.partition{|a| a.metal_level == "silver"}
-        standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
-        @plans = standard_plans + non_standard_plans + non_silver_plans
+        sort_for_csr(@plans)
       else
         @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
       end
@@ -190,6 +188,12 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def sort_for_csr(plans)
+    silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}
+    standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
+    @plans = standard_plans + non_standard_plans + non_silver_plans
+  end
 
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
