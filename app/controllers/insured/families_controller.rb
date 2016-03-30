@@ -294,10 +294,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def notice_upload_secure_message(notice)
-    key, bucket = get_key_and_bucket(notice.identifier)
     subject = "New Notice Available"
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{document_download_path(bucket, key)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!

@@ -492,7 +492,7 @@ RSpec.describe Insured::FamiliesController do
                                    format: "file_content_type" })}
 
       before do
-        allow(@controller).to receive(:document_download_path).with("bucket", "key").and_return("/path/")
+        allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
         @controller.send(:notice_upload_secure_message, notice)
       end
 

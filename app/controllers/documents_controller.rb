@@ -10,6 +10,25 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
+  def authorized_download
+    begin
+      model = params[:model].capitalize
+      model_id = params[:model_id]
+      relation = params[:relation]
+      relation_id = params[:relation_id]
+      model_object = Object.const_get(model).find(model_id)
+      documents = model_object.send(relation.to_sym)
+      if authorized_to_download?(model_object, documents, relation_id)
+        uri = documents.find(relation_id).identifier
+        send_data Aws::S3Storage.find(uri), get_options(params)
+      else
+       raise "Sorry! You are not authorized to download this document."
+      end
+    rescue => e
+      redirect_to(:back, :flash => {error: e.message})
+    end
+  end
+
   def consumer_role_status
     docs_page_filter
     search_box
@@ -101,5 +120,15 @@ end
        @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
    end
  end
+
+  def authorized_to_download?(owner, documents, document_id)
+    owner.user.has_hbx_staff_role? || documents.find(document_id).present?
+  end
+
+  def find_document(documents, document_id)
+    documents.find do |doc|
+      doc.id == document_id.to_s
+    end
+  end
 
 end
