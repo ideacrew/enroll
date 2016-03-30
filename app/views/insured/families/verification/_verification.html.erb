@@ -1,12 +1,13 @@
 <div class="row">
   <% unless enrollment_group_verified?(@person) %>
-      <div class="col-md-7">
-        <h4>Enrollment group verification status: <%= coverage_household_verification %></h4>
-      </div>
-      <div class="col-md-5">
-        <h4>Verification due date: <%= verification_due_date %></h4>
-        <%= link_to "Send all documents for review", "#", class: "btn btn-success btn-sm pull-right", data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
-      </div>
+    <div class="col-md-5">
+      <h4>Verification due date: <%= verification_due_date(@person) %></h4>
+      <% if current_user.has_hbx_staff_role? %>
+        <%= link_to "Complete Verification", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
+      <% elsif current_user.has_consumer_role? && @person.primary_family.active_household.hbx_enrollments.first.review_status == "incomplete" %>
+        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+      <% end %>
+    </div>
   <% end %>
 </div>
 <div class="module ivl-documents-table panel">
@@ -29,11 +30,6 @@
             </td>
             <td>
               <%= show_consumer_role_state(member.person.consumer_role) %>
-              <% if current_user.has_hbx_staff_role? %>
-                <%= link_to "#" do %>
-
-                <% end %>
-              <% end %>
             </td>
             <td colspan="2">
               <% if unverified?(member.person) %>
@@ -44,7 +40,7 @@
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "#{member.id}" } do %>
                 <% if member_has_uploaded_docs(member) %>
-                    <i class="fa fa-caret-down fa-lg" data-toggle="tooltip" title="Documents"></i>
+                      <i class="fa fa-caret-down fa-2x"></i>
                 <% end %>
               <% end %>
             </td>

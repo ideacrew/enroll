@@ -5,7 +5,7 @@
     <!-- Admin comment form -->
     <div class="collapse" id="verif-<%=person.id%>">
       <div class="col-md-12 module verif-type">
-        <%= form_tag update_individual_documents_path, multipart: true, method: :post do %>
+        <%= form_tag update_individual_documents_path, multipart: true, method: :put do %>
             <%= hidden_field_tag 'person_id', person.id  %>
             <%= radio_button_tag 'citizenship', 'us_citizen' %>
             <%= label_tag 'US Citizen', nil, class:"module verif-type" %>
