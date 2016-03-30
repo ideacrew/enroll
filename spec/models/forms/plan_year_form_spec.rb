@@ -37,11 +37,11 @@ describe ::Forms::PlanYearForm, "when newly created" do
       @excluded_metal_level_plan = ["#{::Organization.valid_carrier_names[excluded_metal_level_plan.carrier_profile_id.to_s]} - #{excluded_metal_level_plan.name}", excluded_metal_level_plan.id.to_s]
       excluded_market_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @excluded_market_plan = ["#{::Organization.valid_carrier_names[:excluded_market_plan]} - #{excluded_market_plan.name}", excluded_market_plan.id.to_s]
-      excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver")
+      excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver", dental_level: "high")
       @excluded_coverage_kind_plan = ["#{::Organization.valid_carrier_names[:excluded_coverage_kind_plan]} - #{excluded_coverage_kind_plan.name}", excluded_coverage_kind_plan.id.to_s]
       FactoryGirl.create(:plan, active_year: (TimeKeeper.date_of_record.year - 1), carrier_profile: carrier_profile)
       FactoryGirl.create(:plan, market: "individual", carrier_profile: carrier_profile)
-      FactoryGirl.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile)
+      FactoryGirl.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile, dental_level: "low")
     end
 
     describe "asked to provide plans for a carrier" do
