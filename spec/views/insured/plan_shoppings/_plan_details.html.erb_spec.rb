@@ -12,6 +12,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       ehb: 0.9881,
       can_use_aptc?: true,
       coverage_kind: "health",
+      dental_level: "high",
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     )
@@ -126,11 +127,13 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return false
       allow(plan).to receive(:coverage_kind).and_return('dental')
+      allow(plan).to receive(:metal_level).and_return('dental')
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
     it "should have link to pdf with plan summary text" do
       expect(rendered).to have_selector('a', text:'Plan Summary')
+      expect(rendered).to match "High"
     end
 
   end
