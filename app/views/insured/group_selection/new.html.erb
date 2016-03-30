@@ -48,6 +48,8 @@
             <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
               <div class="module group-selection-table">
                 <div class="table-responsive table-border health">
+                  <% @show_residency_alert = false %>
+
                   <%= render 'ivl_coverage_household' %>
                 </div>
               </div>
@@ -121,7 +123,7 @@
             </div>
           </div>
           <% end %>
-          <% if show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
+          <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
@@ -237,7 +239,7 @@ function setGroupSelectionHandlers(){
     $('#shop-coverage-household .dental').hide();
     $('#shop-coverage-household .dental input').removeProp('checked');
   });
-  
+
   $('#coverage_kind_dental').on('change', function() {
     $('#shop-coverage-household .dental').show();
     $('#shop-coverage-household .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
