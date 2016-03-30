@@ -1,5 +1,5 @@
 module Importers
-  class ConversionEmployerSet
+  class ConversionEmployerPlanYearSet
     HEADERS = [
 "Action",
 "FEIN",
@@ -52,37 +52,43 @@ module Importers
     ROW_MAPPING = [
       :action,
       :fein,
-      :dba,
-      :legal_name,
-      :primary_location_address_1,
-      :primary_location_address_2,
-      :primary_location_city,
-      :primary_location_state,
-      :primary_location_zip,
-      :mailing_location_address_1,
-      :mailing_location_address_2,
-      :mailing_location_city,
-      :mailing_location_state,
-      :mailing_location_zip,
       :ignore,
       :ignore,
-      :contact_email,
-      :contact_phone,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
       :enrolled_employee_count,
-      :new_hire_count,
+      :new_coverage_policy,
       :ignore,
       :ignore,
       :ignore,
       :ignore,
       :ignore,
-      :broker_name,
-      :broker_npn
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :carrier,
+      :plan_selection
     ]
 
-    def initialize(file_name, o_stream)
+    def initialize(file_name, o_stream, default_py_start)
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
+      @default_plan_year_start = default_py_start
     end
 
     def row_iterator
@@ -115,11 +121,11 @@ module Importers
         unless (k == :ignore) || value.blank?
           record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/,"")
         end
+        record_attrs[:default_plan_year_start] = @default_plan_year_start
       end
-      record = ::Importers::ConversionEmployer.new(record_attrs)
+      record = ::Importers::ConversionEmployerPlanYear.new(record_attrs)
       import_details = []
       if record.save
-        puts record.fein
         if record.warnings.any?
           import_details = ["imported with warnings", JSON.dump(record.warnings.to_hash)]
         else
