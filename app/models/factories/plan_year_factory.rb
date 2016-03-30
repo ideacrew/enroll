@@ -4,7 +4,8 @@ module Factories
       plan_year_start_on = coverage_start_date
       plan_year_end_on = coverage_start_date + 1.year - 1.day
       open_enrollment_start_on = plan_year_start_on - 2.months
-      open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+      end_of_open_enrollment_month_start = open_enrollment_start_on - 1.month
+      open_enrollment_end_on = Date.new(end_of_open_enrollment_month_start.year, end_of_open_enrollment_month_start.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on) + 1.month
       {
         start_on: plan_year_start_on,
         end_on: plan_year_end_on,
