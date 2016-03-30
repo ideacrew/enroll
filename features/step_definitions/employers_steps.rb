@@ -314,9 +314,10 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  sleep 1 #Four back to back clicks causes intermittent failures.  Make sure the page setup/DOM load is complete
   find('.carriers-tab a').click
-  sleep 1
-  find('.reference-plan label').click
+  sleep 1 #maybe some work here
+  find('.reference-plans label').click
   sleep 1
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
