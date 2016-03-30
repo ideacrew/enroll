@@ -77,6 +77,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       double(
         "Plan",
         name: "name_1",
+        active_year: 2016,
+        coverage_kind: "health",
         plan_type: "ppo",
         metal_level: "metal_level_1",
         carrier_profile: carrier_profile,
@@ -88,6 +90,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       double(
         "Plan",
         name: "name_2",
+        active_year: 2016,
+        coverage_kind: "health",
         plan_type: "",
         metal_level: "metal_level_2",
         carrier_profile: carrier_profile,
