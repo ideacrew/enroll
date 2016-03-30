@@ -124,11 +124,4 @@ end
   def authorized_to_download?(owner, documents, document_id)
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
   end
-
-  def find_document(documents, document_id)
-    documents.find do |doc|
-      doc.id == document_id.to_s
-    end
-  end
-
 end

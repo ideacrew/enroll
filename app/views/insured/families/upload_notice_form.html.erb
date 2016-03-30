@@ -21,11 +21,10 @@
   <h1>Uploaded Notices</h1>
   <ul>
   <% @notices.each do |notice|%>
-      <% key, bucket = get_key_and_bucket(notice.identifier) %>
-        <li>
-          <%= link_to(notice.title, document_download_path(bucket, key) + "?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") %>
+      <li>
+        <%= link_to(notice.title, authorized_document_download_path('Person', @person.id, 'documents', notice.id ) + "?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") %>
       </li>
-    <% end %>
+  <% end %>
     </ul>
 </div>
 
