@@ -10,7 +10,7 @@ module Employers::EmployerHelper
       if enrollment_state.present? && enrollment_state != "initialized"
       #enrollment_state.humanize
       begin
-        status = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map{|a| "#{a.aasm_state} (#{a.plan.coverage_kind})"}
+        status = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map{|a| "#{a.aasm_state} (#{a.coverage_kind})"}
         status = status.uniq.map(&:inspect).join(', ').gsub('"','').gsub("inactive", "coverage_waived") # since, coverage_waived=>{inactive, renewing_waived}
       rescue
         status = ""
