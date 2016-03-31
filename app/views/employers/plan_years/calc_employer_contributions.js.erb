@@ -39,7 +39,6 @@ if ( $("#<%= @location_id %> .dental-ref-plan").val().length == 0 ) {
 
 //$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label i.fa').attr('data-toggle','tooltip');
-$('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label label i.fa').attr('data-title','Dependents must match health dependents from the section above.');
 
 $("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").show();
 $("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary").show();
