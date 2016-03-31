@@ -104,7 +104,7 @@ module Importers
       })
       locations << main_location
       if !mailing_address.blank?
-        if !mailing_address.matches?(main_address)
+        if !mailing_address.same_address?(main_address)
           locations << OfficeLocation.new({
             :is_primary => false,
             :address => mailing_address
