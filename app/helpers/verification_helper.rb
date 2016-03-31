@@ -74,4 +74,10 @@ module VerificationHelper
       "default"
     end
   end
+
+  def fedhub_responce(member)
+    if member.person.try(:consumer_role).try(:lawful_presence_determination).try(:latest_denial_date)
+      "FedHub fail"
+    end
+  end
 end
