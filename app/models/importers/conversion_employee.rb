@@ -3,7 +3,7 @@ module Importers
     include ActiveModel::Validations
     include ActiveModel::Model
 
-    attr_reader :warnings, :fein, :subscriber_ssn, :subscriber_dob, :subscriber_gender, :hire_date
+    attr_reader :warnings, :fein, :subscriber_ssn, :subscriber_dob, :subscriber_gender, :hire_date, :subscriber_zip
 
     attr_accessor :action,
       :employer_name,
@@ -18,12 +18,12 @@ module Importers
       :subscriber_address_2,
       :subscriber_city,
       :subscriber_state,
-      :subscriber_zip,
       :default_hire_date
 
       (1..8).to_a.each do |num|
         attr_reader "dep_#{num}_ssn".to_sym, "dep_#{num}_dob".to_sym,
-          "dep_#{num}_gender".to_sym, "dep_#{num}_relationship".to_sym
+          "dep_#{num}_gender".to_sym, "dep_#{num}_relationship".to_sym,
+          "dep_#{num}_zip".to_sym
       end
       (1..8).to_a.each do |num|
         attr_accessor "dep_#{num}_name_first".to_sym,
@@ -34,8 +34,7 @@ module Importers
           "dep_#{num}_address_1".to_sym,
           "dep_#{num}_address_2".to_sym,
           "dep_#{num}_city".to_sym,
-          "dep_#{num}_state".to_sym,
-          "dep_#{num}_zip".to_sym
+          "dep_#{num}_state".to_sym
       end
 
       validate :validate_fein
@@ -67,6 +66,19 @@ module Importers
         @subscriber_dob = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
       end
 
+      def subscriber_zip=(val)
+        if val.blank?
+          @subscriber_zip = nil
+          return val
+        else
+          if val.strip.length == 9 
+            @subscriber_zip = val[0..4]
+          else
+            @subscriber_zip = val.strip.rjust(5, "0")
+          end 
+        end
+      end
+
       def subscriber_gender=(val)
         if val.blank?
           @subscriber_gender = nil
@@ -84,6 +96,19 @@ module Importers
 
       (1..8).to_a.each do |num|
         class_eval(<<-RUBYCODE)
+      def dep_#{num}_zip=(val)
+        if val.blank?
+          @dep_#{num}_zip = nil
+          return val
+        else
+          if val.strip.length == 9 
+            @dep_#{num}_zip = val[0..4]
+          else
+            @dep_#{num}_zip = val.strip.rjust(5, "0")
+          end 
+        end
+      end
+
           def dep_#{num}_ssn=(val)
             if val.blank?
               @dep_#{num}_ssn = nil
