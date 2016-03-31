@@ -22,8 +22,15 @@ module Importers
       :contact_phone,
       :enrolled_employee_count,
       :new_hire_count,
-      :broker_name
+      :broker_name,
+      :contact_first_name,
+      :contact_last_name
 
+    include Validations::Email
+
+    validates :contact_email, :email => true, :allow_blank => true
+    validates_presence_of :contact_first_name, :allow_blank => false
+    validates_presence_of :contact_last_name, :allow_blank => false
     validates_presence_of :legal_name, :allow_blank => false
     validates_length_of :fein, is: 9
 
@@ -79,7 +86,7 @@ module Importers
         :zip => primary_location_zip
       )
       mailing_address = Address.new(
-        :kind => "work",
+        :kind => "mailing",
         :address_1 => mailing_location_address_1,
         :address_2 => mailing_location_address_2,
         :city =>  mailing_location_city,
@@ -121,6 +128,28 @@ module Importers
       broker_agency_accounts
     end
 
+    def map_poc(emp)
+      person_attrs = {
+        :first_name => contact_first_name,
+        :last_name => contact_last_name,
+        :employer_staff_roles => [
+          EmployerStaffRole.new(employer_profile_id: emp.id)
+        ],
+        :phones => [
+           Phone.new({
+             :kind => "work",
+             :full_phone_number => contact_phone
+           })
+        ]
+      }
+      if !contact_email.blank?
+        person_attrs[:emails] = [
+          Email.new(:kind => "work", :address => contact_email)
+        ]
+      end
+      Person.create!(person_attrs)
+    end
+
     def save
       return false unless valid?
       new_organization = Organization.new({
@@ -135,6 +164,10 @@ module Importers
         })
       })
       save_result = new_organization.save
+      if save_result
+        emp = new_organization.employer_profile
+        map_poc(emp)
+      end
       propagate_errors(new_organization)
       return save_result
     end
