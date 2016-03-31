@@ -24,7 +24,8 @@ module Importers
       :new_hire_count,
       :broker_name,
       :contact_first_name,
-      :contact_last_name
+      :contact_last_name,
+      :registered_on
 
     include Validations::Email
 
@@ -159,8 +160,9 @@ module Importers
         :office_locations => map_office_locations,
         :employer_profile => EmployerProfile.new({
           :broker_agency_accounts => assign_brokers,
-          :entity_kind => "c_corporation"#,
-        #          :converted_from_carrier_at => Time.now
+          :entity_kind => "c_corporation",
+          :profile_source => "conversion",
+          :registered_on => registered_on
         })
       })
       save_result = new_organization.save
