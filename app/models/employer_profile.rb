@@ -333,12 +333,12 @@ class EmployerProfile
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
-      Organization.where(
-        "$and" => [
-          {:"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED },
-          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) - 1.year }
-        ]
-      )
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
+          :"aasm_state".in => PlanYear::PUBLISHED
+        }
+      })
     end
 
     def advance_day(new_date)
@@ -363,18 +363,18 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        # employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        # employer_enroll_factory.date = new_date
+        employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        employer_enroll_factory.date = new_date
 
-        # organizations_for_plan_year_begin(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.begin
-        # end
+        organizations_for_plan_year_begin(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.begin
+        end
 
-        # organizations_for_plan_year_end(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.end
-        # end
+        organizations_for_plan_year_end(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.end
+        end
       end
 
       # Employer activities that take place monthly - on first of month
