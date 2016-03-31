@@ -19,7 +19,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.xlsx") }
 
     let(:employer_data) do
-      {:action=>"Add", :default_plan_year_start=> default_plan_year_start, :fein=>"931100000", :enrolled_employee_count=>"14", :new_coverage_policy=>"Date of Hire equal to Effective Date", :carrier=>"United Healtcare", :plan_selection=>"Single Plan from Carrier"}
+      {:action=>"Add", :default_plan_year_start=> default_plan_year_start, :fein=>"931100000", :enrolled_employee_count=>"14", :new_coverage_policy=>"Date of Hire equal to Effective Date", :carrier=>"United Healtcare", :plan_selection=>"Single Plan from Carrier", :single_plan_hios_id=>"41842DC0010068-01"}
     end
 
 
@@ -58,7 +58,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.csv") }
 
     let(:employer_data) do
-      {:action=>"Add", :default_plan_year_start=> default_plan_year_start, :fein=>"521782000", :enrolled_employee_count=>"3", :carrier=>"CareFirst BlueCross BlueShield", :plan_selection=>"Single Plan from Carrier"}
+      {:action=>"Add", :default_plan_year_start=> default_plan_year_start, :fein=>"521782000", :enrolled_employee_count=>"3", :carrier=>"CareFirst BlueCross BlueShield", :plan_selection=>"Single Plan from Carrier",:most_common_hios_id=>"86052DC0480005-01",:single_plan_hios_id =>"86052DC0480005-01" }
     end
 
     let(:base_output_result) do

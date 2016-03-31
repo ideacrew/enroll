@@ -9,7 +9,9 @@ module Importers
       :enrolled_employee_count,
       :new_coverage_policy,
       :carrier,
-      :default_plan_year_start
+      :default_plan_year_start,
+      :most_common_hios_id,
+      :single_plan_hios_id
 
     validates_length_of :fein, is: 9
 
@@ -88,9 +90,30 @@ module Importers
       PlanYear.new(plan_year_attrs)
     end
 
+    def select_most_common_plan(available_plans, most_expensive_plan)
+        if !most_common_hios_id.blank?
+          found_single_plan = available_plans.detect { |pl| pl.hios_id == most_common_hios_id.strip }
+          return found_single_plan if found_single_plan
+          warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
+        else
+          warnings.add(:most_common_hios_id, "no most common hios id specified, defaulting to most expensive plan")
+        end
+        most_expensive_plan
+    end
+
     def select_reference_plan(available_plans)
       plans_by_cost = available_plans.sort_by { |plan| plan.premium_tables.first.cost }
-      plans_by_cost.last
+      most_expensive_plan = plans_by_cost.last
+      if (plan_selection == "single_plan")
+        if !single_plan_hios_id.blank?
+          found_single_plan = available_plans.detect { |pl| pl.hios_id == single_plan_hios_id.strip }
+          return found_single_plan if found_single_plan
+          warnings.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group defaulting to most common plan")
+        else
+          warnings.add(:single_plan_hios_id, "no hios id specified for single plan benefit group, defaulting to most common plan")
+        end
+      end
+      select_most_common_plan(available_plans, most_expensive_plan)
     end
 
     def map_benefit_group(found_carrier)
