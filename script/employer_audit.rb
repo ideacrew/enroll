@@ -2,7 +2,7 @@ all_employers = Organization.where(:employer_profile => {"$ne" => nil})
 
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	csv << ["Legal Name", "DBA", "FEIN", "AASM State", "Coverage Year Start", "Coverage Year End",
-			"New Hire Eligibility","Plan Offerings","Employee Count"]
+			"Plan Offerings","Employee Count"]
 	all_employers.each do |employer|
 		begin
 		legal_name = employer.legal_name
@@ -26,7 +26,7 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 			end
 		end
 		rescue Exception=>e
-			binding.pry
+			puts e
 		end
 	end
 end
@@ -43,9 +43,10 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 				hire_date = census_employee.hired_on
 				roster_added = census_employee.created_on
 				coverage_state = enrollment_state(census_employee)
+				csv << [employer_name, fein, name, hire_date, roster_added, coverage_state]
 			end
 		rescue Exception=>e
-			binding.pry
+			puts e
 		end
 	end
 end
