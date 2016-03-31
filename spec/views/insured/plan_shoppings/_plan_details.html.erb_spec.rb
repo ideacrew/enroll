@@ -4,6 +4,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:person) { FactoryGirl.create(:person, :with_family ) }
+
+
+
   let(:plan) do
     double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
       nationwide: "true", total_employee_cost: 100, deductible: 500,
@@ -39,6 +42,10 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return false
+      family = person.primary_family
+      active_household = family.households.first
+      tax_household = FactoryGirl.create(:tax_household, household: active_household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -88,6 +95,10 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return true
       allow(view).to receive(:current_cost).and_return(52)
+      family = person.primary_family
+      active_household = family.households.first
+      tax_household = FactoryGirl.create(:tax_household, household: active_household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -146,8 +157,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   end
 
   context "with tax household and eligibility determination of csr_100" do
-    let(:tax_household) { FactoryGirl.create(:tax_household, household: active_household ) }
-    let(:eligibility_determination) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_eligibility_kind: "csr_100" ) }
 
     before :each do
       sign_in(user)
@@ -160,6 +169,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       allow(plan).to receive(:is_csr?).and_return false
       family = person.primary_family
       active_household = family.households.first
+      tax_household = FactoryGirl.create(:tax_household, household: active_household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_eligibility_kind: 'csr_100' )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
