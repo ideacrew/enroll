@@ -1,0 +1,60 @@
+ <div class="module">
+    <table class="table table-striped" id="verification-dataTable">
+      <thead>
+        <tr>
+          <th>HBX ID</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Documents</th>
+          <th>Due date</th>
+          <th>Status</th>
+          <th>Review</th>
+          <th>FedHub</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @families.each do |family| %>
+      <% person = family.primary_applicant.person %>
+          <% if person.has_consumer_role? && person.consumer_role.aasm_state != "fully verified" %>
+        <tr class="<%= cycle("odd", "even top") %>">
+          <td><%= person.hbx_id %></td>
+          <td><%= person.first_name %></td>
+          <td><%= person.last_name %></td>
+          <td class="text-center"><%= documents_count(person) %></td>
+          <td>
+            <%= verification_due_date(person) %>
+            <%= link_to extend_due_date_documents_path(:person_id => person.id), method: :put do %>
+              <br><i class="fa fa-clock-o"></i>&nbsp;+ 30 days
+            <% end %>
+          </td>
+          <td>
+            <%= family.active_household.hbx_enrollments.first.review_status %>
+          </td>
+          <td>
+            <%= link_to "Review", show_docs_documents_path(:person_id => person.id, :status => "in review"), class:"btn btn-#{review_button_class(family)} btn-xs"%>
+          </td>
+          <td class="text-center">
+            <%= link_to fed_hub_request_documents_path(:person_id => person.id) do%>
+                <i class="fa fa-share-square-o"></i>&nbsp;FedHub
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+ <script type="text/javascript" charset="utf-8">
+   $(document).ready(function() {
+     $('#verification-dataTable').DataTable( {
+       "order": [[ 0, "asc" ]]
+     } );
+     $('select').on('selectric-init', function(element){
+       $('.selectric').closest('.small-6').find('span').remove();
+       $('.selectric').closest('label').after('<span></span>');
+       $('.selectric').closest('.small-6').find('span:first').text(' Entries Shown')
+     });
+   } );
+ </script>
+
