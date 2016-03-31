@@ -68,7 +68,18 @@ module Importers
       end
 
       def subscriber_gender=(val)
-        @subscriber_gender = Maybe.new(val).strip.downcase.extract_value
+        if val.blank?
+          @subscriber_gender = nil
+        else
+          stripped_value = val.strip.downcase
+          if stripped_value =~ /\Am/i
+            @subscriber_gender = "male"
+          elsif stripped_value =~ /\Af/i
+            @subscriber_gender = "female"
+          else
+            @subscriber_gender = val
+          end
+        end
       end
 
       (1..8).to_a.each do |num|
@@ -87,6 +98,18 @@ module Importers
           end
 
           def dep_#{num}_gender=(val)
+            if val.blank?
+              @dep_#{num}_gender = nil
+            else
+              stripped_value = val.strip.downcase
+              if stripped_value =~ /\Am/i
+                @dep_#{num}_gender = "male"
+              elsif stripped_value =~ /\Af/i
+                @dep_#{num}_gender = "female"
+              else
+                @dep_#{num}_gender = val
+              end
+            end
             @dep_#{num}_gender = Maybe.new(val).strip.downcase.extract_value
           end
 
