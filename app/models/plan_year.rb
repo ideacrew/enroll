@@ -81,12 +81,16 @@ class PlanYear
     }).limit(100) # limit census employees to 100 due to performance reasons
 
     families.inject([]) do |enrollments, family|
-      enrollments << family.active_household.hbx_enrollments.where({
+
+      valid_enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
         :"effective_on".lte => date.end_of_month,
         :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
-      }).order_by(:'submitted_at'.desc).first
-    end
+      }).order_by(:'submitted_at'.desc)
+
+      enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
+      enrollments << valid_enrollments.where({:coverage_kind => 'dental'}).first
+    end.compact
   end
 
   def eligible_for_export?
@@ -324,7 +328,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.size
+    enrolled.count { |e| e.has_active_health_coverage? }
   end
 
   def enrollment_ratio

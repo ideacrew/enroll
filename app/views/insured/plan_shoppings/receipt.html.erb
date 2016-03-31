@@ -135,7 +135,10 @@
                     Call: <strong>1-800-471-0236</strong> or <strong>1-800-471-0275</strong>
                     <br/>
                   </div>
-
+                  <% elsif @plan.carrier_profile.legal_name == "MetLife" %>
+                  <div><br/>
+                    Call: <strong>1-855-638-2221</strong><br/>
+                  </div>
                   <% elsif @plan.carrier_profile.legal_name == "Dentegra" %>
                   <div><br/>
                     Call: <strong>1-800-471-0284</strong><br/>

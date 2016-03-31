@@ -196,8 +196,9 @@ Then(/^.* creates and publishes a plan year$/) do
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   sleep 1
   find('.carriers-tab a').click
-  find('.reference-plans label').click
-
+  sleep 1
+  find('.reference-plan label').click
+  sleep 1
   find('.interaction-click-control-create-plan-year').trigger('click')
 
   find('.alert-notice')
