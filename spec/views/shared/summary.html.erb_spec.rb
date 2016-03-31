@@ -7,6 +7,7 @@ describe "shared/_summary.html.erb" do
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
   let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [], :id => "3241251524", :shopping? => true, plan: mock_plan, coverage_kind: 'health') }
   let(:mock_plan) { double("Plan",
+      :active_year => 2016,
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,
@@ -86,6 +87,7 @@ describe "shared/_summary.html.erb" do
 
     it "should not have rx_formulary_url coverage_kind = dental" do
       allow(mock_plan).to receive(:coverage_kind).and_return("dental")
+      allow(mock_plan).to receive(:dental_level).and_return("high")
       render "shared/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_plan.rx_formulary_url}/)
     end
