@@ -119,7 +119,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         coverage_kind: 'dental'
     end
 
-
     before do
       assign(:hbx_enrollments, [hbx_enrollment_two, hbx_enrollment_three])
       render template: 'employers/census_employees/show.html.erb'

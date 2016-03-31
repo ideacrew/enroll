@@ -36,7 +36,8 @@
             other_enrollment.coverage_kind == enrollment.coverage_kind &&
             other_enrollment.effective_on.year == enrollment.effective_on.year &&
             other_enrollment.benefit_group_id == enrollment.benefit_group_id &&
-            other_enrollment.id != enrollment.id } %>
+            other_enrollment.id != enrollment.id
+           end %>
         <div class="col-xs-6">
           <h4><%= enrollment.coverage_kind.capitalize %> Plan</h4>
           <div class="form-border">
