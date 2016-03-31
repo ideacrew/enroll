@@ -22,6 +22,11 @@ class EmployerProfile
   ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
+  PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]
+
+  field :profile_source, type: String, default: "self_serve"
+  field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -47,6 +52,10 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
+
+  validates :profile_source,
+    inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
+    allow_blank: false
 
   validates :entity_kind,
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
