@@ -1,22 +1,26 @@
 class EventForNoticeTriggerRule
 
-  def initialize(resource_kind, event_id, resource_instance)
-    @resource_kind = resource_kind
-    @event_id = event_id
-    @resource_instance = resource_instance
+  def initialize(application_event, notice_trigger)
+    @application_event = application_event
+    @notice_trigger = notice_trigger
   end
 
   def satisfied?
-  end
-
-  def is_primary_recipient_criteria_satisfied?
-    # delivery method available?
+    @errors = []
 
   end
 
-  def is_secondary_recipient_criteria_satisfied?
-    # electronic delivery method available?
+  # delivery method available?
+  def is_primary_recipient_notice_satisfied?
+    delivery_method = @notice.notice_trigger_element_group.primary_recipient_delivery_method
+    if delivery_method == "any"
+      return true
+    else
+    end
+  end
 
+  # electronic delivery method available?
+  def is_secondary_recipient_notice_satisfied?
   end
 
   def determination_results
