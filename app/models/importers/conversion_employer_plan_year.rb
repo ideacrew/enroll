@@ -85,7 +85,7 @@ module Importers
       plan_year_attrs[:fte_count] = enrolled_employee_count
       plan_year_attrs[:employer_profile] = employer
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
-      plan_year_attrs[:imported_plan_year] = true
+#      plan_year_attrs[:imported_plan_year] = true
       plan_year_attrs[:aasm_state] = "active"
       PlanYear.new(plan_year_attrs)
     end
@@ -121,6 +121,7 @@ module Importers
       reference_plan = select_reference_plan(available_plans)
       elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
       BenefitGroup.new({
+        :title => "Standard",
         :plan_option_kind => plan_selection,
         :relationship_benefits => map_relationship_benefits,
         :reference_plan_id => reference_plan.id,
@@ -146,8 +147,17 @@ module Importers
       if save_result
         employer = find_employer
         employer.update_attributes!(:aasm_state => "enrolled")
+        map_employees_to_benefit_groups(employer, record)
       end
       return save_result
+    end
+
+    def map_employees_to_benefit_groups(employer, plan_year)
+      bg = plan_year.benefit_groups.first
+      employer.census_employees.each do |ce|
+        ce.add_benefit_group_assignment(bg)
+        ce.save!
+      end
     end
 
     def propagate_errors(plan_year)

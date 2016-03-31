@@ -3,7 +3,7 @@ module Importers
     include ActiveModel::Validations
     include ActiveModel::Model
 
-    attr_reader :fein, :broker_npn
+    attr_reader :fein, :broker_npn, :primary_location_zip, :mailing_location_zip
 
     attr_accessor :action,
       :dba,
@@ -12,12 +12,10 @@ module Importers
       :primary_location_address_2,
       :primary_location_city,
       :primary_location_state,
-      :primary_location_zip,
       :mailing_location_address_1,
       :mailing_location_address_2,
       :mailing_location_city,
       :mailing_location_state,
-      :mailing_location_zip,
       :contact_email,
       :contact_phone,
       :enrolled_employee_count,
@@ -114,6 +112,23 @@ module Importers
       locations
     end
 
+    ["primary", "mailing"].each do |item|
+      class_eval(<<-RUBY_CODE)
+      def #{item}_location_zip=(val)
+        if val.blank?
+          @#{item}_location_zip = nil
+          return val
+        else
+          if val.strip.length == 9 
+            @#{item}_location_zip = val[0..4]
+          else
+            @#{item}_location_zip = val.strip.rjust(5, "0")
+          end 
+        end
+      end
+      RUBY_CODE
+    end
+
     def assign_brokers
       broker_agency_accounts = []
       if !broker_npn.blank?
@@ -137,10 +152,10 @@ module Importers
           EmployerStaffRole.new(employer_profile_id: emp.id)
         ],
         :phones => [
-           Phone.new({
-             :kind => "work",
-             :full_phone_number => contact_phone
-           })
+          Phone.new({
+            :kind => "work",
+            :full_phone_number => contact_phone
+          })
         ]
       }
       if !contact_email.blank?
