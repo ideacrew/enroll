@@ -23,6 +23,8 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       plan_type: "ppo",
       carrier_profile: carrier_profile,
       metal_level: "bronze",
+      coverage_kind: "health",
+      active_year: 2016,
       nationwide: true
       )
   }
@@ -34,6 +36,9 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       plan_type: "ppo",
       carrier_profile: carrier_profile,
       metal_level: "high",
+      coverage_kind: "dental",
+      active_year: 2016,
+      dental_level: "high",
       nationwide: true
       )
   }
