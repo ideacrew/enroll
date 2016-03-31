@@ -324,12 +324,12 @@ class EmployerProfile
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
-      Organization.where(
-        "$and" => [
-          {:"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED },
-          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) - 1.year }
-        ]
-      )
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
+          :"aasm_state".in => PlanYear::PUBLISHED
+        }
+      })
     end
 
     def advance_day(new_date)
