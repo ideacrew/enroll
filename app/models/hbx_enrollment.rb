@@ -649,7 +649,7 @@ class HbxEnrollment
 
     effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
 
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(effective_date)
     if plan_year.blank?
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
@@ -1053,7 +1053,7 @@ class HbxEnrollment
   private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(coverage_effective_date)
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else
