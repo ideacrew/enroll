@@ -4,9 +4,9 @@ class Insured::GroupSelectionController < ApplicationController
 
   def select_market(person, params)
     return params[:market_kind] if params[:market_kind].present?
-    if params[:employee_role_id].present? || (@person.try(:has_active_employee_role?) && !@person.try(:has_active_consumer_role?))
+    if @person.try(:has_active_employee_role?)
       'shop'
-    elsif !@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)
+    elsif @person.try(:has_active_consumer_role?)
       'individual'
     else
       nil
@@ -21,7 +21,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     @market_kind = select_market(@person, params)
 
-    if @market_kind == 'individual'
+    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -34,6 +34,7 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
+
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
       qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
@@ -87,9 +88,10 @@ class Insured::GroupSelectionController < ApplicationController
     end
   rescue Exception => error
     flash[:error] = error.message
+    logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
-    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, consumer_role_id: consumer_role_id, change_plan: @change_plan, market_kind: @market_kind, enrollment_kind: @enrollment_kind)
+    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection

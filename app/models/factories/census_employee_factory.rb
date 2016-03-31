@@ -2,7 +2,6 @@ module Factories
   class CensusEmployeeFactory
 
     attr_accessor :census_employee, :plan_year
-
     def begin_coverage
 
       if selected_enrollments.size > 1

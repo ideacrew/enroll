@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :plan do
     sequence(:hbx_id)    { |n| n + 12345 }
-    sequence(:name)      { |n| "BlueChoice Silver#{n} $2,000" }
+    sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
     abbrev              "BC Silver $2k"
     sequence(:hios_id, (10..99).cycle)  { |n| "86052DC04000#{n}-01" }
     active_year         { TimeKeeper.date_of_record.year }
@@ -76,11 +76,13 @@ FactoryGirl.define do
       market "shop"
       coverage_kind "dental"
       metal_level "dental"
+      dental_level "high"
     end
     trait :ivl_dental do
       market "individual"
       coverage_kind "dental"
       metal_level "dental"
+      dental_level "high"
     end
     trait :unoffered do
       sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-00" }

@@ -36,6 +36,44 @@ $primary-bold: 600;
 					background-position: left bottom;
 				}
 			}
+        }
+	&.employer-welcome {
+		.left-icon-section {
+			margin-bottom: 2.5%;
+			a {
+				cursor: pointer;
+				&:hover {
+					text-decoration: underline;
+				}
+				.fa {
+					color: #007bc4;
+				}
+			}
+			&.important {
+				margin-top: 7.5%;
+				.pdf-image {
+					img {
+						max-height: 80px;
+					}
+				}
+			}
+			h4 {
+				margin-top: 0;
+			}
+			.x-right.dn {
+				margin-bottom: 5%;
+			}
+			.icon-left-download {
+				padding: 10px 0;
+			}
+		}
+		.close-right {
+			.x {
+				img {
+					cursor: pointer;
+				}
+			}
+		}
 	}
   &.market-selection {
     padding: 0 15% 5%;
@@ -55,4 +93,20 @@ $primary-bold: 600;
       }
     }
   }
+	&.modal-footer {
+		.modal-sbc-link {
+			text-align: left;
+			position: relative;
+			.fa.fa-file-pdf-o {
+				margin: 2px auto auto 5px;
+			}
+			.sbc-text {
+				font-size: 14px;
+				margin-left: 10px;
+				position: absolute;
+				white-space: nowrap;
+				top: 10px;
+			}
+		}
+	}
 }
