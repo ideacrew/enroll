@@ -1,24 +1,15 @@
-<div class="row container">
-  <div class="form-inline button-group-wrapper">
-    <div class="input-group search-wp">
-      <%= render 'shared/search', url: verification_index_exchanges_hbx_profiles_path, q: @q, placeholder: "First/Last Name, SSN", remote: true %>
-    </div>
-  </div>
-</div>
-<%= paginate @families, :remote => true %>
-<div class="module ivl-documents-table panel">
-  <div class="table-responsive">
-    <table class="table table-striped table-hover table-sm">
-      <thead class="thead-default">
+ <div class="module">
+    <table class="table table-striped" id="verification-dataTable">
+      <thead>
         <tr>
-          <th>HBX ID (sortable)</th>
-          <th>First name (sortable)</th>
-          <th>Last name (sortable)</th>
+          <th>HBX ID</th>
+          <th>First name</th>
+          <th>Last name</th>
           <th>Documents</th>
-          <th>Due date (sortable) + extend</th>
+          <th>Due date</th>
           <th>Status</th>
           <th>Review</th>
-          <th>FedHub + retrigger</th>
+          <th>FedHub</th>
         </tr>
       </thead>
       <tbody>
@@ -53,5 +44,17 @@
       </tbody>
     </table>
   </div>
-</div>
-<%= paginate @families, :remote => true %>
+
+ <script type="text/javascript" charset="utf-8">
+   $(document).ready(function() {
+     $('#verification-dataTable').DataTable( {
+       "order": [[ 0, "asc" ]]
+     } );
+     $('select').on('selectric-init', function(element){
+       $('.selectric').closest('.small-6').find('span').remove();
+       $('.selectric').closest('label').after('<span></span>');
+       $('.selectric').closest('.small-6').find('span:first').text(' Entries Shown')
+     });
+   } );
+ </script>
+
