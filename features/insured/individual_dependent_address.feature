@@ -20,3 +20,4 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual edits a dependents address
     Then Individual fills in the form
     Then Individual ads address for dependent
+    And Individual logs out
