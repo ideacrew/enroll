@@ -8,17 +8,17 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
-  visit "/"
-  click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
+  sleep 2
+  visit "/"
+  click_link 'Consumer/Family Portal'
   screenshot("individual_start")
 end
 
 Then(/Individual creates HBX account$/) do
   click_button 'Create account'
-
   fill_in "user[email]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -27,6 +27,7 @@ Then(/Individual creates HBX account$/) do
 end
 
 And(/user should see your information page$/) do
+  expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
 end
@@ -251,7 +252,9 @@ end
 
 Then(/Individual asks for help$/) do
   find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  sleep 1
   click_link "Help from a Customer Service Representative"
+  sleep 1
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
@@ -281,8 +284,6 @@ When(/^CSR accesses the HBX portal$/) do
   fill_in "user[email]", :with => "sherry.buckner@dc.gov"
   find('#user_email').set("sherry.buckner@dc.gov")
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => person[:email] unless find(:xpath, '//*[@id="user_email"]').value == "sherry.buckner@dc.gov"
   find('.interaction-click-control-sign-in').click
 end
 

@@ -128,7 +128,9 @@ class BenefitGroup
     @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
   end
 
-
+  def is_offering_dental?
+    dental_reference_plan_id.present? && elected_dental_plan_ids.any? 
+  end
 
   def is_open_enrollment?
     plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)

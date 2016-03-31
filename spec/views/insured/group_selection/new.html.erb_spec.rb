@@ -25,7 +25,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
-      allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
 
@@ -60,7 +60,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should have a 'not eligible'" do
-      expect(rendered).to have_selector('td', text: 'ineligible relationship')
+      expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.')
     end
 
   end
@@ -536,8 +536,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
       it "dental option should have a class of dn" do
         allow(employee_role).to receive(:benefit_group).and_return(benefit_group_no_dental)
+        assign(:market_kind, 'shop');
         render file: "insured/group_selection/new.html.erb"
-
         expect(rendered).to have_selector('.n-radio-row.dn')
       end
 

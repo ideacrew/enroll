@@ -33,9 +33,13 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
-    unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
+    hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
+      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected'
+      memo[enrollment.coverage_kind].compact
+      memo
+    end
 
-    @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
+    @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| hbx_enrollment_kind_and_years[i.coverage_kind].include? i.effective_on.year}
 
     @employee_role = @person.employee_roles.active.first
     @tab = params['tab']

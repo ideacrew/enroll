@@ -48,6 +48,8 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
+
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -55,10 +57,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
 
     send_receipt_emails if @person.emails.first
   end
@@ -83,6 +81,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -98,10 +97,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
-
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
 
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
