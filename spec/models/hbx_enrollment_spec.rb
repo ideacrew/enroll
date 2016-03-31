@@ -395,6 +395,29 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    #context "find_by_benefit_group_assignments" do
+    #  before :all do
+    #    3.times.each do
+    #      enrollment = household.create_hbx_enrollment_from(
+    #        employee_role: mikes_employee_role,
+    #        coverage_household: coverage_household,
+    #        benefit_group: mikes_benefit_group,
+    #        benefit_group_assignment: @mikes_benefit_group_assignments
+    #      )
+    #      enrollment.save
+    #    end
+    #  end
+
+    #  it "should find more than 3 hbx_enrollments" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
+    #  end
+
+    #  it "should return empty array without params" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
+    #  end
+    #end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
