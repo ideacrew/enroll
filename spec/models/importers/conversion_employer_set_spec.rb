@@ -5,8 +5,9 @@ describe ::Importers::ConversionEmployerSet do
   let(:employer_record) { instance_double("::Importers::ConversionEmployer", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
+  let(:registered_on) { Date.new(2015,3,1) }
 
-  subject { ::Importers::ConversionEmployerSet.new(file_name, out_stream) }
+  subject { ::Importers::ConversionEmployerSet.new(file_name, out_stream, registered_on) }
   before :each do
     allow(::Importers::ConversionEmployer).to receive(:new).with(employer_data).and_return(employer_record)
     subject.import!
@@ -18,7 +19,7 @@ describe ::Importers::ConversionEmployerSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.xlsx") }
 
     let(:employer_data) do
-      ({:action=>"Add", :fein=>"931100000", :dba=>"AGA DBA", :legal_name=>"AGA LEGAL", :primary_location_address_1=>"799 9TH STREET NW", :primary_location_address_2=>"7TH FLR", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20001", :contact_first_name=>"THE", :contact_last_name=>"CONTACT", :contact_email=>"THECONTACT@AGA.COM", :contact_phone=>"2025552675", :enrolled_employee_count=>"14", :new_hire_count=>"Date of Hire equal to Effective Date", :broker_name=>"THE BROKER", :broker_npn=>"8262800"})
+      ({:registered_on => registered_on, :action=>"Add", :fein=>"931100000", :dba=>"AGA DBA", :legal_name=>"AGA LEGAL", :primary_location_address_1=>"799 9TH STREET NW", :primary_location_address_2=>"7TH FLR", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20001", :contact_first_name=>"THE", :contact_last_name=>"CONTACT", :contact_email=>"THECONTACT@AGA.COM", :contact_phone=>"2025552675", :enrolled_employee_count=>"14", :new_hire_count=>"Date of Hire equal to Effective Date", :broker_name=>"THE BROKER", :broker_npn=>"8262800"})
     end
 
 
@@ -57,7 +58,7 @@ describe ::Importers::ConversionEmployerSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.csv") }
 
     let(:employer_data) do
-      {:action=>"Add", :fein=>"521782000", :dba=>"MCP DBA", :legal_name=>"MCP LEGAL", :primary_location_address_1=>"3001 P Street N.W.", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20007", :mailing_location_address_1=>"3001 P Street N.W.", :mailing_location_city=>"Washington", :mailing_location_state=>"DC", :mailing_location_zip=>"20007", :contact_first_name=>"The", :contact_last_name=>"Contact", :contact_email=>"thecontact@mcp.com", :contact_phone=>"2025554100", :enrolled_employee_count=>"3", :broker_name=>"The Broker", :broker_npn=>"629000"}
+      {:registered_on => registered_on, :action=>"Add", :fein=>"521782000", :dba=>"MCP DBA", :legal_name=>"MCP LEGAL", :primary_location_address_1=>"3001 P Street N.W.", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20007", :mailing_location_address_1=>"3001 P Street N.W.", :mailing_location_city=>"Washington", :mailing_location_state=>"DC", :mailing_location_zip=>"20007", :contact_first_name=>"The", :contact_last_name=>"Contact", :contact_email=>"thecontact@mcp.com", :contact_phone=>"2025554100", :enrolled_employee_count=>"3", :broker_name=>"The Broker", :broker_npn=>"629000"}
     end
 
     let(:base_output_result) do

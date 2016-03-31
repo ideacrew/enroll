@@ -85,14 +85,15 @@ module Importers
 
     include ::Importers::RowSet
 
-    def initialize(file_name, o_stream)
+    def initialize(file_name, o_stream, conversion_date)
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
+      @conversion_date = conversion_date
     end
 
     def create_model(record_attrs)
-      ::Importers::ConversionEmployer.new(record_attrs)
+      ::Importers::ConversionEmployer.new(record_attrs.merge({:registered_on => @conversion_date}))
     end
   end
 end
