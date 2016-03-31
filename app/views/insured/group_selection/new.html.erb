@@ -103,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_both_markets?(@person) && !@employee_role.benefit_group.is_offering_dental? && @market_kind != 'individual' %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.benefit_group.is_offering_dental? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
@@ -204,6 +204,7 @@ function setGroupSelectionHandlers(){
 <% if can_shop_both_markets?(@person) %>
   <% if @market_kind == 'individual' %>
     $('#market_kind_individual').prop("checked", true);
+    $('#dental-radio-button').show();
   <% end %>
 
   $('#market_kind_shop').on('change', function() {

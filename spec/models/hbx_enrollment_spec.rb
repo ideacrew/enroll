@@ -395,6 +395,29 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    #context "find_by_benefit_group_assignments" do
+    #  before :all do
+    #    3.times.each do
+    #      enrollment = household.create_hbx_enrollment_from(
+    #        employee_role: mikes_employee_role,
+    #        coverage_household: coverage_household,
+    #        benefit_group: mikes_benefit_group,
+    #        benefit_group_assignment: @mikes_benefit_group_assignments
+    #      )
+    #      enrollment.save
+    #    end
+    #  end
+
+    #  it "should find more than 3 hbx_enrollments" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
+    #  end
+
+    #  it "should return empty array without params" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
+    #  end
+    #end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -1421,26 +1444,23 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
     end
 
     it "should return the hbx_enrollments with the benefit group assignment" do
-      id = enrollment.benefit_group_assignment_id
       enrollment.aasm_state = 'coverage_selected'
       enrollment.save
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to include enrollment
     end
 
     it "should be empty while the enrollment is not health and status is not showing" do
       enrollment.aasm_state = 'shopping'
       enrollment.save
-      id = enrollment.benefit_group_assignment_id
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to be_empty
     end
 
     it "should not return the hbx_enrollments while the enrollment is dental and status is not showing" do
       enrollment.coverage_kind = 'dental'
       enrollment.save
-      id = enrollment.benefit_group_assignment_id
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to be_empty
     end
   end

@@ -17,12 +17,14 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   # let(:hbx_enrollment) {double("HbxEnrollment1",waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: 'health')}
   let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
     household: household,
+    plan: plan,
     benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member],
     coverage_kind: "health" )
   }
   let(:hbx_enrollment_two){ FactoryGirl.create(:hbx_enrollment,
     household: household,
+    plan: plan,
     benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member],
     coverage_kind: "dental" )
@@ -82,7 +84,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   it "should show plan name" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(false)
+    allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
@@ -91,7 +93,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   it "should show plan cost" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(false)
+    allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     assign(:plan, plan)
 
@@ -101,7 +103,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   it "should show the info of employee role" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(false)
+    allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(census_employee).to receive(:employee_role).and_return(double(hired_on: Date.new, effective_on: Date.new))
     render template: "employers/census_employees/show.html.erb"

@@ -69,7 +69,7 @@ class BenefitGroupAssignment
 
   def hbx_enrollments(census_employee)
     emp_role = EmployeeRole.find(census_employee.employee_role_id)
-    emp_role.person.primary_family.enrollments
+    emp_role.person.primary_family.active_household.hbx_enrollments
   end
 
   def hbx_enrollment
@@ -98,7 +98,7 @@ class BenefitGroupAssignment
 
   def active_hbx_enrollments(census_employee)
     hbx_enrollments = self.hbx_enrollments(census_employee) unless self.blank?
-    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" }.partition { |e| e.coverage_kind == "health" }.flatten unless self.blank?
+    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" } unless self.blank?
   end
 
   def end_benefit(end_on)
