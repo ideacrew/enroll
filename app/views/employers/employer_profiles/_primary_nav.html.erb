@@ -38,7 +38,7 @@
     </li>
     <% end %>
   </ul>
-  <div class="panel panel-default">
+  <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">
       <h4><%= @employer_profile.organization.legal_name %></h4>
       <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>
