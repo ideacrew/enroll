@@ -791,7 +791,9 @@ class HbxEnrollment
     end
   end
 
-  def self.find_shop_and_health_by_benefit_group_assignment_id(benefit_group_assignment_id)
+  def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
+    return [] if benefit_group_assignment.blank?
+    benefit_group_assignment_id = benefit_group_assignment.id
     return [] if benefit_group_assignment_id.blank?
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
 

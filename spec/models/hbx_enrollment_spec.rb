@@ -1444,26 +1444,23 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
     end
 
     it "should return the hbx_enrollments with the benefit group assignment" do
-      id = enrollment.benefit_group_assignment_id
       enrollment.aasm_state = 'coverage_selected'
       enrollment.save
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to include enrollment
     end
 
     it "should be empty while the enrollment is not health and status is not showing" do
       enrollment.aasm_state = 'shopping'
       enrollment.save
-      id = enrollment.benefit_group_assignment_id
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to be_empty
     end
 
     it "should not return the hbx_enrollments while the enrollment is dental and status is not showing" do
       enrollment.coverage_kind = 'dental'
       enrollment.save
-      id = enrollment.benefit_group_assignment_id
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(id)
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to be_empty
     end
   end
