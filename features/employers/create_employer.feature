@@ -68,3 +68,4 @@ Feature: Create Employer
         When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
+        And Employee logs out

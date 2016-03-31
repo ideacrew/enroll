@@ -2,7 +2,7 @@
 Feature: Employer Profile
   In order for employers to manage their accounts
   Employer Staff should be able to add and delete employer staff roles
-  
+
   Scenario: An existing person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
@@ -78,3 +78,4 @@ Scenario: A new person claims an existing unclaimed company
     Then NewGuy becomes an Employer
     When NewGuy decides to Update Business information
     Then Point of Contact count is 1
+    And NewGuy logs out
