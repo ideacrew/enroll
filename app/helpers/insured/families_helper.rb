@@ -30,8 +30,10 @@ module Insured::FamiliesHelper
   def render_plan_type_details(plan)
     plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
 
+    metal_level = display_dental_metal_level(plan)
+
     if plan_level = plan.try(:metal_level).try(:humanize)
-      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{plan_level}</span>"
+      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{metal_level}</span>"
     end
 
     if plan.try(:nationwide)
