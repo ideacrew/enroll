@@ -4,7 +4,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
-  let(:family){ double("Family", household: household) }
+  let(:household){ double("Household") }
+  let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
   let(:family_members){ [family_member, family_member] }
   let(:benefit_group) {double("BenefitGroup", is_congress: false)}
@@ -13,9 +14,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:employee_role) { EmployeeRole.new }
-  let(:household) {double("Household", hbx_enrollments: hbx_enrollments, tax_household: tax_household)}
-  let(:tax_household) {double("TaxHousehold", eligibility_determination: eligibility_determination)}
-  let(:eligibility_determination) {double("EligibilityDetermination", csr_eligibility_kind: "csr_94")}
+  let(:household) {double("Household", hbx_enrollments: hbx_enrollments)}
   let(:hbx_enrollments) {double("HbxEnrollment")}
 
   context "POST checkout" do
@@ -251,22 +250,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
-  end
-
-  context "GET plans" do
-
-    before :each do
-      let(:plan1) {double("Plan1", id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
-      let(:plan2) {double("Plan2", id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
-      let(:plan3) {double("Plan3", id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
-      let(:plans) {[plan1, plan2, plan3]}
-      get :plans, id: "hbx_id", plans:
-    end
-
-    it "should be success" do
-      expect(response).to have_http_status(:success)
-    end
-
   end
 
   context "GET show" do
