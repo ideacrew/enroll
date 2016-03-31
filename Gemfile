@@ -15,7 +15,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails', '4.1.0'
+gem 'jquery-rails', '4.0.5'
 gem 'jquery-ui-rails'
 gem 'animate-rails', '~> 1.0.7'
 gem 'maskedinput-rails'
@@ -84,8 +84,6 @@ gem 'bson', '3.2.6'
 gem 'addressable', '2.3.8'
 # gem 'rypt', '0.2.0'
 
-gem 'jquery-datatables-rails', '~> 3.3.0'
-
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
@@ -97,6 +95,8 @@ gem 'wicked_pdf', '1.0.4'
 
 # provide recaptcha services
 gem "recaptcha", '1.1.0'
+
+gem 'jquery-datatables-rails', '~> 3.3.0'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
