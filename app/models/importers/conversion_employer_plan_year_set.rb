@@ -84,7 +84,11 @@ module Importers
       :ignore,
       :ignore,
       :carrier,
-      :plan_selection
+      :plan_selection,
+      :ignore,
+      :single_plan_hios_id,
+      :ignore,
+      :most_common_hios_id
     ]
     end
 
