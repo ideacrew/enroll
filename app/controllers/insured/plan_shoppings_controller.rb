@@ -172,9 +172,9 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
-    if @person.primary_family.active_household.latest_active_tax_household.present?
+    if @person.primary_family.active_household.latest_active_tax_household.eligibility_determinations.present?
       csr_eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-      if EligibilityDetermination::CSR_KINDS.include? csr_eligibility_kind && csr_eligibility_kind != "csr_100"
+      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
         sort_for_csr(@plans)
       else
         @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
