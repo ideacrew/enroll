@@ -84,6 +84,7 @@ module Importers
       plan_year_attrs[:employer_profile] = employer
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
       plan_year_attrs[:imported_plan_year] = true
+      plan_year_attrs[:aasm_state] = "active"
       PlanYear.new(plan_year_attrs)
     end
 
@@ -119,6 +120,10 @@ module Importers
       record = map_plan_year
       save_result = record.save
       propagate_errors(record)
+      if save_result
+        employer = find_employer
+        employer.update_attributes!(:aasm_state => "enrolled")
+      end
       return save_result
     end
 
