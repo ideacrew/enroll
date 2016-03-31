@@ -194,7 +194,11 @@ module Importers
           attr_hash[:middle_name] = middle_name
         end
         unless ssn.blank?
-          attr_hash[:ssn] = ssn
+          if ssn == subscriber_ssn
+            warnings.add("dependent_#{dep_idx}_ssn", "ssn same as subscriber, blanking for import")
+          else
+            attr_hash[:ssn] = ssn
+          end
         end
         CensusDependent.new(attr_hash)
       end
