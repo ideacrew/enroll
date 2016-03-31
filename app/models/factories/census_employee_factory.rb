@@ -46,8 +46,8 @@ module Factories
     end
 
     def end_coverage
-      prev_year_enrollments = employee_enrollments.where(:"effective_on".lt => @plan_year.start_on).shop_market
-      prev_year_enrollments.enrolled.each do |hbx_enrollment|
+      prev_year_enrollments = employee_enrollments.select{|enrollment| enrollment.benefit_group == @plan_year.benefit_groups.first}.select{|e| HbxEnrollment::ENROLLED_STATUSES.include?(e.aasm_state)}
+      prev_year_enrollments.each do |hbx_enrollment|
         hbx_enrollment.expire_coverage! if hbx_enrollment.may_expire_coverage?
         benefit_group_assignment = hbx_enrollment.benefit_group_assignment
         benefit_group_assignment.expire_coverage! if benefit_group_assignment.may_expire_coverage?
