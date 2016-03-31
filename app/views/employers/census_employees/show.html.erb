@@ -67,9 +67,15 @@
                         <td><%= member.person.full_name %></td>
                         <td><%= member.primary_relationship %></td>
                         <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-                        <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-                        <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-                        <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                        <% if @plan.is_a? OpenStruct %>
+                          <td><%= number_to_currency(@plan.total_premium) %></td>
+                          <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+                          <td><%= number_to_currency(@plan.total_employee_cost) %></td>
+                        <% else %>
+                          <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                          <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+                          <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                        <% end %>
                       </tr>
                     <% end %>
                     <tr class="gray-row">
