@@ -110,6 +110,26 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /Eligible for Coverage/i
   end
 
+  context 'with a previous coverage waiver' do
+    let(:hbx_enrollment_three) do
+      FactoryGirl.create :hbx_enrollment, household: household,
+        plan: plan,
+        benefit_group: benefit_group,
+        hbx_enrollment_members: [ hbx_enrollment_member ],
+        coverage_kind: 'dental'
+    end
+
+
+    before do
+      assign(:hbx_enrollments, [hbx_enrollment_two, hbx_enrollment_three])
+      render template: 'employers/census_employees/show.html.erb'
+    end
+
+    it "doesn't show the waived coverage" do
+      expect(rendered).to_not match(/Waiver Reason/)
+    end
+  end
+
   context "dependents" do
     let(:census_dependent1) {double(relationship: 'child_under_26', first_name: 'jack', last_name: 'White', dob: Date.today, gender: 'male')}
     let(:census_dependent2) {double(relationship: 'child_26_and_over', first_name: 'jack', last_name: 'White', dob: Date.today, gender: 'male')}
