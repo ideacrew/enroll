@@ -50,9 +50,8 @@ module Factories
     end
 
     def end
-      expiring_plan_year = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => ((@date || TimeKeeper.date_of_record) - 1.day)).first
-
-      if expiring_plan_year
+      expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
+      expiring_plan_years.each do |expiring_plan_year|
         census_employee_factory = Factories::CensusEmployeeFactory.new
         census_employee_factory.plan_year = expiring_plan_year
 
