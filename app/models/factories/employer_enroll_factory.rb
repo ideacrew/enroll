@@ -9,10 +9,13 @@ module Factories
 
     def begin
       @logger.debug "Processing #{employer_profile.legal_name}"
-      published_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"start_on" => @date || TimeKeeper.date_of_record)
+      published_plan_years = @employer_profile.plan_years.published_or_renewing_published.select do |plan_year|
+        (plan_year.start_on..plan_year.end_on).cover?(@date || TimeKeeper.date_of_record)
+      end
 
       if published_plan_years.size > 1
         @logger.debug "Found more than 1 published plan year for #{employer_profile.legal_name}"
+        return
       end
 
       if published_plan_years.empty?
@@ -47,9 +50,8 @@ module Factories
     end
 
     def end
-      expiring_plan_year = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on" => ((@date || TimeKeeper.date_of_record) - 1.day)).first
-
-      if expiring_plan_year
+      expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
+      expiring_plan_years.each do |expiring_plan_year|
         census_employee_factory = Factories::CensusEmployeeFactory.new
         census_employee_factory.plan_year = expiring_plan_year
 

@@ -18,7 +18,7 @@
                 <%=  link_to "Reject", change_doc_status_documents_path(:person_id => @person.id, :doc_id => vlp_doc.id, :status => "rejected"), method: :put, class: "btn btn-danger btn-xs", remote: true%>
               </td>
             <% end %>
-          <!-- >>>> hbx admin inclusion -->
+          <!-- hbx admin inclusion -->
               <td class="table-functions">
                 <% if vlp_doc.status != "verified" %>
                   <%= link_to document_path(vlp_doc, :person => member.person.id), method: :delete, remote: true do %>

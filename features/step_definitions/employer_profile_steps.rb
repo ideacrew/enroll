@@ -103,12 +103,9 @@ Then /(\w+) sees new employer page/ do |ex_staff|
   expect(match.present?).to be_truthy
 end
 
-Then /(\w+) selects Turner Agency, Inc from the dropdown/ do |name|
-   fill_in 'organization[legal_name]', :with=> 'Tu'
-   sleep 1
-   page.execute_script %Q{ $('.typeahead').trigger('focus') }
-   page.execute_script %Q{ $('.typeahead').trigger('keydown') }
-   find('.tt-selectable').click
+Then /(\w+) enters data for Turner Agency, Inc/ do |name|
+   @fein = Organization.where(legal_name: /Turner Agency, Inc/).first.fein
+   step 'NewGuy enters Employer Information'
 end
 
 Then /(\w+) is notified about Employer Staff Role (.*)/ do |name, alert|

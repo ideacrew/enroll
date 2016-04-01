@@ -209,6 +209,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_dental_relationship_benefits
     end
 
 
@@ -513,6 +514,29 @@ module ApplicationHelper
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "local"
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
+  end
+
+  def admin_docs_filter(filter_param, title = nil, style = nil)
+    direction = filter_param == sort_filter && sort_direction == 'asc' ? 'desc' : 'asc'
+    style = direction if style == 'admin_docs'
+    link_to title, consumer_role_status_documents_path(:sort => filter_param, :direction => direction), remote: true, class: style
+  end
+
+  def docs_waiting_for_review
+    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
+  end
+
+  def missing_docs
+    Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').count
+  end
+
+  def all_unverified
+    number_with_delimiter(@unverified_persons.count)
+  end
+
+  def display_dental_metal_level(plan)
+    return plan.metal_level.humanize if plan.coverage_kind == "health"
+    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
 end
