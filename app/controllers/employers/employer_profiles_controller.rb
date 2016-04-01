@@ -99,7 +99,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'inbox'
 
       else
-        @current_plan_year, enrollments = @employer_profile.premium_billing_plan_year_and_enrollments
+        @current_plan_year = @employer_profile.show_plan_year
+        enrollments = @employer_profile.enrollments_for_billing
         @premium_amt_total   = enrollments.map(&:total_premium).sum
         @employee_cost_total = enrollments.map(&:total_employee_cost).sum
         @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum

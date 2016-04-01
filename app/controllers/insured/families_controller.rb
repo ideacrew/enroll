@@ -33,9 +33,14 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
-    unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
+    hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
+      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected'
+      memo[enrollment.coverage_kind].compact
+      memo
+    end
 
-    @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
+    @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
+    @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.employee_roles.active.first
     @tab = params['tab']
@@ -144,7 +149,7 @@ class Insured::FamiliesController < FamiliesController
       plan = @enrollment.try(:plan)
       if @enrollment.is_shop?
         @benefit_group = @enrollment.benefit_group
-        @reference_plan = @benefit_group.reference_plan
+        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
 
         if @benefit_group.is_congress
           @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)

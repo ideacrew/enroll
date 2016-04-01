@@ -23,10 +23,17 @@ module Forms
 
     def create_employer_staff_role(current_user, employer_profile, existing_company)
       person.user = current_user
-      person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: (existing_company ? 'is_applicant': 'is_active'))
+      employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
+      if employer_ids.include? employer_profile.id
+        pending = false
+      else
+        person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: (existing_company ? 'is_applicant': 'is_active'))
+        pending = existing_company
+      end
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
       person.save!
+      pending
     end
 
     def save(current_user, employer_profile_id)
@@ -43,7 +50,6 @@ module Forms
         return false
       end
       return false if person.errors.present?
-      if !employer_profile_id.present?
         existing_org, claimed = check_existing_organization
         if existing_org
           update_organization(existing_org) unless claimed
@@ -53,12 +59,7 @@ module Forms
           org.save!
           @employer_profile = org.employer_profile
         end
-      else
-        #TODOJF TODO Change the variable name to organization id or fix the employer_profile.js
-        @employer_profile = Organization.find(employer_profile_id).employer_profile
-      end
-      pending =  employer_profile_id.present? || claimed   
-      create_employer_staff_role(current_user, @employer_profile, pending)
+      pending = create_employer_staff_role(current_user, @employer_profile, claimed)
       [true, pending]
     end
 

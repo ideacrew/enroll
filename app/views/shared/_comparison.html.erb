@@ -19,7 +19,7 @@
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= qhp.plan.metal_level.humanize %></span> &nbsp;&#149;&nbsp;
+          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
           <%= qhp.plan.plan_type.upcase %>
           </th>
         <% end %>
@@ -44,28 +44,43 @@
           <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
         <% end %>
       </tr>
-      <tr>
-        <th>PLAN BENEFITS <br> (In Network)</th>
-        <% qhps.each do |qhp|%>
-          <th colspan="1"> CO-PAY </th>
-          <th colspan="1"> COINSURANCE </th>
-        <% end %>
-      </tr>
-      <% @visit_types.each do |visit_type| %>
+
+      <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
         <tr>
-          <td><%= visit_type %></td>
+          <th></th>
           <% qhps.each do |qhp|%>
-            <% service_visit = qhp.qhp_service_visits.detect{|a| a.visit_type == visit_type} %>
-            <% if service_visit %>
-              <td  colspan="1"><%= service_visit.present? ? service_visit.copay_in_network_tier_1 : "N/A" %></td>
-              <td  colspan="1"><%= service_visit.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
-            <% else %>
-              <td  colspan="1"><%= "N/A" %></td>
-              <td  colspan="1"><%= "N/A" %></td>
-            <% end %>
+            <th colspan="2">
+              <% if qhp.plan.nationwide %>
+                <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+              <% end %>
+            </th>
           <% end %>
         </tr>
-      <%end%>
+      <% end %>
+
+      <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2">
+              <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
+                <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+              <% end %>
+            </th>
+          <% end %>
+        </tr>
+      <% end %>
+
+      <% if @coverage_kind == "health" %>
+        <tr>
+          <th>PLAN BENEFITS <br> (In Network)</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="1"> CO-PAY </th>
+            <th colspan="1"> COINSURANCE </th>
+          <% end %>
+        </tr>
+        <%= render partial: "shared/plan_shoppings/plan_visit_types" %>
+      <% end %>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
@@ -76,14 +91,16 @@
           </th>
         <% end %>
       </tr>
-      <tr>
-        <th></th>
-        <% qhps.each do |qhp|%>
-          <th colspan="2">
-            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
-          </th>
-        <% end %>
-      </tr>
+      <% if @coverage_kind == "health" %>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2">
+              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
+            </th>
+          <% end %>
+        </tr>
+      <% end %>
     </table>
   </div>
 </div>

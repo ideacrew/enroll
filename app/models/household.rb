@@ -276,6 +276,14 @@ class Household
     end
   end
 
+  def enrolled_including_waived_hbx_enrollments
+    #hbx_enrollments.coverage_selected_and_waived
+    enrs = hbx_enrollments.coverage_selected_and_waived
+    health_enr = enrs.detect { |a| a.coverage_kind == "health"}
+    dental_enr = enrs.detect { |a| a.coverage_kind == "dental"}
+    [health_enr , dental_enr].compact
+  end
+
   def enrolled_hbx_enrollments
     hbx_enrollments.enrolled
   end

@@ -824,6 +824,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 HbxEnrollment.create(
                   household: family.households.first,
                   benefit_group_id: benefit_group.id,
+                  coverage_kind: 'health',
                   kind: "unassisted_qhp")
               end
 
@@ -864,6 +865,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                       ee.active_benefit_group_assignment.select_coverage
                       ee.save
                     end
+                    allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
                   end
 
                   it "should include all eligible employees" do
@@ -1974,7 +1976,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       })
     }
 
-    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+    let(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
       household: shop_family.latest_household,
       coverage_kind: "health",
       effective_on: effective_date,
@@ -1987,24 +1989,42 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       )
     }
 
+    let(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "dental",
+      effective_on: effective_date,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 10.days,
+      benefit_group_id: plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id
+      )
+    }
+
+    before do
+      allow(shop_family.active_household).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment]) 
+    end
+
+
     context " when enrollments present with enrolled or renewing state" do 
       before do
-        shop_enrollment.update_attributes(:'aasm_state' => 'auto_renewing')
+        health_enrollment.update_attributes(:'aasm_state' => 'auto_renewing')
       end
 
-      it 'should return the enrollments' do
-        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq [shop_enrollment]
+      it 'should return both health and dental enrollments' do
+        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq [health_enrollment, dental_enrollment]
       end
     end
 
 
     context " when enrollments are waived" do
       before do
-        shop_enrollment.update_attributes(:'aasm_state' => 'renewing_waived')
+        health_enrollment.update_attributes(:'aasm_state' => 'renewing_waived')
       end
 
       it 'should not return waived enrollments' do 
-        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq []
+        expect(plan_year.hbx_enrollments_by_month(effective_date)).to eq [dental_enrollment]
       end
     end
   end

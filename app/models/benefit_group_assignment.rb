@@ -22,7 +22,7 @@ class BenefitGroupAssignment
   validate :date_guards, :model_integrity
 
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
-      
+
   def self.by_benefit_group_id(bg_id)
     census_employees = CensusEmployee.where({
       "benefit_group_assignments.benefit_group_id" => bg_id
@@ -67,6 +67,11 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
+  def hbx_enrollments(census_employee)
+    emp_role = EmployeeRole.find(census_employee.employee_role_id)
+    emp_role.person.primary_family.active_household.hbx_enrollments
+  end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 
@@ -87,8 +92,13 @@ class BenefitGroupAssignment
 
       return @hbx_enrollment
     else
-      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) 
+      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
     end
+  end
+
+  def active_hbx_enrollments(census_employee)
+    hbx_enrollments = self.hbx_enrollments(census_employee) unless self.blank?
+    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" } unless self.blank?
   end
 
   def end_benefit(end_on)
@@ -116,7 +126,7 @@ class BenefitGroupAssignment
       transitions from: [:initialized, :coverage_selected, :coverage_renewing], to: :coverage_waived
     end
 
-    event :renew_coverage do 
+    event :renew_coverage do
       transitions from: :initialized , to: :coverage_renewing
     end
 
