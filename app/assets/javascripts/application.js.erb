@@ -33,6 +33,8 @@
 //= require consumer_role
 //= require plan_year_selection
 //= require bootstrap-slider
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require_tree .
 
 
@@ -899,7 +901,6 @@ $(document).on('page:update', function() {
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
 
-  $('select').selectric();
   $('#person_addresses_attributes_0_state').on('change', function () {
     $('select').selectric('refresh');
   });

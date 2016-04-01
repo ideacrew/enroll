@@ -1,19 +1,18 @@
 <% model_class = Family %>
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
-<div class="container">
-  <h3 class="title-inline">Families</h3>
-  <div class="form-inline button-group-wrapper families_search_div">
-    <div class="input-group search-wp">
-      <%= render 'shared/search', url: family_index_broker_agencies_profiles_path, q: @q, placeholder: "Last Name", remote: true %>
+<div class = 'container'>
+
+   <div class = 'row'>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h3 class="title-inline">Families</h3>
     </div>
   </div>
+
+  <div class = 'row'>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    	<%= render "families_table_for_broker", families: @families%>
+  	 </div>
 </div>
 
-<div class="container">
-  <div id="families">
-    <%= render "families_table_for_broker", families: @families%>
-  </div>
-  <%= render 'shared/alph_paginate_remote', url: family_index_broker_agencies_profiles_path, alphs: @page_alphabets, all: family_index_broker_agencies_profiles_path %>
-
-</div>
+     

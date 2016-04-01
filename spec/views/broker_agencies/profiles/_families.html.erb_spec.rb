@@ -11,10 +11,10 @@ RSpec.describe "broker_agencies/profiles/_families.html.erb"  do |variable|
     expect(rendered).to have_selector('h3', text: 'Families')
   end
 
-  it 'should show page alphabet links' do
-    expect(rendered).to have_selector('a', text: 'XXX')
-    expect(rendered).to have_selector('a', text: 'YYY')
-  end
+  #it 'should show page alphabet links' do
+   # expect(rendered).to have_selector('a', text: 'XXX')
+    #expect(rendered).to have_selector('a', text: 'YYY')
+  #end
 
   it 'should not reference enrollment' do
     expect(rendered).not_to have_selector('p', text: 'working on an enrollment')
