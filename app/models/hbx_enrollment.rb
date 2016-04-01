@@ -637,7 +637,15 @@ class HbxEnrollment
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
-      open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+      plan_year = employee_role.employer_profile.show_plan_year
+
+      if employee_role.employer_profile.profile_source.to_s == 'conversion'
+        if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
+          plan_year = renewing_plan_year
+        end
+      end
+      
+      open_enrollment_effective_date = plan_year.start_on
 
       if open_enrollment_effective_date < employee_role.coverage_effective_on
         new_hire_enrollment_period = employee_role.benefit_group.new_hire_enrollment_period(employee_role.new_census_employee.hired_on)
