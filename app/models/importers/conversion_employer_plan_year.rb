@@ -52,8 +52,8 @@ module Importers
       if found_employer.nil?
         errors.add(:fein, "does not exist")
       else
-        if found_employer.plan_years.any?
-          errors.add(:fein, "employer already has plan years")
+        if found_employer.plan_years.any? && (found_employer.profile_source == "conversion")
+          errors.add(:fein, "employer already has conversion plan years")
         end
       end
     end
@@ -146,15 +146,19 @@ module Importers
       propagate_errors(record)
       if save_result
         employer = find_employer
-        employer.update_attributes!(:aasm_state => "enrolled")
-        map_employees_to_benefit_groups(employer, record)
+        begin
+          employer.update_attributes!(:aasm_state => "enrolled", :profile_source => "conversion")
+          map_employees_to_benefit_groups(employer, record)
+        rescue Exception => e
+          raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
+        end
       end
       return save_result
     end
 
     def map_employees_to_benefit_groups(employer, plan_year)
       bg = plan_year.benefit_groups.first
-      employer.census_employees.each do |ce|
+      employer.census_employees.non_terminated.each do |ce|
         ce.add_benefit_group_assignment(bg)
         ce.save!
       end

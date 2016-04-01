@@ -149,7 +149,7 @@ module Importers
         :first_name => contact_first_name,
         :last_name => contact_last_name,
         :employer_staff_roles => [
-          EmployerStaffRole.new(employer_profile_id: emp.id)
+          EmployerStaffRole.new(employer_profile_id: emp.id, is_owner: false)
         ],
         :phones => [
           Phone.new({
