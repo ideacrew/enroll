@@ -150,6 +150,38 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def edit_dob_ssn
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @person = Person.find(params[:id])
+    @person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
+    end
+  end
+
+  def update_dob_ssn
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
+    @person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
+    @alert_premium_when_dob_change = @person_has_active_enrollment && ( @person.dob !=  Date.parse(params[:person][:dob]) )
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+
+    if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
+      @dont_allow_change = true
+    else
+      begin
+        @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+      rescue Exception => e
+        @error_on_save = "SSN must be 9 digits long."
+      end
+      @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
+    end
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person } if @error_on_save
+      format.js { render "update_enrollment", person: @person}
+    end
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show

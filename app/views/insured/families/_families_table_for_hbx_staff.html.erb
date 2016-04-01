@@ -16,6 +16,7 @@
         <th>Employee?</th>
         <th></th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -39,12 +40,15 @@
         <td class='unblock'>
           <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
         </td>
+        <td>
+          <%= link_to 'Edit DOB/SSN', edit_dob_ssn_path(id: family.primary_applicant.person.id), class: "btn btn-default btn-xs", remote: true%>
+        </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td><%= link_to 'Send Secure Message'.html_safe,
                new_insured_inbox_path(id: family.primary_applicant.person.id,
                 profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
                to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),
-            class: "btn btn-default btn-sm", remote: true %></td>
+            class: "btn btn-default btn-xs", remote: true %></td>
         <% end %>
       </tr>
       <% end %>

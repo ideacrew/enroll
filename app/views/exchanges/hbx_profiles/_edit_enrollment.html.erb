@@ -1,0 +1,46 @@
+
+<div class="container bottom-pd">
+  
+  <div class="row">
+    <h3 class="title-inline">Editing DOB / SSN for:</h3>
+  </div>
+  
+  <div>
+    <table class="table table-border">
+      <thead></thead>
+      <tbody>
+        <tr>
+        <td><p> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></p></td>
+        <td><p> <b>HBX ID:</b> <%=@person.hbx_id%></p></tb>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row input-no-pd">
+    <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td>
+              <p><b>New DOB</b></p> 
+              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true} %>
+            </td>  
+            <td>
+               <p><b>New SSN</b></p>  
+              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required mask-ssn form-control", required: true, :input_html => {:maxlength => 15, :size => 40} %>
+            </td>
+              <%= f.hidden_field :pid, :value => @person.id  %>
+            </tr>
+            <td></td>
+            <td>
+              <%if @error_on_save %> <div id = "save_error_msg"><%=@error_on_save%></div><%end%>
+                <%= f.submit "Update", :class => "btn btn-primary pull-right"%>
+            </td>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+  <%if @person_has_active_enrollment%><span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premiums.<%end%>
+</div>
