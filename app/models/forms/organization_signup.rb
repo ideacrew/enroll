@@ -52,7 +52,8 @@ module Forms
       matched_people = Person.where(
         first_name: regex_for(first_name),
         last_name: regex_for(last_name),
-        dob: new_person.dob
+        # TODO
+        # dob: new_person.dob
       )
       if matched_people.count > 1
         raise TooManyMatchingPeople.new
