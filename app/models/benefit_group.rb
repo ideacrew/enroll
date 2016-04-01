@@ -479,6 +479,11 @@ private
   end
 
   def first_of_month_effective_on_for(date_of_hire)
+    if plan_year.employer_profile.profile_source.to_s == 'conversion'
+      if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
+        return [renewing_plan_year.start_on, date_of_hire].max
+      end
+    end
     [plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
