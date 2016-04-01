@@ -257,6 +257,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:plan2) {double("Plan2", id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
     let(:plan3) {double("Plan3", id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
     let(:plans) {[plan1, plan2, plan3]}
+    let(:coverage_kind){"health"}
 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -272,7 +273,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(plan1).to receive(:[]).with(:id)
       allow(plan2).to receive(:[]).with(:id)
       allow(plan3).to receive(:[]).with(:id)
-      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return(plans)
+      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment, coverage_kind).and_return(plans)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       sign_in user

@@ -11,6 +11,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       total_employer_contribution: 200,
       ehb: 0.9881,
       can_use_aptc?: true,
+      coverage_kind: "health",
+      dental_level: "high",
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     )
@@ -113,5 +115,26 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     it "should match fa-check-square for csr" do
       expect(rendered).to have_css("i.fa-check-square-o")
     end
+  end
+
+  context "with dental coverage_kind" do
+    before :each do
+      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+      assign(:plan_hsa_status, plan_hsa_status)
+      assign(:hbx_enrollment, hbx_enrollment)
+      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
+      assign(:carrier_names_map, {})
+      allow(plan).to receive(:total_employee_cost).and_return 100
+      allow(plan).to receive(:is_csr?).and_return false
+      allow(plan).to receive(:coverage_kind).and_return('dental')
+      allow(plan).to receive(:metal_level).and_return('dental')
+      render "insured/plan_shoppings/plan_details", plan: plan
+    end
+
+    it "should have link to pdf with plan summary text" do
+      expect(rendered).to have_selector('a', text:'Plan Summary')
+      expect(rendered).to match "High"
+    end
+
   end
 end

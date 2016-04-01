@@ -1,4 +1,4 @@
-require 'ostruct'
+  require 'ostruct'
 
 class HbxEnrollment
   include Mongoid::Document
@@ -33,6 +33,8 @@ class HbxEnrollment
       "enrolled_contingent",
       "unverified"
     ]
+
+  SELECTED_AND_WAIVED = ["coverage_selected", "inactive"]
 
   TERMINATED_STATUSES = ["coverage_terminated", "unverified"]
   CANCELED_STATUSES = ["coverage_canceled"]
@@ -127,6 +129,7 @@ class HbxEnrollment
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector]) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
+  scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -634,7 +637,15 @@ class HbxEnrollment
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
-      open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+      plan_year = employee_role.employer_profile.show_plan_year
+
+      if employee_role.employer_profile.profile_source.to_s == 'conversion'
+        if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
+          plan_year = renewing_plan_year
+        end
+      end
+      
+      open_enrollment_effective_date = plan_year.start_on
 
       if open_enrollment_effective_date < employee_role.coverage_effective_on
         new_hire_enrollment_period = employee_role.benefit_group.new_hire_enrollment_period(employee_role.new_census_employee.hired_on)
@@ -646,7 +657,7 @@ class HbxEnrollment
 
     effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
 
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(effective_date)
     if plan_year.blank?
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
@@ -788,6 +799,22 @@ class HbxEnrollment
     end
   end
 
+  def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
+    return [] if benefit_group_assignment.blank?
+    benefit_group_assignment_id = benefit_group_assignment.id
+    return [] if benefit_group_assignment_id.blank?
+    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
+
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.show_enrollments.shop_market.by_coverage_kind("health").each do |enrollment|
+          enrollment_list << enrollment if benefit_group_assignment_id.to_s == enrollment.benefit_group_assignment_id.to_s
+        end
+      end
+    end rescue ''
+    enrollment_list
+  end
   # def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
   #   id_list = benefit_group_assignments.collect(&:_id)
 
@@ -944,7 +971,8 @@ class HbxEnrollment
       if benefit_group.is_congress #is_a? BenefitGroupCongress
         PlanCostDecoratorCongress.new(plan, self, benefit_group)
       else
-        PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+        reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
+        PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
       end
     elsif plan.present? && consumer_role.present?
       UnassistedPlanCostDecorator.new(plan, self)
@@ -1033,7 +1061,7 @@ class HbxEnrollment
   private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(coverage_effective_date)
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else

@@ -168,6 +168,16 @@ class Organization
     end
   end
 
+  def self.valid_dental_carrier_names
+    Rails.cache.fetch("dental-carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+      Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_dental_plans("carrier", org.carrier_profile.id, 2016).present?
+        carrier_names
+      end
+    end
+  end
+
   def self.valid_carrier_names_filters
     Rails.cache.fetch("carrier-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
@@ -175,6 +185,10 @@ class Organization
         carrier_names
       end
     end
+  end
+
+  def self.valid_dental_carrier_names_for_options
+    Organization.valid_dental_carrier_names.invert.to_a
   end
 
   def self.valid_carrier_names_for_options

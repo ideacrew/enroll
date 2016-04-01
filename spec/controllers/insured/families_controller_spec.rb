@@ -85,7 +85,7 @@ RSpec.describe Insured::FamiliesController do
       allow(hbx_enrollments).to receive(:_id).and_return(true)
       allow(hbx_enrollments).to receive(:each).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:reject).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:map).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:inject).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
 
       session[:portal] = "insured/families"

@@ -189,6 +189,8 @@ Rails.application.routes.draw do
       end
       resources :plan_years do
         get 'reference_plans'
+        get 'dental_reference_plans'
+        get 'generate_dental_carriers_and_plans'
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
@@ -200,6 +202,8 @@ Rails.application.routes.draw do
         get 'calc_employer_contributions', on: :collection
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
+        get 'reference_plan_summary', on: :collection
+
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

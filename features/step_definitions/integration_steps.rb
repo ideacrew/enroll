@@ -95,6 +95,10 @@ def people
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "CSR" => {
+      email: "sherry.buckner@dc.gov",
+      password: 'aA1!aA1!aA1!'
+    }
   }
 end
 
@@ -149,7 +153,7 @@ Given(/^Hbx Admin exists$/) do
   plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
-Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
+Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
@@ -162,7 +166,24 @@ Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, 2.days.ago
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/^Employer for (.*) exists with a published plan year offering health and dental$/) do |named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date]
+
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
+  benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   Caches::PlanDetails.load_record_cache!
 end
 
@@ -192,14 +213,17 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
-  #TODO bombs on selectric scroll sometimes...
+  sleep(1)
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
+  sleep(1)
+  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   step "I enter office location for #{default_office_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
+  save_page
   find('.interaction-click-control-confirm').click
 end
 
@@ -208,15 +232,16 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
 
   visit "/"
   portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
-  find("a.#{portal_class}").click
-  find('.interaction-click-control-sign-in-existing-account').click
+  portal_uri = find("a.#{portal_class}")["href"]
 
+  visit "/users/sign_in"
   fill_in "user[email]", :with => person[:email]
   find('#user_email').set(person[:email])
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[email]", :with => person[:email] unless find(:xpath, '//*[@id="user_email"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
+  visit portal_uri
 end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
@@ -416,6 +441,20 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
+Then(/^.+ should see the group selection page with health or dental dependents list$/) do
+  expect(page).to have_css('form')
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
+  find(:xpath, '//label[@for="coverage_kind_dental"]').click
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
+  find(:xpath, '//label[@for="coverage_kind_health"]').click
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
+  expect(page).to have_selector('.group-selection-table.health', visible: true)
+end
+
+When(/^.+ clicks? health radio on the group selection page$/) do
+  find(:xpath, '//label[@for="coverage_kind_dental"]').click
+end
+
 When(/^.+ clicks? continue on the group selection page$/) do
   find('#btn-continue').click
 end
@@ -425,10 +464,25 @@ Then(/^.+ should see the plan shopping welcome page$/) do
   screenshot("plan_shopping_welcome")
 end
 
+Then(/^.+ should see the plan shopping page with no dependent$/) do
+  expect(page).to have_content('0 dependent(s)')
+end
+
+Then(/^.+ should see the plan shopping page with one dependent$/) do
+  expect(page).to have_content('1 dependent(s)')
+end
+
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
   scroll_then_click(@browser.a(text: "Continue"))
 end
 
+When(/^.+ clicks? my insured portal link$/) do
+  click_link 'My Insured Portal'
+end
+
+When(/^.+ clicks? shop for plans button$/) do
+  click_button "Shop for Plans"
+end
 
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')

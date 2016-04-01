@@ -1,5 +1,5 @@
 <% plan = hbx_enrollment.plan %>
-<div class="hbx-enrollment-panel">
+<div class="module hbx-enrollment-panel">
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
@@ -219,7 +219,13 @@
                       </strong>
                       <br/>
                     </div>
-
+                    <% elsif plan.carrier_profile.legal_name == "MetLife" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18556382221">1-855-638-2221</a>
+                      </strong><br/>
+                    </div>
                     <% elsif plan.carrier_profile.legal_name == "Dentegra" %>
                     <div>
                       Call:
