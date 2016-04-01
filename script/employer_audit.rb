@@ -24,7 +24,7 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 			benefit_groups = plan_year.benefit_groups
 			benefit_groups.each do |benefit_group|
 				elected_plans = benefit_group.elected_plans.map(&:name)
-				csv << [legal_name, dba, fein, state, start_date, end_date,"",elected_plans,employee_count, addresses]
+				csv << [legal_name, dba, fein, state, start_date, end_date,elected_plans,employee_count, addresses]
 			end
 		end
 		rescue Exception=>e
@@ -41,7 +41,7 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 			fein = employer.fein
 			census_employees = employer.employer_profile.census_employees
 			census_employees.each do |census_employee|
-				name = census_employee.last_name
+				name = "#{census_employee.first_name} #{census_employee.last_name}"
 				hire_date = census_employee.hired_on
 				roster_added = census_employee.created_at
 				coverage_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
