@@ -80,6 +80,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "ppo",
         metal_level: "metal_level_1",
         carrier_profile: carrier_profile,
+        coverage_kind: 'health',
+        active_year: TimeKeeper.date_of_record.beginning_of_year,
+        dental_level: 'high'
         )
     end
 
@@ -90,6 +93,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "",
         metal_level: "metal_level_2",
         carrier_profile: carrier_profile,
+        coverage_kind: 'dental',
+        active_year: TimeKeeper.date_of_record.beginning_of_year,
+        dental_level: 'high'
         )
     end
 
@@ -103,9 +109,16 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_1,
         reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_1,
+        dental_reference_plan_id: "498523982893",
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_1",
         monthly_min_employee_cost: "monthly_min_employee_cost_1",
         monthly_max_employee_cost: "monthly_max_employee_cost_1",
+        id: "9813829831293",
+        dental_plan_option_kind: "single_plan",
+        elected_dental_plan_ids: [],
+        elected_dental_plans: [],
+        dental_relationship_benefits: [relationship_benefits],
         )
     end
 
@@ -119,9 +132,17 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_2,
         reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_2,
+        dental_reference_plan_id: "498523982893",
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_2",
         monthly_min_employee_cost: "monthly_min_employee_cost_2",
         monthly_max_employee_cost: "monthly_max_employee_cost_2",
+        id: "9456349532",
+        dental_plan_option_kind: "single_plan",
+        elected_dental_plan_ids: [],
+        elected_dental_plans: [],
+        dental_relationship_benefits: [relationship_benefits],
+
         )
     end
 
@@ -204,6 +225,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display title" do
+      allow(be)
       expect(rendered).to have_selector("h1", text: "My Health Benefits Program")
     end
 
