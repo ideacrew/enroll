@@ -127,15 +127,14 @@ module Importers
               @dep_#{num}_gender = nil
             else
               stripped_value = val.strip.downcase
-              if stripped_value =~ /\Am/i
+              if stripped_value =~ /\\Am/i
                 @dep_#{num}_gender = "male"
-              elsif stripped_value =~ /\Af/i
+              elsif stripped_value =~ /\\Af/i
                 @dep_#{num}_gender = "female"
               else
                 @dep_#{num}_gender = val
               end
             end
-            @dep_#{num}_gender = Maybe.new(val).strip.downcase.extract_value
           end
 
           def dep_#{num}_relationship=(val)
