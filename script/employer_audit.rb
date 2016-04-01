@@ -2,7 +2,7 @@ all_employers = Organization.where(:employer_profile => {"$ne" => nil})
 
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	csv << ["Legal Name", "DBA", "FEIN", "AASM State", "Coverage Year Start", "Coverage Year End",
-			"Plan Offerings","Employee Count"]
+			"Plan Offerings","Employee Count","Addresses"]
 	all_employers.each do |employer|
 		begin
 		legal_name = employer.legal_name
@@ -13,8 +13,10 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 		employee_count = employer.employer_profile.roster_size
 		office_locations = employer.office_locations
 		addresses = []
-		office_locations.each do |location|
-			addresses.push(location.address.full_address)
+		if office_locations != nil
+			office_locations.each do |location|
+				addresses.push(location.try(:address).try(:full_address))
+			end
 		end
 		plan_years.each do |plan_year|
 			start_date = plan_year.start_on
@@ -22,7 +24,7 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 			benefit_groups = plan_year.benefit_groups
 			benefit_groups.each do |benefit_group|
 				elected_plans = benefit_group.elected_plans.map(&:name)
-				csv << [legal_name, dba, fein, state, start_date, end_date,"",elected_plans,employee_count]
+				csv << [legal_name, dba, fein, state, start_date, end_date,"",elected_plans,employee_count, addresses]
 			end
 		end
 		rescue Exception=>e
