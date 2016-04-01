@@ -39,10 +39,13 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 			fein = employer.fein
 			census_employees = employer.employer_profile.census_employees
 			census_employees.each do |census_employee|
-				name = name_to_listing(census_employee)
+				name = census_employee.last_name
 				hire_date = census_employee.hired_on
-				roster_added = census_employee.created_on
-				coverage_state = enrollment_state(census_employee)
+				roster_added = census_employee.created_at
+				coverage_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
+				if coverage_state.present?
+					coverage_state = coverage_state.humanize
+				end
 				csv << [employer_name, fein, name, hire_date, roster_added, coverage_state]
 			end
 		rescue Exception=>e
