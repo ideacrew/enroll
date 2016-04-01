@@ -401,6 +401,23 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 // reveal published plan years benefit groups
 $(document).ready(function () {
+
+  // ACTUALLY BELONGS IN APPLICATION.JS
+  $('.module a.view-more').on('click', function() {
+    event.preventDefault();
+    if ( $(this).hasClass('view-less') ) {
+      $(this).html('View More<i class="fa fa-chevron-down"></i>');
+      $(this).removeClass('view-less');
+      $(this).closest('.section').find('.dn').slideUp();
+    } else {
+      $(this).html('View Less<i class="fa fa-chevron-up"></i>');
+      $(this).addClass('view-less');
+      if ( $(this).closest('.module').hasClass('employer-welcome') ) {
+        $(this).closest('.section').find('.dn').slideDown();
+      }
+    }
+  });
+
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {

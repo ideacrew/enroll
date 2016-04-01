@@ -70,6 +70,17 @@
  .m-center {
    margin: auto;
  }
+ .dir {
+  margin-top: 0;
+}
+.view-more {
+  white-space: nowrap;
+}
+img {
+ &.full-width {
+   width: 100%;
+ }
+}
  .modal-body-swap {
    position: relative;
    padding: 15px;
@@ -164,6 +175,10 @@
  .empty-box {
    padding: 10px 10px;
    border: solid 1px #d5d5d5;
+   &.important {
+     background-color: #fcf8e3;
+
+   }
    .fa {
      &.fa-flag {
        color: #F9BB33;
