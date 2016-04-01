@@ -166,7 +166,7 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, 2.days.ago
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   Caches::PlanDetails.load_record_cache!
 end
 
@@ -183,7 +183,7 @@ Given(/^Employer for (.*) exists with a published plan year offering health and 
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, 2.days.ago
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   Caches::PlanDetails.load_record_cache!
 end
 
