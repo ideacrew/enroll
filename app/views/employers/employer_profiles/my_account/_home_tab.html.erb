@@ -35,11 +35,12 @@
           -->
           <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
 
-
         <div class="information">
           <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>
           <% if @current_plan_year.start_on.to_date.month != 1 %>
-          <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+            <% if TimeKeeper.date_of_record.to_date <= @current_plan_year.open_enrollment_end_on.to_date %>
+              <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+            <% end %>
           <% end %>
         </div>
       </div>
