@@ -96,6 +96,7 @@ class HbxEnrollment
   field :is_active, type: Boolean, default: true
   field :waiver_reason, type: String
   field :published_to_bus_at, type: DateTime
+  field :review_status, type: String, default: "incomplete"
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"

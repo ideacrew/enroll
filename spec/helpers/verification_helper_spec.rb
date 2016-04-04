@@ -48,7 +48,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#doc_status_label" do
     doc_status_array = VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
-    doc_status_classes = ["warning", "default", "info", "success", "danger"]
+    doc_status_classes = ["warning", "default", "success", "danger"]
     doc_status_array.each_with_index do |doc_verif_status, index|
       context "doc status is #{doc_verif_status}" do
         let(:document) { FactoryGirl.build(:vlp_document, :status=>doc_verif_status) }
