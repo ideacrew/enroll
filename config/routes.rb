@@ -126,6 +126,7 @@ Rails.application.routes.draw do
       get :search, on: :collection
       get :privacy, on: :collection
       post :match, on: :collection
+      post :build, on: :collection
       get :ridp_agreement, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection

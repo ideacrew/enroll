@@ -97,6 +97,12 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def build
+    set_current_person(required: false)
+    build_person_params
+    render 'match'
+  end
+
   def create
 
     if !session[:already_has_consumer_role] == true
@@ -262,5 +268,16 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       return message
     end
+  end
+
+  def build_person_params
+   @person_params = {:ssn =>  Person.decrypt_ssn(@person.encrypted_ssn)}
+   
+    %w(first_name middle_name last_name gender).each do |field|
+      @person_params[field] = @person.attributes[field]
+    end
+
+    @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
+    @person_params.merge!({user_id: current_user.id})
   end
 end
