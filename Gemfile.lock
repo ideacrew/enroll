@@ -11,7 +11,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.2)
-    aasm (4.0.8)
+    aasm (4.8.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
     actionmailer (4.2.3)
@@ -500,7 +500,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aasm (~> 4.0.7)
+  aasm (~> 4.8.0)
   acapi!
   action_mailer_cache_delivery (~> 0.3.7)
   addressable (= 2.3.8)
