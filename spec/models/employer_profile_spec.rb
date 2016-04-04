@@ -164,26 +164,14 @@ describe EmployerProfile, dbclean: :after_each do
         aasm_state: 'renewing_enrolling') 
     }
 
-    context 'when renewing published plan year under open enrollment present' do
+    context 'when renewing published plan year present' do
      
-      it 'should return renewing plan year' do
+      it 'should return renewing published plan year' do
         expect(employer_profile.show_plan_year).to eq renewing_plan_year
       end
     end
 
-    context 'when renewing published plan year not under open enrollment' do 
- 
-      before do 
-        renewing_plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
-        renewing_plan_year.aasm_state = 'renewing_published'
-      end
-
-      it 'should return active plan year' do 
-        expect(employer_profile.show_plan_year).to eq active_plan_year
-      end
-    end
-
-    context 'when renewing plan year not present' do
+    context 'when renewing published plan year not present' do
 
       before do
         employer_profile.plan_years = [active_plan_year] 
