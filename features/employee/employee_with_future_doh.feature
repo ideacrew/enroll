@@ -7,7 +7,7 @@ Feature: Employee with future date of hire
   And Employee should be able to purchase Insurance
 
   Scenario: New hire has future enrollment period
-    Given Employer for Soren White exists with a published plan year
+    Given Employer for Soren White exists with a published health plan year
       And Employee has future hired on date
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
