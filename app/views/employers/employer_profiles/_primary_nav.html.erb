@@ -42,10 +42,8 @@
   </ul>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4>My Account</h4>
-      <% @employer_profile.organization.legal_name %>
-      <br/>
-      <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>
+      <h4 style="margin-bottom: 5%; line-height: 125%;"><%= @employer_profile.legal_name %></h4>
+      <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
       <br/>
       <%= link_to 'View Enrollment Reports', employers_premium_statement_path(@employer_profile, :tab=>'profile') %>
 
