@@ -169,7 +169,7 @@ class EmployerProfile
   end
 
   def show_plan_year
-    renewing_published_plan_year || active_plan_year || published_plan_year || renewing_plan_year
+    renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
   def plan_year_drafts

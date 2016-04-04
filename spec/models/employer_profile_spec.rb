@@ -191,6 +191,17 @@ describe EmployerProfile, dbclean: :after_each do
         expect(employer_profile.show_plan_year).to eq published_plan_year
       end
     end
+
+    context 'when employer did not publish plan year' do 
+
+      let(:draft_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, aasm_state: 'draft') }
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [draft_plan_year]) }
+
+      it 'should return nil' do
+        expect(employer_profile.show_plan_year).to be_nil
+      end
+    end
+
   end
 
   context ".billing_plan_year" do
