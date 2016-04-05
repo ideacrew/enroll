@@ -1,5 +1,10 @@
 require "rails_helper"
 
+class MyTestIncludedSsnParserClass
+  attr_reader :ssn
+  include ValueParsers::SsnParser.on(:ssn)
+end
+
 describe ValueParsers::SsnParser do
   TEST_VALUES = {
     nil => nil,
@@ -17,10 +22,13 @@ describe ValueParsers::SsnParser do
     "12300  0000 \t.000" => "123000000",
     "q*(&@$asdkljfd&*(" => nil
   }
+
+  subject { MyTestIncludedSsnParserClass.new }
  
   TEST_VALUES.each_pair do |k, v| 
     it "parses a value of #{k.to_s} of type #{k.class.inspect} to the #{v.inspect}" do
-      expect(ValueParsers::SsnParser.parse(k)).to eq v
+      subject.ssn = k
+      expect(subject.ssn).to eq v
     end
   end
 
