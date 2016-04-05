@@ -31,7 +31,7 @@ Feature: Binder transitions
     And the employer has remitted the initial binder payment
     When the HBX admin visits the page
     And the HBX admin clicks the "Binder Paid" button
-    Then then the Employer’s state transitions to "Binder Paid”
+    Then then the Employer’s state transitions to "Binder Paid"
     And the Group XML is generated for the Employer
 
   Scenario: HBX-Admin participation requirements checklist for renewing ER
