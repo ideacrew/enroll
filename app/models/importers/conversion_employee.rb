@@ -37,25 +37,14 @@ module Importers
           "dep_#{num}_state".to_sym
       end
 
+      include ValueParsers::SsnParser.on(:subscriber_ssn, :fein)
+
       validate :validate_fein
       validates_length_of :fein, is: 9
 
       def initialize(opts = {})
         super(opts)
         @warnings = ActiveModel::Errors.new(self)
-      end
-
-      def subscriber_ssn=(val)
-        if val.blank?
-          @subscriber_ssn = nil
-        else
-          stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
-          if (stripped_value == "000000000")
-            @subscriber_ssn = nil
-          else
-            @subscriber_ssn = stripped_value
-          end
-        end
       end
 
       def hire_date=(val)
@@ -109,18 +98,7 @@ module Importers
         end
       end
 
-          def dep_#{num}_ssn=(val)
-            if val.blank?
-              @dep_#{num}_ssn = nil
-            else
-              stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
-              if (stripped_value == "000000000")
-                @dep_#{num}_ssn = nil
-              else
-                @dep_#{num}_ssn = stripped_value
-              end
-            end
-          end
+      include ValueParsers::SsnParser.on(:dep_#{num}_ssn)
 
           def dep_#{num}_gender=(val)
             if val.blank?
@@ -231,19 +209,6 @@ module Importers
         (1..8).to_a.map do |idx|
           map_dependent(idx)
         end.compact
-      end
-
-      def fein=(val)
-        if val.blank?
-          @fein = nil
-        else
-          stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")
-          if (stripped_value == "000000000")
-            @fein = nil
-          else
-            @fein = stripped_value
-          end                                                                                                 
-        end
       end
 
       def validate_fein

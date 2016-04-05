@@ -29,18 +29,7 @@ module Importers
       @warnings = ActiveModel::Errors.new(self)
     end
 
-    def fein=(val)
-      if val.blank?               
-        @fein = nil
-      else                                              
-        stripped_value = val.strip.gsub(/\D/, "").rjust(9, "0")       
-        if (stripped_value == "000000000")                                      
-          @fein = nil
-        else
-          @fein = stripped_value
-        end
-      end 
-    end
+    include ValueParsers::SsnParser.on(:fein)
 
     def plan_selection=(val)
       @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
