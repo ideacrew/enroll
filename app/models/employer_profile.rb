@@ -592,11 +592,11 @@ class EmployerProfile
   end
 
   def is_new_employer?
-    TimeKeeper.date_of_record.day > 10 && !renewing_plan_year.present?
+    !renewing_plan_year.present? #&& TimeKeeper.date_of_record > 10
   end
 
   def is_renewing_employer?
-    TimeKeeper.date_of_record.day > 13 && renewing_plan_year.present?
+     renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
   end
 
   def has_next_month_plan_year?
