@@ -61,6 +61,12 @@ describe "shared/_comparison.html.erb" do
     it "should not have copay text" do
       expect(rendered).not_to have_selector('th', text: 'CO-PAY')
     end
+
+    it "should not have download link" do
+      expect(rendered).not_to have_selector('a', text: 'Download')
+      expect(rendered).not_to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=dental"]', text: "Download")
+    end
+
   end
 
   context "with no rx_formulary_url and provider urls for coverage_kind = health" do
@@ -90,6 +96,7 @@ describe "shared/_comparison.html.erb" do
 
     it "should have download link" do
       expect(rendered).to have_selector('a', text: 'Download')
+      expect(rendered).to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=health"]', text: "Download")
     end
 
     it "should not have Out of Network text" do
