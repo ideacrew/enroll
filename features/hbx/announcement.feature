@@ -8,7 +8,15 @@ Feature: Hbx staff create announcements for consumer role
     When Hbx admin enter announcement info
     Then Hbx admin should see the current announcement
     Then Hbx admin logs out
+
+  Scenario: Consumer see announcement for consumer role
+    Given Announcement prepared for Consumer role
     Given Consumer role exists
     When Consumer login 
     Then Consumer should see announcement
 
+  Scenario: Employer do not see announcement for consumer role
+    Given Announcement prepared for Consumer role
+    Given Employer role exists
+    When Employer login 
+    Then Employer should not see announcement
