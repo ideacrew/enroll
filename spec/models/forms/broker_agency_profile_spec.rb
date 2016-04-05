@@ -184,6 +184,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
       expect(organization).to be_truthy
       expect(organization.broker_agency_profile).to be_truthy
       expect(organization.broker_agency_profile.primary_broker_role).to eq(person.broker_role)
+      expect(person.broker_role.market_kind).to eq(attributes[:market_kind])
       expect(person.broker_role.broker_agency_profile).to eq(organization.broker_agency_profile)
     end
   end
