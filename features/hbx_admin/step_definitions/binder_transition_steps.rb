@@ -24,15 +24,13 @@ Given(/^the HBX admin is logged in$/) do
 end
 
 Given(/^the HBX admin visits the Dashboard page$/) do
-  # pending # Write code here that turns the phrase above into concrete actions
   visit exchanges_hbx_profiles_root_path
-  find('.interaction-click-control-binder').click
-  expect(page).to have_content('Employers who are eligible for binder paid')
+  page.find('.interaction-click-control-binder').click
+  page.find(".title-inline").should have_content("Employers who are eligible for binder paid")
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
-  # pending # Write code here that turns the phrase above into concrete actions
-  binding.pry
+  page.check("checkall")
   sleep(5)
   expect(false).to be_truthy
 end
