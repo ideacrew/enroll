@@ -237,6 +237,14 @@ class User
     has_role?(:csr) || has_role?(:assister)
   end
 
+  def can_change_broker?
+    if has_employer_staff_role? || has_hbx_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+      true
+    elsif has_general_agency_staff_role?
+      false
+    end
+  end
+
   def agent_title
     if has_agent_role?
       if has_role?(:assister)

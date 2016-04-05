@@ -24,7 +24,7 @@
               <%= link_to general_agency_profile.legal_name, general_agencies_profile_path(general_agency_profile) %>
               <% if @broker_role.present? %>
                 <%= link_to favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
-                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true"></span>
+                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title="favorite General Agency will list on top of other General Agency on assignment page"></span>
                 <% end %>
               <% end %>
             </td>

@@ -53,11 +53,15 @@
                   <td><%= er.published_plan_year.try(:effective_date) %>
                   <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
                 <% if controller_name == 'profiles' %>
+                  <%- if er.active_broker_agency_account.present? %>
                   <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
                   <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.active_broker) %>
                   <td>
                     <%= link_to er.active_broker.full_name, edit_path, class: "interaction-click-control-broker-show", method: :get %>
                   </td>
+                  <% else %>
+                    <td></td>
+                  <% end %>
                 <% else %>
                   <%- if er.active_broker_agency_account.present? %>
                     <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
@@ -79,13 +83,13 @@
           </tbody>
         </table>
 
-          <%= render 'shared/alph_paginate_remote', url: employers_employer_profiles_path, alphs: @page_alphabets, url_params: {broker_agency_id: @broker_agency_profile.try(:id)} %>
+          <%= render 'shared/alph_paginate_remote', url: employers_broker_agencies_profiles_path, alphs: @page_alphabets, url_params: {id: @broker_agency_profile.try(:id)} %>
         </div>
       </div>
       <div class="col-md-4">
         <h3>General Agencies</h3>
-        <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: true %>
-        <%= submit_tag "Assign", class: 'btn btn-primary' %>
+        <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
+        <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
       </div>
     <% end %>
     </div>

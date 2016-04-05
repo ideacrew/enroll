@@ -1,0 +1,21 @@
+$(document).on('page:update', function() {
+  $('[data-toggle="tooltip"]').tooltip();
+
+  $('#general_agency_id').on('change', function() {
+    check_allow_assign();
+  });
+
+  $("input[name='employer_ids[]']").on('change', function() {
+    check_allow_assign();
+  });
+});
+
+function check_allow_assign() {
+  var allow_assign = ($('#general_agency_id').val() != undefined && $('#general_agency_id').val() != "") && $("[name='employer_ids[]']").is(':checked');
+
+  if (allow_assign){
+    $('#assign_general_agency').removeAttr("disabled");
+  }else{
+    $('#assign_general_agency').attr("disabled","disabled");
+  }
+}
