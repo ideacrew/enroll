@@ -42,6 +42,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
+      assign(:person, person)
       allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return false
       family = person.primary_family
@@ -90,6 +91,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     before :each do
       sign_in(user)
       allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+      assign(:person, person)
       assign(:plan_hsa_status, plan_hsa_status)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
@@ -141,6 +143,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     before :each do
       sign_in(user)
       allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+      assign(:person, person)
       assign(:plan_hsa_status, plan_hsa_status)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
@@ -163,6 +166,7 @@ context "with tax household and eligibility determination of csr_94" do
   before :each do
     sign_in(user)
     allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+    assign(:person, person)
     assign(:plan_hsa_status, plan_hsa_status)
     assign(:hbx_enrollment, hbx_enrollment)
     assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
@@ -186,6 +190,7 @@ context "with tax household and eligibility determination of csr_94" do
     before :each do
       sign_in(user)
       allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+      assign(:person, person)
       assign(:plan_hsa_status, plan_hsa_status)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
