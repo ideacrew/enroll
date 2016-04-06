@@ -638,7 +638,15 @@ class HbxEnrollment
     elsif employee_role.is_eligible_to_enroll_as_new_hire_on?(TimeKeeper.date_of_record)
       new_hire_effective_date = employee_role.coverage_effective_on
     else
-      open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+      plan_year = employee_role.employer_profile.show_plan_year
+
+      if employee_role.employer_profile.profile_source.to_s == 'conversion'
+        if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
+          plan_year = renewing_plan_year
+        end
+      end
+      
+      open_enrollment_effective_date = plan_year.start_on
 
       if open_enrollment_effective_date < employee_role.coverage_effective_on
         new_hire_enrollment_period = employee_role.benefit_group.new_hire_enrollment_period(employee_role.new_census_employee.hired_on)
@@ -650,7 +658,7 @@ class HbxEnrollment
 
     effective_date = qle_effective_date || new_hire_effective_date || open_enrollment_effective_date
 
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(effective_date)
     if plan_year.blank?
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
@@ -792,7 +800,9 @@ class HbxEnrollment
     end
   end
 
-  def self.find_shop_and_health_by_benefit_group_assignment_id(benefit_group_assignment_id)
+  def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
+    return [] if benefit_group_assignment.blank?
+    benefit_group_assignment_id = benefit_group_assignment.id
     return [] if benefit_group_assignment_id.blank?
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
 
@@ -1052,7 +1062,7 @@ class HbxEnrollment
   private 
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_for_coverage_effective_date(coverage_effective_date)
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else

@@ -61,9 +61,20 @@ class CensusEmployee < CensusMember
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
 
   #TODO - need to add fix for multiple plan years
-  scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
-  scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
-  scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+  # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
+  # scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
+  # scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+
+  scope :covered,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
+    })}
+
+  scope :waived,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
+    })}
+
+  scope :enrolled, -> { any_of([covered.selector, waived.selector]) }
+
 
   scope :employee_name, -> (employee_name) { any_of({first_name: /#{employee_name}/i}, {last_name: /#{employee_name}/i}, first_name: /#{employee_name.split[0]}/i, last_name: /#{employee_name.split[1]}/i) }
 
@@ -331,7 +342,7 @@ class CensusEmployee < CensusMember
   end
 
   def has_active_health_coverage?
-    HbxEnrollment.find_shop_and_health_by_benefit_group_assignment_id(active_benefit_group_assignment.id).present?
+    HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).present?
   end
 
   class << self

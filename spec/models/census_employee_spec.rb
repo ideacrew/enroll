@@ -797,12 +797,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return false without hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment_id).and_return []
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
         expect(census_employee.has_active_health_coverage?).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment_id).and_return [hbx_enrollment]
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
         expect(census_employee.has_active_health_coverage?).to be_truthy
       end
     end

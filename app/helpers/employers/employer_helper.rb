@@ -26,7 +26,7 @@ module Employers::EmployerHelper
     return "" if census_employee.blank? || census_employee.employee_role.blank?
     enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)
     if enrolled.present? && enrolled != "initialized"
-      begin 
+      begin
         #kind = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.uniq.join(", ")
         kind = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind).sort.reverse.join(", ")
       rescue
@@ -34,16 +34,16 @@ module Employers::EmployerHelper
       end
     else
       kind = ""
-    end  
+    end
     return kind.titleize
-  end  
+  end
 
   def render_plan_offerings(benefit_group, coverage_type)
     reference_plan = benefit_group.reference_plan
-    if coverage_type == ".dental" && benefit_group.single_plan_type?
+    if coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
       "#{plan_count} Plans"
-    elsif coverage_type == ".dental" && benefit_group.plan_option_kind == "single_carrier"
+    elsif coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_carrier"
       plan_count = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
       "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
     else

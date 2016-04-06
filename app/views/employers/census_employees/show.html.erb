@@ -32,17 +32,23 @@
     <div class="row">
       <% if !@hbx_enrollments.blank? %>
       <% @hbx_enrollments.each do |enrollment|%>
+        <% next if @hbx_enrollments.any? do |other_enrollment|
+            other_enrollment.coverage_kind == enrollment.coverage_kind &&
+            other_enrollment.effective_on.year == enrollment.effective_on.year &&
+            other_enrollment.benefit_group_id == enrollment.benefit_group_id &&
+            other_enrollment.id != enrollment.id
+           end %>
         <div class="col-xs-6">
           <h4><%= enrollment.coverage_kind.capitalize %> Plan</h4>
           <div class="form-border">
             <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
-            <% if @benefit_group_assignment.try(:coverage_waived?) %>
+            <% if enrollment.waiver_reason? %>
               <p>Enrollment Status: Coverage Waived</p>
-              <p>Waiver Reason: <%= enrollment.try(:waiver_reason) %></p>
-            <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
+              <p>Waiver Reason: <%= enrollment.waiver_reason %></p>
+            <% else %>
               <p>Plan Name: <%= enrollment.try(:plan).try(:name) %></p>
               <p>Plan Start: <%= enrollment.try(:effective_on) %></p>
-            <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
+            <% if @census_employee.employee_role.present? and employee_role = @census_employee.employee_role %>
               <p>Hired: <%= @census_employee.employee_role.try(:hired_on) %></p>
               <p>Eligible For Coverage: <em><%= @census_employee.employee_role.try(:effective_on) %></em></p>
             <% end %>
@@ -67,9 +73,15 @@
                         <td><%= member.person.full_name %></td>
                         <td><%= member.primary_relationship %></td>
                         <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-                        <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-                        <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-                        <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                        <% if @plan.is_a? OpenStruct %>
+                          <td><%= number_to_currency(@plan.total_premium) %></td>
+                          <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+                          <td><%= number_to_currency(@plan.total_employee_cost) %></td>
+                        <% else %>
+                          <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                          <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+                          <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                        <% end %>
                       </tr>
                     <% end %>
                     <tr class="gray-row">

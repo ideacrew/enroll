@@ -518,7 +518,7 @@ module ApplicationHelper
 
   def display_dental_metal_level(plan)
     return plan.metal_level.humanize if plan.coverage_kind == "health"
-    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize)
+    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
 end
