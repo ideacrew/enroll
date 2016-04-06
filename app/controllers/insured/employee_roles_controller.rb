@@ -29,7 +29,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { render 'no_match' }
         end
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
         respond_to do |format|
           format.html { render 'match' }
         end

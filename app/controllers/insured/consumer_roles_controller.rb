@@ -67,7 +67,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
             if @employee_candidate.valid?
               found_census_employees = @employee_candidate.match_census_employees
-              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
               if @employment_relationships.present?
                 format.html { render 'insured/employee_roles/match' }
               end
