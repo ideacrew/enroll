@@ -93,6 +93,90 @@ class HbxProfile
     def current_hbx
       find_by_state_abbreviation("DC")
     end
+
+    ###
+    def build_grid_values_for_aptc_csr(family)
+        months_array = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+        plan_premium_vals         = build_plan_premium_values(family, months_array)
+        aptc_applied_vals         = build_aptc_applied_values(family, months_array)
+        avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array)
+        max_aptc_vals             = build_max_aptc_values(family, months_array)
+        csr_percentage_vals       = build_csr_percentage_values(family, months_array)
+        slcsp_values              = build_slcsp_values(family, months_array)
+        individuals_covered_vals  = build_individuals_covered_array(family, months_array)
+
+        return { "plan_premium"   => plan_premium_vals,
+                 "aptc_applied"   => aptc_applied_vals,
+                 "avalaible_aptc" => avalaible_aptc_vals,
+                 "max_aptc"       => max_aptc_vals,
+                 "csr_percentage" => csr_percentage_vals,
+                 "slcsp"          => slcsp_values, 
+                 "individuals_covered" => individuals_covered_vals
+                }
+    end
+
+    def build_plan_premium_values(family, months_array)
+      plan_premium_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        plan_premium_hash.store(month, 600)
+      end
+      return plan_premium_hash
+    end
+
+    def build_aptc_applied_values(family, months_array)
+      aptc_applied_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        aptc_applied_hash.store(month, 500)
+      end
+      return aptc_applied_hash
+    end
+
+    def build_avalaible_aptc_values(family, months_array)
+      avalaible_aptc_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        avalaible_aptc_hash.store(month, 400)
+      end
+      return avalaible_aptc_hash
+    end
+
+    def build_max_aptc_values(family, months_array)
+      max_aptc_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        max_aptc_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.max_aptc.fractional)
+      end
+      return max_aptc_hash
+    end
+
+    def build_csr_percentage_values(family, months_array)
+      csr_percentage_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        csr_percentage_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.csr_eligibility_kind.split('_')[1] + " %")
+      end
+      return csr_percentage_hash
+    end
+
+    def build_slcsp_values(family, months_array)
+      slcsp_hash = Hash.new
+      months_array.each_with_index do |month, ind|
+        slcsp_hash.store(month, 100)
+      end
+      return slcsp_hash
+    end
+
+    def build_individuals_covered_array(family, months_array)
+      individuals_covered_array = Array.new
+      family.family_members.each_with_index do |one_member, index|
+          hash_temp = Hash.new
+          #hash_temp.store("name", one_member.person.full_name)
+            months_array.each_with_index do |month, ind|
+              hash_temp.store(month, true)
+            end  
+          individuals_covered_array << {one_member.person.full_name => hash_temp}
+      end
+      return individuals_covered_array
+    end
+    ###
+
   end
 
   ## Application-level caching

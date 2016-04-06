@@ -235,6 +235,86 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def aptc_csr_family_index
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:families_page)[:families_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    unless @q.present?
+      #binding.pry
+      @families = Family.where(:'households.tax_households' => {:$exists => true}).page page_no
+      @total = Family.where(:'households.tax_households' => {:$exists => true}).count
+    else
+      #binding.pry
+      # TODO : Filter Families (pull only with tax_households) when searching.
+      total_families = Person.search(@q).map(&:families).flatten.uniq
+      @total = total_families.count
+      @families = Kaminari.paginate_array(total_families).page page_no
+    end
+    respond_to do |format|
+      format.html { render "insured/families/aptc_csr_listing1" }
+      format.js {}
+    end
+  end
+
+  # Enrollments for APTC / CSR
+  def aptc_csr_family_index
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:families_page)[:families_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    unless @q.present?
+      @families = Family.all_tax_households.page page_no
+      @total = Family.all_tax_households.count
+    else
+      person_ids = Person.search(@q).map(&:_id)
+      total_families = Family.all_tax_households.in("family_members.person_id" => person_ids).entries
+      @total = total_families.count
+      @families = Kaminari.paginate_array(total_families).page page_no
+    end
+    respond_to do |format|
+      format.html { render "insured/families/aptc_csr_listing" }
+      format.js {}
+    end
+  end
+
+  def edit_aptc_csr
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    #binding.pry
+    @person = Person.find(params[:person_id])
+    @family = Family.find(params[:family_id])
+    @grid_vals = HbxProfile.build_grid_values_for_aptc_csr(@family)
+    #@apt_csr_header_list = ['Plan Premium','APTC Applied','Available APTC','Max APTC','CSR Percentage','SLCSP','Individuals Covered']
+    #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
+    respond_to do |format|
+      format.js { render "edit_aptc_csr", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
+    end
+  end
+
+  def update_aptc_csr
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
+    #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
+    #@alert_premium_when_dob_change = @person_has_active_enrollment && ( @person.dob !=  Date.parse(params[:person][:dob]) )
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+
+    if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
+      @dont_allow_change = true
+    else
+      begin
+        @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+      rescue Exception => e
+        @error_on_save = "SSN must be 9 digits long."
+      end
+      @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
+    end
+    respond_to do |format|
+      format.js { render "edit_aptc_csr", person: @person } if @error_on_save
+      format.js { render "update_aptc_csr", person: @person}
+    end
+  end
+  
+
 private
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?

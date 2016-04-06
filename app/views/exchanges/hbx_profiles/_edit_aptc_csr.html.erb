@@ -1,0 +1,65 @@
+<div class="container bottom-pd">
+  
+  <div class="row">
+    <h4 class="title-inline">Editing APTC / CSR for:</h4>
+  </div>
+  
+  <div>
+    <table class="table table-border">
+      <thead>
+        <th>HBX ID</th>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>SSN</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%=@person.hbx_id%></tb>
+          <td><%=@person.first_name%> <%=@person.last_name%></td>
+          <td><%=@person.dob%></td>
+          <td><%=@person.ssn%></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row input-no-pd">
+    <%= form_for @person, remote: true, url: update_aptc_csr_path, method: "post", class: "form" do |f|%>
+      <table class="table table-border">
+        
+        <thead>
+          <th>Month (2016)</th>
+          <% @grid_vals.first[1].each do |key, val| %>
+            <th><%=key.capitalize%></th>
+          <%end%>
+        </thead>
+        
+        <tbody>
+            <%@grid_vals.keys.each do |key_hdr|%>
+              <tr>
+                <td><%=key_hdr.titleize.upcase%></td>
+                <% @grid_vals[key_hdr].each do |key, val| %> 
+                  <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: !['max_aptc', 'csr_percentage'].include?(key_hdr) if key_hdr != "individuals_covered"%>   </td> 
+                <%end%>
+              </tr>
+            <%end%>
+
+            <%#binding.pry%>            
+            <% @grid_vals["individuals_covered"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
+              <tr>
+                <td><%=one_ind.keys.first%></td>
+                  <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
+                    <td><%=val%></td>
+                  <%end%>
+              </tr>
+            <%end%>
+              
+              
+              <tr>
+              </tr>
+        </tbody>
+      
+      </table>
+    <% end %>
+  </div>
+</div>
