@@ -30,14 +30,16 @@ Given(/^the HBX admin visits the Dashboard page$/) do
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
-  page.check("checkall")
-  sleep(5)
-  expect(false).to be_truthy
+  # page.check("checkall")
+  # page.find("input#checkall").trigger "click"
+  page.find("#employer_profile_id_#{employer.employer_profile.id.to_s}").click
+  sleep(1)
+  click_button "Binder Paid"
 end
 
 Then(/^the HBX admin sees a checklist$/) do |checklist|
   # table is a Cucumber::Core::Ast::DataTable
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(false).to be_truthy
 end
 
 Given(/^the employer meets requirements$/) do
