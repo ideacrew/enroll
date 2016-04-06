@@ -74,8 +74,8 @@
         </div>
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
-          <% if current_user.person.primary_family.active_household.latest_active_tax_household.present? %>
-            <% eligibility_kind = current_user.person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind %>
+          <% if @person.primary_family.active_household.latest_active_tax_household.present? %>
+            <% eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind %>
             <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
               <%= link_to "Select Plan", "javascript:void(0)", class: 'btn btn-trans pull-right btn-right', data: {'toggle': 'modal', 'target': '#csrEligibleReminder'} %> &nbsp;
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
