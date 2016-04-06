@@ -34,7 +34,7 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
     end
 
     it "indicates employee roles"  do
-      allow(family1.primary_applicant.person).to receive(:employee_roles).and_return(true)
+      allow(family1.primary_applicant.person).to receive(:active_employee_roles).and_return(true)
       render partial: 'insured/families/families_table_for_hbx_staff', :collection => [[family1]] , as: :families
       expect(rendered).not_to match /<td>1.+<td>No.+<td>No.+<td>No/m
       expect(rendered).to match /<td>1.+<td>No.+<td>No.+<td>Yes/m
@@ -42,7 +42,7 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
 
     it "indicates both consumer role and employee roles"  do    
       allow(family1.primary_applicant.person).to receive(:consumer_role).and_return(true)
-      allow(family1.primary_applicant.person).to receive(:employee_roles).and_return(true)
+      allow(family1.primary_applicant.person).to receive(:active_employee_roles).and_return(true)
       render partial: 'insured/families/families_table_for_hbx_staff', :collection => [[family1]] , as: :families
       expect(rendered).not_to match /<td>1.+<td>No.+<td>No.+<td>No/m
       expect(rendered).to match /<td>1.+<td>No.+<td>Yes.+<td>Yes/m

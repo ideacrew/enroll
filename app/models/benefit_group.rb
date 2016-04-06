@@ -274,29 +274,6 @@ class BenefitGroup
     end
   end
 
-  def new_hire_effective_on(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      date_of_hire
-    when "first_of_month"
-      eligible_on(date_of_hire)
-    end
-  end
-
-  def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
-    new_hire_effective_date = new_hire_effective_on(date_of_hire)
-
-    lower_limit = (new_hire_effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
-    upper_limit = (new_hire_effective_date + Settings.aca.shop_market.latest_enroll_after_effective_on.days)
-
-    # Length of time that EE may enroll following correction to Census Employee Identifying info
-    if date_of_roster_entry && (date_of_roster_entry > new_hire_effective_date)
-      date_of_roster_entry..(date_of_roster_entry + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
-    else
-      lower_limit..upper_limit
-    end
-  end
-
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
@@ -444,6 +421,18 @@ class BenefitGroup
     end
   end
 
+  def eligible_on(date_of_hire)
+    if effective_on_kind == "date_of_hire"
+      date_of_hire
+    else
+      if (date_of_hire + effective_on_offset.days).day == 1
+        (date_of_hire + effective_on_offset.days)
+      else
+        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+      end
+    end
+  end
+
 private
 
   def set_congress_defaults
@@ -467,15 +456,6 @@ private
 
   def date_of_hire_effective_on_for(date_of_hire)
     [plan_year.start_on, date_of_hire].max
-  end
-
-  def eligible_on(date_of_hire)
-    if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire
-    else
-      doh_with_offset = date_of_hire + effective_on_offset.days
-      doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month
-    end
   end
 
   def first_of_month_effective_on_for(date_of_hire)

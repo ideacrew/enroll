@@ -67,7 +67,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
             if @employee_candidate.valid?
               found_census_employees = @employee_candidate.match_census_employees
-              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
               if @employment_relationships.present?
                 format.html { render 'insured/employee_roles/match' }
               end
@@ -95,6 +95,12 @@ class Insured::ConsumerRolesController < ApplicationController
         format.html { render 'search' }
       end
     end
+  end
+
+  def build
+    set_current_person(required: false)
+    build_person_params
+    render 'match'
   end
 
   def create
@@ -262,5 +268,16 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       return message
     end
+  end
+
+  def build_person_params
+   @person_params = {:ssn =>  Person.decrypt_ssn(@person.encrypted_ssn)}
+   
+    %w(first_name middle_name last_name gender).each do |field|
+      @person_params[field] = @person.attributes[field]
+    end
+
+    @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
+    @person_params.merge!({user_id: current_user.id})
   end
 end

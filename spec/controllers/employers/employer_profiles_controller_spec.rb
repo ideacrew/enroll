@@ -116,6 +116,12 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:current_plan_year)).to eq employer_profile.active_plan_year
     end
 
+    it "should get invoice when tab invoice selected" do
+      get :show, id: employer_profile.id , tab: "invoice"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("show")
+    end
+    
     it "should get default status" do
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:status)).to eq "active"
