@@ -29,7 +29,7 @@ module Importers
       @warnings = ActiveModel::Errors.new(self)
     end
 
-    include ValueParsers::SsnParser.on(:fein)
+    include ValueParsers::OptimisticSsnParser.on(:fein)
 
     def plan_selection=(val)
       @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
