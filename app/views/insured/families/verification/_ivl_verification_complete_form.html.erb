@@ -20,6 +20,6 @@
       </div>
     </div>
     <!-- >>>>>> admin comment form -->
-
-
+<% else %>
+    <%= link_to "Complete verification for #{person.first_name}", "#", class:"btn btn-success btn-xs" %>
 <% end %>
