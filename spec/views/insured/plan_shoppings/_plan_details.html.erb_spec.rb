@@ -205,7 +205,7 @@ context "with tax household and eligibility determination of csr_94" do
     end
 
     it "should not have hidden modal for csr elibility reminder" do
-      expect(rendered).to_not have_css("#csrEligibleReminder")
+      expect(rendered).to_not have_css("#csrEligibleReminder-#{plan.id}")
     end
   end
 
