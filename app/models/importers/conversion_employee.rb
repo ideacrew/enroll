@@ -37,7 +37,7 @@ module Importers
           "dep_#{num}_state".to_sym
       end
 
-      include ValueParsers::SsnParser.on(:subscriber_ssn, :fein)
+      include ValueParsers::OptimisticSsnParser.on(:subscriber_ssn, :fein)
 
       validate :validate_fein
       validates_length_of :fein, is: 9
@@ -98,7 +98,7 @@ module Importers
         end
       end
 
-      include ValueParsers::SsnParser.on(:dep_#{num}_ssn)
+      include ValueParsers::OptimisticSsnParser.on(:dep_#{num}_ssn)
 
           def dep_#{num}_gender=(val)
             if val.blank?

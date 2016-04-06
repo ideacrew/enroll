@@ -43,7 +43,7 @@ module Importers
       @warnings = ActiveModel::Errors.new(self)
     end
     
-    include ValueParsers::SsnParser.on(:fein)
+    include ValueParsers::OptimisticSsnParser.on(:fein)
 
     def broker_npn=(val)
       @broker_npn = Maybe.new(val).strip.extract_value
