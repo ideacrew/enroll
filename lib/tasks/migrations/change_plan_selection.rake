@@ -1,4 +1,4 @@
-namespace :update_shop do
+namespace :migrations do
   desc "Change plan year plan selection for employer"
   task :change_plan_selection => :environment do
     plan_year = Organization.where(:legal_name => /The Arab Gulf States/i).first.employer_profile.active_plan_year
