@@ -10,7 +10,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   let(:plan) do
     double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
       nationwide: "true", total_employee_cost: 100, deductible: 500,
-      name: "My Plan", id: "my id", carrier_profile: nil,
+      name: "My Plan", id: "991283912392", carrier_profile: nil,
       hios_id: "hios id", carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
       total_employer_contribution: 200,
@@ -181,7 +181,7 @@ context "with tax household and eligibility determination of csr_94" do
     end
 
     it "should have hidden modal for csr elibility reminder" do
-      # expect(rendered).to have_css("#csrEligibleReminder", :visible => false)
+      expect(rendered).to have_css("#csrEligibleReminder-#{plan.id}", :visible => false)
     end
   end
 
