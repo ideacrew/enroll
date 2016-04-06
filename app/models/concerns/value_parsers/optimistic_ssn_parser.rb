@@ -1,10 +1,13 @@
 module ValueParsers
-  class SsnParser
-
+  # NOTE: This class is designed for optimistic parsing.  Given a value it
+  #       assumes that it most likely contains an SSN.  This is useful for
+  #       cases such as importing spreadsheets - but *DO NOT* use this in
+  #       models which validate user input.
+  class OptimisticSsnParser
     def self.on(*method_names)
       new_mod = Module.new do 
         def self.included(klass)
-          ::ValueParsers::SsnParser.define_ssn_parse_method(klass)
+          ::ValueParsers::OptimisticSsnParser.define_ssn_parse_method(klass)
         end
       end
       method_names.each do |method_name|
@@ -31,6 +34,5 @@ module ValueParsers
         end
       end
     end
-
   end
 end

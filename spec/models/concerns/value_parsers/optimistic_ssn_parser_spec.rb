@@ -2,10 +2,10 @@ require "rails_helper"
 
 class MyTestIncludedSsnParserClass
   attr_reader :ssn
-  include ValueParsers::SsnParser.on(:ssn)
+  include ValueParsers::OptimisticSsnParser.on(:ssn)
 end
 
-describe ValueParsers::SsnParser do
+describe ValueParsers::OptimisticSsnParser do
   TEST_VALUES = {
     nil => nil,
     "" => nil,
