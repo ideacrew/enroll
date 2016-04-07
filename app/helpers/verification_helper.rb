@@ -80,4 +80,12 @@ module VerificationHelper
       "FedHub fail"
     end
   end
+
+  def show_send_button_for_consumer?(person)
+    current_user.has_consumer_role? && hbx_enrollment_incomplete && documents_uploaded(person)
+  end
+
+  def hbx_enrollment_incomplete
+    @person.primary_family.active_household.hbx_enrollments.empty? || @person.primary_family.try(:active_household).try(:hbx_enrollments).try(:first).try(:review_status) == "incomplete"
+  end
 end
