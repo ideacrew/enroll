@@ -32,8 +32,8 @@ module BradysAfterAll
 
     def mikes_age; 40; end
     def carols_age; 35; end
-    def gregs_age; 17; end
-    def marcias_age; 16; end
+    def gregs_age; 16; end
+    def marcias_age; 15; end
     def peters_age; 14; end
     def jans_age; 12; end
     def bobbys_age; 8; end

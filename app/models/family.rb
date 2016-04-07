@@ -112,7 +112,7 @@ class Family
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
   scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
-  
+
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
@@ -177,6 +177,7 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
+
   end
 
   def primary_family_member
@@ -492,6 +493,10 @@ class Family
     latest_household.try(:enrolled_hbx_enrollments)
   end
 
+  def enrolled_including_waived_hbx_enrollments
+    latest_household.try(:enrolled_including_waived_hbx_enrollments)
+  end
+
   def save_relevant_coverage_households
     households.each do |household|
       household.coverage_households.each{|hh| hh.save }
@@ -507,7 +512,7 @@ class Family
     #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
     eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
 
-    if eligibility_determinations.present? and has_aptc_hbx_enrollment?
+    if eligibility_determinations.present? && has_aptc_hbx_enrollment?
       self.set(status: "aptc_block")
     end
   end
@@ -523,7 +528,7 @@ class Family
     return true if status == "aptc_block"
 
     #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    #if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
+    #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
     #  true
     #else
     #  false
@@ -532,6 +537,38 @@ class Family
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)
     Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
+  end
+
+  def enrollments_for_display
+    Family.collection.aggregate([
+      {"$match" => {'_id' => self._id}},
+      {"$unwind" => '$households'},
+      {"$unwind" => '$households.hbx_enrollments'},
+      {"$match" => {"aasm_state" => {"$ne" => 'inactive'} }},
+      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
+      {"$group" => {'_id' => {
+                  'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
+                  'month' => { "$month" => '$households.hbx_enrollments.effective_on'},
+                  'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
+                  'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
+                  'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
+                  'state' => '$households.hbx_enrollments.aasm_state', 'market' => '$households.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
+      ],
+      :allow_disk_use => true)
+  end
+
+  def waivers_for_display
+    self.collection.aggregate([
+      {"$match" => {'_id' => self._id}},
+      {"$unwind" => '$households'},
+      {"$unwind" => '$households.hbx_enrollments'},
+      {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
+      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
+      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},'state' => '$households.hbx_enrollments.aasm_state', 'kind' => '$households.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
+      ],
+      :allow_disk_use => true)
   end
 
 private

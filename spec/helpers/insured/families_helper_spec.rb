@@ -14,6 +14,24 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
+  describe "#render_plan_type_details" do
+    let(:dental_plan_2015){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2015, metal_level: "dental")}
+    let(:dental_plan_2016){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2016, metal_level: "dental", dental_level: "high")}
+    let(:health_plan_2016){FactoryGirl.create(:plan_template,:shop_health, active_year: 2016, metal_level: "silver")}
+
+    it "should return dental plan with dental_level = high for 2016 plan" do
+      expect(helper.render_plan_type_details(dental_plan_2016)).to eq "<label><span class=\"dental-icon\">High</span></label>"
+    end
+
+    it "should return dental plan with metal_level = dental for 2015 plan" do
+      expect(helper.render_plan_type_details(dental_plan_2015)).to eq "<label><span class=\"dental-icon\">Dental</span></label>"
+    end
+
+    it "should return health plan with metal_level = bronze" do
+      expect(helper.render_plan_type_details(health_plan_2016)).to eq "<label><span class=\"silver-icon\">Silver</span></label>"
+    end
+  end
+
   describe "#show_employer_panel" do
     let(:person) {FactoryGirl.build(:person)}
     let(:employee_role) {FactoryGirl.build(:employee_role)}
@@ -54,6 +72,14 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
           expect(helper.newhire_enrollment_eligible?(employee_role)).to eq true
         end
       end
+    end
+  end
+
+  describe "has_writing_agent?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+
+    it "should return false" do
+      expect(helper.has_writing_agent?(employee_role)).to eq false
     end
   end
 end

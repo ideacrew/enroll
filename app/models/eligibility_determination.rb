@@ -26,8 +26,8 @@ class EligibilityDetermination
   field :max_aptc, type: Money, default: 0.00
   field :premium_credit_strategy_kind, type: String
 
-  # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising 
-  #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan) 
+  # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising
+  #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan)
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: "csr_100"
@@ -97,7 +97,7 @@ class EligibilityDetermination
 
   def self.find(id)
     family = Family.where(:"households.tax_households.eligibility_determinations._id" => id).first
-# binding.pry
+
     if family.present?
       ed = family.households.flat_map() do |household|
         household.tax_households.flat_map() do |tax_household|

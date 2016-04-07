@@ -3,7 +3,7 @@
     <%= render 'help_signup' %>
   <% end %>
     <div class="brokers-widget">
-      <% if @person.has_active_employee_role? %>
+      <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
         <%= render 'employee_brokers_widget' %>
       <% elsif @person.has_consumer_role? %>
       <%= render 'consumer_brokers_widget' %>

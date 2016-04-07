@@ -450,7 +450,7 @@ describe EmployeeRole, dbclean: :after_each do
     white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
     py.benefit_groups = [blue, white]
     py.save
-    py.publish!
+    py.update_attributes(:aasm_state => 'published')
     py
   }
 

@@ -5,6 +5,8 @@ class CensusEmployeeImport
 
   attr_accessor :file, :employer_profile
 
+  validate :check_relationships
+
   TEMPLATE_DATE = Date.new(2015, 9, 6)
   TEMPLATE_VERSION = "1.0"
   TEMPLATE_DATE_CELL = 7
@@ -65,6 +67,18 @@ class CensusEmployeeImport
     raise ArgumentError, "Must provide an EmployerProfile" unless defined?(@employer_profile)
   end
 
+  def check_relationships
+    return true if (@sheet.nil? || @column_header_row.nil?)
+
+    (4..@sheet.last_row).each_with_index.map do |i, index|
+      row = Hash[[@column_header_row, @roster.row(i)].transpose]
+      record = parse_row(row)
+      if record[:employee_relationship].nil?
+         self.errors.add :base, "Row #{index + 4}: Relationship is required"
+      end
+    end
+  end
+
   def persisted?
     false
   end
@@ -80,30 +94,35 @@ class CensusEmployeeImport
 
   def load_imported_census_employees
     # file = 'spec/test_data/spreadsheet_templates/DCHL Employee Census.xlsx'
-    roster = Roo::Spreadsheet.open(@file.tempfile.path)
+    @roster = Roo::Spreadsheet.open(@file.tempfile.path)
 
-    @sheet = roster.sheet(0)
+    @sheet = @roster.sheet(0)
     @last_ee_member = {}
 
     # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references 
     # First three rows are header content
     sheet_header_row = @sheet.row(1)
-    column_header_row = @sheet.row(2)
+    @column_header_row = @sheet.row(2)
     # label_header_row  = @sheet.row(3)
 
-    unless header_valid?(sheet_header_row) && column_header_valid?(column_header_row)
+    unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
       raise "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
     end
 
     census_employees = []
-    (4..@sheet.last_row).map do |i|
-      row = Hash[[column_header_row, roster.row(i)].transpose]
+    (4..@sheet.last_row).each_with_index.map do |i, index|
+      row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
-      break if record[:employee_relationship].nil?
+
       if record[:termination_date].present?
         census_employee = terminate_employee(record)
       else
-        census_employee = add_or_update_census_member(record)
+        if record[:employee_relationship].nil?
+          self.errors.add :base, "Row #{index + 4}: Relationship is required"
+          break
+        else
+          census_employee = add_or_update_census_member(record)
+        end
       end
 
       census_employee ||= nil
@@ -303,7 +322,12 @@ class CensusEmployeeImport
   end
 
   def save
+
     if imported_census_employees.map(&:valid?).all?
+      if !self.valid?
+        return false
+      end
+
       imported_census_employees.each(&:save!)
       true
     else

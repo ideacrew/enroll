@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :orphans, only: [:index, :show, :destroy]
   end
 
-  resources :saml, only: :index do
+  resources :saml, only: [] do
     collection do
       post :login
       get :logout
@@ -126,6 +126,7 @@ Rails.application.routes.draw do
       get :search, on: :collection
       get :privacy, on: :collection
       post :match, on: :collection
+      post :build, on: :collection
       get :ridp_agreement, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
@@ -155,10 +156,17 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
+    post 'search', to: 'employers#search'
     root 'employer_profiles#new'
 
     resources :premium_statements, :only => [:show]
 
+    resources :employer_staff_roles, :only => [:create, :destroy] do
+      member do
+        get :approve
+      end
+    end
+    
     #TODO REFACTOR
     resources :people do
       collection do
@@ -182,6 +190,8 @@ Rails.application.routes.draw do
       end
       resources :plan_years do
         get 'reference_plans'
+        get 'dental_reference_plans'
+        get 'generate_dental_carriers_and_plans'
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
@@ -193,6 +203,8 @@ Rails.application.routes.draw do
         get 'calc_employer_contributions', on: :collection
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
+        get 'reference_plan_summary', on: :collection
+
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

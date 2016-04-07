@@ -8,7 +8,9 @@ describe "employers/premium_statements/show.js.erb" do
     instance_double(
       "HbxEnrollment",
       plan: new_plan,
+      coverage_kind: 'health',
       humanized_dependent_summary: "hds: #{random_value}",
+      humanized_members_summary: "hds: #{random_value}",
       total_employer_contribution: "total_employer_contribution:#{random_value}",
       total_employee_cost: "total_employee_cost:#{random_value}",
       total_premium: "total_premium:#{random_value}",
@@ -66,10 +68,10 @@ describe "employers/premium_statements/show.js.erb" do
     render file: "employers/premium_statements/show.js.erb"
   end
 
-  it "should display start on and end on dates of premium billing report" do
+  it "should display start on and end on dates of Enrollment Report" do
     expect(rendered).to match(/#{current_plan_year.start_on}/m)
     expect(rendered).to match(/#{current_plan_year.start_on.end_of_month}/m)
-    expect(rendered).to match(/.*Premium Billing Report.*#{current_plan_year.start_on}.*-.*#{current_plan_year.start_on.end_of_month}.*/m)
+    expect(rendered).to match(/.*Enrollment Report.*#{current_plan_year.start_on}.*-.*#{current_plan_year.start_on.end_of_month}.*/m)
   end
 
   it "should display billing report of a user" do
@@ -82,7 +84,7 @@ describe "employers/premium_statements/show.js.erb" do
       expect(rendered).to match(/#{format_date(census_employee.hired_on)}/)
       expect(rendered).to match(/#{benefit_group.title}/)
       expect(rendered).to match(/#{hbx_enrollment.plan.name}/)
-      expect(rendered).to match(/#{hbx_enrollment.humanized_dependent_summary}/)
+      expect(rendered).to match(/#{hbx_enrollment.humanized_members_summary}/)
       expect(rendered).to match(/#{hbx_enrollment.total_employer_contribution}/)
       expect(rendered).to match(/#{hbx_enrollment.total_employee_cost}/)
       expect(rendered).to match(/#{hbx_enrollment.total_premium}/)

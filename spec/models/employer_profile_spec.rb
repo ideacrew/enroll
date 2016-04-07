@@ -106,19 +106,22 @@ describe EmployerProfile, dbclean: :after_each do
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
     let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-    let(:min_non_owner_count )  { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum }
+    let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
 
     it "should initialize in applicant status" do
       expect(employer_profile.applicant?).to be_truthy
     end
 
     context "and employer submits a valid plan year application with tomorrow as start open enrollment" do
-      before do
-        TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
-        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
-        plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      before do        
+        plan_year = employer_profile.plan_years.first
         plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
+        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
+        plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 10.days
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
+
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month - 1)
+
         plan_year.publish!
       end
 
@@ -144,6 +147,125 @@ describe EmployerProfile, dbclean: :after_each do
 
       context "and employer is in ineligible or ineligible_appealing state" do
         it "what should be done?"
+      end
+    end
+  end
+
+  context ".show_plan_year" do
+    let(:active_plan_year)     { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active') }
+    let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [active_plan_year, renewing_plan_year]) }
+
+    let(:renewing_plan_year)   { 
+      FactoryGirl.build(:plan_year, 
+        open_enrollment_start_on: TimeKeeper.date_of_record - 1.day, 
+        open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
+        start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, 
+        end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, 
+        aasm_state: 'renewing_enrolling') 
+    }
+
+    context 'when renewing published plan year present' do
+     
+      it 'should return renewing published plan year' do
+        expect(employer_profile.show_plan_year).to eq renewing_plan_year
+      end
+    end
+
+    context 'when renewing published plan year not present' do
+
+      before do
+        employer_profile.plan_years = [active_plan_year] 
+      end
+
+      it 'should retrun active plan year' do 
+        expect(employer_profile.show_plan_year).to eq active_plan_year
+      end 
+    end
+
+    context 'when renewing and active plan year not present' do 
+
+      let(:published_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, aasm_state: 'published') }
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [published_plan_year]) }
+
+      it 'should return published plan year' do
+        expect(employer_profile.show_plan_year).to eq published_plan_year
+      end
+    end
+
+    context 'when employer did not publish plan year' do 
+
+      let(:draft_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, aasm_state: 'draft') }
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [draft_plan_year]) }
+
+      it 'should return nil' do
+        expect(employer_profile.show_plan_year).to be_nil
+      end
+    end
+
+  end
+
+  context ".billing_plan_year" do
+    let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
+    let(:employer_profile)    { EmployerProfile.new(**valid_params, plan_years: [active_plan_year, renewing_plan_year]) }
+    let(:renewing_plan_year)   { 
+      FactoryGirl.build(:plan_year, 
+        open_enrollment_start_on: TimeKeeper.date_of_record + 1.day, 
+        open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
+        start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, 
+        end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, 
+        aasm_state: 'renewing_published') 
+    }
+
+    before do
+      employer_profile.save!
+    end
+
+    context 'when upcoming month plan year present' do
+
+      let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'renewing_published') }
+
+      it 'should return upcoming month plan year' do 
+        plan_year, billing_date = employer_profile.billing_plan_year
+
+        expect(plan_year).to eq renewing_plan_year
+        expect(billing_date).to eq TimeKeeper.date_of_record.next_month
+      end
+    end
+
+    context 'when future plan year is under open enrollment present' do 
+      let(:renewing_plan_year)   { 
+        FactoryGirl.build(:plan_year, 
+          open_enrollment_start_on: TimeKeeper.date_of_record - 1.day, 
+          open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
+          start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, 
+          end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, 
+          aasm_state: 'renewing_published') 
+      }
+
+      it 'should return future plan year' do
+        plan_year, billing_date = employer_profile.billing_plan_year
+        expect(plan_year).to eq renewing_plan_year
+        expect(billing_date).to eq renewing_plan_year.start_on        
+      end
+    end
+
+    context 'when active plan year and future non open enrollment plan year present' do
+
+      it 'should return active plan year' do 
+        plan_year, billing_date = employer_profile.billing_plan_year
+        expect(plan_year).to eq active_plan_year
+        expect(billing_date).to eq TimeKeeper.date_of_record
+      end
+    end
+
+    context 'when only future non open enrollment plan year present' do
+
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
+
+      it 'should return active plan year' do
+        plan_year, billing_date = employer_profile.billing_plan_year
+        expect(plan_year).to eq renewing_plan_year
+        expect(billing_date).to eq renewing_plan_year.start_on    
       end
     end
   end
@@ -220,7 +342,7 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
   ) }
 
   before do
-    plan_year.publish!
+    plan_year.update_attributes({:aasm_state => 'published'})
   end
 
   it "should not find the linkable family when given a different ssn" do
@@ -352,7 +474,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       let(:owner_person) { instance_double("Person")}
 
       it "should return an array of persons" do
-        allow(Person).to receive(:find_all_staff_roles_by_employer_profile).with(employer_profile).and_return([owner_person])
+        allow(Person).to receive(:staff_for_employer).with(employer_profile).and_return([owner_person])
         expect(employer_profile.staff_roles).to include(owner_person)
       end
     end
@@ -415,7 +537,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       end
       def p0; Person.new(**params); end
       before do
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
       end
 
       it "should return an instance of CensusEmployee" do
@@ -483,7 +605,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
           census_employee.benefit_group_assignments = [benefit_group_assignment]
           census_employee.save
         end
-        plan_year.publish!
+        plan_year.update_attributes({:aasm_state => 'published'})
       end
     end
 
@@ -574,6 +696,105 @@ describe EmployerProfile, "when a binder premium is credited" do
     employer.binder_credited
     ActiveSupport::Notifications.unsubscribe(event_subscriber)
     expect(@employer_id).to eq hbx_id
+  end
+end
+
+describe EmployerProfile, "Renewal Queries" do
+  let(:organization1) { 
+    org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    employer = FactoryGirl.create :employer_profile, organization: org
+    2.times{ FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft }
+    org
+  }
+
+  let(:organization2) { 
+    org = FactoryGirl.create :organization, legal_name: "Corp 2" 
+    employer = FactoryGirl.create :employer_profile, organization: org
+    FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft
+    org
+  }
+
+  let(:organization3) { 
+    org = FactoryGirl.create :organization, legal_name: "Corp 3" 
+    employer = FactoryGirl.create :employer_profile, organization: org
+    2.times{ FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft }
+    org
+  }
+
+  let(:organization4) { 
+    org = FactoryGirl.create :organization, legal_name: "Corp 4" 
+    employer = FactoryGirl.create :employer_profile, organization: org
+    plan_year = FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft
+    org
+  }
+
+  let(:calender_year) { TimeKeeper.date_of_record.year }
+
+  before do
+    plan_years = organization1.employer_profile.plan_years.to_a
+    plan_years.first.update_attributes({ aasm_state: :renewing_published, 
+      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 13)
+      })
+    plan_years.last.update_attributes({ aasm_state: :active, 
+      :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year-1, 4, 1), :open_enrollment_end_on => Date.new(calender_year-1, 4, 10)
+      })
+
+    organization2.employer_profile.plan_years.first.update_attributes({ aasm_state: :published, 
+      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10)
+      })
+
+    plan_years = organization3.employer_profile.plan_years.to_a
+    plan_years.first.update_attributes({ aasm_state: :renewing_draft, 
+      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 13)
+      })
+    plan_years.last.update_attributes({ aasm_state: :active, 
+      :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year-1, 4, 1), :open_enrollment_end_on => Date.new(calender_year-1, 4, 10)
+      })
+
+    organization4.employer_profile.plan_years.first.update_attributes({ aasm_state: :draft, 
+      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10)
+      })
+  end
+
+  context '.organizations_for_open_enrollment_begin', dbclean: :after_each do
+    it 'should return organizations elgible for open enrollment' do
+      expect(EmployerProfile.organizations_for_open_enrollment_begin(Date.new(calender_year, 4, 1)).to_a).to eq [organization1, organization2]
+    end
+  end
+
+  context '.organizations_for_open_enrollment_end', dbclean: :after_each do
+    it 'should return organizations for whom open enrollment ended' do
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 10)).to_a).to be_blank
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 11)).to_a).to eq [organization2]
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 14)).to_a).to eq [organization1, organization2]
+    end
+  end
+
+  context '.organizations_for_plan_year_begin', dbclean: :after_each do
+    it 'should return organizations eligible to begin plan year' do
+      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calender_year, 4, 30)).to_a).to be_blank
+      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calender_year, 5, 1)).to_a).to eq [organization1, organization2]
+    end
+  end
+
+  context '.organizations_for_plan_year_end', dbclean: :after_each do
+    it 'should return organizations for whom plan year ended' do
+      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calender_year+1, 4, 30)).to_a).to eq [organization1, organization3]
+      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calender_year+1, 5, 1)).to_a).to eq [organization1, organization2, organization3]
+    end
+  end
+
+  context '.organizations_eligible_for_renewal', dbclean: :after_each do
+    it 'should return organizations for renewal' do
+      months_prior = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
+      expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calender_year+1, 2, 1)).to_a).to eq [organization2]
+    end
   end
 end
 

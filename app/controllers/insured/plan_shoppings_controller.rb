@@ -11,6 +11,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
+
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
     if plan_selection.employee_is_shopping_before_hire?
@@ -40,12 +41,15 @@ class Insured::PlanShoppingsController < ApplicationController
     plan = @enrollment.plan
     if @enrollment.is_shop?
       benefit_group = @enrollment.benefit_group
-      reference_plan = benefit_group.reference_plan
+      reference_plan = @enrollment.coverage_kind == 'dental' ? benefit_group.dental_reference_plan : benefit_group.reference_plan
+
       if benefit_group.is_congress
         @plan = PlanCostDecoratorCongress.new(plan, @enrollment, benefit_group)
       else
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
+
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -53,10 +57,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
 
     send_receipt_emails if @person.emails.first
   end
@@ -66,7 +66,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-    
+
     if @enrollment.is_special_enrollment?
       sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
       @enrollment.update_current(special_enrollment_period_id: sep_id)
@@ -74,12 +74,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if @enrollment.is_shop?
       @benefit_group = @enrollment.benefit_group
-      @reference_plan = @benefit_group.reference_plan
+      @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
+
       if @benefit_group.is_congress
         @plan = PlanCostDecoratorCongress.new(@plan, @enrollment, @benefit_group)
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -96,10 +98,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
 
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
-
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
@@ -110,12 +108,12 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params[:waiver_reason]
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+    if hbx_enrollment.may_waive_coverage? && waiver_reason.present? && hbx_enrollment.valid?
       hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
       hbx_enrollment.propogate_waiver
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Successful"
+      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
     else
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), alert: "Waive Failure"
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   end
 
@@ -171,13 +169,36 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
-    @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      if is_eligibility_determined_and_not_csr_100?(@person)
+        sort_for_csr(@plans)
+      else
+        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+      end
+    else
+      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
+  def sort_for_csr(plans)
+    silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}
+    standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
+    @plans = standard_plans + non_standard_plans + non_silver_plans
+  end
+
+  def is_eligibility_determined_and_not_csr_100?(person)
+      csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
+      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+        return true
+      else
+        return false
+      end
+  end
 
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
@@ -208,7 +229,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
-        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end

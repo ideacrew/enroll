@@ -1,4 +1,3 @@
-@watir @screenshots
 Feature: Create Employer
   In order for Employers to create and manage an account on the HBX for their organization
   In order for Employees to purchase insurance
@@ -69,3 +68,4 @@ Feature: Create Employer
         When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
+        And Employee logs out

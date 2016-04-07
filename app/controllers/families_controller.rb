@@ -1,4 +1,6 @@
 class FamiliesController < ApplicationController
+  include Acapi::Notifiers
+
   before_action :set_family #, only: [:index, :show, :new, :create, :edit, :update]
   # before_action :check_hbx_staff_role, except: [:welcome]
 
@@ -57,6 +59,16 @@ private
     set_current_person
     @family = @person.primary_family if @person.present?
     # @family = Family.find(params[:id])
+    if @person.blank? || @person.primary_family.blank?
+      message = {}
+      message[:message] = '@family was set to nil'
+      message[:session_person_id] = session[:person_id]
+      message[:user_id] = current_user.id
+      message[:email] = current_user.email
+      message[:url] = request.original_url
+      log(message, :severity=>'error')
+      redirect_to "/500.html"
+    end
   end
 
   def family_params

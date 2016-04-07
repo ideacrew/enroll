@@ -22,7 +22,7 @@ class BenefitGroupAssignment
   validate :date_guards, :model_integrity
 
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
-      
+
   def self.by_benefit_group_id(bg_id)
     census_employees = CensusEmployee.where({
       "benefit_group_assignments.benefit_group_id" => bg_id
@@ -67,6 +67,11 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
+  def hbx_enrollments(census_employee)
+    emp_role = EmployeeRole.find(census_employee.employee_role_id)
+    emp_role.person.primary_family.active_household.hbx_enrollments
+  end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 
@@ -87,15 +92,19 @@ class BenefitGroupAssignment
 
       return @hbx_enrollment
     else
-      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) 
+      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
     end
   end
 
+  def active_hbx_enrollments(census_employee)
+    hbx_enrollments = self.hbx_enrollments(census_employee) unless self.blank?
+    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" } unless self.blank?
+  end
+
   def end_benefit(end_on)
-    unless coverage_waived?
-      self.coverage_end_on = end_on
-      terminate_coverage
-    end
+    return if coverage_waived?
+    self.coverage_end_on = end_on
+    terminate_coverage! if may_terminate_coverage?
   end
 
   aasm do
@@ -103,6 +112,7 @@ class BenefitGroupAssignment
     state :coverage_selected
     state :coverage_waived
     state :coverage_terminated
+    state :coverage_void
     state :coverage_renewing
     state :coverage_expired
 
@@ -116,11 +126,12 @@ class BenefitGroupAssignment
       transitions from: [:initialized, :coverage_selected, :coverage_renewing], to: :coverage_waived
     end
 
-    event :renew_coverage do 
+    event :renew_coverage do
       transitions from: :initialized , to: :coverage_renewing
     end
 
     event :terminate_coverage do
+      transitions from: :initialized, to: :coverage_void
       transitions from: :coverage_selected, to: :coverage_terminated
       transitions from: :coverage_renewing, to: :coverage_terminated
     end
@@ -130,7 +141,7 @@ class BenefitGroupAssignment
     end
 
     event :delink_coverage do
-      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated], to: :initialized, after: :propogate_delink
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
     end
   end
 
@@ -161,20 +172,23 @@ class BenefitGroupAssignment
   end
 
   def propogate_delink
-    self.hbx_enrollment_id = nil
+    if hbx_enrollment.present?
+      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
+    end
+    # self.hbx_enrollment_id = nil
   end
 
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
 
-    # if coverage_selected?
-    #   self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
-    # end
+    if coverage_selected?
+      self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
+    end
 
-    # if hbx_enrollment.present?
-    #   self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-    #   self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
-    # end
+    if hbx_enrollment.present?
+      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
+    end
   end
 
   def date_guards

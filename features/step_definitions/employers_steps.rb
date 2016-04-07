@@ -89,75 +89,68 @@ end
 
 
 Then(/^.+ should see a form to enter information about employee, address and dependents details$/) do
-
   # Census Employee
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("John")
-  @browser.text_field(class: /interaction-field-control-census-employee-middle-name/).set("K")
-  @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Doe")
-  @browser.p(text: /suffix/i).click
-  suffix = @browser.element(class: /selectric-scroll/)
-  suffix.wait_until_present
-  suffix = @browser.element(class: /selectric-scroll/)
-  suffix.li(text: /Jr./).click
-  @browser.h1(text: /Add New Employee/i).click
+  fill_in 'census_employee[first_name]', with: 'John'
+  fill_in 'census_employee[middle_name]', with: 'K'
+  fill_in 'census_employee[last_name]', with: 'Doe'
+  find(:xpath, "//p[contains(., 'SUFFIX')]").click
+  find(:xpath, "//li[contains(., 'Jr.')]").click
 
-  # @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
-  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-dob/).set("01/01/1980")
-  @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
-  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
-  @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-hired-on/).set("10/10/2014")
-  @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
-  @browser.p(text: /Silver PPO Group/i).click
-  @browser.li(text: /Silver PPO Group/).click
+  fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
+  fill_in 'census_employee[ssn]', :with => '786120965'
+
+  find(:xpath, "//label[@for='radio_male']").click
+
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', :with => "10/10/2014"
+  find(:xpath, "//label[input[@name='census_employee[is_business_owner]']]").click
+
+  find(:xpath, "//div[div/select[@name='census_employee[benefit_group_assignments_attributes][0][benefit_group_id]']]//p[@class='label']").click
+  find(:xpath, "//div[div/select[@name='census_employee[benefit_group_assignments_attributes][0][benefit_group_id]']]//li[@data-index='1']").click
 
   # Address
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
-  select_state = @browser.divs(text: /SELECT STATE/).last
-  select_state.click
-  scroll_then_click(@browser.li(text: /GA/))
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
-  email_kind = @browser.divs(text: /SELECT KIND/).last
-  email_kind.click
-  @browser.li(text: /home/).click
-  @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  @browser.a(text: /Add Family Member/).click
-  @browser.div(id: /dependent_info/).wait_until_present
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_last_name/).set("Doe")
-  @browser.text_field(id: /jq_datepicker_ignore_census_employee_census_dependents_attributes_\d+_dob/).set("10/12/2012")
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_ssn/).set("321321321")
-  @browser.label(for: /census_employee_census_dependents_attributes_\d+_gender_female/).click
-  input_field = @browser.divs(class: "selectric-wrapper").last
-  input_field.click
-  input_field.li(text: /Child/).click
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+
+  find(:xpath, "//p[contains(., 'SELECT KIND')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., 'home')]").click
+
+  fill_in 'census_employee[email_attributes][address]', :with => 'trey.john@dc.gov'
+
+  find('.form-inputs .add_fields').click
+
+  # need to get name attribute since it's got a timestamp in it
+  name = find(:xpath, "//div[@id='dependent_info']//input[@placeholder='FIRST NAME']")['name']
+  fill_in name, :with => 'Mary'
+  fill_in name.gsub('first', 'middle'), :with => 'K'
+  fill_in name.gsub('first', 'last'), :with => 'Doe'
+  fill_in name.gsub('first_name', 'ssn'), :with => '321321321'
+  fill_in "jq_datepicker_ignore_#{name.gsub('first_name', 'dob')}", :with => '10/12/2012'
+
+  find(:xpath, "//p[contains(text(), 'SELECT RELATIONSHIP')]").click
+  find(:xpath, "//li[contains(text(), 'Child')]").click
+
+  find(:xpath, "//label[@for='#{name.gsub('[', '_').gsub(']', '').gsub('first_name', 'gender_female')}']").click
 
   screenshot("create_census_employee_with_data")
-  @browser.element(class: /interaction-click-control-create-employee/).click
+  click_button "Create Employee"
 end
 
 And(/^.+ should see employer census family created success message$/) do
-  sleep(1)
-  expect(@browser.div(text: /successfully/).visible?).to be_truthy
+  expect(find('.alert')).to have_content('successfully')
+  expect(page).to have_content('John K Doe Jr')
   screenshot("employer_census_new_family_success_message")
-  @browser.refresh
-  @browser.a(text: /Employees/).wait_until_present
-  @browser.a(text: /Employees/).click
-  @browser.a(text: /John K Doe Jr/).wait_until_present
-  expect(@browser.a(text: /John K Doe Jr/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
-  @browser.a(text: /employees/i).wait_until_present
-  @browser.a(text: /employees/i).click
-  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
-  @browser.i(class: /fa-pencil/).fire_event("onclick")
+  click_link 'Employees'
+  find(:xpath, "//div[@class='employees-table']//tr[1][td[contains(., 'John K Doe Jr')]]").click
+  find('.fa-pencil').click
 end
 
 When(/^.+ edits? ssn and dob on employee detail page after linked$/) do
@@ -182,29 +175,26 @@ end
 
 Then(/^.+ should see a form to update the contents of the census employee$/) do
   #Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
+  fill_in 'census_employee[first_name]', :with => 'Patrick'
+  fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
+  fill_in 'census_employee[ssn]', :with => '786120965'
 
-  @browser.button(text: /Update Employee/i).wait_until_present
-  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
-  @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
-  @browser.text_field(id: /census_employee_ssn/).set("786120965")
-  @browser.p(text: /Silver PPO Group/i).click
-  @browser.li(text: /Silver PPO Group/).click
-  select_state = @browser.divs(text: /GA/).last
-  select_state.click
-  scroll_then_click(@browser.li(text: /VA/))
-  #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
-  @browser.checkbox(id: /census_employee_is_business_owner/i).fire_event("onclick")
-  input_field = @browser.divs(class: "selectric-wrapper").last
-  input_field.click
-  input_field.li(text: /Child/).click
+  find(:xpath, '//p[@class="label"][contains(., "GA")]').click
+  find(:xpath, "//li[contains(., 'VA')]").click
+
+  fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
+
+  find("#census_employee_is_business_owner").click
+
+  find(:xpath, "//div[@id='dependent_info']//div[@class='selectric']/p[@class='label']").click
+  find(:xpath, "//div[@id='dependent_info']//li[contains(., 'Child')]").click
+
   screenshot("update_census_employee_with_data")
-  @browser.button(text: /Update Employee/i).fire_event('onclick')
+  click_button 'Update Employee'
 end
 
 And(/^.+ should see employer census family updated success message$/) do
-  @browser.element(class: /interaction-click-control-add-new-employee/).wait_until_present
-  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
+  expect(find('.alert')).to have_content('Census Employee is successfully updated.')
 end
 
 When(/^.+ clicks on terminate button for a census family$/) do
@@ -276,190 +266,184 @@ And(/^.+ should see the census family is successfully rehired message$/) do
 end
 
 When(/^I go to the Profile tab$/) do
-  @browser.a(class: /interaction-click-control-update-business-info/).wait_until_present
-  @browser.a(class: /interaction-click-control-update-business-info/).click
-  @browser.a(class: /interaction-click-control-cancel/).wait_until_present
-  @browser.a(class: /interaction-click-control-cancel/).click
-  @browser.a(text: /business info/i).wait_until_present
-  expect(@browser.a(text: /Business Info/i).visible?).to be_truthy
+  find('.interaction-click-control-update-business-info').click
+  find('.interaction-click-control-cancel').click
+
+  expect(page).to have_content('Business Info')
 end
 
 
 When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
-  @browser.a(text: /Benefits/).wait_until_present
-  @browser.a(text: /Benefits/).click
+  click_link 'Benefits'
 end
 
 
 And(/^.+ should see a button to create new plan year$/) do
-  @browser.a(class: /interaction-click-control-add-plan-year/).wait_until_present
   screenshot("employer_plan_year")
-  @browser.a(class: /interaction-click-control-add-plan-year/).click
+  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  find('a.interaction-click-control-add-plan-year').click
 end
 
-And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
-#Plan Year
-  # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
-  # @browser.text_field(id: /plan_year_fte_count/).wait_until_present
-  @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/).wait_until_present
-  start_on = @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/)
-  start_on.fire_event('onclick')
-  start_on.li(index: 1).fire_event('onclick')
-  screenshot("employer_add_plan_year")
-  # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
-  # @browser.h3(text: /Plan Year/).click
-  # @browser.alert.wait_until_present
-  # @browser.alert.ok
-  # expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
-  # happy path
-  # start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
-  # start_on_field.click
-  # start_on_field.li(index: 1).click
-  @browser.text_field(name: "plan_year[fte_count]").fire_event('onclick')
-  @browser.text_field(name: "plan_year[fte_count]").set("235")
-  @browser.text_field(name: "plan_year[pte_count]").set("15")
-  @browser.text_field(name: "plan_year[msp_count]").set("3")
-  @browser.a(class: /interaction-click-control-continue/).wait_until_present
-  @browser.a(class: /interaction-click-control-continue/).fire_event('onclick')
+And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
 
+  screenshot("employer_add_plan_year")
+  find('.interaction-field-control-plan-year-fte-count').click
+
+  if amount_of_fte == "low"
+    fill_in "plan_year[fte_count]", :with => "3"
+  else
+    fill_in "plan_year[fte_count]", :with => "235"
+  end
+
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+
+  find('.interaction-click-control-continue').click
 
   # Benefit Group
+  fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
 
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
-  select_field.click
-  select_field.li(text: /Date of hire/i).click
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(50)
-  select_plan_option = @browser.ul(class: /nav-tabs/)
-  select_plan_option.li(text: /By carrier/i).click
-  carriers_tab = @browser.div(class: /carriers-tab/)
-  sleep(3)
-  carriers_tab.as[1].fire_event("onclick")
-  plans_tab = @browser.div(class: /reference-plans/)
-  sleep(3)
-  plans_tab.labels.last.fire_event('onclick')
-  sleep(3)
-  # @browser.a(class: /add_fields/).fire_event('onclick')
-  # sleep(3)
-  # benefit_groups = @browser.fieldsets(class: /benefit-group-fields/)
-  # benefit_groups.last.text_fields.first.set("Gold HMO")
-  # @browser.text_fields(name: /relationship_benefits_attributes/).set(55)
+  find('.interaction-choice-control-plan-year-start-on').click
+  find('li.interaction-choice-control-plan-year-start-on-1').click
 
-  @browser.button(class: /interaction-click-control-create-plan-year/).click
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
+
+  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  sleep 1 #Four back to back clicks causes intermittent failures.  Make sure the page setup/DOM load is complete
+  find('.carriers-tab a').click
+  sleep 1 #maybe some work here
+  find('.reference-plans label').click
+  sleep 1
+  find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
-  @browser.element(text: /Plan Year successfully created/).wait_until_present
+  expect(page).to have_content('Plan Year successfully created')
   screenshot("employer_plan_year_success_message")
 end
 
 When(/^.+ enters filter in plan selection page$/) do
-  @browser.element(text: /Filter Results/).wait_until_present
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
-  @browser.element(class: /apply-btn/, text: /Apply/i).wait_until_present
-  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/i))
+  find(:xpath, '//label[@class="checkbox-custom-label"][contains(., "HMO")]').click
+  click_link 'Apply'
 end
 
 When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
-  select_carrier = @browser.div(class: /selectric-plan-carrier-selection-filter/)
-  click_when_present(select_carrier)
-  select_carrier.li(text: /CareFirst/).click
-  select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
-  click_when_present(select_hsa)
-  select_hsa.li(text: /All/i).click
-  scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
-  @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
-  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
-  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/i))
+  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//p[@class='label']").trigger 'click'
+  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-1')]").trigger 'click'
+
+  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//p[@class='label']").trigger 'click'
+  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-0')]").trigger 'click'
+
+  click_link 'Apply'
 end
 
 When(/^.+ enters? combined filter in plan selection page$/) do
-  #@browser.a(text: /All Filters/).wait_until_present
-  #@browser.a(text: /All Filters/).click
-  # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
-  # @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
-  # Nationwide
-  # @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
-  #@browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
+  find(:xpath, "//label[@for='plan-metal-level-silver']").click
+  find(:xpath, '//label[@class="checkbox-custom-label"][contains(., "HMO")]').click
 
-  # Platinum
-  @browser.execute_script(
-    'arguments[0].scrollIntoView();',
-    @browser.element(:text => /Choose Plan/i)
-  )
-  @browser.checkbox(class: /interaction-choice-control-value-plan-metal-level-silver/).set(true)
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
-  @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
-  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
-  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("5500")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
-  @browser.element(class: /apply-btn/, text: /Apply/i).click
+  find('.plan-metal-deductible-from-selection-filter').set("1000")
+  find('.plan-metal-deductible-to-selection-filter').set("5500")
+
+  click_link 'Apply'
 end
 
 Then(/^.+ should see the hsa_compatible filter results$/) do
-  @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
-    expect(plan.text.include?("BlueChoice Plus $2000")).to eq true
-    expect(plan.text.include?("Silver")).to eq true
-    expect(plan.element(text: "$237.15").visible?).to eq true
-  end
+  expect(find('.plan-row')).to have_content('BlueChoice Silver')
 end
 
 Then(/^.+ should see the combined filter results$/) do
-  @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
-    expect(plan.text.include?("BlueChoice Plus HSA/HRA $3500")).to eq true
-    expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.element(text: "$126.18").visible?).to eq true
-  end
+  expect(find('.plan-row')).to have_content('BlueChoice Silver')
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  @browser.element(class: /interaction-click-control-benefits/).wait_until_present
-  @browser.element(class: /interaction-click-control-benefits/).click
+  find(".interaction-click-control-benefits").click
 end
 
 Then(/^.+ should see the plan year$/) do
-  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
+  expect(page).to have_css('.interaction-click-control-publish-plan-year')
 end
 
 When(/^.+ clicks? on publish plan year$/) do
-  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
-  @browser.element(class: /interaction-click-control-publish-plan-year/).click
+  find('.interaction-click-control-publish-plan-year').click
 end
 
 Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
-
-  @browser.element(class: /modal-body/).wait_until_present
-
-  modal = @browser.div(class: /modal-dialog/)
-  warnings= modal.ul(class: /application-warnings/)
-  # TODO:  Add visible? to the next line.  This test is not valid.
-  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
+  expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
-  modal = @browser.div(class: 'modal-dialog')
-  modal.a(class: 'interaction-click-control-cancel').click
+  find(".modal-dialog .interaction-click-control-cancel").click
 end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
-  @browser.element(id: /plan_year/).present?
-  warnings= @browser.div(class: 'alert-plan-year')
-  # TODO:  Add visible? to the next line.  This test is not valid.
-  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
+  expect(page).to have_css('#plan_year')
+  expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
 end
 
 Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
-  @browser.button(class: /interaction-click-control-save-plan-year/).wait_until_present
-  @browser.text_field(name: "plan_year[fte_count]").set("10")
-  scroll_then_click(@browser.button(class: /interaction-click-control-save-plan-year/))
+  fill_in 'plan_year[fte_count]', :with => '10'
+  find('.interaction-click-control-save-plan-year').click
 end
 
 Then(/^.+ should see a plan year successfully saved message$/) do
-  @browser.element( text: /coverage - benefits you offer/i).wait_until_present
-  # TODO:  Add visible? to the next line.  This test is not valid.
-  expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
+  expect(find('.alert')).to have_content('Plan Year successfully saved')
+end
+
+When(/^.+ clicks? on employer my account link$/) do
+  click_link 'My DC Health Link'
+end
+
+Then(/^.+ should see employee cost modal for current plan year$/) do
+  find('a.interaction-click-control-employee-detail-costs').click
+  expect(page).to have_css('h4.modal-title')
+  find('.close').click
+end
+
+
+module EmployeeWorld
+  def owner(*traits)
+    attributes = traits.extract_options!
+    @owner ||= FactoryGirl.create :user, *traits, attributes
+  end
+
+  def employer(*traits)
+    attributes = traits.extract_options!
+    @employer ||= FactoryGirl.create :employer, *traits, attributes
+  end
+
+  def employees(*traits)
+    attributes = traits.extract_options!
+    @employees ||= FactoryGirl.create_list :census_employee, 5, *traits, attributes
+    # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
+  end
+end
+World(EmployeeWorld)
+
+Given /^an employer exists$/ do
+  owner :with_family, :employer, organization: employer
+end
+
+When /^they visit the Employee Roster$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
+end
+
+When /^click on one of their employees$/ do
+  click_link employees.first.full_name
+end
+
+Given /^the employer has employees$/ do
+  employees employer_profile: employer.employer_profile
+end
+
+Given /^the employer is logged in$/ do
+  login_as owner, scope: :user
+end
+
+Then /^they should see that employee's details$/ do
+  expect(page).to have_content(employees.first.dob.strftime('%m/%d/%Y'))
 end

@@ -3,9 +3,10 @@
 <% end %>
 <div class="col-xs-12 premium-reports-tab">
   <div class="row no-buffer">
-    <h1>Premium Billing Report
-    <% if @current_plan_year.present? %>
-      <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h1>
+    <% plan_year, billing_date = @employer_profile.billing_plan_year %>
+    <% if plan_year.present? && billing_date.present? %>
+      <h1>Enrollment Report <%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></h1>
+      <span class="text-danger">This is not an invoice.</span>
     <% end %>
   </div>
   <div class="premium-reports-table">

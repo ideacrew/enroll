@@ -9,6 +9,19 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#display_dental_metal_level" do
+    let(:dental_plan_2015){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2015)}
+    let(:dental_plan_2016){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2016)}
+
+    it "should display metal level if its a 2015 plan" do
+      expect(display_dental_metal_level(dental_plan_2015)).to eq dental_plan_2015.metal_level.titleize
+    end
+
+    it "should display metal level if its a 2016 plan" do
+      expect(display_dental_metal_level(dental_plan_2016)).to eq dental_plan_2016.dental_level.titleize
+    end
+  end
+
   describe "#enrollment_progress_bar" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
@@ -16,6 +29,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
+
+    context ">100 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+
+      it "does not display" do
+        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+      end
+    end
+
   end
 
   describe "#fein helper methods" do
@@ -207,7 +229,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "qualify_qle_notice" do
     it "should return notice" do
-      expect(helper.qualify_qle_notice).to include('<span class="alert">')
       expect(helper.qualify_qle_notice).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
     end
   end

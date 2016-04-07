@@ -1,4 +1,15 @@
 <div class="col-lg-3 col-md-3 co-sm-3 col-xs-12 filter-sidebar input-no-pd">
+  <div class="row">
+    <div class="checkbox-filter-wrapper">
+      <% if !@hbx_enrollment.is_shop? %>
+      <h4>
+        <%= link_to 'Estimate Your Costs', 'https://dc.checkbookhealth.org/hie/dc/2016/index.cfm?data=eyJGT1JNVkFMVUVTIjp7fSwiVVJMVkFMVUVTIjp7IkNPVkVSQUdFIjoiSW5kaXZpZHVhbCIsImRhdGEiOiIifX0%3D', target: '_blank' %>
+      </h4>
+      <% end %>
+      <h4>
+        <%= link_to 'Find Your Doctor', 'https://dc.checkbookhealth.org/dc/', target: '_blank' %>
+      </h4>
+    </div>
   <h3 class="header-title">Filter Results</h3>
   <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
@@ -146,7 +157,7 @@
           <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
       </div>
-      <% if @person.has_active_consumer_role? and @tax_household.present? %>
+      <% if @person.has_active_consumer_role? && @tax_household.present? %>
       <div class="aptc">
         <hr />
         <div class="row">
@@ -175,7 +186,5 @@
           <a href="javascript:void(0);" class="btn btn-trans reset-btn">Reset</a>
         </div>
       </div>
-      <div class="checkbox-filter-wrapper">
-        <a href="https://dc.checkbookhealth.org/dc/" target="_blank"><h4>Find Your Doctor</h4></a>
-      </div>
     </div>
+  </div>

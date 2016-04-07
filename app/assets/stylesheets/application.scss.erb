@@ -15,6 +15,7 @@
  *= require bootstrap-theme
  *= require bootstrap.min
  *= require bootstrap-multiselect
+ *= require jquery.autocomplete
  *= require component
  *= require custom
  *= require open_sans
@@ -23,6 +24,7 @@
  *= require new
  *= require text_styles
  *= require brokers
+ *= require modules
  *= require insured
  *= require sprites
  *= require modules
@@ -31,6 +33,28 @@
  *= require bootstrap-slider
  *= require_self
  */
+
+ .registrations {
+   .actions {
+     .btn {
+       margin-left: auto;
+       margin-right: auto;
+       margin: 0 auto;
+       display: block;
+       margin-bottom: 5px;
+     }
+     span {
+       display: block;
+       text-align: center;
+     }
+
+   }
+   .email-help {
+     font-size: 14px;
+   }
+
+ }
+
 .clear {
   clear: both;
 }
@@ -56,6 +80,43 @@
   border-radius: 6px;
  }
 
+ .bn {
+   border: none;
+ }
+ .b {
+   border: solid 1px #d5d5d5;
+ }
+ .inv {
+   visibility: hidden;
+ }
+ .m-center {
+   margin: auto;
+ }
+ .dir {
+  margin-top: 0;
+}
+.view-more {
+  white-space: nowrap;
+}
+img {
+ &.full-width {
+   width: 100%;
+ }
+}
+ .modal-body-swap {
+   position: relative;
+   padding: 15px;
+   display: none;
+ }
+ .fa-center {
+   &.fa-spinner {
+     position: relative;
+     left: 50%;
+     margin-left: -14px;
+     display: inline-block;
+     padding: 15px 0;
+   }
+ }
  .btn, button {
    &.btn-trans {
      border: solid 1px #b2b2b2;
@@ -125,12 +186,21 @@
      max-width: 100%;
    }
  }
+// full width flash messenger style
+.container > .col-xs-12 > .row > .alert.alert-notice {
+  margin-top: 2.5%;
+  margin-bottom: 0;
+}
  .panel-border {
    border: solid 1px #d5d5d5;
  }
  .empty-box {
    padding: 10px 10px;
    border: solid 1px #d5d5d5;
+   &.important {
+     background-color: #fcf8e3;
+
+   }
    .fa {
      &.fa-flag {
        color: #F9BB33;
@@ -354,4 +424,16 @@
 // hide individual benefits continue button in employee match_person
 .right-section #new_person input[type=submit] {
   display: none;
+}
+
+
+#showhidebutton {
+  font-family: 'Open Sans', sans-serif;
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: #069;
+  cursor: pointer;
+  outline:0;
+  float: right;
 }

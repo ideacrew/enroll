@@ -2,6 +2,25 @@ var benefits_tab_js;
 ready = function() {
   // open published years
 
+  
+  //toggling of divs that show plan details (view details)
+  $('.nav-toggle').click(function(){
+    //get collapse content selector
+    var collapse_content_selector = $(this).attr('href');         
+        
+    //make the collapse content to be shown or hide
+    var toggle_switch = $(this);
+    $(collapse_content_selector).slideToggle('fast', function(){
+      if($(this).css('display')=='none'){
+        toggle_switch.html('View Details <i class="fa fa-chevron-down fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }else{
+        toggle_switch.html('Hide Details <i class="fa fa-chevron-up fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }
+    });
+  });
+
   // mimic jquery toggle function
   $.fn.toggleClick = function() {
     var functions = arguments,

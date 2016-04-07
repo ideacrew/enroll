@@ -118,7 +118,7 @@ class User
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
 
-  has_one :person, dependent: :destroy
+  has_one :person
   accepts_nested_attributes_for :person, :allow_destroy => true
 
   # after_initialize :instantiate_person
@@ -193,7 +193,7 @@ class User
   end
 
   def has_employer_staff_role?
-    has_role?(:employer_staff)
+    person && person.has_active_employer_staff_role?
   end
 
   def has_broker_agency_staff_role?

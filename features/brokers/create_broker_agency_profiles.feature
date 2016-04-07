@@ -1,4 +1,3 @@
-@watir @screenshots @no-database-cleaner
 Feature: Create Primary Broker and Broker Agency
   In order for Brokers to help individuals and SHOP employees
   The Primary Broker must create and manage an account on the HBX for their organization.
@@ -22,7 +21,8 @@ Feature: Create Primary Broker and Broker Agency
         And Primary Broker clicks on Create Broker Agency
         Then Primary Broker should see broker registration successful message
 
-    When Hbx Admin logs on to the Hbx Portal
+    Given Hbx Admin exists
+        When Hbx Admin logs on to the Hbx Portal
         And Hbx Admin clicks on the Brokers tab
         Then Hbx Admin should see the list of broker applicants
         When Hbx Admin clicks on the current broker applicant show button

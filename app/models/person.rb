@@ -326,7 +326,7 @@ class Person
 
   def age_on(date)
     age = date.year - dob.year
-    if date.month < dob.month or (date.month == dob.month and date.day < dob.day)
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
       age - 1
     else
       age
@@ -392,12 +392,21 @@ class Person
     addresses.detect { |adr| adr.kind == "mailing" } || home_address
   end
 
+  def has_mailing_address?
+    addresses.any? { |adr| adr.kind == "mailing" }
+  end
+
   def home_email
     emails.detect { |adr| adr.kind == "home" }
   end
 
   def work_email
     emails.detect { |adr| adr.kind == "work" }
+  end
+
+  def work_email_or_best
+    email = emails.detect { |adr| adr.kind == "work" } || emails.first
+    (email && email.address) || (user && user.email)
   end
 
   def work_phone
@@ -421,15 +430,23 @@ class Person
   end
 
   def has_active_employee_role?
-    employee_roles.present? and employee_roles.active.present?
+    active_employee_roles.any?
   end
 
   def active_employee_roles
-    employee_roles.present? ? employee_roles.active : []
+    employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
+  end
+
+  def has_active_employer_staff_role?
+    employer_staff_roles.present? and employer_staff_roles.active.present?
+  end
+
+  def active_employer_staff_roles
+    employer_staff_roles.present? ? employer_staff_roles.active : []
   end
 
   def has_multiple_roles?
-    consumer_role.present? && employee_roles.present?
+    consumer_role.present? && active_employee_roles.present?
   end
 
   def residency_eligible?
@@ -437,8 +454,8 @@ class Person
   end
 
   def is_dc_resident?
-    return false if no_dc_address == true and no_dc_address_reason.blank?
-    return true if no_dc_address == true and no_dc_address_reason.present?
+    return false if no_dc_address == true && no_dc_address_reason.blank?
+    return true if no_dc_address == true && no_dc_address_reason.present?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
@@ -503,7 +520,8 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      #where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      staff_for_employer(employer_profile)
     end
 
     def match_existing_person(personish)
@@ -539,6 +557,54 @@ class Person
                          ).selector
                )
     end
+
+    def staff_for_employer(employer_profile)
+      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
+      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+    end
+
+    def staff_for_employer_including_pending(employer_profile)
+      self.where(:employer_staff_roles => {
+        '$elemMatch' => {
+            employer_profile_id: employer_profile.id,
+            :aasm_state.ne => :is_closed
+        }
+        })
+    end
+
+    # Adds employer staff role to person
+    # Returns status and message if failed
+    # Returns status and person if successful
+    def add_employer_staff_role(first_name, last_name, dob, email, employer_profile)
+      person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+
+      return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+      return false, 'Person does not exist on the HBX Exchange' if person.count == 0
+
+      employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.save
+      return true, person.first
+    end
+
+    # Sets employer staff role to inactive
+    # Returns false if person not found
+    # Returns false if employer staff role not matches
+    # Returns true is role was marked inactive
+    def deactivate_employer_staff_role(person_id, employer_profile_id)
+
+      begin
+        person = Person.find(person_id)
+      rescue
+        return false, 'Person not found'
+      end
+      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
+        role.update_attributes!(:aasm_state => :is_closed)
+        return true, 'Employee Staff Role is inactive'
+      else
+        return false, 'No matching employer staff role'
+      end
+    end
+
   end
 
   # HACK
@@ -620,6 +686,29 @@ class Person
     !!agent
   end
 
+  def contact_info(email_address, area_code, number, extension)
+    if email_address.present?
+      email = emails.detect{|mail|mail.kind == 'work'}
+      if email
+        email.update_attributes!(address: email_address)
+      else
+        email= Email.new(kind: 'work', address: email_address)
+        emails.append(email)
+        self.update_attributes!(emails: emails)
+        save!
+      end
+    end
+    phone = phones.detect{|p|p.kind == 'work'}
+    if phone
+      phone.update_attributes!(area_code: area_code, number: number, extension: extension)
+    else
+      phone = Phone.new(kind: 'work', area_code: area_code, number: number, extension: extension)
+      phones.append(phone)
+      self.update_attributes!(phones: phones)
+      save!
+    end
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
@@ -644,8 +733,8 @@ class Person
   end
 
   def create_inbox
-    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
-    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
   end
