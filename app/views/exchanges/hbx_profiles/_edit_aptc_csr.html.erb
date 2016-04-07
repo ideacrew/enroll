@@ -37,26 +37,34 @@
         <tbody>
             <%@grid_vals.keys.each do |key_hdr|%>
               <tr>
-                <td><%=key_hdr.titleize.upcase%></td>
-                <% @grid_vals[key_hdr].each do |key, val| %> 
-                  <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: !['max_aptc', 'csr_percentage'].include?(key_hdr) if key_hdr != "individuals_covered"%>   </td> 
+                <%if key_hdr != "individuals_covered"%>
+                  <td><%=key_hdr.titleize.upcase%></td>
+                <%end%>
+                <% @grid_vals[key_hdr].each do |key, val| %>
+                <%if key_hdr != "individuals_covered"%> 
+                  <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: !['max_aptc', 'csr_percentage'].include?(key_hdr)%></td>
+                <%end%> 
                 <%end%>
               </tr>
             <%end%>
 
             <%#binding.pry%>            
+            
+            <tr>
+              <th>Individuals Covered</th>
+              <% @grid_vals.first[1].each do |key, val| %>
+                <th><%=key.capitalize%></th>
+              <%end%>
+            </tr>
             <% @grid_vals["individuals_covered"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
               <tr>
                 <td><%=one_ind.keys.first%></td>
                   <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
-                    <td><%=val%></td>
+                    <td><%= check_box_tag "#{one_ind.keys.first.to_s+"_"+key.to_s}", {id: 'working_hours'}, checked: val %></td>
                   <%end%>
               </tr>
             <%end%>
               
-              
-              <tr>
-              </tr>
         </tbody>
       
       </table>
