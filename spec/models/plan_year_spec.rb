@@ -884,6 +884,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq 1.0
                   end
 
+                  context "greater than 100 employees " do
+                    let(:employee_count)    { 101 }
+
+                    it "return 0" do
+                      expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
+                    end
+                  end
+                  
                   context "and the plan effective date is Jan 1" do
                     before do
                       workflow_plan_year_with_benefit_group.start_on = Date.new(2016, 1, 1)

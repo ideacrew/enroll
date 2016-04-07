@@ -328,7 +328,11 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.count { |e| e.has_active_health_coverage? }
+    if self.employer_profile.census_employees.count < 100
+      enrolled.count { |e| e.has_active_health_coverage? }
+    else
+      0
+    end
   end
 
   def enrollment_ratio

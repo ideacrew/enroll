@@ -389,6 +389,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
+    return if plan_year.employer_profile.census_employees.count > 100
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count

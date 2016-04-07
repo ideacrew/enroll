@@ -21,7 +21,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
-      found_census_employees = @employee_candidate.match_census_employees
+      found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if found_census_employees.empty?
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
@@ -29,7 +29,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { render 'no_match' }
         end
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
         respond_to do |format|
           format.html { render 'match' }
         end

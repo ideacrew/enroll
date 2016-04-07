@@ -17,6 +17,14 @@ When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   screenshot("individual_start")
 end
 
+And(/Individual asks how to make an email account$/) do
+
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.a(text: /Don't have an email account?/).fire_event("onclick")
+  @browser.element(class: /modal/).wait_until_present
+  @browser.element(class: /interaction-click-control-×/).fire_event("onclick")
+end
+
 Then(/Individual creates HBX account$/) do
   click_button 'Create account'
   fill_in "user[email]", :with => (@u.email :email)
