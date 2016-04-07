@@ -120,6 +120,18 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def new_hire_enrollment_period
+    start_on = [hired_on, created_at].max
+    end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
+    (start_on.beginning_of_day)..(end_on.end_of_day)
+  end
+
+  # TODO: eligibility rule different for active and renewal plan years
+  def earliest_eligible_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    benefit_group_assignment.benefit_group.eligible_on(hired_on) if benefit_group_assignment
+  end
+
   # def first_name=(new_first_name)
   #   write_attribute(:first_name, new_first_name)
   #   set_autocomplete_slug
