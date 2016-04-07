@@ -42,8 +42,14 @@ end
 
 Then(/^the initiate "([^"]*)" button will be active$/) do |arg1|
   expect(find("#binderSubmit")["disabled"]).to eq false # binder paid button should be enabled at this point as we selected an employer
+end
+
+And(/^the HBX admin clicks the "([^"]*)" button$/) do |arg1|
   click_button arg1
   sleep 1
+end
+
+Then(/^then the Employer’s state transitions to "([^"]*)"$/) do |arg1|
   employer.reload
   expect(employer.employer_profile.aasm_state.titleize).to eq arg1
 end
@@ -80,13 +86,9 @@ When(/^the HBX admin visits the page$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
-When(/^the HBX admin clicks the "([^"]*)" button$/) do |arg1|
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-Then(/^then the Employer’s state transitions to "Binder Paid”$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
+# When(/^the HBX admin clicks the "([^"]*)" button$/) do |arg1|
+#   pending # Write code here that turns the phrase above into concrete actions
+# end
 
 Then(/^the Group XML is generated for the Employer$/) do
   pending # Write code here that turns the phrase above into concrete actions
