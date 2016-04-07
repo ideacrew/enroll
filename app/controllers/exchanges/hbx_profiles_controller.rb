@@ -235,28 +235,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-  def aptc_csr_family_index
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
-    @q = params.permit(:q)[:q]
-    page_string = params.permit(:families_page)[:families_page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-    unless @q.present?
-      #binding.pry
-      @families = Family.where(:'households.tax_households' => {:$exists => true}).page page_no
-      @total = Family.where(:'households.tax_households' => {:$exists => true}).count
-    else
-      #binding.pry
-      # TODO : Filter Families (pull only with tax_households) when searching.
-      total_families = Person.search(@q).map(&:families).flatten.uniq
-      @total = total_families.count
-      @families = Kaminari.paginate_array(total_families).page page_no
-    end
-    respond_to do |format|
-      format.html { render "insured/families/aptc_csr_listing1" }
-      format.js {}
-    end
-  end
-
   # Enrollments for APTC / CSR
   def aptc_csr_family_index
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
