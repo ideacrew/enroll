@@ -8,13 +8,15 @@ Feature: Binder transitions
 
   Scenario: HBX-Admin participation requirements checklist for new ER
     Given the HBX admin visits the Dashboard page
-    When the HBX admin selects the employer to confirm
+    And the HBX admin clicks on the Binder Transition tab
     Then the HBX admin sees a checklist
       | checklist                                                              |
       | Minimum participation: ≥ 0.66 * (All enrolled + waived / All Eligible) |
       | At least one non-owner or owner family member must enroll (at renewal) |
       | Owner/owner family member flag: Can be self-attested                   |
       | Binder premium amount and payment status verified by HBX               |
+    When the HBX admin selects the employer to confirm
+    Then the initiate "Binder Paid" button will be active
 
   Scenario: HBX-Admin confirms participation requirements for new ER
     Given the employer meets requirements

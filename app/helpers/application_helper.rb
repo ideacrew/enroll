@@ -538,4 +538,13 @@ module ApplicationHelper
     return plan.metal_level.humanize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
+
+  def eligiblity_participation_rule(count)
+    case count
+    when 0
+      return "2/3 Rule Met? : Yes"
+    else
+      return "2/3 Rule Met? : No, #{count} more required"
+    end
+  end
 end
