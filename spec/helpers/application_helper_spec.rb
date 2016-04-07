@@ -29,6 +29,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
+
+    context ">100 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+
+      it "does not display" do
+        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+      end
+    end
+
   end
 
   describe "#fein helper methods" do

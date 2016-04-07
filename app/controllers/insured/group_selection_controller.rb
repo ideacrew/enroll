@@ -17,8 +17,7 @@ class Insured::GroupSelectionController < ApplicationController
     set_bookmark_url
     initialize_common_vars
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
-    @employee_role = @person.employee_roles.active.last if @employee_role.blank? && @person.has_active_employee_role?
-
+    @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
 
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
@@ -125,7 +124,7 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
       end
-      @employee_role = @person.employee_roles.active.last if @employee_role.blank? && @person.has_active_employee_role?
+      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,

@@ -59,9 +59,13 @@
           <td><%= format_date census_employee.employment_terminated_on %>
           </td>
           <% end %>
-
-          <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
-          <!--<td><%#= coverage_kind(census_employee) %></td>-->
+          <td style="text-transform: capitalize;">
+            <% if census_employee.aasm_state == 'employee_role_linked' %>
+              Employee Role Confirmed
+            <% else %>
+              <%= census_employee.aasm_state.humanize %>
+            <% end %>
+          </td>
           <td><%= enrollment_state(census_employee) %></td>
 
           <td class="table-functions">
