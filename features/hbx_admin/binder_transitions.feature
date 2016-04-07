@@ -17,6 +17,8 @@ Feature: Binder transitions
       | Binder premium amount and payment status verified by HBX               |
     When the HBX admin selects the employer to confirm
     Then the initiate "Binder Paid" button will be active
+    And the HBX admin clicks the "Binder Paid" button
+    Then then the Employer’s state transitions to "Binder Paid"
 
   Scenario: HBX-Admin confirms participation requirements for new ER
     Given the employer meets requirements
