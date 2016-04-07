@@ -271,23 +271,33 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def update_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
-    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
+    @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
+    @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
+
+    if @family.present?
+      eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
+      eligibility_determination.max_aptc = params[:max_aptc_jan].to_f
+      eligibility_determination.csr_percent_as_integer = params[:csr_percentage_jan].to_i
+      eligibility_determination.save
+    end
+
+    #@person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
     #@alert_premium_when_dob_change = @person_has_active_enrollment && ( @person.dob !=  Date.parse(params[:person][:dob]) )
-    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+    #@ssn_match = Person.find_by_ssn(params[:person][:ssn])
 
-    if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
-      @dont_allow_change = true
-    else
-      begin
-        @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-      rescue Exception => e
-        @error_on_save = "SSN must be 9 digits long."
-      end
-      @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
-    end
+    #if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
+    #  @dont_allow_change = true
+    #else
+    #  begin
+    #    @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+    #  rescue Exception => e
+    #    @error_on_save = "SSN must be 9 digits long."
+    #  end
+    #  @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
+    #end
     respond_to do |format|
-      format.js { render "edit_aptc_csr", person: @person } if @error_on_save
+      #format.js { render "edit_aptc_csr", person: @person } if @error_on_save
       format.js { render "update_aptc_csr", person: @person}
     end
   end

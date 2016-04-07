@@ -116,17 +116,22 @@ class HbxProfile
     end
 
     def build_plan_premium_values(family, months_array)
+      hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
+
       plan_premium_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        plan_premium_hash.store(month, 600)
+        plan_premium_hash.store(month, hbx.total_premium || 0)
       end
       return plan_premium_hash
     end
 
     def build_aptc_applied_values(family, months_array)
+      hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+      applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
+
       aptc_applied_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        aptc_applied_hash.store(month, 500)
+        aptc_applied_hash.store(month, applied_aptc)
       end
       return aptc_applied_hash
     end
@@ -134,7 +139,7 @@ class HbxProfile
     def build_avalaible_aptc_values(family, months_array)
       avalaible_aptc_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        avalaible_aptc_hash.store(month, 400)
+        avalaible_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
       end
       return avalaible_aptc_hash
     end
@@ -142,7 +147,8 @@ class HbxProfile
     def build_max_aptc_values(family, months_array)
       max_aptc_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        max_aptc_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.max_aptc.fractional)
+        #max_aptc_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.max_aptc.fractional)
+        max_aptc_hash.store(month, family.active_household.latest_active_tax_household.current_max_aptc.to_f)
       end
       return max_aptc_hash
     end
@@ -150,7 +156,8 @@ class HbxProfile
     def build_csr_percentage_values(family, months_array)
       csr_percentage_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        csr_percentage_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.csr_eligibility_kind.split('_')[1] + " %")
+        #csr_percentage_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.csr_eligibility_kind.split('_')[1] + " %")
+        csr_percentage_hash.store(month, (family.active_household.latest_active_tax_household.current_csr_percent*100).to_s + " %")
       end
       return csr_percentage_hash
     end
