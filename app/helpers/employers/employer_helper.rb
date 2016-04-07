@@ -14,7 +14,7 @@ module Employers::EmployerHelper
           enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
         end
       end
-      enrollment_states << 'initialized' if enrollment_states.compact.empty?
+      enrollment_states << '' if enrollment_states.compact.empty?
     end
 
     enrollment_states.compact.join(', ').titleize

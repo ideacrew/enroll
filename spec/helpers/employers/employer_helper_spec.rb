@@ -39,7 +39,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return initialized as default" do
-          expect(helper.enrollment_state(census_employee)).to eq "Initialized"
+          expect(helper.enrollment_state(census_employee)).to be_blank
         end
       end
 

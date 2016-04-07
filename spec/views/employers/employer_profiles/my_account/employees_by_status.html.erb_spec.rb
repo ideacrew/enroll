@@ -28,7 +28,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
   let(:benefit_group_assignment1) { double(hbx_enrollments: [enrollment_with_coverage_selected], benefit_group: benefit_group)}
   let(:benefit_group_assignment2) { double(hbx_enrollments: [enrollment_with_coverage_terminated], benefit_group: benefit_group)}
-  let(:benefit_group_assignment3) { double(hbx_enrollments: [], benefit_group: benefit_group) }
+  let(:benefit_group_assignment3) { double(hbx_enrollments: [hbx_enrollment], benefit_group: benefit_group) }
 
   before :each do
     assign(:employer_profile, employer_profile)
@@ -61,15 +61,16 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     end
   end
 
-  context 'when employee not enrolled' do 
+  context 'when employee is waived' do 
     before do
+      hbx_enrollment.update_attributes(aasm_state: 'inactive')
       allow(census_employee3).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment3)
     end
 
-    it "should displays enrollment status as initialized" do
+    it "should displays enrollment status as waived" do
       assign(:census_employees, [census_employee3])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Initialized/)
+      expect(rendered).to match(/Coverage Waived/)
     end
   end
 
