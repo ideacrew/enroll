@@ -1,6 +1,6 @@
 <div class='container'>
   <div class="row">
-    <h3 class="title-inline">Employers who are eligible for binder paid</h3>
+    <h3 class="title-inline">Binder Transition Information</h3>
   </div>
 </div>
 
@@ -16,7 +16,7 @@
            <th>Name</th>
            <th>Status</th>
            <th>Employer Type</th>
-           <th>Eligibility Criteria Met</th>
+           <th>Eligibility Criteria</th>
           </tr>
         </thead>
         <tbody>
@@ -27,7 +27,9 @@
                 <td><%= employer.legal_name %></td>
                 <td><%= employer.aasm_state %></td>
                 <td><%= employer.renewing_plan_year.present? ? "Renewing" : "New" %></td>
-                <td><%= employer.show_plan_year.additional_required_participants_count == 0 ? "Yes" : ("No: #{employer.show_plan_year.additional_required_participants_count} more required" ) %></td>
+                <td class="eligibility-rule">
+                  <%= eligiblity_participation_rule(employer.show_plan_year.additional_required_participants_count) %>
+                </td>
               </tr>
             <% end %>
           <% end %>

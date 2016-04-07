@@ -1,4 +1,6 @@
 module BinderTransitionWorld
+  include ApplicationHelper
+
   def hbx_admin(*traits)
     attributes = traits.extract_options!
     @hbx_admin ||= FactoryGirl.create :user, *traits, attributes
@@ -25,21 +27,25 @@ end
 
 Given(/^the HBX admin visits the Dashboard page$/) do
   visit exchanges_hbx_profiles_root_path
-  page.find('.interaction-click-control-binder').click
-  page.find(".title-inline").should have_content("Employers who are eligible for binder paid")
-end
-
-When(/^the HBX admin selects the employer to confirm$/) do
-  # page.check("checkall")
-  # page.find("input#checkall").trigger "click"
-  page.find("#employer_profile_id_#{employer.employer_profile.id.to_s}").click
-  sleep(1)
-  click_button "Binder Paid"
+  page.find('.interaction-click-control-binder-transition').click
+  page.find(".title-inline").should have_content("Binder Transition Information")
 end
 
 Then(/^the HBX admin sees a checklist$/) do |checklist|
-  # table is a Cucumber::Core::Ast::DataTable
-  expect(false).to be_truthy
+  expect(page.find(".eligibility-rule").text).to eq eligiblity_participation_rule(employer.employer_profile.show_plan_year.additional_required_participants_count)
+end
+
+When(/^the HBX admin selects the employer to confirm$/) do
+  sleep 1
+  page.find("#employer_profile_id_#{employer.employer_profile.id.to_s}").click
+end
+
+Then(/^the initiate "([^"]*)" button will be active$/) do |arg1|
+  expect(find("#binderSubmit")["disabled"]).to eq false # binder paid button should be enabled at this point as we selected an employer
+  click_button arg1
+  sleep 1
+  employer.reload
+  expect(employer.employer_profile.aasm_state.titleize).to eq arg1
 end
 
 Given(/^the employer meets requirements$/) do
@@ -63,10 +69,6 @@ When(/^the HBX admin has verified new \(initial\) Employer meets minimum partici
 end
 
 When(/^a sufficient number of 'non\-owner' employee\(s\) have enrolled and\/or waived in Employer\-sponsored benefits$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-Then(/^the initiate "([^"]*)" button will be active$/) do |arg1|
   pending # Write code here that turns the phrase above into concrete actions
 end
 
