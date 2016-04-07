@@ -22,6 +22,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#eligiblity_participation_rule" do
+
+    it "should display yes, if 2/3 rule is met" do
+      expect(helper.eligiblity_participation_rule(0)).to eq "2/3 Rule Met? : Yes"
+    end
+
+    it "should display no if rule is not met" do
+      expect(helper.eligiblity_participation_rule(3)).to eq "2/3 Rule Met? : No, 3 more required"
+    end
+  end
+
   describe "#enrollment_progress_bar" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
