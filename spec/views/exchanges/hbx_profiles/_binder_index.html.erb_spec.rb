@@ -63,7 +63,7 @@ RSpec.describe "exchanges/hbx_profiles/_binder_index.html.erb" do
     render partial: "exchanges/hbx_profiles/binder_index"
     expect(rendered).to match(/#{renewing_employer.legal_name}/)
     expect(rendered).to match(/#{renewing_employer.aasm_state}/)
-    expect(rendered).to match(/No: #{renewing_employer.show_plan_year.additional_required_participants_count} more required/)
+    expect(rendered).to match(/No, #{renewing_employer.show_plan_year.additional_required_participants_count} more required/)
     expect(rendered).to match(/Renewing/)
     expect(rendered).not_to match(/#{new_employer.legal_name}/)
   end
