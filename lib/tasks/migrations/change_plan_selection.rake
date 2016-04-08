@@ -7,4 +7,14 @@ namespace :migrations do
     benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     benefit_group.save!
   end
+
+  desc "change renewed employer reference plan"
+  task :change_renewed_employer_reference_plan => :environment do
+    employer_profile = Organization.where(:legal_name => /The Memorial Foundation/i).first.employer_profile
+    benefit_group = employer_profile.plan_years.where(:start_on => Date.new(2016, 4, 1)).first.benefit_groups.first
+    new_reference_plan = Plan.where(:name => /BluePreferred PPO HSA\/HRA Silver 1500/i).first
+    benefit_group.reference_plan= new_reference_plan
+    benefit_group.elected_plans= [new_reference_plan]
+    benefit_group.save!
+  end
 end
