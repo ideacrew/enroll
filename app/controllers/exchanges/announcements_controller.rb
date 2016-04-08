@@ -2,7 +2,8 @@ class Exchanges::AnnouncementsController < ApplicationController
   before_action :check_hbx_staff_role
 
   def index
-    @announcements = Announcement.current
+    @filter = params[:filter] || 'current'
+    @announcements = @filter == 'all' ? Announcement.all : Announcement.current
   end
 
   def create

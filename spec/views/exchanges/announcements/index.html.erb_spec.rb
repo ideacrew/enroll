@@ -18,6 +18,11 @@ describe "exchanges/announcements/index.html.erb" do
     expect(rendered).to have_selector('h1', text: 'Announcements')
   end
 
+  it "should display filter button" do
+    expect(rendered).to have_selector('a', text: 'Current')
+    expect(rendered).to have_selector('a', text: 'All')
+  end
+
   it "should display announcements table" do
     expect(rendered).to have_selector('table.table')
     expect(rendered).to have_text('Current Announcements')

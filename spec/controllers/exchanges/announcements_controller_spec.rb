@@ -13,19 +13,33 @@ RSpec.describe Exchanges::AnnouncementsController do
     end
 
     context "with hbx_staff" do
-      before :each do
-        allow(user).to receive(:has_hbx_staff_role?).and_return true
-        sign_in user
-        get :index
+      context "without filter" do
+        before :each do
+          allow(user).to receive(:has_hbx_staff_role?).and_return true
+          sign_in user
+          get :index
+        end
+
+        it "renders index" do
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("exchanges/announcements/index")
+        end
+
+        it "get current announcements" do
+          expect(assigns(:announcements)).to eq Announcement.current
+        end
       end
 
-      it "renders index" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("exchanges/announcements/index")
-      end
+      context "with filter" do
+        before :each do
+          allow(user).to receive(:has_hbx_staff_role?).and_return true
+          sign_in user
+          get :index, filter: 'all'
+        end
 
-      it "get current announcements" do
-        expect(assigns(:announcements)).to eq Announcement.current
+        it "get all announcements" do
+          expect(assigns(:announcements)).to eq Announcement.all
+        end
       end
     end
   end

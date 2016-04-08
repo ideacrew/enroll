@@ -325,6 +325,8 @@ class User
       announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role?
     when portal_path.include?("broker")
       announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
+    when portal_path.include?("general_agencies")
+      announcements.concat(Announcement.current_msg_for_ga) if has_role?(:general_agency_staff)
     end
 
     announcements.uniq!

@@ -194,6 +194,11 @@ describe User do
       expect(user.get_announcements_by_roles_and_portal("dc.org/consumer")).to eq "Announcement:<br/>msg for IVL"
     end
 
+    it "when general_agency_staff" do
+      user.roles = ['general_agency_staff']
+      expect(user.get_announcements_by_roles_and_portal("dc.org/general_agencies")).to eq "Announcement:<br/>msg for GA"
+    end
+
     context "when broker_role and consumer_role" do
       it "with employer portal" do
         user.roles = ['consumer', 'broker']
