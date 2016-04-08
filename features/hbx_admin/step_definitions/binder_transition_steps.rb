@@ -27,12 +27,15 @@ end
 
 Given(/^the HBX admin visits the Dashboard page$/) do
   visit exchanges_hbx_profiles_root_path
+end
+
+And(/^the HBX admin clicks the Binder Transition tab$/) do
   page.find('.interaction-click-control-binder-transition').click
   page.find(".title-inline").should have_content("Binder Transition Information")
 end
 
-Then(/^the HBX admin sees a checklist$/) do |checklist|
-  expect(page.find(".eligibility-rule").text).to eq eligiblity_participation_rule(employer.employer_profile.show_plan_year.additional_required_participants_count)
+And(/^the HBX admin sees a checklist$/) do |checklist|
+  expect(page.find(".eligibility-rule").text).to eq eligibility_criteria(employer.employer_profile).gsub("<br>", " ")
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
@@ -59,7 +62,8 @@ Given(/^the employer meets requirements$/) do
 end
 
 Given(/^the HBX admin has confirmed requirements for the employer$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  step "the HBX admin clicks the Binder Transition tab"
+  step "the HBX admin selects the employer to confirm"
 end
 
 When(/^the employer remits initial binder payment$/) do
@@ -71,39 +75,25 @@ When(/^the DCHBX confirms binder payment has been received by third\-party proce
 end
 
 When(/^the HBX admin has verified new \(initial\) Employer meets minimum participation requirements \((\d+)\/(\d+) rule\)$/) do |arg1, arg2|
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page.find(".eligibility-rule").text).to include(participation_rule(employer.employer_profile))
 end
 
 When(/^a sufficient number of 'non\-owner' employee\(s\) have enrolled and\/or waived in Employer\-sponsored benefits$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page.find(".eligibility-rule").text).to include(non_owner_participation_rule(employer.employer_profile))
 end
 
 Given(/^the employer has remitted the initial binder payment$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
-When(/^the HBX admin visits the page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-# When(/^the HBX admin clicks the "([^"]*)" button$/) do |arg1|
-#   pending # Write code here that turns the phrase above into concrete actions
-# end
-
 Then(/^the Group XML is generated for the Employer$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
 Given(/^the employer is renewing$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-When(/^the HBX admin visits the last other blank page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-When(/^the HBX admin visits the other blank page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  py = employer.employer_profile.plan_years.last
+  py.aasm_state = "renewing_enrolling"
+  py.save
 end
 
 Then(/^the HBX\-Admin can utilize the “Transmit EDI” button$/) do
