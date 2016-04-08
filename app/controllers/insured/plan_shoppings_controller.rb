@@ -108,9 +108,6 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params[:waiver_reason]
 
-<<<<<<< 0f7e3b823a60b575264d05742d1a4d3fbba6af89
-    if hbx_enrollment.may_waive_coverage? && waiver_reason.present? && hbx_enrollment.valid?
-=======
     # Create a new hbx_enrollment for the waived enrollment.
     unless hbx_enrollment.shopping?
       employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
@@ -126,7 +123,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
->>>>>>> Improved Waive Coverage Functionality
       hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
       hbx_enrollment.propogate_waiver
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
