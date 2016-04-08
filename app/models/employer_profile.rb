@@ -161,13 +161,13 @@ class EmployerProfile
     @general_agency_profile = active_general_agency_account.general_agency_profile if active_general_agency_account.present?
   end
 
-  def hire_general_agency(new_general_agency, start_on = today)
+  def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = today)
     start_on = start_on.to_date.beginning_of_day
     if active_general_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_general_agency(terminate_on)
     end
-    general_agency_accounts.build(general_agency_profile: new_general_agency, start_on: start_on)
+    general_agency_accounts.build(general_agency_profile: new_general_agency, start_on: start_on, broker_role_id: broker_role_id)
     @general_agency_profile = new_general_agency
   end
 

@@ -173,7 +173,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
           if employer_profile.present?
             employer_profile.fire_general_agency
             employer_profile.save
-            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Fire')
+            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
           end
         end
         notice = "Fire these employers successful."
@@ -181,7 +181,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
         params[:employer_ids].each do |employer_id|
           employer_profile = EmployerProfile.find(employer_id) rescue nil
           if employer_profile.present?
-            employer_profile.hire_general_agency(general_agency_profile)
+            broker_role_id = current_user.person.broker_role.id || nil
+            employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
           end
@@ -196,7 +197,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     employer_profile.fire_general_agency
     employer_profile.save
-    send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Fire')
+    send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
     redirect_to broker_agencies_profile_path(@broker_agency_profile)
   end
 
@@ -258,6 +259,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     else
       flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
     end
+  end
+
+  def send_general_agency_assign_msg(general_agency, employer_profile, status)
+    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name} (#{status})"
+    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
+    secure_message(@broker_agency_profile, general_agency, subject, body)
+    secure_message(@broker_agency_profile, employer_profile, subject, body)
   end
 
   def eligible_brokers

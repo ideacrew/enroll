@@ -119,21 +119,47 @@ RSpec.describe GeneralAgencies::ProfilesController do
   end
 
   describe "GET families" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     before(:each) do
+      allow(GeneralAgencyProfile).to receive(:find).and_return(general_agency_profile)
+      allow(general_agency_profile).to receive(:families).and_return [family]
       sign_in(user)
-      xhr :get, :families, id: general_agency_profile.id
     end
 
-    it "returns http success" do
-      expect(response).to have_http_status(:success)
+    context "without page params" do
+      before(:each) do
+        xhr :get, :families, id: general_agency_profile.id
+      end
+
+      it "returns http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the families template" do
+        expect(response).to render_template("families")
+      end
+
+      it "should get families" do
+        expect(assigns[:families]).to eq general_agency_profile.families
+        expect(assigns[:families]).to eq [family]
+      end
     end
 
-    it "should render the families template" do
-      expect(response).to render_template("families")
-    end
+    context "with page params" do
+      it "should get family" do
+        page = family.primary_applicant.person.last_name.first
+        xhr :get, :families, id: general_agency_profile.id, page: page
+        expect(response).to render_template("families")
+        expect(assigns[:families]).to eq [family]
+      end
 
-    it "should get families" do
-      expect(assigns[:families]).to eq general_agency_profile.family_clients
+      it "should not get family" do
+        page = family.primary_applicant.person.last_name.first
+        xhr :get, :families, id: general_agency_profile.id, page: '1'
+        expect(page).not_to eq '1'
+        expect(response).to render_template("families")
+        expect(assigns[:families]).to eq []
+      end
     end
   end
 
@@ -210,6 +236,35 @@ RSpec.describe GeneralAgencies::ProfilesController do
 
     it "should get provider" do
       expect(assigns(:provider)).to eq general_agency_profile
+    end
+  end
+
+  describe "POST create" do
+    let(:form) { double("organization") }
+    before do
+      allow(::Forms::GeneralAgencyProfile).to receive(:new).and_return(form)
+      sign_in(user)
+    end
+
+    it "should redirect" do
+      allow(form).to receive(:save).and_return true
+      post :create, organization: {first_name: 'test'}
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:notice]).to eq "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+    end
+
+    it "should render new_agency template" do
+      allow(form).to receive(:save).and_return false
+      allow(form).to receive(:only_staff_role?).and_return false
+      post :create, organization: {first_name: 'test'}
+      expect(response).to render_template("new_agency")
+    end
+
+    it "should render new_agency_staff template" do
+      allow(form).to receive(:save).and_return false
+      allow(form).to receive(:only_staff_role?).and_return true
+      post :create, organization: {first_name: 'test'}
+      expect(response).to render_template("new_agency_staff")
     end
   end
 end

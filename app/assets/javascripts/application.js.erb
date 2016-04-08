@@ -58,6 +58,17 @@ function applyMultiLanguageSelect() {
   });
 };
 
+function applyMultiLanguageSelectForGA() {
+  $('#general_agency_language_select').multiselect({
+    nonSelectedText: 'Select Language',
+    maxHeight: 300
+  });
+  $('#general_agency_language_select').multiselect('select', 'en', true);
+  $('#general_agency_language_select').on('selectric-init', function(element){
+    $('.language_multi_select .selectric-interaction-field-control-general-agency-languages-spoken').hide();
+  });
+};
+
 function dchbx_enroll_date_of_record() {
   return new Date($('#dchbx_enroll_date_of_record').text());
 };

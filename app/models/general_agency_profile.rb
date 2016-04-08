@@ -83,8 +83,7 @@ class GeneralAgencyProfile
 
   def families
     employee_families = linked_employees.map(&:primary_family).to_a
-    consumer_families = Family.by_general_agency_profile(self).to_a
-    families = (consumer_families + employee_families).uniq
+    families = employee_families.uniq
     families.sort_by{|f| f.primary_applicant.person.last_name}
   end
 

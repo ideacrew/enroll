@@ -1,6 +1,6 @@
 <div id="general_agency_form" class="container">
 <h3>New General Agency</h3>
-<%= link_to 'Broker Agency Staff', new_agency_staff_general_agencies_profiles_path, class: 'btn btn-default' %>
+<%= link_to 'General Agency Staff', new_agency_staff_general_agencies_profiles_path, class: 'btn btn-default' %>
 <%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
 <%= render 'shared/error_messages', :object => @organization %>
   <div class="row">

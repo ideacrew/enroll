@@ -13,6 +13,7 @@ class GeneralAgencyAccount
   field :updated_by, type: String
   field :general_agency_profile_id, type: BSON::ObjectId
   field :aasm_state, type: String, default: 'active'
+  field :broker_role_id, type: BSON::ObjectId
 
   validates_presence_of :start_on, :general_agency_profile_id
 

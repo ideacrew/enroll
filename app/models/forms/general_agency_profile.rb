@@ -29,7 +29,9 @@ module Forms
 
     def save(current_user=nil)
       begin
-        unless only_staff_role?
+        if only_staff_role?
+          general_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
+        else
           return false unless valid?
           check_existing_organization
         end
@@ -40,12 +42,16 @@ module Forms
       rescue OrganizationAlreadyMatched
         errors.add(:base, "organization has already been created.")
         return false
+      rescue BSON::ObjectId::Invalid
+        errors.add(:base, "General agency can not be blank.")
+        return false
+      rescue => e
+        return false
       end
 
       person.save!
       add_staff_role
       if only_staff_role?
-        general_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
         person.general_agency_staff_roles.last.update_attributes({ general_agency_profile_id: general_agency_profile.id })
       else
         organization = create_or_find_organization

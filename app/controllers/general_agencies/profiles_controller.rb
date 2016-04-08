@@ -34,13 +34,10 @@ class GeneralAgencies::ProfilesController < ApplicationController
     @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
     if @organization.save
       flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-      if @organization.only_staff_role?
-        redirect_to new_agency_staff_general_agencies_profiles_path
-      else
-        redirect_to general_agency_registration_path
-      end
+      redirect_to general_agency_registration_path
     else
-      render "new_agency"
+      template = @organization.only_staff_role? ? "new_agency_staff" : "new_agency"
+      render template
     end
   end
 
@@ -55,7 +52,15 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def families
-    @families = @general_agency_profile.family_clients
+    page = params.permit([:page])[:page]
+    total_families = @general_agency_profile.families || []
+
+    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.uniq.map(&:capitalize)
+    if page.present?
+      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
+    else
+      @families = total_families[0..20]
+    end
   end
 
   def staffs
