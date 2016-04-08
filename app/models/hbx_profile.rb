@@ -103,7 +103,8 @@ class HbxProfile
         max_aptc_vals             = build_max_aptc_values(family, months_array)
         csr_percentage_vals       = build_csr_percentage_values(family, months_array)
         slcsp_values              = build_slcsp_values(family, months_array)
-        individuals_covered_vals  = build_individuals_covered_array(family, months_array)
+        #individuals_covered_vals  = build_individuals_covered_array(family, months_array)
+        all_members_vals          = build_all_family_members_hash(family, months_array)
 
         return { "plan_premium"   => plan_premium_vals,
                  "aptc_applied"   => aptc_applied_vals,
@@ -111,13 +112,14 @@ class HbxProfile
                  "max_aptc"       => max_aptc_vals,
                  "csr_percentage" => csr_percentage_vals,
                  "slcsp"          => slcsp_values, 
-                 "individuals_covered" => individuals_covered_vals
+                 "all_members"    => all_members_vals 
                 }
     end
 
     def build_plan_premium_values(family, months_array)
+      #binding.pry
       hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
-
+      #binding.pry
       plan_premium_hash = Hash.new
       months_array.each_with_index do |month, ind|
         plan_premium_hash.store(month, hbx.total_premium || 0)
@@ -170,17 +172,22 @@ class HbxProfile
       return slcsp_hash
     end
 
-    def build_individuals_covered_array(family, months_array)
+    #def build_individuals_covered_array(family, months_array)
+    def build_all_family_members_hash(family, months_array)
+      individuals_non_eligible_array = Array.new
       individuals_covered_array = Array.new
       family.family_members.each_with_index do |one_member, index|
+          #binding.pry
           hash_temp = Hash.new
           #hash_temp.store("name", one_member.person.full_name)
             months_array.each_with_index do |month, ind|
               hash_temp.store(month, true)
-            end  
-          individuals_covered_array << {one_member.person.full_name => hash_temp}
+            end
+          individuals_non_eligible_array << {one_member.person.full_name => hash_temp}
+          next if !one_member.family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members).try(:first).try(:is_ia_eligible) # Skipping the non eligible members
+          individuals_covered_array << {one_member.person.full_name => hash_temp} 
       end
-      return individuals_covered_array
+      return { "eligible" => individuals_covered_array, "not_eligible" => individuals_non_eligible_array }
     end
     ###
 

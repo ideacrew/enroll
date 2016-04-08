@@ -1,9 +1,7 @@
 <div class="container bottom-pd">
-  
   <div class="row">
     <h4 class="title-inline">Editing APTC / CSR for:</h4>
   </div>
-  
   <div>
     <table class="table table-border">
       <thead>
@@ -15,9 +13,9 @@
       <tbody>
         <tr>
           <td><%=@person.hbx_id%></tb>
-          <td><%=@person.first_name%> <%=@person.last_name%></td>
-          <td><%=@person.dob%></td>
-          <td><%=@person.ssn%></td>
+          <td><%=@person.first_name%> <%#=@person.last_name%></td>
+          <td><%#=@person.dob%></td>
+          <td><%#=@person.ssn%></td>
       </tr>
       </tbody>
     </table>
@@ -27,6 +25,7 @@
     <%= form_for @person, remote: true, url: update_aptc_csr_path, method: "post", class: "form" do |f|%>
       <%= f.hidden_field :person_id, value: @person.id %>
       <%= f.hidden_field :family_id, value: @family.id %>
+       <div align="center"> <%= link_to 'Calculate Available APTC', edit_aptc_csr_path(family_id: @family.id, person_id: @person.id), class: "btn btn-default btn", remote: true%></div><br/>
       <table class="table table-border">
         
         <thead>
@@ -34,43 +33,72 @@
           <% @grid_vals.first[1].each do |key, val| %>
             <th><%=key.capitalize%></th>
           <%end%>
-        </thead>
-        
+          <th> </th>
+          <th>Edit Fields</th>
+        </thead>  
         <tbody>
             <%@grid_vals.keys.each do |key_hdr|%>
               <tr>
-                <%if key_hdr != "individuals_covered"%>
-                  <td><%=key_hdr.titleize.upcase%></td>
-                <%end%>
-                <% @grid_vals[key_hdr].each do |key, val| %>
-                <%if key_hdr != "individuals_covered"%> 
-                  <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: !['max_aptc', 'csr_percentage'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage'].include?(key_hdr)%></td>
-                <%end%> 
-                <%end%>
-              </tr>
-            <%end%>
-
-            <%#binding.pry%>            
-            
-            <tr>
-              <th>Individuals Covered</th>
-              <% @grid_vals.first[1].each do |key, val| %>
-                <th><%=key.capitalize%></th>
-              <%end%>
-            </tr>
-            <% @grid_vals["individuals_covered"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
-              <tr>
-                <td><%=one_ind.keys.first%></td>
-                  <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
-                    <td><%= check_box_tag "#{one_ind.keys.first.to_s+"_"+key.to_s}", {id: 'working_hours'}, checked: val %></td>
+                  <%if key_hdr != "all_members"%>
+                      <td><%=key_hdr.titleize.upcase%></td>
+                  
+                      <% @grid_vals[key_hdr].each do |key, val| %>
+                          <%if key_hdr != "individuals_covered"%>
+                            <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
+                          <%end%> 
+                      <%end%>
+                      <td></td>
+                      <td> <%= text_field_tag "#{key_hdr.to_s}", "", placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%></td>
                   <%end%>
               </tr>
+            <%end%>         
+            <%#binding.pry%>
+            <%if @grid_vals["all_members"]["eligible"].blank?%>
+                <tr>
+                  <th>Individual(s) Not Covered</th>
+                  <% @grid_vals.first[1].each do |key, val| %>
+                    <th><%=key.capitalize%></th>
+                  <%end%>
+                  <th></th>
+                  <th></th>
+                  
+                </tr>
+                <% @grid_vals["all_members"]["not_eligible"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
+                  <tr>
+                    <td><b><%=one_ind.keys.first%></b></td>
+                      <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
+                        <td colspan = "12">
+                          <%#=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'accepted', val, disabled: true%>
+                          This member has no active elibility for year <%=TimeKeeper.date_of_record.year%>. <%break%>
+                        </td>
+                      <%end%>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                <%end%>
+            <%else%>
+                <tr>
+                  <th>Individual(s) Covered</th>
+                  <% @grid_vals.first[1].each do |key, val| %>
+                    <th><%=key.capitalize%></th>
+                  <%end%>
+                  <th></th>
+                  <th>Edit Individual(s)</th>
+                </tr>
+                <% @grid_vals["all_members"]["eligible"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
+                  <tr>
+                    <td><%=one_ind.keys.first%></td>
+                      <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
+                        <td><%=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'checked', val, disabled: true%></td>
+                      <%end%>
+                      <td></td>
+                      <td><%=check_box_tag "#{one_ind.keys.first.to_s}", 'accepted', '', disabled: false%></td>
+                  </tr>
+                <%end%>
             <%end%>
-              
-        </tbody>
-      
+        </tbody> 
       </table>
-      <%= f.submit "Confirm" %>
+      <div align="right"><%= f.submit "Confirm", class: "btn btn-primary btn-lg" %></div>
     <% end %>
   </div>
 </div>

@@ -242,11 +242,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
     unless @q.present?
-      @families = Family.all_tax_households.page page_no
-      @total = Family.all_tax_households.count
+      @families = Family.all_aptc_hbx_enrollments.active_assistance_receiving.page page_no
+      @total = Family.all_aptc_hbx_enrollments.active_assistance_receiving.count
     else
       person_ids = Person.search(@q).map(&:_id)
-      total_families = Family.all_tax_households.in("family_members.person_id" => person_ids).entries
+      
+      total_families = Family.all_aptc_hbx_enrollments.active_assistance_receiving.in("family_members.person_id" => person_ids).entries
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
     end
@@ -275,27 +276,31 @@ class Exchanges::HbxProfilesController < ApplicationController
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
 
     if @family.present?
+      # Update Max APTC and CSR Percentage
       eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
-      eligibility_determination.max_aptc = params[:max_aptc_jan].to_f
-      eligibility_determination.csr_percent_as_integer = params[:csr_percentage_jan].to_i
+      eligibility_determination.max_aptc = params[:max_aptc].to_f
+      eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
       eligibility_determination.save
+      
+      # Update APTC Applied
+      if !params[:aptc_applied].blank?
+        hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
+        hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied], "USD")
+        hbx_enrollment.save
+      end
+      
+      # Update  Individuals Coverage Eligibility
+      tax_household_members = @family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
+      tax_household_members.each do |member|
+        if params.has_key?(member.person.full_name.to_s)
+          member.is_ia_eligible = true
+        else
+          member.is_ia_eligible = false
+        end 
+      end
+
     end
 
-    #@person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
-    #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
-    #@alert_premium_when_dob_change = @person_has_active_enrollment && ( @person.dob !=  Date.parse(params[:person][:dob]) )
-    #@ssn_match = Person.find_by_ssn(params[:person][:ssn])
-
-    #if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
-    #  @dont_allow_change = true
-    #else
-    #  begin
-    #    @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-    #  rescue Exception => e
-    #    @error_on_save = "SSN must be 9 digits long."
-    #  end
-    #  @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
-    #end
     respond_to do |format|
       #format.js { render "edit_aptc_csr", person: @person } if @error_on_save
       format.js { render "update_aptc_csr", person: @person}
