@@ -391,12 +391,12 @@ end
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
-  wait_for_ajax
+  wait_for_ajax(10)
   person = people[named_person]
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
-  wait_for_ajax
+  wait_for_ajax(10)
   find("#person_addresses_attributes_0_address_1").click
   find("#person_addresses_attributes_0_address_2").click
   find("#person_addresses_attributes_0_city").click
