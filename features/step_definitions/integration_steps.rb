@@ -673,6 +673,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
   end
