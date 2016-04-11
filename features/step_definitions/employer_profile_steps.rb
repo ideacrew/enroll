@@ -55,8 +55,7 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   end
 
 Then /(\w+) decides to Update Business information/ do |person|
-  find('.interaction-click-control-update-business-info').click
-  sleep 1
+  find('.interaction-click-control-update-business-info', :wait => 5).click
   screenshot('update_business_info')
 end
 
