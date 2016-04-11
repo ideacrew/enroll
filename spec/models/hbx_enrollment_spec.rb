@@ -395,6 +395,29 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    #context "find_by_benefit_group_assignments" do
+    #  before :all do
+    #    3.times.each do
+    #      enrollment = household.create_hbx_enrollment_from(
+    #        employee_role: mikes_employee_role,
+    #        coverage_household: coverage_household,
+    #        benefit_group: mikes_benefit_group,
+    #        benefit_group_assignment: @mikes_benefit_group_assignments
+    #      )
+    #      enrollment.save
+    #    end
+    #  end
+
+    #  it "should find more than 3 hbx_enrollments" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
+    #  end
+
+    #  it "should return empty array without params" do
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
+    #    expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
+    #  end
+    #end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -1329,7 +1352,7 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
     end
 
     it "should have the eligibility event date of hired_on" do
-      expect(subject.eligibility_event_date).to eq hired_on 
+      expect(subject.eligibility_event_date).to eq hired_on
     end
   end
 
@@ -1394,8 +1417,51 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
       end
 
       it "should have the eligibility event date of hired_on" do
-        expect(subject.eligibility_event_date).to eq hired_on 
+        expect(subject.eligibility_event_date).to eq hired_on
       end
+    end
+  end
+end
+
+describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :after_all do
+  include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
+
+  context "shop_market without dental health minimal requirement calculation " do
+    attr_reader :enrollment, :household, :coverage_household
+    before :all do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      @enrollment = household.create_hbx_enrollment_from(
+        employee_role: mikes_employee_role,
+        coverage_household: coverage_household,
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
+      )
+    end
+
+    it "should return the hbx_enrollments with the benefit group assignment" do
+      enrollment.aasm_state = 'coverage_selected'
+      enrollment.save
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      expect(rs).to include enrollment
+    end
+
+    it "should be empty while the enrollment is not health and status is not showing" do
+      enrollment.aasm_state = 'shopping'
+      enrollment.save
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      expect(rs).to be_empty
+    end
+
+    it "should not return the hbx_enrollments while the enrollment is dental and status is not showing" do
+      enrollment.coverage_kind = 'dental'
+      enrollment.save
+      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      expect(rs).to be_empty
     end
   end
 end

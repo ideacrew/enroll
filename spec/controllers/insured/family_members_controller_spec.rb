@@ -110,7 +110,7 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "POST create" do
     let(:address) { double }
-    let(:dependent) { double(addresses: address, family_member: true, same_with_primary: true) }
+    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:save_result) { false }
 
@@ -159,6 +159,11 @@ RSpec.describe Insured::FamilyMembersController do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("new")
       end
+
+      it "should get addresses as an array" do
+        expect(response).to render_template("new")
+        expect(assigns(:dependent).addresses.class).to eq Array
+      end
     end
   end
 
@@ -206,7 +211,7 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:dependent) { double(addresses: address, family_member: true, same_with_primary: true) }
+    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
@@ -222,10 +227,15 @@ RSpec.describe Insured::FamilyMembersController do
 
     describe "with an invalid dependent" do
       it "should render the edit template" do
-        expect(Address).to receive(:new)
+        expect(Address).to receive(:new).twice
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
+      end
+
+      it "addresses should be an array" do
+        put :update, :id => dependent_id, :dependent => dependent_properties
+        expect(assigns(:dependent).addresses.class).to eq Array
       end
     end
 

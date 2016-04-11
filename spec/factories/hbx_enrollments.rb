@@ -7,6 +7,7 @@ FactoryGirl.define do
     association :plan, factory: [:plan, :with_premium_tables]
     effective_on {1.month.ago.to_date}
     terminated_on nil
+    waiver_reason "this is the reason"
     # broker_agency_id nil
     # writing_agent_id nil
     submitted_at {2.months.ago}

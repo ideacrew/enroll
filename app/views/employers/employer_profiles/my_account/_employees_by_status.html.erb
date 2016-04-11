@@ -24,7 +24,8 @@
 
           <th>Status</th>
 
-          <th>Enrollment Status</th>
+          <!--<th>Coverage Kind</th>-->
+          <th>Enrollment Status (Coverage Kind)</th>
 
           <th>
           </th>
@@ -60,6 +61,7 @@
           <% end %>
 
           <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
+          <!--<td><%#= coverage_kind(census_employee) %></td>-->
           <td><%= enrollment_state(census_employee) %></td>
 
           <td class="table-functions">

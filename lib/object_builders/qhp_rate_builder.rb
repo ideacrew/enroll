@@ -6,10 +6,12 @@ class QhpRateBuilder
 
   def initialize
     @rates_array = []
+    @action = "new"
   end
 
-  def add(rates_hash)
+  def add(rates_hash, action)
     @rates_array = @rates_array + rates_hash[:items]
+    @action = action
   end
 
   def run
@@ -18,7 +20,11 @@ class QhpRateBuilder
       @rate = rate
       build_premium_tables
     end
-    find_plan_and_create_premium_tables
+    if @action == "new"
+      find_plan_and_create_premium_tables
+    else
+      find_plan_and_update_premium_tables
+    end
   end
 
 #metlife has a different format for importing rate templates.
@@ -79,4 +85,21 @@ class QhpRateBuilder
       end
     end
   end
+
+  def find_plan_and_update_premium_tables
+    @results.each do |plan_id, premium_table_hash|
+      unless INVALID_PLAN_IDS.include?(plan_id)
+        @plans = Plan.where(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
+        @plans.each do |plan|
+          pts = plan.premium_tables
+          premium_table_hash.each do |value|
+            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on]).first
+            pt.cost = value[:cost]
+            pt.save
+          end
+        end
+      end
+    end
+  end
+
 end
