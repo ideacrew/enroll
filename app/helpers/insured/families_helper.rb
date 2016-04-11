@@ -94,7 +94,8 @@ module Insured::FamiliesHelper
 
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
-
+  end
+  
   def disable_make_changes_button?(hbx_enrollment)
     if hbx_enrollment.census_employee.blank?
       return false
@@ -105,7 +106,7 @@ module Insured::FamiliesHelper
       else
         return true
       end
-    end  
+    end
   end
 
 end
