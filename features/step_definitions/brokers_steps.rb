@@ -192,15 +192,11 @@ Then(/^.* creates and publishes a plan year$/) do
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  #sleep 1
-  wait_for_ajax(5)
+  wait_for_ajax(10)
   find('.carriers-tab a').click
-  #sleep 1
-  wait_for_ajax(3)
-  sleep 1
+  wait_for_ajax(10)
   find('.reference-plan label').click
-  #sleep 1
-  wait_for_ajax(5)
+  wait_for_ajax(10)
   find('.interaction-click-control-create-plan-year').trigger('click')
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
