@@ -13,6 +13,7 @@ Feature: Create Primary Broker and Broker Agency
   Scenario: Primary Broker has not signed up on the HBX
     When Primary Broker visits the HBX Broker Registration form
         Given Primary Broker has not signed up as an HBX user
+        And Primary Broker clicks on New Broker Agency Tab
         Then Primary Broker should see the New Broker Agency form
         When Primary Broker enters personal information
         And Primary Broker enters broker agency information
@@ -107,3 +108,5 @@ Feature: Create Primary Broker and Broker Agency
         # And Primary Broker clicks on purchase button on the coverage summary page
         # And Primary Broker should see the receipt page
         Then Primary Broker logs out
+
+

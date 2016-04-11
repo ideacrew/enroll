@@ -3,13 +3,15 @@ When(/^.+ visits the HBX Broker Registration form$/) do
   find(".interaction-click-control-broker-registration").click
 end
 
+When(/^Primary Broker clicks on New Broker Agency Tab$/) do
+  find(:xpath, "//label[input[@id='new_broker_agency']]").click
+end
+
 When(/^Primary Broker should see the New Broker Agency form$/) do
   expect(page).to have_css("#broker_agency_form")
 end
 
 When(/^.+ enters personal information$/) do
-  visit "/broker_registration"
-
   fill_in 'organization[first_name]', with: 'Ricky'
   fill_in 'organization[last_name]', with: 'Martin'
   fill_in 'jq_datepicker_ignore_organization[dob]', with: '10/10/1984'
@@ -44,7 +46,7 @@ And(/^(.+) enters? office locations information$/) do |named_person|
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency"
+  find('.interaction-click-control-create-broker-agency').click
 end
 
 Then(/^.+ should see broker registration successful message$/) do
