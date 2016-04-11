@@ -67,9 +67,19 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
-  def hbx_enrollments(census_employee)
-    emp_role = EmployeeRole.find(census_employee.employee_role_id)
-    emp_role.person.primary_family.active_household.hbx_enrollments
+  def hbx_enrollments
+    families = Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+      })
+
+    families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment| 
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
   end
 
   def hbx_enrollment
@@ -94,11 +104,6 @@ class BenefitGroupAssignment
     else
       @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
     end
-  end
-
-  def active_hbx_enrollments(census_employee)
-    hbx_enrollments = self.hbx_enrollments(census_employee) unless self.blank?
-    hbx_enrollments.select{ |e| e[:aasm_state] != "coverage_canceled" } unless self.blank?
   end
 
   def end_benefit(end_on)

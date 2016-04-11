@@ -30,39 +30,70 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       allow(person).to receive(:primary_family).and_return(primary_family)
     end
 
-    context "return enrollment state for census_employee" do
+    context ".enrollment_state" do
 
-      it "with nil" do
-        expect(helper.enrollment_state()).to eq ""
+      context 'when enrollments not present' do 
+
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([]) 
+        end
+
+        it "should return initialized as default" do
+          expect(helper.enrollment_state(census_employee)).to be_blank
+        end
       end
 
-      it "when aasm_state is initialized" do
-        allow(benefit_group_assignment).to receive(:aasm_state).and_return("initialized")
-        expect(helper.enrollment_state(census_employee)).to eq ""
+      context 'when health coverage present' do 
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+        end
+
+        it "should return health enrollment status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
+        end
       end
 
-      it "when aasm_state is coverage_selected and of type Health" do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([health_enrollment])
-        expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
+      context 'when dental coverage present' do 
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([dental_enrollment]) 
+        end
+
+        it "should return dental enrollment status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+        end
       end
 
-      it "when aasm_state is coverage_selected and of type Dental" do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([dental_enrollment])
-        expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+      context 'when both health & dental coverage present' do 
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment]) 
+        end
+
+        it "should return enrollment status for both health & dental" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health), Coverage Selected (Dental)"
+        end
       end
 
-      # Tests the uniqueness
-      it "when there are two plans with state coverage selected and both type dental, should return only one" do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([dental_enrollment, dental_enrollment])
-        expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+      context 'when coverage terminated' do 
+        before do
+          health_enrollment.terminate_coverage!
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+        end
+
+        it "should return terminated status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Terminated (Health)"
+        end
       end
 
-      # Tests the uniqueness
-      it "when there are two plans with state coverage selected and both type health, should return only one" do
-        allow(primary_family).to receive(:enrolled_hbx_enrollments).and_return([health_enrollment, health_enrollment])
-        expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
-      end
+      context 'when coverage waived' do 
+        before do
+          health_enrollment.update_attributes(:aasm_state => :inactive)
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+        end
 
+        it "should return terminated status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Waived (Health)"
+        end
+      end
     end
 
 
