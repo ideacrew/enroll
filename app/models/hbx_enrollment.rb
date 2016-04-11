@@ -940,6 +940,10 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :unverified
     end
 
+    event :force_select_coverage, :after => :record_transition do
+      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
+    end
+
     event :begin_coverage, :after => :record_transition do
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified], to: :coverage_enrolled
       transitions from: :renewing_waived, to: :inactive
@@ -950,7 +954,7 @@ class HbxEnrollment
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified], to: :coverage_canceled
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
       transitions from: :renewing_waived, to: :inactive
     end
   end
