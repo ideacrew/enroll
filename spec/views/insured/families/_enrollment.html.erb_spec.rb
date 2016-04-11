@@ -22,6 +22,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :hios_id => "19393939399",
       :plan_type => "A plan type",
       :created_at =>  TimeKeeper.date_of_record,
+      :active_year => TimeKeeper.date_of_record.year,
 
       :nationwide => true,
       :deductible => 0,
