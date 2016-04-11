@@ -68,11 +68,37 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('label', text: 'Effective date:')
       expect(rendered).to have_selector('strong', text: '08/10/2015')
     end
+<<<<<<< Updated upstream
   end
 
   context "with consumer_role" do
     let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
 
+=======
+
+    it "should disable the Make Changes button when open enrollment is over" do 
+      expect(rendered).to have_selector('.cna') 
+    end
+
+    context "when outside Employers open enrollment period" do
+      before :each do
+        allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+      end
+
+      it "should disable the Make Changes button" do 
+        expect(rendered).to have_selector('.cna') 
+      end
+
+    end
+  
+  end
+
+  context "with consumer_role" do
+    let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record, :active_year => TimeKeeper.date_of_record.year)}
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
+>>>>>>> Stashed changes
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
@@ -106,8 +132,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "about covered_members_first_names of hbx_enrollment" do
-    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record)}
-
+    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record, :active_year => TimeKeeper.date_of_record.year)}
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: [], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
