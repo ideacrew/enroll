@@ -140,7 +140,7 @@ class PeopleController < ApplicationController
     if @dependent.blank?
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
-        if member.save and @dependent.save
+        if member.save && @dependent.save
           @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
@@ -215,7 +215,7 @@ class PeopleController < ApplicationController
     clean_duplicate_addresses
     @person.updated_by = current_user.email unless current_user.nil?
 
-    if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
+    if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
@@ -284,7 +284,8 @@ class PeopleController < ApplicationController
     @person = current_user.person
     @hbx_enrollment = find_hbx_enrollment(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
+    @reference_plan = @hbx_enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
+
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end

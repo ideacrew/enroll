@@ -17,68 +17,57 @@ module Factories
 
       begin
 
-      if @employer_profile.may_enroll_employer?
-        @employer_profile.enroll_employer!
-      elsif @employer_profile.may_force_enroll?
-        @employer_profile.force_enroll!
-      end
+        if @employer_profile.may_enroll_employer?
+          @employer_profile.enroll_employer!
+        elsif @employer_profile.may_force_enroll?
+          @employer_profile.force_enroll!
+        end
 
-      validate_employer_profile
+        validate_employer_profile
 
-      @active_plan_year = @employer_profile.active_plan_year
+        @active_plan_year = @employer_profile.active_plan_year
 
-      @plan_year_start_on = @active_plan_year.end_on + 1.day
-      @plan_year_end_on   = @active_plan_year.end_on + 1.year
+        @plan_year_start_on = @active_plan_year.end_on + 1.day
+        @plan_year_end_on   = @active_plan_year.end_on + 1.year
 
-      open_enrollment_start_on = @plan_year_start_on - 1.month
-      open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+        open_enrollment_start_on = @plan_year_start_on - 2.months
+        open_enrollment_end_on = Date.new((@plan_year_start_on - 1.month).year, (@plan_year_start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
 
-      # # Set renewal open enrollment period
-      # open_enrollment_start_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year - 1.day).year,
-      #                                      @active_plan_year.open_enrollment_end_on.month,
-      #                                      1)
-
-      # open_enrollment_end_on = Date.new((@active_plan_year.open_enrollment_end_on + 1.year).year,
-      #                                    @active_plan_year.open_enrollment_end_on.month,
-      #                                    Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
-
-
-      @renewal_plan_year = @employer_profile.plan_years.build({
-        start_on: @plan_year_start_on,
-        end_on: @plan_year_end_on,
-        open_enrollment_start_on: open_enrollment_start_on,
-        open_enrollment_end_on: open_enrollment_end_on,
-        fte_count: @active_plan_year.fte_count,
-        pte_count: @active_plan_year.pte_count,
-        msp_count: @active_plan_year.msp_count,
-
-    ## Remove this setting when plan year business rules should be engaged
+        @renewal_plan_year = @employer_profile.plan_years.build({
+          start_on: @plan_year_start_on,
+          end_on: @plan_year_end_on,
+          open_enrollment_start_on: open_enrollment_start_on,
+          open_enrollment_end_on: open_enrollment_end_on,
+          fte_count: @active_plan_year.fte_count,
+          pte_count: @active_plan_year.pte_count,
+          msp_count: @active_plan_year.msp_count,
+        ## Remove this setting when plan year business rules should be engaged
         imported_plan_year: @active_plan_year.imported_plan_year
-      })
+        })
 
-      if @renewal_plan_year.may_renew_plan_year?
-        @renewal_plan_year.renew_plan_year
-      else
-        raise PlanYearRenewalFactoryError,
+        if @renewal_plan_year.may_renew_plan_year?
+          @renewal_plan_year.renew_plan_year
+        else
+          raise PlanYearRenewalFactoryError,
           "For employer: #{@employer_profile.inspect}, \n" \
           "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"
-      end
+        end
 
-      if @renewal_plan_year.save
-        renew_benefit_groups
-        @renewal_plan_year
-      else
-        raise PlanYearRenewalFactoryError,
+        if @renewal_plan_year.save
+          renew_benefit_groups
+          @renewal_plan_year
+        else
+          raise PlanYearRenewalFactoryError,
           "For employer: #{@employer_profile.inspect}, \n" \
           "Error(s): \n #{@renewal_plan_year.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n" \
           "Unable to save renewal plan year: #{@renewal_plan_year.inspect}"
+        end
+      rescue Exception => e
+        @logger.debug e.inspect
       end
-    rescue Exception => e
-      @logger.debug e.inspect
-    end
     end
 
-  private
+    private
 
     def validate_employer_profile
       if @employer_profile.plan_years.renewing.any?
@@ -172,7 +161,6 @@ module Factories
 
     def generate_employer_profile_notices
     end
-
   end
 
   class PlanYearRenewalFactoryError < StandardError; end

@@ -140,7 +140,66 @@ RSpec.describe Plan, dbclean: :after_each do
         expect(Plan.create(**params).errors[:active_year]).to eq [active_year_error_message]
       end
     end
+
+    context "with empty dental metal level for coverage_kind = health" do
+
+      def params;
+        valid_params.deep_merge({dental_level: "", coverage_kind: "health"});
+      end
+
+      it "should not save plan object" do
+        expect(Plan.create(**params).errors[:dental_level].any?).to be_falsey
+      end
+    end
+
+    context "with empty dental metal level for coverage_kind = dental" do
+
+      def params;
+        valid_params.deep_merge({dental_level: "", coverage_kind: "dental"});
+      end
+
+      it "should not save plan object" do
+        expect(Plan.create(**params).errors[:dental_level].any?).to be_truthy
+        expect(Plan.create(**params).errors[:dental_level]).to eq [" is not a valid dental metal level kind"]
+      end
+    end
+
+    context "with invalid dental metal level for coverage_kind = dental" do
+
+      def params;
+        valid_params.deep_merge({dental_level: "invalid", coverage_kind: "dental"});
+      end
+
+      it "should not save plan object" do
+        expect(Plan.create(**params).errors[:dental_level].any?).to be_truthy
+        expect(Plan.create(**params).errors[:dental_level]).to eq ["invalid is not a valid dental metal level kind"]
+      end
+    end
+
+    context "with valid dental metal level for coverage_kind = dental" do
+
+      def params;
+        valid_params.deep_merge({dental_level: "low", coverage_kind: "dental"});
+      end
+
+      it "should not save plan object" do
+        expect(Plan.create(**params).errors[:dental_level].any?).to be_falsey
+      end
+    end
   end
+
+  describe "dental_level" do
+    context "check valid options for dental level metal level kind" do
+      it "should return true if valid options are present" do
+        expect(Plan::DENTAL_METAL_LEVEL_KINDS).to eq ["high", "low"]
+      end
+
+      it "should return false if invalid options are present" do
+        expect(Plan::DENTAL_METAL_LEVEL_KINDS).not_to eq ["dental", "high", "low"]
+      end
+    end
+  end
+
 
   describe ".premium_table_for" do
     let(:valid_plan_params) do
@@ -439,10 +498,10 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "individual_plans" do
-      let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
-      let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
-      let(:plan4) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+      let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
+      let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
+      let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
       let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
 
       before :each do

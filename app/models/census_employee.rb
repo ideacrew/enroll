@@ -61,9 +61,20 @@ class CensusEmployee < CensusMember
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
 
   #TODO - need to add fix for multiple plan years
-  scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
-  scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
-  scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+  # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
+  # scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
+  # scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+
+  scope :covered,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
+    })}
+
+  scope :waived,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
+    })}
+
+  scope :enrolled, -> { any_of([covered.selector, waived.selector]) }
+
 
   scope :employee_name, -> (employee_name) { any_of({first_name: /#{employee_name}/i}, {last_name: /#{employee_name}/i}, first_name: /#{employee_name.split[0]}/i, last_name: /#{employee_name.split[1]}/i) }
 
@@ -97,7 +108,7 @@ class CensusEmployee < CensusMember
   end
 
   def update_hbx_enrollment_effective_on_by_hired_on
-    if employee_role.present? and hired_on != employee_role.hired_on
+    if employee_role.present? && hired_on != employee_role.hired_on
       employee_role.set(hired_on: hired_on)
       enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
       enrollments.each do |enrollment|
@@ -107,6 +118,18 @@ class CensusEmployee < CensusMember
         end
       end
     end
+  end
+
+  def new_hire_enrollment_period
+    start_on = [hired_on, created_at].max
+    end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
+    (start_on.beginning_of_day)..(end_on.end_of_day)
+  end
+
+  # TODO: eligibility rule different for active and renewal plan years
+  def earliest_eligible_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    benefit_group_assignment.benefit_group.eligible_on(hired_on) if benefit_group_assignment
   end
 
   # def first_name=(new_first_name)
@@ -325,9 +348,13 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? or (person.present? and person.has_active_employee_role?)
+    return false if person.blank? || (person.present? && person.has_active_employee_role?)
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
+  end
+
+  def has_active_health_coverage?
+    HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).present?
   end
 
   class << self
@@ -348,12 +375,12 @@ class CensusEmployee < CensusMember
     def find_all_terminated(employer_profiles: [], date_range: (TimeKeeper.date_of_record..TimeKeeper.date_of_record))
 
       if employer_profiles.size > 0
-        employer_profile_ids = employer_profiles.map(&:_id) 
+        employer_profile_ids = employer_profiles.map(&:_id)
         query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last
-                                    )      
+                                    )
       else
         query = unscoped.terminated.where(
                                     :employment_terminated_on.gte => date_range.first,
@@ -418,13 +445,13 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
-    if employment_terminated_on and employment_terminated_on <= hired_on
+    if employment_terminated_on && employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before hiring date")
     end
   end
 
   def check_coverage_terminated_on
-    if employment_terminated_on and employment_terminated_on <= TimeKeeper.date_of_record - 60.days
+    if employment_terminated_on && employment_terminated_on <= TimeKeeper.date_of_record - 60.days
       errors.add(:base, "Employee termination must be within the past 60 days")
     end
   end

@@ -43,11 +43,11 @@
         <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
         <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
         <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
-        <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
+        <% if @census_employee.employee_role.try(:present?) && employee_role = @census_employee.employee_role %>
         <p>HIRED: <%= employee_role.try(:hired_on) %></p>
         <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
         <% end %>
-        <% if @plan.present? and @hbx_enrollment.present? %>
+        <% if @plan.present? && @hbx_enrollment.present? %>
 
       </div>
       <div class="table-border table-responsive">
@@ -64,7 +64,7 @@
           </thead>
 
             <tbody>
-              <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+              <!-- <%# @hbx_enrollment.hbx_enrollment_members.each do |member| %>
                 <tr>
                   <td><%= member.person.full_name %></td>
                   <td><%= member.primary_relationship %></td>
@@ -73,7 +73,7 @@
                   <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
                   <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
                 </tr>
-              <% end %>
+              <%# end %> -->
               <tr class="gray-row">
                 <td class="capital"><strong>Totals</strong></td>
                 <td></td>

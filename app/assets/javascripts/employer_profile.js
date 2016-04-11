@@ -1,3 +1,74 @@
+$(document).ready(function() {
+  if ('input.typeahead') {
+    var employers = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('legal_name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        prepare: function (query, settings) {
+          settings.type = "POST";
+          settings.data = { q: query };
+          return settings;
+        },
+        url: '/employers/search'
+      }
+    });
+
+    // initialize the bloodhound suggestion engine
+    employers.initialize();
+    // instantiate the typeahead UI
+    $('input.typeahead').typeahead({
+      hint: false,
+      minLength: 2
+    },{
+      display: 'legal_name',
+      name: 'employers',
+      source: employers.ttAdapter()
+    });
+
+    $('input.typeahead').on('blur keyup', function(e) {
+      if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
+        $('#office_locations_buttons a.btn').removeAttr('disabled');
+        $('input#employer_id').val("");
+        $('input#organization_dba').val("").removeAttr('readonly');
+        $('input#organization_fein').val("").removeAttr('readonly');
+        $('select#organization_entity_kind').val("").removeAttr('disabled').selectric('refresh');
+        $('select#organization_office_locations_attributes_0_address_attributes_kind').val("primary").removeAttr('disabled').selectric('refresh');
+        $('input#organization_office_locations_attributes_0_address_attributes_address_1').val("").removeAttr('readonly');
+        $('input#organization_office_locations_attributes_0_address_attributes_address_2').val("").removeAttr('readonly');
+        $('input#organization_office_locations_attributes_0_address_attributes_city').val("").removeAttr('readonly');
+        $('select#organization_office_locations_attributes_0_address_attributes_state').val("").removeAttr('disabled').selectric('refresh');
+        $('input#organization_office_locations_attributes_0_address_attributes_zip').val("").removeAttr('readonly');
+
+        $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val("").removeAttr('readonly');
+        $('input#organization_office_locations_attributes_0_phone_attributes_number').val("").removeAttr('readonly');
+        $('input#organization_office_locations_attributes_0_phone_attributes_extension').val("").removeAttr('readonly');
+      };
+    });
+
+    $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
+
+      $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
+      $('input#employer_id').val(suggestion._id);
+      $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
+      $('input#organization_fein').val(suggestion.fein).attr('readonly', 'readonly');
+      $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+      var primary_office = suggestion.office_locations[0]
+      if (primary_office) {
+        $('select#organization_office_locations_attributes_0_address_attributes_kind').val(primary_office.address.kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+        $('input#organization_office_locations_attributes_0_address_attributes_address_1').val(primary_office.address.address_1).attr('readonly', 'readonly');
+        $('input#organization_office_locations_attributes_0_address_attributes_address_2').val(primary_office.address.address_2).attr('readonly', 'readonly');
+        $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city).attr('readonly', 'readonly');
+        $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+        $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip).attr('readonly', 'readonly');
+
+        $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code).attr('readonly', 'readonly');
+        $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number).attr('readonly', 'readonly');
+        $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension).attr('readonly', 'readonly');
+      }
+    });
+  }
+});
+
 $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
@@ -28,15 +99,14 @@ $(document).on('click', ".show_confirm", function(){
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
   var link_to_delete = $(this).data('link');
-  console.log(termination_date);
-  console.log(link_to_delete);
+
   $.ajax({
     type: 'get',
     datatype : 'js',
     url: link_to_delete,
     data: {termination_date: termination_date},
     success: function(response){
-  
+
         window.location.reload();
 
     },
@@ -169,3 +239,16 @@ function checkAreaCode(textbox) {
   }
   return true;
 }
+
+  //toggling of divs that show plan details (view details)
+  $('.nav-toggle').click(function(){
+    var collapse_content_selector = $(this).attr('href');
+    var toggle_switch = $(this);
+    $(collapse_content_selector).slideToggle('fast', function(){
+      if($(this).css('display')=='none'){
+        toggle_switch.html('View Details <i class="fa fa-chevron-down fa-lg">');
+      }else{
+        toggle_switch.html('Hide Details <i class="fa fa-chevron-up fa-lg">');
+      }
+    });
+  });

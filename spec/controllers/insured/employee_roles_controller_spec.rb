@@ -235,8 +235,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     before(:each) do
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
+      allow(census_employee).to receive(:is_active?).and_return(true)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
-      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, census_employee).and_return(employment_relationships)
+      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
       post :match, :person => person_parameters
     end
 

@@ -149,7 +149,7 @@ private
   end
 
   def cancel_benefit
-    employer_profile.benefit_canceled!
+    employer_profile.benefit_canceled! if employer_profile.may_benefit_canceled?
   end
 
   def suspend_benefit

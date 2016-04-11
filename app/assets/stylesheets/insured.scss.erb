@@ -195,11 +195,26 @@
     font-weight: 600;
   }
 }
-#plans {
-  .sbc_link {
-    margin-top: 6px;
-    display: inline-block;
+.module {
+  &.plan-row {
+    .sbc_link {
+      margin-top: 6px;
+    }
   }
+  .sbc_link {
+    display: inline-block;
+    &.dental {
+      position: relative;
+      span {
+        position: absolute;
+        margin-top: 10px !important;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+.modal {
+  
 }
 .horizontal-status {
   padding: 3.75% 0 1.25%;

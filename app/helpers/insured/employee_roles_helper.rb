@@ -10,7 +10,7 @@ module Insured::EmployeeRolesHelper
   def coverage_relationship_check(offered_relationship_benefits=[], family_member)
     relationship = PlanCostDecorator.benefit_relationship(family_member.primary_relationship)
 
-    if relationship == "child_under_26" and calculate_age_by_dob(family_member.dob) > 26
+    if relationship == "child_under_26" && calculate_age_by_dob(family_member.dob) > 26
       relationship = "child_over_26"
     end
 

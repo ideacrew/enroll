@@ -12,7 +12,7 @@ module Forms
     include NpnField
 
     validates :market_kind,
-      inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid market kind" },
+      inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
       allow_blank: false
 
     validates :email, :email => true, :allow_blank => false

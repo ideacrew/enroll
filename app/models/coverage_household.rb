@@ -171,7 +171,7 @@ class CoverageHousehold
 
 private
   def presence_of_coverage_household_members
-    if self.coverage_household_members.size == 0 and is_immediate_family
+    if self.coverage_household_members.size == 0 && is_immediate_family
       self.errors.add(:base, "Should have at least one coverage_household_member")
     end
   end

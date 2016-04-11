@@ -30,8 +30,10 @@ module Insured::FamiliesHelper
   def render_plan_type_details(plan)
     plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
 
+    metal_level = display_dental_metal_level(plan)
+
     if plan_level = plan.try(:metal_level).try(:humanize)
-      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{plan_level}</span>"
+      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{metal_level}</span>"
     end
 
     if plan.try(:nationwide)
@@ -93,12 +95,16 @@ module Insured::FamiliesHelper
     if hbx_enrollment.census_employee.blank?
       return false
     else
-      if !hbx_enrollment.census_employee.employee_role.blank? && hbx_enrollment.census_employee.employee_role.is_under_open_enrollment?
+      if !hbx_enrollment.census_employee.employee_role.blank? && hbx_enrollment.census_employee.employee_role.is_under_open_enrollment? && hbx_enrollment.plan.active_year == TimeKeeper.date_of_record.year
         return false
       else
         return true
       end
     end  
+  end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
 end
