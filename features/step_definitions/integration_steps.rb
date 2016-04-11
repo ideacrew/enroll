@@ -63,6 +63,24 @@ def people
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "CareFirst Broker" => {
+      first_name: 'Broker',
+      last_name: 'martin',
+      dob: "05/07/1977",
+      ssn: "761111111",
+      email: 'broker.martin@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "John Wood" => {
+      first_name: "John",
+      last_name: "Wood",
+      dob: "03/13/1977",
+      legal_name: "Acmega LLC",
+      dba: "Acmega LLC",
+      fein: "890112233",
+      email: 'johb.wood@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "John Doe" => {
       first_name: "John",
       last_name: "Doe#{rand(1000)}",
@@ -372,10 +390,13 @@ end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # Sometimes bombs due to overlapping modal
+  # TODO: fix this bombing issue
+  wait_for_ajax
   person = people[named_person]
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
+  wait_for_ajax
   find("#person_addresses_attributes_0_address_1").click
   find("#person_addresses_attributes_0_address_2").click
   find("#person_addresses_attributes_0_city").click

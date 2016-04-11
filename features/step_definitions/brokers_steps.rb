@@ -41,10 +41,6 @@ And(/^.+ enters broker agency information$/) do
   find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
 end
 
-And(/^(.+) enters? office locations information$/) do |named_person|
-  enter_office_location(default_office_location)
-end
-
 And(/^.+ clicks? on Create Broker Agency$/) do
   find('.interaction-click-control-create-broker-agency').click
 end
@@ -117,6 +113,8 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
+  #TODO add AJAX handling
+  wait_for_ajax(3)
   expect(page).to have_content('Broker Agencies')
 end
 
@@ -194,13 +192,16 @@ Then(/^.* creates and publishes a plan year$/) do
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  sleep 1
+  #sleep 1
+  wait_for_ajax
   find('.carriers-tab a').click
+  #sleep 1
+  wait_for_ajax(3)
   sleep 1
   find('.reference-plan label').click
-  sleep 1
+  #sleep 1
+  wait_for_ajax(5)
   find('.interaction-click-control-create-plan-year').trigger('click')
-
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
@@ -216,7 +217,8 @@ Then(/^.+ should see the matched employee record form$/) do
 end
 
 Then(/^Broker Assisted is a family$/) do
-  sleep 1
+  #sleep 1
+  wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
 end
