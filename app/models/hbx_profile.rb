@@ -199,7 +199,6 @@ class HbxProfile
           eligible_members << member.person.full_name
         end
       end
-      binding.pry
       return eligible_members
     end
     ###
