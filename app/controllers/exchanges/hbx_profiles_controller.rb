@@ -263,6 +263,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
     @grid_vals = HbxProfile.build_grid_values_for_aptc_csr(@family)
+    @aptc_applied = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0 
+    @max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+    @csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
     #@apt_csr_header_list = ['Plan Premium','APTC Applied','Available APTC','Max APTC','CSR Percentage','SLCSP','Individuals Covered']
     #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
     respond_to do |format|
@@ -296,7 +299,8 @@ class Exchanges::HbxProfilesController < ApplicationController
           member.is_ia_eligible = true
         else
           member.is_ia_eligible = false
-        end 
+        end
+        member.save! 
       end
 
     end

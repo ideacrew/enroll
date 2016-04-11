@@ -39,7 +39,7 @@
         <tbody>
             <%@grid_vals.keys.each do |key_hdr|%>
               <tr>
-                  <%if key_hdr != "all_members"%>
+                  <%if key_hdr != "individuals_covered" && key_hdr != "eligible_members"%>
                       <td><%=key_hdr.titleize.upcase%></td>
                   
                       <% @grid_vals[key_hdr].each do |key, val| %>
@@ -48,54 +48,40 @@
                           <%end%> 
                       <%end%>
                       <td></td>
-                      <td> <%= text_field_tag "#{key_hdr.to_s}", "", placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%></td>
+                      <td>
+                          <%if key_hdr == "aptc_applied"%> 
+                              <%= text_field_tag "#{key_hdr.to_s}", @aptc_applied, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
+                          <%elsif key_hdr == "max_aptc"%>
+                              <%= text_field_tag "#{key_hdr.to_s}", @max_aptc, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
+                          <%elsif key_hdr == "csr_percentage"%>
+                              <%= text_field_tag "#{key_hdr.to_s}", @csr_percent_as_integer, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
+                          <%end%> 
+                      </td>
                   <%end%>
               </tr>
+              <tr></tr>
             <%end%>         
-            <%#binding.pry%>
-            <%if @grid_vals["all_members"]["eligible"].blank?%>
-                <tr>
-                  <th>Individual(s) Not Covered</th>
-                  <% @grid_vals.first[1].each do |key, val| %>
-                    <th><%=key.capitalize%></th>
-                  <%end%>
-                  <th></th>
-                  <th></th>
-                  
-                </tr>
-                <% @grid_vals["all_members"]["not_eligible"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
-                  <tr>
-                    <td><b><%=one_ind.keys.first%></b></td>
-                      <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
-                        <td colspan = "12">
-                          <%#=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'accepted', val, disabled: true%>
-                          This member has no active elibility for year <%=TimeKeeper.date_of_record.year%>. <%break%>
-                        </td>
-                      <%end%>
-                      <td></td>
-                      <td></td>
-                  </tr>
-                <%end%>
-            <%else%>
+
                 <tr>
                   <th>Individual(s) Covered</th>
                   <% @grid_vals.first[1].each do |key, val| %>
                     <th><%=key.capitalize%></th>
                   <%end%>
                   <th></th>
-                  <th>Edit Individual(s)</th>
+                  <th>Eligible?</th>
                 </tr>
-                <% @grid_vals["all_members"]["eligible"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
+                <% @grid_vals["individuals_covered"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
                   <tr>
                     <td><%=one_ind.keys.first%></td>
                       <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
                         <td><%=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'checked', val, disabled: true%></td>
                       <%end%>
+                      <%binding.pry%>
                       <td></td>
-                      <td><%=check_box_tag "#{one_ind.keys.first.to_s}", 'accepted', '', disabled: false%></td>
+                      <td><%=check_box_tag "#{one_ind.keys.first.to_s}", 'accepted', (@grid_vals["eligible_members"].include? one_ind.keys.first.to_s), disabled: false%></td>
                   </tr>
                 <%end%>
-            <%end%>
+
         </tbody> 
       </table>
       <div align="right"><%= f.submit "Confirm", class: "btn btn-primary btn-lg" %></div>
