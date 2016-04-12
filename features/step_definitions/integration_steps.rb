@@ -63,6 +63,24 @@ def people
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "CareFirst Broker" => {
+      first_name: 'Broker',
+      last_name: 'martin',
+      dob: "05/07/1977",
+      ssn: "761111111",
+      email: 'broker.martin@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "John Wood" => {
+      first_name: "John",
+      last_name: "Wood",
+      dob: "03/13/1977",
+      legal_name: "Acmega LLC",
+      dba: "Acmega LLC",
+      fein: "890112233",
+      email: 'johb.wood@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "John Doe" => {
       first_name: "John",
       last_name: "Doe#{rand(1000)}",
@@ -153,7 +171,7 @@ Given(/^Hbx Admin exists$/) do
   plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
-Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
+Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
@@ -166,7 +184,25 @@ Given(/^Employer for (.*) exists with a published plan year$/) do |named_person|
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, 2.days.ago
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/^Employer for (.*) exists with a published plan year offering health and dental$/) do |named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date]
+
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
+  benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   Caches::PlanDetails.load_record_cache!
 end
 
@@ -196,7 +232,6 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
-  #TODO bombs on selectric scroll sometimes...
   sleep(1)
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
@@ -355,11 +390,14 @@ end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # Sometimes bombs due to overlapping modal
+  # TODO: fix this bombing issue
+  wait_for_ajax(10)
   person = people[named_person]
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
-  find("#person_addresses_attributes_0_address_1").click
+  wait_for_ajax(10)
+  find("#person_addresses_attributes_0_address_1", :wait => 10).click
   find("#person_addresses_attributes_0_address_2").click
   find("#person_addresses_attributes_0_city").click
   find("#person_addresses_attributes_0_zip").click
@@ -425,6 +463,20 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
+Then(/^.+ should see the group selection page with health or dental dependents list$/) do
+  expect(page).to have_css('form')
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
+  find(:xpath, '//label[@for="coverage_kind_dental"]').click
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
+  find(:xpath, '//label[@for="coverage_kind_health"]').click
+  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
+  expect(page).to have_selector('.group-selection-table.health', visible: true)
+end
+
+When(/^.+ clicks? health radio on the group selection page$/) do
+  find(:xpath, '//label[@for="coverage_kind_dental"]').click
+end
+
 When(/^.+ clicks? continue on the group selection page$/) do
   find('#btn-continue').click
 end
@@ -434,10 +486,25 @@ Then(/^.+ should see the plan shopping welcome page$/) do
   screenshot("plan_shopping_welcome")
 end
 
+Then(/^.+ should see the plan shopping page with no dependent$/) do
+  expect(page).to have_content('0 dependent(s)')
+end
+
+Then(/^.+ should see the plan shopping page with one dependent$/) do
+  expect(page).to have_content('1 dependent(s)')
+end
+
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
   scroll_then_click(@browser.a(text: "Continue"))
 end
 
+When(/^.+ clicks? my insured portal link$/) do
+  click_link 'My Insured Portal'
+end
+
+When(/^.+ clicks? shop for plans button$/) do
+  click_button "Shop for Plans"
+end
 
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')
@@ -523,11 +590,14 @@ And(/^.+ should see the premium billings report$/) do
 end
 
 When(/^.+ should see a published success message without employee$/) do
+  # TODO: Fix checking for flash messages. We will need to check using
+  #       xpath for an element that may not be visible, but has already
+  #       been faded away by jQuery.
   expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  find('.interaction-click-control-add-new-employee').click
+  find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
@@ -606,6 +676,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
   end

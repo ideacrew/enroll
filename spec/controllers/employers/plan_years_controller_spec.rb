@@ -5,6 +5,20 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
 
+  describe "GET reference_plan_summary" do
+    let(:qhp_cost_share_variance){ Products::QhpCostShareVariance.new }
+    it 'should return qhp cost share variance for the plan' do
+      allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return([qhp_cost_share_variance])
+      sign_in
+      xhr :get, :reference_plan_summary, coverage_kind: "health", start_on: 2016, hios_id: "48484848", employer_profile_id: "1111", format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("reference_plan_summary")
+      expect(assigns[:visit_types].size).to eq 11
+      expect(assigns[:qhps]).to be_an_instance_of(Array)
+      expect(assigns[:qhps].first).to be_an_instance_of(Products::QhpCostShareVariance)
+    end
+  end
+
   describe "GET new" do
 
     before :each do
@@ -168,8 +182,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     allow(employer_profile).to receive(:plan_years).and_return(plan_years)
     allow(plan_years).to receive(:where).and_return([plan_year])
     allow(benefit_group).to receive(:elected_plans=).and_return("test")
+    allow(benefit_group).to receive(:elected_dental_plans=).and_return("test")
     allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+    allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
     allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+    allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -266,8 +283,12 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
   allow(employer_profile).to receive(:default_benefit_group).and_return(nil)
   allow(benefit_group).to receive(:elected_plans=).and_return("test")
+  allow(benefit_group).to receive(:elected_dental_plans=).and_return("test")
   allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
   allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
+  allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
+  allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
+
   allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
@@ -493,9 +514,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
-
       sign_in
-      xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id
+      xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 
       expect(response).to have_http_status(:success)
     end

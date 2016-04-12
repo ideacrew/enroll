@@ -112,7 +112,7 @@ class Family
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
   scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
-  
+
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
@@ -177,6 +177,7 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
+
   end
 
   def primary_family_member
@@ -490,6 +491,10 @@ class Family
 
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def enrolled_including_waived_hbx_enrollments
+    latest_household.try(:enrolled_including_waived_hbx_enrollments)
   end
 
   def save_relevant_coverage_households

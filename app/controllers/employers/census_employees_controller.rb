@@ -169,14 +169,12 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @benefit_group_assignment = @census_employee.active_benefit_group_assignment
+    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
+      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
+      @benefit_group = @benefit_group_assignment.benefit_group
+    end
 
-    @hbx_enrollment = @benefit_group_assignment.try(:hbx_enrollment)
-    @benefit_group = @benefit_group_assignment.try(:benefit_group)
-    # reference_plan = @benefit_group.try(:reference_plan)
-    @plan = @hbx_enrollment && @hbx_enrollment.decorated_hbx_enrollment
-
-    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? && @benefit_group.present? && reference_plan.present?
+    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
   def delink

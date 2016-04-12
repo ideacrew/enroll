@@ -284,7 +284,8 @@ class PeopleController < ApplicationController
     @person = current_user.person
     @hbx_enrollment = find_hbx_enrollment(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
+    @reference_plan = @hbx_enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
+
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end

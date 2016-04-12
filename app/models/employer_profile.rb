@@ -22,6 +22,11 @@ class EmployerProfile
   ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
+  PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]
+
+  field :profile_source, type: String, default: "self_serve"
+  field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -47,6 +52,10 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
+
+  validates :profile_source,
+    inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
+    allow_blank: false
 
   validates :entity_kind,
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
@@ -160,15 +169,19 @@ class EmployerProfile
   end
 
   def show_plan_year
-    if renewing_published_plan_year && renewing_published_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-      renewing_published_plan_year
-    else
-      active_plan_year || published_plan_year || renewing_published_plan_year
-    end
+    renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+  end
+
+  def find_plan_year_for_coverage_effective_date(target_date)
+    plan_year = find_plan_year_by_effective_date(target_date)
+    if profile_source.to_s == 'conversion'
+      return if plan_year.coverage_period_contains?(registered_on)
+    end
+    plan_year
   end
 
   def find_plan_year_by_effective_date(target_date)
@@ -324,12 +337,12 @@ class EmployerProfile
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
-      Organization.where(
-        "$and" => [
-          {:"employer_profile.plan_years.aasm_state".in => PlanYear::PUBLISHED },
-          {:"employer_profile.plan_years.start_on" => (new_date + months_prior_to_effective.months) - 1.year }
-        ]
-      )
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
+          :"aasm_state".in => PlanYear::PUBLISHED
+        }
+      })
     end
 
     def advance_day(new_date)
@@ -354,18 +367,18 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        # employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        # employer_enroll_factory.date = new_date
+        employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        employer_enroll_factory.date = new_date
 
-        # organizations_for_plan_year_begin(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.begin
-        # end
+        organizations_for_plan_year_begin(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.begin
+        end
 
-        # organizations_for_plan_year_end(new_date).each do |organization|
-        #   employer_enroll_factory.employer_profile = organization.employer_profile
-        #   employer_enroll_factory.end
-        # end
+        organizations_for_plan_year_end(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.end
+        end
       end
 
       # Employer activities that take place monthly - on first of month

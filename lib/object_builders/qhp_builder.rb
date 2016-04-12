@@ -137,11 +137,13 @@ class QhpBuilder
   end
 
   def associate_plan_with_qhp
+    @dental_metal_level = ""
     effective_date = @qhp.plan_effective_date.to_date
     @qhp.plan_effective_date = effective_date.beginning_of_year
     @qhp.plan_expiration_date = effective_date.end_of_year
     @plan_year = effective_date.year
     if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
+      @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
       create_plan_from_serff_data
     end
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
@@ -159,7 +161,8 @@ class QhpBuilder
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
           nationwide: nation_wide,
-          dc_in_network: dc_in_network
+          dc_in_network: dc_in_network,
+          dental_level: @dental_metal_level
       )
       up_plan.save!
     end
@@ -199,7 +202,8 @@ class QhpBuilder
           ehb: @qhp.ehb_percent_premium,
           # carrier_profile_id: "53e67210eb899a460300000d",
           carrier_profile_id: get_carrier_id(@carrier_name),
-          coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
+          coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+          dental_level: @dental_metal_level
           )
         if new_plan.valid?
           new_plan.save!

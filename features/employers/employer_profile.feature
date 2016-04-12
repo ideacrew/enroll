@@ -2,14 +2,14 @@
 Feature: Employer Profile
   In order for employers to manage their accounts
   Employer Staff should be able to add and delete employer staff roles
-  
+  @wip
   Scenario: An existing person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
     Given BusyGuy is a person
     Given BusyGuy accesses the Employer Portal
 
-    Given BusyGuy selects Turner Agency, Inc from the dropdown
+    Given BusyGuy enters data for Turner Agency, Inc
     Then BusyGuy is notified about Employer Staff Role application is pending
     Then BusyGuy logs out
     When Hannah accesses the Employer Portal
@@ -43,16 +43,16 @@ Feature: Employer Profile
     And Sarah decides to Update Business information
     Then Point of Contact count is 1
     Then Sarah logs out
-
+  @wip
   Scenario: A new person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
     Given NewGuy is a user with no person who goes to the Employer Portal
     Given NewGuy enters first, last, dob and contact info
-    Given NewGuy selects Turner Agency, Inc from the dropdown
+    Given NewGuy enters data for Turner Agency, Inc
     Then NewGuy is notified about Employer Staff Role application is pending
     Then NewGuy logs out
-    # Could be HBXAdmin or Broker or Hannah doing approval
+    # Could be HBXAdmin or Broker
     Given Admin is a person
     Given Admin has HBXAdmin privileges
     And Admin accesses the Employers tab of HBX portal
@@ -78,3 +78,4 @@ Scenario: A new person claims an existing unclaimed company
     Then NewGuy becomes an Employer
     When NewGuy decides to Update Business information
     Then Point of Contact count is 1
+    And NewGuy logs out

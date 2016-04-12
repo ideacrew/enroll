@@ -1,8 +1,7 @@
 <div class="row">
-  <div id="scroll_container" class=<%= @benefit_group.plan_option_kind == "single_plan" ? "col-xs-9" : "col-xs-12" %>>
-
+  <div id="scroll_container" class="col-xs-12">
     <div>
-      <label>Plan Offerings - <%= render_plan_offerings(@benefit_group) %></label>
+      <label class="plan-offerings">Plan Offerings - <%= render_plan_offerings(@benefit_group, @coverage_type) %></label>
     </div>
     <div>
       <label>Employer Lowest/Reference/Highest - <%= number_to_currency(@benefit_group_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:highest_plan_employer_cost]) %></label>
@@ -13,11 +12,11 @@
         <tr>
           <th>Employee</th>
           <th>Dependent Count</th>
-          <% if !@benefit_group.single_plan_type? %>
+          <% if !@benefit_group.single_plan_type? || @coverage_type == '.dental' %>
           <th>Lowest Cost Available Plan</th>
           <% end %>
           <th>Reference Plan</th>
-          <% if !@benefit_group.single_plan_type? %>
+          <% if !@benefit_group.single_plan_type? || @coverage_type == '.dental'%>
           <th>Highest Cost Available Plan</th>
           <% end %>
         </tr>
@@ -55,7 +54,7 @@
 
 //   initialLoad = true;
 
-//   $(window).scroll(function() {  
+//   $(window).scroll(function() {
 //     if($(window).scrollTop() == $(document).height() - $(window).height()) {
 //       if (!initialLoad) {
 //       loaded[pages[current+1]] = loaded[pages[current+1]] + 1;

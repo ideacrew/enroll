@@ -8,17 +8,25 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
-  visit "/"
-  click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
+  sleep 2
+  visit "/"
+  click_link 'Consumer/Family Portal'
   screenshot("individual_start")
+end
+
+And(/Individual asks how to make an email account$/) do
+
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.a(text: /Don't have an email account?/).fire_event("onclick")
+  @browser.element(class: /modal/).wait_until_present
+  @browser.element(class: /interaction-click-control-×/).fire_event("onclick")
 end
 
 Then(/Individual creates HBX account$/) do
   click_button 'Create account'
-
   fill_in "user[email]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -144,11 +152,14 @@ And(/Individual again clicks on add member button/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
+  #testing
+  screenshot("added member")
   click_button "Confirm Member"
 end
 
 
 And(/I click on continue button on household info form/) do
+  screenshot("line 161")
   click_link "Continue"
 end
 
@@ -158,8 +169,15 @@ end
 
 And(/I click on continue button on group selection page/) do
   #TODO This some group selection nonsense
-  click_link "Continue" #Get
-  click_button "CONTINUE" #Post
+  #wait_for_ajax(2,2)
+  screenshot("test1")
+  #click_link "Continue" #Get
+  click_button "CONTINUE"
+  screenshot("test2")
+  wait_for_ajax
+  find(:xpath, '//*[@id="btn-continue"]').trigger('click')
+  #click_button "Continue" #Post
+  screenshot("test3")
   #Goes off the see the wizard at /I select three plans to compare/ for now
 end
 
@@ -187,6 +205,35 @@ And(/I should see the individual home page/) do
   # click_link "Documents"
   # click_link "Manage Family"
   # click_link "My DC Health Link"
+end
+
+Then(/^Individual edits a dependents address$/) do
+  click_link 'Add Member'
+end
+
+Then(/^Individual fills in the form$/) do
+  fill_in 'dependent[first_name]', :with => (@u.first_name :first_name)
+  fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
+  fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
+  fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
+  find('.house .selectric p.label').trigger 'click'
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
+  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
+  find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+end
+
+Then(/^Individual ads address for dependent$/) do
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
+  fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
+  fill_in 'dependent[addresses][0][city]', :with => 'Washington'
+  find('#address_info .selectric p.label').trigger 'click'
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
+  fill_in 'dependent[addresses][0][zip]', :with => "20002"
+  click_button 'Confirm Member'
+  find('#btn-continue').click
 end
 
 And(/I click to see my Secure Purchase Confirmation/) do
@@ -223,7 +270,9 @@ end
 
 Then(/Individual asks for help$/) do
   find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  sleep 1
   click_link "Help from a Customer Service Representative"
+  sleep 1
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
@@ -285,6 +334,7 @@ end
 
 Then(/^click continue again$/) do
   wait_and_confirm_text /continue/i
+  sleep(1)
   scroll_then_click(@browser.a(text: /continue/i))
 end
 
