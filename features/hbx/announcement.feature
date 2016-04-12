@@ -7,6 +7,10 @@ Feature: Hbx staff create announcements for consumer role
     Then Hbx admin should see the page of announcements
     When Hbx admin enter announcement info
     Then Hbx admin should see the current announcement
+    When Hbx admin enter announcement info with future date
+    Then Hbx admin should not see the future announcement
+    When Hbx admin click the link of all
+    Then Hbx admin should see the future announcement
     Then Hbx admin logs out
 
   Scenario: Consumer see announcement for consumer role
