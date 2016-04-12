@@ -153,6 +153,8 @@ class Employers::CensusEmployeesController < ApplicationController
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
           new_census_employee.benefit_group_assignments.build if new_census_employee.benefit_group_assignments.blank?
+          new_census_employee.construct_employee_role_for_match_person
+          
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
