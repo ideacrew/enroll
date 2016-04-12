@@ -27,6 +27,12 @@ module Employers::EmployerHelper
       'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES,
       'coverage_waived' => HbxEnrollment::WAIVED_STATUSES
     }
+
+    assignment_mapping.each do |bgsm_state, enrollment_statuses|
+      if enrollment_statuses.include?(enrollment_status.to_s)
+        return bgsm_state
+      end
+    end
   end
 
   def renewal_enrollment_state(census_employee=nil)

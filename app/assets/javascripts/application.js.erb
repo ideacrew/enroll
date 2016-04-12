@@ -481,11 +481,11 @@ $(document).ready(function () {
     })
   }
   //employees table table functions
-  $('.table-functions i.fa-trash-o').on('click', function() {
+  $(document).on('click', '.table-functions i.fa-trash-o', function()  {
     $(this).closest("tr").next().show();
     $(this).closest("tr").hide();
   });
-  $('a.terminate.cancel').on('click', function() {
+  $(document).on('click', 'a.terminate.cancel', function()  {
     $(this).closest('tr').prev().show();
     $(this).closest('tr').hide();
   });
