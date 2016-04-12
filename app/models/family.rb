@@ -120,7 +120,7 @@ class Family
 
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
-  scope :active_assistance_receiving,   ->{ all_assistance_receiving.exists(:"households.tax_households.effective_ending_on" => false) }
+  scope :active_assistance_receiving,   ->{ all_assistance_receiving.where(:"households.tax_households.effective_ending_on" => nil) }
   scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
 
 

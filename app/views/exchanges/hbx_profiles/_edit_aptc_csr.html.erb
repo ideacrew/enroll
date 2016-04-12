@@ -25,7 +25,10 @@
     <%= form_for @person, remote: true, url: update_aptc_csr_path, method: "post", class: "form" do |f|%>
       <%= f.hidden_field :person_id, value: @person.id %>
       <%= f.hidden_field :family_id, value: @family.id %>
-       <div align="center"> <%= link_to 'Calculate Available APTC', edit_aptc_csr_path(family_id: @family.id, person_id: @person.id), class: "btn btn-default btn", remote: true%></div><br/>
+      <div align="center">
+        <%#= link_to 'Calculate Available APTC', edit_aptc_csr_path(family_id: @family.id, person_id: @person.id), class: "btn btn-default btn", remote: true%>
+        <a href="javascript:void(0)" class='btn btn-default' id='calculate_available_aptc'>Calculate Available APTC</a>
+      </div><br/>
       <table class="table table-border">
         
         <thead>
@@ -44,7 +47,7 @@
                   
                       <% @grid_vals[key_hdr].each do |key, val| %>
                           <%if key_hdr != "individuals_covered"%>
-                            <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
+                            <td> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: "form-control #{key_hdr.to_s}", readonly: true, disabled: true%></td>
                           <%end%> 
                       <%end%>
                       <td></td>
