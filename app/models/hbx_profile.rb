@@ -166,9 +166,17 @@ class HbxProfile
     end
 
     def build_slcsp_values(family, months_array)
+      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+      slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+      aptc_members = family.active_household.latest_active_tax_household.aptc_members
+      cost = aptc_members.map do |member|
+        slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+      end.inject(:+) || 0
+          
       slcsp_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        slcsp_hash.store(month, 100)
+        slcsp_hash.store(month, cost)
       end
       return slcsp_hash
     end
