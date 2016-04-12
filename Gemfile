@@ -99,6 +99,7 @@ gem "recaptcha", '1.1.0'
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
+  gem "parallel_tests"
 end
 
 group :development, :test do

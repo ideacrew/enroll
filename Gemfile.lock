@@ -295,6 +295,9 @@ GEM
       nokogiri (~> 1.5)
     origin (2.2.0)
     orm_adapter (0.5.0)
+    parallel (1.8.0)
+    parallel_tests (2.5.0)
+      parallel
     pdf-reader (1.4.0)
       Ascii85 (~> 1.0.0)
       afm (~> 0.2.1)
@@ -539,6 +542,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  parallel_tests
   poltergeist
   prawn (~> 0.11.1)
   pry
