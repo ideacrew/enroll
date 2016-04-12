@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
+RSpec.describe VitalSign, :db_clean => :around_each do
 
   let(:shop_current_enrollment_count) { 1 }
   let(:shop_past_enrollment_count)    { 2 }
