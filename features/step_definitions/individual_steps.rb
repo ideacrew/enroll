@@ -17,6 +17,14 @@ When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   screenshot("individual_start")
 end
 
+And(/Individual asks how to make an email account$/) do
+
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.a(text: /Don't have an email account?/).fire_event("onclick")
+  @browser.element(class: /modal/).wait_until_present
+  @browser.element(class: /interaction-click-control-×/).fire_event("onclick")
+end
+
 Then(/Individual creates HBX account$/) do
   click_button 'Create account'
   fill_in "user[email]", :with => (@u.email :email)
@@ -144,11 +152,14 @@ And(/Individual again clicks on add member button/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
+  #testing
+  screenshot("added member")
   click_button "Confirm Member"
 end
 
 
 And(/I click on continue button on household info form/) do
+  screenshot("line 161")
   click_link "Continue"
 end
 
@@ -158,8 +169,15 @@ end
 
 And(/I click on continue button on group selection page/) do
   #TODO This some group selection nonsense
-  click_link "Continue" #Get
-  click_button "CONTINUE" #Post
+  #wait_for_ajax(2,2)
+  screenshot("test1")
+  #click_link "Continue" #Get
+  click_button "CONTINUE"
+  screenshot("test2")
+  wait_for_ajax
+  find(:xpath, '//*[@id="btn-continue"]').trigger('click')
+  #click_button "Continue" #Post
+  screenshot("test3")
   #Goes off the see the wizard at /I select three plans to compare/ for now
 end
 

@@ -35,11 +35,12 @@
           -->
           <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
 
-
         <div class="information">
           <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>
           <% if @current_plan_year.start_on.to_date.month != 1 %>
-          <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+            <% if TimeKeeper.date_of_record.to_date <= @current_plan_year.open_enrollment_end_on.to_date %>
+              <strong><%= @current_plan_year.additional_required_participants_count.to_i %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+            <% end %>
           <% end %>
         </div>
       </div>
@@ -122,19 +123,19 @@
       </table>
 
     </div>
-    
 
-    <div class="plan-details panel benefitgroup col-xs-12" style="display: true;"> 
+
+    <div class="plan-details panel benefitgroup col-xs-12" style="display: true;">
 
         <div class="panel benefitgroup referenceplan home">
-          
+
           <!--Health Plan Summary: start-->
           <div>
             <div style="float:right">
               <button id = "showhidebutton" href="#collapse-health-<%=bg.id%>" class="nav-toggle">
-                View Details 
+                View Details
                 <a><i class="fa fa-chevron-down fa-lg"></i></a>
-              </button> 
+              </button>
             </div>
             <div style="float:left">
               <% if bg.dental_reference_plan_id.present? %>
@@ -204,7 +205,7 @@
 
           <!--Health plan collapsible: start -->
           <div id="collapse-health-<%=bg.id%>" style="display:none">
-            
+
               <!--Health Contributions: start-->
               <div class="col-xs-12 package-offering">
               <table>
@@ -255,21 +256,21 @@
         <hr />
 
         <% if bg.dental_reference_plan_id.present? %>
-          
+
           <!--Dental Plan Summary: start-->
           <div>
             <div style="float:right">
               <button id = "showhidebutton" href="#collapse-dental-<%=bg.id%>" class="nav-toggle">
-                  View Details 
+                  View Details
                   <a><i class="fa fa-chevron-down fa-lg"></i></a>
-              </button> 
+              </button>
             </div>
             <div style="float:left">
               <h5 class="bg-title">Dental</h5>
             </div>
           </div>
-          
-          <div></div>  
+
+          <div></div>
 
           <table>
             <tr>
@@ -333,10 +334,10 @@
             </tr>
           </table>
           <!--Dental Plan Summary: end-->
-      
+
           <!—Dental plan collapsible: start -->
           <div id="collapse-dental-<%=bg.id%>" style="display:none">
-            
+
             <!--Dental Contributions: start -->
             <div class="col-xs-12 package-offering">
               <table>
@@ -346,7 +347,7 @@
                 </tr>
                 <% bg.relationship_benefits.each_with_index do |rb, i| %>
                 <tr>
-                  <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td> 
+                  <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
                   <td><strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0 %></strong></td>
                 </tr>
                 <% end %>
@@ -395,7 +396,7 @@
 
     <% end %>
     <% else %>
-    <h4>You have not yet published a plan year. Once you do, it will display here. To make your first plan year now, <%= link_to "click here", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits') %>.</h4>
+    <%= render partial: 'employers/employer_profiles/my_account/employer_welcome' %>
     <% end %>
   </div>
 </div>

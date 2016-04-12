@@ -185,12 +185,13 @@ RSpec.describe Employers::CensusEmployeesController do
 
   describe "GET show" do
     let(:benefit_group_assignment) { double(hbx_enrollment: hbx_enrollment, active_hbx_enrollments: [hbx_enrollment]) }
+    let(:benefit_group) { double }
     let(:hbx_enrollment) { double }
     let(:hbx_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment) }
 
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(double)
+      allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(census_employee).to receive(:employee_role).and_return(true)
       sign_in

@@ -43,10 +43,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     }
   }
 
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
-  end
-
   context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
@@ -781,6 +777,24 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "newhire_enrollment_eligible" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+    before do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+
+    it "should return true when active_benefit_group_assignment is initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return true
+      expect(census_employee.newhire_enrollment_eligible?).to eq true
+    end
+
+    it "should return false when active_benefit_group_assignment is not initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return false
+      expect(census_employee.newhire_enrollment_eligible?).to eq false
+    end
+  end
+
   context "has_active_health_coverage?" do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -888,4 +902,79 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   #   end
   #
   # end
+
+  context '.new_hire_enrollment_period' do
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+    end
+
+    context 'when hired_on date is in the past' do 
+      it 'should return census employee created date as new hire enrollment period start date' do 
+        expect(census_employee.new_hire_enrollment_period.min).to eq (census_employee.created_at.beginning_of_day)
+      end
+    end
+
+    context 'when hired_on date is in the future' do
+      let(:hired_on){ TimeKeeper.date_of_record + 14.days }
+
+      it 'should return hired_on date as new hire enrollment period start date' do
+        expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.hired_on
+      end
+    end 
+
+    context 'when earliest effective date is in future more than 30 days from current date' do 
+      let(:hired_on){ TimeKeeper.date_of_record }
+
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return earliest_eligible_date as new hire enrollment period end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq ((hired_on + 60.days).end_of_month + 1.day).end_of_day
+      end
+    end
+
+    context 'when earliest effective date less than 30 days from current date' do
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return 30 days from new hire enrollment period start as end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq (census_employee.new_hire_enrollment_period.min + 30.days).end_of_day
+      end
+    end
+  end
+
+  context '.earliest_eligible_date' do
+    let(:hired_on){ TimeKeeper.date_of_record }
+
+    let(:plan_year) do
+      py = FactoryGirl.create(:plan_year)
+      bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+      PlanYear.find(py.id)
+    end
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+    end
+
+    it 'should return earliest effective date' do 
+      expect(census_employee.earliest_eligible_date).to eq (hired_on + 60.days).end_of_month + 1.day
+    end
+  end
 end

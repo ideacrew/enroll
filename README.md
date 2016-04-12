@@ -1,5 +1,7 @@
 # Enroll
 
+Enroll is an open source health care exchange build on Ruby on Rails with a Mongo database managed by IdeaCrew, Inc.
+
 ## TODO 
 * Two lines project description
 * Project setup instructions
