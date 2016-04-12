@@ -1,5 +1,16 @@
 all_employers = Organization.where(:employer_profile => {"$ne" => nil})
 
+def elected_plans_choice(benefit_group)
+	option = benefit_group.plan_option_kind
+	if option == "single_plan"
+		return benefit_group.elected_plans.first.name
+	elsif option == "single_carrier"
+		return benefit_group.reference_plan.carrier_profile.legal_name
+	elsif option == "metal_level"
+		return benefit_group.reference_plan.metal_level.titleize
+	end
+end
+
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	csv << ["Legal Name", "DBA", "FEIN", "AASM State", "Coverage Year Start", "Coverage Year End",
 			"Plan Offerings","Employee Count","Addresses"]
