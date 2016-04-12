@@ -63,7 +63,10 @@ RSpec.describe Insured::FamilyMembersController do
       allow(person).to receive(:employee_role).and_return(employee_role)
       allow(person).to receive(:primary_family).and_return(fm)
       allow(person).to receive(:broker_role).and_return(nil)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:save!).and_return(true)
+      allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
+
       sign_in user
       allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
       expect{
