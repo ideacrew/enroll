@@ -120,7 +120,7 @@ group :development, :test do
   gem 'ruby-progressbar', '1.6.0'
 
   # Keep these in Development and Test environments for access by rails generators
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.4.2'
   gem 'factory_girl_rails', "4.6.0"
   gem 'forgery'
   gem 'email_spec', '2.0.0'
@@ -128,7 +128,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'mongoid-rspec'
+  gem 'mongoid-rspec', '3.0.0'
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'poltergeist'
