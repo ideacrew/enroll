@@ -113,9 +113,12 @@
             </div>
           </div>
           <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-            <%= render 'shared/consumer_home_address_fields', f: f %>
+            <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
           </div>
         </div>
+      <% elsif @person.has_active_employee_role? %>
+        <%= f.hidden_field :same_with_primary, value: 'false' %>
+        <%= render 'shared/address_fields_for_dependent', f: f %>
       <% end %>
 
       <%= f.hidden_field :family_id %>

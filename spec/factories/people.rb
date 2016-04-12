@@ -73,7 +73,13 @@ FactoryGirl.define do
 
     trait :with_csr_role do
       after(:create) do |p, evaluator|
-        create_list(:assister_role, 1, person: p)
+        create_list(:csr_role, 1, person: p)
+      end
+    end
+
+    trait :with_family do
+      after :create do |person|
+        family = FactoryGirl.create :family, :with_primary_family_member, person: person
       end
     end
 

@@ -52,7 +52,8 @@ module Forms
       matched_people = Person.where(
         first_name: regex_for(first_name),
         last_name: regex_for(last_name),
-        dob: new_person.dob
+        # TODO
+        # dob: new_person.dob
       )
       if matched_people.count > 1
         raise TooManyMatchingPeople.new
@@ -118,7 +119,7 @@ module Forms
     def office_locations_attributes=(attrs)
       @office_locations = []
       attrs.each_pair do |k, att_set|
-        att_set.delete('phone_attributes') if att_set["phone_attributes"].present? and att_set["phone_attributes"]["number"].blank?
+        att_set.delete('phone_attributes') if att_set["phone_attributes"].present? && att_set["phone_attributes"]["number"].blank?
         @office_locations << OfficeLocation.new(att_set)
       end
       @office_locations
@@ -134,7 +135,9 @@ module Forms
     end
 
     def regex_for(str)
-      Regexp.compile(Regexp.escape(str.to_s))
+      #Regexp.compile(Regexp.escape(str.to_s))
+      clean_string = Regexp.escape(str.strip)
+      /^#{clean_string}$/i
     end
   end
 end

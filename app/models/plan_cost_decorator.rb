@@ -65,7 +65,7 @@ class PlanCostDecorator < SimpleDelegator
 
   def relationship_benefit_for(member)
     relationship = relationship_for(member)
-    benefit_group.relationship_benefit_for(relationship)
+    @reference_plan.coverage_kind == 'dental' ? benefit_group.dental_relationship_benefit_for(relationship) : benefit_group.relationship_benefit_for(relationship)
   end
 
   def employer_contribution_percent(member)

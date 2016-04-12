@@ -30,8 +30,10 @@ module Insured::FamiliesHelper
   def render_plan_type_details(plan)
     plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
 
+    metal_level = display_dental_metal_level(plan)
+
     if plan_level = plan.try(:metal_level).try(:humanize)
-      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{plan_level}</span>"
+      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{metal_level}</span>"
     end
 
     if plan.try(:nationwide)
@@ -78,14 +80,13 @@ module Insured::FamiliesHelper
     options
   end
 
-  def show_employer_panel?(person, hbx_enrollments)
-    return false if person.blank? or !person.has_active_employee_role?
-    return true if hbx_enrollments.blank? or hbx_enrollments.shop_market.blank?
+  def newhire_enrollment_eligible?(employee_role)
+    return false if employee_role.blank? || employee_role.census_employee.blank?
 
-    if hbx_enrollments.shop_market.entries.map(&:employee_role_id).include? person.active_employee_roles.first.id
-      false
-    else
-      true
-    end
+    employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
+  end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 end

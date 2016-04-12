@@ -21,6 +21,7 @@ class BenefitGroup
   field :title, type: String, default: ""
   field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
+  field :dental_plan_option_kind, type: String
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
 
@@ -42,6 +43,11 @@ class BenefitGroup
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
+  # Employer dental plan_ids
+  field :dental_relationship_benefits_attributes_time, type: BSON::ObjectId, default: 0
+  field :dental_reference_plan_id, type: BSON::ObjectId
+  field :elected_dental_plan_ids, type: Array, default: []
+
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
@@ -53,6 +59,13 @@ class BenefitGroup
 
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  embeds_many :dental_relationship_benefits, cascade_callbacks: true
+  accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  field :carrier_for_elected_dental_plan, type: BSON::ObjectId
+
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan, :carrier_for_elected_dental_plan
 
   #TODO add following attributes: :title,
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
@@ -99,9 +112,24 @@ class BenefitGroup
     @reference_plan = new_reference_plan
   end
 
+  def dental_reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.dental_reference_plan_id = new_reference_plan._id
+    @dental_reference_plan = new_reference_plan
+  end
+
   def reference_plan
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def dental_reference_plan
+    return @dental_reference_plan if defined? @dental_reference_plan
+    @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
+  end
+
+  def is_offering_dental?
+    dental_reference_plan_id.present? && elected_dental_plan_ids.any? 
   end
 
   def is_open_enrollment?
@@ -143,6 +171,23 @@ class BenefitGroup
       end
     end
 
+    set_lowest_and_highest(plans)
+  end
+
+  def set_bounding_cost_dental_plans
+    return if reference_plan_id.nil?
+
+    if dental_plan_option_kind == "single_plan"
+      plans = elected_dental_plans
+    elsif dental_plan_option_kind == "single_carrier"
+      plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+    end
+
+    set_lowest_and_highest(plans)
+  end
+
+
+  def set_lowest_and_highest(plans)
     if plans.size > 0
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
@@ -175,21 +220,36 @@ class BenefitGroup
     @elected_plans = new_plans
   end
 
+  def elected_dental_plans=(new_plans)
+    return unless new_plans.present?
+    self.elected_dental_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+
+    # set_bounding_cost_plans
+    @elected_dental_plans = new_plans
+  end
+
   def elected_plans
     return @elected_plans if defined? @elected_plans
     @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
-  def decorated_elected_plans(member_provider)
-    max_contribution_cache = Hash.new
-    elected_plans.collect(){|plan| decorated_plan(plan, member_provider, max_contribution_cache)}
+  def elected_dental_plans
+    return @elected_dental_plans if defined? @elected_dental_plans
+    @elected_dental_plans ||= Plan.where(:id => {"$in" => elected_dental_plan_ids}).to_a
   end
 
-  def decorated_plan(plan, member_provider, max_contribution_cache = {})
+  def decorated_elected_plans(member_provider, coverage_kind="")
+    max_contribution_cache = Hash.new
+    get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
+    ref_plan = (coverage_kind == "health" ? reference_plan : dental_reference_plan)
+    get_elected_plans.collect(){|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
+  end
+
+  def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
     else
-      PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
+      PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
   end
 
@@ -214,29 +274,6 @@ class BenefitGroup
     end
   end
 
-  def new_hire_effective_on(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      date_of_hire
-    when "first_of_month"
-      eligible_on(date_of_hire)
-    end
-  end
-
-  def new_hire_enrollment_period(date_of_hire, date_of_roster_entry = nil)
-    new_hire_effective_date = new_hire_effective_on(date_of_hire)
-
-    lower_limit = (new_hire_effective_date + Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days)
-    upper_limit = (new_hire_effective_date + Settings.aca.shop_market.latest_enroll_after_effective_on.days)
-
-    # Length of time that EE may enroll following correction to Census Employee Identifying info
-    if date_of_roster_entry && (date_of_roster_entry > new_hire_effective_date)
-      date_of_roster_entry..(date_of_roster_entry + Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days)
-    else
-      lower_limit..upper_limit
-    end
-  end
-
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
@@ -249,11 +286,23 @@ class BenefitGroup
     relationship_benefits.where(relationship: relationship).first
   end
 
+  def dental_relationship_benefit_for(relationship)
+    dental_relationship_benefits.where(relationship: relationship).first
+  end
+
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
+
+  def build_dental_relationship_benefits
+    self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.dental_relationship_benefits.build(relationship: relationship, offered: true)
+    end
+  end
+
+
 
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
     [
@@ -284,26 +333,39 @@ class BenefitGroup
     end.first
   end
 
+
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+      if plan.coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+      end
       pcd.total_employer_contribution
     end.sum
   end
 
-  def monthly_min_employee_cost
+  def monthly_min_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      if coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      end
       pcd.total_employee_cost
     end.min
   end
 
-  def monthly_max_employee_cost
+  def monthly_max_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      if coverage_kind == 'dental'
+        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      else
+        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      end
       pcd.total_employee_cost
     end.max
   end
@@ -340,6 +402,14 @@ class BenefitGroup
     end
   end
 
+  def elected_dental_plans_by_option_kind
+    if dental_plan_option_kind == "single_carrier"
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+    else
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
+    end
+  end
+
   def effective_title_by_offset
     case effective_on_offset
     when 0
@@ -348,6 +418,18 @@ class BenefitGroup
       "First of the month following 30 days"
     when 60
       "First of the month following 60 days"
+    end
+  end
+
+  def eligible_on(date_of_hire)
+    if effective_on_kind == "date_of_hire"
+      date_of_hire
+    else
+      if (date_of_hire + effective_on_offset.days).day == 1
+        (date_of_hire + effective_on_offset.days)
+      else
+        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+      end
     end
   end
 
@@ -376,16 +458,12 @@ private
     [plan_year.start_on, date_of_hire].max
   end
 
-  def eligible_on(date_of_hire)
-    if effective_on_offset == 0 && date_of_hire.day == 1
-      date_of_hire
-    else
-      doh_with_offset = date_of_hire + effective_on_offset.days
-      doh_with_offset.day == 1 ? doh_with_offset : doh_with_offset.next_month.beginning_of_month
-    end
-  end
-
   def first_of_month_effective_on_for(date_of_hire)
+    if plan_year.employer_profile.profile_source.to_s == 'conversion'
+      if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
+        return [renewing_plan_year.start_on, date_of_hire].max
+      end
+    end
     [plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
@@ -441,14 +519,14 @@ private
     # all employee contribution < 50% for 1/1 employers
     if start_on.month == 1 && start_on.day == 1
     else
-      if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
+      if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
         self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
       end
     end
   end
 
   def check_offered_for_employee
-    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
+    if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
       self.errors.add(:relationship_benefits, "employee must be offered")
     end
   end

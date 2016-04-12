@@ -1,6 +1,6 @@
 <p>
-  <i class="fa fa-refresh fa-spin" style="color:green"></i> Review in progress&nbsp&nbsp
-  <i class="fa fa-times-circle" style="color:red"></i> No valid documents&nbsp&nbsp
+  <i class="fa fa-spinner fa-spin" style="color:green"></i> Review in progress
+  <i class="fa fa-times-circle" style="color:red"></i> No valid documents
   <i class="fa fa-file"></i> New documents uploaded
 </p><br>
 
@@ -49,7 +49,7 @@
             <% if person.consumer_role.vlp_documents.where(status:"downloaded").count > 0 %>
               <i class="fa fa-file"></i>
             <% elsif person.consumer_role.vlp_documents.where(status:"in review").count > 0 || person.consumer_role.vlp_documents.where(status:"verified").count > 0 %>
-              <i class="fa fa-refresh fa-spin" style="color:green"></i>
+              <i class="fa fa-spinner fa-spin" style="color:green"></i>
             <% elsif %>
               <i class="fa fa-times-circle" style="color:red"></i>
             <% end %>

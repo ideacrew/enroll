@@ -73,6 +73,26 @@ class PlanYear
     )
   }
 
+  def hbx_enrollments_by_month(date)
+    id_list = benefit_groups.collect(&:_id).uniq
+    families = Family.where({
+      :"households.hbx_enrollments.benefit_group_id".in => id_list,
+      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+    }).limit(100) # limit census employees to 100 due to performance reasons
+
+    families.inject([]) do |enrollments, family|
+
+      valid_enrollments = family.active_household.hbx_enrollments.where({
+        :benefit_group_id.in => id_list,
+        :"effective_on".lte => date.end_of_month,
+        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+      }).order_by(:'submitted_at'.desc)
+
+      enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
+      enrollments << valid_enrollments.where({:coverage_kind => 'dental'}).first
+    end.compact
+  end
+
   def eligible_for_export?
     return false if self.aasm_state.blank?
     !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
@@ -308,7 +328,11 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.size
+    if self.employer_profile.census_employees.count < 100
+      enrolled.count { |e| e.has_active_health_coverage? }
+    else
+      0
+    end
   end
 
   def enrollment_ratio
@@ -525,7 +549,7 @@ class PlanYear
 
     state :renewing_draft
     state :renewing_published
-    state :renewing_enrolling
+    state :renewing_enrolling, :after_enter => :trigger_passive_renewals
     state :renewing_enrolled
     state :renewing_publish_pending
 
@@ -547,7 +571,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
+      # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
@@ -638,14 +662,23 @@ class PlanYear
     end
   end
 
+
+  def trigger_passive_renewals
+    open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
+    open_enrollment_factory.employer_profile = self.employer_profile
+    open_enrollment_factory.date = TimeKeeper.date_of_record
+    open_enrollment_factory.renewing_plan_year = self
+    open_enrollment_factory.process_family_enrollment_renewals
+  end
+
   def revert_employer_profile_application
     employer_profile.revert_application! if employer_profile.may_revert_application?
     record_transition
   end
 
   def accept_application
-    transition_success = employer_profile.application_accepted!
-    send_employee_invites if transition_success
+    transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
+    send_employee_invites if transition_success && !is_renewing?
   end
 
   def decline_application
@@ -653,7 +686,7 @@ class PlanYear
   end
 
   def ratify_enrollment
-    employer_profile.enrollment_ratified!
+    employer_profile.enrollment_ratified! if employer_profile.may_enrollment_ratified?
   end
 
   def deny_enrollment

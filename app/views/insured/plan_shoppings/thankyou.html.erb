@@ -18,7 +18,7 @@
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
-            Metal level : <%= @plan.try(:metal_level).try(:humanize) %>
+            Metal level : <%= display_dental_metal_level @plan %>
           </p>
 
           <br>
