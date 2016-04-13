@@ -2,12 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController do
   let(:family) { double }
+  let(:published_plan_year) { double}
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:fm) { FactoryGirl.build(:family, :with_primary_family_member) }
   let(:employee_role){ double("EmployeeRole", id: double("id")) }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
   describe "GET index" do
     context 'normal' do
       before(:each) do

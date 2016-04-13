@@ -123,7 +123,7 @@ class HbxProfile
 
       plan_premium_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        plan_premium_hash.store(month, hbx.total_premium || 0)
+        plan_premium_hash.store(month, hbx.try(:total_premium) || false)
       end
       return plan_premium_hash
     end
@@ -149,20 +149,57 @@ class HbxProfile
 
     def build_max_aptc_values(family, months_array)
       max_aptc_hash = Hash.new
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       months_array.each_with_index do |month, ind|
+        # iterate over all the EligibilityDeterminations and store the correct max_aptc value for each month. Account for any monthly change in Eligibility Determination.
+        eligibility_determinations.each do |ed|
+          update_max_aptc_hash_for_month(max_aptc_hash, month, ed)
+        end  
         #max_aptc_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.max_aptc.fractional)
-        max_aptc_hash.store(month, family.active_household.latest_active_tax_household.current_max_aptc.to_f)
+        #max_aptc_hash.store(month, family.active_household.latest_active_tax_household.current_max_aptc.to_f)
       end
       return max_aptc_hash
     end
 
+    def update_max_aptc_hash_for_month(max_aptc_hash, month, ed)
+      month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
+      current_year = TimeKeeper.date_of_record.year
+      first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      # Check if  'month' >= EligibilityDetermination.determined_on date?
+      if first_of_month_num_current_year >= ed.determined_on
+        # assign that month with aptc_max value from this ed (EligibilityDetermination)
+        max_aptc_hash.store(month, ed.max_aptc.to_f)
+      else
+        # update max_aptc value for that month as a "-"
+        max_aptc_hash.store(month, "---")
+      end  
+    end
+
+
     def build_csr_percentage_values(family, months_array)
       csr_percentage_hash = Hash.new
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       months_array.each_with_index do |month, ind|
-        #csr_percentage_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.csr_eligibility_kind.split('_')[1] + " %")
-        csr_percentage_hash.store(month, (family.active_household.latest_active_tax_household.current_csr_percent*100).to_s + " %")
+        eligibility_determinations.each do |ed|
+          update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed)
+        end 
+        #csr_percentage_hash.store(month, (family.active_household.latest_active_tax_household.current_csr_percent*100).to_s + " %")
       end
       return csr_percentage_hash
+    end
+
+    def update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed)
+      month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
+      current_year = TimeKeeper.date_of_record.year
+      first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      # Check if  'month' >= EligibilityDetermination.determined_on date?
+      if first_of_month_num_current_year >= ed.determined_on
+        # assign that month with csr_percent value from this ed (EligibilityDetermination)
+        csr_percentage_hash.store(month, ed.csr_percent_as_integer)
+      else
+        # update csr_percent value for that month as a "-"
+        csr_percentage_hash.store(month, "---")
+      end  
     end
 
     def build_slcsp_values(family, months_array)

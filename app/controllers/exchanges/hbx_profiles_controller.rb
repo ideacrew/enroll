@@ -242,12 +242,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
     unless @q.present?
-      @families = Family.all_aptc_hbx_enrollments.active_assistance_receiving.page page_no
-      @total = Family.all_aptc_hbx_enrollments.active_assistance_receiving.count
+      @families = Family.all_assistance_receiving.page page_no
+      @total = Family.all_assistance_receiving.count
     else
       person_ids = Person.search(@q).map(&:_id)
       
-      total_families = Family.all_aptc_hbx_enrollments.active_assistance_receiving.in("family_members.person_id" => person_ids).entries
+      total_families = Family.all_assistance_receiving.in("family_members.person_id" => person_ids).entries
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
     end

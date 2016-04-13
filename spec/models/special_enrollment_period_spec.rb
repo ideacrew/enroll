@@ -256,9 +256,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     context "SHOP QLE and event date are specified" do
       it "should set start_on date to date of event" do
         allow(family).to receive(:primary_applicant).and_return(primary_applicant)
-        allow(primary_applicant).to receive(:person).and_return(person) 
-        binding.pry
-
+        allow(primary_applicant).to receive(:person).and_return(person)
         expect(sep_effective_date.start_on).to eq event_date
       end
 
