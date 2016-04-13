@@ -366,4 +366,21 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       expect(ivl_qle_sep.is_shop?).to be_falsey
     end
   end
+
+
+  context "is reporting a qle before the employer plan start_date" do
+    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 06, 01) }
+    let(:sep_effective_on) { Date.new(TimeKeeper.date_of_record.year, 04, 01) }
+    let(:sep) { SpecialEnrollmentPeriod.new(qualifying_life_event_kind: qle_first_of_month, effective_on_kind: 'first_of_month', effective_on: sep_effective_on) }
+    let!(:published_plan_year) { FactoryGirl.create(:plan_year, start_on: plan_year_start_on)}
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    it "should return a sep with an effective date that equals to employers plan year start-date when sep_effective_date  < plan_year_start_on" do
+       allow(sep).to receive(:family).and_return(shop_family)
+       allow(self).to receive(:family) { shop_family }
+       # TODO : Incomplete
+       expect(sep.send(:set_effective_on)).to eq published_plan_year.start_on
+    end
+  end
+
 end

@@ -143,7 +143,6 @@ private
   end
 
   def validate_and_set_effective_on
-    binding.pry
     person = self.family.primary_applicant.person if self.family
     employee_role = person.active_employee_roles.first if person
     if employee_role && employee_role.employer_profile.plan_years.published_plan_years_by_date(effective_on).blank?
