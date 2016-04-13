@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
+RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :after_each => :db_clean do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:person) { FactoryGirl.create(:person, :with_family ) }
