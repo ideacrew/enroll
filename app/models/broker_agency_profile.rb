@@ -19,6 +19,7 @@ class BrokerAgencyProfile
   field :market_kind, type: String
   field :corporate_npn, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
+  field :default_general_agency_profile_id, type: BSON::ObjectId
 
   field :languages_spoken, type: Array, default: ["en"] # TODO
   field :working_hours, type: Boolean, default: false
@@ -155,6 +156,21 @@ class BrokerAgencyProfile
     consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
     families = (consumer_families + employee_families).uniq
     families.sort_by{|f| f.primary_applicant.person.last_name}
+  end
+
+  def default_general_agency_profile=(new_default_general_agency_profile = nil)
+    if new_default_general_agency_profile.present?
+      raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? GeneralAgencyProfile
+      self.default_general_agency_profile_id = new_default_general_agency_profile.id
+    else
+      unset("default_general_agency_profile_id")
+    end
+    @default_general_agency_profile = new_default_general_agency_profile
+  end
+
+  def default_general_agency_profile
+    return @default_general_agency_profile if defined? @default_general_agency_profile
+    @default_general_agency_profile = GeneralAgencyProfile.find(self.default_general_agency_profile_id) if default_general_agency_profile_id.present?
   end
 
   ## Class methods

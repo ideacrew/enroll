@@ -336,4 +336,31 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(flash[:notice]).to eq 'Assign successful.'
     end
   end
+
+  describe "POST set_default_ga" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    before :each do
+      allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
+    end
+
+    it "should set default_general_agency_profile" do
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile 
+    end
+
+    it "should clear default general_agency_profile" do
+      broker_agency_profile.default_general_agency_profile = general_agency_profile
+      broker_agency_profile.save
+      expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
+
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
+    end
+  end
 end

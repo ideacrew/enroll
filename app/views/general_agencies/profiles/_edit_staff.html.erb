@@ -14,7 +14,7 @@
             </tr>
             <tr>
               <th>Email:</th>
-              <td><%= @staff.person.home_email %></td>
+              <td><%= @staff.person.work_email.try(:address) %></td>
             </tr>
             <tr>
               <th>Agency:</th>

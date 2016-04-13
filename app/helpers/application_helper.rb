@@ -553,4 +553,43 @@ module ApplicationHelper
       "glyphicon-star-empty"
     end
   end
+
+  def show_default_ga?(general_agency_profile, broker_agency_profile)
+    return false if general_agency_profile.blank? || broker_agency_profile.blank?
+    broker_agency_profile.default_general_agency_profile == general_agency_profile
+  end
+
+  def eligiblity_participation_rule(count)
+    case count
+    when 0
+      return "2/3 Rule Met? : Yes"
+    else
+      return "2. You have 0 non-owner employees on your roster"
+    end
+  end
+
+  def eligibility_criteria(employer)
+    participation_rule_text = participation_rule(employer)
+    non_owner_participation_rule_text = non_owner_participation_rule(employer)
+    text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
+    ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+  end
+
+  def participation_rule(employer)
+    @participation_count = employer.show_plan_year.additional_required_participants_count
+    if @participation_count == 0
+      return "1. 2/3 Rule Met? : Yes"
+    else
+      return "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
+    end
+  end
+
+  def non_owner_participation_rule(employer)
+    @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
+    if @non_owner_participation_rule == true
+      return "2. Non-Owner exists on the roster for the employer"
+    else
+      return "2. You have 0 non-owner employees on your roster"
+    end
+  end
 end

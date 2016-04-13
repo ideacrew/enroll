@@ -689,7 +689,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present?
     !!agent
   end
 

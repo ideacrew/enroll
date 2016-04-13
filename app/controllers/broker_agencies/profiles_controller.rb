@@ -2,7 +2,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer]
 
@@ -151,6 +151,25 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
   end
 
+  def set_default_ga
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
+
+    if @broker_agency_profile.present?
+      if params[:type] == 'clear'
+        @broker_agency_profile.default_general_agency_profile = nil
+      elsif @general_agency_profile.present?
+        @broker_agency_profile.default_general_agency_profile = @general_agency_profile
+      end
+      @broker_agency_profile.save
+      @broker_role = current_user.person.broker_role || nil
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def assign
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
@@ -181,7 +200,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         params[:employer_ids].each do |employer_id|
           employer_profile = EmployerProfile.find(employer_id) rescue nil
           if employer_profile.present?
-            broker_role_id = current_user.person.broker_role.id || nil
+            broker_role_id = current_user.person.broker_role.id rescue nil
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
@@ -278,12 +297,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     elsif @person.has_active_employee_role?
       "shop"
     end
-  end
-
-  def send_general_agency_assign_msg(general_agency, employer_profile, status)
-    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name}"
-    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
-    secure_message(@broker_agency_profile, general_agency, subject, body)
   end
 
   def check_general_agency_profile_permissions_assign

@@ -25,7 +25,7 @@ module AccessPolicies
     end
 
     def authorize_assign(controller, broker_agency_profile)
-      return true if user.has_broker_role?
+      return true if user.has_broker_role? || user.has_hbx_staff_role?
 
       controller.redirect_to_show(broker_agency_profile.id)
     end
