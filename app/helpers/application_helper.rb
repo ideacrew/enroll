@@ -539,4 +539,16 @@ module ApplicationHelper
     return plan.metal_level.humanize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
+
+  def aptc_csr_data_type(month)
+    month_num = Date::ABBR_MONTHNAMES.index(month.to_s.capitalize || month.to_s)
+    this_month_date = Date.parse("#{TimeKeeper.date_of_record.year}-#{month_num}-01")
+    todays_date = TimeKeeper.date_of_record
+    if this_month_date < todays_date
+      td_style = 'historic-aptc-csr-data'
+    else
+      td_style="non-historic-aptc-csr-data"
+    end
+  end
+  
 end

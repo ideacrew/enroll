@@ -26,7 +26,7 @@
       <table class="table table-border">
         
         <thead>
-          <th>Month (2016)</th>
+          <th>Month (<%=@current_year%>)</th>
           <% @grid_vals.first[1].each do |key, val| %>
             <th><%=key.capitalize%></th>
           <%end%>
@@ -40,17 +40,15 @@
                   <%if key_hdr != "individuals_covered" && key_hdr != "eligible_members"%>
                       <td><%=key_hdr.titleize.upcase%></td>
                       <%no_hbx = false%>
-                      <% @grid_vals[key_hdr].each do |key, val| %>
-                          <%#if key_hdr != "individuals_covered"%>
+                      <% @grid_vals[key_hdr].each do |key, val| %>  <!--field, month pairs-->
                             <%if val %>
-                            <td><%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
+                              <td class="<%=aptc_csr_data_type(key)%>"> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
                             <%else%>
                               <%no_hbx = true%>
                             <%end%>
-                          <%#end%> 
                       <%end%>
 
-                     <%if no_hbx%> <td align = "center" colspan = "12">No Plan Enrollment</td> <%end%>
+                     <%if no_hbx%> <td align = "center" colspan = "12">No Active Enrollment (Assistance Receiving) for <%=@current_year%>.</td> <%end%>
                       <td></td>
                       <td>
                           <%if key_hdr == "aptc_applied"%> 

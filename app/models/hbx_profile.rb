@@ -105,7 +105,6 @@ class HbxProfile
         slcsp_values              = build_slcsp_values(family, months_array)
         individuals_covered_vals  = build_individuals_covered_array(family, months_array)
         eligible_members_vals     = build_eligible_members(family, months_array)
-        #all_members_vals          = build_all_family_members_hash(family, months_array)
 
         return { "plan_premium"   => plan_premium_vals,
                  "aptc_applied"   => aptc_applied_vals,
@@ -162,9 +161,10 @@ class HbxProfile
     end
 
     def update_max_aptc_hash_for_month(max_aptc_hash, month, ed)
-      month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
-      current_year = TimeKeeper.date_of_record.year
-      first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      # month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
+      # current_year = TimeKeeper.date_of_record.year
+      # first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      first_of_month_num_current_year = first_of_month_converter(month)
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
@@ -174,6 +174,7 @@ class HbxProfile
         max_aptc_hash.store(month, "---")
       end  
     end
+
 
 
     def build_csr_percentage_values(family, months_array)
@@ -189,9 +190,10 @@ class HbxProfile
     end
 
     def update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed)
-      month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
-      current_year = TimeKeeper.date_of_record.year
-      first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      # month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
+      # current_year = TimeKeeper.date_of_record.year
+      # first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      first_of_month_num_current_year = first_of_month_converter(month)
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
         # assign that month with csr_percent value from this ed (EligibilityDetermination)
@@ -201,6 +203,13 @@ class HbxProfile
         csr_percentage_hash.store(month, "---")
       end  
     end
+
+    def first_of_month_converter(month)
+      month_num = Date::ABBR_MONTHNAMES.index(month.capitalize || month) # coverts Month name to Month Integer : "jan" -> 1
+      current_year = TimeKeeper.date_of_record.year
+      first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
+      return first_of_month_num_current_year
+    end  
 
     def build_slcsp_values(family, months_array)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship

@@ -259,6 +259,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def edit_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @current_year = TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
     @grid_vals = HbxProfile.build_grid_values_for_aptc_csr(@family)
