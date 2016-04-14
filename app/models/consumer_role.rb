@@ -58,7 +58,6 @@ class ConsumerRole
   field :bookmark_url, type: String, default: nil
   field :contact_method, type: String, default: "Only Paper communication"
   field :language_preference, type: String, default: "English"
-  field :special_verification_period, type: DateTime
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true

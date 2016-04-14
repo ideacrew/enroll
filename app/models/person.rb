@@ -344,7 +344,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'SSN' if self.ssn
+    verification_types << 'Social Security Number' if self.ssn
     if self.us_citizen
       verification_types << 'Citizenship'
     else

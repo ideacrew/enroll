@@ -32,11 +32,6 @@
             <% end %>
           </tr>
         <% end %>
-        <!-- HBX admin inclusion -->
-        <% unless person.consumer_role.aasm_state.eql? "fully_verified" %>
-          <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: person } %>
-        <% end %>
-        <!-- >>>> hbx admin inclusion -->
       </table>
     </div>
   </td>

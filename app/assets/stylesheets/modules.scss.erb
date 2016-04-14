@@ -193,6 +193,17 @@ $primary-bold: 600;
 								background-color: transparent;
 							}
 						}
+            .verif-type {
+              li {
+                list-style-type: none;
+              }
+            }
+            .upload-form {
+              margin-top: 20px;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              border: 2px solid $primary-color;
+            }
             &.table-functions {
 							a {
 								&:hover {
@@ -298,7 +309,9 @@ $primary-bold: 600;
 
   &.verif-type {
     margin-right: 20px;
+    list-style-type: none;
   }
+
 
 	&.modal-footer {
 		.modal-sbc-link {
@@ -319,5 +332,30 @@ $primary-bold: 600;
 }
 }
 }
+    .inputfile {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+    .inputfile + label {
+      font-size: 1.25em;
+      font-weight: 700;
+      color: white;
+      background-color: $primary-color;
+      display: inline-block;
+    }
+
+    .inputfile:focus + label,
+    .inputfile + label:hover {
+      background-color: red;
+    }
+
+    .inputfile + label {
+      cursor: pointer; /* "hand" cursor */
+    }
+
 }
 }

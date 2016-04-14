@@ -844,7 +844,7 @@ describe Person do
       end
 
       it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("SSN")
+        expect(person.verification_types).to include("Social Security Number")
       end
 
       it "contains Immigration status verification type for person" do
@@ -868,7 +868,7 @@ describe Person do
       end
 
       it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("SSN")
+        expect(person.verification_types).to include("Social Security Number")
       end
 
       it "contains Immigration status verification type for person" do

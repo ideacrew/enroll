@@ -22,21 +22,22 @@
           <td><%= person.last_name %></td>
           <td class="text-center"><%= documents_count(person) %></td>
           <td>
-            <%= verification_due_date(person) %>
-            <%= link_to extend_due_date_documents_path(:person_id => person.id), method: :put do %>
-              <br><i class="fa fa-clock-o"></i>&nbsp;+ 30 days
+            <%= verification_due_date(family) %>
+            <%= link_to extend_due_date_documents_path(:family_id => family.id), method: :put do %>
+              <br><i class="fa fa-clock-o"></i>&nbsp;extend
             <% end %>
           </td>
           <td>
-            <%= family.active_household.hbx_enrollments.first.review_status %>
+            <%= family.active_household.hbx_enrollments.verification_needed.first.review_status %>&nbsp;
+            <% if verification_due_date(family) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger">Past Due</span>
+            <% end %>
           </td>
           <td>
             <%= link_to "Review", show_docs_documents_path(:person_id => person.id, :status => "in review"), class:"btn btn-#{review_button_class(family)} btn-xs"%>
           </td>
           <td class="text-center">
-            <%= link_to fed_hub_request_documents_path(:person_id => person.id) do%>
-                <i class="fa fa-share-square-o"></i>&nbsp;FedHub
-            <% end %>
+            <%= link_to "Federal Hub Detail", "#", class:"btn btn-default btn-xs"%>
           </td>
         </tr>
       <% end %>
@@ -53,7 +54,6 @@
      $('select').on('selectric-init', function(element){
        $('.selectric').closest('.small-6').find('span').remove();
        $('.selectric').closest('label').after('<span></span>');
-       $('.selectric').closest('.small-6').find('span:first').text(' Entries Shown')
      });
    } );
  </script>

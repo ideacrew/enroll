@@ -19,18 +19,18 @@ When(/^I click on verification link$/) do
 end
 
 Given(/^I should see page for documents verification$/) do
-  expect(page).to have_content "Verification due date"
+  expect(page).to have_content "Documents FAQ"
   expect(page).to have_selector('table tr')
 end
 
 Given(/^I upload the file as vlp document$/) do
-  within('div.SSN') do
+  within('div.Number') do
     attach_file('file[]', Rails.root.join('app', 'assets', 'images', 'logo', 'carefirst.jpg'))
   end
 end
 
 Given(/^I click the upload file button$/) do
-  within('div.SSN2') do
+  within('div.Number2') do
     click_button "Upload"
   end
 end
@@ -50,7 +50,7 @@ When(/^the consumer visits verification page$/) do
 end
 
 When(/^the consumer should see documents verification page$/) do
-  expect(page).to have_content "Verification due date"
+  expect(page).to have_content "Documents FAQ"
   expect(page).to have_selector('table tr')
 end
 

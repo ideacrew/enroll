@@ -1,14 +1,16 @@
 <div class="row">
-  <% unless enrollment_group_verified?(@person) %>
+  <% if enrollment_due_date?(@person) %>
     <div class="col-md-5">
-      <h4>Verification due date: <%= verification_due_date(@person) %></h4>
-      <% if current_user.has_hbx_staff_role? %>
-        <%= link_to "Complete Verification", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
-      <% elsif show_send_button_for_consumer?(@person) %>
-        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
-      <% end %>
+      <h4>Verification due date: <%= verification_due_date(@person.primary_family) %></h4>
     </div>
   <% end %>
+
+      <div class="col-md-2 pull-right">
+        <a class="btn btn-default btn-xs" role="button" data-toggle="collapse" href="#docs-verification-faq" aria-expanded="false" aria-controls="docs-verification-faq">
+          Documents FAQ
+        </a>
+      </div>
+
 </div>
 <div class="module ivl-documents-table panel">
   <div class="table-responsive">
@@ -16,31 +18,34 @@
       <thead class="thead-default">
       <tr>
         <th>Family Member</th>
-        <th>Individual<br>Status</th>
         <th>Verification Type</th>
         <th>Documents</th>
+        <% if current_user && current_user.has_hbx_staff_role? %>
+          <th>Complete</th>
+        <% end %>
         <th></th>
       </tr>
       </thead>
       <tbody>
       <% @family_members.each do |member|%>
           <tr class="<%= cycle("odd", "even top") %>">
-            <td>
-              <%= member.person.first_name %> <%= member.person.last_name%>
-            </td>
-            <td>
-              <%= show_consumer_role_state(member.person.consumer_role) %>
-            </td>
+            <td><%= member.person.first_name %> <%= member.person.last_name%></td>
             <td colspan="2">
               <% if unverified?(member.person) %>
                   <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
               <% end %>
             </td>
-
+            <td>
+              <!-- HBX admin inclusion -->
+              <% unless member.person.consumer_role.aasm_state.eql? "fully_verified" %>
+                  <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person } %>
+              <% end %>
+              <!-- >>>> hbx admin inclusion -->
+            </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "#{member.id}" } do %>
                 <% if member_has_uploaded_docs(member) %>
-                      <i class="fa fa-caret-down fa-2x"></i>
+                  <i class="fa fa-caret-down fa-2x"></i>
                 <% end %>
               <% end %>
             </td>
@@ -52,4 +57,14 @@
       </tbody>
     </table>
   </div>
+</div>
+
+<% if current_user.has_hbx_staff_role? && all_family_members_verified %>
+    <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
+<% elsif show_send_button_for_consumer? %>
+    <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm pull-right", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+<% end %>
+<br><br><br>
+<div class="collapse" id="docs-verification-faq">
+  <%= render partial: "insured/families/verification/documents_verification_list" %>
 </div>

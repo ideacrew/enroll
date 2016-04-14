@@ -6,7 +6,7 @@ RSpec.describe DocumentsController, :type => :controller do
   let(:consumer_role) {FactoryGirl.build(:consumer_role)}
   let(:document) {FactoryGirl.build(:vlp_document)}
   let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination)}
+  let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment) }
 
   before :each do
     sign_in user
@@ -82,37 +82,11 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      put :extend_due_date, person_id: person.id
+      put :extend_due_date, family_id: family.id
     end
 
     it "should redirect to back" do
       expect(response).to redirect_to :back
-    end
-
-    context "with denied documents by FedHub response" do
-      it "creates special verification period" do
-        allow(lawful_presence_determination).to receive(:latest_denial_date).and_return(TimeKeeper.date_of_record)
-        person.consumer_role.lawful_presence_determination = lawful_presence_determination
-        person.reload
-        expect(person.consumer_role.special_verification_period).to eq(TimeKeeper.date_of_record + 120.days)
-      end
-    end
-
-    context "without FedHub response" do
-      it "creates special verification period with 30 days delay" do
-        person.reload
-        expect(person.consumer_role.special_verification_period).to eq(TimeKeeper.date_of_record + 120.days)
-      end
-    end
-
-    context "person has special verification period" do
-      it "extend existing special verification period to 30 days" do
-        person.consumer_role.special_verification_period = TimeKeeper.date_of_record
-        person.save
-        put :extend_due_date, person_id: person.id
-        person.reload
-        expect(person.consumer_role.special_verification_period).to eq(TimeKeeper.date_of_record + 30.days)
-      end
     end
   end
 end

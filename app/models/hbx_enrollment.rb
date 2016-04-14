@@ -97,6 +97,7 @@ class HbxEnrollment
   field :waiver_reason, type: String
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
+  field :special_verification_period, type: DateTime
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -124,6 +125,7 @@ class HbxEnrollment
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
   scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
+  scope :verification_needed, ->{ where(:aasm_state => "enrolled_contingent", :effective_on.gte => (TimeKeeper.date_of_record - 95.days)).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }

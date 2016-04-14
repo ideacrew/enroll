@@ -1,13 +1,10 @@
+<% person = member.person %>
 <table class="sub-table">
-  <% member.person.verification_types.each do |v_type| %>
+  <% person.verification_types.each do |v_type| %>
       <tr>
         <td>
-          <%= v_type %> &nbsp;<span class="label label-<%=verification_type_class(v_type)%>"><%= verification_type_status(v_type) %></span>
-          <% if current_user && current_user.has_hbx_staff_role? %>
-            <%= fedhub_responce(member) %>
-          <% end %>
+          <%=v_type%>&nbsp;<span class="pull-right label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person) %></span>
         </td>
-
         <td>
           <%= render partial: 'insured/families/verification/verification_upload', locals: {member: member, v_type: v_type} %>
         </td>

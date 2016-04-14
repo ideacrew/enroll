@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :extend_due_date, :update_individual, :fed_hub_request, :enrollment_verification]
+  before_action :set_person, only: [:enrollment_docs_state, :update_individual, :fed_hub_request, :enrollment_verification]
   respond_to :html, :js
 
   def download
@@ -18,9 +18,7 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-    @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
-      enrollment.evaluate_individual_market_eligiblity
-    end
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.evaluate_individual_market_eligiblity
     respond_to do |format|
       format.html {
         flash[:success] = "Enrollment group was completely verified."
@@ -42,9 +40,7 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_docs_state
-    @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
-      enrollment.update_attributes(:review_status => params[:docs_status])
-    end
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:docs_status])
     flash[:success] = "Your documents were sent for verification."
     redirect_to :back
   end
@@ -53,26 +49,24 @@ class DocumentsController < ApplicationController
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
       set_current_person
-      @person.primary_family.active_household.hbx_enrollments.each do |enrollment|
-        enrollment.update_attributes(:review_status => params[:status])
-      end
+      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
     end
     redirect_to verification_insured_families_path
   end
 
   def extend_due_date
-      if @person.consumer_role.special_verification_period
-        @person.consumer_role.special_verification_period += 30.days
-      elsif @person.consumer_role.lawful_presence_determination.try(:latest_denial_date)
-        @person.consumer_role.special_verification_period = person.consumer_role.lawful_presence_determination.latest_denial_date + 120.days
+    family = Family.find(params[:family_id])
+      if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).try(:first).try(:special_verification_period)
+        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period += 30.days
+        if family.save!
+          flash[:success] = "Special verification period was extended for 30 days."
+        end
       else
-        @person.consumer_role.special_verification_period = TimeKeeper.date_of_record + 120.days
+        if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).try(:first)
+          family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:special_verification_period => TimeKeeper.date_of_record + 30.days)
+          flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
+        end
       end
-    if @person.save!
-      flash[:success] = "Updated successfully."
-    else
-      flash[:notice] = "The due date can't be updated."
-    end
     redirect_to :back
   end
 
