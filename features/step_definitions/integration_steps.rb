@@ -63,6 +63,24 @@ def people
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "CareFirst Broker" => {
+      first_name: 'Broker',
+      last_name: 'martin',
+      dob: "05/07/1977",
+      ssn: "761111111",
+      email: 'broker.martin@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "John Wood" => {
+      first_name: "John",
+      last_name: "Wood",
+      dob: "03/13/1977",
+      legal_name: "Acmega LLC",
+      dba: "Acmega LLC",
+      fein: "890112233",
+      email: 'johb.wood@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "John Doe" => {
       first_name: "John",
       last_name: "Doe#{rand(1000)}",
@@ -372,11 +390,14 @@ end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # Sometimes bombs due to overlapping modal
+  # TODO: fix this bombing issue
+  wait_for_ajax(10)
   person = people[named_person]
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
-  find("#person_addresses_attributes_0_address_1").click
+  wait_for_ajax(10)
+  find("#person_addresses_attributes_0_address_1", :wait => 10).click
   find("#person_addresses_attributes_0_address_2").click
   find("#person_addresses_attributes_0_city").click
   find("#person_addresses_attributes_0_zip").click
@@ -569,11 +590,14 @@ And(/^.+ should see the premium billings report$/) do
 end
 
 When(/^.+ should see a published success message without employee$/) do
+  # TODO: Fix checking for flash messages. We will need to check using
+  #       xpath for an element that may not be visible, but has already
+  #       been faded away by jQuery.
   expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  find('.interaction-click-control-add-new-employee').click
+  find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
@@ -652,6 +676,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
   end

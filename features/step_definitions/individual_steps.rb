@@ -152,11 +152,14 @@ And(/Individual again clicks on add member button/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
+  #testing
+  screenshot("added member")
   click_button "Confirm Member"
 end
 
 
 And(/I click on continue button on household info form/) do
+  screenshot("line 161")
   click_link "Continue"
 end
 
@@ -166,8 +169,15 @@ end
 
 And(/I click on continue button on group selection page/) do
   #TODO This some group selection nonsense
-  click_link "Continue" #Get
-  click_button "CONTINUE" #Post
+  #wait_for_ajax(2,2)
+  screenshot("test1")
+  #click_link "Continue" #Get
+  click_button "CONTINUE"
+  screenshot("test2")
+  wait_for_ajax
+  find(:xpath, '//*[@id="btn-continue"]').trigger('click')
+  #click_button "Continue" #Post
+  screenshot("test3")
   #Goes off the see the wizard at /I select three plans to compare/ for now
 end
 

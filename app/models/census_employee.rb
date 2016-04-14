@@ -353,6 +353,10 @@ class CensusEmployee < CensusMember
     return true
   end
 
+  def newhire_enrollment_eligible?
+    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
+  end
+
   def has_active_health_coverage?
     HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).present?
   end

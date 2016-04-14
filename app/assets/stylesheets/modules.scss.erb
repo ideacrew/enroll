@@ -94,6 +94,37 @@ $primary-bold: 600;
   }
   &.ivl-documents-table {
     margin-top: 1.25%;
+    .demo-up {
+      border: 0 !important;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 150px;
+      text-overflow: "";
+      border-radius: 15px;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    &.verif-type {
+      margin-right: 20px;
+    }
+
+  	&.modal-footer {
+  		.modal-sbc-link {
+  			text-align: left;
+  			position: relative;
+  			.fa.fa-file-pdf-o {
+  				margin: 2px auto auto 5px;
+  			}
+  			.sbc-text {
+  				font-size: 14px;
+  				margin-left: 10px;
+  				position: absolute;
+  				white-space: nowrap;
+  				top: 10px;
+  			}
+  		}
+  	}
     .table {
       width: 100%;
       .thead-default {
@@ -193,6 +224,7 @@ $primary-bold: 600;
 								background-color: transparent;
 							}
 						}
+
             .verif-type {
               li {
                 list-style-type: none;
@@ -204,6 +236,7 @@ $primary-bold: 600;
               padding-bottom: 20px;
               border: 2px solid $primary-color;
             }
+
             &.table-functions {
 							a {
 								&:hover {
@@ -238,6 +271,12 @@ $primary-bold: 600;
               }
             }
           }
+
+        }
+      }
+    }
+  }
+
   &.modal-footer {
     .modal-sbc-link {
       text-align: left;
@@ -330,32 +369,5 @@ $primary-bold: 600;
 		}
 	}
 }
-}
-}
-    .inputfile {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-    }
-    .inputfile + label {
-      font-size: 1.25em;
-      font-weight: 700;
-      color: white;
-      background-color: $primary-color;
-      display: inline-block;
-    }
 
-    .inputfile:focus + label,
-    .inputfile + label:hover {
-      background-color: red;
-    }
 
-    .inputfile + label {
-      cursor: pointer; /* "hand" cursor */
-    }
-
-}
-}

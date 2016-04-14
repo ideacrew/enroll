@@ -1,4 +1,4 @@
-<div class="modal" id="csrEligibleReminder" tabindex="-1" role="dialog" role="document">
+<div class="modal" id="csrEligibleReminder-<%= plan.id%>" tabindex="-1" role="dialog" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -15,8 +15,11 @@
       </div>
       <div class="modal-footer">
 				<%= link_to 'Cancel', "", class: 'btn btn-trans', data: {'dismiss': 'modal' } %>
-				<%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right btn-br mtz plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %> &nbsp;
+  				<%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right btn-br mtz plan-select select', onclick: "$(\'.panel[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-trans.dn\').trigger(\'click\')"}) %> &nbsp;
       </div>
     </div>
   </div>
 </div>
+<script>
+
+</script>

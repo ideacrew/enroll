@@ -80,15 +80,10 @@ module Insured::FamiliesHelper
     options
   end
 
-  def show_employer_panel?(person, hbx_enrollments)
-    return false if person.blank? or !person.has_active_employee_role?
-    return true if hbx_enrollments.blank? or hbx_enrollments.shop_market.blank?
+  def newhire_enrollment_eligible?(employee_role)
+    return false if employee_role.blank? || employee_role.census_employee.blank?
 
-    if hbx_enrollments.shop_market.entries.map(&:employee_role_id).include? person.active_employee_roles.first.id
-      false
-    else
-      true
-    end
+    employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
   end
 
   def has_writing_agent?(employee_role)
