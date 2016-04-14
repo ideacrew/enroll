@@ -161,6 +161,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
       @broker_agency_profile.save
+      update_ga_for_employers(@broker_agency_profile)
       @broker_role = current_user.person.broker_role || nil
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
     end
@@ -289,6 +290,18 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def eligible_brokers
     Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').any_in(:'broker_role.market_kind'=>[person_market_kind, "both"])
+  end
+
+  def update_ga_for_employers(broker_agency_profile)
+    return if broker_agency_profile.blank? || broker_agency_profile.default_general_agency_profile.blank?
+
+    orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
+    employer_profiles = orgs.map {|o| o.employer_profile}
+    employer_profiles.each do |employer_profile|
+      employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
+      employer_profile.save
+      send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
+    end
   end
 
   def person_market_kind

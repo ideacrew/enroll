@@ -43,6 +43,10 @@ class Employers::BrokerAgencyController < ApplicationController
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
+      if broker_agency_profile.default_general_agency_profile.present?
+        @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
+        send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
+      end
       @employer_profile.save!(validate: false)
     end
 
@@ -102,6 +106,13 @@ class Employers::BrokerAgencyController < ApplicationController
     }
 
     create_secure_message(message_params, @broker_person, :inbox)
+  end
+
+  def send_general_agency_assign_msg(general_agency, employer_profile, broker_agency_profile, status)
+    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name} (#{status})"
+    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
+    secure_message(broker_agency_profile, general_agency, subject, body)
+    secure_message(broker_agency_profile, employer_profile, subject, body)
   end
 
   def find_employer

@@ -362,5 +362,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
       xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
     end
+
+    it "should call update_ga_for_employers" do
+      sign_in user
+      expect(controller).to receive(:update_ga_for_employers)
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+    end
   end
 end
