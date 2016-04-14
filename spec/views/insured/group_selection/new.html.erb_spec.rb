@@ -350,8 +350,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "when hbx_enrollment is terminated" do
-      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
       allow(hbx_enrollment).to receive(:auto_renewing?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
     end

@@ -52,11 +52,11 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   find("a.#{portal_class}").click
   find('.interaction-click-control-sign-in-existing-account').click
   step "#{name} signs in to portal"
-  end
+end
 
 Then /(\w+) decides to Update Business information/ do |person|
-  find('.interaction-click-control-update-business-info').click
-  sleep 1
+  find('.interaction-click-control-update-business-info', :wait => 10).click
+  wait_for_ajax(10)
   screenshot('update_business_info')
 end
 

@@ -4,23 +4,36 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
-    return "" if census_employee.blank? || census_employee.employee_role.blank?
+    enrollment_states = []
 
-    enrollment_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
-      if enrollment_state.present? && enrollment_state != "initialized"
-      #enrollment_state.humanize
-      begin
-        status = census_employee.employee_role.person.primary_family.enrolled_including_waived_hbx_enrollments.map{|a| "#{a.aasm_state} (#{a.coverage_kind})"}
-        status = status.uniq.map(&:inspect).join(', ').gsub('"','').gsub("inactive", "coverage_waived") # since, coverage_waived=>{inactive, renewing_waived}
-      rescue
-        status = ""
+    if benefit_group_assignment = census_employee.active_benefit_group_assignment
+      enrollments = benefit_group_assignment.hbx_enrollments
+
+      %W(health dental).each do |coverage_kind|
+        if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
+          enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
+        end
       end
-    else
-      status = ""
+      enrollment_states << '' if enrollment_states.compact.empty?
     end
-    return status.titleize
+
+    enrollment_states.compact.join(', ').titleize
   end
 
+  def benefit_group_assignment_status(enrollment_status)
+    assignment_mapping = {
+      'coverage_renewing' => HbxEnrollment::RENEWAL_STATUSES,
+      'coverage_terminated' => HbxEnrollment::TERMINATED_STATUSES,
+      'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES,
+      'coverage_waived' => HbxEnrollment::WAIVED_STATUSES
+    }
+
+    assignment_mapping.each do |bgsm_state, enrollment_statuses|
+      if enrollment_statuses.include?(enrollment_status.to_s)
+        return bgsm_state
+      end
+    end
+  end
 
   def coverage_kind(census_employee=nil)
     return "" if census_employee.blank? || census_employee.employee_role.blank?
