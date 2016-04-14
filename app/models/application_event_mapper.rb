@@ -27,9 +27,10 @@ class ApplicationEventMapper
         }
     }
 
+  # Employer Profile :fein_corrected ->
+  # "acapi.info.events.employer.fein_corrected"
+  def publish_friendly_event(resource_name, current_event, from_state, to_state)
 
-  def publish_friendly_event(resource_name, current_event, from_state, to_state, event_payload)
-    
   end
 
 end
