@@ -27,7 +27,7 @@ class ApplicationEventKind
 
   validates_presence_of :title, :resource_name, :event_name
   validates :resource_name,
-    inclusion: { in: RESOURCE_NAME_KINDS, message: "%{value} is not a valid resource name" }
+    inclusion: { in: RESOURCE_NAME_KINDS, message: "%{value} is not a defined resource name" }
 
   def resource_name=(new_resource_name)
     write_attribute(:resource_name, stringify(new_resource_name))

@@ -2,15 +2,13 @@ class NoticeTrigger
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  MARKET_PLACE_KINDS  = %w(individual shop)
-
-  field :hbx_id, type: Integer
+  field :name, type: String
   field :title, type: String
-  field :market_places, type: Array
   field :resource_publisher, type: String
-  field :notice_template_id, type: BSON::ObjectId
+  field :notice_template, type: String
+  field :notice_builder, type: String
 
-  embedded_in :application_event
+  embedded_in :application_event_kind
 
   embeds_one :notice_trigger_element_group
   accepts_nested_attributes_for :notice_trigger_element_group
@@ -20,6 +18,7 @@ class NoticeTrigger
   def publish(new_event)
     rule = EventForNoticeTriggerRule.new(self, new_event)
     if rule.satisfied?
+      notice_builder.camelize.constantize.new(self, template: notice_template)
       # call notice generation code
     else
       # log error

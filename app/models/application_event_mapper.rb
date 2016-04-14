@@ -28,7 +28,29 @@ class ApplicationEventMapper
     }
 
 
-  def publish_friendly_event(resource_name, current_state, from_state, to_state, event_payload)
+  def publish_friendly_event(resource_name, current_event, from_state, to_state, event_payload)
+    
   end
 
 end
+
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#created"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#address_changed"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#contact_changed"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#fein_corrected"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#name_changed"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#broker_added"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#broker_terminated"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#general_agent_added"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#general_agent_terminated"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_open_enrollment_ended"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_binder_paid"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_application_approved"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_voluntary"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_nonpayment"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_relocated"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_open_enrollment_ended"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_terminated_voluntary"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_terminated_ineligible"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_expired"/>
+      # <xs:enumeration value="urn:openhbx:events:v1:employer#other"/>

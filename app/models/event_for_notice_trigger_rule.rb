@@ -7,7 +7,7 @@ class EventForNoticeTriggerRule
 
   def satisfied?
     @errors = []
-
+    
   end
 
   # delivery method available?
@@ -17,6 +17,10 @@ class EventForNoticeTriggerRule
       return true
     else
     end
+  end
+
+  def noticable_event
+    event_list.include? @notice_trigger.
   end
 
   # electronic delivery method available?
