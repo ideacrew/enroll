@@ -132,7 +132,6 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays the renewal enrollment aasm state" do
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      debugger
       expect(rendered).to_not match(/Renewal Status/)
       expect(rendered).to_not match(/#{benefit_group_assignment.aasm_state.humanize}/)
     end
