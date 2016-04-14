@@ -23,7 +23,7 @@
         <%#= link_to 'Calculate Available APTC', edit_aptc_csr_path(family_id: @family.id, person_id: @person.id), class: "btn btn-default btn", remote: true%>
          <a href="javascript:void(0)" class='btn btn-default' id='calculate_available_aptc'>Calculate Available APTC</a>
       </div><br/>
-      <table class="table table-border">
+      <table class="table table-border module edit-aptc-csr-table">
         
         <thead>
           <th>Month (<%=@current_year%>)</th>
