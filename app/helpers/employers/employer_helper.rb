@@ -4,9 +4,17 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+  end
+
+  def renewal_enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+  end
+
+  def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
-    if benefit_group_assignment = census_employee.active_benefit_group_assignment
+    if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
 
       %W(health dental).each do |coverage_kind|
@@ -32,17 +40,6 @@ module Employers::EmployerHelper
       if enrollment_statuses.include?(enrollment_status.to_s)
         return bgsm_state
       end
-    end
-  end
-
-  def renewal_enrollment_state(census_employee=nil)
-    return "" if census_employee.blank?
-
-    enrollment_state = census_employee.renewal_benefit_group_assignment.try(:aasm_state)
-    if enrollment_state.present? and enrollment_state != "initialized"
-      enrollment_state.humanize
-    else
-      ""
     end
   end
 
