@@ -117,7 +117,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     end
   end
 
-  context "renewal enrollment state" do
+  context "enrolling enrollment state" do
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
     let(:benefit_group_assignment) { FactoryGirl.create( :benefit_group_assignment, census_employee: census_employee1 ) }
     let(:benefit_group) { FactoryGirl.create( :benefit_group, benefit_group_assignment: benefit_group_assignment ) }
@@ -126,13 +126,12 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(employer_profile).to receive(:renewing_plan_year).and_return(false)
-
     end
 
     it "should displays the renewal enrollment aasm state" do
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to_not match(/Renewal Status/)
+      expect(rendered).to_not match(/Renewal Enrollment Status/)
       expect(rendered).to_not match(/#{benefit_group_assignment.aasm_state.humanize}/)
     end
   end
