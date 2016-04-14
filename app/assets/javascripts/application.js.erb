@@ -400,6 +400,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
 
   // ACTUALLY BELONGS IN APPLICATION.JS
   $('.module a.view-more').on('click', function() {
@@ -1069,7 +1070,6 @@ $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
 });
 
-$('[data-toggle="tooltip"]').tooltip();
 
 $("[data-toggle=popover]").popover();
 $(document).on('click', '#address_info + span.form-action', function(){
