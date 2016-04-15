@@ -112,6 +112,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     before do
       census_employee.census_dependents = [census_dependent]
       census_employee.save
+      #sick hackery
       plan_year.update_attributes({:aasm_state => 'published'})
     end
 
@@ -361,6 +362,8 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       census_employee.census_dependents = [census_dependent]
       census_employee.save
       plan_year.publish!
+      #more sick hackery
+      plan_year.update_attributes({:aasm_state => 'published'})
     end
 
     context "and prior dependent exists with same dob and ssn" do
