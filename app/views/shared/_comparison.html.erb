@@ -106,6 +106,8 @@
 </div>
 <div class="modal-footer" style="border-top: none;">
   <button type="button" class="btn btn-default btn-trans" id='btnPrint'>Print</button>
-  <%= link_to "Download", comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-trans" %>
+  <% if @coverage_kind == "health" %>
+    <%= link_to "Download", comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-trans" %>
+  <% end %>
   <button type="button" class="btn  btn-default btn-trans" data-dismiss="modal">Close</button>
 </div>
