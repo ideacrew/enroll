@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       end
 
       member do
+        post :transmit_group_xml
         get :home
         get :inbox
       end

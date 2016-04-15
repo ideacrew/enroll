@@ -28,6 +28,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def transmit_group_xml
+    HbxProfile.transmit_group_xml(params[:id].split)
+    flash["notice"] = "Successfully transmitted the employer group xml."
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
   def employer_index
     @q = params.permit(:q)[:q]
     @orgs = Organization.search(@q).exists(employer_profile: true)

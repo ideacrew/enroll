@@ -99,3 +99,9 @@ end
 Then(/^the HBX\-Admin can utilize the “Transmit EDI” button$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
+
+Then(/^a button to transmit the Employer's Group XML will be active$/) do
+  step "the HBX admin clicks the Binder Transition tab"
+  expect(page).to have_css(".transmit-group-xml")
+  expect(page).to have_link('Transmit XML')
+end
