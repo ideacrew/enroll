@@ -157,8 +157,25 @@ Feature: Broker Assigns a General Agency to an Employer
     When the broker visits their Employers page
     Then the employer will be assigned that general agency
 
-    When the broker visits their general agencies page
-    Then the broker should see the list of general agencies
-    When the broker click the link of clear default ga
+    When the broker click the link of clear assign
     When the broker visits their Employers page
     Then the employer will not be assigned that general agency
+
+    When the broker visits their general agencies page
+    And the broker set default ga
+    When the broker visits their Employers page
+    Then the employer will be assigned that general agency
+    Then the broker logs out
+
+    When the ga login in
+    Then the ga should see the home of ga
+    When the ga visits their Employers page
+    Then the ga should see the employer
+
+    When the ga click the name of employer
+    Then the ga should see the home of employer
+    When the ga clicks on the Brokers tab
+    Then the ga should see the broker
+
+    When the ga click the back link
+    Then the ga should see the home of ga
