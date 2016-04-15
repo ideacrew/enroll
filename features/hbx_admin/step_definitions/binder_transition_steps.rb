@@ -105,3 +105,13 @@ Then(/^a button to transmit the Employer's Group XML will be active$/) do
   expect(page).to have_css(".transmit-group-xml")
   expect(page).to have_link('Transmit XML')
 end
+
+When(/^the HBX\-Admin clicks the button to transmit the Employer's Group XML$/) do
+  binding.pry
+  expect(page).to have_css(".transmit-group-xml")
+  page.find(".transmit-group-xml").click
+end
+
+Then(/^the appropriate XML file is generated and transmitted$/) do
+  pending # Write code here that turns the phrase above into concrete actions
+end

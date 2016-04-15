@@ -43,6 +43,16 @@ Feature: Binder transitions
     Then then the Employer’s state transitions to "Binder Paid"
     Then a button to transmit the Employer's Group XML will be active
 
+  Scenario: HBX-Admin transmits Group XML for new ER
+    When the HBX admin visits the Dashboard page
+    And the HBX admin has confirmed requirements for the employer
+    And the HBX admin clicks the "Binder Paid" button
+    Then then the Employer’s state transitions to "Binder Paid"
+    Then a button to transmit the Employer's Group XML will be active
+    When the HBX-Admin clicks the button to transmit the Employer's Group XML
+    Then the appropriate XML file is generated and transmitted
+
+
   Scenario: HBX-Admin participation requirements checklist for renewing ER
     Given the employer is renewing
     And the HBX admin visits the Dashboard page
