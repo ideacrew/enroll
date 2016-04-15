@@ -540,6 +540,11 @@ module ApplicationHelper
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
+  def make_binder_checkbox_disabled(employer)
+    eligibility_criteria(employer)
+    (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
+  end
+
   def eligibility_criteria(employer)
     participation_rule_text = participation_rule(employer)
     non_owner_participation_rule_text = non_owner_participation_rule(employer)
