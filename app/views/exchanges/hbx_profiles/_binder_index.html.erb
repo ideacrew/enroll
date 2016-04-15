@@ -24,7 +24,9 @@
           <% if employer.is_new_employer? || employer.is_renewing_employer? %>
             <tr>
               <td>
-                <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(employer), class: "binderCheckBox") %>
+                <% if employer.aasm_state != "binder_paid" %>
+                  <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(employer), class: "binderCheckBox") %>
+                <% end %>
               </td>
               <td><%= employer.legal_name %></td>
               <td><%= employer.aasm_state.titleize %></td>
