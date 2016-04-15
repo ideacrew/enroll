@@ -22,7 +22,7 @@
           <th>Termination Date</th>
           <% end %>
           <th>Enrollment Status</th>
-          <% if @employer_profile.renewing_plan_year.present? %>
+          <% if @employer_profile.renewing_published_plan_year.present? %>
               <th>Renewal Enrollment Status</th>
           <% end %>
           <th>
@@ -60,7 +60,7 @@
           </td>
           <% end %>
           <td><%= enrollment_state(census_employee) %></td>
-          <% if @employer_profile.renewing_plan_year.present? %>
+          <% if @employer_profile.renewing_published_plan_year.present? %>
               <td><%= renewal_enrollment_state(census_employee) %></td>
           <% end %>
           <td class="table-functions">

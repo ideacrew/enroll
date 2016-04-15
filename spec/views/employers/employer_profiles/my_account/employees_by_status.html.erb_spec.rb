@@ -106,7 +106,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     before do
       benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
-      allow(employer_profile).to receive(:renewing_plan_year).and_return(true)
+      allow(employer_profile).to receive(:renewing_published_plan_year).and_return(true)
 
     end
 
@@ -125,7 +125,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     before do
       benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
-      allow(employer_profile).to receive(:renewing_plan_year).and_return(false)
+      allow(employer_profile).to receive(:renewing_published_plan_year).and_return(false)
     end
 
     it "should displays the renewal enrollment aasm state" do
