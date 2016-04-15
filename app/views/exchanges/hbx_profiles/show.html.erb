@@ -5,8 +5,8 @@
 		<%= render 'shared/tab_panel' %>
 	</div>
 
-	   <%= link_to(aptc_csr_family_index_exchanges_hbx_profiles_path, "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
-          <span class="hidden-xs">APTC/CSR Updates</span>
-          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
-       <% end %>
+		<br /> <br />
+		<div class="container bottom-pd">
+	       <%= link_to 'Update APTC / CSR', aptc_csr_family_index_exchanges_hbx_profiles_path, class: "btn btn-default btn", remote: true%>
+   		</div>
 </div>

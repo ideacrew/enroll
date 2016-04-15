@@ -547,7 +547,7 @@ module ApplicationHelper
     if this_month_date < todays_date
       td_style = 'historic-aptc-csr-data'
     else
-      td_style="non-historic-aptc-csr-data"
+      td_style="current-aptc-csr-data"
     end
   end
   

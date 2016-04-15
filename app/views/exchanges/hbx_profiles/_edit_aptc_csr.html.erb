@@ -78,7 +78,7 @@
                   <tr>
                     <td><%=one_ind.keys.first%></td>
                       <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
-                        <td><%=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'checked', val, disabled: true%></td>
+                        <td class="<%=aptc_csr_data_type(key)%>"><%=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'checked', val, disabled: true%></td>
                       <%end%>
                       <td></td>
                       <td><%=check_box_tag "#{one_ind.keys.first.to_s}", 'accepted', (@grid_vals["eligible_members"].include? one_ind.keys.first.to_s), disabled: false%></td>

@@ -285,9 +285,10 @@ class Exchanges::HbxProfilesController < ApplicationController
       eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
       eligibility_determination.save
       
+      
+      hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
       # Update APTC Applied
-      if !params[:aptc_applied].blank?
-        hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
+      if params[:aptc_applied].present? && hbx_enrollment.present?
         hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied], "USD")
         hbx_enrollment.save
       end
@@ -300,6 +301,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         else
           member.is_ia_eligible = false
         end
+        binding.pry
         member.save! 
       end
 
