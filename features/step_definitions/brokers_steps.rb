@@ -1,87 +1,70 @@
 When(/^.+ visits the HBX Broker Registration form$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.element(class: /interaction-click-control-broker-registration/).wait_until_present
-  @browser.element(class: /interaction-click-control-broker-registration/).click
+  visit '/'
+  find(".interaction-click-control-broker-registration").click
 end
 
- When(/^Primary Broker clicks on New Broker Agency Tab$/) do
-  @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).wait_until_present
-  @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).fire_event("onclick")
+When(/^Primary Broker clicks on New Broker Agency Tab$/) do
+  find(:xpath, "//label[input[@id='new_broker_agency']]").click
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
-  @browser.element(id: "broker_agency_form").wait_until_present
-  expect(@browser.element(id: "broker_agency_form").visible?).to be_truthy
+  expect(page).to have_css("#broker_agency_form")
 end
 
 When(/^.+ enters personal information$/) do
-  @browser.text_field(class: /interaction-field-control-person-first-name/).set("Ricky")
-  @browser.text_field(class: /interaction-field-control-person-last-name/).set("Martin")
-  @browser.text_field(class: /interaction-field-control-person-dob/).set("10/10/1984")
-  @browser.text_field(class: /interaction-field-control-person-email/).click
-  @browser.text_field(class: /interaction-field-control-person-email/).set("ricky.martin@example.com")
-  @browser.text_field(class: /interaction-field-control-person-npn/).set("109109109")
+  fill_in 'organization[first_name]', with: 'Ricky'
+  fill_in 'organization[last_name]', with: 'Martin'
+  fill_in 'jq_datepicker_ignore_organization[dob]', with: '10/10/1984'
+  find('.interaction-field-control-person-email').click
+  fill_in 'organization[email]', with: 'ricky.martin@example.com'
+  fill_in 'organization[npn]', with: '109109109'
 end
 
 And(/^.+ enters broker agency information$/) do
-  @browser.text_field(class: /interaction-field-control-organization-legal-name/).set("Logistics Inc")
-  @browser.text_field(class: /interaction-field-control-organization-dba/).set("Logistics Inc")
-  @browser.text_field(class: /interaction-field-control-organization-fein/).set("890890891")
+  fill_in 'organization[legal_name]', with: "Logistics Inc"
+  fill_in 'organization[dba]', with: "Logistics Inc"
+  fill_in 'organization[fein]', with: "890890891"
 
-  entity_kind = @browser.div(class: /interaction-choice-control-organization-entity-kind/)
-  entity_kind.click
-  entity_kind.li(text: /S Corporation/).click
+  find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
+  find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  @browser.text_field(class: /interaction-field-control-broker-home-page/).set("www.logistics.example.com")
+  fill_in 'organization[home_page]', with: 'www.logistics.example.com'
 
-  practice_area = @browser.div(class: /selectric-interaction-choice-control-broker-agency-practice-area/)
-  practice_area.click
-  practice_area.li(text: /Small Business Marketplace ONLY/).click
+  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
-  language_multi_select = @browser.element(class: "language_multi_select").element(class: "multiselect")
-  language_multi_select.wait_until_present
-  language_multi_select.click
-  @browser.checkbox(:value => 'bn').set
-  @browser.checkbox(:value => 'fr').set
+  find('button.multiselect').click
+  find(:xpath, '//label[input[@value="bn"]]').click
+  find(:xpath, '//label[input[@value="fr"]]').click
 
-  @browser.checkbox(:name => "organization[working_hours]").set
-  @browser.checkbox(:name => "organization[accept_new_clients]").set
-end
-
-And(/^(.+) enters? office locations information$/) do |named_person|
-  enter_office_location(default_office_location)
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  @browser.element(class: /interaction-click-control-create-broker-agency/).wait_until_present
-  scroll_then_click(@browser.button(class: /interaction-click-control-create-broker-agency/))
+  find('.interaction-click-control-create-broker-agency').click
 end
 
-
 Then(/^.+ should see broker registration successful message$/) do
-  @browser.element(text: /Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed./).wait_until_present
-  expect(@browser.element(text: /Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed./).visible?).to be_truthy
+  expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
 And(/^.+ should see the list of broker applicants$/) do
 end
 
 Then(/^.+ clicks? on the current broker applicant show button$/) do
-  @browser.element(class: /interaction-click-control-broker-show/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-broker-show/))
+  find('.interaction-click-control-broker-show').click
 end
 
 And(/^.+ should see the broker application$/) do
 end
 
 And(/^.+ clicks? on approve broker button$/) do
-  @browser.element(class: /interaction-click-control-broker-approve/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-broker-approve/))
+  find('.interaction-click-control-broker-approve').click
 end
 
 Then(/^.+ should see the broker successfully approved message$/) do
-  @browser.element(text: /Broker applicant approved successfully./).wait_until_present
-  expect(@browser.element(text: /Broker applicant approved successfully./).visible?).to be_truthy
+  expect(page).to have_content('Broker applicant approved successfully.')
 end
 
 And(/^.+ should receive an invitation email$/) do
@@ -92,184 +75,153 @@ end
 
 When(/^.+ visits? invitation url in email$/) do
   invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/https\:\/\/enroll1\.dchealthlink\.com/, 'http://localhost:3000')
-  @browser.goto(invitation_link)
+  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  visit(invitation_link)
 end
 
 Then(/^.+ should see the login page$/) do
-  @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
+  find('.interaction-click-control-sign-in')
 end
 
 Then(/^.+ should see the create account page$/) do
-  @browser.element(class: /interaction-click-control-create-account/).wait_until_present
+  find('.interaction-click-control-create-account')
 end
 
 When(/^.+ clicks? on Create Account$/) do
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
+  click_link 'Create account'
 end
 
 When(/^.+ registers? with valid information$/) do
-  @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  @browser.text_field(name: "user[email]").set("ricky.martin@example.com")
-  @browser.text_field(name: "user[password]").set("aA1!aA1!aA1!")
-  @browser.text_field(name: "user[password_confirmation]").set("aA1!aA1!aA1!")
-  @browser.input(value: /Create account/).click
+  fill_in "user[email]", with: "ricky.martin@example.com"
+  fill_in "user[password]", with: "aA1!aA1!aA1!"
+  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  click_button 'Create account'
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  @browser.element(text: /Welcome to DC Health Link. Your account has been created./).wait_until_present
-  expect(@browser.element(text: /Welcome to DC Health Link. Your account has been created./).visible?).to be_truthy
+  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
 
-  @browser.h3(text: /Broker Agency \: Logistics Inc/).wait_until_present
-  expect(@browser.h3(text: /Broker Agency \: Logistics Inc/).visible?).to be_truthy
+  expect(page).to have_content('Broker Agency : Logistics Inc')
 end
 
 Then(/^.+ should see no active broker$/) do
-  @browser.element(class: /interaction-click-control-browse-brokers/).wait_until_present
-  expect(@browser.element(text: /You have no active Broker/).visible?).to be_truthy
+  expect(page).to have_content('You have no active Broker')
 end
 
 When(/^.+ clicks? on Browse Brokers button$/) do
-  click_when_present(@browser.element(class: /interaction-click-control-browse-brokers/))
+  find('.interaction-click-control-browse-brokers').click
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  @browser.h1(text: /Broker Agencies/).wait_until_present
-  expect(@browser.h1(text: /Broker Agencies/).visible?).to be_truthy
+  #TODO add AJAX handling
+  wait_for_ajax(3)
+  expect(page).to have_content('Broker Agencies')
 end
 
 When(/^.+ searches broker agency by name$/) do
-  search_div = @browser.div(class: "broker_agencies_search")
-  search_div.wait_until_present
+  find('.broker_agencies_search')
 
-  search_div.text_field(name: "q").wait_until_present
-  search_div.text_field(name: "q").set("Logistics")
+  fill_in 'q', with: 'Logistics'
 
-  search_div.button(class: /btn/).wait_until_present
-  search_div.button(class: /btn/).click
+  find('.search-wp .btn').click
 end
 
 Then(/^.+ should see broker agency$/) do
-  @browser.a(text: /Logistics Inc/).wait_until_present
-  expect(@browser.a(text: /Logistics Inc/).visible?).to be_truthy
+  expect(page).to have_content('Logistics Inc')
 end
 
 Then(/^.+ clicks? select broker button$/) do
-  @browser.a(text: /Select Broker/).wait_until_present
-  logistics = @browser.as(text: /Select Broker/).last
-  logistics.click
+  click_link 'Select Broker'
 end
 
 Then(/^.+ should see confirm modal dialog box$/) do
-  wait_and_confirm_text /Broker Selection Confirmation/
+  expect(page).to have_content('Broker Selection Confirmation')
 end
 
 Then(/^.+ confirms? broker selection$/) do
-  modal = @browser.divs(class: 'modal-dialog').last
-  modal.input(value: /Confirm/).wait_until_present
-  modal.input(value: /Confirm/).click
+  within '.modal-dialog' do
+    find('input.btn-primary').click
+  end
 end
 
 Then(/^.+ should see broker selected successful message$/) do
-  @browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).wait_until_present
-  expect(@browser.element(text: /Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'./).visible?).to be_truthy
+  expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
 And (/^.+ should see broker active for the employer$/) do
-  @browser.element(text: /Logistics Inc/i).wait_until_present
-  expect(@browser.element(text: /Logistics Inc/).visible?).to be_truthy
-  expect(@browser.element(text: /Ricky Martin/i).visible?).to be_truthy
+  expect(page).to have_content('Logistics Inc')
+  expect(page).to have_content('RICKY MARTIN')
 end
 
 When(/^.+ terminates broker$/) do
-  @browser.a(text: /Change Broker/i).wait_until_present
-  @browser.a(text: /Change Broker/i).click
-  @browser.element(text: /Broker Termination Confirmation/).wait_until_present
-  @browser.a(text: /Terminate Broker/i).wait_until_present
-  @browser.a(text: /Terminate Broker/i).click
+  find('.interaction-click-control-change-broker').click
+  find('.interaction-click-control-change-broker').trigger 'click'
 
-  #according to 2096 remove terminate in future
-  #@browser.text_field(class: "date-picker").wait_until_present
-  #@browser.text_field(class: "date-picker").set("07/23/2015")
-
-  #2.times { @browser.a(text: /Terminate/).click } # To collapse calender
-
-  #@browser.a(text: /Submit/).wait_until_present
-  #@browser.a(text: /Submit/).click
+  within '.modal-dialog' do
+    click_link 'Terminate Broker'
+  end
 end
 
 Then(/^.+ should see broker terminated message$/) do
-  @browser.element(text: /Broker terminated successfully./).wait_until_present
-  expect(@browser.element(text: /Broker terminated successfully./).visible?).to be_truthy
+  expect(page).to have_content('Broker terminated successfully.')
 end
 
 Then(/^.+ should see Employer and click on legal name$/) do
-  @browser.a(text: /Legal LLC/).wait_until_present
-  @browser.a(text: /Legal LLC/).click
+  click_link 'Legal LLC'
 end
 
 Then(/^.+ should see the Employer Profile page as Broker$/) do
-  @browser.element(text: /I'm a Broker/).wait_until_present
-  expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
+  expect(page).to have_content("I'm a Broker")
 end
 
 Then(/^.* creates and publishes a plan year$/) do
-  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
-  click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
-  start_on = @browser.p(text: /SELECT START ON/i)
-  click_when_present(start_on)
-  start_on = @browser.li(text: /SELECT START ON/i)
-  click_when_present(start_on.parent().lis()[1])
-  #id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
-  #@browser.text_field(id: id).set(50)
-  @browser.text_field(name: "plan_year[fte_count]").fire_event('onclick')
-  @browser.text_field(name: "plan_year[fte_count]").set("3")
-  @browser.a(class: /interaction-click-control-continue/).wait_until_present
-  @browser.a(class: /interaction-click-control-continue/).fire_event('onclick')
-    @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
-  select_field.click
-  select_field.li(text: /Date of hire/i).click
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(50)
-  select_plan_option = @browser.ul(class: /nav-tabs/)
-  select_plan_option.li(text: /By carrier/i).click
-  carriers_tab = @browser.div(class: /carriers-tab/)
-  sleep(3)
-  carriers_tab.as[1].fire_event("onclick")
-  plans_tab = @browser.div(class: /reference-plans/)
-  sleep(3)
-  plans_tab.labels.last.fire_event('onclick')
-  sleep(3)
+  find('.interaction-click-control-benefits').click
+  find('.interaction-click-control-add-plan-year').click
 
-  scroll_then_click(@browser.button(class: /interaction-click-control-create-plan-year/))
-  @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
-  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
-  click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
-  # @browser.refresh
+  find(:xpath, '//p[@class="label"][contains(., "SELECT START ON")]').click
+  find(:xpath, '//div[div/p[contains(., "SELECT START ON")]]//li[@data-index="1"]').click
+
+  fill_in 'plan_year[fte_count]', with: '3'
+  find('.interaction-click-control-continue').click
+
+  fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
+
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
+
+  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  wait_for_ajax(10)
+  find('.carriers-tab a').click
+  wait_for_ajax(10)
+  find('.reference-plan label').click
+  wait_for_ajax(10)
+  find('.interaction-click-control-create-plan-year').trigger('click')
+  find('.alert-notice')
+  find('.interaction-click-control-benefits').click
+  find('.interaction-click-control-publish-plan-year').click
 end
 
 Then(/^.+ sees employer census family created$/) do
-  wait_and_confirm_text(/successfully created/)
+  expect(page).to have_content('successfully created')
 end
 
 Then(/^.+ should see the matched employee record form$/) do
-  @browser.p(text: /Legal LLC/).wait_until_present
   screenshot("broker_employer_search_results")
-  expect(@browser.p(text: /Legal LLC/).visible?).to be_truthy
+  expect(page).to have_content('Legal LLC')
 end
 
 Then(/^Broker Assisted is a family$/) do
-  wait_and_confirm_text(/Broker Assisted/)
+  #sleep 1
+  wait_for_ajax
+  find(:xpath, "//li[contains(., 'Families')]/a").click
+  expect(page).to have_content('Broker Assisted')
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  broker_assist_row = @browser.td(text: /Broker Assisted/).parent
-  broker_assist_row.a(text: /Consumer/).click
-  wait_and_confirm_text(/My DC Health Link/)
+  click_link 'Consumer'
+  expect(page).to have_content('My DC Health Link')
 end
 
 # Then(/^.+ is on the consumer home page$/) do

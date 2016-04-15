@@ -87,7 +87,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if benefit_group_id.present?
         flash[:notice] = "Census Employee is successfully updated."
       else
-        flash[:notice] = "Note: new employee cannot enroll on #{HbxProfile::ShortName} until they are assigned a benefit group. "
+        flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
       redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
@@ -119,7 +119,7 @@ class Employers::CensusEmployeesController < ApplicationController
     end
     respond_to do |format|
       format.js {
-        if termination_date.present? and @fa
+        if termination_date.present? && @fa
           flash[:notice] = "Successfully terminated Census Employee."
           render text: true
         else
@@ -142,11 +142,11 @@ class Employers::CensusEmployeesController < ApplicationController
       rehiring_date = ""
     end
     @rehiring_date = rehiring_date
-    if @rehiring_date.present? and @rehiring_date > @census_employee.employment_terminated_on
+    if @rehiring_date.present? && @rehiring_date > @census_employee.employment_terminated_on
       new_census_employee = @census_employee.replicate_for_rehire
       if new_census_employee.present? # not an active family, then it is ready for rehire.#
         new_census_employee.hired_on = @rehiring_date
-        if new_census_employee.valid? and @census_employee.valid?
+        if new_census_employee.valid? && @census_employee.valid?
           @census_employee.save
           new_census_employee.save
 
@@ -169,12 +169,10 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @benefit_group_assignment = @census_employee.active_benefit_group_assignment
-
-    @hbx_enrollment = @benefit_group_assignment.try(:hbx_enrollment)
-    @benefit_group = @benefit_group_assignment.try(:benefit_group)
-    # reference_plan = @benefit_group.try(:reference_plan)
-    @plan = @hbx_enrollment && @hbx_enrollment.decorated_hbx_enrollment
+    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
+      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
+      @benefit_group = @benefit_group_assignment.benefit_group
+    end
 
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end

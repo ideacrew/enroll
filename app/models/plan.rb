@@ -8,6 +8,7 @@ class Plan
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
+  DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
 
   field :hbx_id, type: Integer
@@ -49,6 +50,13 @@ class Plan
 
   field :nationwide, type: Boolean # Nationwide
   field :dc_in_network, type: Boolean # DC In-Network or not
+
+  # Fields for provider direcotry and rx formulary url
+  field :provider_directory_url, type: String
+  field :rx_formulary_url, type: String
+
+  # for dental plans only, metal level -> high/low values
+  field :dental_level, type: String
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -107,6 +115,12 @@ class Plan
      in: METAL_LEVEL_KINDS,
      message: "%{value} is not a valid metal level kind"
   }
+
+  validates :dental_level,
+   inclusion: {
+     in: DENTAL_METAL_LEVEL_KINDS,
+     message: "%{value} is not a valid dental metal level kind"
+  }, if: Proc.new{|a| a.active_year.present? && a.active_year > 2015 && a.coverage_kind == "dental" } # we do not check for 2015 plans because, they are already imported with metal_level="dental"
 
   validates :market,
    allow_blank: false,
@@ -174,7 +188,7 @@ class Plan
         carrier_profile_id: carrier_profile_id,
         active_year: year,
         market: "shop",
-        hios_id: /-01$/,
+        hios_id: { "$not" => /-00$/ },
         metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
       )
   }
@@ -371,8 +385,20 @@ class Plan
     end
 
     def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
-        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).to_a
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
+        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
+      end
+    end
+
+    def valid_for_carrier(active_year)
+      # carrier_ids = Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile_id).uniq
+      # carrier_ids.map{|c| org= Organization.where(:'carrier_profile._id' => c).first;org}
+      Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile).uniq
+    end
+
+    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
+        Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
       end
     end
 

@@ -15,7 +15,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails'
+gem 'jquery-rails', '4.0.5'
 gem 'jquery-ui-rails'
 gem 'animate-rails', '~> 1.0.7'
 gem 'maskedinput-rails'
@@ -32,13 +32,14 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'less-rails-bootstrap', '~> 3.3.1.0'
-gem 'font-awesome-rails'
+gem 'font-awesome-rails', '4.5.0.1'
 gem 'nokogiri-happymapper', :require => 'happymapper'
+gem 'nokogiri', '1.6.7.2'
 
 gem 'mongoid', '5.0.1'
+gem 'mongo', '2.1.2'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "mongoid-autoinc"
-# gem 'mongoid-autoinc'
 gem 'mongoid-versioning'
 
 gem 'money-rails', '~> 1.3.0'
@@ -57,11 +58,14 @@ gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
-gem 'sass'
+gem 'sass', '3.4.21'
 # gem 'bh'
 
 # spreadsheet support
 gem 'roo', '~> 2.1.0'
+
+# configuration support
+gem "config", '~> 1.0.0'
 
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
@@ -74,22 +78,29 @@ gem 'kaminari'
 
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
-gem 'rails-i18n', '~> 4.0.0'
-gem 'mail'
-gem 'bson'
+gem 'rails-i18n', '4.0.8'
+gem 'mail', '2.6.3'
+gem 'bson', '3.2.6'
+gem 'addressable', '2.3.8'
 # gem 'rypt', '0.2.0'
 
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
-gem 'bootstrap-slider-rails'
+gem 'bootstrap-slider-rails', '6.0.17'
 
 gem 'prawn', '~> 0.11.1'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.2.1'
-gem 'wicked_pdf'
+gem 'wicked_pdf', '1.0.4'
 
 # provide recaptcha services
-gem "recaptcha"
+gem "recaptcha", '1.1.0'
+
+group :development do
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '2.3.0'
+  gem "parallel_tests"
+end
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -99,33 +110,35 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-remote'
 
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
-
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
+  gem 'spring', '1.6.3'
 
   # Use Capistrano for deployment
   gem 'capistrano', '3.3.5'
   # gem 'capistrano-scm-gitcopy'
-  gem 'capistrano-rails', '~> 1.1.2'
+  gem 'capistrano-rails', '1.1.6'
   gem 'ruby-progressbar', '1.6.0'
 
   # Keep these in Development and Test environments for access by rails generators
-  gem 'rspec-rails', '~> 3.1.0'
-  gem 'factory_girl_rails', "~> 4.0"
+  gem 'rspec-rails', '~> 3.4.2'
+  gem 'factory_girl_rails', "4.6.0"
   gem 'forgery'
-  gem 'email_spec'
+  gem 'email_spec', '2.0.0'
+  gem 'byebug', '8.2.2'
+  gem 'rspec_junit_formatter', '0.2.3'
 end
 
 group :test do
-  gem 'mongoid-rspec'
+  gem 'mongoid-rspec', '3.0.0'
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
+  gem 'poltergeist'
+  gem 'capybara-screenshot'
   gem 'database_cleaner', '1.5.1'
-  gem 'shoulda-matchers'
+  gem 'shoulda-matchers', '3.1.1'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
-#  gem 'headless'
+  gem 'capybara', '2.6.2'
+  gem 'warden'
 end
 
 group :production do
@@ -138,5 +151,5 @@ group :production do
 
 end
 
-gem 'aws-sdk', '~> 2'
+gem 'aws-sdk', '2.2.4'
 gem 'ruby-saml', '~> 1.0.0'

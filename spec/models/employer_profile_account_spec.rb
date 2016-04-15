@@ -8,7 +8,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   end
 
   let(:open_enrollment_start_on)    { TimeKeeper.date_of_record }
-  let(:open_enrollment_end_on)      { open_enrollment_start_on + HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day }
+  let(:open_enrollment_end_on)      { open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day }
   let(:start_on)                    { open_enrollment_start_on + 1.month }
   let(:end_on)                      { start_on + 1.year - 1.day }
 
@@ -104,6 +104,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       end
 
       let(:new_employer_profile_account) { persisted_employer_profile.employer_profile_account }
+
       def persisted_new_employer_profile_account
         EmployerProfileAccount.find(new_employer_profile_account.id)
       end
@@ -113,13 +114,14 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                                             start_on: plan_year.start_on
                                           )}
 
-      let(:census_employee)             { FactoryGirl.create(:census_employee, 
+      let(:census_employee)             { FactoryGirl.create(:census_employee,
                                             employer_profile: employer_profile,
                                             benefit_group_assignments: [benefit_group_assignment]
                                           ) }
 
       before do
         plan_year.publish!
+        allow_any_instance_of(CensusEmployee).to receive(:has_active_health_coverage?).and_return(true)
         census_employee.active_benefit_group_assignment.select_coverage!
 
         TimeKeeper.set_date_of_record(open_enrollment_end_on + 1.day)
@@ -250,7 +252,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                         persisted_new_employer_profile_account.reverse_coverage_period
                       end
 
-                      it "should revert to suspended status" 
+                      it "should revert to suspended status"
 
                       it "and reset employer to suspended status"
                     end

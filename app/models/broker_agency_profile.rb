@@ -50,7 +50,7 @@ class BrokerAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
     allow_blank: false
 
   validates :entity_kind,

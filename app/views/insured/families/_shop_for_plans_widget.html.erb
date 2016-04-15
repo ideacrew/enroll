@@ -1,4 +1,4 @@
-<% if current_user.has_consumer_role? && !current_user.has_employee_role? %>
+<% if @person.active_employee_roles.blank? %>
 <div class="panel panel-default" id='shop-for-plans-widget'>
 <div class="panel-body">
 <div class="row">
@@ -13,15 +13,16 @@
 Shop for Plans
 </button>
         <% else %>
-        <% action_path = new_insured_group_selection_path %>
-        <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-        <% action_path = find_sep_insured_families_path %>
+
+        <% action_path = find_sep_insured_families_path  %>
+        <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? %>
+          <% action_path = new_insured_group_selection_path %>
         <% end %>
 
         <%= form_tag action_path, method: :get do %>
 
         <% if @hbx_enrollments.present? %>
-        <%= hidden_field_tag 'change_plan', 'change_plan' %>
+          <%= hidden_field_tag 'change_plan', 'change_plan' %>
         <% end %>
 
         <%= hidden_field_tag 'person_id', @person.try(:id) %>
@@ -53,6 +54,7 @@ Shop for Plans
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <div class="row">
           <div class="col-sm-12">
+            <% if @person.consumer_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
             <% options = {shop_for_plan: 'shop_for_plan'}
               options.merge!(person_id: @person.id) if @person.present?
               options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
@@ -68,6 +70,12 @@ Shop for Plans
             <br />
 
             <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
+            <% else %>
+               You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
+               <div id="shop-for-plans-widget">
+               <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+               </div>
+            <% end %>
           </div>
         </div>
       </div>

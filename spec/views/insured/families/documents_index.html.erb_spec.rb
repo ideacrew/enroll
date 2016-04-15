@@ -25,4 +25,17 @@ RSpec.describe "insured/families/documents_index.html.erb" do
     render file: "insured/families/documents_index.html.erb"
     expect(rendered).not_to have_selector('a', text: 'Upload Document')
   end
+
+  it "should display the link to download tax documents" do
+    allow(person).to receive(:consumer_role).and_return(double)
+    render file: "insured/families/documents_index.html.erb"
+    expect(rendered).to have_selector('a', text: 'Download Tax Documents')
+  end
+
+  it "should not display the link to download tax documents for non ivl users" do
+    allow(person).to receive(:consumer_role).and_return(nil)
+    render file: "insured/families/documents_index.html.erb"
+    expect(rendered).not_to have_selector('a', text: 'Download Tax Documents')
+  end
+  
 end

@@ -65,13 +65,20 @@ class SamlController < ApplicationController
   # Going to curam during the initial flow is triggered differently.
   # What we do here is set the navigation flag and send to the right location.
   def navigate_to_assistance
-    ::IdpAccountManager.update_navigation_flag(
-      current_user.oim_id,
-      current_user.email,
-      ::IdpAccountManager::CURAM_NAVIGATION_FLAG
-    )
-    # redirect_to destroy_user_session_path
-    redirect_to SamlInformation.curam_landing_page_url
+
+    if current_user.present?
+
+      ::IdpAccountManager.update_navigation_flag(
+        current_user.oim_id,
+        current_user.email,
+        ::IdpAccountManager::CURAM_NAVIGATION_FLAG
+      )
+      # redirect_to destroy_user_session_path
+      redirect_to SamlInformation.curam_landing_page_url
+    else
+      redirect_to SamlInformation.iam_login_url
+    end
+
   end
 
   def logout

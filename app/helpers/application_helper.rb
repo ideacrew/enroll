@@ -1,12 +1,16 @@
 module ApplicationHelper
 
+  def copyright_notice
+    raw("&copy; #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.")
+  end
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
   def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
     # source is account or shopping
-    if source == 'account' and hbx_enrollment.present? and hbx_enrollment.try(:applied_aptc_amount).to_f > 0
+    if source == 'account' && hbx_enrollment.present? && hbx_enrollment.try(:applied_aptc_amount).to_f > 0
       if hbx_enrollment.coverage_kind == 'health'
         return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
       else
@@ -14,7 +18,7 @@ module ApplicationHelper
       end
     end
 
-    if session['elected_aptc'].present? and session['max_aptc'].present? and can_use_aptc
+    if session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
       aptc_amount = session['elected_aptc'].to_f
       ehb_premium = plan_cost * ehb
       cost = plan_cost - [ehb_premium, aptc_amount].min
@@ -205,6 +209,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_dental_relationship_benefits
     end
 
 
@@ -384,6 +389,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
+    return if plan_year.employer_profile.census_employees.count > 100
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -413,8 +419,6 @@ module ApplicationHelper
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;" unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
-
-       #binding.pry
 
         concat(content_tag(:div, class: 'progress-val') do
           concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)
@@ -449,11 +453,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.under_open_enrollment?
+    HbxProfile.current_hbx.try(:under_open_enrollment?)
   end
 
   def ivl_enrollment_effective_date
-    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+    HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
   def parse_ethnicity(value)
@@ -465,7 +469,7 @@ module ApplicationHelper
   def incarceration_cannot_purchase(family_member)
     pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
     name=family_member.try(:first_name) || ''
-    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{HbxProfile::ShortName}.<br/> Other family members may still be eligible to enroll."
+    "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
   end
 
   def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
@@ -488,8 +492,9 @@ module ApplicationHelper
     'Confirm'
   end
 
+
   def qualify_qle_notice
-    content_tag(:span, class: :alert) do
+    content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
@@ -528,5 +533,10 @@ module ApplicationHelper
 
   def all_unverified
     number_with_delimiter(@unverified_persons.count)
+  end
+
+  def display_dental_metal_level(plan)
+    return plan.metal_level.humanize if plan.coverage_kind == "health"
+    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 end

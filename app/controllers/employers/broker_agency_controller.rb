@@ -1,5 +1,5 @@
 class Employers::BrokerAgencyController < ApplicationController
-
+  include Acapi::Notifiers
   before_action :find_employer
   before_action :find_borker_agency, :except => [:index, :active_broker]
 
@@ -46,9 +46,14 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!(validate: false)
     end
 
-    flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email him or her directly. If this is not the broker you want to use, select 'Change Broker'."
+    flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
+  rescue => e
+    if @employer_profile.errors
+      error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages)
+    end
+    log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
   end
 
 

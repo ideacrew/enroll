@@ -4,7 +4,7 @@ module Factories
 
     # Renews a family's active enrollments from current plan year
 
-    attr_accessor :family, :census_employee
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year
 
     def renew
       raise ArgumentError unless defined?(@family)
@@ -19,21 +19,30 @@ module Factories
 
       return nil if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
-      shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
+      shop_enrollments  = @family.active_household.hbx_enrollments.enrolled.shop_market + @family.active_household.hbx_enrollments.waived
+      return nil if shop_enrollments.any? {|enrollment| enrollment.effective_on >= @renewing_plan_year.start_on }
 
-      if shop_enrollments.empty?
+      @plan_year_start_on = @renewing_plan_year.start_on
+      prev_plan_year_start = @plan_year_start_on - 1.year
+      prev_plan_year_end = @plan_year_start_on - 1.day
+
+      shop_enrollments.reject! {|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
+      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
+
+      if shop_enrollments.compact.empty?
         renew_waived_enrollment
       else
-        shop_enrollments.each do |active_enrollment|  
-          next unless active_enrollment.currently_active?
+        active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
 
+        # shop_enrollments.each do |active_enrollment|
+          # next unless active_enrollment.currently_active?
           # renewal_enrollment = renewal_builder.call(active_enrollment)
           renewal_enrollment = renewal_builder(active_enrollment)
           renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
 
           renewal_enrollment.decorated_hbx_enrollment # recalc the premium amounts
           save_renewal_enrollment(renewal_enrollment, active_enrollment)
-        end
+        # end
       end
      
       # @family.enrollments.individual_market do |active_enrollment|       
@@ -166,8 +175,21 @@ module Factories
         renewal_enrollment.waive_coverage 
       end
 
-      renewal_enrollment.hbx_enrollment_members = active_enrollment.hbx_enrollment_members
+      renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
       renewal_enrollment
+    end
+      
+    def clone_enrollment_members(active_enrollment)
+      hbx_enrollment_members = active_enrollment.hbx_enrollment_members
+      hbx_enrollment_members.reject!{|hbx_enrollment_member| !hbx_enrollment_member.is_covered_on?(@plan_year_start_on - 1.day)  }
+      hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
+        members << HbxEnrollmentMember.new({
+          applicant_id: hbx_enrollment_member.applicant_id,
+          eligibility_date: @plan_year_start_on,
+          coverage_start_on: @plan_year_start_on,
+          is_subscriber: hbx_enrollment_member.is_subscriber
+        })
+      end
     end
 
     # Validate enrollment membership against benefit package-covered relationships
@@ -187,12 +209,5 @@ module Factories
   
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
-
-      # renewal_builder = lambda do |active_enrollment|
-      #   renewal_enrollment = @family.active_household.hbx_enrollments.new
-      #   renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
-      #   renewal_enrollment.renew_enrollment
-      #   renewal_enrollment
-      # end
 
 

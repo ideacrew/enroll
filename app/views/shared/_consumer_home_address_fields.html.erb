@@ -7,7 +7,7 @@
 
       <% style = "" %>
       <% div_class = kind+"-div" %>
-      <% if kind != 'home' and address.object.new_record? %>
+      <% if kind != 'home' && address.object.new_record? %>
         <% style="display:none;" %>
       <% end %>
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">

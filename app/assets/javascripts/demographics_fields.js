@@ -86,7 +86,8 @@ function showOnly(selected) {
     data: {
       'target_id': target_id,
       'target_type': target_type,
-      'vlp_doc_target': vlp_doc_target
+      'vlp_doc_target': vlp_doc_target,
+      'vlp_doc_subject': selected
     },
   });
 }
@@ -118,7 +119,7 @@ function validationForIndianTribeMember() {
       e.preventDefault && e.preventDefault();
       return false;
     };
-    
+
     // for tribal_id
     var tribal_val = $('#tribal_id').val();
     if($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')){
@@ -132,4 +133,9 @@ function validationForIndianTribeMember() {
 $(document).ready(function(){
   applyListeners();
   validationForIndianTribeMember();
+  if (window.location.href.indexOf("insured") > -1 && window.location.href.indexOf("consumer_role") > -1 && window.location.href.indexOf("edit") > -1) {
+    $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e){
+      
+    });
+  }
 });

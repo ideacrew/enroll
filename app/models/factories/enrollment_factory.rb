@@ -44,7 +44,7 @@ module Factories
         person_params["name_sfx"], person_params["ssn"].gsub("-",""),
         person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
         )
-      if person.blank? and person_new.blank?
+      if person.blank? && person_new.blank?
         begin
           raise
         rescue => e
@@ -130,7 +130,7 @@ module Factories
         person_details.name_sfx, census_employee.ssn,
         census_employee.dob, person_details.gender, "employee"
         )
-      return nil, nil if person.blank? and person_new.blank?
+      return nil, nil if person.blank? && person_new.blank?
       self.build_employee_role(
         person, person_new, census_employee.employer_profile,
         census_employee, census_employee.hired_on
@@ -180,6 +180,17 @@ module Factories
         person.delete
       end
       return role, family
+    end
+
+    def self.build_family(person, dependents)
+      #only build family if there is no primary family, otherwise return primary family
+      if person.primary_family.nil?
+        family, primary_applicant = self.initialize_family(person, dependents)
+        saved = save_all_or_delete_new(family, primary_applicant)
+      else
+        family = person.primary_family
+      end
+      return family
     end
 
     private

@@ -410,38 +410,136 @@ describe EmployeeRole, dbclean: :after_each do
       expect(EmployeeRole.find_by_employer_profile(match_employer_profile).first).to be_an_instance_of EmployeeRole
     end
   end
+end
 
-  context "is under open enrollment" do
-    let(:employee_role) { EmployeeRole.new }
 
-    it "return false without employer profile" do
-      allow(employee_role).to receive(:employer_profile).and_return nil
+describe EmployeeRole, dbclean: :after_each do
 
-      expect(employee_role.is_under_open_enrollment?).to eq false
+  let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+
+  let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
+  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+
+  let(:employee_role) {
+    person.employee_roles.create(
+      employer_profile: employer_profile,
+      hired_on: census_employee.hired_on,
+      census_employee_id: census_employee.id
+      )
+  }
+
+  let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
+  let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
+  let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
+  let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+
+  let!(:plan_year) { 
+
+    py = FactoryGirl.create(:plan_year,
+      start_on: plan_year_start_on,
+      end_on: plan_year_end_on,
+      open_enrollment_start_on: open_enrollment_start_on,
+      open_enrollment_end_on: open_enrollment_end_on,
+      employer_profile: employer_profile
+      )
+
+    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+    py.benefit_groups = [blue, white]
+    py.save
+    py.update_attributes(:aasm_state => 'published')
+    py
+  }
+
+
+  let(:benefit_group_assignment) {
+    BenefitGroupAssignment.create({
+      census_employee: census_employee,
+      benefit_group: plan_year.benefit_groups.first,
+      start_on: plan_year_start_on
+      })
+  }
+
+  before do 
+    allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
+    allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+  end
+
+  context ".is_under_open_enrollment?" do
+    context 'when under open enrollment' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
+      end
+
+      it "should return true" do
+        expect(employee_role.is_under_open_enrollment?).to be_truthy
+      end
     end
 
-    context "with employer profile" do
-      let(:plan_year) {FactoryGirl.create(:plan_year)}
-      let(:employer_profile) { double("EmployerProfile") }
-
-      before :each do
-        allow(employee_role).to receive(:employer_profile).and_return employer_profile
-        allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
+    context 'when outside open enrollment' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on + 5.days)
       end
 
-      it "return false" do
-        allow(plan_year).to receive(:open_enrollment_start_on).and_return (TimeKeeper.date_of_record - 10.days)
-        allow(plan_year).to receive(:open_enrollment_end_on).and_return (TimeKeeper.date_of_record - 5.days)
-        
-        expect(employee_role.is_under_open_enrollment?).to eq false
+      it "should return false" do
+        expect(employee_role.is_under_open_enrollment?).to be_falsey
+      end
+    end
+  end
+
+  context ".is_eligible_to_enroll_without_qle?" do
+    context 'when new hire open enrollment period available' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
+
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 15.days)
       end
 
-      it "return true" do
-        allow(plan_year).to receive(:open_enrollment_start_on).and_return (TimeKeeper.date_of_record - 10.days)
-        allow(plan_year).to receive(:open_enrollment_end_on).and_return (TimeKeeper.date_of_record + 5.days)
-        
-        expect(employee_role.is_under_open_enrollment?).to eq true
+      it "should return true" do 
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
       end
+    end
+
+
+    context 'when new roster entry enrollment period available' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: middle_of_prev_year) }
+
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 15.days)
+      end
+
+      it "should return true" do 
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
+      end
+    end
+
+    context 'when outside new hire enrollment period and employer open enrolment' do
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
+
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 55.days)
+      end
+
+      it "should return false" do 
+        expect(employee_role.is_eligible_to_enroll_without_qle?).to be_falsey
+      end
+    end
+  end
+
+  context "can_select_coverage?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+
+    it "should return true when hired_on is less than two monthes ago" do
+      employee_role.hired_on = TimeKeeper.date_of_record - 15.days
+      expect(employee_role.can_select_coverage?).to eq true
+    end
+
+    it "should return false when hired_on is more than two monthes ago" do
+      employee_role.hired_on = TimeKeeper.date_of_record - 75.days
+      expect(employee_role.can_select_coverage?).to eq false
     end
   end
 end

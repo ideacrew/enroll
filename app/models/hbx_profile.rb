@@ -109,6 +109,8 @@ class HbxProfile
   IndividualEnrollmentDueDayOfMonth = 18
   IndividualEnrollmentTerminationMinimum = 14.days
 
+  InitialEmployerPlanYearPublishDueDayOfMonth = 5
+  RenewingEmployerPlanYearPublishDueDayOfMonth = 10
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,
@@ -134,56 +136,56 @@ class HbxProfile
 
   # Maximum number of days an Employer may notify HBX of termination
   # may terminate an employee and effective date
-  ShopRetroactiveTerminationMaximum = 60.days
+  # ShopRetroactiveTerminationMaximum = 60.days
+  #
+  # # Length of time preceeding next effective date that an employer may renew
+  # ShopMaximumRenewalPeriodBeforeStartOn = 3.months
+  #
+  # # Length of time preceeding effective date that an employee may submit a plan enrollment
+  # ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
+  #
+  # # Length of time following effective date that an employee may submit a plan enrollment
+  # ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
+  #
+  # # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
+  # ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
+  #
+  # # TODO - turn into struct that includes count, plus effective date range
+  # ShopApplicationAppealPeriodMaximum = 30.days
+  #
+  # # After submitting an ineligible plan year application, time period an Employer must wait
+  # #   before submitting a new application
+  # ShopApplicationIneligiblePeriodMaximum = 90.days
+  #
+  # # TODO - turn into struct that includes count, plus effective date range
+  # ShopSmallMarketFteCountMaximum = 50
+  #
+  # ## SHOP enrollment-related periods in days
+  # # Minimum number of days for SHOP open enrollment period
+  # ShopOpenEnrollmentPeriodMinimum = 5
+  # ShopOpenEnrollmentEndDueDayOfMonth = 10
+  #
+  # # Maximum number of months for SHOP open enrollment period
+  # ShopOpenEnrollmentPeriodMaximum = 2
+  #
+  # # Minumum length of time for SHOP Plan Year
+  # ShopPlanYearPeriodMinimum = 1.year - 1.day
+  #
+  # # Maximum length of time for SHOP Plan Year
+  # ShopPlanYearPeriodMaximum = 1.year - 1.day
+  #
+  # # Maximum number of months prior to coverage effective date to submit a Plan Year application
+  # ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
+  #
+  # ShopEmployerContributionPercentMinimum = 50.0
+  # ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
+  # ShopEnrollmentNonOwnerParticipationMinimum = 1
+  #
+  # ShopBinderPaymentDueDayOfMonth = 15
+  # ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
 
-  # Length of time preceeding next effective date that an employer may renew
-  ShopMaximumRenewalPeriodBeforeStartOn = 3.months
 
-  # Number of days preceeding effective date that an employee may submit a plan enrollment
-  ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
-
-  # Number of days following effective date that employee may purchase plan
-  ShopMaximumEnrollmentPeriodAfterEligibilityInDays = 30
-
-  # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
-  ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
-
-  # TODO - turn into struct that includes count, plus effective date range
-  ShopApplicationAppealPeriodMaximum = 30.days
-
-  # After submitting an ineligible plan year application, time period an Employer must wait
-  #   before submitting a new application
-  ShopApplicationIneligiblePeriodMaximum = 90.days
-
-  # TODO - turn into struct that includes count, plus effective date range
-  ShopSmallMarketFteCountMaximum = 50
-
-  ## SHOP enrollment-related periods in days
-  # Minimum number of days for SHOP open enrollment period
-  ShopOpenEnrollmentPeriodMinimum = 5
-  ShopOpenEnrollmentEndDueDayOfMonth = 10
-
-  # Maximum number of months for SHOP open enrollment period
-  ShopOpenEnrollmentPeriodMaximum = 2
-
-  # Minumum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMinimum = 1.year - 1.day
-
-  # Maximum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMaximum = 1.year - 1.day
-
-  # Maximum number of months prior to coverage effective date to submit a Plan Year application
-  ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
-
-  ShopEmployerContributionPercentMinimum = 50.0
-  ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
-  ShopEnrollmentNonOwnerParticipationMinimum = 1
-
-  ShopBinderPaymentDueDayOfMonth = 15
-  ShopRenewalOpenEnrollmentEndDueDayOfMonth = 13
-  
-
-  ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+  ShopOpenEnrollmentBeginDueDayOfMonth = Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 
@@ -205,8 +207,8 @@ class HbxProfile
   end
 
   def save_inbox
-    welcome_subject = "Welcome to #{HbxProfile::ShortName}"
-    welcome_body = "#{HbxProfile::ShortName} is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

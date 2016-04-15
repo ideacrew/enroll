@@ -16,7 +16,7 @@ class PlanSelection
 
   def can_apply_aptc?(shopping_tax_household, elected_aptc)
     return false if hbx_enrollment.is_shop?
-    shopping_tax_household.present? and elected_aptc > 0 and plan.can_use_aptc?
+    shopping_tax_household.present? && elected_aptc > 0 && plan.can_use_aptc?
   end
 
   def apply_aptc_if_needed(shopping_tax_household, elected_aptc, max_aptc)

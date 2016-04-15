@@ -4994,7 +4994,7 @@ position: absolute;
   float: left;
   margin-right: 20px;
 }
-#shop-for-plans-widget .btn {
+#shop-for-plans-widget .btn, .employer-panel .btn {
   color: #007BC4;
   font-weight: 600;
 }
@@ -5074,10 +5074,25 @@ input:required:valid {
     left:0;
     top:0;
   }
-  div.plan_receipt{
+  #printArea {
+    display: none;
+  }
+  #printSection #printArea {
+    display: block !important;
+  }
+  #btnPrint {
+    display: none;
+  }
+  div.horizontal-status {
+    display: none;
+  }
+  div.plan_receipt, div#plan_shoppings_show_form, div.plan_shoppings{
     display: none;
   }
   div.waiver_receipt, a.plan-select{
+    display: none;
+  }
+  .footer-wrapper {
     display: none;
   }
 }

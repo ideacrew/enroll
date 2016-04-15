@@ -20,6 +20,9 @@
 
 <%= render partial: "employers/employer_profiles/my_account/documents" %>
 
+<%- elsif @tab == 'billing' %>
+  <%= render partial: "employers/employer_profiles/my_account/billing" %>
+
 <%- elsif @tab == 'families' %>
 <%= render partial:  "employers/employer_profiles/my_account/families" %>
 <%- end %>
@@ -57,12 +60,14 @@
       </article>
     </section>
   <% end %>
+  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
-      <h3>Premium Billing Report</h3>
-        <% if @employer_profile.published_plan_year.present? %>
-          <span><%= TimeKeeper.date_of_record.beginning_of_month %> - <%= TimeKeeper.date_of_record.end_of_month %></span>
-        <% end %>
+    <% plan_year, billing_date = @employer_profile.billing_plan_year %>
+      <% if billing_date.present? %>
+
+      <h3>Enrollment Report</h3>
+      <span><%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></span>
         <br/>
         <br/>
         <table>
@@ -81,8 +86,11 @@
         </table>
         <br/>
     </article>
+    <% end %>
   </section>
   <br/>
+  <% end %>
+
 
   <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
     <article>

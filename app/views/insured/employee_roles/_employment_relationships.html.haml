@@ -1,19 +1,17 @@
-.n-radio-group
-  .n-radio-row
-    %label.n-radio{ :for=>"employee-sponsored-benefits" }
-      %input.n-radio{ :type=>"radio", :checked=>"checked", :id=>"employee-sponsored-benefits", :name=>"healthcare-marketplace" }
-      %span.n-radio
-      Enroll in Employer-Sponsored Benefits
-  .n-radio-row
-    %label.n-radio{ :for=>"individual-benefits" }
-      %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
-      %span.n-radio
-      Enroll in Individual Benefits
-  %br
-.row
-  .col-md-12.col-sm-12.col-xs-12
-    %p
-      %br
-      If you don't see your employer listed below, click
-      = link_to 'here', 'https://dchealthlink.com/help', class: '', target: '_blank'
-      for help.
+.n-radio-row
+  %label.n-radio{ :for=>"new_employee-sponsored-benefits#{er.object_id}" }
+    - check = (index == 0 ? true : false)
+    %input.n-radio{ :type=>"radio", :class=> "employer-sponsored", :checked=>check, :id=>"new_employee-sponsored-benefits#{er.object_id}", :name=>"healthcare-marketplace" }
+    %span.n-radio
+    ="Enroll as an employee of #{er.employer_name} with coverage starting #{format_date er.eligible_for_coverage_on}."
+= form_for(er, :url => insured_employee_index_path, :as => :employment_relationship, :html => {:class => "new_employee-sponsored-benefits#{er.object_id}"}, :method => :post) do |f|
+  = f.submit :class => "hidden", :id => "employee-sponsored-benefits#{er.object_id}"
+  = f.hidden_field :first_name
+  = f.hidden_field :last_name
+  = f.hidden_field :middle_name
+  = f.hidden_field :name_pfx
+  = f.hidden_field :name_sfx
+  = f.hidden_field :gender
+  = f.hidden_field :hired_on
+  = f.hidden_field :eligible_for_coverage_on
+  = f.hidden_field :census_employee_id

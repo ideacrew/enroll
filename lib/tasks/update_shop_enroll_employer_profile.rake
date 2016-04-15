@@ -3,7 +3,7 @@ namespace :update_shop do
   task :enroll_employer_profile => :environment do
     changed_count = 0
 
-    effective_date = Date.new(2016,1,1)
+    effective_date = Date.new(2015,12,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
     employers = organizations.map(&:employer_profile).inject({}) do |employers, profile|
@@ -11,6 +11,8 @@ namespace :update_shop do
       employers
     end
         
+    missing_family = 0
+    missing_person = 0
     employers.each do |fein, name|
       begin
         puts "Processing employer: #{name}"
@@ -24,6 +26,10 @@ namespace :update_shop do
         renewal_factory.employer_profile = employer
         renewal_factory.start_on = effective_date
         renewal_factory.enroll
+        
+        missing_family += renewal_factory.missing_family
+        missing_person += renewal_factory.missing_person
+
         changed_count += 1
       rescue => e
         puts e.to_s
@@ -31,11 +37,11 @@ namespace :update_shop do
     end
 
     puts "Processed #{employers.count} employers, renewed #{changed_count} employers"
+    puts "Total missing families #{missing_family} missing person #{missing_person}"
   end
 
-  task :cancel_benefit_group_assignment => :environment do 
-    changed_count = 0
 
+  task :waive_benefit_group_assignments => :environment do
     effective_date = Date.new(2016,1,1)
     organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
 
@@ -44,6 +50,7 @@ namespace :update_shop do
       employers
     end
 
+    count = 0
     employers.each do |fein, name|
       begin
 
@@ -53,9 +60,6 @@ namespace :update_shop do
           puts "  ** employer not found"
           next
         end
-
-        next unless employer.active_plan_year.present?
-        next unless employer.active_plan_year.start_on == effective_date
 
         published_plan_years = employer.plan_years.where(:"start_on" => effective_date).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
 
@@ -67,49 +71,58 @@ namespace :update_shop do
           next
         end
 
-        benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id) 
+        next unless employer.active_plan_year.present?
+        next unless employer.active_plan_year.start_on == effective_date
+        benefit_group_ids = employer.active_plan_year.benefit_groups.map(&:id)
 
-        count = 0
-        found = 0
-
-        employer.census_employees.each do |ce| 
-          if ce.active_benefit_group_assignment.present? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
-            ce.active_benefit_group_assignment.update_attributes(is_active: false)
-          end
-        end
+        created = 0
+        waived = 0
+        expired = 0
 
         employer.census_employees.each do |ce| 
-          if ce.is_active? && ce.active_benefit_group_assignment.blank?
+          begin
+            next unless ce.is_active?
 
-            renewing_benefit_group_assignment = ce.benefit_group_assignments.renewing.detect{|bg_assignment|
-              benefit_group_ids.include?(bg_assignment.benefit_group_id)
-            }
-
-            # TODO Handle cases where benefit group assignment shows coverage selected, while employee don't have coverage
-
-            # if renewing_benefit_group_assignment.blank?
-            #   renewing_benefit_group_assignment = ce.benefit_group_assignments.detect{ |bg_assignment| 
-            #     benefit_group_ids.include?(bg_assignment.benefit_group_id) 
-            #   }
-            #   found += 1 if renewing_benefit_group_assignment.present?
-            # end
-
-            if renewing_benefit_group_assignment.blank?
-              count += 1
-            else 
-              renewing_benefit_group_assignment.update_attributes(is_active: true)
+            # Expire last year benefit group assignments
+            ce.benefit_group_assignments.each do |bg_assignment|
+              if bg_assignment.is_active? && !benefit_group_ids.include?(ce.active_benefit_group_assignment.benefit_group_id)
+                bg_assignment.update_attributes(is_active: false, end_on: [employer.active_plan_year.start_on - 1.day, bg_assignment.start_on].max)
+                bg_assignment.expire_coverage! if bg_assignment.may_expire_coverage?
+                expired += 1
+              end
             end
+
+            renewal_factory = Factories::PlanYearEnrollFactory.new
+            renewal_factory.employer_profile = employer
+            renewal_factory.start_on = effective_date
+            renewal_factory.benefit_group_ids = benefit_group_ids
+            renewal_factory.end_on = employer.active_plan_year.end_on
+
+            # Assign new benefit group assignment if active benefit group assignment missing
+            if ce.active_benefit_group_assignment.blank?
+              if ce.benefit_group_assignments.none? {|bg_assignment| benefit_group_ids.include?(bg_assignment.benefit_group_id)}
+                ce.add_benefit_group_assignment(employer.active_plan_year.benefit_groups.first, effective_date)
+                ce.active_benefit_group_assignment.update_attributes(is_active: true)
+                created += 1
+              end
+            end
+
+            # Waive benefit group assignment if coverage is waived for the employee
+            if renewal_factory.waived_benefit_group_assignment(ce)
+              waived += 1
+            end
+          rescue => e
+            puts "#{e.to_s} occured for #{ce.full_name}"
           end
         end
 
-        puts "#{count} census employee records missing active benefit group assignments"
-        # {found} mapped to #{effective_date.year} benefit group"
-        changed_count += 1
+        puts "#{expired} expired records,  #{created} created records, #{waived} waived records"
+        count += 1
       rescue => e
         puts e.to_s
       end
     end
 
-    puts "Processed #{employers.count} employers, fixed #{changed_count} employers"
+    puts "Processed #{employers.count} employers, updated #{count} employers"
   end
 end

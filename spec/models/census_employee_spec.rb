@@ -43,10 +43,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     }
   }
 
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
-  end
-
   context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
@@ -261,21 +257,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                         end
 
-                        context "and employee is terminated" do
-                          let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
-                          let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
+                        context "and employee is terminated and reported by employer on timely basis" do
+                          let(:earliest_retro_coverage_termination_date)    { (TimeKeeper.date_of_record.advance(
+                                                                                  Settings.
+                                                                                  aca.
+                                                                                  shop_market.
+                                                                                  retroactive_coverage_termination_maximum.
+                                                                                  to_hash)
+                                                                                ).end_of_month
+                                                                              }
+                          let(:earliest_valid_employment_termination_date)  { earliest_retro_coverage_termination_date.beginning_of_month }
+                          let(:invalid_employment_termination_date) { earliest_valid_employment_termination_date - 1.day }
+                          let(:invalid_coverage_termination_date)   { invalid_employment_termination_date.end_of_month }
 
-                          it "transition to termination should be valid" do
-                            expect(initial_census_employee.may_terminate_employee_role?).to be_truthy
-                          end
 
-                          context "and the termination date exceeds the HBX maximum" do
-                            before { initial_census_employee.terminate_employment(invalid_termination_date) }
+                          context "and the employment termination is reported later after max retroactive date" do
 
-                            context "and the user is employer rep" do
-                              it "transition to terminated state should fail" do
-                                expect{initial_census_employee.terminate_employment!(invalid_termination_date)}.to raise_error CensusEmployeeError
-                              end
+                            before { initial_census_employee.terminate_employment!(invalid_employment_termination_date) }
+
+                            it "calculated coverage termination date should preceed the valid coverage termination date" do
+                              expect(invalid_coverage_termination_date).to be < earliest_retro_coverage_termination_date
+                            end
+
+                            it "is in terminated state" do
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should have the correct employment termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).employment_terminated_on).to eq invalid_employment_termination_date
+                            end
+
+                            it "should have the earliest coverage termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).coverage_terminated_on).to eq earliest_retro_coverage_termination_date
                             end
 
                             context "and the user is HBX admin" do
@@ -283,12 +296,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                             end
                           end
 
-                          context "and the termination date is within the HBX maximum" do
-                            before { initial_census_employee.terminate_employment!(valid_termination_date) }
+                          context "and the termination date is within the retroactive reporting time period" do
+                            before { initial_census_employee.terminate_employment!(earliest_valid_employment_termination_date) }
 
-                            it "is should transition to terminated state" do
-                              expect(initial_census_employee.employment_terminated?).to be_truthy
+                            it "is in terminated state" do
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
                             end
+
+                            it "should have the correct employment termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).employment_terminated_on).to eq earliest_valid_employment_termination_date
+                            end
+
+                            it "should have the earliest coverage termination date" do
+                              expect(CensusEmployee.find(initial_census_employee.id).coverage_terminated_on).to eq earliest_retro_coverage_termination_date
+                            end
+
 
                             context "and the terminated employee is rehired" do
                               let!(:rehire)   { initial_census_employee.replicate_for_rehire }
@@ -326,8 +348,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
               end
 
             end
-
           end
+
+          context "and employer is renewing" do
+          end
+
         end
       end
     end
@@ -752,6 +777,51 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "newhire_enrollment_eligible" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+    before do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+
+    it "should return true when active_benefit_group_assignment is initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return true
+      expect(census_employee.newhire_enrollment_eligible?).to eq true
+    end
+
+    it "should return false when active_benefit_group_assignment is not initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return false
+      expect(census_employee.newhire_enrollment_eligible?).to eq false
+    end
+  end
+
+  context "has_active_health_coverage?" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+
+    it "should return false without benefit_group_assignment" do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
+      expect(census_employee.has_active_health_coverage?).to be_falsey
+    end
+
+    context "with active benefit_group_assignment" do
+      before do
+        census_employee.add_benefit_group_assignment(benefit_group)
+      end
+
+      it "should return false without hbx_enrollment" do
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
+        expect(census_employee.has_active_health_coverage?).to be_falsey
+      end
+
+      it "should return true when has health hbx_enrollment" do
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
+        expect(census_employee.has_active_health_coverage?).to be_truthy
+      end
+    end
+  end
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}
@@ -832,4 +902,79 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   #   end
   #
   # end
+
+  context '.new_hire_enrollment_period' do
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+    end
+
+    context 'when hired_on date is in the past' do 
+      it 'should return census employee created date as new hire enrollment period start date' do 
+        expect(census_employee.new_hire_enrollment_period.min).to eq (census_employee.created_at.beginning_of_day)
+      end
+    end
+
+    context 'when hired_on date is in the future' do
+      let(:hired_on){ TimeKeeper.date_of_record + 14.days }
+
+      it 'should return hired_on date as new hire enrollment period start date' do
+        expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.hired_on
+      end
+    end 
+
+    context 'when earliest effective date is in future more than 30 days from current date' do 
+      let(:hired_on){ TimeKeeper.date_of_record }
+
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return earliest_eligible_date as new hire enrollment period end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq ((hired_on + 60.days).end_of_month + 1.day).end_of_day
+      end
+    end
+
+    context 'when earliest effective date less than 30 days from current date' do
+      let(:plan_year) do
+        py = FactoryGirl.create(:plan_year)
+        bg = FactoryGirl.create(:benefit_group, plan_year: py)
+        PlanYear.find(py.id)
+      end
+
+      it 'should return 30 days from new hire enrollment period start as end date' do 
+        expect(census_employee.new_hire_enrollment_period.max).to eq (census_employee.new_hire_enrollment_period.min + 30.days).end_of_day
+      end
+    end
+  end
+
+  context '.earliest_eligible_date' do
+    let(:hired_on){ TimeKeeper.date_of_record }
+
+    let(:plan_year) do
+      py = FactoryGirl.create(:plan_year)
+      bg = FactoryGirl.create(:benefit_group, effective_on_kind: 'first_of_month', effective_on_offset: 60,  plan_year: py)
+      PlanYear.find(py.id)
+    end
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+    end
+
+    it 'should return earliest effective date' do 
+      expect(census_employee.earliest_eligible_date).to eq (hired_on + 60.days).end_of_month + 1.day
+    end
+  end
 end

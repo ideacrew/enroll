@@ -46,7 +46,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
 
   describe "instance methods" do
     let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Dependent loss of employer-sponsored insurance because employee is enrolling in Medicare ", reason: "employee_gaining_medicare")}
-    let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Moved or moving to the District of Columbia", reason: "relocate")}
+    let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Moved or moving to the #{Settings.aca.state_name}", reason: "relocate")}
     let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Employer did not pay premiums on time", reason: 'employer_sponsored_coverage_termination')}
 
     before do

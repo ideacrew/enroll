@@ -1,5 +1,5 @@
 <% plan = hbx_enrollment.plan %>
-<div class="hbx-enrollment-panel">
+<div class="module hbx-enrollment-panel">
   <div class="panel panel-default min-h">
 
     <div class="panel-heading">
@@ -35,8 +35,16 @@
                     </div>
                   </td>
                 </tr>
-                <tr>
+
                   <% if hbx_enrollment.coverage_terminated? %>
+                  <tr>
+                  <td>
+                    <div class="enrollment-effective info">
+                      <label>Effective date:
+                      </label>
+                      <strong><%= hbx_enrollment.effective_on %></strong>
+                    </div>
+                  </td>
                    <td>
                     <div class="enrollment-effective info">
                       <label>Coverage end:
@@ -44,6 +52,7 @@
                       <strong><%= hbx_enrollment.terminated_on %></strong>
                     </div>
                   </td>
+                </tr>
                   <% else %>
                   <td>
                     <div class="enrollment-effective info">
@@ -109,6 +118,8 @@
                 <div class="status">
                   <% if hbx_enrollment.coverage_terminated? %>
                   <h4 style="font-size: 18px; color: #909090;">Terminated</h4>
+                  <% elsif hbx_enrollment.coverage_canceled?  %>
+                  <h4 style="font-size: 18px; color: #909090;">Canceled</h4>
                   <% else %>
                   <%= render partial: "enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
                   <% end %>
@@ -217,7 +228,13 @@
                       </strong>
                       <br/>
                     </div>
-
+                    <% elsif plan.carrier_profile.legal_name == "MetLife" %>
+                    <div>
+                      Call:
+                      <strong>
+                        <a href="tel:+18556382221">1-855-638-2221</a>
+                      </strong><br/>
+                    </div>
                     <% elsif plan.carrier_profile.legal_name == "Dentegra" %>
                     <div>
                       Call:
