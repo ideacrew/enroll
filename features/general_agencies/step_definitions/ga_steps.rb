@@ -167,3 +167,172 @@ end
 Then /^they see the General Agency homepage$/ do
   expect(page).to have_content(general_agency.legal_name)
 end
+
+Given /^a general agency, approved, confirmed, exists$/ do
+  general_agency(legal_name: 'Rooxo')
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff.person.emails.last.update(kind: 'work')
+  email_address = general_agency.general_agency_profile.general_agency_staff_roles.first.emails.first.address
+  user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+
+  staff.person.user = user
+  staff.person.save
+  user.roles << "general_agency_staff" unless user.roles.include?("general_agency_staff")
+  user.save
+end
+
+And /^a broker exists$/ do
+  organization = FactoryGirl.create(:organization, legal_name: 'Acarehouse Inc', dba: 'Acarehouse')
+  broker_agency = FactoryGirl.create(:broker_agency_profile, organization: organization)
+  person = broker_agency.primary_broker_role.person
+  person.emails.last.update(kind: 'work')
+  user = FactoryGirl.create(:user, email: "broker1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+  person.user = user
+  person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({broker_agency_profile: broker_agency, aasm_state: 'active'})
+  person.save
+  user.roles << "broker" unless user.roles.include?("broker")
+  if !user.roles.include?("broker_agency_staff")
+    user.roles << "broker_agency_staff"
+  end
+  user.save
+  broker_role = person.broker_role
+  broker_role.approve
+  broker_role.broker_agency_accept
+  broker_role.broker_agency_profile_id = broker_agency.id
+  broker_role.save
+  broker_agency.approve!
+end
+
+And /^an employer exists for ga$/ do
+  organization = FactoryGirl.create(:organization, legal_name: 'EmployerA Inc', dba: 'EmployerA')
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization
+  user = FactoryGirl.create :user, :with_family, :employer_staff, email: 'employer1@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
+  FactoryGirl.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
+end
+
+When /^the employer login in$/ do
+  visit '/'
+  click_link 'Employer Portal'
+  find('.interaction-click-control-sign-in-existing-account').click
+
+  fill_in "user[email]", with: "employer1@dc.gov"
+  find('#user_email').set("employer1@dc.gov")
+  fill_in "user[password]", with: "1qaz@WSX"
+  fill_in "user[email]", :with => "employer1@dc.gov" unless find(:xpath, '//*[@id="user_email"]').value == "employer1@dc.gov"
+  find('.interaction-click-control-sign-in').click
+end
+
+Then /^the employer should see the home of employer$/ do
+  expect(page).to have_content('Signed in successfully')
+  expect(page).to have_content("I'm an Employer")
+end
+
+When /^the employer click the link of brokers$/ do
+  find('.interaction-click-control-brokers').click
+end
+
+Then /^the employer should see the broker agency$/ do
+  expect(page).to have_content('Acarehouse')
+end
+
+Then /^the employer should see broker active for the employer$/ do
+  expect(page).to have_content('Acarehouse')
+  expect(page).to have_content('Active Broker')
+end
+
+When /^the broker login in$/ do
+  visit '/'
+  click_link 'Broker Agency Portal'
+  find('.interaction-click-control-sign-in-existing-account').click
+
+  fill_in "user[email]", with: "broker1@dc.gov"
+  find('#user_email').set("broker1@dc.gov")
+  fill_in "user[password]", with: "1qaz@WSX"
+  fill_in "user[email]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_email"]').value == "broker1@dc.gov"
+  find('.interaction-click-control-sign-in').click
+end
+
+Then /^the broker should see the home of broker$/ do
+  expect(page).to have_content('Broker Agency : Acarehouse')
+end
+
+When /^the broker visits their Employers page$/ do
+  find('.interaction-click-control-employers').click
+end
+
+And /^selects the general agency from dropdown for the employer$/ do
+  expect(page).to have_content('EmployerA')
+  find("input#employer_ids_").click
+  find(:xpath, "//p[@class='label']").click
+  find(:xpath, "//li[contains(., 'Rooxo')]").click
+  find("input.btn-primary").click
+end
+
+Then /^the employer will be assigned that general agency$/ do
+  expect(page).to have_content('Employers')
+  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('General Agencies')
+  expect(page).to have_content('Rooxo')
+end
+
+When /^the broker click the link of clear assign$/ do
+  click_link 'clear assign'
+end
+
+Then /^the employer will not be assigned that general agency$/ do
+  expect(page).to have_content('Employers')
+  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('General Agencies')
+  expect(page).not_to have_content('Rooxo')
+end
+
+When /^the broker visits their general agencies page$/ do
+  find(".interaction-click-control-general-agencies").click
+end
+
+And /^the broker set default ga$/ do
+  click_link 'Set Default GA'
+end
+
+When /^the ga login in$/ do
+  email_address = "ga1@dc.gov"
+  visit '/'
+  click_link 'General Agency Portal'
+  find('.interaction-click-control-sign-in-existing-account').click
+
+  fill_in "user[email]", with: email_address
+  find('#user_email').set(email_address)
+  fill_in "user[password]", with: "1qaz@WSX"
+  fill_in "user[email]", :with => email_address unless find(:xpath, '//*[@id="user_email"]').value == email_address
+  find('.interaction-click-control-sign-in').click
+end
+
+Then /^the ga should see the home of ga$/ do
+  expect(page).to have_content('General Agency : Rooxo')
+end
+
+When /^the ga visits their Employers page$/ do
+  find('.interaction-click-control-employers').click
+end
+
+Then /^the ga should see the employer$/ do
+  expect(page).to have_content('EmployerA Inc')
+end
+
+When /^the ga click the name of employer$/ do
+  click_link "EmployerA Inc"
+end
+
+Then /^the ga should see the home of employer$/ do
+  expect(page).to have_content('My Health Benefits Program')
+end
+
+Then /^the ga should see the broker$/ do
+  expect(page).to have_content('Acarehouse')
+  expect(page).to have_selector('.disabled', text: 'Change Broker')
+  expect(page).to have_selector('.disabled', text: 'ROWSE BROKERS')
+end
+
+When /^the ga click the back link$/ do
+  click_link "I'm a General Agency"
+end
