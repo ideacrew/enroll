@@ -31,6 +31,15 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     end
   end
 
+  context "with has_csr_subrole user" do
+    subject { AccessPolicies::EmployeeRole.new(csr_user) }
+    let(:csr_user) { FactoryGirl.create(:user, person: csr_role_person) }
+    let(:csr_role_person) {FactoryGirl.create(:person, :with_csr_role) }
+    it "should be ok with the action" do
+      expect(subject.authorize_employee_role(person.employee_roles.first, controller)).to be_truthy
+    end
+  end
+
   context "with broker role user" do
     subject { AccessPolicies::EmployeeRole.new(broker_user) }
     let(:broker_user) { FactoryGirl.create(:user, person: broker_person, roles: ["broker"]) }
