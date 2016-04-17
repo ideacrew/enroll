@@ -96,7 +96,7 @@ class HbxProfile
 
     ###
     def build_grid_values_for_aptc_csr(family)
-        months_array = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+        months_array = Date::ABBR_MONTHNAMES.compact
         plan_premium_vals         = build_plan_premium_values(family, months_array)
         aptc_applied_vals         = build_aptc_applied_values(family, months_array)
         avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array)
@@ -106,14 +106,14 @@ class HbxProfile
         individuals_covered_vals  = build_individuals_covered_array(family, months_array)
         eligible_members_vals     = build_eligible_members(family, months_array)
 
-        return { "plan_premium"   => plan_premium_vals,
-                 "aptc_applied"   => aptc_applied_vals,
-                 "avalaible_aptc" => avalaible_aptc_vals,
-                 "max_aptc"       => max_aptc_vals,
-                 "csr_percentage" => csr_percentage_vals,
-                 "slcsp"          => slcsp_values, 
-                 "individuals_covered"    => individuals_covered_vals,
-                 "eligible_members"  => eligible_members_vals 
+        return { "plan_premium"         => plan_premium_vals,
+                 "aptc_applied"         => aptc_applied_vals,
+                 "avalaible_aptc"       => avalaible_aptc_vals,
+                 "max_aptc"             => max_aptc_vals,
+                 "csr_percentage"       => csr_percentage_vals,
+                 "slcsp"                => slcsp_values, 
+                 "individuals_covered"  => individuals_covered_vals,
+                 "eligible_members"     => eligible_members_vals 
                 }
     end
 
@@ -128,22 +128,53 @@ class HbxProfile
     end
 
     def build_aptc_applied_values(family, months_array)
-      hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
-      applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
-
+      #hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
       aptc_applied_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        aptc_applied_hash.store(month, applied_aptc)
+        eligibility_determinations.each do |ed|
+          update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family)
+          #aptc_applied_hash.store(month, applied_aptc)
+        end
       end
       return aptc_applied_hash
     end
 
+    def update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family)
+      hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+      applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
+      first_of_month_num_current_year = first_of_month_converter(month)
+      if first_of_month_num_current_year >= ed.determined_on
+        aptc_applied_hash.store(month, applied_aptc)
+      else
+        aptc_applied_hash.store(month, "---")
+      end  
+    end
+
+
     def build_avalaible_aptc_values(family, months_array)
-      avalaible_aptc_hash = Hash.new
+
+      available_aptc_hash = Hash.new
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+
       months_array.each_with_index do |month, ind|
-        avalaible_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
+        eligibility_determinations.each do |ed|
+
+          update_available_aptc_hash_for_month(available_aptc_hash, month, ed, family)
+        #avalaible_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
+        end
       end
-      return avalaible_aptc_hash
+      return available_aptc_hash
+    end
+
+    def update_available_aptc_hash_for_month(available_aptc_hash, month, ed, family)
+      first_of_month_num_current_year = first_of_month_converter(month)
+      if first_of_month_num_current_year >= ed.determined_on
+        available_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
+      else
+        available_aptc_hash.store(month, "---")
+      end  
     end
 
     def build_max_aptc_values(family, months_array)
@@ -161,16 +192,13 @@ class HbxProfile
     end
 
     def update_max_aptc_hash_for_month(max_aptc_hash, month, ed)
-      # month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
-      # current_year = TimeKeeper.date_of_record.year
-      # first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
       first_of_month_num_current_year = first_of_month_converter(month)
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
         max_aptc_hash.store(month, ed.max_aptc.to_f)
       else
-        # update max_aptc value for that month as a "-"
+        # update max_aptc value for that month as a "---"
         max_aptc_hash.store(month, "---")
       end  
     end
@@ -190,9 +218,6 @@ class HbxProfile
     end
 
     def update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed)
-      # month_num = Date::ABBR_MONTHNAMES.index(month.capitalize! || month) # coverts Month name to Month Integer : "jan" -> 1
-      # current_year = TimeKeeper.date_of_record.year
-      # first_of_month_num_current_year = Date.parse("#{current_year}-#{month_num}-01")
       first_of_month_num_current_year = first_of_month_converter(month)
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
@@ -213,6 +238,7 @@ class HbxProfile
 
     def build_slcsp_values(family, months_array)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       aptc_members = family.active_household.latest_active_tax_household.aptc_members
@@ -222,24 +248,35 @@ class HbxProfile
           
       slcsp_hash = Hash.new
       months_array.each_with_index do |month, ind|
-        slcsp_hash.store(month, cost)
+        eligibility_determinations.each do |ed|
+          first_of_month_num_current_year = first_of_month_converter(month)
+            if first_of_month_num_current_year >= ed.determined_on
+              slcsp_hash.store(month, cost)
+            else
+              slcsp_hash.store(month, "---")
+            end  
+          
+        end
       end
       return slcsp_hash
     end
 
     def build_individuals_covered_array(family, months_array)
-    #def build_all_family_members_hash(family, months_array)
-      #individuals_non_eligible_array = Array.new
       individuals_covered_array = Array.new
+      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       family.family_members.each_with_index do |one_member, index|
-          hash_temp = Hash.new
-          #hash_temp.store("name", one_member.person.full_name)
+          covered_hash = Hash.new
             months_array.each_with_index do |month, ind|
-              hash_temp.store(month, true)
+                eligibility_determinations.each do |ed|
+                  first_of_month_num_current_year = first_of_month_converter(month)
+                  if first_of_month_num_current_year >= ed.determined_on
+                    covered_hash.store(month, true)
+                  else
+                    covered_hash.store(month, false)
+                  end 
+                end
             end
-          #individuals_non_eligible_array << {one_member.person.full_name => hash_temp}
-          #next if !one_member.family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members).try(:first).try(:is_ia_eligible) # Skipping the non eligible members
-          individuals_covered_array << {one_member.person.full_name => hash_temp} 
+           individuals_covered_array << {one_member.person.id.to_s => covered_hash} 
       end
       return individuals_covered_array
     end
@@ -250,7 +287,7 @@ class HbxProfile
       tax_household_members = family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
       tax_household_members.each do |member|
         if member.is_ia_eligible
-          eligible_members << member.person.full_name
+          eligible_members << member.person.id.to_s
         end
       end
       return eligible_members

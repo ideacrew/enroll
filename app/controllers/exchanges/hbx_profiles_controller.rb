@@ -259,15 +259,16 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def edit_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @months_array = Date::ABBR_MONTHNAMES.compact
     @current_year = TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
     @grid_vals = HbxProfile.build_grid_values_for_aptc_csr(@family)
+    @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
     @aptc_applied = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0 
     @max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
     @csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
-    #@apt_csr_header_list = ['Plan Premium','APTC Applied','Available APTC','Max APTC','CSR Percentage','SLCSP','Individuals Covered']
-    #@person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
+
     respond_to do |format|
       format.js { render "edit_aptc_csr", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
     end
@@ -285,30 +286,26 @@ class Exchanges::HbxProfilesController < ApplicationController
       eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
       eligibility_determination.save
       
-      
+      # Update APTC Applied if there is an existing hbx_enrollment
       hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
-      # Update APTC Applied
       if params[:aptc_applied].present? && hbx_enrollment.present?
-        hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied], "USD")
+        hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied].to_f*100, "USD")
         hbx_enrollment.save
       end
       
       # Update  Individuals Coverage Eligibility
       tax_household_members = @family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
       tax_household_members.each do |member|
-        if params.has_key?(member.person.full_name.to_s)
+        if params.has_key?(member.person.id.to_s) || (params[:person][:person_id] == member.person.id.to_s) # The second condition is to include the primary applicant who is always eligible.
           member.is_ia_eligible = true
         else
           member.is_ia_eligible = false
         end
-        binding.pry
         member.save! 
       end
-
     end
 
     respond_to do |format|
-      #format.js { render "edit_aptc_csr", person: @person } if @error_on_save
       format.js { render "update_aptc_csr", person: @person}
     end
   end

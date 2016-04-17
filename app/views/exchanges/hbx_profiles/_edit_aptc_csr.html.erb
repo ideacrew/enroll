@@ -9,7 +9,7 @@
       </thead>
       <tbody>
         <tr>
-          <td><%=@person.hbx_id%></tb> <td><%=@person.first_name%> <%=@person.last_name%></td> <td><%=@person.dob%></td> <td><%=@person.ssn%></td>
+          <td><%=@person.hbx_id%></tb> <td><%=@person.first_name%> <%=@person.last_name%></td> <td><%#=@person.dob%></td> <td><%#=@person.ssn%></td>
         </tr>
       </tbody>
     </table>
@@ -27,38 +27,39 @@
         
         <thead>
           <th>Month (<%=@current_year%>)</th>
-          <% @grid_vals.first[1].each do |key, val| %>
-            <th><%=key.capitalize%></th>
+          <% @months_array.each do |month| %>
+            <th><%=month.capitalize%></th>
           <%end%>
           <th> </th>
           <th>Edit Fields</th>
         </thead>  
         <tbody>
 
-            <%@grid_vals.keys.each do |key_hdr|%>
+            <%@grid_vals.keys.each do |attribute|%> <!-- Iterating over Different APTC / CSR attributes in the hash-->
               <tr>
-                  <%if key_hdr != "individuals_covered" && key_hdr != "eligible_members"%>
-                      <td><%=key_hdr.titleize.upcase%></td>
-                      <%no_hbx = false%>
-                      <% @grid_vals[key_hdr].each do |key, val| %>  <!--field, month pairs-->
+                  <%if attribute != "individuals_covered" && attribute != "eligible_members"%>
+                      <td><%=attribute.titleize.upcase%></td>
+                      <%no_hbx = false%>  <!--TODO : See if you can get rid of this? -->
+                      <% @grid_vals[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
                             <%if val %>
-                              <td class="<%=aptc_csr_data_type(key)%>"> <%= text_field_tag "#{key_hdr.to_s+"_"+key.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
+                              <td class="<%=aptc_csr_data_type(month)%>"> <%= text_field_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
                             <%else%>
                               <%no_hbx = true%>
                             <%end%>
                       <%end%>
 
                      <%if no_hbx%> <td align = "center" colspan = "12">No Active Enrollment (Assistance Receiving) for <%=@current_year%>.</td> <%end%>
+
                       <td></td>
                       <td>
-                          <%if key_hdr == "aptc_applied"%> 
-                              <%= text_field_tag "#{key_hdr.to_s}", @aptc_applied, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
-                          <%elsif key_hdr == "available_aptc"%>
-                              <%= text_field_tag "#{key_hdr.to_s}", @max_aptc, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>    
-                          <%elsif key_hdr == "max_aptc"%>
-                              <%= text_field_tag "#{key_hdr.to_s}", @max_aptc, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
-                          <%elsif key_hdr == "csr_percentage"%>
-                              <%= text_field_tag "#{key_hdr.to_s}", @csr_percent_as_integer, placeholder: key_hdr.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(key_hdr)%>
+                          <%if attribute == "aptc_applied"%> 
+                              <%= text_field_tag "#{attribute.to_s}", @aptc_applied, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute),  disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), class: 'form-control', readonly: @no_enrollment %>
+                          <%elsif attribute == "available_aptc"%>
+                              <%= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute)%>    
+                          <%elsif attribute == "max_aptc"%>
+                              <%= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute)%>
+                          <%elsif attribute == "csr_percentage"%>
+                              <%= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute)%>
                           <%end%> 
                       </td>
                   <%end%>
@@ -68,20 +69,22 @@
 
                 <tr>
                   <th>Individual(s) Covered</th>
-                  <% @grid_vals.first[1].each do |key, val| %>
-                    <th><%=key.capitalize%></th>
+                  <% @months_array.each do |month| %>
+                    <th><%=month.capitalize%></th>
                   <%end%>
                   <th></th>
                   <th>Eligible?</th>
                 </tr>
-                <% @grid_vals["individuals_covered"].each do |one_ind| %> <!--this "val" is a hash of {"month" => value}-->
+                <% @grid_vals["individuals_covered"].each do |person_id| %>
                   <tr>
-                    <td><%=one_ind.keys.first%></td>
-                      <%one_ind.values.first.each do |key, val|%> <!--(month and value)-->
-                        <td class="<%=aptc_csr_data_type(key)%>"><%=check_box_tag "#{one_ind.keys.first.to_s+'_'+key.to_s}", 'checked', val, disabled: true%></td>
+                    <td><!--TODO: Make this a helper method call.--><%=Person.find(person_id.keys.first).full_name%></td>
+
+                      <%person_id.values.first.each do |month, is_eligible|%>  <!-- Eligibility Statuses for each Month  for  one individual -->
+                        <td class="<%=aptc_csr_data_type(month)%>"><%=check_box_tag "#{person_id.keys.first+'_'+month}", 'checked', is_eligible, disabled: true%></td>
                       <%end%>
                       <td></td>
-                      <td><%=check_box_tag "#{one_ind.keys.first.to_s}", 'accepted', (@grid_vals["eligible_members"].include? one_ind.keys.first.to_s), disabled: false%></td>
+
+                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: primary_member(person_id.keys.first) %></td>
                   </tr>
                 <%end%>
 

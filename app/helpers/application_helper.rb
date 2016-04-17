@@ -550,5 +550,9 @@ module ApplicationHelper
       td_style="current-aptc-csr-data"
     end
   end
+
+  def primary_member(person_id)
+    Person.find(person_id).try(:primary_family).try(:primary_family_member).try(:person) == Person.find(person_id)
+  end
   
 end
