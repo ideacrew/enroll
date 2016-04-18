@@ -44,7 +44,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
       if broker_agency_profile.default_general_agency_profile.present?
-        @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
+        @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
       end
       @employer_profile.save!(validate: false)

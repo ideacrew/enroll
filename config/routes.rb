@@ -247,6 +247,7 @@ Rails.application.routes.draw do
         get :messages
         get :staff_index
         get :agency_messages
+        get :all_assign_history
       end
       member do
         get :general_agency_index
@@ -255,6 +256,7 @@ Rails.application.routes.draw do
         get :assign
         post :update_assign
         post :set_default_ga
+        get :assign_history
       end
 
       resources :applicants

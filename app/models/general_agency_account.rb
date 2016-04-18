@@ -33,6 +33,14 @@ class GeneralAgencyAccount
     general_agency_profile.present? ? general_agency_profile.legal_name : ""
   end
 
+  def broker_role
+    broker_role_id.present? ? BrokerRole.find(broker_role_id) : nil
+  end
+
+  def broker_role_name
+    broker_role.present? ? broker_role.person.full_name : ""
+  end
+
   aasm do
     state :active, initial: true
     state :inactive
@@ -46,6 +54,16 @@ class GeneralAgencyAccount
     def find(id)
       org = Organization.unscoped.where(:"employer_profile.general_agency_accounts._id" => id).first
       org.employer_profile.general_agency_accounts.detect { |account| account._id == id } unless org.blank?
+    end
+
+    def all
+      orgs = Organization.exists(employer_profile: true).exists("employer_profile.general_agency_accounts"=> true).to_a
+      list = []
+      orgs.each do |org|
+        list.concat(org.employer_profile.general_agency_accounts) if org.employer_profile.general_agency_accounts.present?
+      end
+
+      list
     end
   end
 end

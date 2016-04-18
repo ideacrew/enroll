@@ -38,6 +38,8 @@
                     <td>
                       <%= er.active_general_agency_account.try(:legal_name) %>
                       &nbsp;
+                      <%= link_to 'assign history', assign_history_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_profile_id: er.id), remote: true %>
+                      &nbsp;
                       <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post if er.active_general_agency_account.present? %>
                     </td>
                   </tr>

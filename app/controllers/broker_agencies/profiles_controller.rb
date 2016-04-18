@@ -223,6 +223,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     redirect_to broker_agencies_profile_path(@broker_agency_profile)
   end
 
+  def assign_history
+    @employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    @general_agency_account_history = @employer_profile.general_agency_accounts rescue []
+  end
+
+  def all_assign_history
+    @general_agency_account_history = GeneralAgencyAccount.all
+  end
+
   def manage_employers
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
     @employers = @general_agency_profile.employer_clients
@@ -308,7 +317,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       end
     else
       employer_profiles.each do |employer_profile|
-        employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
+        employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role)
         employer_profile.save
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
       end

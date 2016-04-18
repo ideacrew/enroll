@@ -283,23 +283,46 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET general_agency_index" do
+  describe "GET all_assign_history" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
     before :each do
       sign_in user
-      xhr :get, :assign, id: broker_agency_profile.id
+      xhr :get, :all_assign_history, id: broker_agency_profile.id, format: :js
     end
 
-    it "returns http success" do
+    it "should return http success" do
       expect(response).to have_http_status(:success)
     end
 
-    it "should get general_agency_profiles" do
-      expect(assigns(:general_agency_profiles).count).to eq GeneralAgencyProfile.count
+    it "should get general_agency_accounts" do
+      expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.all
     end
   end
+
+  describe "GET assign_history" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    before :each do
+      sign_in user
+      xhr :get, :assign_history, id: broker_agency_profile.id, employer_profile_id: employer_profile.id,  format: :js
+    end
+
+    it "should return http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agency_accounts" do
+      expect(assigns(:general_agency_account_history)).to eq employer_profile.general_agency_accounts
+    end
+  end
+
 
   describe "GET clear_assign_for_employer" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
