@@ -75,6 +75,22 @@ FactoryGirl.define do
     end
   end
 
+  trait :employer_staff do
+    roles ["employer_staff"]
+  end
+
+  trait "broker" do
+    roles ["broker"]
+  end
+
+  trait "broker_agency_staff" do
+    roles ["broker_agency_staff"]
+  end
+
+  trait :general_agency_staff do
+    roles ['general_agency_staff']
+  end
+
   trait :with_consumer_role do
     after :create do |user|
       FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user

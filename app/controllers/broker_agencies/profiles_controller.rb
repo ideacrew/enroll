@@ -5,6 +5,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer]
+  before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -325,5 +326,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_assign(self, @broker_agency_profile)
+  end
+
+  def check_general_agency_profile_permissions_set_default
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_set_default_ga(self, @broker_agency_profile)
   end
 end
