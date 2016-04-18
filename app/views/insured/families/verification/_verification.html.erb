@@ -1,7 +1,12 @@
 <div class="row">
-  <% if enrollment_due_date?(@person) %>
+  <% if true %>
     <div class="col-md-5">
-      <h4>Verification due date: <%= verification_due_date(@person.primary_family) %></h4>
+      <h4>
+        Verification due date: <%= verification_due_date(@person.primary_family) %>
+        <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
+            <span class="label label-danger">Past Due</span>
+        <% end %>
+      </h4>
     </div>
   <% end %>
 
@@ -59,7 +64,7 @@
   </div>
 </div>
 
-<% if current_user.has_hbx_staff_role? && all_family_members_verified %>
+<% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
     <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
 <% elsif show_send_button_for_consumer? %>
     <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm pull-right", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>

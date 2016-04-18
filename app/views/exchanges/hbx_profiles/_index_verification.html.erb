@@ -23,7 +23,7 @@
           <td class="text-center"><%= documents_count(person) %></td>
           <td>
             <%= verification_due_date(family) %>
-            <%= link_to extend_due_date_documents_path(:family_id => family.id), method: :put do %>
+            <%= link_to extend_due_date_documents_path(:family_id => family.id), method: :put, data: { confirm: "Verification due date for #{person.first_name + " " + person.last_name} will be extended." } do %>
               <br><i class="fa fa-clock-o"></i>&nbsp;extend
             <% end %>
           </td>

@@ -30,15 +30,15 @@ module VerificationHelper
   end
 
   def enrollment_group_verified?(person)
-    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"} if person.has_consumer_role?
+    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"}
   end
 
-  def enrollment_due_date?(person)
-    person.primary_family.active_household.hbx_enrollments.verification_needed.any?
+  def verification_needed?(person)
+    person.try(:primary_family).try(:active_household).try(:hbx_enrollments).verification_needed.any?
   end
 
   def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).try(:any?)
+    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
       if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
         family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
       else
