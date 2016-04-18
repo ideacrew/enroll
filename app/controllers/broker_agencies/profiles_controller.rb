@@ -295,7 +295,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update_ga_for_employers(broker_agency_profile)
-    return if broker_agency_profile.blank? || broker_agency_profile.default_general_agency_profile.blank?
+    return if broker_agency_profile.blank?
 
     orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
     employer_profiles = orgs.map {|o| o.employer_profile}
