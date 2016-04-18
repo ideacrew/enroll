@@ -11,9 +11,30 @@ def elected_plans_choice(benefit_group)
 	end
 end
 
+def enrollment_state(census_employee=nil)
+  enrollment_states = []
+
+  if benefit_group_assignment = census_employee.active_benefit_group_assignment
+    enrollments = benefit_group_assignment.hbx_enrollments
+
+    %W(health dental).each do |coverage_kind|
+      if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
+        enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
+      end
+    end
+    enrollment_states << '' if enrollment_states.compact.empty?
+  end
+
+  enrollment_states.compact.join(', ').titleize
+end
+
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	csv << ["Legal Name", "DBA", "FEIN", "AASM State", "Coverage Year Start", "Coverage Year End",
-			"Plan Offerings","Employee Count","Addresses"]
+			"Plan Offerings", "Reference Plan Name", "Reference Plan HIOS", "Reference Plan Metal Level",
+			"", "", "Employer Contribution", "", "",
+			"Employee Count","Address"]
+	csv << ["","","","","","","","","","",
+			"Employee", "Spouse", "Domestic Partner","Child Under 26", "Child Over 26"]
 	all_employers.each do |employer|
 		begin
 		legal_name = employer.legal_name
@@ -26,6 +47,7 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 		addresses = []
 		if office_locations != nil
 			office_locations.each do |location|
+				next if location.address.kind != "work"
 				addresses.push(location.try(:address).try(:full_address))
 			end
 		end
@@ -34,8 +56,24 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 			end_date = plan_year.end_on
 			benefit_groups = plan_year.benefit_groups
 			benefit_groups.each do |benefit_group|
-				elected_plans = benefit_group.elected_plans.map(&:name)
-				csv << [legal_name, dba, fein, state, start_date, end_date,elected_plans,employee_count, addresses]
+				elected_plans = elected_plans_choice(benefit_group)
+				reference_plan = benefit_group.reference_plan
+				reference_plan_name = reference_plan.name
+				reference_plan_hios = reference_plan.hios_id
+				reference_plan_metal = reference_plan.metal_level
+				benefits_hashes_array = []
+				benefit_group.relationship_benefits.each do |benefit|
+					benefits_hashes_array.push({benefit.relationship => benefit.premium_pct})
+				end
+				emp_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["employee"]}
+				spouse_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["spouse"]}
+				dp_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["domestic_partner"]}
+				under_26_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["child_under_26"]}
+				over_26_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["child_26_and_over"]}
+				csv << [legal_name, dba, fein, state, start_date, end_date,
+						elected_plans, reference_plan_name, reference_plan_hios, reference_plan_metal,
+						emp_contrib,spouse_contrib,dp_contrib,under_26_contrib,over_26_contrib,
+						employee_count, addresses]
 			end
 		end
 		rescue Exception=>e
@@ -45,7 +83,9 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 end
 
 CSV.open("employer_audit_data_tab2.csv","w") do |csv|
-	csv << ["Employer Name", "Employer FEIN", "Employee Name", "Hire Date", "Date Added to Roster", "Coverage State"]
+	csv << ["Employer Name", "Employer FEIN", "Employee Name", "HBX ID",
+			"Hire Date", "Date Added to Roster", "Coverage State",
+			"Coverage Status"]
 	all_employers.each do |employer|
 		begin
 			employer_name = employer.legal_name
@@ -53,13 +93,18 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 			census_employees = employer.employer_profile.census_employees
 			census_employees.each do |census_employee|
 				name = "#{census_employee.first_name} #{census_employee.last_name}"
+				employee_role = census_employee.employee_role
+				unless employee_role == nil
+					hbx_id = employee_role.hbx_id
+				end
 				hire_date = census_employee.hired_on
 				roster_added = census_employee.created_at
 				coverage_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
 				if coverage_state.present?
 					coverage_state = coverage_state.humanize
 				end
-				csv << [employer_name, fein, name, hire_date, roster_added, coverage_state]
+				state_of_enrollment = enrollment_state(census_employee)
+				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, coverage_state, state_of_enrollment]
 			end
 		rescue Exception=>e
 			puts e
