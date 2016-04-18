@@ -293,14 +293,23 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update_ga_for_employers(broker_agency_profile)
-    return if broker_agency_profile.blank? || broker_agency_profile.default_general_agency_profile.blank?
+    return if broker_agency_profile.blank?
 
     orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
     employer_profiles = orgs.map {|o| o.employer_profile}
-    employer_profiles.each do |employer_profile|
-      employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
-      employer_profile.save
-      send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
+    if broker_agency_profile.default_general_agency_profile.blank?
+      employer_profiles.each do |employer_profile|
+        general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
+        send_general_agency_assign_msg(general_agency, employer_profile, 'Terminate') if general_agency
+        employer_profile.fire_general_agency
+        employer_profile.save
+      end
+    else
+      employer_profiles.each do |employer_profile|
+        employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile)
+        employer_profile.save
+        send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
+      end
     end
   end
 

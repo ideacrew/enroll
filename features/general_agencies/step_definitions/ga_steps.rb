@@ -291,7 +291,7 @@ When /^the broker visits their general agencies page$/ do
 end
 
 And /^the broker set default ga$/ do
-  click_link 'Set Default GA'
+  first(:xpath, "//a[contains(., 'Set Default GA')]").click
 end
 
 When /^the ga login in$/ do
@@ -335,4 +335,68 @@ end
 
 When /^the ga click the back link$/ do
   click_link "I'm a General Agency"
+end
+
+Given /^another general agency-ga2, approved, confirmed, exists$/ do
+  general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff.person.emails.last.update(kind: 'work')
+  email_address = general_agency.general_agency_profile.general_agency_staff_roles.first.emails.first.address
+  user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+
+  staff.person.user = user
+  staff.person.save
+  user.roles << "general_agency_staff" unless user.roles.include?("general_agency_staff")
+  user.save
+end
+
+And /^selects the GA2 from dropdown for the employer$/ do
+  expect(page).to have_content('EmployerA')
+  find("input#employer_ids_").click
+  find(:xpath, "//p[@class='label']").click
+  find(:xpath, "//li[contains(., 'Zooxy')]").click
+  find("input.btn-primary").click
+end
+
+Then /^the employer has assigned to GA2$/ do
+  expect(page).to have_content('Employers')
+  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('General Agencies')
+  expect(page).to have_content('Zooxy')
+end
+
+Then /^the broker should see the list of general agencies$/ do
+  expect(page).to have_content('General Agencies')
+  expect(page).to have_content('Clear Default GA')
+  #expect(page).to have_content('Zooxy')
+  #expect(page).to have_content('Rooxo')
+end
+
+When /^the ga2 login in$/ do
+  email_address = "ga2@dc.gov"
+  visit '/'
+  click_link 'General Agency Portal'
+  find('.interaction-click-control-sign-in-existing-account').click
+
+  fill_in "user[email]", with: email_address
+  find('#user_email').set(email_address)
+  fill_in "user[password]", with: "1qaz@WSX"
+  fill_in "user[email]", :with => email_address unless find(:xpath, '//*[@id="user_email"]').value == email_address
+  find('.interaction-click-control-sign-in').click
+end
+
+Then /^the ga2 should see the home of ga$/ do
+  expect(page).to have_content('General Agency : Zooxy')
+end
+
+When /^the ga2 visits their Employers page$/ do
+  find('.interaction-click-control-employers').click
+end
+
+Then /^the ga2 should not see the employer$/ do
+  expect(page).not_to have_content('EmployerA Inc')
+end
+
+When /^the broker click the link of clear default ga$/ do
+  click_link "Clear Default GA"
 end
