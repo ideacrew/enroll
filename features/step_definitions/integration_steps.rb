@@ -367,7 +367,7 @@ end
 
 When(/^.+ accepts? the matched employer$/) do
   screenshot("update_personal_info")
-  find(:xpath, "//span[contains(., 'Continue')]").click
+  find(:xpath, "//span[contains(., 'CONTINUE')]").click
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
