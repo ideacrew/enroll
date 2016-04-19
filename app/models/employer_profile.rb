@@ -588,6 +588,12 @@ class EmployerProfile
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
+  def self.by_hbx_id(an_hbx_id)
+    org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" : true})
+    return nil unless org.any?
+    org.employer_profile
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)

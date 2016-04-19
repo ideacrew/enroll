@@ -72,4 +72,51 @@ describe ApplicationEventMapper do
       end
     end
   end
+
+  describe "providing a reverse resource mapping a non-existant class" do
+    let(:event_name) { "acapi.info.events.NO SUCH CLASS IN WHOLE UNIVERSE DUDE.something_i_made_up" }
+
+    subject { ApplicationEventMapper.lookup_resource_mapping(event_name) }
+
+    it "returns nothing" do
+      expect(subject).to eq nil
+    end
+  end
+
+  describe "providing a reverse resource mapping for an arbitrary, existing class" do
+    let(:event_name) { "acapi.info.events.integer.something_i_made_up" }
+
+    subject { ApplicationEventMapper.lookup_resource_mapping(event_name) }
+
+    it "provides the correct class to search" do
+      expect(subject.mapped_class).to eq Integer 
+    end
+
+    it "provides the correct key to use" do
+      expect(subject.identifier_key).to eq "integer_id"
+    end
+
+    it "provides the correct lookup method" do
+      expect(subject.search_method).to eq :find
+    end
+  end
+
+  describe "providing a reverse resource mappingo for an arbitrary resource" do
+    let(:event_name) { "acapi.info.events.employer.binder_paid" }
+
+    subject { ApplicationEventMapper.lookup_resource_mapping(event_name) }
+
+    it "provides the correct class to search" do
+      expect(subject.mapped_class).to eq EmployerProfile
+    end
+
+    it "provides the correct key to use" do
+      expect(subject.identifier_key).to eq "employer_id"
+    end
+
+    it "provides the correct lookup method" do
+      expect(subject.search_method).to eq :by_hbx_id
+    end
+  end
+
 end

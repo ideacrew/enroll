@@ -1,5 +1,6 @@
 class ApplicationEventMapper
-  Resource = Struct.new(:resource_name, :identifier_method, :identifier_key)
+  Resource = Struct.new(:resource_name, :identifier_method, :identifier_key, :search_method)
+  ResourceReverseLookup = Struct.new(:mapped_class, :identifier_key, :search_method)
 
   EVENT_PREFIX = "acapi.info.events."
 
@@ -10,8 +11,21 @@ class ApplicationEventMapper
     }
 
   RESOURCE_MAP = {
-    employer_profile: Resource.new(:employer, :hbx_id, :employer_id)
+    "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id)
   }
+
+  REVERSE_LOOKUP_MAP = RESOURCE_MAP.inject({}) do |acc, vals|
+    key, mapping = vals
+    acc[mapping.resource_name.to_s] = ResourceReverseLookup.new(key.constantize, mapping.identifier_key.to_s, mapping.search_method)
+    acc
+  end
+
+  def self.lookup_resource_mapping(event_name)
+    event_parts = event_name.split(".")
+    resource_name = event_parts[3]
+    return REVERSE_LOOKUP_MAP[resource_name] if REVERSE_LOOKUP_MAP.has_key?(resource_name)
+    ResourceReverseLookup.new(resource_name.camelize.constantize, "#{resource_name}_id", :find) rescue nil
+  end
 
   class << self
     def publish_friendly_event(resource_name, current_event, from_state, to_state)
@@ -19,7 +33,7 @@ class ApplicationEventMapper
 
     def map_resource(resource_name)
       mapped_name = resource_name.to_s.underscore.to_sym
-      return RESOURCE_MAP[mapped_name] if RESOURCE_MAP.has_key?(mapped_name)
+      return RESOURCE_MAP[resource_name.to_s] if RESOURCE_MAP.has_key?(resource_name.to_s)
       Resource.new(mapped_name, :id, (mapped_name.to_s + "_id").to_sym)
     end
 
