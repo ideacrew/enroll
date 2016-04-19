@@ -20,17 +20,18 @@ class ApplicationEventMapper
     acc
   end
 
-  def self.lookup_resource_mapping(event_name)
+  def self.extract_event_parts(event_name)
     event_parts = event_name.split(".")
-    resource_name = event_parts[3]
+    [event_parts[3], event_parts[4]]
+  end
+
+  def self.lookup_resource_mapping(event_name)
+    resource_name, *garbage_i_dont_care_about = extract_event_parts(event_name)
     return REVERSE_LOOKUP_MAP[resource_name] if REVERSE_LOOKUP_MAP.has_key?(resource_name)
     ResourceReverseLookup.new(resource_name.camelize.constantize, "#{resource_name}_id", :find) rescue nil
   end
 
   class << self
-    def publish_friendly_event(resource_name, current_event, from_state, to_state)
-    end
-
     def map_resource(resource_name)
       mapped_name = resource_name.to_s.underscore.to_sym
       return RESOURCE_MAP[resource_name.to_s] if RESOURCE_MAP.has_key?(resource_name.to_s)

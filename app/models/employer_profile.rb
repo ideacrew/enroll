@@ -589,7 +589,7 @@ class EmployerProfile
   end
 
   def self.by_hbx_id(an_hbx_id)
-    org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" : true})
+    org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.employer_profile
   end

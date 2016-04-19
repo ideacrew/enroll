@@ -3,10 +3,9 @@ class ApplicationEventKind
 
   # PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
 
-  EVENT_PREFIX = "acapi.info.events."
   RESOURCE_NAME_KINDS = %w(
                           family 
-                          employer_profile 
+                          employer
                           employee_role 
                           consumer_role 
                           broker_agency_profile 
@@ -20,7 +19,6 @@ class ApplicationEventKind
   field :description, type: String
   field :resource_name, type: String
   field :event_name, type: String
-  field :key, type: String
 
   embeds_many :notice_triggers
   accepts_nested_attributes_for :notice_triggers
@@ -28,6 +26,21 @@ class ApplicationEventKind
   validates_presence_of :title, :resource_name, :event_name
   validates :resource_name,
     inclusion: { in: RESOURCE_NAME_KINDS, message: "%{value} is not a defined resource name" }
+
+  def self.application_events_for(event_name)
+    resource_name, event_name = ApplicationEventMapper.extract_event_parts(event_name)
+    self.where(event_name: event_name, resource_name: resource_name)
+  end
+
+  def execute_notices(event_name, payload)
+    finder_mapping = ApplicationEventMapper.lookup_resource_mapping(event_name)
+    if finder_mapping.nil?
+      # LOG AN ERROR ABOUT A BOGUS EVENT WHERE YOU CAN'T FIND THINGS
+      return
+    end
+    object_event_was_about = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key])
+    # Use the object and the application event kind to do your stuff
+  end
 
   def resource_name=(new_resource_name)
     write_attribute(:resource_name, stringify(new_resource_name))
