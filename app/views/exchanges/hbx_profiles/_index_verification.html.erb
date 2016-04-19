@@ -28,7 +28,7 @@
             <% end %>
           </td>
           <td>
-            <%= family.active_household.hbx_enrollments.verification_needed.first.review_status %>&nbsp;
+            <%= review_status(family) %>&nbsp;
             <% if verification_due_date(family) <= TimeKeeper.date_of_record %>
               <span class="label label-danger">Past Due</span>
             <% end %>

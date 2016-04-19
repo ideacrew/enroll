@@ -23,7 +23,7 @@ class Insured::VerificationDocumentsController < ApplicationController
         end
       end
     else
-      flash[:error] = "File not uploaded"
+      flash[:error] = "File not uploaded. Please select the file to upload."
     end
     redirect_to verification_insured_families_path
   end
