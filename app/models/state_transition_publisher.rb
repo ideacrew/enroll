@@ -8,11 +8,11 @@ module StateTransitionPublisher
       end
     end
   end
-​
+
   def publish_transition
-    resource_name = self.class.to_s.underscore
-    event_name = ApplicationEventMapper.publish_friendly_event(resource_name, aasm.current_event, aasm.from_state, aasm.to_state)
-    notify(event_name, {resource_name.to_sym => self})
+    resource_mapping = ApplicationEventMapper.map_resource(self.class)
+    event_name = ApplicationEventMapper.map_event_name(resource_mapping, aasm.current_event)
+    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method)})
   end
 
 end

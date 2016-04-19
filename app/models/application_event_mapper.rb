@@ -1,6 +1,8 @@
 class ApplicationEventMapper
   Resource = Struct.new(:resource_name, :identifier_method, :identifier_key)
 
+  EVENT_PREFIX = "acapi.info.events."
+
   EVENT_MAP = {
       employer: {
           binder_paid: :benefit_coverage_initial_binder_paid,        
@@ -16,15 +18,18 @@ class ApplicationEventMapper
     end
 
     def map_resource(resource_name)
-      RESOURCE_MAP[resource_name.to_s.underscore.to_sym]
+      mapped_name = resource_name.to_s.underscore.to_sym
+      return RESOURCE_MAP[mapped_name] if RESOURCE_MAP.has_key?(mapped_name)
+      Resource.new(mapped_name, :id, (mapped_name.to_s + "_id").to_sym)
     end
 
     def map_event_name(resource_mapping, transition_event_name)
       event_name = transition_event_name.to_s.sub(/\!$/, '').to_sym
-      if EVENT_MAP[resource_mapping.resource_name][event_name].present?
+      resource_prefix = EVENT_PREFIX + "#{resource_mapping.resource_name}."
+      if EVENT_MAP[resource_mapping.resource_name] && EVENT_MAP[resource_mapping.resource_name][event_name]
         event_name = EVENT_MAP[resource_mapping.resource_name][event_name]
       end
-      "acapi.info.events.#{resource_mapping.resource_name}.#{event_name}"
+      resource_prefix + event_name.to_s
     end
   end
 end
