@@ -93,6 +93,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @plan_years = @employer_profile.plan_years.order(id: :desc)
       when 'documents'
       when 'employees'
+        @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
       when 'brokers'
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
@@ -158,7 +159,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           render action: 'new'
         else
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
-        end  
+        end
       end
     else
       render action: "new"
