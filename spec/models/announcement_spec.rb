@@ -47,7 +47,11 @@ describe Announcement, dbclean: :after_each do
       let(:params) {valid_params.except(:audiences)}
 
       it "should fail validation" do
-        expect(Announcement.create(**params).errors[:audiences].any?).to be_truthy
+        expect(Announcement.create(**params).errors[:base].any?).to be_truthy
+      end
+
+      it "should get alert msg" do
+        expect(Announcement.create(**params).errors[:base]).to include "Please select at least one Audience"
       end
     end
 

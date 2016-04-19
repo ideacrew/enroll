@@ -184,6 +184,12 @@ describe User do
       expect(user.get_announcements_by_roles_and_portal("dc.org/employees")).to eq "Announcement:<br/>msg for Employee"
     end
 
+    it "when has active_employee_roles, but without employee_role role" do
+      user.roles = []
+      allow(person).to receive(:has_active_employee_role?).and_return true
+      expect(user.get_announcements_by_roles_and_portal("dc.org/employees")).to eq "Announcement:<br/>msg for Employee"
+    end
+
     it "when broker_role" do
       user.roles = ['broker']
       expect(user.get_announcements_by_roles_and_portal("dc.org/broker")).to eq "Announcement:<br/>msg for Broker"
@@ -192,6 +198,12 @@ describe User do
     it "when consumer_role" do
       user.roles = ['consumer']
       expect(user.get_announcements_by_roles_and_portal("dc.org/consumer")).to eq "Announcement:<br/>msg for IVL"
+    end
+
+    it "when has active_consumer_roles, but without consumer_role role" do
+      user.roles = []
+      allow(person).to receive(:has_active_consumer_role?).and_return true
+      expect(user.get_announcements_by_roles_and_portal("dc.org/consumers")).to eq "Announcement:<br/>msg for IVL"
     end
 
     it "when general_agency_staff" do

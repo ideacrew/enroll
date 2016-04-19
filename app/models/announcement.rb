@@ -10,7 +10,12 @@ class Announcement
   field :end_date, type: Date
   field :audiences, type: Array, default: []
 
-  validates_presence_of :content, :start_date, :end_date, :audiences
+  validates_presence_of :content, :start_date, :end_date
+  validate :must_have_audiences
+
+  def must_have_audiences
+    errors.add(:base, 'Please select at least one Audience') if audiences.blank?
+  end
 
   scope :current, ->{ where(:start_date.lte => TimeKeeper.date_of_record, :end_date.gte => TimeKeeper.date_of_record) }
   scope :by_audience, ->(value){ where(audiences: value) }
