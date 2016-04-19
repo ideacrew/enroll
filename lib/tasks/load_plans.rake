@@ -115,6 +115,7 @@ namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
+    # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
     qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
       puts file
       xml = Nokogiri::XML(File.open(file))
@@ -129,13 +130,14 @@ end
 
 namespace :xml do
   desc "Import qhp rates from xml files"
-  task :rates, [:file] => :environment do |task, args|
+  task :rates, [:action] => :environment do |task, args|
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
     rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+      action = args[:action] == "update" ? "update" : "new"
       puts file
       xml = Nokogiri::XML(File.open(file))
       rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
-      rate_hash.add(rates.to_hash)
+      rate_hash.add(rates.to_hash, action)
       rate_hash
     end
     rate_import_hash.run

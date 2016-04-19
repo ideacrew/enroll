@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
+RSpec.describe VitalSign, :db_clean => :around_each do
 
   let(:shop_current_enrollment_count) { 1 }
   let(:shop_past_enrollment_count)    { 2 }
   let(:shop_total_enrollment_count)   { shop_current_enrollment_count + shop_past_enrollment_count }
 
 
-  let!(:shop_current_enrollments) do
+  let(:shop_current_enrollments) do
     families = FactoryGirl.create_list(:family, shop_current_enrollment_count, :with_primary_family_member)
     shop_current_enrollment_count.times.map do |i|
       FactoryGirl.create(:hbx_enrollment,
@@ -19,7 +19,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
     end
   end
 
-  let!(:shop_past_enrollments) do
+  let(:shop_past_enrollments) do
     families = FactoryGirl.create_list(:family, shop_past_enrollment_count, :with_primary_family_member)
     shop_past_enrollment_count.times.map do |i|
       FactoryGirl.create(:hbx_enrollment,
@@ -36,7 +36,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
   let(:ivl_past_enrollment_count)    { 4 }
   let(:ivl_total_enrollment_count)   { ivl_current_enrollment_count + ivl_past_enrollment_count }
 
-  let!(:ivl_current_enrollments) do
+  let(:ivl_current_enrollments) do
     families = FactoryGirl.create_list(:family, ivl_current_enrollment_count, :with_primary_family_member)
     ivl_current_enrollment_count.times.map do |i|
       FactoryGirl.create(:hbx_enrollment,
@@ -48,7 +48,7 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
     end
   end
 
-  let!(:ivl_past_enrollments) do
+  let(:ivl_past_enrollments) do
     families = FactoryGirl.create_list(:family, ivl_past_enrollment_count, :with_primary_family_member)
     ivl_past_enrollment_count.times.map do |i|
       FactoryGirl.create(:hbx_enrollment,
@@ -64,6 +64,13 @@ RSpec.describe VitalSign, :type => :model, :db_clean => :after_each do
 
   context "New VitalSign query is created without date/time constraints", dbclean: :after_each do
     let(:vital_sign)  { VitalSign.new }
+
+    before :each do
+      shop_past_enrollments
+      shop_current_enrollments
+      ivl_past_enrollments
+      ivl_current_enrollments
+    end
 
     it "should find all enrollments" do
       expect(vital_sign.all_enrollments.size).to eq (shop_total_enrollment_count + ivl_total_enrollment_count)

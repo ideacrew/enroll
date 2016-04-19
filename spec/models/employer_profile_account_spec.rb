@@ -104,6 +104,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       end
 
       let(:new_employer_profile_account) { persisted_employer_profile.employer_profile_account }
+
       def persisted_new_employer_profile_account
         EmployerProfileAccount.find(new_employer_profile_account.id)
       end
@@ -120,6 +121,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
       before do
         plan_year.publish!
+        allow_any_instance_of(CensusEmployee).to receive(:has_active_health_coverage?).and_return(true)
         census_employee.active_benefit_group_assignment.select_coverage!
 
         TimeKeeper.set_date_of_record(open_enrollment_end_on + 1.day)

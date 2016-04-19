@@ -83,6 +83,51 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
+
+  context "enrolled_including_waived_hbx_enrollments" do
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let(:plan1){ FactoryGirl.create(:plan_template, :shop_health) }
+    let(:plan2){ FactoryGirl.create(:plan_template, :shop_dental) }
+
+    context "for shop health enrollment" do
+      let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+
+      it "should return only health hbx enrollment" do
+        expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
+        expect(household.enrolled_including_waived_hbx_enrollments.to_a).to eq [hbx1]
+        expect(household.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind)).to eq ["health"]
+      end
+    end
+
+    context "for shop dental enrollment" do
+      let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+
+      it "should return only health hbx enrollment" do
+        expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
+        expect(household.enrolled_including_waived_hbx_enrollments.to_a).to eq [hbx2]
+        expect(household.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind)).to eq ["dental"]
+      end
+    end
+
+    context "for both shop health and dental enrollment" do
+      let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx5) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+
+      it "should return the latest hbx enrollments for each shop and dental" do
+        expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 2
+        expect(household.enrolled_including_waived_hbx_enrollments.to_a).to eq [hbx4, hbx3]
+        expect(household.enrolled_including_waived_hbx_enrollments.map(&:plan).map(&:coverage_kind)).to eq ["dental", "health"]
+      end
+    end
+
+  end
+
+
+
   it "ImmediateFamily should have stepchild" do
     expect(Household::ImmediateFamily.include?('stepchild')).to eq true
   end

@@ -116,6 +116,12 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:current_plan_year)).to eq employer_profile.active_plan_year
     end
 
+    it "should get invoice when tab invoice selected" do
+      get :show, id: employer_profile.id , tab: "invoice"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("show")
+    end
+    
     it "should get default status" do
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:status)).to eq "active"
@@ -190,7 +196,8 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:last_portal_visited=).and_return("true")
         allow(user).to receive(:save).and_return(true)
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-        allow(employer_profile).to receive(:premium_billing_plan_year_and_enrollments).and_return([plan_year, [hbx_enrollment]])
+        allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
+        allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
   
         sign_in(user)
       end

@@ -1,9 +1,15 @@
-<div class="employer-panel panel panel-default">
-  <div class="panel-body">
+<div class="alert alert-notice">
+  <a href="#" data-dismiss="alert" class="close interaction-click-control-×">×</a>
     <div class="row">
-      <div class="col-xs-12">
-        <a href="#" data-toggle="modal" data-target="#choose_flow"><%= "Your Employer is: #{@employee_role.employer_profile.legal_name}. Click here to shop for Employer-Sponsored coverage." %></a>
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <strong>Congratulations on your new job at <%= @employee_role.employer_profile.legal_name %>. </strong>
+      </div>
+      <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+        <%= form_tag new_insured_group_selection_path, method: :get do %>
+          <%= hidden_field_tag 'person_id', @person.id if @person %>
+          <%= hidden_field_tag 'employee_role_id', @employee_role.id if @employee_role %>
+          <%= submit_tag 'Shop for Employer Sponsored Coverage', class: "btn btn-default pull-right" %>
+        <% end %>
       </div>
     </div>
-  </div>
 </div>

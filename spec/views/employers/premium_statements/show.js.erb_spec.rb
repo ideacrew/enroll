@@ -8,6 +8,8 @@ describe "employers/premium_statements/show.js.erb" do
     instance_double(
       "HbxEnrollment",
       plan: new_plan,
+      coverage_kind: 'health',
+      humanized_dependent_summary: "hds: #{random_value}",
       humanized_members_summary: "hds: #{random_value}",
       total_employer_contribution: "total_employer_contribution:#{random_value}",
       total_employee_cost: "total_employee_cost:#{random_value}",

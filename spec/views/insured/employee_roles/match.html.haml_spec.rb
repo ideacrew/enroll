@@ -19,7 +19,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
 
     expect(rendered).to have_selector('h1', text: 'Personal Information')
     expect(rendered).to have_selector("input[type='text']", count: 5)
-    expect(rendered).to have_selector("input[type='radio']", count: 2)
+    expect(rendered).to have_selector("input[type='radio']", count: 3)
 
     # expect(rendered).to have_selector("input[type=submit][value='This is my employer']")
     # expect(rendered).to have_selector('dt', text: 'Employer :')

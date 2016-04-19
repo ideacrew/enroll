@@ -258,9 +258,15 @@ describe Person do
       context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
+        let(:census_employee) { double }
+
+        before do
+          allow(employee_roles).to receive(:census_employee).and_return(census_employee)
+          allow(census_employee).to receive(:is_active?).and_return(true)
+        end
 
         it "should return true" do
-          allow(person).to receive(:employee_roles).and_return(employee_roles)
+          allow(person).to receive(:employee_roles).and_return([employee_roles])
           expect(person.has_active_employee_role?).to eq true
         end
 
@@ -306,14 +312,14 @@ describe Person do
 
         it "returns true if person has consumer_role and employee_roles" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:employee_roles).and_return(employee_roles)
+          allow(person).to receive(:active_employee_roles).and_return(employee_roles)
 
           expect(person.has_multiple_roles?).to eq true
         end
 
         it "returns false if person has only consumer_role" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:employee_roles).and_return(nil)
+          allow(person).to receive(:active_employee_roles).and_return(nil)
 
           expect(person.has_multiple_roles?).to eq false
         end

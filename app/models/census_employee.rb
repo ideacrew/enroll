@@ -61,9 +61,20 @@ class CensusEmployee < CensusMember
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
 
   #TODO - need to add fix for multiple plan years
-  scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
-  scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
-  scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+  # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
+  # scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
+  # scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+
+  scope :covered,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
+    })}
+
+  scope :waived,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
+    })}
+
+  scope :enrolled, -> { any_of([covered.selector, waived.selector]) }
+
 
   scope :employee_name, -> (employee_name) { any_of({first_name: /#{employee_name}/i}, {last_name: /#{employee_name}/i}, first_name: /#{employee_name.split[0]}/i, last_name: /#{employee_name.split[1]}/i) }
 
@@ -107,6 +118,18 @@ class CensusEmployee < CensusMember
         end
       end
     end
+  end
+
+  def new_hire_enrollment_period
+    start_on = [hired_on, created_at].max
+    end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
+    (start_on.beginning_of_day)..(end_on.end_of_day)
+  end
+
+  # TODO: eligibility rule different for active and renewal plan years
+  def earliest_eligible_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    benefit_group_assignment.benefit_group.eligible_on(hired_on) if benefit_group_assignment
   end
 
   # def first_name=(new_first_name)
@@ -330,6 +353,14 @@ class CensusEmployee < CensusMember
     return true
   end
 
+  def newhire_enrollment_eligible?
+    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
+  end
+
+  def has_active_health_coverage?
+    HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).present?
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
@@ -348,12 +379,12 @@ class CensusEmployee < CensusMember
     def find_all_terminated(employer_profiles: [], date_range: (TimeKeeper.date_of_record..TimeKeeper.date_of_record))
 
       if employer_profiles.size > 0
-        employer_profile_ids = employer_profiles.map(&:_id) 
+        employer_profile_ids = employer_profiles.map(&:_id)
         query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last
-                                    )      
+                                    )
       else
         query = unscoped.terminated.where(
                                     :employment_terminated_on.gte => date_range.first,
