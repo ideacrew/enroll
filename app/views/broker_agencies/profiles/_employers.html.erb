@@ -2,6 +2,7 @@
   <div class="row">
     <div id= 'message_form'></div>
     <div class="top-pd" id="inbox_provider_form">
+      <span class="flash_message"></span>
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <h3 class="title-inline">Employers</h3>
 
@@ -15,7 +16,7 @@
         </div>
       </div>
 
-      <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post) do %>
+      <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="table-responsive">
           <table class="table table-wrapper" style="opacity: 1;">
@@ -89,7 +90,7 @@
       <div class="col-md-4">
         <h3>General Agencies</h3>
         <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
-        <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+        <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true, data: { disable_with: "Processing..." } %>
         <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
       </div>
     <% end %>
