@@ -13,8 +13,8 @@ RSpec.describe VitalSign, :db_clean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "employer_sponsored",
-                          submitted_at: TimeKeeper.datetime_of_record - 1.day,
-                          created_at: TimeKeeper.datetime_of_record - 1.day
+                          submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                          created_at: TimeKeeper.datetime_of_record - 3.day
                         )
     end
   end
@@ -42,8 +42,8 @@ RSpec.describe VitalSign, :db_clean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "individual",
-                          submitted_at: TimeKeeper.datetime_of_record - 1.day,
-                          created_at: TimeKeeper.datetime_of_record - 1.day
+                          submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                          created_at: TimeKeeper.datetime_of_record - 3.day
                         )
     end
   end
