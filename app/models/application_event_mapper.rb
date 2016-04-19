@@ -24,7 +24,7 @@ class ApplicationEventMapper
       if EVENT_MAP[resource_mapping.resource_name][event_name].present?
         event_name = EVENT_MAP[resource_mapping.resource_name][event_name]
       end
-      "acapi.info.events.employer.#{event_name}"
+      "acapi.info.events.#{resource_mapping.resource_name}.#{event_name}"
     end
   end
 end
