@@ -14,7 +14,7 @@ class ApplicationEventKind
                           general_agent_profile
                         )
 
-  field :hbx_id, type: Integer
+  field :hbx_id, type: String
   field :title, type: String
   field :description, type: String
   field :resource_name, type: String

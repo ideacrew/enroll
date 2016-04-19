@@ -3,8 +3,6 @@ class NoticeTrigger
   include Mongoid::Timestamps
 
   field :name, type: String
-  field :title, type: String
-  field :resource_publisher, type: String
   field :notice_template, type: String
   field :notice_builder, type: String
 
