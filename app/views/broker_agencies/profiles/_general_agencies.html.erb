@@ -4,6 +4,13 @@
       <h3 class="title-inline">General Agencies</h3>
       <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: 'btn btn-min pull-right' %>
     </div>
+    <div class="col-md-12">
+      <% if @broker_agency_profile.default_general_agency_profile.present? %>
+        <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - this is your default GA, to change your default GA click "Select Default GA" under your desired agency.</p>
+      <% else %>
+        <p>You do not have default GA, to select your default GA click "Select Default GA" under your desired agency.</p>
+      <% end %>
+    </div>
   </div>
   <div class="row">
     <div class="col-md-12">
@@ -22,10 +29,6 @@
         <% @general_agency_profiles.each do |general_agency_profile| %>
           <tbody>
             <td id="ga-<%= general_agency_profile.id %>">
-              <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
-                <span class="glyphicon glyphicon-bookmark">
-                </span>
-              <% end %>
               <%= general_agency_profile.legal_name %>
               <% if @broker_role.present? %>
                 <%= link_to favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
@@ -39,7 +42,11 @@
             <td><%= general_agency_profile.market_kind.titleize %></td>
             <td><%= general_agency_profile.current_state %></td>
             <td>
-              <%= link_to 'Set Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' unless show_default_ga?(general_agency_profile, @broker_agency_profile) %>
+              <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
+                Default GA
+              <% else %>
+                <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+              <% end %>
             </td>
           </tbody>
         <% end %>

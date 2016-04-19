@@ -280,7 +280,7 @@ When /^the broker visits their general agencies page$/ do
 end
 
 And /^the broker set default ga$/ do
-  first(:xpath, "//a[contains(., 'Set Default GA')]").click
+  first(:xpath, "//a[contains(., 'Select Default GA')]").click
 end
 
 When /^the ga login in$/ do

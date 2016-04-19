@@ -24,6 +24,10 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
   end
 
   it "should have link of set default ga" do
-    expect(rendered).to have_selector('a', text: 'Set Default GA')
+    expect(rendered).to have_selector('a', text: 'Select Default GA')
+  end
+
+  it "should have hint msg for select default GA" do
+    expect(rendered).to have_content("your default GA click \"Select Default GA\" under your desired agency")
   end
 end
