@@ -46,7 +46,7 @@
        <% end %>
       </li>
       <li role="presentation" id="assign-history-tab" <%= menu_tab_class(active_tab, "assign-history-tab") %>>
-       <%= link_to(all_assign_history_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
+       <%= link_to(assign_history_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
           <span class="hidden-xs">Assign History</span>
           <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
        <% end %>

@@ -41,7 +41,7 @@
             </thead>
             <tbody>
               <% @employer_profiles.each do |er| %>
-                <tr>
+                <tr id="employer_<%= er.id %>">
                   <% if controller_name == 'profiles' %>
                     <td><%= check_box_tag "employer_ids[]", er.id %></td>
                   <% end %>
@@ -70,10 +70,10 @@
                     <td>None selected</td>
                   <% end %>
                 <% end %>
-                <td>
+                <td class='general_agency'>
                   <%= er.active_general_agency_legal_name %>
                   &nbsp;
-                  <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post if er.active_general_agency_account.present? && controller_name == 'profiles' %>
+                  <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? && controller_name == 'profiles' %>
                 </td>
                 <%- if @profile %>
                   <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>

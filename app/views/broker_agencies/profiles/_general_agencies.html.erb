@@ -39,7 +39,6 @@
             <td><%= general_agency_profile.market_kind.titleize %></td>
             <td><%= general_agency_profile.current_state %></td>
             <td>
-              <%= link_to "Manage for employers(#{general_agency_profile.employer_clients_count})", manage_employers_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), remote: true, class: 'btn btn-min' %>
               <%= link_to 'Set Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' unless show_default_ga?(general_agency_profile, @broker_agency_profile) %>
             </td>
           </tbody>

@@ -280,6 +280,9 @@ Feature: Broker Assigns a General Agency to an Employer
 
     When the broker login in
     Then the broker should see the home of broker
+    When the broker visits their general agencies page
+    Then the broker should see the list of general agencies
+    And the broker set default ga
     When the broker visits their Employers page
     And selects the general agency from dropdown for the employer
     Then the broker should see assign successful message
