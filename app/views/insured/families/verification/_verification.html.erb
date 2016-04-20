@@ -27,10 +27,10 @@
       <tr>
         <th>Family Member</th>
         <th>Verification Type</th>
-        <th>Documents</th>
         <% if current_user && current_user.has_hbx_staff_role? %>
-          <th>Complete</th>
+            <!--<th>Complete</th>-->
         <% end %>
+        <th>Documents</th>
         <th></th>
       </tr>
       </thead>
@@ -42,13 +42,6 @@
               <% if unverified?(member.person) %>
                   <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
               <% end %>
-            </td>
-            <td>
-              <!-- HBX admin inclusion -->
-              <% unless member.person.consumer_role.aasm_state.eql? "fully_verified" %>
-                  <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person } %>
-              <% end %>
-              <!-- >>>> hbx admin inclusion -->
             </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "#{member.id}" } do %>

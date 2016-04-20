@@ -11,7 +11,8 @@ class DocumentsController < ApplicationController
   end
 
   def update_individual
-    @person.consumer_role.import! verification_attr
+    @person.consumer_role.authorize_residency! verification_attr
+    @person.consumer_role.authorize_lawful_presence! verification_attr
     respond_to do |format|
       format.html { redirect_to :back }
     end

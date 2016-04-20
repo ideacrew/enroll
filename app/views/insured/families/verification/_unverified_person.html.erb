@@ -8,36 +8,13 @@
         <td>
           <span class="label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person) %></span>
         </td>
-        <!-- Admin comment form -->
-        <div class="collapse" id="verif-<%=person.id%>">
-          <div class="col-md-12 verif-type">
-            <%= form_tag update_individual_documents_path, multipart: true, method: :put do %>
-                <ul>
-                  <%= hidden_field_tag 'person_id', person.id  %>
-                  <li>
-                    <%= radio_button_tag 'citizenship', 'document_in_Enroll_app', true %>
-                    <%= label_tag "document in EnrollApp", "document in EnrollApp", class:"module verif-type" %>
-                  </li>
-                  <li>
-                    <%= radio_button_tag 'citizenship', 'document_in_DIMS' %>
-                    <%= label_tag 'document in DIMS', 'document in DIMS', class:"module verif-type" %>
-                  </li>
-                  <li>
-                    <%= radio_button_tag 'citizenship', 'SAVE_system' %>
-                    <%= label_tag 'SAVE system', 'SAVE system', class:"module verif-type" %>
-                  </li>
-                  <li>
-                    <%= radio_button_tag 'citizenship', 'e-verified_in_Curam' %>
-                    <%= label_tag 'e-verified in Curam', 'e-verified in Curam', class:"module verif-type" %>
-                  </li>
-                  <div>
-                    <%= submit_tag "Complete verification", class: "btn btn-default btn-xs" %>
-                  </div>
-                </ul>
-            <% end %>
-          </div>
-        </div>
-        <!-- >>>>>> admin comment form -->
+        <td>
+          <!-- HBX admin inclusion -->
+          <% unless member.person.consumer_role.aasm_state.eql? "fully_verified" %>
+              <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person, v_type: v_type } %>
+          <% end %>
+          <!-- >>>> hbx admin inclusion -->
+        </td>
         <td>
           <%= render partial: 'insured/families/verification/verification_upload', locals: {member: member, v_type: v_type} %>
         </td>
