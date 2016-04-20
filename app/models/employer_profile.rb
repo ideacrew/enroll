@@ -48,6 +48,7 @@ class EmployerProfile
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 

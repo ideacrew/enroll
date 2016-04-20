@@ -5,8 +5,10 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     @employer_profile = employer_profile
     @template = args[:template]
     @delivery_method = args[:delivery_method].split(',')
-    @employer_contact = @employer_profile.staff_roles.first
-    # @to = @employer_contact.home_email.address
+    @recipient = @employer_profile.staff_roles.first
+    @secure_message_recipient = employer_profile
+    
+    # @to = @recipient.home_email.address
 
     # @email_notice = args[:email_notice] || true
     # @paper_notice = args[:paper_notice] || true
@@ -22,16 +24,16 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
   def build
     @notice = PdfTemplates::EmployerNotice.new
 
-    @notice.primary_fullname = @employer_contact.full_name.titleize
+    @notice.primary_fullname = @recipient.full_name.titleize
     @notice.primary_identifier = @employer_profile.hbx_id
 
     # @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
     # @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
     # @notice.coverage_start_on = employer_profile.plan_years.sort_by{|start_on| start_on}.last.start_on
 
-    # if @employer_contact.mailing_address.present?
+    # if @recipient.mailing_address.present?
 
-    append_primary_address(@employer_contact.mailing_address)
+    append_primary_address(@recipient.mailing_address)
 
     # else
     #   append_primary_address(employer_profile.organization.try(:primary_office_location).try(:address))
@@ -40,4 +42,6 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     append_hbe
     append_broker(@employer_profile.broker_agency_profile)
   end
+
+  def 
 end 

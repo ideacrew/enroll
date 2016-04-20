@@ -4,7 +4,8 @@ class Notice
 
   def initialize(args = {})
     random_str = rand(10**10).to_s
-    @notice_path = Rails.root.join("tmp", "notice_#{random_str}.pdf")
+    @notice_filename = "notice_#{random_str}.pdf"
+    @notice_path = Rails.root.join("tmp", @notice_filename)
     @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @layout = 'pdf_notice'
   end
@@ -33,12 +34,13 @@ class Notice
         page_size: 'Letter',
         formats: :html,
         encoding: 'utf8',
-        footer: { 
-          content: ApplicationController.new.render_to_string({ 
-            template: "notices/shared/footer.html.erb", 
-            layout: false 
-            })
-        })
+        # footer: { 
+        #   content: ApplicationController.new.render_to_string({ 
+        #     template: "notices/shared/footer.html.erb", 
+        #     layout: false 
+        #     })
+        # })
+        )
   end
 
   def send_email_notice
@@ -52,20 +54,47 @@ class Notice
   end
 
   def generate_pdf_notice
-     File.open(@notice_path, 'wb') do |file|
+    File.open(@notice_path, 'wb') do |file|
       file << self.pdf
+    end
+
+    doc_uri = upload_to_amazons3
+    notice = create_recipient_document(doc_uri)
+    create_secure_inbox_message(notice)
+    # clear_tmp
+  end
+
+  def upload_to_amazonS3
+    Aws::S3Storage.save(@notice_path, 'notices')
+  end
+
+  def create_recipient_document(doc_uri)
+    notice = @secure_message_recipient.documents.build({
+      title: @notice_filename, 
+      creator: "hbx_staff",
+      subject: "notice",
+      identifier: doc_uri,
+      format: "application/pdf"
+    })
+
+    if notice.save
+      notice
+    else
+      # LOG ERROR
     end
   end
 
-  def upload
-    result = Aws::S3Storage.save(@notice_path, 'notices')
+  def create_secure_inbox_message(notice)
+    subject = "New Notice Available"
+    body = "<br>You can download the notice by clicking this link " +
+            "<a href=" + "#{authorized_document_download_path(@secure_message_recipient.class.to_s, @secure_message_recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+    @secure_message_recipient.inbox.messages.build({
+      subject: subject, body: body, from: 'DC Health Link'
+    }).save!
   end
 
   def clear_tmp
     File.delete(@envelope_path)
     File.delete(@notice_path)
   end
-end
-
-class ShopPdfNotice < Notice
 end
