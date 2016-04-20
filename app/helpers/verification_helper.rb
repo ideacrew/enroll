@@ -64,6 +64,7 @@ module VerificationHelper
   end
 
   def documents_count(person)
+    return 0 unless person.consumer_role
     person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
   end
 
