@@ -40,6 +40,9 @@ class ApplicationEventKind
     end
 
     object_event_was_about = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_sym])
+    notice_triggers.each do |trigger|
+      trigger.publish(self.event_name)
+    end
     # Use the object and the application event kind to do your stuff
   end
 

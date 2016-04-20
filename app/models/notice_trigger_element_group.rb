@@ -14,4 +14,12 @@ class NoticeTriggerElementGroup
   field :secondary_recipients,                type: Array, default: ["any"]
   field :secondary_recipient_delivery_method, type: Array, default: ["paper"]
 
+
+  def notice_peferences
+    {
+      :recipients => primary_recipients.join(','),
+      :delivery_method => primary_recipient_delivery_method.join(',')
+    }
+  end
+
 end

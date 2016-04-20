@@ -16,13 +16,11 @@ class NoticeTrigger
   def publish(new_event)
     rule = EventForNoticeTriggerRule.new(self, new_event)
     if rule.satisfied?
-      notice_builder.camelize.constantize.new(self, template: notice_template)
-      # call notice generation code
+      notice_builder.camelize.constantize.new(self, {template: notice_template}.merge(notice_trigger_element_group.notice_peferences))
     else
       # log error
     end
   end
-
 
 private
   def initialize_dependent_models

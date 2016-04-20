@@ -7,7 +7,7 @@ class EventForNoticeTriggerRule
 
   def satisfied?
     @errors = []
-    
+    return true
   end
 
   # delivery method available?
