@@ -116,6 +116,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def verification_index
+    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    respond_to do |format|
+      format.html { render partial: "index_verification" }
+      format.js {}
+    end
+  end
+
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
 
@@ -130,14 +138,6 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     respond_to do |format|
       format.html { render "issuer_index" }
-      format.js {}
-    end
-  end
-
-  def verification_index
-    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    respond_to do |format|
-      format.html { render partial: "index_verification" }
       format.js {}
     end
   end
