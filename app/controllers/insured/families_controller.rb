@@ -39,6 +39,7 @@ class Insured::FamiliesController < FamiliesController
       memo
     end
 
+
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 

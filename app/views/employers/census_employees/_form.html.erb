@@ -17,8 +17,10 @@
                 <li> <%= msg %> </li>
               <% end %>
             <% end %>
+            <% if @census_employee.address.present? %>
             <% @census_employee.address.errors.full_messages.each do |msg| %>
               <li> <%= msg %> </li>
+            <% end %>
             <% end %>
             <% @census_employee.benefit_group_assignments.each do |bg| %>
               <% bg.errors.full_messages.each do |msg| %>

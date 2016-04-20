@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/dchbx/acapi.git
+  remote: https://github.com/dchbx/acapi.git
   revision: d41e5fab75a77abca64f33278150735438acfff6
   branch: development
   specs:

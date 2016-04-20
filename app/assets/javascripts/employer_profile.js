@@ -119,12 +119,18 @@ $(document).on('click', ".delete_confirm", function(){
 $(document).on('click', ".rehire_confirm", function(){
   var element_id = $(this).attr('id');
   var rehiring_date = $(this).siblings().val();
-  var link_to_delete = $(this).data('link');
+  var rehire_link = $(this).data('link');
   $.ajax({
     type: 'get',
     datatype : 'js',
-    url: link_to_delete,
-    data: {rehiring_date: rehiring_date}
+    url: rehire_link,
+    data: {rehiring_date: rehiring_date},
+    success: function(response){
+        window.location.reload();
+    },
+    error: function(response){
+      Alert("Sorry, something went wrong");
+    }
   });
 });
 
