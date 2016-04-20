@@ -76,22 +76,17 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('strong', text: '08/10/2015')
     end
 
-    it "should not disable the Make Changes button" do 
-      expect(rendered).to_not have_selector('.cna') 
+
+    it "should display the effective date" do
+      expect(rendered).to have_selector('label', text: 'Effective date:')
+      expect(rendered).to have_selector('strong', text: '08/10/2015')
     end
 
-    context "when outside Employers open enrollment period" do
-      before :each do
-        allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
-      end
-
-      it "should disable the Make Changes button" do 
-        expect(rendered).to have_selector('.cna') 
-      end
-
+    it "should display effective date when terminated enrollment" do
+      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
+      expect(rendered).to match /effective date/i
     end
-  
+
   end
 
   context "with consumer_role" do

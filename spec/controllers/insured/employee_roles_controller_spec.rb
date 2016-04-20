@@ -116,7 +116,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(census_employee).to receive(:address).and_return(address)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:primary_family).and_return(family)
-      allow(person).to receive(:emails).and_return([email])
+      allow(person).to receive(:emails=).and_return([email])
       allow(census_employee).to receive(:email).and_return(email)
       allow(email).to receive(:address=).and_return("test@example.com")
       allow(controller).to receive(:build_nested_models).and_return(true)
