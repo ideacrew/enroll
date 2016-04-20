@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include DataTablesAdapter
 
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -135,11 +136,20 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def verification_index
-    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
     respond_to do |format|
       format.html { render partial: "index_verification" }
       format.js {}
     end
+  end
+
+  def verifications_index_datatable
+    dt_query = extract_datatable_parameters
+    families = Family.by_enrollment_individual_market # .where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    @draw = dt_query.draw
+    @total_records = families.count
+    @records_filtered = families.count
+    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    render 
   end
 
   def product_index
