@@ -13,10 +13,10 @@ class NoticeTrigger
 
   after_initialize :initialize_dependent_models
 
-  def publish(new_event)
+  def publish(target_object, new_event)
     rule = EventForNoticeTriggerRule.new(self, new_event)
     if rule.satisfied?
-      notice_builder.camelize.constantize.new(self, {template: notice_template}.merge(notice_trigger_element_group.notice_peferences))
+      notice_builder.camelize.constantize.new(target_object, {template: notice_template}.merge(notice_trigger_element_group.notice_peferences)).deliver
     else
       # log error
     end

@@ -8,12 +8,12 @@ notice_triggers = [
     title: 'Initial Employer SHOP Application Approval',
     description: 'ER application requirements met SHOP participation approved',
     resource_name: 'employer',
-    event_name: 'benefit_coverage_initial_binder_paid',
+    event_name: 'application_accepted',
     notice_triggers: [
       {
         name: 'Employer notice trigger',
-        notice_template: 'application_approval',
-        notice_builder: 'EmployerNotice',
+        notice_template: 'notices/shop_notices/1a_application_approval',
+        notice_builder: 'ShopNotices::EmployerNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -32,8 +32,8 @@ notice_triggers = [
     notice_triggers: [
       {
         name: 'Employer notice trigger',
-        notice_template: 'request_for_addional_documents',
-        notice_builder: 'EmployerNotice',
+        notice_template: 'notices/shop_notices/1b_request_documents',
+        notice_builder: 'ShopNotices::EmployerNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -52,8 +52,8 @@ notice_triggers = [
     notice_triggers: [
       {
         name: 'Employer notice trigger',
-        notice_template: 'application_approval_after_documents_review',
-        notice_builder: 'EmployerNotice',
+        notice_template: 'notices/shop_notices/1c_application_approval',
+        notice_builder: 'ShopNotices::EmployerNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

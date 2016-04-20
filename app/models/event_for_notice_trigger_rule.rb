@@ -20,7 +20,6 @@ class EventForNoticeTriggerRule
   end
 
   def noticable_event
-    event_list.include? @notice_trigger.
   end
 
   # electronic delivery method available?
@@ -29,8 +28,6 @@ class EventForNoticeTriggerRule
 
   def determination_results
     @errors
-
-    # log errors
   end
 
   def work_email
@@ -44,5 +41,4 @@ class EventForNoticeTriggerRule
 
   def primary_address
   end
-
 end
