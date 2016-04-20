@@ -6,7 +6,7 @@
 "<%= documents_count(person) %>",
 <% verification_due_info = capture do %>
 	<%= verification_due_date(outstanding_verification_family) %>
-	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date for #{person.first_name + " " + person.last_name} will be extended." } do %>
+	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date for #{person.first_name.to_s + " " + person.last_name.to_s} will be extended." } do %>
 		<br><i class="fa fa-clock-o"></i>&nbsp;extend
 	<% end %>
 <% end %>
