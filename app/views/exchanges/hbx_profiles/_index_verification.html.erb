@@ -17,15 +17,17 @@
   </table>
 </div>
 
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    $('#verification-dataTable').DataTable({
-      "processing": true,
-      "serverSide": true,
-      "ajax": {
-        url: "<%= verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
-        type: "GET"
-      }
-    });
-  });
-</script>
+ <script type="text/javascript" charset="utf-8">
+   $(document).ready(function() {
+     $('#verification-dataTable').DataTable( {
+	       "processing": true,
+	       "serverSide": true,
+	       "ordering" : false,
+	       "ajax": {
+                  url: "<%= verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
+                  type: "GET"
+               } 
+	       } );
+     });
+ </script>
+
