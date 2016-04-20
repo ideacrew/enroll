@@ -56,4 +56,11 @@ class UserMailer < ApplicationMailer
       format.html { render "broker_denied", :locals => { :applicant_name => broker_role.person.full_name }}
     end
   end
+
+  def notice_uploaded_notification(person)
+    mail({to: person.user.email, subject: "New Notice Uploaded"}) do |format|
+      format.html { render "notice_uploaded", :locals => { :person_name => person.full_name }}
+    end
+  end
+
 end
