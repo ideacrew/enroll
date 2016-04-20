@@ -133,7 +133,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification due date" do
     let(:family) { FactoryGirl.build(:family) }
-    let(:hbx_enrollment) { HbxEnrollment.new(:updated_at => TimeKeeper.date_of_record) }
+    let(:hbx_enrollment) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
     before :each do
       assign(:family, family)
     end

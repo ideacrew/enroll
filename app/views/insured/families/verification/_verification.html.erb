@@ -15,7 +15,10 @@
           Documents FAQ
         </a>
       </div>
-
+  <br>
+  <div class="collapse" id="docs-verification-faq">
+    <%= render partial: "insured/families/verification/documents_verification_list" %>
+  </div>
 </div>
 <div class="module ivl-documents-table panel">
   <div class="table-responsive">
@@ -69,7 +72,3 @@
 <% elsif show_send_button_for_consumer? %>
     <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm pull-right", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
 <% end %>
-<br><br><br>
-<div class="collapse" id="docs-verification-faq">
-  <%= render partial: "insured/families/verification/documents_verification_list" %>
-</div>

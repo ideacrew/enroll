@@ -144,7 +144,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = Family.by_enrollment_individual_market # .where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
     @draw = dt_query.draw
     @total_records = families.count
     @records_filtered = families.count

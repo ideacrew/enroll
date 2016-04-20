@@ -2,32 +2,7 @@
     <%= link_to "#verif-#{person.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "verif-#{person.id}" } do %>
         <%= button_tag "Verify", class:"btn btn-danger btn-xs" %>
     <% end %>
-    <!-- Admin comment form -->
-    <div class="collapse" id="verif-<%=person.id%>">
-      <div class="col-md-12 verif-type">
-        <%= form_tag update_individual_documents_path, multipart: true, method: :put do %>
-            <ul>
-              <%= hidden_field_tag 'person_id', person.id  %>
-              <li>
-                <%= radio_button_tag 'citizenship', 'us_citizen' %>
-                <%= label_tag 'US Citizen', nil, class:"module verif-type" %>
-              </li>
-              <li>
-                <%= radio_button_tag 'citizenship', 'lawful_permanent_resident' %>
-                <%= label_tag 'Permanent Resident', nil, class:"module verif-type" %>
-              </li>
-              <li>
-                <%= radio_button_tag 'citizenship', 'alien_lawfully_present' %>
-                <%= label_tag 'Alien', nil, class:"module verif-type" %>
-              </li>
-              <div>
-                <%= submit_tag "Complete verification", class: "btn btn-default btn-xs" %>
-              </div>
-            </ul>
-        <% end %>
-      </div>
-    </div>
-    <!-- >>>>>> admin comment form -->
+
 <% else %>
     <% link_to "Send for review", "#", class:"btn btn-success btn-xs" %>
 <% end %>
