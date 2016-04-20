@@ -38,7 +38,8 @@ class ApplicationEventKind
       # LOG AN ERROR ABOUT A BOGUS EVENT WHERE YOU CAN'T FIND THINGS
       return
     end
-    object_event_was_about = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key])
+
+    object_event_was_about = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_sym])
     # Use the object and the application event kind to do your stuff
   end
 

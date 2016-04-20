@@ -591,7 +591,7 @@ class EmployerProfile
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
-    org.employer_profile
+    org.first.employer_profile
   end
 
 private
