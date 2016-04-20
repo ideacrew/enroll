@@ -3,7 +3,10 @@
   <% person.verification_types.each do |v_type| %>
       <tr>
         <td>
-          <%=v_type%>&nbsp;<span class="pull-right label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person) %></span>
+          <%=v_type%>&nbsp;
+        </td>
+        <td>
+          <span class="label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person) %></span>
         </td>
         <!-- Admin comment form -->
         <div class="collapse" id="verif-<%=person.id%>">

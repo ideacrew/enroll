@@ -38,6 +38,7 @@ class Insured::VerificationDocumentsController < ApplicationController
       flash[:error] = "File does not exist or you are not authorized to access it."
       redirect_to verification_insured_families_path
     end
+    vlp_docs_clean(@person)
   end
 
   private
@@ -78,6 +79,16 @@ class Insured::VerificationDocumentsController < ApplicationController
     options[:content_type] = document.format
     options[:filename] = document.title
     options
+  end
+
+  def vlp_docs_clean(person)
+    existing_documents = person.consumer_role.vlp_documents
+    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents =[]
+    person_consumer_role.save
+    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents = existing_documents.uniq
+    person_consumer_role.save
   end
 
 end
