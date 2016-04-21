@@ -3,6 +3,14 @@ require 'csv'
 
 filename = "Redmine-6712.csv"
 
+def select_benefit_package(title, benefit_coverage_period)
+	benefit_coverage_period.benefit_packages.each do |benefit_package|
+		if benefit_package.title == title
+			return benefit_package
+		end
+	end
+end
+
 CSV.foreach(filename, headers: true) do |row|
 	begin
 		data_row = row.to_hash
@@ -82,8 +90,8 @@ CSV.foreach(filename, headers: true) do |row|
 			coverage_household.save
 		end
 		eg_id = data_row["Enrollment Group ID"].to_s
-		hbx_enrollment = HbxEnrollment.by_hbx_id(eg_id)
-		if hbx_enrollment == []
+		hbx_enrollment = HbxEnrollment.by_hbx_id(eg_id).first
+		if hbx_enrollment == nil
 			hbx_enrollment = HbxEnrollment.new
 			household.hbx_enrollments.push(hbx_enrollment)
 			hbx_enrollment.coverage_household_id = coverage_household._id
@@ -93,12 +101,20 @@ CSV.foreach(filename, headers: true) do |row|
 			unless hbx_enrollment.is_shop?
 				year = hbx_enrollment.effective_on.year.to_i
 			end
+			hbx_enrollment.benefit_coverage_period_id = BenefitCoveragePeriod.find_by_date(hbx_enrollment.effective_on)._id
+			hbx_enrollment.benefit_package_id = select_benefit_package(data_row["Benefit Package Title"], 
+																	   BenefitCoveragePeriod.find(hbx_enrollment.benefit_coverage_period_id))._id
 			plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
 			hbx_enrollment.plan_id = plan._id
 			hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
 			hbx_enrollment.hbx_id = eg_id
 			hbx_enrollment.consumer_role_id = consumer_role._id
 			hbx_enrollment.aasm_state = "coverage_selected"
+			if data_row["Plan Selected"] != nil
+				hbx_enrollment.submitted_at = data_row["Date Plan Selected"].to_time
+			else
+				hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_time
+			end
 			hbx_enrollment.save
 
 			## Create the Hbx Enrollment Member
