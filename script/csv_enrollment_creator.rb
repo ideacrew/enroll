@@ -1,4 +1,3 @@
-require 'pry'
 require 'csv'
 
 filename = "Redmine-6712.csv"
