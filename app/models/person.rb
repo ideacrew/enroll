@@ -536,6 +536,19 @@ class Person
       Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
     end
 
+    def person_has_an_active_enrollment?(person)
+      if !person.primary_family.blank? && !person.primary_family.enrollments.blank?
+        person.primary_family.enrollments.each do |enrollment|
+          return true if enrollment.is_active
+        end
+      end
+      return false
+    end
+
+    def find_by_ssn(ssn)
+      Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]

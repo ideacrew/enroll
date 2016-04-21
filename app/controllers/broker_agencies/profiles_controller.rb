@@ -163,10 +163,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
       @broker_agency_profile.save
-      update_ga_for_employers(@broker_agency_profile, old_default_ga)
       @broker_role = current_user.person.broker_role || nil
+      update_ga_for_employers(@broker_agency_profile, old_default_ga)
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
-      update_ga_for_employers(@broker_agency_profile)
     end
 
     respond_to do |format|
