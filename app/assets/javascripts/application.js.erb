@@ -400,6 +400,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
 
   // ACTUALLY BELONGS IN APPLICATION.JS
   $('.module a.view-more').on('click', function() {
@@ -481,11 +482,11 @@ $(document).ready(function () {
     })
   }
   //employees table table functions
-  $('.table-functions i.fa-trash-o').on('click', function() {
+  $(document).on('click', '.table-functions i.fa-trash-o', function()  {
     $(this).closest("tr").next().show();
     $(this).closest("tr").hide();
   });
-  $('a.terminate.cancel').on('click', function() {
+  $(document).on('click', 'a.terminate.cancel', function()  {
     $(this).closest('tr').prev().show();
     $(this).closest('tr').hide();
   });
@@ -1069,7 +1070,6 @@ $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
 });
 
-$('[data-toggle="tooltip"]').tooltip();
 
 $("[data-toggle=popover]").popover();
 $(document).on('click', '#address_info + span.form-action', function(){

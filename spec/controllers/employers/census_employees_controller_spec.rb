@@ -289,7 +289,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(new_census_employee).to receive(:hired_on=).and_return("test")
           allow(new_census_employee).to receive(:employer_profile=).and_return("test")
           allow(new_census_employee).to receive(:address).and_return(true)
-          allow(new_census_employee).to receive(:benefit_group_assignments).and_return([double])
+          allow(new_census_employee).to receive(:add_default_benefit_group_assignment).and_return(true)
         end
 
         it "rehire success" do
@@ -298,6 +298,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
+          allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
@@ -309,6 +310,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
+          allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
