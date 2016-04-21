@@ -8,6 +8,7 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include StateTransitionPublisher
 
   embedded_in :organization
 

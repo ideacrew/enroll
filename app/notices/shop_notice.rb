@@ -7,6 +7,7 @@ class ShopNotices::ShopPdfNotice < Notice
   def deliver
     build
     generate_pdf_notice
+    upload_and_send_secure_message
   end
 
   def append_hbe

@@ -57,13 +57,15 @@ class Notice
     File.open(@notice_path, 'wb') do |file|
       file << self.pdf
     end
-
-    doc_uri = upload_to_amazonS3
-    notice = create_recipient_document(doc_uri)
-    create_secure_inbox_message(notice)
     # clear_tmp
   end
 
+  def upload_and_send_secure_message
+    doc_uri = upload_to_amazonS3
+    notice = create_recipient_document(doc_uri)
+    create_secure_inbox_message(notice)
+  end
+  
   def upload_to_amazonS3
     Aws::S3Storage.save(@notice_path, 'notices')
   end

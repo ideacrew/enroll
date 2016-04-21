@@ -72,7 +72,7 @@ ivl_notice_triggers = [
     title: ' Verification Backlog Notification',
     description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
     resource_name: 'consumer_role',
-    event_name: 'trigger_verification_pending',
+    event_name: 'verifications_backlog',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
@@ -85,14 +85,14 @@ ivl_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'Notice20A',
     title: 'Outstanding Verification Notification - First Reminder',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'trigger_first_verification_pending_reminder',
+    event_name: 'first_verifications_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
@@ -112,7 +112,7 @@ ivl_notice_triggers = [
     title: 'Outstanding Verification Notification - Second Reminder',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'trigger_second_verification_pending_reminder',
+    event_name: 'second_verifications_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
@@ -132,7 +132,7 @@ ivl_notice_triggers = [
     title: 'Outstanding Verification Notification - Third Reminder',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'trigger_thrid_verification_pending_reminder',
+    event_name: 'third_verifications_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
@@ -152,7 +152,7 @@ ivl_notice_triggers = [
     title: 'Outstanding Verification Notification - Fourth Reminder',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'trigger_fourth_verification_pending_reminder',
+    event_name: 'fourth_verifications_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',

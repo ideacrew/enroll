@@ -7,6 +7,7 @@ class ConsumerRole
   include Acapi::Notifiers
   include AASM
   include Mongoid::Attributes::Dynamic
+  include StateTransitionPublisher
 
   embedded_in :person
 
@@ -313,6 +314,26 @@ class ConsumerRole
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+    end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
     end
   end
 
