@@ -46,6 +46,31 @@ FactoryGirl.define do
     end
   end
 
+  factory :general_agency, class: Organization do
+    legal_name { Forgery(:name).company_name }
+    dba { legal_name }
+
+    fein do
+      Forgery('basic').text(:allow_lower   => false,
+                            :allow_upper   => false,
+                            :allow_numeric => true,
+                            :allow_special => false, :exactly => 9)
+    end
+
+    ignore do
+      general_agency_traits []
+      general_agency_attributes { {} }
+    end
+
+    before :create do |organization, evaluator|
+      organization.office_locations.push FactoryGirl.build :office_location, :primary
+    end
+
+    after :create do |organization, evaluator|
+      FactoryGirl.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
+    end
+  end
+
   factory :general_agency_with_organization, class: Organization do
     sequence(:legal_name) {|n| "General Agency#{n}" }
     sequence(:dba) {|n| "General Agency#{n}" }
