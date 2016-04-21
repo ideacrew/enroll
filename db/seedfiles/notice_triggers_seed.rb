@@ -68,15 +68,35 @@ shop_notice_triggers = [
 
 ivl_notice_triggers = [
   {
+    hbx_id: 'VerificationBacklog',
+    title: ' Verification Backlog Notification',
+    description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
+    resource_name: 'consumer_role',
+    event_name: 'trigger_verification_pending',
+    notice_triggers: [
+      {
+        name: 'Outstanding Verification Notification',
+        notice_template: 'notices/ivl/verifications_backlog_notice',
+        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
+  {
     hbx_id: 'Notice20A',
     title: 'Outstanding Verification Notification - First Reminder',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'send_first_reminder',
+    event_name: 'trigger_first_verification_pending_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
-        notice_template: 'notices/ivl_notices/first_outstanding_notification',
+        notice_template: 'notices/ivl/documents_verification_reminder1',
         notice_builder: 'IvlNotices::ConsumerNotice',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -92,11 +112,11 @@ ivl_notice_triggers = [
     title: 'Outstanding Verification Notification - Second Reminder',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'send_second_reminder',
+    event_name: 'trigger_second_verification_pending_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
-        notice_template: 'notices/ivl_notices/second_outstanding_notification',
+        notice_template: 'notices/ivl/documents_verification_reminder2',
         notice_builder: 'IvlNotices::ConsumerNotice',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -112,11 +132,11 @@ ivl_notice_triggers = [
     title: 'Outstanding Verification Notification - Third Reminder',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'send_third_reminder',
+    event_name: 'trigger_thrid_verification_pending_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
-        notice_template: 'notices/ivl_notices/third_outstanding_notification',
+        notice_template: 'notices/ivl/documents_verification_reminder3',
         notice_builder: 'IvlNotices::ConsumerNotice',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -125,18 +145,18 @@ ivl_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'Notice22',
     title: 'Outstanding Verification Notification - Fourth Reminder',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
-    event_name: 'send_fourth_reminder',
+    event_name: 'trigger_fourth_verification_pending_reminder',
     notice_triggers: [
       {
         name: 'Outstanding Verification Notification',
-        notice_template: 'notices/ivl_notices/fourth_outstanding_notification',
+        notice_template: 'notices/ivl/documents_verification_reminder4',
         notice_builder: 'IvlNotices::ConsumerNotice',
         notice_trigger_element_group: {
           market_places: ['individual'],
