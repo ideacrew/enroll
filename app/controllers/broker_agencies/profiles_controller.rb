@@ -1,4 +1,6 @@
 class BrokerAgencies::ProfilesController < ApplicationController
+  include Acapi::Notifiers
+
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
@@ -156,15 +158,17 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
 
     if @broker_agency_profile.present?
-      old_default_ga = @broker_agency_profile.default_general_agency_profile
+      old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
       @broker_agency_profile.save
+      #update_ga_for_employers(@broker_agency_profile, old_default_ga)
+      notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
+
       @broker_role = current_user.person.broker_role || nil
-      update_ga_for_employers(@broker_agency_profile, old_default_ga)
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
     end
 
@@ -313,7 +317,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         if general_agency && general_agency == old_default_ga
           send_general_agency_assign_msg(general_agency, employer_profile, 'Terminate')
           employer_profile.fire_general_agency
-          employer_profile.save
+          #employer_profile.save
         end
       end
     else

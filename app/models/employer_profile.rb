@@ -173,8 +173,9 @@ class EmployerProfile
 
   def fire_general_agency(terminate_on = today)
     return unless active_general_agency_account
-    active_general_agency_account.end_on = terminate_on
-    active_general_agency_account.terminate if active_general_agency_account.may_terminate?
+    active_general_agency_account.update(aasm_state: "inactive", end_on: terminate_on)
+    #active_general_agency_account.end_on = terminate_on
+    #active_general_agency_account.terminate if active_general_agency_account.may_terminate?
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
