@@ -1,7 +1,7 @@
 require 'pry'
 require 'csv'
 
-filename = "Stuart_Heiser_Redmine-6712.csv"
+filename = "Redmine-6712.csv"
 
 CSV.foreach(filename, headers: true) do |row|
 	begin
@@ -35,8 +35,6 @@ CSV.foreach(filename, headers: true) do |row|
 			phone = Phone.new
 			phone.kind = data_row["Phone Type"].downcase
 			phone.full_phone_number = data_row["Phone Number"].gsub("(","").gsub(")","").sub("-","")
-			phone.save			
-
 			person.phones.push(phone)
 			phone.save
 
@@ -44,6 +42,7 @@ CSV.foreach(filename, headers: true) do |row|
 			email = Email.new
 			email.kind = data_row["Email Kind"]
 			email.address = data_row["Email Address"]
+			person.emails.push(email)
 			email.save			
 
 			## Give them a Consumer Role
@@ -101,7 +100,15 @@ CSV.foreach(filename, headers: true) do |row|
 			hbx_enrollment.consumer_role_id = consumer_role._id
 			hbx_enrollment.aasm_state = "coverage_selected"
 			hbx_enrollment.save
-			hbx_enrollment.decorated_hbx_enrollment
+
+			## Create the Hbx Enrollment Member
+			hbx_enrollment_member = HbxEnrollmentMember.new
+			hbx_enrollment_member.is_subscriber = true
+			hbx_enrollment_member.coverage_start_on = hbx_enrollment.effective_on
+			hbx_enrollment_member.applicant_id = hbx_enrollment.household.family.family_members.first._id
+			hbx_enrollment_member.eligibility_date = hbx_enrollment_member.coverage_start_on.prev_month + 14.days
+			hbx_enrollment.hbx_enrollment_members.push(hbx_enrollment_member)
+			hbx_enrollment_member.save
 			hbx_enrollment.save
 		end
 	rescue Exception=>e
