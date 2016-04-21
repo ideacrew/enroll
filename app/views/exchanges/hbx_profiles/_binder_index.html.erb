@@ -48,6 +48,12 @@
       "iDisplayLength": 10
     });
 
+    var rowCount = $("#binder-transition-dataTable > tbody > tr").length;
+    //checking with one because, we display a row with text "no data available" if there are no rows
+    if(rowCount == 1){
+      $('#binderSubmit').prop('disabled', true);
+    }
+
     var checkBoxes = $('tbody .binderCheckBox');
     var headCheckBox = $('thead #checkall');
 
