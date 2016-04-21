@@ -121,7 +121,7 @@ CSV.foreach(filename, headers: true) do |row|
 			hbx_enrollment_member = HbxEnrollmentMember.new
 			hbx_enrollment_member.is_subscriber = true
 			hbx_enrollment_member.coverage_start_on = hbx_enrollment.effective_on
-			hbx_enrollment_member.applicant_id = hbx_enrollment.household.family.family_members.first._id
+			hbx_enrollment_member.applicant_id = family.family_members.first._id
 			hbx_enrollment_member.eligibility_date = hbx_enrollment_member.coverage_start_on.prev_month + 14.days
 			hbx_enrollment.hbx_enrollment_members.push(hbx_enrollment_member)
 			hbx_enrollment_member.save
