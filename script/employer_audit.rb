@@ -47,7 +47,7 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 		addresses = []
 		if office_locations != nil
 			office_locations.each do |location|
-				next if location.address.kind != "work"
+				next if location.is_primary == false
 				addresses.push(location.try(:address).try(:full_address))
 			end
 		end
@@ -66,14 +66,29 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 					benefits_hashes_array.push({benefit.relationship => benefit.premium_pct})
 				end
 				emp_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["employee"]}
+				if emp_contrib != nil
+					emp_contrib = emp_contrib["employee"].to_s
+				end
 				spouse_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["spouse"]}
+				if spouse_contrib != nil
+					spouse_contrib = spouse_contrib["spouse"].to_s
+				end
 				dp_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["domestic_partner"]}
+				if dp_contrib != nil
+					dp_contrib = dp_contrib["domestic_partner"].to_s
+				end
 				under_26_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["child_under_26"]}
+				if under_26_contrib != nil
+					under_26_contrib = under_26_contrib["child_under_26"].to_s
+				end
 				over_26_contrib = benefits_hashes_array.detect{|benefit_hash| benefit_hash["child_26_and_over"]}
+				if over_26_contrib != nil
+					over_26_contrib = over_26_contrib["child_26_and_over"]
+				end
 				csv << [legal_name, dba, fein, state, start_date, end_date,
 						elected_plans, reference_plan_name, reference_plan_hios, reference_plan_metal,
 						emp_contrib,spouse_contrib,dp_contrib,under_26_contrib,over_26_contrib,
-						employee_count, addresses]
+						employee_count, addresses.first]
 			end
 		end
 		rescue Exception=>e
