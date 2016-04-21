@@ -2,6 +2,7 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
 
   def initialize(employer_profile, args = {})
     super(args)
+
     @employer_profile = employer_profile
     @template = args[:template]
     @delivery_method = args[:delivery_method].split(',')
@@ -9,7 +10,6 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     @secure_message_recipient = employer_profile
     
     # @to = @recipient.home_email.address
-
     # @email_notice = args[:email_notice] || true
     # @paper_notice = args[:paper_notice] || true
   end
@@ -30,7 +30,6 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     # @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
     # @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
     # @notice.coverage_start_on = employer_profile.plan_years.sort_by{|start_on| start_on}.last.start_on
-
     # if @recipient.mailing_address.present?
 
     append_primary_address(@recipient.mailing_address)
@@ -42,6 +41,4 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
     append_hbe
     append_broker(@employer_profile.broker_agency_profile)
   end
-
-  def 
 end 

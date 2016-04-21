@@ -1,6 +1,6 @@
 class EventForNoticeTriggerRule
 
-  def initialize(application_event, notice_trigger)
+  def initialize(notice_trigger, application_event)
     @application_event = application_event
     @notice_trigger = notice_trigger
   end
