@@ -11,7 +11,8 @@ class ApplicationEventMapper
     }
 
   RESOURCE_MAP = {
-    "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id)
+    "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
+    "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find)
   }
 
   REVERSE_LOOKUP_MAP = RESOURCE_MAP.inject({}) do |acc, vals|
@@ -34,9 +35,9 @@ class ApplicationEventMapper
     end
 
     def map_resource(resource_name)
-      mapped_name = resource_name.to_s.underscore.to_sym
       return RESOURCE_MAP[resource_name.to_s] if RESOURCE_MAP.has_key?(resource_name.to_s)
-      Resource.new(mapped_name, :id, (mapped_name.to_s + "_id").to_sym)
+      mapped_name = resource_name.to_s.underscore.to_sym
+      Resource.new(mapped_name, :id, (mapped_name.to_s + "_id").to_sym, :find)
     end
 
     def map_event_name(resource_mapping, transition_event_name)
