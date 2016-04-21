@@ -84,7 +84,7 @@
                       <%end%>
                       <td></td>
 
-                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: primary_member(person_id.keys.first) %></td>
+                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: primary_member(person_id.keys.first), class: 'individual_coverd' %></td>
                   </tr>
                 <%end%>
 

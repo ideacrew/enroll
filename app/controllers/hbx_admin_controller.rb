@@ -17,6 +17,23 @@ class HbxAdminController < ApplicationController
     end
   end
 
+  def calculate_aptc_csr
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    @months_array = Date::ABBR_MONTHNAMES.compact
+    @current_year = TimeKeeper.date_of_record.year
+    @person = Person.find(params[:person_id])
+    @family = Family.find(params[:family_id])
+    @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family, params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:member_ids])
+    @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
+    @aptc_applied = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0 
+    @max_aptc = params[:max_aptc] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+    @csr_percent_as_integer = params[:csr_percentage] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
+
+    respond_to do |format|
+      format.js { render "edit_aptc_csr", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
+    end
+  end
+
   def update_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
