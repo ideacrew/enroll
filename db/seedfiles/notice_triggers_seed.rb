@@ -2,7 +2,7 @@ puts "*"*80
 puts "::: Cleaning ApplicationEventKinds :::"
 ApplicationEventKind.delete_all
 
-notice_triggers = [
+shop_notice_triggers = [
   {
     hbx_id: 'SHOP1A',
     title: 'Initial Employer SHOP Application Approval',
@@ -65,7 +65,96 @@ notice_triggers = [
   }
 ]
 
-notice_triggers.each do |trigger_params|
+
+ivl_notice_triggers = [
+  {
+    hbx_id: 'Notice20A',
+    title: 'Outstanding Verification Notification - First Reminder',
+    description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+    resource_name: 'consumer_role',
+    event_name: 'send_first_reminder',
+    notice_triggers: [
+      {
+        name: 'Outstanding Verification Notification',
+        notice_template: 'notices/ivl_notices/first_outstanding_notification',
+        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
+  {
+    hbx_id: 'Notice20B',
+    title: 'Outstanding Verification Notification - Second Reminder',
+    description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+    resource_name: 'consumer_role',
+    event_name: 'send_second_reminder',
+    notice_triggers: [
+      {
+        name: 'Outstanding Verification Notification',
+        notice_template: 'notices/ivl_notices/second_outstanding_notification',
+        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
+  {
+    hbx_id: 'Notice21',
+    title: 'Outstanding Verification Notification - Third Reminder',
+    description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+    resource_name: 'consumer_role',
+    event_name: 'send_third_reminder',
+    notice_triggers: [
+      {
+        name: 'Outstanding Verification Notification',
+        notice_template: 'notices/ivl_notices/third_outstanding_notification',
+        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
+  {
+    hbx_id: 'Notice22',
+    title: 'Outstanding Verification Notification - Fourth Reminder',
+    description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+    resource_name: 'consumer_role',
+    event_name: 'send_fourth_reminder',
+    notice_triggers: [
+      {
+        name: 'Outstanding Verification Notification',
+        notice_template: 'notices/ivl_notices/fourth_outstanding_notification',
+        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  }
+]
+
+
+shop_notice_triggers.each do |trigger_params|
+  ApplicationEventKind.create(trigger_params)
+end
+
+ivl_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
 
