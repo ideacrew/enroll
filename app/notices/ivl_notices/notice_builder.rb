@@ -77,7 +77,7 @@ class IvlNotices::NoticeBuilder
   end
 
   def generate_pdf_notice
-    ivl_notice = IvlPdfNotice.new
+    ivl_notice = IvlNotice.new
     ivl_notice.notice = @notice
     ivl_notice.template = @template
     ivl_notice.create
@@ -85,7 +85,7 @@ class IvlNotices::NoticeBuilder
   end
 
   def generate_html
-    ivl_notice = IvlPdfNotice.new
+    ivl_notice = IvlNotice.new
     ivl_notice.notice = @notice
     ivl_notice.template = @template
     ivl_notice.save_html

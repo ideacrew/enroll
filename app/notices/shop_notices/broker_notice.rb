@@ -1,4 +1,4 @@
-class ShopNotices::BrokerNotice < ShopNotices::ShopPdfNotice
+class ShopNotices::BrokerNotice < ShopNotice
 
   def initialize(broker, args = {})
     super(args)

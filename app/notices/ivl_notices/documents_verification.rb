@@ -1,4 +1,4 @@
-class IvlNotices::DocumentsVerification < IvlPdfNotice
+class IvlNotices::DocumentsVerification < IvlNotice
 
   attr_reader :notice
 

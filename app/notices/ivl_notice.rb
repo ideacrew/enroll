@@ -1,4 +1,4 @@
-class IvlPdfNotice < Notice
+class IvlNotice < Notice
 
   def initialize(options ={})
     super

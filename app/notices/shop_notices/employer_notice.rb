@@ -1,4 +1,4 @@
-class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
+class ShopNotices::EmployerNotice < ShopNotice
 
   def initialize(employer_profile, args = {})
     super(args)
@@ -17,7 +17,7 @@ class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
   # def deliver
   #   # send_email_notice if @email_notice
   #   # send_pdf_notice if @paper_notice
-  #   # send_email_notice
+  #   # send_email_notice 
   #   super
   # end
 
