@@ -182,4 +182,36 @@ RSpec.describe VerificationHelper, :type => :helper do
       expect(helper.documents_count(person)).to eq 0
     end
   end
+
+  describe "#hbx_enrollment_incomplete" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:hbx_enrollment_incomplete) { HbxEnrollment.new(:review_status => "incomplete") }
+    let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
+    before :each do
+      assign(:person, person)
+    end
+    context "if verification needed" do
+      before :each do
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+      end
+      it "returns true if enrollment has complete review status" do
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
+        expect(helper.hbx_enrollment_incomplete).to be_truthy
+      end
+      it "returns false for not incomplete status" do
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
+        expect(helper.hbx_enrollment_incomplete).to be_falsey
+      end
+    end
+
+    context "without enrollments that needs verification" do
+      before :each do
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
+      end
+
+      it "returns false without enrollments" do
+        expect(helper.hbx_enrollment_incomplete).to be_falsey
+      end
+    end
+  end
 end
