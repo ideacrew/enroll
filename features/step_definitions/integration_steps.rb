@@ -397,6 +397,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
+  sleep 3
   wait_for_ajax(10)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   find("#person_addresses_attributes_0_address_1").trigger('click')
