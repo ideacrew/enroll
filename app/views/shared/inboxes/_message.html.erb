@@ -1,5 +1,5 @@
 <%- if message.present? %>
-<div class="col-xs-12 content-bottom">
+<div class="col-xs-12">
   <ul class="list-group">
     <li class="list-group-item">
       Sent By:
@@ -13,8 +13,10 @@
       <%= message.try(:body).html_safe %>
       <br></li>
   </ul>
-  <a class="btn btn-trans msg_cancel_btn" href="#">
-    <i aria-hidden="true" class="fa fa-caret-left"></i>
-    &nbsp;Back</a>
+</div>
+<br class="clear"/>
+<br/>
+<div class="col-xs-12">
+  <%= link_to "<i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>".html_safe, :back, class: 'btn btn-trans' %>
 </div>
 <% end %>
