@@ -39,10 +39,6 @@ Then(/^.+ should see general agency registration successful message$/) do
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
-And(/^.+ clicks on the General agency tab$/) do
-  find('.interaction-click-control-general-agencies').click
-end
-
 Then(/^.+ should see the list of general agencies$/) do
   expect(page).to have_content('General Agencies')
   expect(page).to have_content('Housecare Inc')
@@ -56,8 +52,8 @@ Then(/^.+ should see the show page of general agency$/) do
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
-When(/^.+ clicks on the Staff tab$/) do
-  find('.interaction-click-control-staff').click
+And(/^.+ clicks on the link of General agency$/) do
+  find('.interaction-click-control-general-agencies').click
 end
 
 Then(/^.+ should see the list of general agency staff$/) do
@@ -209,11 +205,11 @@ Then(/^.+ should see general agency home page$/) do
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
-When(/^General Agency clicks on the employers tab$/) do
-  find('.interaction-click-control-employers').click
-end
-
 Then(/^General Agency should see the list of employer$/) do
   expect(page).to have_content('Employers')
   expect(page).to have_content('Acmega LLC')
+end
+
+When(/^General Agency clicks on the link of employers$/) do
+  find('.interaction-click-control-employers').click
 end

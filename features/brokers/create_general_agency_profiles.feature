@@ -10,7 +10,7 @@ Feature: Create General Agency and General Agency Staff Role
 
     Given Hbx Admin exists
       When Hbx Admin logs on to the Hbx Portal
-      And Hbx Admin clicks on the General agency tab
+      And Hbx Admin clicks on the link of General agency
       Then Hbx Admin should see the list of general agencies
       When Hbx Admin clicks the link of Housecare Inc
       Then Hbx Admin should see the show page of general agency
@@ -84,6 +84,6 @@ Feature: Create General Agency and General Agency Staff Role
 
     When General Agency staff logs on the General Agency Portal
       Then General Agency should see general agency home page 
-      When General Agency clicks on the employers tab
+      When General Agency clicks on the link of employers
       Then General Agency should see the list of employer
       And General Agency log out

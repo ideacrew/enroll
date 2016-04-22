@@ -389,6 +389,7 @@ When(/^.+ accepts? the matched employer$/) do
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
+  sleep 3
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax(10)
@@ -438,6 +439,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
+  sleep 3
   expect(page).to have_content('Confirm Member')
 end
 
