@@ -10,6 +10,7 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :first_name, String
     attribute :last_name, String
+    attribute :subject, String
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }

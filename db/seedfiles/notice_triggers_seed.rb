@@ -69,7 +69,7 @@ shop_notice_triggers = [
 ivl_notice_triggers = [
   {
     hbx_id: 'VerificationBacklog',
-    title: ' Verification Backlog Notification',
+    title: 'Verification Backlog Notification',
     description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
     resource_name: 'consumer_role',
     event_name: 'verifications_backlog',

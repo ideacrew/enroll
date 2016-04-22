@@ -34,13 +34,13 @@ class Notice
         page_size: 'Letter',
         formats: :html,
         encoding: 'utf8',
-        # footer: { 
-        #   content: ApplicationController.new.render_to_string({ 
-        #     template: "notices/shared/footer.html.erb", 
-        #     layout: false 
-        #     })
-        # })
-        )
+        footer: { 
+          content: ApplicationController.new.render_to_string({ 
+            template: "notices/shared/footer.html.erb", 
+            layout: false 
+            })
+        }
+    )
   end
 
   def send_email_notice
@@ -87,7 +87,7 @@ class Notice
   end
 
   def create_secure_inbox_message(notice)
-    subject = "New Notice Available"
+    subject = @notice.subject || "New Notice Available"
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@secure_message_recipient.class.to_s, @secure_message_recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     @secure_message_recipient.inbox.messages.build({
