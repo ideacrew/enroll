@@ -85,7 +85,9 @@ module VerificationHelper
   end
 
   def hbx_enrollment_incomplete
-    no_enrollments || enrollment_incomplete
+    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
+      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
+    end
   end
 
   #use this method to send docs to review for family member level
