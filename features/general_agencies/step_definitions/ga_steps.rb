@@ -279,8 +279,29 @@ When /^the broker visits their general agencies page$/ do
   find(".interaction-click-control-general-agencies").click
 end
 
-And /^the broker set default ga$/ do
+When /^the broker set default ga$/ do
   first(:xpath, "//a[contains(., 'Select Default GA')]").click
+end
+
+Then /^the broker should see default ga msg$/ do
+  expect(page).to have_content("this is your default GA, to change your default GA click \"Select Default GA\" under your desired agency.")
+end
+
+Then /^the broker should see no default ga msg$/ do
+  expect(page).to have_content("You do not have default GA, to select your default GA click \"Select Default GA\" under your desired agency.")
+end
+
+Given /^call change default ga subscriber for ga1$/ do
+  broker = User.find_by(email: "broker1@dc.gov")
+  hbx_id = broker.person.hbx_id
+  Subscribers::DefaultGaChanged.new.call(nil, nil, nil, nil, {broker_id: hbx_id})
+end
+
+Given /^call change default ga subscriber for ga1 with pre default ga id$/ do
+  broker = User.find_by(email: "broker1@dc.gov")
+  hbx_id = broker.person.hbx_id
+  pre_ga_id = Organization.find_by(legal_name: 'Rooxo').try(:general_agency_profile).try(:id).try(:to_s)
+  Subscribers::DefaultGaChanged.new.call(nil, nil, nil, nil, {broker_id: hbx_id, pre_default_ga_id: pre_ga_id})
 end
 
 When /^the ga login in$/ do

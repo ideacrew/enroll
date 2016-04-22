@@ -152,8 +152,7 @@ class EmployerProfile
   end
 
   def active_general_agency_account
-    return @active_general_agency_account if defined? @active_general_agency_account
-    @active_general_agency_account = general_agency_accounts.detect { |account| account.active? }
+    general_agency_accounts.detect { |account| account.active? }
   end
 
   def general_agency_profile
