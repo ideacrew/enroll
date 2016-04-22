@@ -35,20 +35,16 @@
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong>"],
     heading: 'Provide Documents Needed 45 CFR §155.315(f)(2)', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[PICK one or multiple of the following, based on which persons have inconsistencies and which areas are inconsistent]</span>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "[SSN Inconsistent First Name 1] [SSN Inconsistent Last Name 1]"} %>
+  content: "<strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span #{@style_color_text}>[IF Multiple SSN Inconsistencies]</span>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "[SSN Inconsistent First Name 1] [SSN Inconsistent Last Name 1]<br>[Repeat for as many members as is necessary]"} %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
@@ -56,17 +52,13 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember your Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span> <strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "[Citizenship/Immigration Inconsistent First Name 1] [Citizenship/Immigration Inconsistent Last Name 1] "} %>
+  content: "<strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span #{@style_color_text}>[IF Multiple Citizenship/Immigration Inconsistencies]</span>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "[Citizenship/Immigration Inconsistent First Name 1] [Citizenship/Immigration Inconsistent Last Name 1]"} %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<u>How to Prove US Citizenship</u><br>
