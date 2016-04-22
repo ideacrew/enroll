@@ -1,13 +1,29 @@
-<tr class='<%=message.message_read==true ? "msg-inbox-read" : ""%>'>
-  <td> <%= message.try(:from) if @folder == 'Inbox' %>
-   <%= message.try(:to)   if @folder == 'Sent'%>
- </td>
- <td> <%=message.created_at %>
-  <td> <%= message.try(:subject) %> </td>
-  <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
-    <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary show_msg mz", remote: true %>
+<tr class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
+  <td>
+    <%= message.try(:from) if @folder == 'Inbox' %>
+    <%= message.try(:to)   if @folder == 'Sent'%>
+  </td>
+  <td>
+    <%=message.created_at %>
+    <td>
+      <%= message.try(:subject) %>
+    </td>
     <%- if @folder != 'Deleted' %>
-    <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-trans", remote: true, method: :delete %>
+    <td>
+      <%= link_to retrieve_show_path(provider, message), remote: true, method: :delete, title: 'Delete', data: {'toggle': 'tooltip'} do %>
+        <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+      <% end %>
+      <%= link_to "show", retrieve_show_path(provider, message), class: "hidden show-message" %>
+    </td>
     <% end %>
   </td>
 </tr>
+<script>
+function showMessage(url) {
+	$.ajax({
+		type: "GET",
+  	url: url,
+  	dataType: 'script',
+	});
+}
+</script>

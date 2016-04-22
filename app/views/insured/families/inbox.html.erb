@@ -1,11 +1,7 @@
 <% content_for :navigation do %>
 <%= render 'navigation' %>
 <% end %>
-
-<div class="my-account-page col-md-12">
-  <h1>Messages</h1>
-</div>
-
 <div class="col-md-12">
-  <%= render 'inbox', provider: current_user.person %>
+  <h1 class="darkblue no-buffer">Messages</h1>
 </div>
+<%= render 'inbox', provider: current_user.person %>
