@@ -36,6 +36,8 @@ module Subscribers
           end
         end
       end
+    rescue => e
+      log("GA_ERROR: Unable to set default ga for #{e.try(:message)}", {:severity => "error"})
     end
 
     def send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, status)
