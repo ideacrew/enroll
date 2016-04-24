@@ -71,7 +71,7 @@ describe FamilyMember, dbclean: :after_each do
 
     it "should raise error with nil family" do
       family_member = FamilyMember.new(**family_member_params)
-      expect{family_member.parent}.to raise_error
+      expect{family_member.parent}.to raise_error(RuntimeError, "undefined parent family")
     end
   end
 

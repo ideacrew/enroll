@@ -89,8 +89,9 @@
     <% if @employer_profile.census_employees.count > 0 %>
 
 <div class="row">
-
-    <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+  <div class="module census-employees-table">
+      <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+  </div>
 </div>
     <div id="employee_roster">
 
