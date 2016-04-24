@@ -283,6 +283,29 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+  describe "GET assign" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    before :each do
+      sign_in user
+      xhr :get, :assign, id: broker_agency_profile.id, format: :js
+    end
+
+    it "should return http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agency_profiles" do
+      expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
+    end
+
+    it "should get employers" do
+      expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+    end
+  end
+
   describe "GET assign_history" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role) }

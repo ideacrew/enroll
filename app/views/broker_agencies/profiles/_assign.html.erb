@@ -46,6 +46,11 @@
             </table>
           </div>
         </div>
+        <div class="row container">
+          <div class="col-md-12" id="paginator">
+            <%= paginate @employers, :remote => true, :param_name => "employers_page" %>
+          </div>
+        </div>
       <% end %>
     </div>
   </div>

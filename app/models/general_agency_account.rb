@@ -15,6 +15,9 @@ class GeneralAgencyAccount
   field :aasm_state, type: String, default: 'active'
   field :broker_role_id, type: BSON::ObjectId
 
+  scope :active, ->{ where(aasm_state: 'active') }
+  scope :inactive, ->{ where(aasm_state: 'inactive') }
+
   validates_presence_of :start_on, :general_agency_profile_id
 
   # belongs_to general_agency_profile

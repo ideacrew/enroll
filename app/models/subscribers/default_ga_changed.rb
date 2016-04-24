@@ -30,8 +30,7 @@ module Subscribers
             general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
             if general_agency && general_agency.id.to_s == pre_default_ga_id.to_s
               send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, 'Terminate')
-              employer_profile.fire_general_agency
-              #employer_profile.save
+              employer_profile.fire_general_agency!
             end
           end
         end

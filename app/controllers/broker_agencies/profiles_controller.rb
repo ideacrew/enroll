@@ -178,15 +178,19 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def assign
+    page_string = params.permit(:employers_page)[:employers_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
     else
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.by_broker_role(broker_role_id)
     end
-    @employers = @orgs.map {|o| o.employer_profile}
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+
+    @employers = @orgs.map(&:employer_profile)
+    @employers = Kaminari.paginate_array(@employers).page page_no
   end
 
   def update_assign
@@ -197,8 +201,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         params[:employer_ids].each do |employer_id|
           employer_profile = EmployerProfile.find(employer_id) rescue nil
           if employer_profile.present?
-            employer_profile.fire_general_agency
-            employer_profile.save
+            employer_profile.fire_general_agency!
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
           end
         end
@@ -224,8 +227,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
       send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
-      @employer_profile.fire_general_agency
-      @employer_profile.save
+      @employer_profile.fire_general_agency!
     end
   end
 
@@ -316,8 +318,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
         if general_agency && general_agency == old_default_ga
           send_general_agency_assign_msg(general_agency, employer_profile, 'Terminate')
-          employer_profile.fire_general_agency
-          #employer_profile.save
+          employer_profile.fire_general_agency!
         end
       end
     else
