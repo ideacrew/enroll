@@ -1,7 +1,16 @@
 module Importers
   class ConversionEmployerPlanYear
+    NewHireCoveragePolicy = Struct.new(:kind, :offset)
+
     include ActiveModel::Validations
     include ActiveModel::Model
+
+    HIRE_COVERAGE_POLICIES = {
+      "date of hire equal to effective eate" => NewHireCoveragePolicy.new("date_of_hire", 0),
+      "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
+      "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
+      "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
+    }
 
     attr_reader :fein, :plan_selection
 
@@ -17,6 +26,7 @@ module Importers
 
     validate :validate_fein
     validate :validate_carrier
+    validate :validate_new_coverage_policy
 
     validates_presence_of :carrier, :allow_blank => false
     validates_presence_of :plan_selection, :allow_blank => false
@@ -31,6 +41,14 @@ module Importers
 
     include ValueParsers::OptimisticSsnParser.on(:fein)
 
+    def new_coverage_policy=(val)
+      if val.blank?
+        @new_coverage_policy = nil
+        return val
+      end
+      @new_coverage_policy = HIRE_COVERAGE_POLICIES[val.strip.downcase]
+    end
+
     def plan_selection=(val)
       @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
     end
@@ -44,6 +62,12 @@ module Importers
         if found_employer.plan_years.any? && (found_employer.profile_source == "conversion")
           errors.add(:fein, "employer already has conversion plan years")
         end
+      end
+    end
+
+    def validate_new_coverage_policy
+      if new_coverage_policy.blank?
+        warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(",")}), defaulting to first of month following date of hire")
       end
     end
 
@@ -109,13 +133,18 @@ module Importers
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, default_plan_year_start.year)
       reference_plan = select_reference_plan(available_plans)
       elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
-      BenefitGroup.new({
+      benefit_group_properties = {
         :title => "Standard",
         :plan_option_kind => plan_selection,
         :relationship_benefits => map_relationship_benefits,
         :reference_plan_id => reference_plan.id,
         :elected_plan_ids => elected_plan_ids
-      })
+      }
+      if !new_coverage_policy.blank?
+         benefit_group_properties[:effective_on_offset] = new_coverage_policy.offset
+         benefit_group_properties[:effective_on_kind] = new_coverage_policy.kind        
+      end
+      BenefitGroup.new(benefit_group_properties)
     end
 
     def map_relationship_benefits
