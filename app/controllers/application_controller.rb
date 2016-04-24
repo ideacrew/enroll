@@ -134,6 +134,15 @@ class ApplicationController < ActionController::Base
         end
         redirect_to new_user_registration_path
       end
+    rescue Exception => e
+      message = {}
+      message[:message] = "Application Exception - #{e.message}"
+      message[:session_person_id] = session[:person_id] if session[:person_id]
+      message[:user_id] = current_user.id if current_user
+      message[:email] = current_user.email if current_user
+      message[:url] = request.original_url
+      message[:params] = params if params
+      log(message, :severity=>'error')
     end
 
     def after_sign_in_path_for(resource)

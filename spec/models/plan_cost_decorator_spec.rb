@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe PlanCostDecorator, dbclean: :after_each do
   let!(:plan_year)               { double("PlanYear", start_on: Date.today.beginning_of_year) }
   let!(:default_benefit_group)   { double("BenefitGroup", plan_year: plan_year) }
-  let!(:default_plan)            { double("Plan", id: "default_plan_id") }
-  let!(:default_reference_plan)  { double("Plan", id: "default_reference_plan_id") }
+  let!(:default_plan)            { double("Plan", id: "default_plan_id", coverage_kind: 'health') }
+  let!(:default_reference_plan)  { double("Plan", id: "default_reference_plan_id", coverage_kind: 'health') }
   let!(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
   context "rating a large family" do
     let!(:plan)            {default_plan}

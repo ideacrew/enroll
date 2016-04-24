@@ -64,7 +64,7 @@
           </thead>
 
             <tbody>
-              <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+              <!-- <%# @hbx_enrollment.hbx_enrollment_members.each do |member| %>
                 <tr>
                   <td><%= member.person.full_name %></td>
                   <td><%= member.primary_relationship %></td>
@@ -73,7 +73,7 @@
                   <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
                   <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
                 </tr>
-              <% end %>
+              <%# end %> -->
               <tr class="gray-row">
                 <td class="capital"><strong>Totals</strong></td>
                 <td></td>

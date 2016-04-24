@@ -33,11 +33,17 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
-    unique_display_years = @hbx_enrollments.map{|t| t.effective_on.year if t.aasm_state == 'coverage_selected'}.compact
+    hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
+      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected'
+      memo[enrollment.coverage_kind].compact
+      memo
+    end
 
-    @waived = @family.coverage_waived? && !@waived_hbx_enrollments.any? {|i| unique_display_years.include? i.effective_on.year}
 
-    @employee_role = @person.employee_roles.active.first
+    @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
+    @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
+
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     respond_to do |format|
       format.html
@@ -60,16 +66,17 @@ class Insured::FamiliesController < FamiliesController
   def brokers
     @tab = params['tab']
 
-    if @person.employee_roles.present?
-      @employee_role = @person.employee_roles.try(:first)
+    if @person.active_employee_roles.present?
+      @employee_role = @person.active_employee_roles.first
     end
-
   end
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
@@ -144,7 +151,7 @@ class Insured::FamiliesController < FamiliesController
       plan = @enrollment.try(:plan)
       if @enrollment.is_shop?
         @benefit_group = @enrollment.benefit_group
-        @reference_plan = @benefit_group.reference_plan
+        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
 
         if @benefit_group.is_congress
           @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
@@ -177,8 +184,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
   def check_employee_role
-    @employee_role = @person.employee_roles.try(:first)
+    @employee_role = @person.active_employee_roles.first
   end
 
   def init_qualifying_life_events
@@ -196,7 +204,7 @@ class Insured::FamiliesController < FamiliesController
       @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
       @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
     else
-      if @person.employee_roles.active.present?
+      if @person.active_employee_roles.present?
         @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
       else @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
@@ -208,7 +216,7 @@ class Insured::FamiliesController < FamiliesController
   def check_for_address_info
     if @person.has_active_employee_role?
       if @person.addresses.blank?
-        redirect_to edit_insured_employee_path(@person.employee_roles.active.first)
+        redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)

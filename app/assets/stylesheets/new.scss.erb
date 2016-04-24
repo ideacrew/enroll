@@ -11,6 +11,8 @@
       }
       li {
         padding: 8px 0;
+        padding-right: 15px;
+
         &.active {
           a {
             color: #ffffff;
@@ -33,44 +35,6 @@
           background-color: #e72b2d;
         }
       }
-      &+.panel {
-        border-radius: 0;
-        background-image: none;
-        border-bottom: none;
-        padding: 0 20px;
-        font-size: 14px;
-        text-transform: uppercase;
-        color: #ffffff;
-        margin: 0;
-        padding: 0 15px;
-        .panel-heading {
-          background-color: #ffffff;
-          background-image: none;
-          border-bottom: none;
-          padding: 0;
-          font-size: 12px;
-          color: #333333;
-          text-transform: capitalize;
-          text-align: center;
-
-          h4 {
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 0;
-            a {
-
-            }
-          }
-        }
-        .panel-body {
-          color: #9b9b9b;
-          text-transform: uppercase;
-          font-size: 14px;
-          text-align: center;
-          .fte-count {
-            color: #007bc4;
-          }
-      }}
     }
   }
   .employees-tab {
@@ -206,28 +170,11 @@
 
           }
 
-          &.table-functions {
-            padding: 0;
-            text-align: right;
-
-              .fa {
-                display: none;
-                cursor: pointer;
-                margin: 0 5px 0 0;
-                &.fa-trash-o {
-                  padding-right: 20px;
-                }
-            }
-          }
           &:hover {
             color: #007bc4;
 
           }
 
-        }
-        &:hover .table-functions .fa {
-          color: #007bc4;
-          display: inline-block;
         }
       }
     }
@@ -272,7 +219,7 @@
       }
     }
   }
-  .planyear-add-tab, .employee-add-tab, .employer-edit-tab, .employees-tab, .home-tab, #add_employee_action {
+  .planyear-add-tab, .employee-add-tab, .employer-edit-tab, .home-tab, #add_employee_action {
     padding-bottom: 45px;
     h3 {
       &:first-of-type {
@@ -283,8 +230,10 @@
         }
       }
     }
+    .plan-year-primary {
+      pointer-events: auto;
+    }
     .fa {
-      color: #007bc4;
       cursor: pointer;
     }
     .plan-title {
@@ -303,6 +252,14 @@
       .panel {
         padding-bottom: 15px;
         background-color: transparent;
+        &:first-of-type {
+          margin-right: 1.25%;
+          width: 48.75% !important;
+        }
+        &:last-of-type {
+          margin-left: 1.25%;
+          width: 48.75% !important;
+        }
         .panel-heading {
           text-transform: uppercase;
           background-color: transparent;
@@ -359,7 +316,6 @@
 
   .benefits-tab, .home-tab {
     .fa {
-      color: #007bc4;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
@@ -506,13 +462,22 @@
             color: #b7b7b7;
             font-size: 12px;
             text-transform: uppercase;
+            padding-right:15px;
+            &:last-of-type {
+              padding-right: 0;
+            }
+
           }
           td {
             color: #333333;
-            font-size: 16px;
+            font-size: 12px;
             word-wrap: break-word;
+            vertical-align: top;
+            padding-right:15px;
             &:last-of-type {
               padding-left: 0;
+              padding-right:0;
+
             }
           }
         }
@@ -581,6 +546,9 @@
         box-shadow: none;
         table {
           border-bottom: 0;
+          tr {
+            vertical-align: top;
+          }
         }
         &.est {
 
@@ -643,7 +611,6 @@
         }
       }
       label {
-        text-transform: uppercase;
         margin-top: 5px;
         font-size: 14px;
         color: rgba(131, 135, 128, 1);
@@ -673,6 +640,13 @@
         }
       }
 
+    }
+    .health {
+      .offerings {
+        .heading {
+          border-top: solid 1px #d5d5d5;
+        }
+      }
     }
     .offerings {
 
@@ -830,12 +804,34 @@
         }
       }
     }
+    .elected-plans-continue, .edit-add-dental {
+      padding: 15px 0 20px;
+      background-color: #fff;
+      .di {
+        position: relative;
+        top: 10px;
+        font-size: 15px;
+      }
+    }
     .plan-options {
       background-color: #ffffff;
       border: solid 1px #b7b7b7;
       .metals-tab {
         >.col-xs-3:last-of-type {
           display: none;
+        }
+      }
+      .elected-plans-tab {
+        border: none;
+        padding: 0;
+        height: 450px;
+        span:first-of-type {
+          text-align: left;
+          font-size: initial;
+          display: inline;
+          padding: 0;
+          margin: 0;
+          max-width: none;
         }
       }
       span:first-of-type {
@@ -881,11 +877,12 @@
         }
       }
     }
-    .reference-plans {
+    .reference-plans, .dental-reference-plans, .elected-plans-tab  {
       background-color: #ffffff;
       border: solid 1px #d7d7d7;
       padding-bottom: 25px;
       overflow-y: scroll;
+      display: none;
 
 
       .loading {
@@ -894,8 +891,8 @@
         top: 50%;
         text-align: center;
       }
-      .reference-plan {
-        height: 155px;
+      .reference-plan, .dental-reference-plan {
+        height: 175px;
         padding: 0;
         cursor: pointer;
         padding-top: 20px;
@@ -903,8 +900,14 @@
 
         &:hover {
           border-bottom: solid 1px #007bc4;
+          .col-xs-10 .panel .panel-body .view-summary {
+            display: inline-block;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
-        .col-xs-3:first-of-type {
+        .col-xs-2:first-of-type {
           padding-left: 0;
         }
         .panel {
@@ -934,6 +937,10 @@
               color: #b7b7b7;
               font-size: 10px;
 
+            }
+            a.view-summary {
+              display: none;
+              margin-top: 3.5%;
             }
           }
         }
@@ -1159,7 +1166,7 @@
         border-right: solid 1px #b7b7b7;
         background-color: #ffffff;
         margin-top: 0;
-        padding-bottom: 20px;
+        padding-bottom: 10px;
 
         .reference-plan-details {
           display: none;
@@ -1568,8 +1575,14 @@
     margin-bottom: 10px;
   }
 }
-.edit-offering, .reference-steps {
-  h4.change-plan, h4.cancel-plan-change {
+.edit-offering, .reference-steps, .selected-plan {
+  h4.change-dental-reference-plan {
+    font-size: 15px;
+  }
+  h4.dental-view-summary, h4.health-view-summary {
+    display: none;
+  }
+  h4.change-plan, h4.cancel-plan-change, h4.dental-config-reference-selection, h4.change-dental-reference-plan, h4.dental-view-summary, h4.health-view-summary {
     color: #007bc4;
     &:hover {
       text-decoration: underline;
@@ -1583,6 +1596,91 @@
     padding-bottom: 0;
   }
 }
+
+
+#home .select-dental-plan {
+  .fa {
+    &.fa-trash-o {
+      color: #b7b7b7;
+      &:hover {
+        color: #23527c;
+      }
+    }
+  }
+  .premium-storage-input {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+  }
+  .dental-benefits-fields {
+    background-color: #ffffff;
+    border-left: solid 1px #d5d5d5;
+    border-right: solid 1px #d5d5d5;
+    border-bottom: solid 1px #d5d5d5;
+    .slider {
+      .slider-selection {
+         background: #9C9C9C;
+      }
+    }
+
+    .row-form-wrapper {
+      padding: 15px 0;
+      border-bottom: solid 1px #d5d5d5;
+      .form-group {
+        .col-xs-9 {
+          padding-right: 0;
+        }
+      }
+      &:last-of-type {
+        border-bottom: none;
+        display: none;
+      }
+    }
+
+  }
+  .row-form-wrapper.heading {
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 10px 0 0 0;
+
+    color: rgb(131, 135, 128);
+    border-bottom: none;
+
+
+    .col-xs-6 {
+      border-bottom: solid 1px #d5d5d5;
+      padding: 15px 0 25px;
+      text-align: center;
+
+    }
+    .row-form-wrapper {
+      border: none;
+      border-left: solid 1px #d5d5d5;
+      border-top: none;
+
+    }
+    &+.row-form-wrapper {
+        border-top: none;
+
+
+    }
+  }
+  .benefits-fields {
+    .row-form-wrapper {
+      padding: 15px 0;
+      &:last-of-type {
+        display: none;
+      }
+    }
+  }
+  .row-form-wrapper {
+    border: none;
+  }
+}
+
+
+
 #home #account-detail {
   .panel.myplanyear h5 {
     color: #b7b7b7;

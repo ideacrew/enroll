@@ -119,12 +119,18 @@ $(document).on('click', ".delete_confirm", function(){
 $(document).on('click', ".rehire_confirm", function(){
   var element_id = $(this).attr('id');
   var rehiring_date = $(this).siblings().val();
-  var link_to_delete = $(this).data('link');
+  var rehire_link = $(this).data('link');
   $.ajax({
     type: 'get',
     datatype : 'js',
-    url: link_to_delete,
-    data: {rehiring_date: rehiring_date}
+    url: rehire_link,
+    data: {rehiring_date: rehiring_date},
+    success: function(response){
+        window.location.reload();
+    },
+    error: function(response){
+      Alert("Sorry, something went wrong");
+    }
   });
 });
 
@@ -239,3 +245,16 @@ function checkAreaCode(textbox) {
   }
   return true;
 }
+
+  //toggling of divs that show plan details (view details)
+  $('.nav-toggle').click(function(){
+    var collapse_content_selector = $(this).attr('href');
+    var toggle_switch = $(this);
+    $(collapse_content_selector).slideToggle('fast', function(){
+      if($(this).css('display')=='none'){
+        toggle_switch.html('View Details <i class="fa fa-chevron-down fa-lg">');
+      }else{
+        toggle_switch.html('Hide Details <i class="fa fa-chevron-up fa-lg">');
+      }
+    });
+  });

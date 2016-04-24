@@ -41,12 +41,15 @@ class Insured::PlanShoppingsController < ApplicationController
     plan = @enrollment.plan
     if @enrollment.is_shop?
       benefit_group = @enrollment.benefit_group
-      reference_plan = benefit_group.reference_plan
+      reference_plan = @enrollment.coverage_kind == 'dental' ? benefit_group.dental_reference_plan : benefit_group.reference_plan
+
       if benefit_group.is_congress
         @plan = PlanCostDecoratorCongress.new(plan, @enrollment, benefit_group)
       else
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
+
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -54,10 +57,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
 
     send_receipt_emails if @person.emails.first
   end
@@ -75,12 +74,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if @enrollment.is_shop?
       @benefit_group = @enrollment.benefit_group
-      @reference_plan = @benefit_group.reference_plan
+      @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
+
       if @benefit_group.is_congress
         @plan = PlanCostDecoratorCongress.new(@plan, @enrollment, @benefit_group)
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
+      @employer_profile = @person.active_employee_roles.first.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -97,10 +98,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
 
-    if @person.employee_roles.any?
-      @employer_profile = @person.employee_roles.first.employer_profile
-    end
-
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
@@ -111,7 +108,21 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params[:waiver_reason]
 
-    if hbx_enrollment.may_waive_coverage? && waiver_reason.present? && hbx_enrollment.valid?
+    # Create a new hbx_enrollment for the waived enrollment.
+    unless hbx_enrollment.shopping?
+      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
+      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+
+      waived_enrollment.generate_hbx_signature
+
+      if waived_enrollment.save!
+        hbx_enrollment = waived_enrollment
+        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+      end
+    end
+
+    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
       hbx_enrollment.propogate_waiver
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
@@ -172,13 +183,36 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
-    @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      if is_eligibility_determined_and_not_csr_100?(@person)
+        sort_for_csr(@plans)
+      else
+        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+      end
+    else
+      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
+  def sort_for_csr(plans)
+    silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}
+    standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
+    @plans = standard_plans + non_standard_plans + non_silver_plans
+  end
+
+  def is_eligibility_determined_and_not_csr_100?(person)
+      csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
+      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+        return true
+      else
+        return false
+      end
+  end
 
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
@@ -209,7 +243,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
-        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+        @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end

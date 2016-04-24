@@ -42,6 +42,7 @@ namespace :sbc do
     file_path = Rails.root.join("db", "seedfiles", "plans-sbcs.csv").to_s
     aws_env = ENV['AWS_ENV'] || 'local'
     CSV.foreach(file_path) do |row|
+      next if (row[1].include? "-") && (!row[1].include? "-01")
       plan_find_regex = Regexp.compile("^" + row[1].to_s.split("-").first)
       Plan.where(hios_id: plan_find_regex, active_year: row[2]).each do |plan|
         bucket_name = "dchbx-enroll-sbc-#{aws_env}"
@@ -51,7 +52,21 @@ namespace :sbc do
         plan.save!
       end
     end
-    puts "#{Plan.all.select do |p| p.sbc_document.present? end.count} plans updated with sbc document"
+
+    CSV.foreach(file_path) do |row|
+      next unless row[1].include? "-"
+      plan = Plan.where(hios_id: row[1], active_year: row[2]).first
+      next if plan.nil?
+      bucket_name = "dchbx-enroll-sbc-#{aws_env}"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
+      plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
+      plan.sbc_document.save!
+      plan.save!
+    end
+
+    puts "#{Plan.all.select do |p|
+      p.sbc_document.present?
+    end.count} plans updated with sbc document"
   end
 
   namespace :'2015' do

@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
-  context "employer profile dashboard" do
+  context "employer profile dashboard with current plan year" do
 
     let(:start_on){TimeKeeper.date_of_record.beginning_of_year}
     let(:end_on){TimeKeeper.date_of_record.end_of_year}
+    let(:end_on_negative){ TimeKeeper.date_of_record.beginning_of_year - 2.years }
+
 
     def new_organization
       instance_double(
@@ -80,6 +82,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "ppo",
         metal_level: "metal_level_1",
         carrier_profile: carrier_profile,
+        coverage_kind: 'health',
+        active_year: TimeKeeper.date_of_record.beginning_of_year,
+        dental_level: 'high'
         )
     end
 
@@ -90,6 +95,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         plan_type: "",
         metal_level: "metal_level_2",
         carrier_profile: carrier_profile,
+        coverage_kind: 'dental',
+        active_year: TimeKeeper.date_of_record.beginning_of_year,
+        dental_level: 'high'
         )
     end
 
@@ -103,9 +111,16 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_1,
         reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_1,
+        dental_reference_plan_id: "498523982893",
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_1",
         monthly_min_employee_cost: "monthly_min_employee_cost_1",
         monthly_max_employee_cost: "monthly_max_employee_cost_1",
+        id: "9813829831293",
+        dental_plan_option_kind: "single_plan",
+        elected_dental_plan_ids: [],
+        elected_dental_plans: [],
+        dental_relationship_benefits: [relationship_benefits],
         )
     end
 
@@ -119,9 +134,17 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_2,
         reference_plan_id: double("id"),
+        dental_reference_plan: reference_plan_2,
+        dental_reference_plan_id: "498523982893",
         monthly_employer_contribution_amount: "monthly_employer_contribution_amount_2",
         monthly_min_employee_cost: "monthly_min_employee_cost_2",
         monthly_max_employee_cost: "monthly_max_employee_cost_2",
+        id: "9456349532",
+        dental_plan_option_kind: "single_plan",
+        elected_dental_plan_ids: [],
+        elected_dental_plans: [],
+        dental_relationship_benefits: [relationship_benefits],
+
         )
     end
 
@@ -151,7 +174,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         hbx_enrollments: [hbx_enrollment],
         additional_required_participants_count: 5,
         benefit_groups: benefit_groups,
-        aasm_state: 'draft'
+        aasm_state: 'draft',
+        employer_profile: double(census_employees: double(count: 10))
         )
     end
 
@@ -213,5 +237,29 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         expect(rendered).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
       end
     end
+
+    it "should not display minimum participation requirement" do
+        assign :end_on, end_on_negative
+        expect(rendered).to_not match(/or more needed by/i)
+    end
+
+  end
+
+  context "employer profile without current plan year" do
+    let(:employer_profile){ FactoryGirl.create(:employer_profile) }
+
+    before :each do
+      assign :employer_profile, employer_profile
+      render partial: "employers/employer_profiles/my_account/home_tab"
+    end
+
+    it "should not display employee enrollment information" do
+      expect(rendered).to_not match(/Employee Enrollments and Waivers/i)
+    end
+
+    it "should display a link to download employer guidance pdf" do
+      expect(rendered).to have_selector(".icon-left-download", text: /Download Step-by-Step Instructions/i)
+    end
+
   end
 end

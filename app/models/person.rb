@@ -430,11 +430,11 @@ class Person
   end
 
   def has_active_employee_role?
-    employee_roles.present? and employee_roles.active.present?
+    active_employee_roles.any?
   end
 
   def active_employee_roles
-    employee_roles.present? ? employee_roles.active : []
+    employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end
 
   def has_active_employer_staff_role?
@@ -446,7 +446,7 @@ class Person
   end
 
   def has_multiple_roles?
-    consumer_role.present? && employee_roles.present?
+    consumer_role.present? && active_employee_roles.present?
   end
 
   def residency_eligible?

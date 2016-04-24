@@ -116,11 +116,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(census_employee).to receive(:address).and_return(address)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:primary_family).and_return(family)
-      allow(person).to receive(:emails).and_return([email])
+      allow(person).to receive(:emails=).and_return([email])
       allow(census_employee).to receive(:email).and_return(email)
       allow(email).to receive(:address=).and_return("test@example.com")
       allow(controller).to receive(:build_nested_models).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:has_csr_subrole?).and_return(false)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
@@ -235,8 +236,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     before(:each) do
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
+      allow(census_employee).to receive(:is_active?).and_return(true)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
-      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, census_employee).and_return(employment_relationships)
+      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
       post :match, :person => person_parameters
     end
 

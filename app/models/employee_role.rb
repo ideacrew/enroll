@@ -74,25 +74,11 @@ class EmployeeRole
   end
 
   def is_under_open_enrollment?
-    employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def is_eligible_to_enroll_without_qle?
-    is_under_open_enrollment? || has_new_hire_enrollment_period?(TimeKeeper.date_of_record)
-  end
-
-  def has_new_hire_enrollment_period?(enrollment_date = TimeKeeper.date_of_record)
-    new_hire_period = benefit_group.new_hire_enrollment_period(new_census_employee.hired_on)
-    if enrollment_date < new_hire_period.min || new_hire_period.cover?(enrollment_date)
-      return true 
-    end
-
-    new_roster_entry_period = benefit_group.new_hire_enrollment_period(new_census_employee.hired_on, new_census_employee.created_at.to_date)
-    if enrollment_date < new_roster_entry_period.min || new_roster_entry_period.cover?(enrollment_date)
-      true 
-    else
-      false
-    end
+    is_under_open_enrollment? || census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record) || census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
   end
 
   def new_census_employee=(new_census_employee)
@@ -110,24 +96,19 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def coverage_effective_on
-    benefit_group.effective_on_for(new_census_employee.hired_on)
+    benefit_group.effective_on_for(census_employee.hired_on)
   end
 
-  def is_eligible_to_enroll_as_new_hire_on?(enrollment_date = TimeKeeper.date_of_record)
-    # # when census employee don't have initial coverage
-    # if new_census_employee.is_covered_or_waived?
-    # false
-    # else
-    # end
-    if benefit_group.new_hire_enrollment_period(new_census_employee.hired_on).cover?(enrollment_date)
-      true 
-    else
-      benefit_group.new_hire_enrollment_period(new_census_employee.hired_on, new_census_employee.created_at.to_date).cover?(enrollment_date)
-    end
+  def can_enroll_as_new_hire?    
+    census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end
 
   def is_active?
-    self.is_active
+    census_employee && census_employee.is_active?
+  end
+
+  def can_select_coverage?
+    hired_on + 60.days >= TimeKeeper.date_of_record
   end
 
   class << self
