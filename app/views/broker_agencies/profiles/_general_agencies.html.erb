@@ -43,7 +43,7 @@
             <td><%= general_agency_profile.current_state %></td>
             <td>
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
-                Default GA
+                <div class="ga_status">Default GA</div>
               <% else %>
                 <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
               <% end %>
