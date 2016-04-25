@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Exchanges::HbxProfilesController do
+RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -70,7 +70,7 @@ RSpec.describe Exchanges::HbxProfilesController do
       xhr :get, :inbox, id: hbx_profile.id
       expect(response).to have_http_status(:success)
     end
-    
+
   end
 
   describe "#create" do
@@ -180,13 +180,19 @@ RSpec.describe Exchanges::HbxProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      session[:dismiss_announcements] = 'hello'
       sign_in(user)
-      get :show
     end
 
     it "renders 'show' " do
+      get :show
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/show")
+    end
+
+    it "should clear session for dismiss_announcements" do
+      get :show
+      expect(session[:dismiss_announcements]).to eq nil
     end
   end
 
@@ -310,6 +316,24 @@ RSpec.describe Exchanges::HbxProfilesController do
       expect(TimeKeeper).to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
+    end
+  end
+
+  describe "GET general_agency_index" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should returns http success" do
+      xhr :get, :general_agency_index, format: :js
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agencies" do
+      xhr :get, :general_agency_index, format: :js
+      expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
     end
   end
 end

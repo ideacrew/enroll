@@ -30,6 +30,47 @@ RSpec.describe "events/employer/updated.haml.erb" do
       expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
     end
 
+    context "with dental plans" do
+
+      let(:benefit_group) {bg = FactoryGirl.create(:benefit_group, plan_year: plan_year);
+                          bg.elected_dental_plans = [FactoryGirl.create(:plan, name: "new dental plan", coverage_kind: 'dental',
+                                                 dental_level: 'high')];
+                          bg}
+
+      context "is_offering_dental? is true" do
+        it "shows the dental plan in output" do
+          benefit_group.dental_reference_plan_id = benefit_group.elected_dental_plans.first.id
+          plan_year.benefit_groups.first.save!
+          render :template => "events/employers/updated", :locals => {:employer => employer}
+          expect(rendered).to include "new dental plan"
+        end
+      end
+
+
+      context "is_offering_dental? is false" do
+        it "does not show the dental plan in output" do
+          benefit_group.dental_reference_plan_id = nil
+          benefit_group.save!
+          render :template => "events/employers/updated", :locals => {:employer => employer}
+          expect(rendered).not_to include "new dental plan"
+        end
+      end
+    end
+
+    context "staff is owner" do
+      let(:staff_and_owner) {FactoryGirl.create(:person)}
+
+      before do
+        allow(employer).to receive(:staff_roles).and_return([staff_and_owner])
+        allow(employer).to receive(:owners).and_return([staff_and_owner])
+        render :template => "events/employers/updated", :locals => { :employer => employer }
+      end
+
+      it "does not included the contact person twice" do
+        expect(rendered).to have_selector('contact', count: 1)
+      end
+    end
+
   end
 
   (1..15).to_a.each do |rnd|

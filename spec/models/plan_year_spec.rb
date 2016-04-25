@@ -861,11 +861,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
                 context "and three of the six employees have enrolled" do
                   before do
-                    census_employees[1..employee_count - 4].each do |ee|
-                      ee.active_benefit_group_assignment.select_coverage
-                      ee.save
+                    census_employees[0..2].each do |ee|
+                      if ee.active_benefit_group_assignment.may_select_coverage?
+                        ee.active_benefit_group_assignment.select_coverage
+                        ee.save
+                      end
+                      allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).with(ee.active_benefit_group_assignment).and_return [hbx_enrollment]
                     end
-                    allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
+
+                    census_employees[3..5].each do |ee|
+                      allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).with(ee.active_benefit_group_assignment).and_return []
+                    end
                   end
 
                   it "should include all eligible employees" do
@@ -912,10 +918,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     end
                   end
 
-                  context "and five of the six employees have enrolled or waived coverage" do
+                  context "and four of the six employees have enrolled or waived coverage" do
                     before do
-                      census_employees[employee_count - 1].active_benefit_group_assignment.select_coverage
-                      census_employees[employee_count - 1].save
+                      ee = census_employees[employee_count - 1]
+                      if ee.active_benefit_group_assignment.may_select_coverage?
+                        ee.active_benefit_group_assignment.select_coverage
+                        ee.save
+                      end
+                      allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).with(ee.active_benefit_group_assignment).and_return [hbx_enrollment]
                     end
 
                     it "should NOT raise enrollment errors" do
@@ -2036,7 +2046,43 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
+
+
+  context '.adjust_open_enrollment_date' do
+    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
+    let(:plan_year_end_on) { Date.new(calender_year + 1, 5, 31) }
+    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
+    let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
+    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'renewing_draft'
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 10.days)
+    end
+
+    it 'should reset open enrollment date when published plan year' do
+      plan_year.publish!
+      expect(plan_year.aasm_state).to eq 'renewing_enrolling'
+      expect(plan_year.open_enrollment_start_on).to eq (open_enrollment_start_on + 10.days)
+    end                                             
+  end
 end
+
 
 describe PlanYear, "which has the concept of export eligibility" do
   ALL_STATES = PlanYear.aasm.states.map(&:name).map(&:to_s)

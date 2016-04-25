@@ -8,6 +8,7 @@ RSpec.describe "broker_agencies/profiles/edit.html.erb" do
     org_form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)
     assign :organization, org_form
     assign :broker_agency_profile, broker_agency_profile
+    assign :id, broker_agency_profile.id
     render template: "broker_agencies/profiles/edit.html.erb"
   end
 

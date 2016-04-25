@@ -700,7 +700,60 @@ describe BenefitGroup, type: :model do
           end
         end
       end
-
     end
+
+    context "renewing conversion employer" do
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion', registered_on: Date.new(2016, 4, 1)) }
+      let!(:off_exchange_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,7,1), end_on: Date.new(2016,6,30), open_enrollment_start_on: Date.new(2015, 5, 1), open_enrollment_end_on: Date.new(2015, 6, 10), aasm_state: 'active') }
+      let!(:offexchange_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: off_exchange_planyear, effective_on_kind: "first_of_month", effective_on_offset: 0)}
+      let!(:renewing_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2016,7,1), end_on: Date.new(2017,6,30), open_enrollment_start_on: Date.new(2016, 5, 1), open_enrollment_end_on: Date.new(2016, 6, 13), aasm_state: 'renewing_published') }
+      let(:hired_on) { Date.new(2016, 5, 10) }
+
+      context 'when plan is off-exchange plan year' do
+        context '.valid_plan_year' do 
+          it 'should return renewing plan year' do
+            expect(offexchange_benefit_group.valid_plan_year).to eq renewing_planyear
+          end
+        end
+
+        context '.date_of_hire_effective_on_for' do 
+          it 'should return effection on as renewal plan year start' do
+            expect(offexchange_benefit_group.date_of_hire_effective_on_for(hired_on)).to eq renewing_planyear.start_on
+          end
+        end
+
+        context '.first_of_month_effective_on_for' do 
+          it 'should return effective on as renewal plan year start' do
+            expect(offexchange_benefit_group.first_of_month_effective_on_for(hired_on)).to eq renewing_planyear.start_on
+          end
+        end
+      end
+
+      context 'when plan year is not an off-exchange plan year' do
+
+        before do 
+          employer_profile.update_attributes(:registered_on => Date.new(2015,4,1))
+        end
+
+        context '.valid_plan_year' do 
+          it 'should return plan year as is' do
+            expect(offexchange_benefit_group.valid_plan_year).to eq off_exchange_planyear
+          end 
+        end
+
+        context '.date_of_hire_effective_on_for' do 
+          it 'should return date of hire as effective date' do
+            expect(offexchange_benefit_group.date_of_hire_effective_on_for(hired_on)).to eq hired_on
+          end
+        end
+
+        context '.first_of_month_effective_on_for' do 
+          it 'should return first of next month as effective date' do
+            expect(offexchange_benefit_group.first_of_month_effective_on_for(hired_on)).to eq hired_on.next_month.beginning_of_month
+          end
+        end
+      end    
+    end
+
   end
 end

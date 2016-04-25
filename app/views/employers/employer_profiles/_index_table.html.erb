@@ -11,6 +11,7 @@
     <% else %>
     <th>Broker Agency</th>
     <% end %>
+    <th>General Agency</th>
     <th>&nbsp;</th>
   </tr>
 </thead>
@@ -38,6 +39,7 @@
         <td>None selected</td>
       <% end %>
       <% end %>
+      <td><%= er.active_general_agency_legal_name %></td>
       <%- if @profile %>
       <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
       <% end %>

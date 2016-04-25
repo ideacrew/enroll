@@ -5,4 +5,3 @@ $(".btn-danger").click(function(){
   $('#show_message_form').hide();
   $('#profile-content .container').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
 });
-alert(123);
