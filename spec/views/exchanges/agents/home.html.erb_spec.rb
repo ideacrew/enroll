@@ -26,7 +26,7 @@ describe "exchanges/agents/home.erb" do
       sign_in(current_user)
       render template: "/exchanges/agents/home", :active_tab => "home-tab"
       expect(rendered).to have_text(@title)
-      expect(rendered).to have_text("Agent Messages")
+      expect(rendered).to have_text("Messages")
       expect(rendered).to have_text("Inbox: FROM")
       expect(rendered).not_to have_text(/nav_bar/)
     end
@@ -37,9 +37,9 @@ describe "exchanges/agents/home.erb" do
       sign_in(current_user)
       render template: "/exchanges/agents/home", :active_tab => "home-tab"
       expect(rendered).to have_text(@title)
-      expect(rendered).to have_text("Agent Messages")
+      expect(rendered).to have_text("Messages")
       expect(rendered).to have_text("Inbox: FROM")
       expect(rendered).not_to have_text(/nav_bar/)
     end
 
-end    
+end
