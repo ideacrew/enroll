@@ -544,7 +544,7 @@ class Family
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {"aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
@@ -552,20 +552,26 @@ class Family
                   'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
                   'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
                   'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
-                  'state' => '$households.hbx_enrollments.aasm_state', 'market' => '$households.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+                  'state' => '$households.hbx_enrollments.aasm_state',
+                  'market' => '$households.hbx_enrollments.kind',
+                  'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
+                  "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
       {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
       ],
       :allow_disk_use => true)
   end
 
   def waivers_for_display
-    self.collection.aggregate([
+    Family.collection.aggregate([
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},'state' => '$households.hbx_enrollments.aasm_state', 'kind' => '$households.hbx_enrollments.kind', 'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
+                    'state' => '$households.hbx_enrollments.aasm_state',
+                    'kind' => '$households.hbx_enrollments.kind',
+                    'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
       {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
       ],
       :allow_disk_use => true)

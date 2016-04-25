@@ -149,7 +149,9 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
-  find(:xpath, "//div[@class='employees-table']//tr[1][td[contains(., 'John K Doe Jr')]]").click
+  within '.census-employees-table' do
+    find('.top').click
+  end
   find('.fa-pencil').click
 end
 

@@ -7,7 +7,7 @@ module AccessPolicies
     end
 
     def authorize_employee_role(employee_role, controller)
-      return true if user.has_hbx_staff_role? || is_broker_for_employer?(employee_role.employer_profile_id)
+      return true if user.has_hbx_staff_role? || user.has_csr_subrole? || is_broker_for_employer?(employee_role.employer_profile_id)
       if !(user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s)
         controller.redirect_to_check_employee_role
       else
