@@ -15,6 +15,7 @@ module PdfTemplates
     attribute :coverage_start_on, Date
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
+    attribute :subject, String
 
     def shop?
       return true

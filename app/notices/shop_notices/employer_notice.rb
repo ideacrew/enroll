@@ -9,6 +9,9 @@ class ShopNotices::EmployerNotice < ShopNotice
     @recipient = @employer_profile.staff_roles.first
     @secure_message_recipient = employer_profile
     @market_kind = 'shop'
+
+    @notice = PdfTemplates::EmployerNotice.new
+    @notice.subject = args[:subject]
     
     # @to = @recipient.home_email.address
     # @email_notice = args[:email_notice] || true
@@ -23,8 +26,6 @@ class ShopNotices::EmployerNotice < ShopNotice
   # end
 
   def build
-    @notice = PdfTemplates::EmployerNotice.new
-
     @notice.primary_fullname = @recipient.full_name.titleize
     @notice.primary_identifier = @employer_profile.hbx_id
 
