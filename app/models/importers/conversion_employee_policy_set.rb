@@ -174,7 +174,7 @@ module Importers
       :ignore,
       :ignore,
       :ignore,
-      :ignore,
+      :hios_id,
       :ignore,
       :ignore,
       :ignore,
@@ -185,15 +185,16 @@ module Importers
 
     include ::Importers::RowSet
 
-    def initialize(file_name, o_stream, default_hire_date)
-      @default_hire_date = default_hire_date
+    def initialize(file_name, o_stream, default_policy_start, py)
+      @default_policy_start = default_policy_start
+      @plan_year = py
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
     end
 
     def create_model(record_attrs)
-      ::Importers::ConversionEmployeePolicy.new(record_attrs.merge({:default_policy_start => @default_hire_date}))
+      ::Importers::ConversionEmployeePolicy.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
     end
   end
 end
