@@ -81,7 +81,7 @@ ivl_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
-          primary_recipient_delivery_method: ["secure_message"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
           secondary_recipients: []
         }
       }
@@ -101,7 +101,7 @@ ivl_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
-          primary_recipient_delivery_method: ["secure_message"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
           secondary_recipients: []
         }
       }
@@ -121,7 +121,7 @@ ivl_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
-          primary_recipient_delivery_method: ["secure_message"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
           secondary_recipients: []
         }
       }
@@ -141,7 +141,7 @@ ivl_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
-          primary_recipient_delivery_method: ["secure_message"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
           secondary_recipients: []
         }
       }
@@ -161,7 +161,7 @@ ivl_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
-          primary_recipient_delivery_method: ["secure_message"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
           secondary_recipients: []
         }
       }

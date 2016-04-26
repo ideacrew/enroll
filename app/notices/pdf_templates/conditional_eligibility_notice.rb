@@ -8,9 +8,12 @@ module PdfTemplates
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
     attribute :individuals, Array[PdfTemplates::Individual]
+    attribute :ssa_unverified, Array[PdfTemplates::Individual]
+    attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :first_name, String
     attribute :last_name, String
     attribute :subject, String
+    attribute :due_date, String
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }

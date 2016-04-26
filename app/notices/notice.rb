@@ -21,26 +21,34 @@ class Notice
   end
 
   def pdf
-    WickedPdf.new.pdf_from_string(
-      self.html({kind: 'pdf'}),
-      margin:  {  
+    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
+  end
+
+  def pdf_options
+    options = {
+      margin:  {
         top: 15,
         bottom: 30,
         left: 22,
         right: 22 
-        },
-        disable_smart_shrinking: true,
-        dpi: 96,
-        page_size: 'Letter',
-        formats: :html,
-        encoding: 'utf8',
-        footer: { 
-          content: ApplicationController.new.render_to_string({ 
-            template: "notices/shared/footer.html.erb", 
-            layout: false 
-            })
-        }
-    )
+      },
+      disable_smart_shrinking: true,
+      dpi: 96,
+      page_size: 'Letter',
+      formats: :html,
+      encoding: 'utf8'
+    }
+
+    if @market_kind == 'individual'
+      options.merge!({footer: { 
+        content: ApplicationController.new.render_to_string({ 
+          template: "notices/shared/footer.html.erb", 
+          layout: false 
+        })
+      }})
+    end
+    
+    options
   end
 
   def send_email_notice

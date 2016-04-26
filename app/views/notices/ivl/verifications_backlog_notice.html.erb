@@ -29,7 +29,7 @@
   content: "When you enrolled in your insurance plan(s) through DC Health Link, some of your information did not match all the electronic data sources we are required by law to check.  As a result, we now need you to submit documents verifying the information you provided on your application. This notice lists the documents that we need below."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "We need your documents by [date of notice + 95 days]. If we do not have your documents by then, your insurance plan(s) may be terminated."} %>
+  content: "We need your documents by #{notice.due_date}. If we do not have your documents by then, your insurance plan(s) may be terminated."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong>"],
@@ -44,7 +44,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
-<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
@@ -58,7 +58,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
-<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<u>How to Prove US Citizenship</u><br>
@@ -163,10 +163,10 @@
     "Resident of American Samoa"]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "We need your documents above by <strong>[Date=Date of Notice +95 days]</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
+  content: "We need your documents above by <strong>#{notice.due_date}</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you think you will not be able to submit the requested documentation by <strong>[Date=Date of Notice +95 days]</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
+  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],

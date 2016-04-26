@@ -8,6 +8,7 @@ class ShopNotices::EmployerNotice < ShopNotice
     @delivery_method = args[:delivery_method].split(',')
     @recipient = @employer_profile.staff_roles.first
     @secure_message_recipient = employer_profile
+    @market_kind = 'shop'
     
     # @to = @recipient.home_email.address
     # @email_notice = args[:email_notice] || true

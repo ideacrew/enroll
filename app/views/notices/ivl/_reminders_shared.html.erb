@@ -23,7 +23,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
-<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
@@ -40,7 +40,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
-<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|individual| individual.full_name } } %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_underline}>How to Prove US Citizenship</span><br>
@@ -272,10 +272,10 @@
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "We need your documents above by <strong>[Date=Date of Notice +95 days]</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
+  content: "We need your documents above by <strong>#{notice.due_date}</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you think you will not be able to submit the requested documentation by <strong>[Date=Date of Notice +95 days]</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
+  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
