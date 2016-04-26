@@ -4,7 +4,8 @@ class Notice
 
   def initialize(args = {})
     random_str = rand(10**10).to_s
-    @notice_filename = "notice_#{random_str}.pdf"
+    @subject = args[:subject] || "notice_#{random_str}.pdf"
+    @notice_filename = "#{@subject.gsub(/\s*/, '')}.pdf"
     @notice_path = Rails.root.join("tmp", @notice_filename)
     @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @layout = 'pdf_notice'
@@ -95,10 +96,9 @@ class Notice
   end
 
   def create_secure_inbox_message(notice)
-    subject = @notice.subject || "New Notice Available"
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@secure_message_recipient.class.to_s, @secure_message_recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = @secure_message_recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
+    message = @secure_message_recipient.inbox.messages.build({ subject: @subject, body: body, from: 'DC Health Link' })
     message.save!
   end
 

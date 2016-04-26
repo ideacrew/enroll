@@ -11,7 +11,6 @@ class ShopNotices::EmployerNotice < ShopNotice
     @market_kind = 'shop'
 
     @notice = PdfTemplates::EmployerNotice.new
-    @notice.subject = args[:subject]
     
     # @to = @recipient.home_email.address
     # @email_notice = args[:email_notice] || true

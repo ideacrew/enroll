@@ -12,7 +12,6 @@ module PdfTemplates
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :first_name, String
     attribute :last_name, String
-    attribute :subject, String
     attribute :due_date, String
 
     def other_enrollments
