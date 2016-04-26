@@ -33,7 +33,7 @@ class ShopNotices::EmployerNotice < ShopNotice
     # @notice.coverage_start_on = employer_profile.plan_years.sort_by{|start_on| start_on}.last.start_on
     # if @recipient.mailing_address.present?
 
-    append_primary_address(@recipient.mailing_address)
+    append_primary_address(@recipient.mailing_address || @employer_profile.organization.office_locations.first.address)
 
     # else
     #   append_primary_address(employer_profile.organization.try(:primary_office_location).try(:address))

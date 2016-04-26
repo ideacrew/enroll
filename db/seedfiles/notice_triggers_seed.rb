@@ -28,7 +28,7 @@ shop_notice_triggers = [
     title: 'Request for Clarifying Documentation',
     description: 'User has 30 calendar days to respond to this notice from the notice date',
     resource_name: 'employer',
-    event_name: 'benefit_coverage_initial_binder_paid',
+    event_name: 'application_declined',
     notice_triggers: [
       {
         name: 'Employer notice trigger',
