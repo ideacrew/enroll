@@ -395,6 +395,66 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    context "waive_coverage_by_benefit_group_assignment" do
+      before :all do
+        @enrollment4 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment4.save
+        @enrollment5 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment5.save
+        @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
+        @enrollment5.reload
+      end
+
+      it "enrollment4 should be inactive" do
+        expect(@enrollment4.aasm_state).to eq "inactive"
+      end
+
+      it "enrollment4 should get waiver_reason" do
+        expect(@enrollment4.waiver_reason).to eq "start a new job"
+      end
+
+      it "enrollment5 should be inactive" do
+        expect(@enrollment5.aasm_state).to eq "inactive"
+      end
+
+      it "enrollment5 should get waiver_reason" do
+        expect(@enrollment5.waiver_reason).to eq "start a new job"
+      end
+    end
+
+    context "find_by_benefit_group_assignments" do
+      before :all do
+        3.times.each do
+          enrollment = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+          )
+          enrollment.save
+        end
+      end
+
+      it "should find more than 3 hbx_enrollments" do
+        expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
+      end
+
+      it "should return empty array without params" do
+        expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
+        expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
+      end
+    end
+
     #context "find_by_benefit_group_assignments" do
     #  before :all do
     #    3.times.each do
