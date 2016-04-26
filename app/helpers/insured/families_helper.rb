@@ -16,7 +16,7 @@ module Insured::FamiliesHelper
   end
 
   def shift_purchase_time(policy)
-    policy.created_at.in_time_zone('Eastern Time (US & Canada)') 
+    policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
   def format_policy_purchase_date(policy)
@@ -49,9 +49,7 @@ module Insured::FamiliesHelper
     options = {class: 'qle-menu-item'}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
-      post_event_sep_in_days: qle.post_event_sep_in_days,
-      pre_event_sep_in_days: qle.pre_event_sep_in_days,
-      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested,
+      is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
 

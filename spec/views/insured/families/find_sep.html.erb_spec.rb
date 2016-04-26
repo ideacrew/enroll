@@ -36,7 +36,6 @@ RSpec.describe "insured/families/find_sep.html.erb" do
     expect(rendered).to have_selector('form#qle_form')
     expect(rendered).to have_selector('h3.qle-details-title')
     expect(rendered).to have_selector('h5.qle-label')
-    expect(rendered).to have_selector('h5.qle-date-hint')
     expect(rendered).to have_selector("input[name='qle_date']", count: 1)
   end
 
