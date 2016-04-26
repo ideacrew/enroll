@@ -39,6 +39,7 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
       allow(broker_agency_profile).to receive(:default_general_agency_profile).and_return general_agency_profile
       assign :general_agency_profiles, [general_agency_profile]
       assign :broker_agency_profile, broker_agency_profile
+      assign :notice, "Changing default general agencies may take a few minutes to update all employers."
       render template: "broker_agencies/profiles/_general_agencies.html.erb" 
     end
 
@@ -61,6 +62,11 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
 
     it "should have hint msg for select default GA" do
       expect(rendered).to have_content("#{broker_agency_profile.legal_name} - this is your default GA, to change your default GA click \"Select Default GA\" under your desired agency")
+    end
+
+    it "should show notice" do
+      expect(rendered).to have_selector('.alert-warning')
+      expect(rendered).to have_content("Changing default general agencies may take a few minutes to update all employers.")
     end
   end
 end

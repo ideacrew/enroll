@@ -167,6 +167,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @broker_agency_profile.save
       #update_ga_for_employers(@broker_agency_profile, old_default_ga)
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
+      @notice = "Changing default general agencies may take a few minutes to update all employers."
 
       @broker_role = current_user.person.broker_role || nil
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)

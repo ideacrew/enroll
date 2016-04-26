@@ -396,5 +396,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(controller).to receive(:notify)
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
     end
+
+    it "should get notice" do
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
+    end
   end
 end

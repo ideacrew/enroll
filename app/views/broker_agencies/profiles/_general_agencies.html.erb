@@ -5,6 +5,13 @@
       <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: 'btn btn-min pull-right' %>
     </div>
     <div class="col-md-12">
+      <% if @notice.present? %>
+        <div class="alert alert-warning">
+          <a href="#" data-dismiss="alert" class="close">×</a>
+          <%= @notice %>
+        </div>
+      <% end %>
+
       <% if @broker_agency_profile.default_general_agency_profile.present? %>
         <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - this is your default GA, to change your default GA click "Select Default GA" under your desired agency.</p>
       <% else %>
