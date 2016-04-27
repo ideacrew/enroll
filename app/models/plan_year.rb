@@ -548,6 +548,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => :trigger_passive_renewals
     state :renewing_enrolled
     state :renewing_publish_pending
+    state :renewing_canceled
 
     state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated     # Coverage under this application is terminated
@@ -653,8 +654,12 @@ class PlanYear
     end
 
     # Admin ability to reset renewing plan year application
-   event :revert_renewal, :after => :record_transition do
+    event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
+    end
+
+    event :cancel_renewal, :after => :record_transition do 
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
   end
 
