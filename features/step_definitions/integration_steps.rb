@@ -487,11 +487,11 @@ Then(/^.+ should see the plan shopping welcome page$/) do
 end
 
 Then(/^.+ should see the plan shopping page with no dependent$/) do
-  expect(page).to have_content('0 dependent(s)')
+  expect(page).to have_content("Soren White")
 end
 
 Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content('1 dependent(s)')
+  expect(page).to have_content("Soren White + 1 Dependent")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -675,7 +675,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[0].click
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
-    find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    all('.compare-selected-plans-link')[1].click
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
