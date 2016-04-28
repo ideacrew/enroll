@@ -17,16 +17,15 @@ describe Aws::S3Storage do
   describe "save()" do
     context "successful upload with explicit key" do
       it 'return the URI of saved file' do
-        allow(object).to receive(:upload_file).with(file_path).and_return(true)
+        allow(object).to receive(:upload_file).with(file_path, :server_side_encryption => 'AES256').and_return(true)
         allow_any_instance_of(Aws::S3Storage).to receive(:get_object).and_return(object)
         expect(subject.save(file_path, bucket_name, key)).to eq(uri)
       end
     end
 
-
     context "successful upload without explicit key" do
       it 'return the URI of saved file' do
-        allow(object).to receive(:upload_file).with(file_path).and_return(true)
+        allow(object).to receive(:upload_file).with(file_path, :server_side_encryption => 'AES256').and_return(true)
         allow_any_instance_of(Aws::S3Storage).to receive(:get_object).and_return(object)
         expect(subject.save(file_path, bucket_name)).to include("urn:openhbx:terms:v1:file_storage:s3:bucket:")
       end
@@ -34,7 +33,7 @@ describe Aws::S3Storage do
 
     context "failed upload" do
       it 'returns nil' do
-        allow(object).to receive(:upload_file).with(file_path).and_return(nil)
+        allow(object).to receive(:upload_file).with(file_path, :server_side_encryption => 'AES256').and_return(nil)
         allow_any_instance_of(Aws::S3Storage).to receive(:get_object).and_return(object)
         expect(subject.save(file_path, bucket_name)).to be_nil
       end
