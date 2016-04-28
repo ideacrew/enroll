@@ -38,7 +38,7 @@
             <%@grid_vals.keys.each do |attribute|%> <!-- Iterating over Different APTC / CSR attributes in the hash-->
               <tr>
                   <%if attribute != "individuals_covered" && attribute != "eligible_members"%>
-                      <td><%=attribute.titleize.upcase%></td>
+                      <td><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
                       <%no_hbx = false%>  <!--TODO : See if you can get rid of this? -->
                       <% @grid_vals[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
                             <%if val %>
@@ -68,23 +68,24 @@
             <%end%>         
 
                 <tr>
-                  <th>Individual(s) Covered</th>
-                  <% @months_array.each do |month| %>
-                    <th><%=month.capitalize%></th>
-                  <%end%>
+                  <th colspan = "13">Individual(s) Covered</th>
+                  <%# @months_array.each do |month| %>
+                    <!--<th><%#=month.capitalize%></th>-->
+                  <%# end%>
                   <th></th>
                   <th>Eligible?</th>
                 </tr>
                 <% @grid_vals["individuals_covered"].each do |person_id| %>
                   <tr>
-                    <td><!--TODO: Make this a helper method call.--><%=Person.find(person_id.keys.first).full_name%></td>
+                    <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=Person.find(person_id.keys.first).full_name%></td>
 
-                      <%person_id.values.first.each do |month, is_eligible|%>  <!-- Eligibility Statuses for each Month  for  one individual -->
-                        <td class="<%=aptc_csr_data_type(month)%>"><%=check_box_tag "#{person_id.keys.first+'_'+month}", 'checked', is_eligible, disabled: true%></td>
-                      <%end%>
+                      <%#person_id.values.first.each do |month, is_eligible|%>  <!-- Eligibility Statuses for each Month  for  one individual -->
+                        <!--<td class="<%#=aptc_csr_data_type(month)%>"><%#=check_box_tag "#{person_id.keys.first+'_'+month}", 'checked', is_eligible, disabled: true%></td>-->
+                      <%#end%>
                       <td></td>
 
-                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: primary_member(person_id.keys.first), class: 'individual_coverd' %></td>
+                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: true, class: 'individual_coverd' %>
+                      </td>
                   </tr>
                 <%end%>
 

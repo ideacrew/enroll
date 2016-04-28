@@ -20,7 +20,7 @@ class HbxAdmin
                  "aptc_applied"         => aptc_applied_vals,
                  "avalaible_aptc"       => avalaible_aptc_vals,
                  "max_aptc"             => max_aptc_vals,
-                 "csr_percentage"       => csr_percentage_vals,
+                 "csr_percentage"     => csr_percentage_vals,
                  "slcsp"                => slcsp_values, 
                  "individuals_covered"  => individuals_covered_vals,
                  "eligible_members"     => eligible_members_vals 
@@ -40,6 +40,7 @@ class HbxAdmin
     def build_aptc_applied_values(family, months_array)
       #hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       #applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
       aptc_applied_hash = Hash.new
       months_array.each_with_index do |month, ind|
@@ -58,7 +59,7 @@ class HbxAdmin
       if first_of_month_num_current_year >= ed.determined_on
         aptc_applied_hash.store(month, applied_aptc)
       else
-        aptc_applied_hash.store(month, "---")
+        aptc_applied_hash.store(month, "---") #if aptc_applied_hash[month].blank? #dont mess with the past values
       end  
     end
 
@@ -67,12 +68,11 @@ class HbxAdmin
 
       available_aptc_hash = Hash.new
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-
+      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       months_array.each_with_index do |month, ind|
         eligibility_determinations.each do |ed|
-
           update_available_aptc_hash_for_month(available_aptc_hash, month, ed, family, max_aptc, member_ids)
-        #avalaible_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
+          #avalaible_aptc_hash.store(month, family.active_household.latest_active_tax_household.total_aptc_available_amount)
         end
       end
       return available_aptc_hash
@@ -88,19 +88,23 @@ class HbxAdmin
       else
         available_aptc = family.active_household.latest_active_tax_household.total_aptc_available_amount
       end
+
       if first_of_month_num_current_year >= ed.determined_on
-        available_aptc_hash.store(month, available_aptc)
+        available_aptc_hash.store(month, available_aptc.round(2))
       else
-        available_aptc_hash.store(month, "---")
-      end  
+        available_aptc_hash.store(month, "---") #if available_aptc_hash[month].blank? #dont mess with the past values
+      end
+
     end
 
     def build_max_aptc_values(family, months_array, max_aptc=nil)
       max_aptc_hash = Hash.new
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       months_array.each_with_index do |month, ind|
         # iterate over all the EligibilityDeterminations and store the correct max_aptc value for each month. Account for any monthly change in Eligibility Determination.
         eligibility_determinations.each do |ed|
+          #binding.pry
           update_max_aptc_hash_for_month(max_aptc_hash, month, ed, max_aptc)
         end  
         #max_aptc_hash.store(month, family.active_household.tax_households[0].eligibility_determinations.first.max_aptc.fractional)
@@ -112,14 +116,26 @@ class HbxAdmin
     def update_max_aptc_hash_for_month(max_aptc_hash, month, ed, max_aptc=nil)
       first_of_month_num_current_year = first_of_month_converter(month)
 
-      max_aptc_value = max_aptc.present? ? max_aptc : ed.max_aptc.to_f
+      #max_aptc_value = max_aptc.present? ? max_aptc : ed.max_aptc.to_f
+      max_aptc_value = ""
+      if max_aptc.present?
+        # this is when we check available aptc. We only want to update the current and future fields with the updated value.
+        if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
+          max_aptc_value = max_aptc
+        else
+          # leave past values as-is
+          max_aptc_value = ed.max_aptc.to_f
+        end 
+      else
+        max_aptc_value = ed.max_aptc.to_f
+      end
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
         max_aptc_hash.store(month, max_aptc_value)
       else
         # update max_aptc value for that month as a "---"
-        max_aptc_hash.store(month, "---")
+        max_aptc_hash.store(month, "---") if max_aptc_hash[month].blank?
       end  
     end
 
@@ -128,6 +144,7 @@ class HbxAdmin
     def build_csr_percentage_values(family, months_array, csr_percentage=nil)
       csr_percentage_hash = Hash.new
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       months_array.each_with_index do |month, ind|
         eligibility_determinations.each do |ed|
           update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed, csr_percentage)
@@ -139,15 +156,26 @@ class HbxAdmin
 
     def update_csr_percentages_hash_for_month(csr_percentage_hash, month, ed, csr_percentage=nil)
       first_of_month_num_current_year = first_of_month_converter(month)
-
-      csr_percentage_value = csr_percentage.present? ? csr_percentage : ed.csr_percent_as_integer
+      csr_percentage_value = ""
+      #csr_percentage_value = csr_percentage.present? ? csr_percentage : ed.csr_percent_as_integer
+      if csr_percentage.present?
+        # this is when we check available aptc. We only want to update the current and future fields with the updated value.
+        if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
+          csr_percentage_value = csr_percentage
+        else
+          # leave past values as-is
+          csr_percentage_value = ed.csr_percent_as_integer
+        end 
+      else
+        csr_percentage_value = ed.csr_percent_as_integer
+      end
       # Check if  'month' >= EligibilityDetermination.determined_on date?
       if first_of_month_num_current_year >= ed.determined_on
         # assign that month with csr_percent value from this ed (EligibilityDetermination)
         csr_percentage_hash.store(month, csr_percentage_value)
       else
         # update csr_percent value for that month as a "-"
-        csr_percentage_hash.store(month, "---")
+        csr_percentage_hash.store(month, "---") if csr_percentage_hash[month].blank?
       end  
     end
 
@@ -196,11 +224,18 @@ class HbxAdmin
           covered_hash = Hash.new
             months_array.each_with_index do |month, ind|
                 eligibility_determinations.each do |ed|
+                  #binding.pry
                   first_of_month_num_current_year = first_of_month_converter(month)
                   if first_of_month_num_current_year >= ed.determined_on
                     covered_hash.store(month, true)
                   else
-                    covered_hash.store(month, false)
+                    #check if present/future data? #if yes?
+                    if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
+                      covered_hash.store(month, false)
+                    #if past data?
+                    else
+                      covered_hash.store(month, false) if covered_hash[month].blank?
+                    end
                   end 
                 end
             end

@@ -1,7 +1,6 @@
 $(document).on('click', "a#calculate_available_aptc", function(){
 
   //var aptc_applied = parseFloat($('input#aptc_applied').val());
-  //alert("aptc_applied is : " + aptc_applied);
   var max_aptc = parseFloat($('input#max_aptc').val());
   var person_id = $("#person_person_id").val();
   var family_id = $("#person_family_id").val();
@@ -12,7 +11,6 @@ $(document).on('click', "a#calculate_available_aptc", function(){
       member_ids.push($(this).attr('id'));
     }
   });
-
   if (!isNaN(csr_percentage) && !isNaN(max_aptc)){
     $.ajax({
       type: "GET",

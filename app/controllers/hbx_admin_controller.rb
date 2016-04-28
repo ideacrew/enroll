@@ -41,10 +41,29 @@ class HbxAdminController < ApplicationController
 
     if @family.present?
       # Update Max APTC and CSR Percentage
-      eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
-      eligibility_determination.max_aptc = params[:max_aptc].to_f
-      eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
-      eligibility_determination.save
+      max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+      csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
+      
+      existing_latest_eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
+      latest_active_tax_household = @family.active_household.latest_active_tax_household
+      #binding.pry
+      if (params[:max_aptc].to_f == max_aptc) && (params[:csr_percentage].to_i == csr_percent_as_integer)
+        # eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
+        # eligibility_determination.max_aptc = params[:max_aptc].to_f
+        # eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
+        # eligibility_determination.save
+      else
+        # if max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
+        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => TimeKeeper.datetime_of_record, 
+                                                                      "determined_on"                 => TimeKeeper.datetime_of_record, 
+                                                                      "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
+                                                                      "premium_credit_strategy_kind"  => existing_latest_eligibility_determination.premium_credit_strategy_kind, 
+                                                                      "csr_percent_as_integer"        => params[:csr_percentage].to_i, 
+                                                                      "max_aptc"                      => params[:max_aptc].to_f, 
+                                                                      "benchmark_plan_id"             => existing_latest_eligibility_determination.benchmark_plan_id,
+                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id  
+                                                                      }).save!
+      end
       
       # Update APTC Applied if there is an existing hbx_enrollment
       hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
@@ -54,15 +73,20 @@ class HbxAdminController < ApplicationController
       end
       
       # Update  Individuals Coverage Eligibility
-      tax_household_members = @family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
-      tax_household_members.each do |member|
-        if params.has_key?(member.person.id.to_s) || (params[:person][:person_id] == member.person.id.to_s) # The second condition is to include the primary applicant who is always eligible.
-          member.is_ia_eligible = true
-        else
-          member.is_ia_eligible = false
-        end
-        member.save! 
-      end
+      # We are not updating eligibility on an individual level - at least not until now. Eligibility resides on the tax_household level. 
+      # Hence commenting the code below.
+
+      # tax_household_members = @family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
+      # tax_household_members.each do |member|
+      #   if params.has_key?(member.person.id.to_s) || (params[:person][:person_id] == member.person.id.to_s) # The second condition is to include the primary applicant who is always eligible.
+      #     member.is_ia_eligible = true
+      #   else
+      #     member.is_ia_eligible = false
+      #   end
+      #   member.save! 
+      # end
+
+
     end
 
     respond_to do |format|
