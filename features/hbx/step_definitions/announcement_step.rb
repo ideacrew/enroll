@@ -33,6 +33,19 @@ Then(/^Hbx admin should not see the future announcement$/) do
   expect(page).not_to have_content('announcement for future')
 end
 
+When(/^Hbx admin enter announcement info with invalid params$/) do
+  fill_in 'announcement[content]', with: 'invalid announcement'
+  fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
+  fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record).to_s
+  find('#announcement_audiences_ivl').click
+  find('.interaction-click-control-create-announcement').click
+end
+
+Then(/^Hbx admin should see the alert msg$/) do
+  expect(page).to have_content('prohibited this announcement from being saved')
+  expect(page).to have_content('End Date should be later than Start date')
+end
+
 When(/^Hbx admin click the link of all$/) do
   click_link "All"
 end
@@ -46,8 +59,17 @@ Then(/^.+ should see announcement$/) do
   expect(page).to have_content('msg content')
 end
 
+When(/^Consumer click the link of documents$/) do
+  find('.interaction-click-control-documents').click
+end
+
+When(/^Consumer click the link of homepage$/) do
+  find('.interaction-click-control-my-dc-health-link').click
+end
+
 Given(/^Consumer role exists$/) do
-  user = FactoryGirl.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
+  user = FactoryGirl.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX', idp_verified: true
+  FactoryGirl.create(:consumer_role, person: user.person)
 end
 
 Given(/^Employer role exists$/) do
@@ -56,7 +78,7 @@ Given(/^Employer role exists$/) do
   FactoryGirl.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
 end
 
-Then(/^Employer should not see announcement$/) do
+Then(/^.+ should not see announcement$/) do
   expect(page).not_to have_content('msg content')
 end
 

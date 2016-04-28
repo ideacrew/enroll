@@ -11,12 +11,18 @@ Feature: Hbx staff create announcements for consumer role
     Then Hbx admin should not see the future announcement
     When Hbx admin click the link of all
     Then Hbx admin should see the future announcement
+    When Hbx admin enter announcement info with invalid params
+    Then Hbx admin should see the alert msg
     Then Hbx admin logs out
 
   Scenario: Consumer see announcement for consumer role
     Given Announcement prepared for Consumer role
     Given Consumer role exists
     When Consumer login 
+    Then Consumer should see announcement
+    When Consumer click the link of documents
+    Then Consumer should not see announcement
+    When Consumer click the link of homepage
     Then Consumer should see announcement
 
   Scenario: Employer do not see announcement for consumer role

@@ -176,23 +176,28 @@ describe User do
 
     it "when employer_staff_role" do
       allow(user).to receive(:has_employer_staff_role?).and_return true
-      expect(user.get_announcements_by_roles_and_portal("dc.org/employers")).to eq "Announcement:<br/>msg for Employer"
+      expect(user.get_announcements_by_roles_and_portal("dc.org/employers/employer_profiles")).to eq "Announcement:<br/>msg for Employer"
     end
 
     it "when employee_role" do
       user.roles = ['employee']
-      expect(user.get_announcements_by_roles_and_portal("dc.org/employees")).to eq "Announcement:<br/>msg for Employee"
+      expect(user.get_announcements_by_roles_and_portal("dc.org/employee")).to eq "Announcement:<br/>msg for Employee"
     end
 
     it "when has active_employee_roles, but without employee_role role" do
       user.roles = []
       allow(person).to receive(:has_active_employee_role?).and_return true
-      expect(user.get_announcements_by_roles_and_portal("dc.org/employees")).to eq "Announcement:<br/>msg for Employee"
+      expect(user.get_announcements_by_roles_and_portal("dc.org/employee")).to eq "Announcement:<br/>msg for Employee"
+    end
+
+    it "when visit families/home" do
+      user.roles = ['employee', 'consumer']
+      expect(user.get_announcements_by_roles_and_portal("dc.org/families/home")).to eq "Announcement:<br/>msg for Employee<br/>msg for IVL"
     end
 
     it "when broker_role" do
       user.roles = ['broker']
-      expect(user.get_announcements_by_roles_and_portal("dc.org/broker")).to eq "Announcement:<br/>msg for Broker"
+      expect(user.get_announcements_by_roles_and_portal("dc.org/broker_agencies")).to eq "Announcement:<br/>msg for Broker"
     end
 
     it "when consumer_role" do

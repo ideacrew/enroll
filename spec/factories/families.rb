@@ -1,7 +1,12 @@
 FactoryGirl.define do
   factory :family do
     association :person
-    sequence(:e_case_id) {|n| "abc#{n}12xyz#{n}"}
+    e_case_id do
+      Forgery('basic').text(:allow_lower   => false,
+                            :allow_upper   => false,
+                            :allow_numeric => true,
+                            :allow_special => false, :exactly => 9)
+    end
     renewal_consent_through_year  2017
     submitted_at Time.now
     updated_at "user"
