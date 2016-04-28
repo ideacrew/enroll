@@ -78,12 +78,12 @@ RSpec.describe Exchanges::AnnouncementsController do
         post :create, invalid_announcement_params
       end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
+      it "should render template" do
+        expect(response).to render_template("index")
       end
 
-      it "should get failed alert" do
-        expect(flash[:alert]).to include "Please select at least one Audience"
+      it "should get announcements" do
+        expect(assigns(:announcements)).to eq Announcement.current
       end
     end
   end

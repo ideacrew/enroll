@@ -55,6 +55,36 @@ describe Announcement, dbclean: :after_each do
       end
     end
 
+    context "end date old than today" do
+      let(:params) do
+        valid_params[:end_date] = TimeKeeper.date_of_record - 1.days
+        valid_params
+      end
+
+      it "should fail validation" do
+        expect(Announcement.create(**params).errors[:base].any?).to be_truthy
+      end
+
+      it "should get alert msg" do
+        expect(Announcement.create(**params).errors[:base]).to include "End Date should be later than today"
+      end
+    end
+
+    context "end date before start date" do
+      let(:params) do
+        valid_params[:end_date] = TimeKeeper.date_of_record - 20.days
+        valid_params
+      end
+
+      it "should fail validation" do
+        expect(Announcement.create(**params).errors[:base].any?).to be_truthy
+      end
+
+      it "should get alert msg" do
+        expect(Announcement.create(**params).errors[:base]).to include "End Date should be later than Start date"
+      end
+    end
+
     context "with all valid arguments" do
       let(:params) {valid_params}
       let(:announcement) {Announcement.new(**params)}

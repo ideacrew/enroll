@@ -11,8 +11,8 @@ class Exchanges::AnnouncementsController < ApplicationController
     if @announcement.save
       redirect_to exchanges_announcements_path, notice: 'Create Announcement Successful.'
     else
-      alert_msg = @announcement.errors.full_messages.join(',') rescue "Create Announcement Failure."
-      redirect_to exchanges_announcements_path, alert: alert_msg
+      @announcements = Announcement.current
+      render :index
     end
   end
 
