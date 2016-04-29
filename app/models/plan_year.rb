@@ -677,7 +677,14 @@ class PlanYear
     record_transition
   end
 
+  def adjust_open_enrollment_date
+    if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
+      update_attributes(:open_enrollment_start_on => TimeKeeper.date_of_record)
+    end
+  end
+
   def accept_application
+    adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
     send_employee_invites if transition_success && !is_renewing?
   end
