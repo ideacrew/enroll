@@ -119,10 +119,6 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
   end
 
-  def documents_index
-
-  end
-
   def verification
     @family_members = @person.primary_family.family_members.active
   end

@@ -107,7 +107,6 @@ Rails.application.routes.draw do
         get 'personal'
         get 'inbox'
         get 'brokers'
-        get 'documents_index'
         get 'verification'
         get 'document_upload'
         get 'find_sep'

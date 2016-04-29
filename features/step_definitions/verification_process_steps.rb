@@ -11,11 +11,11 @@ Then(/^Individual click continue button$/) do
 end
 
 Then(/^I should see verification outstanding label$/) do
-  expect(page).to have_content "outstanding"
+  expect(page).to have_content "Action Needed"
 end
 
 When(/^I click on verification link$/) do
-  click_link "Verification"
+  click_link "Documents"
 end
 
 Given(/^I should see page for documents verification$/) do
@@ -46,7 +46,7 @@ end
 
 When(/^the consumer visits verification page$/) do
   visit verification_insured_families_path
-  click_link 'Verification'
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^the consumer should see documents verification page$/) do
