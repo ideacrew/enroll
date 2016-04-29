@@ -16,7 +16,7 @@ module Subscribers
           orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
           employer_profiles = orgs.map {|o| o.employer_profile}
           employer_profiles.each do |employer_profile|
-            if employer_profile.active_general_agency_account != broker_agency_profile.default_general_agency_profile
+            if employer_profile.active_general_agency_account.blank?
               employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
               employer_profile.save
               send_general_agency_assign_msg(broker_agency_profile, broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
