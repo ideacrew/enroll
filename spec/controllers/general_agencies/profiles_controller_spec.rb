@@ -128,7 +128,10 @@ RSpec.describe GeneralAgencies::ProfilesController do
     end
 
     context "without page params" do
+      let(:person2) { FactoryGirl.create(:person , :last_name => "smith11") } # last name has to be in small case
+      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member , :person => person2  ) }
       before(:each) do
+        allow(general_agency_profile).to receive(:families).and_return [family,family2]
         xhr :get, :families, id: general_agency_profile.id
       end
 
@@ -142,7 +145,11 @@ RSpec.describe GeneralAgencies::ProfilesController do
 
       it "should get families" do
         expect(assigns[:families]).to eq general_agency_profile.families
-        expect(assigns[:families]).to eq [family]
+        expect(assigns[:families]).to eq [family,family2]
+      end
+      
+      it "should assign uniq page_alphabets" do 
+        expect(assigns[:page_alphabets]).to eq ["S"]
       end
     end
 

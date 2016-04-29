@@ -55,7 +55,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
     page = params.permit([:page])[:page]
     total_families = @general_agency_profile.families || []
 
-    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.uniq.map(&:capitalize)
+    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
     else
