@@ -5,7 +5,8 @@ namespace :migrations do
     employers = {
       "201904217" => "5/31/2016",
       "464567869" => "5/31/2016",
-      "521224516" => "5/31/2016"
+      "521224516" => "5/31/2016",
+      "760830661" => "5/31/2016"
     }
 
     employers.each do |fein, termination_date|
@@ -43,7 +44,14 @@ namespace :migrations do
           organization.employer_profile.census_employees.non_terminated.each do |ce|
             ce.renewal_benefit_group_assignment.make_active 
           end
+
           plan_year.update_attributes(:aasm_state => 'active')
+        end
+
+        if plan_year.renewing_enrolling? && !plan_year.is_enrollment_valid?
+          organization.employer_profile.census_employees.non_terminated.each do |ce|
+            ce.renewal_benefit_group_assignment.make_active
+          end         
         end
 
         create_initial_plan_year(organization, plan_year, termination_date)
@@ -54,14 +62,20 @@ namespace :migrations do
         end
 
         enrollments.each do |hbx_enrollment|
-          if hbx_enrollment.may_terminate_coverage?
+          if plan_year.renewing_enrolling? && !plan_year.is_enrollment_valid?
+            hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
+          elsif hbx_enrollment.may_terminate_coverage?
             hbx_enrollment.update_attributes(:terminated_on => termination_date)
             hbx_enrollment.terminate_coverage!
           end
         end
 
-        plan_year.update_attributes(:terminated_on => termination_date, :end_on => termination_date)
-        plan_year.terminate! if plan_year.may_terminate?
+        if plan_year.renewing_enrolling? && !plan_year.is_enrollment_valid?
+          plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+        elsif plan_year.may_terminate?
+          plan_year.update_attributes(:terminated_on => termination_date, :end_on => termination_date)
+          plan_year.terminate!
+        end
 
         if organization.employer_profile.may_revert_application?
           organization.employer_profile.revert_application! 
