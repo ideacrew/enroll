@@ -1,5 +1,18 @@
 module Insured::FamiliesHelper
 
+  def plan_shopping_dependent_text(hbx_enrollment)
+    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    if subscriber.present? && dependents.count == 0
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count == 1
+      ("<span class='dependent-text'>#{dependents.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count > 1
+      (link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    else
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>" + " + " + link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    end
+  end
+
   def current_premium hbx_enrollment
     if hbx_enrollment.kind == 'employer_sponsored'
       hbx_enrollment.total_employee_cost

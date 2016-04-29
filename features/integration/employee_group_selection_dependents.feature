@@ -19,7 +19,7 @@ Feature: Employee goes through plan shopping with dependents when employer offer
       Then Employee should see 1 dependents
       When Employee clicks continue on the dependents page
       Then Employee should see the group selection page with health or dental dependents list
-      When Emplotee clicks health radio on the group selection page
+      When Employee clicks health radio on the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see the plan shopping page with no dependent
       When Employee clicks my insured portal link
