@@ -125,7 +125,7 @@ class Invitation
   def claim_general_agency_staff_role(user_obj, redirection_obj)
     staff_role = GeneralAgencyStaffRole.find(source_id)
     person = staff_role.person
-    redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
+    redirection_obj.create_sso_account(user_obj, person, 15, "general_agent") do
       person.user = user_obj
       person.save!
       general_agency_profile = staff_role.general_agency_profile
