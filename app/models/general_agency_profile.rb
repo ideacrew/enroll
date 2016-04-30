@@ -57,7 +57,7 @@ class GeneralAgencyProfile
   end
 
   def general_agency_staff_roles
-    Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(self.id))
+    Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(self.id)).map {|p| p.general_agency_staff_roles.detect {|s| s.general_agency_profile_id == id}}
   end
 
   def legal_name
@@ -89,6 +89,15 @@ class GeneralAgencyProfile
 
   def employer_clients_count
     employer_clients.present? ? employer_clients.count : 0
+  end
+
+  # general_agency should have only one general_agency_staff_role
+  def primary_staff
+    general_agency_staff_roles.present? ? general_agency_staff_roles.last : nil
+  end
+
+  def current_staff_state
+    primary_staff.current_state rescue ""
   end
 
   def current_state

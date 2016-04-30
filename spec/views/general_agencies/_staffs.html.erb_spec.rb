@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
-  let(:staff) { FactoryGirl.create(:general_agency_staff_role).person }
+  let(:staff) { FactoryGirl.create(:general_agency_staff_role) }
   before :each do
     assign :staffs, [staff] 
     render template: "general_agencies/profiles/_staffs.html.erb" 
@@ -12,6 +12,6 @@ RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   end
 
   it 'should show staff info' do
-    expect(rendered).to have_selector('a', text: "#{staff.first_name} #{staff.last_name}")
+    expect(rendered).to have_selector('a', text: "#{staff.person.first_name} #{staff.person.last_name}")
   end
 end

@@ -28,3 +28,18 @@ $(document).on('click', 'input#select_all_tag', function(){
   }
   check_allow_assign();
 });
+
+function enableGeneralAgenciesFilters() {
+  var url = '/exchanges/hbx_profiles/general_agency_index.js';
+
+  $('div[name=general_agencies_tab] > ').children().each( function() {
+    $(this).change(function(){
+      filter = $(this).val();
+      $.ajax({
+        url: url,
+        type: "GET",
+        data : { 'status': filter }
+      });
+    });
+  });
+}

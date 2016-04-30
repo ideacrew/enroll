@@ -94,6 +94,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, person:person, general_agency_profile_id: general_agency_profile.id) }
 
     it "current_state" do
       general_agency_profile.aasm_state = "is_approved"
@@ -114,6 +115,10 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employer_profile]
       allow(Person).to receive(:where).and_return [person]
       expect(general_agency_profile.families).to eq [person.primary_family]
+    end
+
+    it "general_agency_staff_roles" do
+      #expect(general_agency_profile.general_agency_staff_roles).to eq [general_agency_staff_role]
     end
   end
 end
