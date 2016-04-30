@@ -73,4 +73,26 @@ RSpec.describe GeneralAgencyAccount, type: :model do
       expect(general_agency_account.general_agency_profile).to eq general_agency_profile
     end
   end
+
+  describe 'Class method' do
+    let(:broker_role1) { FactoryGirl.create(:broker_role) }
+    let(:broker_role2) { FactoryGirl.create(:broker_role) }
+    let(:gaa1) { FactoryGirl.create(:general_agency_account, broker_role_id: broker_role1.id) }
+    let(:gaa2) { FactoryGirl.create(:general_agency_account, broker_role_id: broker_role2.id) }
+
+    before :each do
+      gaa1
+      gaa2
+    end
+
+    it "all" do
+      expect(GeneralAgencyAccount.all).to include gaa1
+      expect(GeneralAgencyAccount.all).to include gaa2
+    end
+
+    it "find_by_broker_role_id" do
+      expect(GeneralAgencyAccount.find_by_broker_role_id(broker_role1.id)).to include gaa1
+      expect(GeneralAgencyAccount.find_by_broker_role_id(broker_role1.id)).not_to include gaa2
+    end
+  end
 end

@@ -160,17 +160,22 @@ class EmployerProfile
     @general_agency_profile = active_general_agency_account.general_agency_profile if active_general_agency_account.present?
   end
 
-  def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = today)
-    start_on = start_on.to_date.beginning_of_day
-    if active_general_agency_account.present?
-      terminate_on = (start_on - 1.day).end_of_day
-      fire_general_agency!(terminate_on)
-    end
+  def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
+    # commented out the start_on and terminate_on 
+    # which is same as broker calculation, However it will cause problem 
+    # start_on later than end_on
+    # 
+    #start_on = start_on.to_date.beginning_of_day
+    #if active_general_agency_account.present?
+    #  terminate_on = (start_on - 1.day).end_of_day
+    #  fire_general_agency!(terminate_on)
+    #end
+    fire_general_agency!(TimeKeeper.datetime_of_record) if active_general_agency_account.present?
     general_agency_accounts.build(general_agency_profile: new_general_agency, start_on: start_on, broker_role_id: broker_role_id)
     @general_agency_profile = new_general_agency
   end
 
-  def fire_general_agency!(terminate_on = today)
+  def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
   end

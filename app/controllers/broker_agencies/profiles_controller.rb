@@ -4,7 +4,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -235,7 +235,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def assign_history
     page_string = params.permit(:gas_page)[:gas_page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.all).page page_no
+
+    if current_user.has_hbx_staff_role?
+      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.all).page page_no
+    elsif current_user.has_broker_role? && current_user.person.broker_role.present?
+      broker_role_id = @broker_agency_profile.present? ? @broker_agency_profile.primary_broker_role_id : current_user.person.broker_role.id
+      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.find_by_broker_role_id(broker_role_id)).page page_no
+    else
+      @general_agency_account_history = Kaminari.paginate_array(Array.new)
+    end
   end
 
   def manage_employers

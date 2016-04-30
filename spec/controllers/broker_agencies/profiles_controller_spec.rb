@@ -311,17 +311,36 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_role) { FactoryGirl.create(:broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    before :each do
-      sign_in user
-      xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+    let(:hbx) { FactoryGirl.create(:user, person: person, roles: ['hbx_staff']) }
+
+    context "with admin user" do
+      before :each do
+        sign_in hbx
+        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_accounts" do
+        expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.all.first(20)
+      end
     end
 
-    it "should return http success" do
-      expect(response).to have_http_status(:success)
-    end
+    context "with broker user" do
+      before :each do
+        sign_in user
+        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+      end
 
-    it "should get general_agency_accounts" do
-      expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.all.first(20)
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_accounts" do
+        expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.find_by_broker_role_id(broker_role.id).first(20)
+      end
     end
   end
 

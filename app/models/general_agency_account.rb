@@ -65,6 +65,18 @@ class GeneralAgencyAccount
       orgs.each do |org|
         list.concat(org.employer_profile.general_agency_accounts) if org.employer_profile.general_agency_accounts.present?
       end
+      list = list.sort { |a, b| b.start_on <=> a.start_on }
+
+      list
+    end
+
+    def find_by_broker_role_id(broker_role_id)
+      orgs = Organization.unscoped.where(:"employer_profile.general_agency_accounts.broker_role_id" => broker_role_id)
+      list = []
+      orgs.each do |org|
+        list.concat(org.employer_profile.general_agency_accounts.where(broker_role_id: broker_role_id).entries) if org.employer_profile.general_agency_accounts.present?
+      end
+      list = list.sort { |a, b| b.start_on <=> a.start_on }
 
       list
     end
