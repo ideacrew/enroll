@@ -115,7 +115,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    flash[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
+    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
