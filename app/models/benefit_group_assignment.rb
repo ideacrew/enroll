@@ -18,6 +18,8 @@ class BenefitGroupAssignment
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   validates_presence_of :benefit_group_id, :start_on, :is_active
   validate :date_guards, :model_integrity
 
@@ -123,29 +125,29 @@ class BenefitGroupAssignment
 
     #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
     #then we will not need from coverage_terminated to coverage_selected
-    event :select_coverage do
+    event :select_coverage, :after => :record_transition do
       transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
     end
 
-    event :waive_coverage do
+    event :waive_coverage, :after => :record_transition do
       transitions from: [:initialized, :coverage_selected, :coverage_renewing], to: :coverage_waived
     end
 
-    event :renew_coverage do
+    event :renew_coverage, :after => :record_transition do
       transitions from: :initialized , to: :coverage_renewing
     end
 
-    event :terminate_coverage do
+    event :terminate_coverage, :after => :record_transition do
       transitions from: :initialized, to: :coverage_void
       transitions from: :coverage_selected, to: :coverage_terminated
       transitions from: :coverage_renewing, to: :coverage_terminated
     end
 
-    event :expire_coverage do
+    event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :coverage_renewing], to: :coverage_expired, :guard  => :can_be_expired?
     end
 
-    event :delink_coverage do
+    event :delink_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
     end
   end
