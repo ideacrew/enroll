@@ -40,7 +40,16 @@ module Importers
       include ValueParsers::OptimisticSsnParser.on(:subscriber_ssn, :fein)
 
       validate :validate_fein
+      validate :validate_relationships
       validates_length_of :fein, is: 9
+
+      RELATIONSHIP_MAP = {
+        "spouse" => "spouse",
+        "domestic partner" => "domestic_partner",
+        "child under 26" => "child_under_26",
+        "child over 26" => "child_26_and_over",
+        "disabled child under 26" => "disabled_child_26_and_over"
+      }
 
       def initialize(opts = {})
         super(opts)
@@ -53,6 +62,18 @@ module Importers
 
       def subscriber_dob=(val)
         @subscriber_dob = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
+      end
+
+      def validate_relationships
+        (1..8).to_a.each do |num|
+           dep_ln = "dep_#{num}_name_last".to_sym
+           dep_rel = "dep_#{num}_relationship".to_sym
+           unless self.send(dep_ln).blank?
+             if self.send(dep_rel).blank?
+                errors.add("dep_#{num}_relationship", "invalid.  must be one of: #{RELATIONSHIP_MAP.keys.join(", ")}")
+             end
+           end
+        end
       end
 
       def subscriber_zip=(val)
@@ -116,7 +137,8 @@ module Importers
           end
 
           def dep_#{num}_relationship=(val)
-            @dep_#{num}_relationship = Maybe.new(val).strip.downcase.extract_value
+            dep_rel = Maybe.new(val).strip.downcase.extract_value
+            @dep_#{num}_relationship = RELATIONSHIP_MAP[dep_rel]
           end
 
           def dep_#{num}_dob=(val)
