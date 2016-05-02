@@ -178,6 +178,13 @@ class BenefitGroupAssignment
     benefit_group.end_on <= TimeKeeper.date_of_record
   end
 
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
+
   def propogate_delink
     if hbx_enrollment.present?
       hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?

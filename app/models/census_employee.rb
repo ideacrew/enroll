@@ -438,6 +438,13 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
+
   def set_autocomplete_slug
     return unless (first_name.present? && last_name.present?)
     @autocomplete_slug = first_name.concat(" #{last_name}")
