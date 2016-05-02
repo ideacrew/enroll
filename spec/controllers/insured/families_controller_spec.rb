@@ -30,7 +30,7 @@ RSpec.describe Insured::FamiliesController do
     it "should raise the error on invalid person_id" do
       allow(session).to receive(:[]).and_return(33)
       allow(person).to receive(:agent?).and_return(true)
-      expect{get :home}.to raise_error
+      expect{get :home}.to raise_error(ArgumentError)
     end
   end
 end
