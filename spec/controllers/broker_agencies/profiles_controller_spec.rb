@@ -204,7 +204,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
       families[0].primary_applicant.person.update_attributes!(last_name: 'Jones1')
       families[1].primary_applicant.person.update_attributes!(last_name: 'Jones2')
-      families[2].primary_applicant.person.update_attributes!(last_name: 'Jones3')
+      families[2].primary_applicant.person.update_attributes!(last_name: 'jones3')
     end
 
     it 'should render 21 familes' do
@@ -213,6 +213,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
       expect(assigns(:families).count).to eq(21)
+      expect(assigns(:page_alphabets).count).to eq(2)
       expect(assigns(:page_alphabets)).to include("J")
       expect(assigns(:page_alphabets)).to include("S")
     end
