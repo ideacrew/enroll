@@ -29,6 +29,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
+  after_save :generate_family_search
 
   belongs_to  :person
 
@@ -577,6 +578,9 @@ class Family
       :allow_disk_use => true)
   end
 
+  def generate_family_search
+    ::MapReduce::FamilySearchForFamily.populate_for(self)
+  end
 private
   def build_household
     if households.size == 0
