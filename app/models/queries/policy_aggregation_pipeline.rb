@@ -203,6 +203,7 @@ module Queries
 
     def filter_criteria_expression
         project_property("policy_start_on", "$households.hbx_enrollments.effective_on") +
+        project_property("policy_end_on", "$households.hbx_enrollments.terminated_on") +
         project_property("family_created_at", "$created_at") +
         project_property("policy_purchased_at", { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }) +
 =begin
@@ -228,7 +229,7 @@ module Queries
         "state_transitions",
           { "$cond" =>
             [
-              "$households.hbx_enrollment.workflow_state_transitions",
+              "$households.hbx_enrollments.workflow_state_transitions",
               {"$map" => {
                  "input" => "$households.hbx_enrollments.workflow_state_transitions",
                  "as" => "state_trans",
@@ -269,7 +270,8 @@ module Queries
 
     def denormalized_properties
       filter_criteria_expression + 
-        project_property("_id", "$households.hbx_enrollments.hbx_id")  +
+        project_property("_id", "$households.hbx_enrollments._id")  +
+        project_property("hbx_id", "$households.hbx_enrollments.hbx_id")  +
         project_property("consumer_role_id", "$households.hbx_enrollments.consumer_role_id") +
         project_property("benefit_group_id", "$households.hbx_enrollments.benefit_group_id") +
         project_property("benefit_group_assignment_id", "$households.hbx_enrollments.benefit_group_assignment_id")
