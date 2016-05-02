@@ -370,7 +370,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:er2_active_employee_count)      { 1 }
       let(:er2_terminated_employee_count)  { 1 }
 
-      let(:employee_count)                 { 
+      let(:employee_count)                 {
                                               er1_active_employee_count +
                                               er1_terminated_employee_count +
                                               er1_rehired_employee_count +
@@ -391,11 +391,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       let(:er1_active_employees)      { FactoryGirl.create_list(:census_employee, er1_active_employee_count,
                                                                  employer_profile: employer_profile_1
-                                                                ) 
+                                                                )
                                                               }
       let(:er1_terminated_employees)  { FactoryGirl.create_list(:census_employee, er1_terminated_employee_count,
                                                                  employer_profile: employer_profile_1
-                                                                ) 
+                                                                )
                                                               }
       let(:er1_rehired_employees)     { FactoryGirl.create_list(:census_employee, er1_rehired_employee_count,
                                                                  employer_profile: employer_profile_1
@@ -403,20 +403,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                                           }
       let(:er2_active_employees)      { FactoryGirl.create_list(:census_employee, er2_active_employee_count,
                                                                  employer_profile: employer_profile_2
-                                                                ) 
+                                                                )
                                                               }
       let(:er2_terminated_employees)  { FactoryGirl.create_list(:census_employee, er2_terminated_employee_count,
                                                                  employer_profile: employer_profile_2
-                                                                ) 
+                                                                )
                                                               }
 
       before do
-        er1_active_employees.each do |ee| 
+        er1_active_employees.each do |ee|
           ee.aasm_state = "employee_role_linked"
           ee.save!
         end
 
-        er1_terminated_employees.each do |ee| 
+        er1_terminated_employees.each do |ee|
           ee.aasm_state = "employment_terminated"
           ee.employment_terminated_on = today
           ee.save!
@@ -428,7 +428,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           ee.save!
         end
 
-        er2_active_employees.each do |ee| 
+        er2_active_employees.each do |ee|
           ee.aasm_state = "employee_role_linked"
           ee.save!
         end
@@ -462,7 +462,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       context "and for one employer, the set of employees terminated since company joined the exchange are queried" do
         it "should find the correct set" do
-          expect(CensusEmployee.find_all_terminated(employer_profiles: [employer_profile_1], 
+          expect(CensusEmployee.find_all_terminated(employer_profiles: [employer_profile_1],
                                                     date_range: last_year_to_date).size).to eq er1_termination_count
         end
       end
@@ -577,7 +577,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "a plan year application is submitted" do
-    before { plan_year.publish! }
+    before do
+      plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day if plan_year.open_enrollment_start_on = TimeKeeper.date_of_record
+      plan_year.publish!
+    end
 
     it "should be in published status" do
       expect(plan_year.aasm_state).to eq "published"
@@ -914,8 +917,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       benefit_group.plan_year.update_attributes(:aasm_state => 'published')
     end
 
-    context 'when hired_on date is in the past' do 
-      it 'should return census employee created date as new hire enrollment period start date' do 
+    context 'when hired_on date is in the past' do
+      it 'should return census employee created date as new hire enrollment period start date' do
         expect(census_employee.new_hire_enrollment_period.min).to eq (census_employee.created_at.beginning_of_day)
       end
     end
@@ -926,9 +929,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should return hired_on date as new hire enrollment period start date' do
         expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.hired_on
       end
-    end 
+    end
 
-    context 'when earliest effective date is in future more than 30 days from current date' do 
+    context 'when earliest effective date is in future more than 30 days from current date' do
       let(:hired_on){ TimeKeeper.date_of_record }
 
       let(:plan_year) do
@@ -937,8 +940,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         PlanYear.find(py.id)
       end
 
-      it 'should return earliest_eligible_date as new hire enrollment period end date' do 
-        expect(census_employee.new_hire_enrollment_period.max).to eq ((hired_on + 60.days).end_of_month + 1.day).end_of_day
+      it 'should return earliest_eligible_date as new hire enrollment period end date' do
+        expected_end_date = (hired_on + 60.days)
+        expected_end_date = (hired_on + 60.days).end_of_month + 1.day if expected_end_date.day != 1
+        expect(census_employee.new_hire_enrollment_period.max).to eq (expected_end_date).end_of_day
       end
     end
 
@@ -949,7 +954,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         PlanYear.find(py.id)
       end
 
-      it 'should return 30 days from new hire enrollment period start as end date' do 
+      it 'should return 30 days from new hire enrollment period start as end date' do
         expect(census_employee.new_hire_enrollment_period.max).to eq (census_employee.new_hire_enrollment_period.min + 30.days).end_of_day
       end
     end
@@ -973,8 +978,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       benefit_group.plan_year.update_attributes(:aasm_state => 'published')
     end
 
-    it 'should return earliest effective date' do 
-      expect(census_employee.earliest_eligible_date).to eq (hired_on + 60.days).end_of_month + 1.day
+    it 'should return earliest effective date' do
+      eligible_date = (hired_on + 60.days)
+      eligible_date = (hired_on + 60.days).end_of_month + 1.day if eligible_date.day != 1
+      expect(census_employee.earliest_eligible_date).to eq eligible_date
     end
   end
 end
