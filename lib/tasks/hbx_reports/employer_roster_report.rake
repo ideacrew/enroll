@@ -6,7 +6,7 @@ namespace :reports do
     desc "Employer plan year application status by effective date"
     task :employer_roster_report => :environment do
 
-      organizations = Organization.exists(:employer_profile => true).where(:"hbx_id".nin => [100101, 100102, 118510]).limit(50)
+      organizations = Organization.exists(:employer_profile => true).where(:"hbx_id".nin => [100101, 100102, 118510])
       build_csv_report('er_roster_report.csv', organizations)
 
       organizations = Organization.where(:"hbx_id".in => [100101, 100102, 118510])
