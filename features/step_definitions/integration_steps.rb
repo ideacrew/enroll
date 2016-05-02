@@ -397,8 +397,9 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   find('.interaction-click-control-close').click
 
   wait_for_ajax(10)
-  find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  find("#person_addresses_attributes_0_address_2").click
+  #find("#person_addresses_attributes_0_address_1", :wait => 10).click
+  find("#person_addresses_attributes_0_address_1").trigger('click')
+  find("#person_addresses_attributes_0_address_2").trigger('click')
   find("#person_addresses_attributes_0_city").click
   find("#person_addresses_attributes_0_zip").click
 
@@ -428,7 +429,7 @@ When(/^.+ clicks? delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
-Then(/^.+ should see (.*) dependents*$/) do |n|
+Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
@@ -477,7 +478,7 @@ When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
 
-When(/^.+ clicks? continue on the group selection page$/) do
+When(/^(?:(?!Employee).)+ clicks? continue on the group selection page$/) do
   find('#btn-continue').click
 end
 
@@ -600,7 +601,7 @@ When(/^.+ clicks? on the add employee button$/) do
   find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 
-When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]").click
 end
 
@@ -669,6 +670,7 @@ Then(/^I should see the dependents and group selection page$/) do
 end
 
 And(/I select three plans to compare/) do
+  wait_for_ajax
   expect(page).to have_content("Select Plan")
   if page.all("span.checkbox-custom-label").count > 3
     #modal plan data for IVL not really seeded in.

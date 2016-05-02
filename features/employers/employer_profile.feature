@@ -1,3 +1,4 @@
+@watir @screenshots
 Feature: Employer Profile
   In order for employers to manage their accounts
   Employer Staff should be able to add and delete employer staff roles

@@ -206,7 +206,7 @@ Then(/^.+ sees employer census family created$/) do
   expect(page).to have_content('successfully created')
 end
 
-Then(/^.+ should see the matched employee record form$/) do
+Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
   screenshot("broker_employer_search_results")
   expect(page).to have_content('Legal LLC')
 end
