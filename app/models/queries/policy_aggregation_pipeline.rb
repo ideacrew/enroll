@@ -13,7 +13,7 @@ module Queries
         { "$unwind" => "$households"},
         { "$unwind" => "$households.hbx_enrollments"},
         { "$match" => {"households.hbx_enrollments" => {"$ne" => nil}}},
-        { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}}}
+        { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}, "households.hbx_enrollments.external_enrollment" => {"$ne" => true}}}
       ]
     end
 
