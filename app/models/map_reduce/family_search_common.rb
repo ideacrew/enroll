@@ -7,6 +7,9 @@ module MapReduce
          for (var i = 0; i < this["family_members"].length; i++) {
            var family_member = this["family_members"][i];
            fam["family_members"][i]["person"] = people[family_member["person_id"].valueOf()];
+           if (family_member["is_primary_applicant"]) {
+             fam["primary_member"] = family_member;
+           } 
          }
          delete(fam['versions']);
          emit(fam._id, fam);
