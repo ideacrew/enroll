@@ -39,7 +39,7 @@ module MapReduce
           :updated_at, :created_at,
           :updated_by_id
         ],
-        :include => {:consumer_role => {:except => :vlp_documents}}                                         
+        :include => {:consumer_role => {:except => [:vlp_documents, :updated_at, :created_at, :documents]}}
         )
       end
       person_data
