@@ -26,10 +26,10 @@
                   <td><%= er.aasm_state.humanize %></td>
                   <td><%= er.published_plan_year.try(:effective_date) %>
                   <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
-                  <td><%= er.broker_agency_profile.legal_name if er.broker_agency_profile.present? %></td>
-              </tr>
-            <% end %>
-          </tbody>
+                  <td><%= er.broker_agency_profile.organization.legal_name if er.broker_agency_profile.present? %></td>
+                </tr>
+              <% end %>
+            </tbody>
           </table>
         </div>
       </div>
