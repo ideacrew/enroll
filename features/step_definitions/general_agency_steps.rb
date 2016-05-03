@@ -63,6 +63,10 @@ Then(/^.+ should see the list of general agency staff$/) do
   expect(page).to have_content('Applicant')
 end
 
+When(/^Hbx Admin clicks on the Staff tab$/) do
+  find('li#staffs-tab').click
+end
+
 When(/^.+ clicks the link of staff role$/) do
   find(:xpath, "//a[contains(., 'Jack Martin')]").click
 end
@@ -104,10 +108,6 @@ Then(/^.+ should see successful message with general agency home page$/) do
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
-When(/^CareFirst Broker clicks on New Broker Agency Tab$/) do
-  find(:xpath, "//label[input[@id='new_broker_agency']]").click
-end
-
 When(/^CareFirst Broker should see the New Broker Agency form$/) do
   expect(page).to have_css("#broker_agency_form")
 end
@@ -130,10 +130,6 @@ And(/^.+ enters broker agency information for ga flow$/) do
 
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
-
-  find('button.multiselect').click
-  find(:xpath, '//label[input[@value="bn"]]').click
-  find(:xpath, '//label[input[@value="fr"]]').click
 
   find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
   find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')

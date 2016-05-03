@@ -117,8 +117,22 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       expect(general_agency_profile.families).to eq [person.primary_family]
     end
 
-    it "general_agency_staff_roles" do
-      #expect(general_agency_profile.general_agency_staff_roles).to eq [general_agency_staff_role]
+    context "for general_agency_staff_role" do
+      before :each do
+        general_agency_staff_role
+      end
+
+      it "general_agency_staff_roles" do
+        expect(general_agency_profile.general_agency_staff_roles).to eq [general_agency_staff_role]
+      end
+
+      it "primary_staff" do
+        expect(general_agency_profile.primary_staff).to eq general_agency_staff_role
+      end
+
+      it "current_staff_state" do
+        expect(general_agency_profile.current_staff_state).to eq general_agency_staff_role.current_state
+      end
     end
   end
 end

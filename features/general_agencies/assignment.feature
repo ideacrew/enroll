@@ -27,7 +27,7 @@ Feature: Broker Assigns a General Agency to an Employer
     And selects the general agency from dropdown for the employer
     Then the broker should see assign successful message
     When the broker visits their Employers page
-    Then the employer will be assigned that general agency
+    Then the employer is assigned to general agency
     Then the broker logs out
 
     When the ga login in
@@ -109,7 +109,7 @@ Feature: Broker Assigns a General Agency to an Employer
     When the broker visits their Employers page
     Given call change default ga subscriber for ga1
     When the broker visits their Employers page
-    Then the employer will be assigned that general agency
+    Then the employer is assigned to GA2
     Then the broker logs out
 
     When the ga2 login in
@@ -141,7 +141,7 @@ Feature: Broker Assigns a General Agency to an Employer
     And selects the general agency from dropdown for the employer
     Then the broker should see assign successful message
     When the broker visits their Employers page
-    Then the employer will be assigned that general agency
+    Then the employer is assigned to general agency
 
     When the broker visits their general agencies page
     Then the broker should see the Clear Default GA in the list of general agencies

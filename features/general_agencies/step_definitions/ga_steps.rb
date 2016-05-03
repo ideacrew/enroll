@@ -61,7 +61,7 @@ end
 
 And /^a general agency, pending approval, exists$/ do
   general_agency
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
 end
 
@@ -90,7 +90,7 @@ When /^they visit the list of staff$/ do
 end
 
 Then /^they should see the name of staff$/ do
-  full_name = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.full_name
+  full_name = general_agency.general_agency_profile.general_agency_staff_roles.last.person.full_name
   expect(page).to have_content("General Agency Staff")
   expect(page).to have_content(general_agency.legal_name)
   expect(page).to have_content(full_name)
@@ -100,7 +100,7 @@ Then /^they should see the name of staff$/ do
 end
 
 When /^they approve the general agency$/ do
-  click_link general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.full_name
+  click_link general_agency.general_agency_profile.general_agency_staff_roles.last.person.full_name
   screenshot("general_agency_staff_edit_page")
   click_button 'Approve'
 end
@@ -111,19 +111,19 @@ Then /^they should see updated status$/ do
 end
 
 Then /^the general agency should receive an email$/ do
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   open_email(staff.email_address)
 end
 
 Given /^a general agency, approved, awaiting account creation, exists$/ do
   general_agency
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
   staff.approve!
 end
 
 When /^the HBX admin visits the link received in the approval email$/ do
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   email_address = staff.email_address
 
   open_email(email_address)
@@ -140,7 +140,7 @@ Then /^they should see an account creation form$/ do
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
-  email_address = general_agency.general_agency_profile.general_agency_staff_roles.first.emails.first.address
+  email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   fill_in "user[email]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
@@ -158,9 +158,9 @@ end
 
 Given /^a general agency, approved, confirmed, exists$/ do
   general_agency(legal_name: 'Rooxo')
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
-  email_address = general_agency.general_agency_profile.general_agency_staff_roles.first.emails.first.address
+  email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
   staff.person.user = user
@@ -257,11 +257,18 @@ And /^selects the general agency from dropdown for the employer$/ do
   find("input.btn-primary").click
 end
 
-Then /^the employer will be assigned that general agency$/ do
+Then /^the employer is assigned to general agency$/ do
   expect(page).to have_content('Employers')
   expect(page).to have_content('EmployerA Inc')
   expect(page).to have_content('General Agencies')
   expect(page).to have_content('Rooxo')
+end
+
+Then /^the employer is assigned to GA2$/ do
+  expect(page).to have_content('Employers')
+  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('General Agencies')
+  expect(page).to have_content('Zooxy')
 end
 
 When /^the broker click the link of clear assign$/ do
@@ -349,9 +356,9 @@ end
 
 Given /^another general agency-ga2, approved, confirmed, exists$/ do
   general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.order(id: :desc).first.general_agency_staff_roles.last
+  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
-  email_address = general_agency.general_agency_profile.general_agency_staff_roles.first.emails.first.address
+  email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
   staff.person.user = user

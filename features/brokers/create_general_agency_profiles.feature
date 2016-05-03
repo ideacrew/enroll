@@ -31,7 +31,6 @@ Feature: Create General Agency and General Agency Staff Role
 
     When CareFirst Broker visits the HBX Broker Registration form
       Given CareFirst Broker has not signed up as an HBX user
-      And CareFirst Broker clicks on New Broker Agency Tab
       Then CareFirst Broker should see the New Broker Agency form
       When CareFirst Broker enters personal information for ga flow
       And CareFirst Broker enters broker agency information for ga flow
