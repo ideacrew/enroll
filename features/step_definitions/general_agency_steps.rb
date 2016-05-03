@@ -4,7 +4,7 @@ When(/^.+ visit the HBX General Agency Registration form$/) do
 end
 
 Then(/^.+ should see the New General Agency form/) do
-  expect(page).to have_content('New General Agency')
+  expect(page).to have_content('General Agency / TPA Registration')
   expect(page).to have_css("#general_agency_form")
 end
 

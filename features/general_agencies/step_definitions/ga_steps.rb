@@ -15,7 +15,7 @@ When /^they click the 'New General Agency' button$/ do
 end
 
 Then /^they should see the new general agency form$/ do
-  expect(page).to have_content('New General Agency')
+  expect(page).to have_content('General Agency / TPA Registration')
   screenshot("general_agency_registration")
 end
 
