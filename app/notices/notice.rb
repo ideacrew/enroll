@@ -80,8 +80,7 @@ class Notice
   end
 
   def send_generic_notice_alert
-    binding.pry
-    UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, @secure_message_recipient.user.email)
+    UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, @secure_message_recipient.user.email).deliver_now
   end
 
   def create_recipient_document(doc_uri)
