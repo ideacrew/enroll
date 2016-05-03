@@ -8,6 +8,7 @@ class ShopNotice < Notice
     build
     generate_pdf_notice
     upload_and_send_secure_message
+    send_generic_notice_alert
   end
 
   def append_hbe
