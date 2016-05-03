@@ -11,6 +11,7 @@ class IvlNotice < Notice
     attach_dchl_rights
     prepend_envelope
     upload_and_send_secure_message
+    send_generic_notice_alert
   end
 
   def prepend_envelope

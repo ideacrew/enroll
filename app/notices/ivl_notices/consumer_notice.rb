@@ -19,13 +19,17 @@ class IvlNotices::ConsumerNotice < IvlNotice
     @family = @recipient.primary_family    
     @notice.primary_fullname = @recipient.full_name.titleize
     @notice.primary_identifier = @recipient.hbx_id
-
     append_address(@recipient.addresses[0])
+
     append_unverified_family_members
   end
 
   def append_unverified_family_members
     enrollments = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a
+    
+    if enrollments.empty?
+      raise "enrollment don't exists!!"
+    end
 
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
@@ -35,7 +39,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     people.reject!{|person| person.consumer_role.blank? || !person.consumer_role.verifications_outstanding? }
 
     append_unverified_individuals(people)
-    @notice.due_date = enrollments.first.created_at.strftime("%B %d, %Y")
+    @notice.due_date = (enrollments.first.created_at + 95.days).strftime("%B %d, %Y")
   end
 
   def append_unverified_individuals(people)

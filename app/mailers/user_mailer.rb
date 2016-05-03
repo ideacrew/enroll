@@ -13,7 +13,6 @@ class UserMailer < ApplicationMailer
   end
 
   def invitation_email(email, person_name, invitation)
-
     mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at DC Health Link "}) do |format|
       format.html { render "invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
@@ -48,6 +47,12 @@ class UserMailer < ApplicationMailer
   def generic_consumer_welcome(first_name, hbx_id, email)
     message = mail({to: email, subject: "DC HealthLink", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
+    end
+  end
+
+  def generic_notice_alert(first_name, notice_subject, email)
+    message = mail({to: email, subject: "You have a DC Marketplace notice waiting!", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_notice_alert", locals: {first_name: first_name, hbx_id: notice_subject}}
     end
   end
 

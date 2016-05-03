@@ -79,6 +79,11 @@ class Notice
     Aws::S3Storage.save(@notice_path, 'notices')
   end
 
+  def send_generic_notice_alert
+    binding.pry
+    UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, @secure_message_recipient.user.email)
+  end
+
   def create_recipient_document(doc_uri)
     notice = @secure_message_recipient.documents.build({
       title: @notice_filename, 
