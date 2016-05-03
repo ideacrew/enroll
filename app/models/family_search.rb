@@ -16,6 +16,10 @@ class FamilySearch
   embeds_one :value, class_name: "::FamilySearch::FamilySearchFamily"
 
   index({
+    "value.primary_member.ssn" => 1,
+    "value.primary_member.hbx_id" => 1,
+    "value.primary_member.first_name" => 1,
+    "value.primary_member.last_name" => 1,
     "value.family_members.person.ssn" => 1,
     "value.family_members.person.hbx_id" => 1,
     "value.family_members.person.first_name" => 1,

@@ -59,7 +59,7 @@ loop do
     {"$match" => {"_id" => {"$nin" => family_search_ids}}},
     {"$unwind" => "$family_members"},
     {"$group" => {"_id" => "$_id", "family_member_ids" => {"$addToSet" => "$family_members.person_id"}}},
-    {"$limit" => 250}
+    {"$limit" => 100}
   ]).each do |rec|
     family_ids << rec['_id']
     rec["family_member_ids"].each do |fmi|
