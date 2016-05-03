@@ -275,7 +275,7 @@ describe Person do
           expect(person.has_active_employee_role?).to eq false
         end
       end
-      
+
       context "with invalid Tribal Id" do
         let(:params) {valid_params.deep_merge({tribal_id: "12124"})}
 
@@ -288,7 +288,7 @@ describe Person do
           expect(person.errors[:base]).to eq ["Tribal id must be 9 digits"]
         end
       end
-      
+
 
       context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}
@@ -607,7 +607,7 @@ describe Person do
       person1.user_id = user_id
       person2.user_id = user_id
       person1.save!
-      expect { person2.save! }.to raise_error
+      expect { person2.save! }.to raise_error(Mongo::Error::OperationFailure)
     end
 
   end

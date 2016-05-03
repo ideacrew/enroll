@@ -2046,7 +2046,43 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
+
+
+  context '.adjust_open_enrollment_date' do
+    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
+    let(:plan_year_end_on) { Date.new(calender_year + 1, 5, 31) }
+    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
+    let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
+    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'renewing_draft'
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 10.days)
+    end
+
+    it 'should reset open enrollment date when published plan year' do
+      plan_year.publish!
+      expect(plan_year.aasm_state).to eq 'renewing_enrolling'
+      expect(plan_year.open_enrollment_start_on).to eq (open_enrollment_start_on + 10.days)
+    end                                             
+  end
 end
+
 
 describe PlanYear, "which has the concept of export eligibility" do
   ALL_STATES = PlanYear.aasm.states.map(&:name).map(&:to_s)

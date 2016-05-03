@@ -163,11 +163,11 @@ And(/I click on continue button on household info form/) do
   click_link "Continue"
 end
 
-When(/I click on continue button on group selection page during a sep/) do
+When(/^I click on continue button on group selection page during a sep$/) do
   click_button "CONTINUE"
 end
 
-And(/I click on continue button on group selection page/) do
+And(/^I click on continue button on group selection page$/) do
   #TODO This some group selection nonsense
   #wait_for_ajax(2,2)
   screenshot("test1")
