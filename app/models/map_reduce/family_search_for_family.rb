@@ -22,7 +22,7 @@ module MapReduce
       @map_reduce.scope({
         people: people_hash_for(@person_ids)
       })
-      @map_reduce.count
+      @map_reduce.counts
     end
   end
 end

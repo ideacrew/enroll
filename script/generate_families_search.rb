@@ -14,24 +14,31 @@ class FamilySearchRunOnce
     end
 
     def execute
+      people_hash = people_hash_for(@person_ids)
       @map_reduce.scope({
         people: people_hash_for(@person_ids)
       })
-      @map_reduce.count
+      @map_reduce.counts
     end
 end
 
+bail_count = 0
 
 loop do
   family_ids = []
   people_ids = []
 
   family_search_ids = FamilySearch.where({}).pluck("_id")
+  puts Family.collection.aggregate([
+    {"$match" => {"_id" => {"$nin" => family_search_ids}}},
+    {"$unwind" => "$family_members"},
+    {"$group" => {"_id" => "$_id", "family_member_ids" => {"$addToSet" => "$family_members.person_id"}}}
+  ]).count
   Family.collection.aggregate([
     {"$match" => {"_id" => {"$nin" => family_search_ids}}},
     {"$unwind" => "$family_members"},
     {"$group" => {"_id" => "$_id", "family_member_ids" => {"$addToSet" => "$family_members.person_id"}}},
-    {"$limit" => 500}
+    {"$limit" => 1000}
   ]).each do |rec|
     family_ids << rec['_id']
     rec["family_member_ids"].each do |fmi|
@@ -42,4 +49,3 @@ loop do
   break if family_ids.empty?
   FamilySearchRunOnce.new(family_ids, people_ids).execute
 end
-
