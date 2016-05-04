@@ -9,10 +9,8 @@
       <thead class="thead-default">
         <tr>
           <th>Employee Name<!-- <i class="fa fa-caret-down"></i>--></th>
-          <th>SSN</th>
           <th>DOB</th>
           <th>Hired</th>
-          <th>Added to Roster</th>
           <th>Status</th>
           <th>Benefit Package</th>
           <% if @employer_profile.renewing_plan_year.present? %>
@@ -37,10 +35,8 @@
           <td>
             <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id) %>
           </td>
-          <td><%= number_to_obscured_ssn census_employee.ssn %></td>
           <td><%= format_date census_employee.dob %></td>
           <td><%= format_date census_employee.hired_on %></td>
-          <td><%= format_date census_employee.created_at %></td>
           <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
 
           <td>

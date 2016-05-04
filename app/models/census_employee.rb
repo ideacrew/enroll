@@ -29,6 +29,8 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
@@ -400,19 +402,19 @@ class CensusEmployee < CensusMember
     state :employment_terminated
     state :rehired
 
-    event :rehire_employee_role do
+    event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :link_employee_role do
+    event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
     end
 
-    event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
+    event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
-    event :terminate_employee_role do
+    event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
     end
   end
@@ -434,6 +436,13 @@ class CensusEmployee < CensusMember
       benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
       benefit_group_assignment.update_attributes(is_active: false)
     end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
   end
 
   def set_autocomplete_slug
