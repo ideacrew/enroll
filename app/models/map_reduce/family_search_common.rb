@@ -1,5 +1,12 @@
 module MapReduce
   module FamilySearchCommon
+    def ensure_collections_for_testing
+      if Rails.env.test?
+         Family.collection.indexes
+         Person.collection.indexes
+      end
+    end
+
     def map_function
       <<-JS_CODE
       function() {
