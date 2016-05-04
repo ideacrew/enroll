@@ -4,7 +4,6 @@ module MapReduce
 
     def initialize(person)
       @person = person
-      ensure_collections_for_testing
     end
 
     def self.populate_for(person)

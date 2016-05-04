@@ -8,7 +8,6 @@ module MapReduce
 
     def initialize(family)
       @family = family
-      ensure_collections_for_testing
       @person_ids = family.family_members.map(&:person_id)
       @map_reduce = Mongoid::Contextual::MapReduce.new(
         reduced_collection,
