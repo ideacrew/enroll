@@ -273,29 +273,18 @@ class CensusEmployee < CensusMember
   def terminate_employment!(employment_terminated_on)
     if may_terminate_employee_role?
 
-      if active_benefit_group_assignment.present?
-        unless active_benefit_group_assignment.may_terminate_coverage?
-          message = "Error terminating employee #{full_name}, unable to terminate benefit group assignment"
-          Rails.logger.error { message }
-          raise CensusEmployeeError, message
-        end
+      if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
+        active_benefit_group_assignment.terminate_coverage!
       end
 
-      if renewal_benefit_group_assignment.present?
-        unless renewal_benefit_group_assignment.may_terminate_coverage?
-          message = "Error terminating employee #{full_name}, unable to terminate renewal benefit group assignment"
-          Rails.logger.error { message }
-          raise CensusEmployeeError, message
-        end
+      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
+        renewal_benefit_group_assignment.terminate_coverage!
       end
 
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-      active_benefit_group_assignment.terminate_coverage! if active_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.terminate_coverage! if renewal_benefit_group_assignment.present?
       terminate_employee_role!
-
     else
       message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
       Rails.logger.error { message }

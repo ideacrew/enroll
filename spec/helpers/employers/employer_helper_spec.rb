@@ -32,10 +32,10 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
     context ".enrollment_state" do
 
-      context 'when enrollments not present' do 
+      context 'when enrollments not present' do
 
         before do
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
         end
 
         it "should return initialized as default" do
@@ -43,9 +43,9 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
-      context 'when health coverage present' do 
+      context 'when health coverage present' do
         before do
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
 
         it "should return health enrollment status" do
@@ -53,9 +53,9 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
-      context 'when dental coverage present' do 
+      context 'when dental coverage present' do
         before do
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([dental_enrollment]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([dental_enrollment])
         end
 
         it "should return dental enrollment status" do
@@ -63,20 +63,20 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
-      context 'when both health & dental coverage present' do 
+      context 'when both health & dental coverage present' do
         before do
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment])
         end
 
         it "should return enrollment status for both health & dental" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health), Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
         end
       end
 
-      context 'when coverage terminated' do 
+      context 'when coverage terminated' do
         before do
           health_enrollment.terminate_coverage!
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
 
         it "should return terminated status" do
@@ -84,10 +84,10 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
-      context 'when coverage waived' do 
+      context 'when coverage waived' do
         before do
           health_enrollment.update_attributes(:aasm_state => :inactive)
-          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment]) 
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
 
         it "should return terminated status" do

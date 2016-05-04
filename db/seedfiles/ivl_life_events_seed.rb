@@ -388,7 +388,7 @@ QualifyingLifeEventKind.create!(
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60,
-  is_self_attested: true,
+  is_self_attested: false,
     # start_of_sep: "Based on circumstances as determined by HBX Date of loss of coverage",
     # coverage_effective_date: "As determined by HBX, with the intent of preventing gaps in health coverage")
   )

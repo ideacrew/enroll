@@ -225,7 +225,7 @@ Rails.application.routes.draw do
   end
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
-  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker', via: [:get]
+  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do

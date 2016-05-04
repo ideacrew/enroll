@@ -98,6 +98,12 @@ class HbxEnrollment
   field :waiver_reason, type: String
   field :published_to_bus_at, type: DateTime
 
+
+  # An external enrollment is one which we keep for recording purposes,
+  # but did not originate with the exchange.  'External' enrollments
+  # should not be transmitted to carriers nor reported in metrics.
+  field :external_enrollment, type: Boolean, default: false
+
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
@@ -226,6 +232,7 @@ class HbxEnrollment
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
     if eligibility_ruleset.applicable?
       self.send(eligibility_ruleset.determine_next_state)
+      self.save!
     end
   end
 
@@ -288,6 +295,20 @@ class HbxEnrollment
       return false
     end
 
+  end
+
+  def waive_coverage_by_benefit_group_assignment(waiver_reason)
+    update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
+    propogate_waiver
+
+    hbxs = HbxEnrollment.find_by_benefit_group_assignments([benefit_group_assignment])
+    return if hbxs.blank?
+    hbxs.each do |hbx|
+      if hbx.may_waive_coverage?
+        hbx.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
+        hbx.propogate_waiver
+      end
+    end
   end
 
   def cancel_previous(year)
@@ -801,42 +822,34 @@ class HbxEnrollment
 
   def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
     return [] if benefit_group_assignment.blank?
-    benefit_group_assignment_id = benefit_group_assignment.id
-    return [] if benefit_group_assignment_id.blank?
+    benefit_group_assignment_id = benefit_group_assignment.id    
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
-
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.show_enrollments.shop_market.by_coverage_kind("health").each do |enrollment|
+        household.hbx_enrollments.show_enrollments_sans_canceled.shop_market.by_coverage_kind("health").each do |enrollment|
           enrollment_list << enrollment if benefit_group_assignment_id.to_s == enrollment.benefit_group_assignment_id.to_s
         end
       end
     end rescue ''
     enrollment_list
   end
-  # def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-  #   id_list = benefit_group_assignments.collect(&:_id)
 
-  #   # families = nil
-  #   # if id_list.size == 1
-  #   #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
-  #   # else
-  #   #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
-  #   # end
+  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+    return [] if benefit_group_assignments.blank?
+    id_list = benefit_group_assignments.collect(&:_id).uniq
+    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
 
-  #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
-
-  #   enrollment_list = []
-  #   families.each do |family|
-  #     family.households.each do |household|
-  #       household.hbx_enrollments.active.each do |enrollment|
-  #         enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
-  #       end
-  #     end
-  #   end
-  #   enrollment_list
-  # end
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.active.each do |enrollment|
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
+        end
+      end
+    end
+    enrollment_list
+  end
 
   # def self.covered(enrollments)
   #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
@@ -921,13 +934,18 @@ class HbxEnrollment
     end
 
     event :move_to_enrolled!, :after => :record_transition do
-      transitions from: :coverage_selected, to: :coverage_selected
+      transitions from: :inactive, to: :inactive
+      transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
       transitions from: :coverage_selected, to: :coverage_selected
     end
 
     event :move_to_contingent!, :after => :record_transition do
+      transitions from: :inactive, to: :inactive
+      transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
@@ -936,6 +954,9 @@ class HbxEnrollment
     end
 
     event :move_to_pending!, :after => :record_transition do
+      transitions from: :inactive, to: :inactive
+      transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
