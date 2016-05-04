@@ -29,8 +29,8 @@ module VerificationHelper
     person.consumer_role.aasm_state != "fully_verified"
   end
 
-  def enrollment_group_verified?(person)
-    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"}
+  def enrollment_group_unverified?(person)
+    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verifications_outstanding"}
   end
 
   def verification_needed?(person)

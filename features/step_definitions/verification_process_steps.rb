@@ -10,8 +10,8 @@ Then(/^Individual click continue button$/) do
   click_button "CONTINUE"
 end
 
-Then(/^I should see verification outstanding label$/) do
-  expect(page).to have_content "Action Needed"
+Then(/^I should see Documents link$/) do
+  expect(page).to have_content "Documents"
 end
 
 When(/^I click on verification link$/) do
