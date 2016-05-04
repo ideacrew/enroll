@@ -192,6 +192,8 @@ class BenefitGroupAssignment
 
     if hbx_enrollment.present?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      # TODO: Re-enable this after enrollment propagation issues resolved. 
+      #       Right now this is causing issues when linking census employee under Enrollment Factory.
       # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
     end
   end
