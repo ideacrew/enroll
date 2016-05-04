@@ -6,11 +6,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
   let(:broker_agency_profile) { broker_agency.broker_agency_profile }
 
   describe "GET new" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { double("user", last_portal_visited: "test.com")}
     let(:person) { double("person")}
 
     it "should render the new template" do
-      allow(user).to receive(:last_portal_visited).and_return 'test.com'
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
       allow(user).to receive(:has_broker_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=).and_return("true")
@@ -22,30 +21,23 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET show" do
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { double("user")}
+    let(:person) { double("person")}
 
     before(:each) do
-      allow(user).to receive(:has_broker_role?).and_return true
+      allow(user).to receive(:has_broker_role?)
       allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in(user)
+      get :show, id: broker_agency_profile.id
     end
 
     it "returns http success" do
-      get :show, id: broker_agency_profile.id
       expect(response).to have_http_status(:success)
     end
 
     it "should render the show template" do
-      get :show, id: broker_agency_profile.id
       expect(response).to render_template("show")
-    end
-
-    it "should get announcement" do
-      FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
-      get :show, id: broker_agency_profile.id
-      expect(flash.now[:warning]).to match /msg for Broker/
     end
   end
 

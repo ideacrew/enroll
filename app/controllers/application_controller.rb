@@ -273,9 +273,4 @@ class ApplicationController < ActionController::Base
     def authorize_for
       authorize(controller_name.classify.constantize, "#{action_name}?".to_sym)
     end
-
-    def set_flash_by_announcement
-      return if current_user.blank?
-      flash.now[:warning] = current_user.get_announcements_by_roles_and_portal(request.path) if flash.blank? || flash[:warning].blank?
-    end
 end
