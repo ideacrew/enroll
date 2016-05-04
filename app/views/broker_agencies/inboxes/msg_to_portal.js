@@ -5,3 +5,4 @@ $(".btn-danger").click(function(){
   $('#show_message_form').hide();
   $('#message_list_form').show();
 });
+alert(123);

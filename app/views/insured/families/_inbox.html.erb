@@ -2,7 +2,7 @@
   <div class="row">
     <div class="inboxes" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_insured_families_path(provider, folder: 'Deleted'), class: 'pull-right') do %>
+        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted'), class: 'pull-right') do %>
         <% if @folder == 'Deleted' %>
         <strong>
           Deleted
@@ -14,7 +14,7 @@
         <span class="pull-right">
           &nbsp;|&nbsp;
         </span>
-        <%= link_to(inbox_insured_families_path(provider), class: 'pull-right') do %>
+        <%= link_to(inbox_insured_families_path(@provider), class: 'pull-right') do %>
         <% if @folder == 'Inbox' %>
         <strong>
           Inbox
@@ -22,10 +22,10 @@
         <% else %>
         Inbox
         <% end %>
-        <span class="badge message-badge"><%= provider.inbox.unread_messages.size %></span>
+        <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
         <% end %>
         <%- if @sent_box == true %>
-        <%= link_to(inbox_insured_families_path(provider, folder: 'Sent')) do%>
+        <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do%>
         <% if @folder == 'Sent' %>
         <strong>
           Sent
@@ -57,8 +57,8 @@
           </tr>
         </thead>
         <tbody>
-          <%- if provider.try(:inbox).try(:messages) %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: provider} %>
+          <%- if @provider.try(:inbox).try(:messages) %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @provider} %>
           <% end %>
         </tbody>
       </table>
