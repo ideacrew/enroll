@@ -200,17 +200,16 @@ class BrokerAgencies::ProfilesController < ApplicationController
       case params[:type]
       when 'fire'
         params[:employer_ids].each do |employer_id|
-          employer_profile = EmployerProfile.find(employer_id) rescue nil
-          if employer_profile.present?
-            employer_profile.fire_general_agency!
-            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
-          end
+          employer_profile = EmployerProfile.find(employer_id) rescue next
+
+          employer_profile.fire_general_agency!
+          send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
         end
         notice = "Fire these employers successful."
       else
         params[:employer_ids].each do |employer_id|
           employer_profile = EmployerProfile.find(employer_id) rescue nil
-          if employer_profile.present?
+          if employer_profile.present? #FIXME : Please move me to model
             broker_role_id = current_user.person.broker_role.id rescue nil
             broker_role_id ||= @broker_agency_profile.primary_broker_role_id
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
@@ -220,6 +219,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
         end
         notice = "Assign successful."
       end
+    elsif params["commit"].try(:downcase) == "clear assignment"
+      params[:employer_ids].each do |employer_id|
+        employer_profile = EmployerProfile.find(employer_id) rescue next
+
+        send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
+        employer_profile.fire_general_agency!
+      end
+      notice = "Unassign successful."
     end
     redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
   end

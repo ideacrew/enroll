@@ -370,17 +370,37 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    before :each do
-      sign_in user
-      post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
-    end
+    context "when we Assign agency" do 
+      before :each do
+        sign_in user
+        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+      end
 
-    it "should redirect" do
-      expect(response).to have_http_status(:redirect)
-    end
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
 
-    it "should get notice" do
-      expect(flash[:notice]).to eq 'Assign successful.'
+      it "should get notice" do
+        expect(flash[:notice]).to eq 'Assign successful.'
+      end
+    end
+    context "when we Unassign agency" do 
+      before :each do
+        sign_in user
+        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should get notice" do
+        expect(flash[:notice]).to eq 'Unassign successful.'
+      end
+      it "should update aasm_state" do
+        employer_profile.reload 
+        expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+      end
     end
   end
 
