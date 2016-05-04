@@ -1,5 +1,5 @@
 <div class="row">
-  <% if true %>
+  <% if verification_needed?(@person) %>
     <div class="col-md-5">
       <h4>
         Verification due date: <%= verification_due_date(@person.primary_family) %>
