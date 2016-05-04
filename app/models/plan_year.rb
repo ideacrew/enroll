@@ -315,21 +315,17 @@ class PlanYear
 
   # Employees who selected or waived and are not owners or direct family members of owners
   def non_business_owner_enrolled
-    enrolled.non_business_owner
-  end
-
-  def non_business_owner_enrollment_count
-    non_business_owner_enrolled.size
+    enrolled.select{|ce| !ce.is_business_owner}
   end
 
   # Any employee who selected or waived coverage
   def enrolled
-    eligible_to_enroll.enrolled
+    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage? }
   end
 
   def total_enrolled_count
     if self.employer_profile.census_employees.count < 100
-      enrolled.count { |e| e.has_active_health_coverage? }
+      enrolled.count
     else
       0
     end
@@ -373,8 +369,8 @@ class PlanYear
     end
 
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < eligible_to_enroll_count
-      if non_business_owner_enrollment_count < Settings.aca.shop_market.non_owner_participation_count_minimum
+    if non_business_owner_enrolled.count < eligible_to_enroll_count
+      if non_business_owner_enrolled.count < Settings.aca.shop_market.non_owner_participation_count_minimum
         errors.merge!(non_business_owner_enrollment_count: "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll")
       end
     end

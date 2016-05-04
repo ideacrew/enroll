@@ -31,8 +31,8 @@
                   <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %><br>
                 </small>
                 <small>
-                  <%= @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
-                  <%= @person.primary_family.current_broker_agency.writing_agent.person.phones.first %>
+                   <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address  ,truncate(@person.primary_family.current_broker_agency.writing_agent.email.address , :length => 25) %><br>
++                  <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
                   <br/><br/>
                 </small>
               </span>

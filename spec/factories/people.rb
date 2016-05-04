@@ -17,6 +17,14 @@ FactoryGirl.define do
       #create_list(:employee_role, 1, person: p)
     end
 
+    trait :with_work_email do
+      emails { [FactoryGirl.build(:email, kind: "work") ] }
+    end
+
+    trait :with_work_phone do
+      phones { [FactoryGirl.build(:phone, kind: "work") ] }
+    end
+
     trait :without_first_name do
       first_name ' '
     end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe VitalSign, :db_clean => :around_each do
+RSpec.describe VitalSign, :dbclean => :around_each do
 
   let(:shop_current_enrollment_count) { 1 }
   let(:shop_past_enrollment_count)    { 2 }
@@ -62,7 +62,7 @@ RSpec.describe VitalSign, :db_clean => :around_each do
 
 
 
-  context "New VitalSign query is created without date/time constraints", dbclean: :after_each do
+  context "New VitalSign query is created without date/time constraints" do
     let(:vital_sign)  { VitalSign.new }
 
     before :each do
