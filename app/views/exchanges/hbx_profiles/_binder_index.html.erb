@@ -19,7 +19,8 @@
         </tr>
       </thead>
       <tbody>
-        <% @employers.each do |employer| %>
+        <% @organizations.each do |organization| %>
+          <% employer = organization.employer_profile %>
           <% if employer.is_new_employer? || employer.is_renewing_employer? %>
             <tr>
               <td>
@@ -44,9 +45,15 @@
 
   $(document).ready(function(){
 
-    var table = $("#binder-transition-dataTable").DataTable({
-      "iDisplayLength": 10
-    });
+    var table = $('#binder-transition-dataTable').DataTable( {
+      "processing": true,
+      "serverSide": true,
+      "ordering" : false,
+      "ajax": {
+        url: "<%= binder_index_datatable_exchanges_hbx_profiles_path(format: :json) %>",
+        type: "GET"
+      }
+    } );
 
     var rowCount = $("#binder-transition-dataTable > tbody > tr").length;
     //checking with one because, we display a row with text "no data available" if there are no rows

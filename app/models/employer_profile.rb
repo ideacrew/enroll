@@ -72,6 +72,10 @@ class EmployerProfile
 
   alias_method :is_active?, :is_active
 
+  # def self.all_with_next_month_effective_date
+    # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+  # end
+
   def parent
     raise "undefined parent Organization" unless organization?
     organization
@@ -206,7 +210,7 @@ class EmployerProfile
       end
     end
 
-    if plan_year.blank? 
+    if plan_year.blank?
       if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
         billing_report_date = plan_year.start_on
       end
@@ -249,6 +253,7 @@ class EmployerProfile
 
   ## Class methods
   class << self
+
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.employer_profile }
     end
@@ -600,7 +605,8 @@ class EmployerProfile
   end
 
   def self.filter_employers_for_binder_paid
-    all.select{ |empr| empr.has_next_month_plan_year? }
+    # filter employers that have next month plan year
+    orgs = Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
   end
 
   def is_eligible_to_enroll?

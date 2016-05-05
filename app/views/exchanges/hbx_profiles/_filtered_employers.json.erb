@@ -1,0 +1,17 @@
+<% org = filtered_employers %>
+<% empr = org.employer_profile %>
+[
+<% checkboxes = capture do %>
+  <%= check_box_tag("employer_profile_ids[]", empr.id, nil, id: "employer_profile_id_#{empr.id.to_s}", disabled: make_binder_checkbox_disabled(empr), class: "binderCheckBox") %>
+<% end %>
+<%= raw checkboxes.to_json %>,
+"<%= json_escape org.legal_name %>",
+"<%= json_escape empr.aasm_state.titleize %>",
+"<%= json_escape empr.renewing_plan_year.present? ? "Renewing" : "New" %>",
+<% rule = capture do %>
+	<td class="eligibility-rule">
+    <%= eligibility_criteria(empr) %>
+	</td>
+<% end %>
+<%= raw rule.to_json %>
+]

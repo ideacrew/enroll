@@ -36,6 +36,7 @@ Rails.application.routes.draw do
         get :assister_index
         get :request_help
         get :binder_index
+        get :binder_index_datatable
         post :binder_paid
         get :verification_index
         get :verifications_index_datatable
