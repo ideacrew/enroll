@@ -1,3 +1,5 @@
+include Employers::EmployerHelper
+
 all_employers = Organization.where(:employer_profile => {"$ne" => nil})
 
 def elected_plans_choice(benefit_group)
@@ -9,23 +11,6 @@ def elected_plans_choice(benefit_group)
 	elsif option == "metal_level"
 		return benefit_group.reference_plan.metal_level.titleize
 	end
-end
-
-def enrollment_state(census_employee=nil)
-  enrollment_states = []
-
-  if benefit_group_assignment = census_employee.active_benefit_group_assignment
-    enrollments = benefit_group_assignment.hbx_enrollments
-
-    %W(health dental).each do |coverage_kind|
-      if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-        enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
-      end
-    end
-    enrollment_states << '' if enrollment_states.compact.empty?
-  end
-
-  enrollment_states.compact.join(', ').titleize
 end
 
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
@@ -92,21 +77,25 @@ CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 			end
 		end
 		rescue Exception=>e
-			puts e
+			puts e.backtrace
+			puts "----------------------------"
 		end
 	end
 end
+
+count = 0
 
 CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 	csv << ["Employer Name", "Employer FEIN", "Employee Name", "HBX ID",
 			"Hire Date", "Date Added to Roster", "Coverage State",
 			"Coverage Status"]
 	all_employers.each do |employer|
-		begin
 			employer_name = employer.legal_name
 			fein = employer.fein
 			census_employees = employer.employer_profile.census_employees
 			census_employees.each do |census_employee|
+				begin
+				count += 1
 				name = "#{census_employee.first_name} #{census_employee.last_name}"
 				employee_role = census_employee.employee_role
 				unless employee_role == nil
@@ -120,9 +109,11 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 				end
 				state_of_enrollment = enrollment_state(census_employee)
 				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, coverage_state, state_of_enrollment]
+				rescue Exception=>e
+					puts "#{count} - #{census_employee.first_name} #{census_employee.last_name}"
+					puts e.backtrace
+					puts "---"*50
+				end
 			end
-		rescue Exception=>e
-			puts e
-		end
 	end
 end
