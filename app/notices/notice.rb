@@ -69,6 +69,12 @@ class Notice
     # clear_tmp
   end
 
+  def join_pdfs(pdfs)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    pdf.save @notice_path
+  end
+
   def upload_and_send_secure_message
     doc_uri = upload_to_amazonS3
     notice  = create_recipient_document(doc_uri)

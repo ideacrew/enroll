@@ -142,6 +142,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.10.0)
+    combine_pdf (0.2.4)
+      ruby-rc4 (>= 0.1.5)
     commonjs (0.2.7)
     commonwatir (4.0.0)
     config (1.0.0)
@@ -516,6 +518,7 @@ DEPENDENCIES
   capybara-screenshot
   carrierwave-mongoid
   coffee-rails (~> 4.1.0)
+  combine_pdf
   config (~> 1.0.0)
   cucumber-rails (~> 1.4.2)
   database_cleaner (= 1.5.1)
@@ -579,7 +582,7 @@ DEPENDENCIES
   watir
   web-console (= 2.3.0)
   wicked_pdf (= 1.0.4)
-  wkhtmltopdf-binary-edge (= 0.12.3.0)
+  wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
    1.11.2

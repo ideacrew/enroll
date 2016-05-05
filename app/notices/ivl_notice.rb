@@ -34,17 +34,17 @@ class IvlNotice < Notice
     end
   end
 
-  def join_pdfs(pdfs)
-    Prawn::Document.generate(@notice_path, {:page_size => 'LETTER', :skip_page_creation => true}) do |pdf|
-      pdfs.each do |pdf_file|
-        if File.exists?(pdf_file)
-          pdf_temp_nb_pages = Prawn::Document.new(:template => pdf_file).page_count
+  # def join_pdfs(pdfs)
+  #   Prawn::Document.generate(@notice_path, {:page_size => 'LETTER', :skip_page_creation => true}) do |pdf|
+  #     pdfs.each do |pdf_file|
+  #       if File.exists?(pdf_file)
+  #         pdf_temp_nb_pages = Prawn::Document.new(:template => pdf_file).page_count
 
-          (1..pdf_temp_nb_pages).each do |i|
-            pdf.start_new_page(:template => pdf_file, :template_page => i)
-          end
-        end
-      end
-    end
-  end
+  #         (1..pdf_temp_nb_pages).each do |i|
+  #           pdf.start_new_page(:template => pdf_file, :template_page => i)
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
 end
