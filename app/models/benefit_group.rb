@@ -427,7 +427,7 @@ class BenefitGroup
     if effective_on_kind == "date_of_hire"
       date_of_hire
     else
-      if effective_on_offset == '1'
+      if effective_on_offset == 1
         date_of_hire.end_of_month + 1.day
       else
       if (date_of_hire + effective_on_offset.days).day == 1
