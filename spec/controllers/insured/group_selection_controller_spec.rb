@@ -198,14 +198,29 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(response).to redirect_to(insured_plan_shopping_path(id: hbx_enrollment.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
-    it "when keep_existing_plan" do
-      user = FactoryGirl.create(:user, id: 97, person: FactoryGirl.create(:person))
-      sign_in user
-      allow(hbx_enrollment).to receive(:save).and_return(true)
-      allow(hbx_enrollment).to receive(:plan=).and_return(true)
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change'
-      expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop'))
+    context "when keep_existing_plan" do
+      let(:old_hbx) { HbxEnrollment.new }
+      let(:special_enrollment) { FactoryGirl.build(:special_enrollment_period) }
+      before :each do
+        user = FactoryGirl.create(:user, person: FactoryGirl.create(:person))
+        sign_in user
+        allow(hbx_enrollment).to receive(:save).and_return(true)
+        allow(hbx_enrollment).to receive(:plan=).and_return(true)
+        allow(HbxEnrollment).to receive(:find).and_return old_hbx
+        allow(old_hbx).to receive(:is_shop?).and_return true
+        allow(old_hbx).to receive(:family).and_return family
+        allow(family).to receive(:earliest_effective_shop_sep).and_return special_enrollment
+        post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop'))
+      end
+
+      it "should get special_enrollment_period_id" do
+        expect(hbx_enrollment.special_enrollment_period_id).to eq special_enrollment.id
+      end
     end
 
     it "should render group selection page if not valid" do
