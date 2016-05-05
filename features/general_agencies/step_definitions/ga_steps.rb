@@ -254,7 +254,7 @@ And /^selects the general agency from dropdown for the employer$/ do
   find("input#employer_ids_").click
   find(:xpath, "//p[@class='label']").click
   find(:xpath, "//li[contains(., 'Rooxo')]").click
-  find("input.btn-primary").click
+  find("#assign_general_agency").click
 end
 
 Then /^the employer is assigned to general agency$/ do
@@ -372,7 +372,7 @@ And /^selects the GA2 from dropdown for the employer$/ do
   find("input#employer_ids_").click
   find(:xpath, "//p[@class='label']").click
   find(:xpath, "//li[contains(., 'Zooxy')]").click
-  find("input.btn-primary").click
+  find("#assign_general_agency").click
 end
 
 Then /^the employer has assigned to GA2$/ do

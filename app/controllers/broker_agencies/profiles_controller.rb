@@ -222,9 +222,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     elsif params["commit"].try(:downcase) == "clear assignment"
       params[:employer_ids].each do |employer_id|
         employer_profile = EmployerProfile.find(employer_id) rescue next
-
-        send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
-        employer_profile.fire_general_agency!
+        if employer_profile.general_agency_profile.present?
+          send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
+          employer_profile.fire_general_agency!
+        end
       end
       notice = "Unassign successful."
     end
