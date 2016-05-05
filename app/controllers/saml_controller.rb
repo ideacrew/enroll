@@ -13,7 +13,7 @@ class SamlController < ApplicationController
 
     sign_out current_user if current_user.present?
 
-    if response.is_valid?
+    if response.is_valid? && response.attributes['mail'].present?
       email = response.attributes['mail'].downcase
 
       user_with_email = User.where(email: email).first
@@ -55,6 +55,9 @@ class SamlController < ApplicationController
           redirect_to relay_state, flash: {notice: "Signed in Successfully."}
         end
       end
+    elsif !response.attributes['mail'].present?
+      log("ERROR: SAMLResponse has missing required mail attribute", {:severity => "critical"})
+      render file: 'public/403.html', status: 403
     else
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
       render file: 'public/403.html', status: 403

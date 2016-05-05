@@ -30,7 +30,7 @@ RSpec.describe Insured::FamiliesController do
     it "should raise the error on invalid person_id" do
       allow(session).to receive(:[]).and_return(33)
       allow(person).to receive(:agent?).and_return(true)
-      expect{get :home}.to raise_error
+      expect{get :home}.to raise_error(ArgumentError)
     end
   end
 end
@@ -166,6 +166,80 @@ RSpec.describe Insured::FamiliesController do
 
         it "should be a redirect" do
           expect(response).to have_http_status(:redirect)
+        end
+      end
+    end
+
+    context "for both ivl and shop" do
+      let(:employee_roles) { double }
+      let(:employee_role) { [double("EmployeeRole")] }
+      let(:enrollments) { double }
+
+      before :each do
+        sign_in user
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+        allow(employee_roles).to receive(:first).and_return(employee_role)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(employee_roles).to receive(:active).and_return([employee_role])
+        allow(family).to receive(:coverage_waived?).and_return(true)
+        allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
+        allow(family).to receive(:enrollments).and_return(enrollments)
+        allow(enrollments).to receive(:order).and_return([display_hbx])
+        allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
+        allow(controller).to receive(:update_changing_hbxs).and_return(true)
+      end
+
+      context "with waived_hbx when display_hbx is employer_sponsored" do
+        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
+        let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        before :each do
+          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          get :home
+        end
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render my account page" do
+          expect(response).to render_template("home")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:employee_role)).to eq(employee_role)
+        end
+
+        it "waived should be false" do
+          expect(assigns(:waived)).to eq false
+        end
+      end
+
+      context "with waived_hbx when display_hbx is individual" do
+        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
+        let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        before :each do
+          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          get :home
+        end
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render my account page" do
+          expect(response).to render_template("home")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:employee_role)).to eq(employee_role)
+        end
+
+        it "waived should be true" do
+          expect(assigns(:waived)).to eq true
         end
       end
     end

@@ -29,6 +29,8 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
@@ -213,6 +215,15 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def add_default_benefit_group_assignment
+    if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
+      add_benefit_group_assignment(plan_year.benefit_groups.first)
+      if self.employer_profile.renewing_plan_year.present?
+        add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
+      end
+    end
+  end
+
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
@@ -264,29 +275,18 @@ class CensusEmployee < CensusMember
   def terminate_employment!(employment_terminated_on)
     if may_terminate_employee_role?
 
-      if active_benefit_group_assignment.present?
-        unless active_benefit_group_assignment.may_terminate_coverage?
-          message = "Error terminating employee #{full_name}, unable to terminate benefit group assignment"
-          Rails.logger.error { message }
-          raise CensusEmployeeError, message
-        end
+      if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
+        active_benefit_group_assignment.terminate_coverage!
       end
 
-      if renewal_benefit_group_assignment.present?
-        unless renewal_benefit_group_assignment.may_terminate_coverage?
-          message = "Error terminating employee #{full_name}, unable to terminate renewal benefit group assignment"
-          Rails.logger.error { message }
-          raise CensusEmployeeError, message
-        end
+      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
+        renewal_benefit_group_assignment.terminate_coverage!
       end
 
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-      active_benefit_group_assignment.terminate_coverage! if active_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.terminate_coverage! if renewal_benefit_group_assignment.present?
       terminate_employee_role!
-
     else
       message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
       Rails.logger.error { message }
@@ -402,19 +402,19 @@ class CensusEmployee < CensusMember
     state :employment_terminated
     state :rehired
 
-    event :rehire_employee_role do
+    event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :link_employee_role do
+    event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
     end
 
-    event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
+    event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
-    event :terminate_employee_role do
+    event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
     end
   end
@@ -436,6 +436,13 @@ class CensusEmployee < CensusMember
       benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
       benefit_group_assignment.update_attributes(is_active: false)
     end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
   end
 
   def set_autocomplete_slug

@@ -4,9 +4,17 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+  end
+
+  def renewal_enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+  end
+
+  def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
-    if benefit_group_assignment = census_employee.active_benefit_group_assignment
+    if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
 
       %W(health dental).each do |coverage_kind|
@@ -17,7 +25,8 @@ module Employers::EmployerHelper
       enrollment_states << '' if enrollment_states.compact.empty?
     end
 
-    enrollment_states.compact.join(', ').titleize
+    "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
+    
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -27,6 +36,15 @@ module Employers::EmployerHelper
       'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES,
       'coverage_waived' => HbxEnrollment::WAIVED_STATUSES
     }
+
+    assignment_mapping.each do |bgsm_state, enrollment_statuses|
+      if enrollment_statuses.include?(enrollment_status.to_s)
+        return bgsm_state
+      end
+    end
+  end
+
+  def render_plan_offerings(benefit_group)
 
     assignment_mapping.each do |bgsm_state, enrollment_statuses|
       if enrollment_statuses.include?(enrollment_status.to_s)
