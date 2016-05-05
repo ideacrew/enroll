@@ -17,6 +17,8 @@ class ConsumerRole
   NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
 
+  SSN_VALIDATION_STATES = %w(na valid outstanding pending)
+
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
   naturalized_citizen
@@ -58,6 +60,9 @@ class ConsumerRole
   field :bookmark_url, type: String, default: nil
   field :contact_method, type: String, default: "Only Paper communication"
   field :language_preference, type: String, default: "English"
+
+  field :ssn_validation, type: String, default: "pending"
+  validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -105,6 +110,20 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
 
+  before_validation :ensure_ssn_validation_status
+
+  def ensure_ssn_validation_status
+    if self.person
+      if self.person.ssn.blank?
+        ssn_validation = "na"
+      else
+        if ssn_validation == "na"
+          ssn_validation = "pending"
+        end
+      end
+    end
+  end
+
   def ssn_or_no_ssn
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
   end
@@ -127,6 +146,18 @@ class ConsumerRole
   def is_aca_enrollment_eligible?
     is_hbx_enrollment_eligible? &&
     Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
+  end
+
+  def ssn_verified?
+    ["na", "valid"].include?(self.ssn_validation)
+  end
+
+  def ssn_pending?
+    self.ssn_validation == "pending"
+  end
+
+  def ssn_outstanding?
+    self.ssn_validation == "outstanding"
   end
 
   def is_hbx_enrollment_eligible?
@@ -280,6 +311,8 @@ class ConsumerRole
     state :verifications_outstanding
     state :fully_verified
 
+    before_all_events :ensure_ssn_validation_status
+
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :verifications_pending, to: :fully_verified
       transitions from: :verifications_outstanding, to: :fully_verified
@@ -430,14 +463,6 @@ private
 
   def residency_verified?
     is_state_resident?
-  end
-
-  def ssn_verified?
-    if lawful_presence_determination.vlp_document_id == 'ssa'
-      lawful_presence_authorized?
-    else
-      true
-    end
   end
 
   def citizenship_verified?

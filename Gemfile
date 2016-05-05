@@ -56,7 +56,7 @@ gem 'symmetric-encryption', '~> 3.6.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 
-gem 'aasm', '~> 4.0.7'
+gem 'aasm', '~> 4.8.0'
 gem 'haml'
 gem 'sass', '3.4.21'
 # gem 'bh'

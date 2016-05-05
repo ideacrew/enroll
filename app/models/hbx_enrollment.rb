@@ -919,10 +919,6 @@ class HbxEnrollment
     #   transitions from: :coverage_enrolled, to: :coverage_canceled, after: :propogate_terminate
     # end
 
-    event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
-    end
-
     event :terminate_coverage, :after => :record_transition do
 
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
