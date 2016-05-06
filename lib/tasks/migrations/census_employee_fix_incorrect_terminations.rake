@@ -27,4 +27,16 @@ namespace :migrations do
       end
     end
   end
+
+  desc "delete benefit group assignments with missing benefit groups"
+  task :delete_invalid_benefit_group_assignments, [:fein] => :environment do |task, args| 
+    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    employer_profile.census_employees.each do |ce|
+      bg_assignments = ce.benefit_group_assignments.select{|bgsm| bgsm.benefit_group.blank?}
+      if bg_assignments.any?
+        bg_assignments.each{|bg_assignment| bg_assignment.delete }
+        puts "deleted invalid benefit group assignment under #{ce.full_name}"
+      end
+    end
+  end
 end
