@@ -1,0 +1,52 @@
+<div class="modal fade" id="dependentsList" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Coverage For</h4>
+      </div>
+      <div class="modal-body">
+        <div class="module dependents-list-members">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm">
+              <thead class="thead-default">
+                <tr>
+                  <th>
+                    Name
+                  </th>
+                  <th>
+                    Relationship
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <% dependentslist = subscriber + dependents %>
+                <% dependentslist.each do |d| %>
+                <tr>
+                  <td>
+                    <%= d.person.full_name %>
+                  </td>
+                  <td>
+                    <% if subscriber.blank? %>
+                      <%= @hbx_enrollment.consumer_role.person.find_relationship_with(d.person) %>
+                    <% else %>
+                      <%= subscriber.first.person.find_relationship_with(d.person) %>
+                    <% end %>
+                  </td>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+        <%= link_to 'Close', '', :class => 'btn btn-trans', data: { dismiss: "modal"} %>
+      </div>
+    </div>
+  </div>
+</div>

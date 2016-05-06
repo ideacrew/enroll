@@ -25,7 +25,8 @@ module Employers::EmployerHelper
       enrollment_states << '' if enrollment_states.compact.empty?
     end
 
-    enrollment_states.compact.join(', ').titleize
+    "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
+    
   end
 
   def benefit_group_assignment_status(enrollment_status)

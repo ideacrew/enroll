@@ -1,11 +1,18 @@
-<br/>
-<p class="pull-left">
-  <span class="ttu lg twelve">Coverage For:</span>
-  <strong><%= @person.full_name %></strong> <% if @person.has_consumer_role? %><% else %> (employee) <% end %>+
-  <strong><%= @hbx_enrollment.try(:humanized_dependent_summary) %> dependent(s)</strong>&nbsp;&nbsp;
-  <% if @market_kind == 'shop' && @coverage_kind == 'health' %>
-  Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
-  <% end %>
-  <span class="ttu lg twelve">Plans:</span>
-<strong id='plans-count'><%= @plans.count %></strong>
-</p>
+<div class="module shopping-data">
+  <br/>
+  <div class="pull-left">
+    <span class="ttu lg twelve">Coverage For:</span>
+    &nbsp;
+    <%= plan_shopping_dependent_text(@hbx_enrollment) %>
+    &nbsp;&nbsp;
+    <% if @market_kind == 'shop' && @coverage_kind == 'health' %>
+    Employer: &nbsp;
+    <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong>
+    &nbsp;&nbsp;
+    <% end %>
+    <span class="ttu lg twelve">Plans:</span>
+    &nbsp;
+    <strong id='plans-count'><%= @plans.count %></strong>
+  </div>
+  <br/>
+</div>
