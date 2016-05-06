@@ -34,9 +34,7 @@
               <td><%= employer.renewing_plan_year.present? ? "Renewing" : "New" %></td>
               <td><%= eligibility_criteria(employer) %></td>
               <td>
-                <% if employer.aasm_state == "binder_paid" %>
-                  <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}) %>
-                <% end %>
+                <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}, disabled: employer.aasm_state != "binder_paid") %>
               </td>
             </tr>
           <% end %>
