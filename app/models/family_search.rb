@@ -24,7 +24,7 @@ class FamilySearch
     "value.family_members.person.hbx_id" => 1,
     "value.family_members.person.first_name" => 1,
     "value.family_members.person.last_name" => 1
-  })
+  }, :name => "family_search_all_attributes_index")
 
   def family
     value
