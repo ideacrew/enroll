@@ -170,7 +170,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         waived_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
-        non_business_owner_enrollment_count: 10,
+        non_business_owner_enrolled: 10.times.map{|i| double },
         hbx_enrollments: [hbx_enrollment],
         additional_required_participants_count: 5,
         benefit_groups: benefit_groups,

@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include DataTablesAdapter
 
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -11,15 +12,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
-  end
-
-  def binder_index
-    @employers = EmployerProfile.filter_employers_for_binder_paid
-
-    respond_to do |format|
-      format.html { render "employers/employer_profiles/binder_index" }
-      format.js {}
-    end
   end
 
   def binder_paid
@@ -161,6 +153,62 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.html { render partial: "index_verification" }
       format.js {}
     end
+  end
+
+  def binder_index
+    @organizations = EmployerProfile.filter_employers_for_binder_paid
+
+    respond_to do |format|
+      format.html { render "employers/employer_profiles/binder_index" }
+      format.js {}
+    end
+  end
+
+  def binder_index_datatable
+    dt_query = extract_datatable_parameters
+    organizations = []
+
+    all_organizations = EmployerProfile.filter_employers_for_binder_paid
+
+    if dt_query.search_string.blank?
+      organizations = all_organizations#.map(&:employer_profile)
+      # employers = EmployerProfile.find("57238d89006d7c7c3c00002f")
+    else
+      org_ids = Organization.search(dt_query.search_string).pluck(:id)
+      organizations = all_organizations.where({
+        "id" => {"$in" => org_ids}
+      })
+    end
+
+    @draw = dt_query.draw
+    @total_records = all_organizations.count
+    @records_filtered = organizations.count
+    @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
+    render
+
+    # respond_to do |format|
+    #   format.html { render "employers/employer_profiles/binder_index" }
+    #   format.js {}
+    # end
+  end
+
+  def verifications_index_datatable
+    dt_query = extract_datatable_parameters
+    families = []
+    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    if dt_query.search_string.blank?
+      families = all_families
+    else
+      person_ids = Person.search(dt_query.search_string).pluck(:id)
+      families = all_families.where({
+        "family_members.person_id" => {"$in" => person_ids}
+      })
+    end
+    @draw = dt_query.draw
+    @total_records = all_families.count
+    @records_filtered = families.count
+    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    render 
   end
 
   def product_index

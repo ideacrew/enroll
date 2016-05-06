@@ -393,7 +393,7 @@ module ApplicationHelper
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
-    non_owner = plan_year.non_business_owner_enrollment_count
+    non_owner = plan_year.non_business_owner_enrolled.count
     covered = plan_year.covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
@@ -515,24 +515,6 @@ module ApplicationHelper
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "local"
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
-  end
-
-  def admin_docs_filter(filter_param, title = nil, style = nil)
-    direction = filter_param == sort_filter && sort_direction == 'asc' ? 'desc' : 'asc'
-    style = direction if style == 'admin_docs'
-    link_to title, consumer_role_status_documents_path(:sort => filter_param, :direction => direction), remote: true, class: style
-  end
-
-  def docs_waiting_for_review
-    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
-  end
-
-  def missing_docs
-    Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').count
-  end
-
-  def all_unverified
-    number_with_delimiter(@unverified_persons.count)
   end
 
   def display_dental_metal_level(plan)
