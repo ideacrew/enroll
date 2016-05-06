@@ -9,9 +9,13 @@
 "<%= json_escape empr.aasm_state.titleize %>",
 "<%= json_escape empr.renewing_plan_year.present? ? "Renewing" : "New" %>",
 <% rule = capture do %>
-  <td class="eligibility-rule">
-    <%= eligibility_criteria(empr) %>
-  </td>
+  <%= eligibility_criteria(empr) %>
 <% end %>
-<%= raw rule.to_json %>
+<%= raw rule.to_json %>,
+<% transmit_xml_button = capture do %>
+  <% if empr.aasm_state == "binder_paid" %>
+    <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(empr), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}) %>
+  <% end %>
+<% end %>
+<%= raw transmit_xml_button.to_json %>
 ]
