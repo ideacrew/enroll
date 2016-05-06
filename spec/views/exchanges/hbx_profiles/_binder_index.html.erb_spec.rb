@@ -29,6 +29,22 @@ RSpec.describe "exchanges/hbx_profiles/_binder_index.html.erb" do
     )
   }
 
+  let(:organization_1){
+    instance_double(
+      "Organization",
+      legal_name: "test employer new",
+      employer_profile: new_employer
+      )
+  }
+
+  let(:organization_2){
+    instance_double(
+      "Organization",
+      legal_name: "test employer new",
+      employer_profile: renewing_employer
+      )
+  }
+
   let(:renewing_employer){
     instance_double(
       "EmployerProfile",
@@ -42,10 +58,10 @@ RSpec.describe "exchanges/hbx_profiles/_binder_index.html.erb" do
     )
   }
 
-  let(:employers){ [new_employer, renewing_employer] }
+  let(:organizations){ [organization_1, organization_2] }
 
   before :each do
-    assign(:employers, employers)
+    assign(:organizations, organizations)
     allow(new_plan_year).to receive(:assigned_census_employees_without_owner).and_return(true)
     allow(renewing_plan_year).to receive(:assigned_census_employees_without_owner).and_return(true)
   end
