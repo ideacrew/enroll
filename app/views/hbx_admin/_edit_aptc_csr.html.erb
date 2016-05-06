@@ -14,27 +14,24 @@
       </tbody>
     </table>
   </div>
-
   <div class="row input-no-pd">
     <%= form_for @person, remote: true, url: update_aptc_csr_path, method: "post", class: "form" do |f|%>
       <%= f.hidden_field :person_id, value: @person.id %>
       <%= f.hidden_field :family_id, value: @family.id %>
+      <%= f.hidden_field :hbx_enrollment_id, value: @hbx.id if @hbx.present?%>
        <div align="center"> 
-        <%#= link_to 'Calculate Available APTC', edit_aptc_csr_path(family_id: @family.id, person_id: @person.id), class: "btn btn-default btn", remote: true%>
          <a href="javascript:void(0)" class='btn btn-default' id='calculate_available_aptc'>Calculate Available APTC</a>
       </div><br/>
       <table class="table table-border module edit-aptc-csr-table">
-        
         <thead>
-          <th>Month (<%=@current_year%>)</th>
+          <th><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%=@current_year%></th>
           <% @months_array.each do |month| %>
             <th><%=month.capitalize%></th>
           <%end%>
           <th> </th>
-          <th>Edit Fields</th>
+          <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th>
         </thead>  
         <tbody>
-
             <%@grid_vals.keys.each do |attribute|%> <!-- Iterating over Different APTC / CSR attributes in the hash-->
               <tr>
                   <%if attribute != "individuals_covered" && attribute != "eligible_members"%>
@@ -47,13 +44,11 @@
                               <%no_hbx = true%>
                             <%end%>
                       <%end%>
-
-                     <%if no_hbx%> <td align = "center" colspan = "12">No Active Enrollment (Assistance Receiving) for <%=@current_year%>.</td> <%end%>
-
+                     <%if no_hbx%> <td align = "center" colspan = "12"> <span class="glyphicon glyphicon-info-sign"></span>&nbsp;No Active Plan Enrollment (Assistance Receiving) for <%=@current_year%>.</td> <%end%>
                       <td></td>
                       <td>
                           <%if attribute == "aptc_applied"%> 
-                              <%= text_field_tag "#{attribute.to_s}", @aptc_applied, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute),  disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), class: 'form-control', readonly: @no_enrollment %>
+                              <%= text_field_tag "#{attribute.to_s}", @aptc_applied, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute),  disabled: @no_enrollment, class: 'form-control', readonly: @no_enrollment %>
                           <%elsif attribute == "available_aptc"%>
                               <%= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute)%>    
                           <%elsif attribute == "max_aptc"%>
@@ -66,29 +61,21 @@
               </tr>
               <tr></tr>
             <%end%>         
-
                 <tr>
-                  <th colspan = "13">Individual(s) Covered</th>
-                  <%# @months_array.each do |month| %>
-                    <!--<th><%#=month.capitalize%></th>-->
-                  <%# end%>
+                  <th colspan = "13">Individual Member(s)</th>
                   <th></th>
-                  <th>Eligible?</th>
+                 <!--  <th>Eligible?</th> -->
+                  <th></th>
                 </tr>
                 <% @grid_vals["individuals_covered"].each do |person_id| %>
                   <tr>
-                    <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=Person.find(person_id.keys.first).full_name%></td>
-
-                      <%#person_id.values.first.each do |month, is_eligible|%>  <!-- Eligibility Statuses for each Month  for  one individual -->
-                        <!--<td class="<%#=aptc_csr_data_type(month)%>"><%#=check_box_tag "#{person_id.keys.first+'_'+month}", 'checked', is_eligible, disabled: true%></td>-->
-                      <%#end%>
-                      <td></td>
-
-                      <td><%=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: true, class: 'individual_coverd' %>
-                      </td>
+                    <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=Person.find(person_id.keys.first).full_name%><%if primary_member(person_id.keys.first)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%end%></td>
+                    <td></td>
+                    <!-- <td><%#=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: true, class: 'individual_coverd' %></td> -->
+                    <td></td>
+                    <!-- <td><%#= text_field_tag "aptc_applied_#{person_id.keys.first}", @aptc_applied, size: '8px', class: 'form-control', readonly: @no_enrollment %></td> -->
                   </tr>
                 <%end%>
-
         </tbody> 
       </table>
       <div align="right"><%= f.submit "Confirm", class: "btn btn-primary btn-lg" %></div>

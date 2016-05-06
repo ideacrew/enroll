@@ -103,4 +103,16 @@ module Insured::FamiliesHelper
     end
   end
 
+  def all_active_enrollment_with_aptc(family)
+    family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+  end
+
+  def hbx_memeber_names(hbx_enrollment_members)
+    member_names = Array.new
+    hbx_enrollment_members.each do |hem|
+      member_names.push(Person.find(hem.family_member.person_id.to_s).full_name)
+    end
+    return member_names.join(", ")
+  end
+
 end

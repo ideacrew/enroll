@@ -6,8 +6,11 @@ class HbxAdminController < ApplicationController
     @current_year = TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family)
+    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
+    #binding.pry
+    @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family, @hbx)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
+    #binding.pry
     @aptc_applied = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0 
     @max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
     @csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
@@ -23,7 +26,8 @@ class HbxAdminController < ApplicationController
     @current_year = TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family, params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:member_ids])
+    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if @hbx.present?
+    @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family, @hbx, params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:member_ids])
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
     @aptc_applied = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0 
     @max_aptc = params[:max_aptc] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
@@ -38,6 +42,7 @@ class HbxAdminController < ApplicationController
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
+    hbx    = HbxEnrollment.find(params[:person][:hbx_enrollment_id]) if params[:person].present? && params[:person][:hbx_enrollment_id].present?
 
     if @family.present?
       # Update Max APTC and CSR Percentage
@@ -46,12 +51,8 @@ class HbxAdminController < ApplicationController
       
       existing_latest_eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
       latest_active_tax_household = @family.active_household.latest_active_tax_household
-      #binding.pry
+
       if (params[:max_aptc].to_f == max_aptc) && (params[:csr_percentage].to_i == csr_percent_as_integer)
-        # eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
-        # eligibility_determination.max_aptc = params[:max_aptc].to_f
-        # eligibility_determination.csr_percent_as_integer = params[:csr_percentage].to_i
-        # eligibility_determination.save
       else
         # if max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
         latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => TimeKeeper.datetime_of_record, 
@@ -66,15 +67,21 @@ class HbxAdminController < ApplicationController
       end
       
       # Update APTC Applied if there is an existing hbx_enrollment
-      hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
-      if params[:aptc_applied].present? && hbx_enrollment.present?
-        hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied].to_f*100, "USD")
-        hbx_enrollment.save
+      if params[:aptc_applied].present? && hbx.present?
+        #binding.pry
+        hbx.applied_aptc_amount = Money.new(params[:aptc_applied].to_f*100, "USD")
+        hbx.save
       end
+
+      # hbx_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).first
+      # if params[:aptc_applied].present? && hbx_enrollment.present?
+      #   hbx_enrollment.applied_aptc_amount = Money.new(params[:aptc_applied].to_f*100, "USD")
+      #   hbx_enrollment.save
+      # end
       
       # Update  Individuals Coverage Eligibility
       # We are not updating eligibility on an individual level - at least not until now. Eligibility resides on the tax_household level. 
-      # Hence commenting the code below.
+      # Hence commenting the code below for now.
 
       # tax_household_members = @family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
       # tax_household_members.each do |member|

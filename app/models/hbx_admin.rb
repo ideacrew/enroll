@@ -5,31 +5,36 @@ class HbxAdmin
 
   class << self
 
-    def build_grid_values_for_aptc_csr(family, max_aptc=nil, csr_percentage=nil, member_ids=nil)
+    def build_grid_values_for_aptc_csr(family, hbx, max_aptc=nil, csr_percentage=nil, member_ids=nil)
+        puts "We have hbx !!! : #{hbx.id}" if hbx.present?
+        puts "NO HBX / ENROLLMENT !!" if hbx.blank?
         months_array = Date::ABBR_MONTHNAMES.compact
-        plan_premium_vals         = build_plan_premium_values(family, months_array)
-        aptc_applied_vals         = build_aptc_applied_values(family, months_array)
+        plan_premium_vals         = build_plan_premium_values(family, months_array, hbx)
+        aptc_applied_vals         = build_aptc_applied_values(family, months_array, hbx)
         avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array, max_aptc, member_ids)
         max_aptc_vals             = build_max_aptc_values(family, months_array, max_aptc)
         csr_percentage_vals       = build_csr_percentage_values(family, months_array, csr_percentage)
         slcsp_values              = build_slcsp_values(family, months_array, member_ids)
         individuals_covered_vals  = build_individuals_covered_array(family, months_array)
-        eligible_members_vals     = build_eligible_members(family, months_array, member_ids)
+        eligible_members_vals     = build_eligible_members(family, member_ids)
 
         return { "plan_premium"         => plan_premium_vals,
                  "aptc_applied"         => aptc_applied_vals,
                  "avalaible_aptc"       => avalaible_aptc_vals,
                  "max_aptc"             => max_aptc_vals,
-                 "csr_percentage"     => csr_percentage_vals,
+                 "csr_percentage"       => csr_percentage_vals,
                  "slcsp"                => slcsp_values, 
                  "individuals_covered"  => individuals_covered_vals,
                  "eligible_members"     => eligible_members_vals 
                 }
     end
 
-    def build_plan_premium_values(family, months_array)
-      hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
-
+    def build_plan_premium_values(family, months_array, hbx_enrollment=nil)
+      if hbx_enrollment.nil?
+        hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
+      else
+        hbx = hbx_enrollment
+      end    
       plan_premium_hash = Hash.new
       months_array.each_with_index do |month, ind|
         plan_premium_hash.store(month, hbx.try(:total_premium) || false)
@@ -37,7 +42,7 @@ class HbxAdmin
       return plan_premium_hash
     end
 
-    def build_aptc_applied_values(family, months_array)
+    def build_aptc_applied_values(family, months_array, hbx_enrollment=nil)
       #hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
@@ -45,16 +50,24 @@ class HbxAdmin
       aptc_applied_hash = Hash.new
       months_array.each_with_index do |month, ind|
         eligibility_determinations.each do |ed|
-          update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family)
+          update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family, hbx_enrollment)
           #aptc_applied_hash.store(month, applied_aptc)
         end
       end
       return aptc_applied_hash
     end
 
-    def update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family)
-      hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
-      applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
+    # APTC APPLIED
+    def update_aptc_applied_hash_for_month(aptc_applied_hash, month, ed, family, hbx_enrollment=nil)
+      if hbx_enrollment.nil?
+        hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+        applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
+      else
+        hbx = hbx_enrollment
+        applied_aptc = hbx.applied_aptc_amount.to_f
+      end
+      #binding.pry
+      
       first_of_month_num_current_year = first_of_month_converter(month)
       if first_of_month_num_current_year >= ed.determined_on
         aptc_applied_hash.store(month, applied_aptc)
@@ -78,9 +91,11 @@ class HbxAdmin
       return available_aptc_hash
     end
 
+    #   AVAILABLE APTC
     def update_available_aptc_hash_for_month(available_aptc_hash, month, ed, family, max_aptc=nil, member_ids=nil)
       first_of_month_num_current_year = first_of_month_converter(month)
-
+      ## Populate IDs of all members in member_ids for now because we dont allow the changing of eligibility on an individual basis. all are eligible.
+      member_ids = HbxAdmin.build_eligible_members(family)
       if max_aptc.present? && member_ids.present?
         hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
         applied_aptc = hbxs.map(&:hbx_enrollment_members).flatten.select{|hm| member_ids.include?(hm.person.id.to_s) }.map{|h| h.applied_aptc_amount.to_f }.sum
@@ -245,7 +260,7 @@ class HbxAdmin
     end
 
 
-    def build_eligible_members(family, months_array, member_ids=nil)
+    def build_eligible_members(family, member_ids=nil)
       return member_ids if member_ids.present?
 
       eligible_members = Array.new
@@ -256,6 +271,18 @@ class HbxAdmin
         end
       end
       return eligible_members
+    end
+
+
+
+    def build_aptc_per_enrollment(hbxs)
+      aptc_per_enrollment = Hash.new
+      hbxs.each do |hbx|
+        plan_name         = Plan.where(id: hbx.plan_id).first.name
+        hbx_applied_aptc  = hbx.applied_aptc_amount.to_f
+        aptc_per_enrollment[hbx.id.to_s] = [hbx_applied_aptc, plan_name]
+      end
+      aptc_per_enrollment  
     end
     ###
 

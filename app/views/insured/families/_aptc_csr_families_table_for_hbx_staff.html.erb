@@ -11,8 +11,8 @@
         <th>First Name</th>
         <th>DOB</th>
         <th>SSN</th>
-        <th></th>
-        <th>Edit APTC/CSR</th>
+        <th>Active <br />Enrollments?</th>
+        <th>Edit <br />APTC/CSR</th>
       </tr>
     </thead>
     <tbody>
@@ -26,9 +26,33 @@
         <td><%= pp.first_name%></td>
         <td><%= format_date(pp.dob) %></td>
         <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
-        <td></td>
-        <td><%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id), class: "btn btn-default btn-xs", remote: true%></td>
+        <td>
+            <% if all_active_enrollment_with_aptc(family).present?%>
+              <button id = "showhideenrollments" href="#showhide-enrollments" class="nav-toggle btn btn-default btn-xs">
+                Enrollment(s)
+                <a><i class="fa fa-chevron-down fa-lg"></i></a>
+              </button> 
+            <%else%>
+              <span class="glyphicon glyphicon-remove">
+            <%end%> 
+        </td>
+        <td>
+              <% if all_active_enrollment_with_aptc(family).blank?%>
+                  <%= link_to 'Edit Eligibility', edit_aptc_csr_path(family_id: family.id, person_id: pp.id), class: "btn btn-info btn-xs", remote: true%>
+              <%end%>
+        </td>
       </tr>
+      <div id="showhide-enrollments" style="display:none">
+
+        <%all_active_enrollment_with_aptc(family).each do |hbx|%>
+        <tr>
+          <td colspan = "2"></td>
+          <td colspan = "4">( <b>Members:</b>, <%=hbx_memeber_names(hbx.hbx_enrollment_members)%> )  <b>Plan</b> <%=hbx.plan.name%></td>
+          <td><%= link_to 'Edit Enrollment', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, hbx_enrollment_id: hbx.id), class: "btn btn-warning btn-xs", remote: true%></td>
+        </tr>
+        <%end%>
+      </div>
+
       <% end %>
     </tbody>
   </table>
