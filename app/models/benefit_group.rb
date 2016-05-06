@@ -19,6 +19,7 @@ class BenefitGroup
   ]
 
   field :title, type: String, default: ""
+  field :description, type: String, default: ""
   field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :dental_plan_option_kind, type: String
@@ -129,7 +130,7 @@ class BenefitGroup
   end
 
   def is_offering_dental?
-    dental_reference_plan_id.present? && elected_dental_plan_ids.any? 
+    dental_reference_plan_id.present? && elected_dental_plan_ids.any?
   end
 
   def is_open_enrollment?
