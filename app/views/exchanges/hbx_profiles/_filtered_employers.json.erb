@@ -9,9 +9,9 @@
 "<%= json_escape empr.aasm_state.titleize %>",
 "<%= json_escape empr.renewing_plan_year.present? ? "Renewing" : "New" %>",
 <% rule = capture do %>
-	<td class="eligibility-rule">
+  <td class="eligibility-rule">
     <%= eligibility_criteria(empr) %>
-	</td>
+  </td>
 <% end %>
 <%= raw rule.to_json %>
 ]
