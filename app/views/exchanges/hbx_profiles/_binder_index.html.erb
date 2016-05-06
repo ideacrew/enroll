@@ -52,11 +52,13 @@
         "ajax": {
           url: "<%= binder_index_datatable_exchanges_hbx_profiles_path(format: :json) %>",
           type: "GET"
+        },
+        "initComplete": function(settings, json) {
+          binderTransition.init();
         }
       }
     );
 
-    binderTransition.init();
   });
 
 </script>
