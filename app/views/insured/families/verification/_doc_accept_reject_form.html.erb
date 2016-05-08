@@ -1,8 +1,8 @@
 <% if current_user.has_hbx_staff_role? %>
     <td>
-      <%= link_to "accept", document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs", remote: true%>
+      <%= link_to "Accept", document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs btn-br", remote: true%>
       <%= link_to "#comment-#{vlp_doc.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "comment-#{vlp_doc.id}" } do %>
-          <%= button_tag "reject", class:"btn btn-danger btn-xs" %>
+          <%= button_tag "Reject", class:"btn btn-danger btn-xs btn-br" %>
       <% end %>
       <!-- Admin comment form -->
       <div class="collapse" id="comment-<%=vlp_doc.id%>">
