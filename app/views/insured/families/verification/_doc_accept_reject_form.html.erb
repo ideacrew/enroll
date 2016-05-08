@@ -1,4 +1,4 @@
-<% if current_user && current_user.has_hbx_staff_role? %>
+<% if current_user.has_hbx_staff_role? %>
     <td>
       <%= link_to "accept", document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs", remote: true%>
       <%= link_to "#comment-#{vlp_doc.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "comment-#{vlp_doc.id}" } do %>

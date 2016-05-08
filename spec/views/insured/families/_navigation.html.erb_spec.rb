@@ -32,7 +32,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     allow(person).to receive(:has_consumer_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
     allow(inbox).to receive(:unread_messages).and_return(3)
-    allow(view).to receive(:enrollment_group_verified?).and_return(true)
+    allow(view).to receive(:enrollment_group_unverified?).and_return(true)
     allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
     allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
     assign(:person, person)
@@ -44,8 +44,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   it "should match the side bar tabs info on family home page" do
     expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: 'My DC Health Link')
     expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-    expect(rendered).to have_selector('a[href="/insured/families/documents_index?tab=documents"]', text: 'Documents')
-    expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Verification')
+    expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
     expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
   end
 

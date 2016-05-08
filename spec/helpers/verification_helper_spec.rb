@@ -111,23 +111,23 @@ RSpec.describe VerificationHelper, :type => :helper do
     before :each do
       assign(:person, person)
     end
-    it "returns true if all family members are fully verified" do
+    it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
-        member.person.consumer_role.aasm_state="fully_verified"
+        member.person.consumer_role.aasm_state="verifications_outstanding"
         member.save
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
-      expect(helper.enrollment_group_verified?(person)).to eq true
+      expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
-    it "returns false if any of family members is not fully verified" do
+    it "returns false if all family members are fully verified or pending" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
-      expect(helper.enrollment_group_verified?(person)).to eq false
+      expect(helper.enrollment_group_unverified?(person)).to eq false
     end
   end
 

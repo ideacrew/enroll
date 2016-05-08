@@ -1,12 +1,12 @@
 <% if current_user && current_user.has_hbx_staff_role? %>
-    <%= link_to "#verif-#{v_type.split.join("_")}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "verif-#{v_type.split.join("_")}" } do %>
-        <%= button_tag "Verify", class:"btn btn-danger btn-xs" %>
-    <% end %>
+    <div class="popover-markup">
+      <%= link_to "Verify", "#", class:"btn btn-success btn-xs trigger" %>
+
     <!-- Admin comment form -->
-    <div class="collapse" id="verif-<%=v_type.split.join("_")%>">
-      <div class="col-md-12 verif-type">
+      <div class="head hide">Provide verification reason:</div>
+      <div class="content hide">
         <%= form_tag update_individual_documents_path, multipart: true, method: :put do %>
-            <ul>
+            <ul id="verification-reason">
               <%= hidden_field_tag 'person_id', person.id  %>
               <%= hidden_field_tag 'verification_type', v_type  %>
               <li>
@@ -26,7 +26,7 @@
                 <%= label_tag 'e-verified in Curam', 'e-verified in Curam', class:"module verif-type" %>
               </li>
               <div>
-                <%= submit_tag "Complete verification", class: "btn btn-default btn-xs" %>
+                <%= submit_tag "Complete", class: "btn btn-success btn-xs" %>
               </div>
             </ul>
         <% end %>
@@ -35,5 +35,18 @@
     <!-- >>>>>> admin comment form -->
 
 <% else %>
-    <% link_to "Send for review", "#", class:"btn btn-success btn-xs" %>
+    <% #link_to "Send for review", "#", class:"btn btn-success btn-xs" %>
 <% end %>
+
+<script type="text/javascript" charset="utf-8">
+  $('.popover-markup>.trigger').popover({
+    html: true,
+    title: function () {
+      return $(this).parent().find('.head').html();
+    },
+    content: function () {
+      return $(this).parent().find('.content').html();
+    },
+    animation: true
+  });
+</script>
