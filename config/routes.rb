@@ -227,7 +227,7 @@ Rails.application.routes.draw do
   end
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
-  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker', via: [:get]
+  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -333,7 +333,8 @@ Rails.application.routes.draw do
     collection do
       put :change_person_aasm_state
       get :show_docs
-      put :update_individual
+      get :update_individual
+      put :update_verification_type
       get :enrollment_verification
       put :enrollment_docs_state
       put :extend_due_date

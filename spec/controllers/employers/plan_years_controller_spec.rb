@@ -582,7 +582,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       it "should raise the error" do
         expect do
           post :make_default_benefit_group, employer_profile_id: employer_profile.id.to_s, plan_year_id: plan_year.id.to_s, benefit_group_id: benefit_group.id.to_s, format: :js
-        end.to raise_error
+        end.to raise_error(Mongoid::Errors::Validations)
       end
     end
   end
