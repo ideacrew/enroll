@@ -14,10 +14,10 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
-     if type == 'Social Security Number' || type == 'Citizenship'
-        member.consumer_role.is_state_resident? ? "verified" : "outstanding"
-     elsif type == 'Immigration status'
-        member.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
+     if type == 'Social Security Number'
+        member.consumer_role.ssn_verified? ? "verified" : "outstanding"
+     elsif type == 'Citizenship' || type == 'Immigration status'
+       member.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
      end
   end
 

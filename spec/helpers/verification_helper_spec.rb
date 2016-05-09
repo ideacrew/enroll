@@ -22,11 +22,11 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     context "SSN and Citizenship type" do
       it "returns outstanding status for consumer without state residency" do
-        person.consumer_role.is_state_resident = false
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
       end
 
       it "returns verified status for consumer with state residency" do
+        person.consumer_role.ssn_validation = "valid"
         expect(helper.verification_type_status("Social Security Number", person)).to eq "verified"
       end
     end
@@ -57,10 +57,12 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     context "verification type status verified" do
       it "returns success SSN verified" do
+        person.consumer_role.ssn_validation = "valid"
         expect(helper.verification_type_class("Social Security Number", person)).to eq("success")
       end
 
       it "returns success for Citizenship verified" do
+        person.consumer_role.lawful_presence_determination = lawful_presence_determination
         expect(helper.verification_type_class("Citizenship", person)).to eq("success")
       end
 

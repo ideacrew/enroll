@@ -1,19 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
-
-  let(:person){
-    instance_double(
-      "Person",
-      full_name: "my full name"
-      )
-  }
-
-  let(:hbx_enrollment){
-    instance_double(
-      "HbxEnrollment"
-      )
-  }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:person_two) { FactoryGirl.create(:person, first_name: 'iajsdias') }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:household) { FactoryGirl.create(:household, family: family) }
+  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: household) }
+  let(:hbx_enrollment_member_one) { double("hbx_enrollment_member") }
+  let(:hbx_enrollment_member_two) { double("hbx_enrollment_member") }
 
   let(:plan){
     instance_double(
@@ -28,23 +22,46 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
   before :each do
     allow(hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
     allow(person).to receive(:has_consumer_role?).and_return(false)
-
     assign :hbx_enrollment, hbx_enrollment
     assign :plans, plan_count
-    assign :person, person
-    render partial: "shared/plan_shoppings/more_plan_details"
   end
 
-  it "should match person full name" do
-    expect(rendered).to match /Coverage For.*#{person.full_name}.*/m
+  # it "should match dependent count" do
+  #   render "shared/plan_shoppings/more_plan_details"
+  #   expect(rendered).to match /.*#{hbx_enrollment.humanized_dependent_summary} dependent*/m
+  # end
+
+  context "with a primary subscriber and one dependent" do
+    before :each do
+      allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
+      allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
+      allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
+      allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two ])
+      render "shared/plan_shoppings/more_plan_details", person: person
+
+    end
+
+    it "should match person full name" do
+      expect(rendered).to match /#{person.full_name}/i
+    end
+
+    it "should match dependents full name" do
+      expect(rendered).to match /#{person_two.full_name}/i
+    end
   end
 
-  it "should match dependent count" do
-    expect(rendered).to match /.*#{hbx_enrollment.humanized_dependent_summary} dependent*/m
-  end
+  context "with no primary subscriber and one dependent" do
+    before :each do
+      allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
+      allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_two])
+      render "shared/plan_shoppings/more_plan_details", person: person
+    end
 
-  it "should match plan count" do
-    expect(rendered).to match /Plans.*#{plan_count}.*/
+    it "should match dependent count" do
+      expect(rendered).to match /#{person_two.full_name}/i
+    end
   end
 
 end

@@ -7,15 +7,14 @@
     <!-- Admin comment form -->
       <div class="head hide">Provide Verification Reason:</div>
       <div class="content hide">
-        <%= form_tag update_individual_documents_path, multipart: true, method: :put do %>
+        <%= form_tag update_verification_type_documents_path, multipart: true, method: :put do %>
             <ul id="verification-reason">
               <%= hidden_field_tag 'person_id', person.id  %>
               <%= hidden_field_tag 'verification_type', v_type  %>
-
               <div class="n-radio-group">
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_document_in_Enroll_app">
-                    <%= radio_button_tag 'citizenship', 'document_in_Enroll_app', true, class: 'n-radio' %>
+                    <%= radio_button_tag 'verification_reason', 'document_in_Enroll_app', true, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in EnrollApp
@@ -23,7 +22,7 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_document_in_DIMS">
-                    <%= radio_button_tag 'citizenship', 'document_in_DIMS', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'verification_reason', 'document_in_DIMS', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in DIMS
@@ -31,7 +30,7 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_SAVE_system">
-                    <%= radio_button_tag 'citizenship', 'SAVE system', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'verification_reason', 'SAVE system', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     SAVE system
@@ -39,15 +38,12 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_e-verified_in_Curam">
-                    <%= radio_button_tag 'citizenship', 'e-verified_in_Curam', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'verification_reason', 'e-verified_in_Curam', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     E-Verified in Curam
                   </label>
                 </div>
-              </div>
-              <div class="text-center">
-                <%= submit_tag "Complete", class: "btn btn-primary btn-small btn-br" %>
               </div>
             </ul>
         <% end %>

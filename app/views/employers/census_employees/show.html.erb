@@ -11,9 +11,11 @@
         <h4><%= name_to_listing(@census_employee) %>'s Details</h4>
         <div class="form-border">
           <p>
-            Name: <%= name_to_listing(@census_employee) %> <br/>
-            DOB:  <%= format_date @census_employee.dob %> <br/>
-            Hired On: <%= format_date @census_employee.hired_on %> <br/>
+            Name: <%= name_to_listing(@census_employee) %><br/>
+            DOB:  <%= format_date @census_employee.dob %><br/>
+            SSN: <%= number_to_obscured_ssn @census_employee.ssn %><br/>
+            Hired On: <%= format_date @census_employee.hired_on %><br/>
+            Date Added to Roster: <%= format_date @census_employee.created_at %><br/>
             Owner: <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
           </p>
         </div>
