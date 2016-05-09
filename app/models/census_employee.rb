@@ -462,8 +462,10 @@ class CensusEmployee < CensusMember
   end
 
   def check_coverage_terminated_on
-    if employment_terminated_on && employment_terminated_on <= TimeKeeper.date_of_record - 60.days
-      errors.add(:base, "Employee termination must be within the past 60 days")
+    unless self.employment_terminated?
+      if employment_terminated_on && employment_terminated_on <= TimeKeeper.date_of_record - 60.days
+        errors.add(:base, "Employee termination must be within the past 60 days")
+      end
     end
   end
 
