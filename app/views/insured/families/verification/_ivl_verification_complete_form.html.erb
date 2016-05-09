@@ -1,5 +1,6 @@
-<% if current_user && current_user.has_hbx_staff_role? %>
 <span class="label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person).titleize %></span>
+
+<% if current_user && current_user.has_hbx_staff_role? %>
 &nbsp;
     <div class="popover-markup" style="display: inline;">
       <%= link_to "Verify <i class='fa fa-check-circle-o' aria-hidden='true'></i>".html_safe, "#", class:"btn btn-success btn-xs trigger btn-br" %>
@@ -14,7 +15,7 @@
               <div class="n-radio-group">
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_document_in_Enroll_app">
-                    <%= radio_button_tag 'verification_reason', 'document_in_Enroll_app', true, class: 'n-radio' %>
+                    <%= radio_button_tag 'citizenship', 'document_in_Enroll_app', true, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in EnrollApp
@@ -22,7 +23,7 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_document_in_DIMS">
-                    <%= radio_button_tag 'verification_reason', 'document_in_DIMS', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'citizenship', 'document_in_DIMS', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in DIMS
@@ -30,7 +31,7 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_SAVE_system">
-                    <%= radio_button_tag 'verification_reason', 'SAVE system', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'citizenship', 'SAVE system', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     SAVE system
@@ -38,7 +39,7 @@
                 </div>
                 <div class="n-radio-row">
                   <label class="n-radio module verif-type" for="citizenship_e-verified_in_Curam">
-                    <%= radio_button_tag 'verification_reason', 'e-verified_in_Curam', false, class: 'n-radio' %>
+                    <%= radio_button_tag 'citizenship', 'e-verified_in_Curam', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     E-Verified in Curam
