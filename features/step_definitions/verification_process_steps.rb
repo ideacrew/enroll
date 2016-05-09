@@ -24,14 +24,16 @@ Given(/^I should see page for documents verification$/) do
 end
 
 Given(/^I upload the file as vlp document$/) do
+  script = "$('[name=\"file[]\"]').css({opacity: 100, display: 'block'});"
+  page.evaluate_script(script)
   within('div.Number') do
     attach_file('file[]', Rails.root.join('app', 'assets', 'images', 'logo', 'carefirst.jpg'))
   end
 end
 
 Given(/^I click the upload file button$/) do
-  within('div.Number2') do
-    click_button "Upload"
+  within first('div.btn-group') do
+    click_button "Upload", :match => :first
   end
 end
 
@@ -57,6 +59,3 @@ end
 Then(/^the consumer can expand the table by clicking on caret sign$/) do
   find('.fa-caret-down').click
 end
-
-
-
