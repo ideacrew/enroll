@@ -10,7 +10,7 @@
         </td>
         <td>
           <!-- HBX admin inclusion -->
-          <% unless member.person.consumer_role.aasm_state.eql? "fully_verified" %>
+          <% if verification_type_status(v_type, person) == "outstanding" %>
               <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person, v_type: v_type } %>
           <% end %>
           <!-- >>>> hbx admin inclusion -->
