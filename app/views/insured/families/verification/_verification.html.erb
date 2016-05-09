@@ -28,6 +28,8 @@
         <tr>
           <th>Family Member</th>
           <th>Verification Type</th>
+          <th>Status</th>
+
           <% if current_user && current_user.has_hbx_staff_role? %>
           <!--<th>Complete</th>-->
           <% end %>
@@ -40,7 +42,7 @@
         <tr class="<%= cycle("odd top", "even top") %>">
           <td><%= member.person.first_name.capitalize %>
             <%= member.person.last_name.capitalize %></td>
-          <td colspan="2">
+          <td colspan="3">
             <% if unverified?(member.person) %>
             <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
             <% end %>
@@ -73,5 +75,6 @@
 <script>
 $(document).ready(function() {
   $("[data-toggle='tooltip']").tooltip();
+  Insured.custom_upload_init();
 });
 </script>

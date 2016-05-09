@@ -1,5 +1,7 @@
 <% if current_user && current_user.has_hbx_staff_role? %>
-    <div class="popover-markup">
+<span class="label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person).titleize %></span>
+&nbsp;
+    <div class="popover-markup" style="display: inline;">
       <%= link_to "Verify <i class='fa fa-check-circle-o' aria-hidden='true'></i>".html_safe, "#", class:"btn btn-success btn-xs trigger btn-br" %>
 
     <!-- Admin comment form -->

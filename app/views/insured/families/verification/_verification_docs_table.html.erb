@@ -1,6 +1,6 @@
 <% person = member.person %>
 <tr class="collapse dn" id="<%= member.id %>">
-  <td colspan="6" class="td-container">
+  <td colspan="5" class="td-container">
     <div class="table-responsive">
       <table class="table table-sm">
         <% person.consumer_role.vlp_documents.each_with_index do |vlp_doc, i | %>
@@ -20,7 +20,6 @@
                   <% end %>
               </td>
           <!-- HBX admin inclusion -->
-            <%= render partial: 'insured/families/verification/doc_accept_reject_form', locals: { person: person, vlp_doc: vlp_doc } %>
           <!-- >>>> hbx admin inclusion -->
               <td class="table-functions">
                 <% if vlp_doc.status != "verified" %>
@@ -28,6 +27,7 @@
                       <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Delete"></i>
                   <% end %>
                 <% end %>
+                <%= render partial: 'insured/families/verification/doc_accept_reject_form', locals: { person: person, vlp_doc: vlp_doc } %>
               </td>
             <% end %>
           </tr>
