@@ -14,6 +14,7 @@ describe "insured/families/verification/_verification.html.erb" do
     allow(view).to receive(:member_has_uploaded_docs).and_return false
     allow(view).to receive(:show_send_button_for_consumer?).and_return false
     allow(view).to receive(:verification_needed?).and_return true
+    allow(view).to receive(:enrollment_group_unverified?).and_return true
   end
 
   context "when user is consumer" do
