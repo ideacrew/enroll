@@ -984,4 +984,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.earliest_eligible_date).to eq eligible_date
     end
   end
+
+  context 'Validating CensusEmployee Termination Date' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+
+    it 'should return true when census employee is not terminated' do
+      expect(census_employee.valid?).to be_truthy
+    end
+
+    it 'should return false when census employee date is not within 60 days' do
+      census_employee.hired_on = TimeKeeper.date_of_record - 120.days
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 90.days
+      expect(census_employee.valid?).to be_falsey
+    end
+
+    it 'should return true when census employee is already terminated' do
+      census_employee.hired_on = TimeKeeper.date_of_record - 120.days
+      census_employee.save! # set initial state
+      census_employee.aasm_state = "employment_terminated"
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 90.days
+      expect(census_employee.valid?).to be_truthy
+    end
+
+  end
+
 end
