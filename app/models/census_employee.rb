@@ -435,9 +435,9 @@ class CensusEmployee < CensusMember
     valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
     if valid_bg_assignment.present?
       valid_bg_assignment.make_active
-      return
+    else
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
     end
-    add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
   end
 
   private

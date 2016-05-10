@@ -1022,11 +1022,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should activate benefit group assignment with valid enrollment status' do
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
-        expect(blue_collar_benefit_group_assignment2.actived_at).to be_nil
+        expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
         census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment2 
-        expect(blue_collar_benefit_group_assignment2.actived_at).not_to be_nil       
+        expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil       
       end
     end
 
