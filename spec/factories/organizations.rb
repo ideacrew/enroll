@@ -62,7 +62,7 @@ FactoryGirl.define do
                             :allow_special => false, :exactly => 9)
     end
 
-    ignore do
+    transient do
       general_agency_traits []
       general_agency_attributes { {} }
     end
