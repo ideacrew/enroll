@@ -14,32 +14,32 @@
               <%= hidden_field_tag 'verification_type', v_type  %>
               <div class="n-radio-group">
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="citizenship_document_in_Enroll_app">
-                    <%= radio_button_tag 'citizenship', 'document_in_Enroll_app', true, class: 'n-radio' %>
+                  <label class="n-radio module verif-type" for='<%= v_type.parameterize.underscore %>_document_in_Enroll_app'>
+                    <%= radio_button_tag "#{v_type}".downcase, 'document_in_Enroll_app', true, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in EnrollApp
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="citizenship_document_in_DIMS">
-                    <%= radio_button_tag 'citizenship', 'document_in_DIMS', false, class: 'n-radio' %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_document_in_DIMS">
+                    <%= radio_button_tag "#{v_type}".downcase, 'document_in_DIMS', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Document in DIMS
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="citizenship_SAVE_system">
-                    <%= radio_button_tag 'citizenship', 'SAVE system', false, class: 'n-radio' %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_SAVE_system">
+                    <%= radio_button_tag "#{v_type}".downcase, 'SAVE system', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     SAVE system
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="citizenship_e-verified_in_Curam">
-                    <%= radio_button_tag 'citizenship', 'e-verified_in_Curam', false, class: 'n-radio' %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_e-verified_in_Curam">
+                    <%= radio_button_tag "#{v_type}".downcase, 'e-verified_in_Curam', false, class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     E-Verified in Curam
