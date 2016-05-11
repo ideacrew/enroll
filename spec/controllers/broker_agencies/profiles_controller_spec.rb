@@ -164,7 +164,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "get employers" do
     let(:broker_role) {FactoryGirl.build(:broker_role)}
     let(:person) {double("person", broker_role: broker_role)}
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 
@@ -204,7 +204,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
       families[0].primary_applicant.person.update_attributes!(last_name: 'Jones1')
       families[1].primary_applicant.person.update_attributes!(last_name: 'Jones2')
-      families[2].primary_applicant.person.update_attributes!(last_name: 'Jones3')
+      families[2].primary_applicant.person.update_attributes!(last_name: 'jones3')
     end
 
     it 'should render 21 familes' do
@@ -213,6 +213,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
       expect(assigns(:families).count).to eq(21)
+      expect(assigns(:page_alphabets).count).to eq(2)
       expect(assigns(:page_alphabets)).to include("J")
       expect(assigns(:page_alphabets)).to include("S")
     end
@@ -279,6 +280,166 @@ RSpec.describe BrokerAgencies::ProfilesController do
           expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
         end
       end
+    end
+  end
+
+  describe "GET assign" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    before :each do
+      sign_in user
+      xhr :get, :assign, id: broker_agency_profile.id, format: :js
+    end
+
+    it "should return http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agency_profiles" do
+      expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
+    end
+
+    it "should get employers" do
+      expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+    end
+  end
+
+  describe "GET assign_history" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:hbx) { FactoryGirl.create(:user, person: person, roles: ['hbx_staff']) }
+
+    context "with admin user" do
+      before :each do
+        sign_in hbx
+        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_accounts" do
+        expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.all.first(20)
+      end
+    end
+
+    context "with broker user" do
+      before :each do
+        sign_in user
+        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_accounts" do
+        expect(assigns(:general_agency_account_history)).to eq GeneralAgencyAccount.find_by_broker_role_id(broker_role.id).first(20)
+      end
+    end
+  end
+
+  describe "GET clear_assign_for_employer" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    before :each do
+      sign_in user
+      xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get employer_profile" do
+      expect(assigns(:employer_profile)).to eq employer_profile
+    end
+  end
+
+  describe "POST update_assign" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    context "when we Assign agency" do 
+      before :each do
+        sign_in user
+        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should get notice" do
+        expect(flash[:notice]).to eq 'Assign successful.'
+      end
+    end
+    context "when we Unassign agency" do 
+      before :each do
+        sign_in user
+        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should get notice" do
+        expect(flash[:notice]).to eq 'Unassign successful.'
+      end
+      it "should update aasm_state" do
+        employer_profile.reload 
+        expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+      end
+    end
+  end
+
+  describe "POST set_default_ga" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    before :each do
+      allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
+    end
+
+    it "should set default_general_agency_profile" do
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile 
+    end
+
+    it "should clear default general_agency_profile" do
+      broker_agency_profile.default_general_agency_profile = general_agency_profile
+      broker_agency_profile.save
+      expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
+
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
+    end
+
+    it "should call update_ga_for_employers" do
+      sign_in user
+      expect(controller).to receive(:notify)
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+    end
+
+    it "should get notice" do
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
     end
   end
 end

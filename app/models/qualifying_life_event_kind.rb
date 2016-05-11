@@ -42,7 +42,7 @@ class QualifyingLifeEventKind
     "employee_gaining_medicare",
     "enrollment_error_or_misconduct_hbx",
     "enrollment_error_or_misconduct_issuer",
-    "enrollment_error_or_misconduct_non_hbx", 
+    "enrollment_error_or_misconduct_non_hbx",
     "contract_violation",
     "court_order",
     "eligibility_change_income",
@@ -77,7 +77,7 @@ class QualifyingLifeEventKind
   field :is_active, type: Boolean, default: true
   field :event_on, type: Date
   field :coverage_effective_on, type: Date
-  field :start_on, type: Date 
+  field :start_on, type: Date
   field :end_on, type: Date
 
 
@@ -85,13 +85,13 @@ class QualifyingLifeEventKind
   index({market: 1, ordinal_position: 1 })
   index({start_on: 1, end_on: 1})
 
-  # validates :effective_on_kinds, 
+  # validates :effective_on_kinds,
   #           presence: true,
   #           allow_blank: false,
   #           allow_nil:   false,
   #           inclusion: {in: EffectiveOnKinds}
 
-  validates :market_kind, 
+  validates :market_kind,
             presence: true,
             allow_blank: false,
             allow_nil:   false,
@@ -105,14 +105,14 @@ class QualifyingLifeEventKind
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
 
   # Business rules for EmployeeGainingMedicare
-  # If coverage ends on last day of month and plan selected before loss of coverage: 
+  # If coverage ends on last day of month and plan selected before loss of coverage:
   #   effective date is first day of the month after other coverage will end
-  # If coverage ends on last day of month and plan selected after loss of other coverage: 
+  # If coverage ends on last day of month and plan selected after loss of other coverage:
   #   effective date is first day of the month following plan selection (not following 15th of month rule)
-  # If coverage ends on date other than last day of the month and plan selected during or after the month in which coverage ends: 
+  # If coverage ends on date other than last day of the month and plan selected during or after the month in which coverage ends:
   #   effective date is 1st of the month following plan selection
-  # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends: 
-  #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month) 
+  # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends:
+  #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month)
   #   or the first of the month following the month when coverage ends
   def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, consumer_coverage_effective_on = nil)
     coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
@@ -134,7 +134,7 @@ class QualifyingLifeEventKind
       end
 
       #FIXME what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
-      #if (consumer_coverage_effective_on >= coverage_end_on.first_of_month) && 
+      #if (consumer_coverage_effective_on >= coverage_end_on.first_of_month) &&
       #  (consumer_coverage_effective_on <= (coverage_end_on.first_of_month + 1.month))
       #  coverage_effective_on = consumer_coverage_effective_on
       #else
@@ -160,7 +160,7 @@ class QualifyingLifeEventKind
     #title == "I'm moving to the District of Columbia"
     reason == 'relocate'
   end
-  
+
   def individual?
     market_kind == "individual"
   end
@@ -180,9 +180,4 @@ class QualifyingLifeEventKind
     end
   end
 
-  def date_hint
-    start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
-    end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
-    "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
-  end
 end

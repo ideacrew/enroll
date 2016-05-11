@@ -4,7 +4,12 @@ FactoryGirl.define do
     entity_kind "s_corporation"
     association :primary_broker_role, factory: :broker_role
     organization
-    sequence(:corporate_npn) {|n| "2002345#{n}" }
+    corporate_npn do
+      Forgery('basic').text(:allow_lower   => false,
+                            :allow_upper   => false,
+                            :allow_numeric => true,
+                            :allow_special => false, :exactly => 8)
+    end
     # before(:create) do |broker_agency|
     #   FactoryGirl.create(:organization, broker_agency_profile: broker_agency)
     # end

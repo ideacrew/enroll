@@ -193,7 +193,9 @@ function setGroupSelectionHandlers(){
 
   if ( $('#market_kind_shop').is(':checked') ) {
     $("#coverage_kind_health").prop("checked", true);
+    $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
   }
+  
   $('#group-selection-form').on('change', function() {
     if ( $('#market_kind_shop').is(':checked') ) {
     } else {
