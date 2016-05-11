@@ -112,7 +112,6 @@ RSpec.describe ApplicationController do
       end
   end
 
-<<<<<<< HEAD
   context "require_login" do
     let(:person) {FactoryGirl.create(:person);}
     let(:user) { FactoryGirl.create(:user, :person=>person); }
