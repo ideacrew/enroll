@@ -49,9 +49,8 @@ $(function () {
       changeMonth: true,
       changeYear: true,
       dateFormat: 'mm/dd/yy',
-      defaultDate: cdate,
-      minDate: dateMin,
-      maxDate: dateMax});
+      defaultDate: cdate
+		});
   };
 
   $(document).on('click', 'a.qle-menu-item', function() {
@@ -59,7 +58,6 @@ $(function () {
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
     $('.qle-label').html($(this).data('label'));
-    $('.qle-date-hint').html($(this).data('date-hint'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
 

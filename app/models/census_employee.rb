@@ -29,6 +29,8 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
@@ -400,19 +402,19 @@ class CensusEmployee < CensusMember
     state :employment_terminated
     state :rehired
 
-    event :rehire_employee_role do
+    event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :link_employee_role do
+    event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
     end
 
-    event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
+    event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
-    event :terminate_employee_role do
+    event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
     end
   end
@@ -427,6 +429,17 @@ class CensusEmployee < CensusMember
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
+  def find_or_create_benefit_group_assignment(benefit_group)
+    bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc)
+    valid_bg_assignment = bg_assignments.detect{|bg_assign| bg_assign.aasm_state != 'initialized'}
+    valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
+    if valid_bg_assignment.present?
+      valid_bg_assignment.make_active
+    else
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+    end
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -434,6 +447,13 @@ class CensusEmployee < CensusMember
       benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
       benefit_group_assignment.update_attributes(is_active: false)
     end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
   end
 
   def set_autocomplete_slug

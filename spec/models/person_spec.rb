@@ -275,7 +275,7 @@ describe Person do
           expect(person.has_active_employee_role?).to eq false
         end
       end
-      
+
       context "with invalid Tribal Id" do
         let(:params) {valid_params.deep_merge({tribal_id: "12124"})}
 
@@ -288,7 +288,7 @@ describe Person do
           expect(person.errors[:base]).to eq ["Tribal id must be 9 digits"]
         end
       end
-      
+
 
       context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}
@@ -607,7 +607,7 @@ describe Person do
       person1.user_id = user_id
       person2.user_id = user_id
       person1.save!
-      expect { person2.save! }.to raise_error
+      expect { person2.save! }.to raise_error(Mongo::Error::OperationFailure)
     end
 
   end
@@ -971,6 +971,49 @@ describe Person do
       it 'sets is_active to false' do
         expect(employer_staff_role.reload.is_active?).to eq false
       end
+    end
+  end
+
+  describe "person_has_an_active_enrollment?" do
+
+    let(:person) { FactoryGirl.create(:person) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    context 'person_has_an_active_enrollment?' do
+      let(:active_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: true
+                                       )}
+      it 'returns true if person has an active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([active_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_truthy
+      end
+    end
+
+    context 'person_has_an_inactive_enrollment?' do
+      let(:inactive_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: false
+                                       )}
+      it 'returns false if person does not have any active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([inactive_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_falsey
+      end
+    end
+
+  end
+
+  describe "agent?" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return true with general_agency_staff_roles" do
+      person.general_agency_staff_roles << FactoryGirl.build(:general_agency_staff_role)
+      expect(person.agent?).to be_truthy
     end
   end
 end

@@ -1,9 +1,13 @@
 class BrokerAgencies::ProfilesController < ApplicationController
+  include Acapi::Notifiers
+
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
+  before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
+  before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -114,7 +118,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     total_families = broker_agency_profile.families
     @total = total_families.count
-    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.uniq.map(&:capitalize)
+    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
     elsif @q
@@ -140,6 +144,119 @@ class BrokerAgencies::ProfilesController < ApplicationController
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
     @employer_profiles = @organizations.map {|o| o.employer_profile}
+
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+  end
+
+  def general_agency_index
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+  end
+
+  def set_default_ga
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
+
+    if @broker_agency_profile.present?
+      old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
+      if params[:type] == 'clear'
+        @broker_agency_profile.default_general_agency_profile = nil
+      elsif @general_agency_profile.present?
+        @broker_agency_profile.default_general_agency_profile = @general_agency_profile
+      end
+      @broker_agency_profile.save
+      #update_ga_for_employers(@broker_agency_profile, old_default_ga)
+      notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
+      @notice = "Changing default general agencies may take a few minutes to update all employers."
+
+      @broker_role = current_user.person.broker_role || nil
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def assign
+    page_string = params.permit(:employers_page)[:employers_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+
+    @employers = @orgs.map(&:employer_profile)
+    @employers = Kaminari.paginate_array(@employers).page page_no
+  end
+
+  def update_assign
+    if params[:general_agency_id].present? && params[:employer_ids].present?
+      general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
+      case params[:type]
+      when 'fire'
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue next
+
+          employer_profile.fire_general_agency!
+          send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
+        end
+        notice = "Fire these employers successful."
+      else
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue nil
+          if employer_profile.present? #FIXME : Please move me to model
+            broker_role_id = current_user.person.broker_role.id rescue nil
+            broker_role_id ||= @broker_agency_profile.primary_broker_role_id
+            employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
+            employer_profile.save
+            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
+          end
+        end
+        notice = "Assign successful."
+      end
+    elsif params["commit"].try(:downcase) == "clear assignment"
+      params[:employer_ids].each do |employer_id|
+        employer_profile = EmployerProfile.find(employer_id) rescue next
+        if employer_profile.general_agency_profile.present?
+          send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
+          employer_profile.fire_general_agency!
+        end
+      end
+      notice = "Unassign successful."
+    end
+    redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
+  end
+
+  def clear_assign_for_employer
+    @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
+    if @employer_profile.present?
+      send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
+      @employer_profile.fire_general_agency!
+    end
+  end
+
+  def assign_history
+    page_string = params.permit(:gas_page)[:gas_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+
+    if current_user.has_hbx_staff_role?
+      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.all).page page_no
+    elsif current_user.has_broker_role? && current_user.person.broker_role.present?
+      broker_role_id = @broker_agency_profile.present? ? @broker_agency_profile.primary_broker_role_id : current_user.person.broker_role.id
+      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.find_by_broker_role_id(broker_role_id)).page page_no
+    else
+      @general_agency_account_history = Kaminari.paginate_array(Array.new)
+    end
+  end
+
+  def manage_employers
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
+    @employers = @general_agency_profile.employer_clients
   end
 
   def messages
@@ -162,6 +279,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     else
       @provider = @broker_agency_provider
     end
+  end
+
+  def redirect_to_show(broker_agency_profile_id)
+    redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
   end
 
   private
@@ -193,8 +314,37 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def send_general_agency_assign_msg(general_agency, employer_profile, status)
+    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name} (#{status})"
+    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
+    secure_message(@broker_agency_profile, general_agency, subject, body)
+    secure_message(@broker_agency_profile, employer_profile, subject, body)
+  end
+
   def eligible_brokers
     Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').any_in(:'broker_role.market_kind'=>[person_market_kind, "both"])
+  end
+
+  def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
+    return if broker_agency_profile.blank?
+
+    orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
+    employer_profiles = orgs.map {|o| o.employer_profile}
+    if broker_agency_profile.default_general_agency_profile.blank?
+      employer_profiles.each do |employer_profile|
+        general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
+        if general_agency && general_agency == old_default_ga
+          send_general_agency_assign_msg(general_agency, employer_profile, 'Terminate')
+          employer_profile.fire_general_agency!
+        end
+      end
+    else
+      employer_profiles.each do |employer_profile|
+        employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
+        employer_profile.save
+        send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
+      end
+    end
   end
 
   def person_market_kind
@@ -203,5 +353,17 @@ class BrokerAgencies::ProfilesController < ApplicationController
     elsif @person.has_active_employee_role?
       "shop"
     end
+  end
+
+  def check_general_agency_profile_permissions_assign
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_assign(self, @broker_agency_profile)
+  end
+
+  def check_general_agency_profile_permissions_set_default
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
+    policy.authorize_set_default_ga(self, @broker_agency_profile)
   end
 end

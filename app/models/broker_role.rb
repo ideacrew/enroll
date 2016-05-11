@@ -30,6 +30,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :favorite_general_agencies, cascade_callbacks: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
@@ -59,6 +60,14 @@ class BrokerRole
       pr.broker_role.present? && 
         (pr.broker_role.npn == broker_npn)
     end.map(&:broker_role)
+  end
+
+  def search_favorite_general_agencies(general_agency_profile_id)
+    favorite_general_agencies.where(general_agency_profile_id: general_agency_profile_id)
+  end
+
+  def included_in_favorite_general_agencies?(general_agency_profile_id)
+    favorite_general_agencies.present? && favorite_general_agencies.map(&:general_agency_profile_id).include?(general_agency_profile_id)
   end
 
   def email_address
