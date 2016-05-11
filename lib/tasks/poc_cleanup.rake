@@ -25,7 +25,7 @@ namespace :employers do
           fixme << (item + [ce, ce.id])
         end
       end
-    end
+    end;nil
 
     fixme_dups = fixme.select do |item|
       fein= item[0]
@@ -36,9 +36,16 @@ namespace :employers do
         puts "Not fixing for for #{fein}, census_employee: #{ce.id}, ce.employee_role_id #{ce.employee_role_id || ' no employee_role id    '}, duplicates #{duplicates}" 
       end
       duplicates == 2  && ce.employee_role_id
-    end
+    end;nil
+
     puts fixme_dups.count
 
+    def count_roles person
+      roles = person.consumer_role ? 1 : 0
+      roles += person.employee_roles.count + person.employer_staff_roles.count 
+      roles += person.broker_role ? 1 : 0
+      roles
+    end 
 
     def consolidate person1, person2, employer_profile_id
       puts "trying #{person1.id}, #{person2.id} #{employer_profile_id}"
@@ -55,6 +62,9 @@ namespace :employers do
         person2.user = user
         person2.save!
         puts "User id #{user.id} moved from person1 #{person1.id} to #{person2.id} #{Person.find(person2.id).user}"
+        user.roles = (user.roles << 'employee')
+        user.save!
+        puts "Roles #{user.roles} for #{user.id}"
       end
       puts "updating #{person2.id}, #{email}, #{phone}"
       person2.emails = (person2.emails << email) if email
@@ -63,7 +73,7 @@ namespace :employers do
       person2.save!
       EmployerStaffRole.create(person: person2, employer_profile_id: employer_profile_id)
       person1.delete
-      puts "here migrated #{person1.id}  to #{person2.id}"
+      puts "here migrated #{person1.id}, which had role count #{count_roles person1}  to #{person2.id}"
     end
     #Task is idempotent if next line is commented out.      
     fixme_dups.each{|item| 
