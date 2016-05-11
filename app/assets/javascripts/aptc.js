@@ -4,6 +4,8 @@ $(document).on('click', "a#calculate_available_aptc", function(){
   var max_aptc = parseFloat($('input#max_aptc').val());
   var person_id = $("#person_person_id").val();
   var family_id = $("#person_family_id").val();
+  var hbx_enrollment_id = $("#person_hbx_enrollment_id").val();
+  var aptc_applied = $("#aptc_applied").val();
   var csr_percentage = $("#csr_percentage").val();
   var member_ids = [];
   $('input.individual_coverd').each(function(){
@@ -14,7 +16,7 @@ $(document).on('click', "a#calculate_available_aptc", function(){
   if (!isNaN(csr_percentage) && !isNaN(max_aptc)){
     $.ajax({
       type: "GET",
-      data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, member_ids: member_ids},
+      data:{person_id: person_id, family_id: family_id, hbx_enrollment_id: hbx_enrollment_id, max_aptc: max_aptc, aptc_applied: aptc_applied, csr_percentage: csr_percentage, member_ids: member_ids},
       url: "/hbx_admin/calculate_aptc_csr"
     });
   }

@@ -47,7 +47,7 @@
         <%all_active_enrollment_with_aptc(family).each do |hbx|%>
         <tr>
           <td colspan = "2"></td>
-          <td colspan = "4">( <b>Members:</b>, <%=hbx_memeber_names(hbx.hbx_enrollment_members)%> )  <b>Plan</b> <%=hbx.plan.name%></td>
+          <td colspan = "4">( <b>Members:</b> <%=hbx_memeber_names(hbx.hbx_enrollment_members)%> ) ,  <b>Plan:</b> <%=hbx.plan.name%></td>
           <td><%= link_to 'Edit Enrollment', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, hbx_enrollment_id: hbx.id), class: "btn btn-warning btn-xs", remote: true%></td>
         </tr>
         <%end%>

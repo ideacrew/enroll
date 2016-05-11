@@ -1,4 +1,5 @@
 <div class="container bottom-pd">
+  
   <div class="row">
     <h4 class="title-inline">Editing APTC / CSR for:</h4>
   </div>
@@ -9,8 +10,11 @@
       </thead>
       <tbody>
         <tr>
-          <td><%=@person.hbx_id%></tb> <td><%=@person.first_name%> <%=@person.last_name%></td> <td><%=@person.dob%></td> <td><%=@person.ssn%></td>
+          <td><%=@person.hbx_id%></tb> <td><%=@person.full_name%></td> <td><%=@person.dob%></td> <td><%=@person.ssn%></td>
         </tr>
+        <%if @hbx%>
+          <tr><td colspan = "4" align="center"><b>Plan:</b> <%=@hbx.plan.name%></td></tr>
+        <%end%>
       </tbody>
     </table>
   </div>
@@ -30,6 +34,7 @@
           <%end%>
           <th> </th>
           <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th>
+          <th></th>
         </thead>  
         <tbody>
             <%@grid_vals.keys.each do |attribute|%> <!-- Iterating over Different APTC / CSR attributes in the hash-->
@@ -39,7 +44,7 @@
                       <%no_hbx = false%>  <!--TODO : See if you can get rid of this? -->
                       <% @grid_vals[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
                             <%if val %>
-                              <td class="<%=aptc_csr_data_type(month)%>"> <%= text_field_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true%></td>
+                              <td class="<%=aptc_csr_data_type(month)%>"> <%= text_field_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;font-size:7px;'%></td>
                             <%else%>
                               <%no_hbx = true%>
                             <%end%>
@@ -57,28 +62,106 @@
                               <%= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px', hidden: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute), disabled: !['max_aptc', 'csr_percentage', 'aptc_applied'].include?(attribute)%>
                           <%end%> 
                       </td>
-                  <%end%>
+                      <%if attribute == "aptc_applied" &&  @hbx && @hbxs.count >= 2%>
+                        <td><a href="#otherEnrollments" role="button" class="btn btn-xs btn-info" data-toggle="modal">Other<br/>Enrollment(s)</a></td>
+                      <%else%>
+                        <td></td>
+                      <%end%>
+                  <%end%> 
               </tr>
               <tr></tr>
-            <%end%>         
+            <%end%>
                 <tr>
                   <th colspan = "13">Individual Member(s)</th>
                   <th></th>
-                 <!--  <th>Eligible?</th> -->
+                  <th></th>
                   <th></th>
                 </tr>
-                <% @grid_vals["individuals_covered"].each do |person_id| %>
-                  <tr>
-                    <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=Person.find(person_id.keys.first).full_name%><%if primary_member(person_id.keys.first)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%end%></td>
-                    <td></td>
-                    <!-- <td><%#=check_box_tag "#{person_id.keys.first}", 'accepted', (@grid_vals["eligible_members"].include? person_id.keys.first), disabled: true, class: 'individual_coverd' %></td> -->
-                    <td></td>
-                    <!-- <td><%#= text_field_tag "aptc_applied_#{person_id.keys.first}", @aptc_applied, size: '8px', class: 'form-control', readonly: @no_enrollment %></td> -->
-                  </tr>
+                <%if @hbx%>
+                  <%@hbx.hbx_enrollment_members.each do |hbx_member|%>
+                    <tr>
+                      <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=full_name_of_person(hbx_member.family_member.person_id)%><%if primary_member(hbx_member.family_member.person_id.to_s)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%end%></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  <%end%>
+                <%else%>
+                  <% @grid_vals["individuals_covered"].each do |person_id| %>
+                    <tr>
+                      <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=full_name_of_person(person_id.keys.first)%><%if primary_member(person_id.keys.first)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%end%></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  <%end%>
                 <%end%>
         </tbody> 
       </table>
       <div align="right"><%= f.submit "Confirm", class: "btn btn-primary btn-lg" %></div>
     <% end %>
   </div>
+
+  <%if @hbxs%>  <!--Only applicable to case  where there are multiple enrollments.-->
+    <!-- Bootstrap Modal Start -->
+    <div id="otherEnrollments" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><%=@hbxs.count%> Enrollments for <i><%=@person.full_name%></i></h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-border">
+                      <thead>
+                        <th>Enrolled<br/>Plan Name</th>
+                        <th>Plan<br/>Premium</th>
+                        <th>APTC<br/>Applied</th>
+                        <th>Edit Other<br/>Enrollment</th>
+                        <th></th>
+                      </thead>
+                      <tbody>
+                        <%@hbxs.each do |hbx|%>
+                          <tr <%="bgcolor=#FFFF33" if hbx == @hbx%> >
+                            <td><%=hbx.plan.name%></td>
+                            <td><%=hbx.total_premium%></td>
+                            <td><%='%.2f' % hbx.applied_aptc_amount.to_f%></td>
+                            <td><%='Edit' if hbx != @hbx%> </td>
+                            <td></td>
+                          </tr>
+                        <%end%>
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td><b><%=@aptc_applied_for_all_hbxs%></b> <br/>(Total Applied)</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table class="table table-border">
+                      <thead>
+                        <th>CSR Percentage</th>
+                        <th>Max APTC</th>
+                        <th>Available APTC</th>
+                      </thead>
+                      <tr>
+                        <td><%=@csr_percent_as_integer%> %</td>
+                        <td><%='%.2f' % @max_aptc%></td>
+                        <td><%='%.2f' % (@max_aptc.to_f - @aptc_applied_for_all_hbxs.to_f)%></td>
+                      </tr>
+                    </table>
+                    <p class="text-warning"><small> ** The highlighted plan is the one you are currently editing.</small></p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default-sm" data-dismiss="modal">OK</button>
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Bootstrap modal end-->
+  <%end%>
+
 </div>
