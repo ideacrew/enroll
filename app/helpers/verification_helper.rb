@@ -18,7 +18,7 @@ module VerificationHelper
        if member.consumer_role.ssn_verified?
          "verified"
        elsif member.consumer_role.has_docs_for_type?(type)
-         "pending doc"
+         "in review"
        else
          "outstanding"
        end
@@ -26,7 +26,7 @@ module VerificationHelper
        if member.consumer_role.lawful_presence_authorized?
          "verified"
        elsif member.consumer_role.has_docs_for_type?(type)
-         "pending doc"
+         "in review"
        else
          "outstanding"
        end
@@ -37,7 +37,7 @@ module VerificationHelper
     case verification_type_status(type, member)
       when "verified"
         "success"
-      when "pending doc"
+      when "in review"
         "warning"
       else
         "danger"

@@ -25,9 +25,9 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
       end
 
-      it "returns pending doc for outstanding with docs" do
+      it "returns in review for outstanding with docs" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
-        expect(helper.verification_type_status("Social Security Number", person)).to eq "pending doc"
+        expect(helper.verification_type_status("Social Security Number", person)).to eq "in review"
       end
 
       it "returns verified status for consumer with state residency" do
@@ -49,7 +49,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         it "returns verified status for consumer with state residency" do
           person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
           person.consumer_role.lawful_presence_determination = lawful_presence_determination
-          expect(helper.verification_type_status("Immigration status", person)).to eq "pending doc"
+          expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
         end
       end
       context "lawful presence determination fails" do
@@ -85,7 +85,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    context "verification type status pending doc" do
+    context "verification type status in review" do
       let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_pending") }
       before :each do
         person.consumer_role.is_state_resident = false
