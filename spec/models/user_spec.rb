@@ -162,3 +162,37 @@ describe User do
     end
   end
 end
+
+describe User do
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+
+  describe "can_change_broker?" do
+    context "with user" do
+      it "should return true when hbx staff" do
+        user.roles = ['hbx_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when employer staff" do
+        allow(person).to receive(:has_active_employer_staff_role?).and_return true
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker role" do
+        user.roles = ['broker']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker agency staff" do
+        user.roles = ['broker_agency_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return false when general agency staff" do
+        user.roles = ['general_agency_staff']
+        expect(user.can_change_broker?).to eq false
+      end
+    end
+  end
+end

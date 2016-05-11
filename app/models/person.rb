@@ -65,6 +65,11 @@ class Person
                 inverse_of: :broker_agency_contacts,
                 index: true
 
+  belongs_to :general_agency_contact,
+                class_name: "GeneralAgencyProfile",
+                inverse_of: :general_agency_contacts,
+                index: true
+
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
@@ -76,6 +81,7 @@ class Person
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
+  embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true
@@ -182,6 +188,10 @@ class Person
   scope :unverified_persons,        -> {Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending'])}
   scope :matchable,                 ->(ssn, dob, last_name) { where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name: last_name) }
 
+  scope :general_agency_staff_applicant,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :applicant })}
+  scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
+  scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
+  scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
 
 #  ViewFunctions::Person.install_queries
 
@@ -530,6 +540,19 @@ class Person
       Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
     end
 
+    def person_has_an_active_enrollment?(person)
+      if !person.primary_family.blank? && !person.primary_family.enrollments.blank?
+        person.primary_family.enrollments.each do |enrollment|
+          return true if enrollment.is_active
+        end
+      end
+      return false
+    end
+
+    def find_by_ssn(ssn)
+      Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
@@ -683,7 +706,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present?
     !!agent
   end
 

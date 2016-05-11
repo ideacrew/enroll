@@ -901,4 +901,47 @@ describe Person do
       end
     end
   end
+
+  describe "person_has_an_active_enrollment?" do
+
+    let(:person) { FactoryGirl.create(:person) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    context 'person_has_an_active_enrollment?' do
+      let(:active_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: true
+                                       )}
+      it 'returns true if person has an active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([active_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_truthy
+      end
+    end
+
+    context 'person_has_an_inactive_enrollment?' do
+      let(:inactive_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: false
+                                       )}
+      it 'returns false if person does not have any active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([inactive_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_falsey
+      end
+    end
+
+  end
+
+  describe "agent?" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return true with general_agency_staff_roles" do
+      person.general_agency_staff_roles << FactoryGirl.build(:general_agency_staff_role)
+      expect(person.agent?).to be_truthy
+    end
+  end
 end

@@ -33,6 +33,9 @@
 //= require consumer_role
 //= require plan_year_selection
 //= require bootstrap-slider
+//= require general_agency
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require_tree .
 
 
@@ -54,6 +57,17 @@ function applyMultiLanguageSelect() {
   $('#broker_agency_language_select').multiselect('select', 'en', true);
   $('#broker_agency_language_select').on('selectric-init', function(element){
     $('.language_multi_select .selectric-interaction-field-control-broker-agency-languages-spoken').hide();
+  });
+};
+
+function applyMultiLanguageSelectForGA() {
+  $('#general_agency_language_select').multiselect({
+    nonSelectedText: 'Select Language',
+    maxHeight: 300
+  });
+  $('#general_agency_language_select').multiselect('select', 'en', true);
+  $('#general_agency_language_select').on('selectric-init', function(element){
+    $('.language_multi_select .selectric-interaction-field-control-general-agency-languages-spoken').hide();
   });
 };
 
