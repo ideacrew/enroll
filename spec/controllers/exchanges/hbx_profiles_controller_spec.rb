@@ -312,4 +312,17 @@ RSpec.describe Exchanges::HbxProfilesController do
       expect(response).to have_http_status(:redirect)
     end
   end
+
+  describe "GET general_agency_index" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should returns http success" do
+      xhr :get, :general_agency_index, format: :js
+      expect(response).to have_http_status(:success)
+    end
+  end
 end

@@ -429,6 +429,17 @@ class CensusEmployee < CensusMember
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
+  def find_or_create_benefit_group_assignment(benefit_group)
+    bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc)
+    valid_bg_assignment = bg_assignments.detect{|bg_assign| bg_assign.aasm_state != 'initialized'}
+    valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
+    if valid_bg_assignment.present?
+      valid_bg_assignment.make_active
+    else
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+    end
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)

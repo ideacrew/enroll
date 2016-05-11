@@ -60,8 +60,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+
       if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+        @census_employee.find_or_create_benefit_group_assignment(benefit_group)
       end
     end
 
