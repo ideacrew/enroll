@@ -122,7 +122,7 @@ module Forms
     end
 
     def self.find(general_agency_profile_id)
-      general_agency_profile = ::BrokerAgencyProfile.find(general_agency_profile_id)
+      general_agency_profile = ::GeneralAgencyProfile.find(general_agency_profile_id)
       organization = general_agency_profile.organization
 
       record = self.new({

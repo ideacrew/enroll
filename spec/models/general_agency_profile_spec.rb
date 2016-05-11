@@ -89,4 +89,31 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       end
     end
   end
+
+  describe "instance method" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:person) { FactoryGirl.create(:person, :with_family) }
+
+    it "current_state" do
+      general_agency_profile.aasm_state = "is_approved"
+      expect(general_agency_profile.current_state).to eq "Is Approved"
+    end
+
+    it "legal_name" do
+      expect(general_agency_profile.legal_name).to eq general_agency_profile.organization.legal_name
+    end
+
+    it "linked_employees" do
+      allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employer_profile]
+      allow(Person).to receive(:where).and_return [person]
+      expect(general_agency_profile.linked_employees).to eq [person]
+    end
+
+    it "families" do
+      allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employer_profile]
+      allow(Person).to receive(:where).and_return [person]
+      expect(general_agency_profile.families).to eq [person.primary_family]
+    end
+  end
 end

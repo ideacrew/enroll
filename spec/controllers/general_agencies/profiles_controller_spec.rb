@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe GeneralAgencies::ProfilesController do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  let(:general_agency_staff) { FactoryGirl.create(:general_agency_staff_role) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
@@ -179,6 +180,42 @@ RSpec.describe GeneralAgencies::ProfilesController do
 
     it "should get staffs" do
       expect(assigns[:staffs]).to eq general_agency_profile.general_agency_staff_roles
+    end
+  end
+
+  describe "GET edit_staff" do
+    before(:each) do
+      sign_in(user)
+      xhr :get, :edit_staff, id: general_agency_staff.id
+    end
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the staffs template" do
+      expect(response).to render_template("edit_staff")
+    end
+  end
+
+  describe "POST update_staff" do
+    before(:each) do
+      FactoryGirl.create(:hbx_profile) if HbxProfile.count == 0
+      sign_in(user)
+      post :update_staff, id: general_agency_staff.id, approve: 'true'
+    end
+
+    it "should redirect" do
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should get notice" do
+      expect(flash[:notice]).to eq "Staff approved successfully."
+    end
+
+    it "should change staff status" do
+      general_agency_staff.reload
+      expect(general_agency_staff.aasm_state).to eq 'active'
     end
   end
 

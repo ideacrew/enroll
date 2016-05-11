@@ -60,4 +60,17 @@ RSpec.describe GeneralAgencyAccount, type: :model do
       end
     end
   end
+
+  describe 'Instance method' do
+    let(:general_agency_account) { FactoryGirl.build(:general_agency_account) }
+
+    it "legal_name" do
+      expect(general_agency_account.legal_name).to eq general_agency_account.general_agency_profile.try(:legal_name)
+    end
+
+    it "general_agency_profile" do
+      general_agency_account.general_agency_profile = general_agency_profile
+      expect(general_agency_account.general_agency_profile).to eq general_agency_profile
+    end
+  end
 end

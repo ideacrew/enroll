@@ -102,4 +102,11 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
       end
     end
   end
+
+  context "instance method" do
+    let(:staff_role) { FactoryGirl.create(:general_agency_staff_role) }
+    it "parent" do
+      expect(staff_role.parent).to eq staff_role.person
+    end
+  end
 end

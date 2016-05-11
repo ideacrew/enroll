@@ -282,4 +282,58 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
   end
+
+  describe "GET general_agency_index" do
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    before :each do
+      sign_in user
+      xhr :get, :assign, id: broker_agency_profile.id
+    end
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agency_profiles" do
+      expect(assigns(:general_agency_profiles).count).to eq GeneralAgencyProfile.count
+    end
+  end
+
+  describe "GET clear_assign_for_employer" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    before :each do
+      sign_in user
+      xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should redirect" do
+      expect(response).to have_http_status(:redirect)
+    end
+  end
+
+  describe "POST update_assign" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    before :each do
+      sign_in user
+      post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+    end
+
+    it "should redirect" do
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should get notice" do
+      expect(flash[:notice]).to eq 'Assign successful.'
+    end
+  end
 end

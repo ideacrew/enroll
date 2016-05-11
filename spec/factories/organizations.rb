@@ -45,4 +45,17 @@ FactoryGirl.define do
       organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization
     end
   end
+
+  factory :general_agency_with_organization, class: Organization do
+    sequence(:legal_name) {|n| "General Agency#{n}" }
+    sequence(:dba) {|n| "General Agency#{n}" }
+    sequence(:fein, 200000000)
+    home_page   "http://www.example.com"
+    office_locations  { [FactoryGirl.build(:office_location, :primary),
+                         FactoryGirl.build(:office_location)] }
+
+    after(:create) do |organization|
+      FactoryGirl.create(:general_agency_profile, organization: organization)
+    end
+  end
 end
