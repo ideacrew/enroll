@@ -151,6 +151,27 @@ class ConsumerRole
     Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
   end
 
+  #check if consumer has uploaded documents for verification type
+  def has_docs_for_type?(type)
+    self.vlp_documents.any?{ |doc| doc.verification_type == type }
+  end
+
+  #use this method to check what verification types needs to be included to the notices
+  def outstanding_verification_types
+    self.person.verification_types.find_all do |type|
+      self.is_type_outstanding?(type)
+    end
+  end
+
+  #check verification type status
+  def is_type_outstanding?(type)
+    if type == 'Social Security Number'
+      !self.ssn_verified? && !self.has_docs_for_type?(type)
+    elsif type == 'Citizenship' || type == 'Immigration status'
+      !lawful_presence_authorized? && !self.has_docs_for_type?(type)
+    end
+  end
+
   def ssn_verified?
     ["na", "valid"].include?(self.ssn_validation)
   end

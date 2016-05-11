@@ -10,32 +10,32 @@
               <%= hidden_field_tag 'verification_type', v_type  %>
               <div class="n-radio-group">
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for='<%= v_type.parameterize.underscore %>_document_in_Enroll_app'>
-                    <%= radio_button_tag "verification_reason", 'document_in_Enroll_app', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_Enroll_app" %>
+                  <label class="n-radio module verif-type" for='<%= v_type.parameterize.underscore %>_document_in_Enroll_app_<%=person.id%>'>
+                    <%= radio_button_tag "verification_reason", 'document_in_Enroll_app', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_Enroll_app_#{person.id}" %>
                     <span class="n-radio">
                     </span>
                     Document in EnrollApp
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_document_in_DIMS">
-                    <%= radio_button_tag "verification_reason", 'document_in_DIMS', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_DIMS" %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_document_in_DIMS_<%=person.id%>">
+                    <%= radio_button_tag "verification_reason", 'document_in_DIMS', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_DIMS_#{person.id}" %>
                     <span class="n-radio">
                     </span>
                     Document in DIMS
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_SAVE_system">
-                    <%= radio_button_tag "verification_reason", 'SAVE system', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_SAVE_system" %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_SAVE_system_<%=person.id%>">
+                    <%= radio_button_tag "verification_reason", 'SAVE system', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_SAVE_system_#{person.id}" %>
                     <span class="n-radio">
                     </span>
                     SAVE system
                   </label>
                 </div>
                 <div class="n-radio-row">
-                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_e-verified_in_Curam">
-                    <%= radio_button_tag "verification_reason", 'e-verified_in_Curam', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_e-verified_in_Curam" %>
+                  <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_e-verified_in_Curam_<%=person.id%>">
+                    <%= radio_button_tag "verification_reason", 'e-verified_in_Curam', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_e-verified_in_Curam_#{person.id}" %>
                     <span class="n-radio">
                     </span>
                     E-Verified in Curam

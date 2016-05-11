@@ -15,14 +15,33 @@ module VerificationHelper
 
   def verification_type_status(type, member)
      if type == 'Social Security Number'
-        member.consumer_role.ssn_verified? ? "verified" : "outstanding"
+       if member.consumer_role.ssn_verified?
+         "verified"
+       elsif member.consumer_role.has_docs_for_type?(type)
+         "pending doc"
+       else
+         "outstanding"
+       end
      elsif type == 'Citizenship' || type == 'Immigration status'
-       member.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
+       if member.consumer_role.lawful_presence_authorized?
+         "verified"
+       elsif member.consumer_role.has_docs_for_type?(type)
+         "pending doc"
+       else
+         "outstanding"
+       end
      end
   end
 
   def verification_type_class(type, member)
-    verification_type_status(type, member) == "verified" ? "success" : "danger"
+    case verification_type_status(type, member)
+      when "verified"
+        "success"
+      when "pending doc"
+        "warning"
+      else
+        "danger"
+    end
   end
 
   def unverified?(person)
