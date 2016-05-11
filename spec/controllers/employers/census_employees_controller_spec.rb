@@ -51,7 +51,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
-      allow(census_employee).to receive(:check_coverage_terminated_on).and_return(true)
     end
 
     it "should be redirect when valid" do
