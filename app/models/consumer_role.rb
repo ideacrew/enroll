@@ -153,7 +153,7 @@ class ConsumerRole
 
   #check if consumer has uploaded documents for verification type
   def has_docs_for_type?(type)
-    self.vlp_documents.any?{ |doc| doc.verification_type == type }
+    self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
 
   #use this method to check what verification types needs to be included to the notices

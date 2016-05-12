@@ -478,16 +478,29 @@ end
 context "Verification process and notices" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   describe "#has_docs_for_type?" do
-    it "returns true if person has uploaded documents for this type" do
-      expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_truthy
+    before do
+      person.consumer_role.vlp_documents=[]
     end
-    it "returns false if person has NO documents for this type" do
-      expect(person.consumer_role.has_docs_for_type?("Social Security Number")).to be_falsey
+    context "vlp exist but document is NOT uploaded" do
+      it "returns false for vlp doc without uploaded copy" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil )
+        expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_falsey
+      end
+      it "returns false for Immigration type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil, :verification_type  => "Immigration type")
+        expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_falsey
+      end
     end
-  end
-
-  describe "#outstanding_verification_types" do
-
+    context "vlp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Citizenship")
+        expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
+        expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_truthy
+      end
+    end
   end
 
   describe "#is_type_outstanding?" do
