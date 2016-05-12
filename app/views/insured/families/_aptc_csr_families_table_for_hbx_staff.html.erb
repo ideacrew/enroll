@@ -1,3 +1,13 @@
+<script>
+$(document).ready(function(){
+    $(".toggler").click(function(e){
+        e.preventDefault();
+        $('.cat'+$(this).attr('data-prod-cat')).toggle();
+    });
+});
+</script>
+
+
 <div id= 'message_form'></div>
 <div id="inbox_provider_form" class="table-responsive">
   <table class="table table-condensed">
@@ -11,49 +21,52 @@
         <th>First Name</th>
         <th>DOB</th>
         <th>SSN</th>
-        <th>Active <br />Enrollments?</th>
+        <th>Active <br />Enrollment(s)?</th>
         <th>Edit <br />APTC/CSR</th>
       </tr>
     </thead>
     <tbody>
       <%= table_empty_to_human if families.count == 0 %>
-      <% families.each do |family| %>
-      <% pp = family.primary_applicant.person %>
+      <% families.each_with_index do |family, ind| %>
+        <% pp = family.primary_applicant.person %>
 
-      <tr id="family_<%= family.id %>">
-        <td><%= pp.hbx_id %></td>
-        <td><%= pp.last_name%></td>
-        <td><%= pp.first_name%></td>
-        <td><%= format_date(pp.dob) %></td>
-        <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
-        <td>
-            <% if all_active_enrollment_with_aptc(family).present?%>
-              <button id = "showhideenrollments" href="#showhide-enrollments" class="nav-toggle btn btn-default btn-xs">
-                Enrollment(s)
-                <a><i class="fa fa-chevron-down fa-lg"></i></a>
-              </button> 
-            <%else%>
-              <span class="glyphicon glyphicon-remove">
-            <%end%> 
-        </td>
-        <td>
-              <% if all_active_enrollment_with_aptc(family).blank?%>
-                  <%= link_to 'Edit Eligibility', edit_aptc_csr_path(family_id: family.id, person_id: pp.id), class: "btn btn-info btn-xs", remote: true%>
-              <%end%>
-        </td>
-      </tr>
-      <div id="showhide-enrollments" style="display:none">
+        <tr id="family_<%= family.id %>">
+          <td><%= pp.hbx_id %></td>
+          <td><%= pp.last_name%></td>
+          <td><%= pp.first_name%></td>
+          <td><%= format_date(pp.dob) %></td>
+          <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
+          <td>
+              <% if all_active_enrollment_with_aptc(family).present?%>
+                <span class="glyphicon glyphicon-check">&nbsp;</span>
+                <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ Enrollments</a>
+                <!-- <button id = "showhideenrollments" href="#showhide-enrollments" class="nav-toggle btn btn-default btn-xs">
+                  Show
+                  <a><i class="fa fa-chevron-down fa-lg"></i></a>
+                </button> --> 
+              <%else%>
+                <span class="glyphicon glyphicon-unchecked">
+              <%end%> 
+          </td>
+          <td>
+                <%if all_active_enrollment_with_aptc(family).blank?%>
+                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id), class: "btn btn-info btn-sm", remote: true%>
+                <%else%>
+                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id), class: "btn btn-info btn-sm", remote: true%>
+                <%end%>
+          </td>
+        </tr>
 
         <%all_active_enrollment_with_aptc(family).each do |hbx|%>
-        <tr>
-          <td colspan = "2"></td>
-          <td colspan = "4">( <b>Members:</b> <%=hbx_memeber_names(hbx.hbx_enrollment_members)%> ) ,  <b>Plan:</b> <%=hbx.plan.name%></td>
-          <td><%= link_to 'Edit Enrollment', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, hbx_enrollment_id: hbx.id), class: "btn btn-warning btn-xs", remote: true%></td>
+        <tr class="cat<%=ind%>" style="display:none">
+          <td colspan = "1"></td>
+          <td colspan = "6">(<b>Members:</b> <%=hbx_memeber_names(hbx.hbx_enrollment_members)%>),  <b>Plan:</b> <%=hbx.plan.name%></td>
+          <!-- <td><%#= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, hbx_enrollment_id: hbx.id), class: "btn btn-warning btn-xs", remote: true%></td> -->
         </tr>
         <%end%>
-      </div>
-
       <% end %>
+      
     </tbody>
   </table>
 </div>
+

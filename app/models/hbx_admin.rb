@@ -3,29 +3,41 @@ class HbxAdmin
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  $months_array = Date::ABBR_MONTHNAMES.compact
+
   class << self
 
-    def build_grid_values_for_aptc_csr(family, hbx, max_aptc=nil, aptc_applied=nil, csr_percentage=nil, member_ids=nil)
-        #binding.pry
-        months_array = Date::ABBR_MONTHNAMES.compact
-        plan_premium_vals         = build_plan_premium_values(family, months_array, hbx)
-        aptc_applied_vals         = build_aptc_applied_values(family, months_array, hbx, aptc_applied)
-        avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array, hbx, aptc_applied, max_aptc, member_ids)
-        max_aptc_vals             = build_max_aptc_values(family, months_array, max_aptc)
-        csr_percentage_vals       = build_csr_percentage_values(family, months_array, csr_percentage)
-        slcsp_values              = build_slcsp_values(family, months_array, member_ids)
-        individuals_covered_vals  = build_individuals_covered_array(family, months_array)
-        eligible_members_vals     = build_eligible_members(family, member_ids)
+    def build_household_level_aptc_csr_data(family, hbx, max_aptc=nil, aptc_applied=nil, csr_percentage=nil, member_ids=nil)
+      max_aptc_vals             = build_max_aptc_values(family, $months_array, max_aptc)
+      avalaible_aptc_vals       = build_avalaible_aptc_values(family, $months_array, hbx, aptc_applied, max_aptc, member_ids)
+      csr_percentage_vals       = build_csr_percentage_values(family, $months_array, csr_percentage)
+      slcsp_values              = build_slcsp_values(family, $months_array, member_ids)
+      return { "max_aptc" => max_aptc_vals, "available_aptc" => avalaible_aptc_vals, "csr_percentage" => csr_percentage_vals, "slcsp" => slcsp_values}#, "individuals_covered" =>  individuals_covered_vals}
+    end
 
-        return { "plan_premium"         => plan_premium_vals,
-                 "aptc_applied"         => aptc_applied_vals,
-                 "available_aptc"       => avalaible_aptc_vals,
-                 "max_aptc"             => max_aptc_vals,
-                 "csr_percentage"       => csr_percentage_vals,
-                 "slcsp"                => slcsp_values, 
-                 "individuals_covered"  => individuals_covered_vals,
-                 "eligible_members"     => eligible_members_vals 
-                }
+    def build_household_members(family)
+      build_individuals_covered_array(family, $months_array)
+    end
+
+    def build_enrollments_data(family, hbxs, max_aptc=nil, aptc_applied=nil, csr_percentage=nil, member_ids=nil)
+      enrollments_data = Hash.new
+      hbxs.each do |hbx|
+        enrollments_data[hbx.id] = self.build_enrollment_level_aptc_csr_data(family, hbx)
+      end
+      return enrollments_data
+    end
+
+    def build_enrollment_level_aptc_csr_data(family, hbx, max_aptc=nil, aptc_applied=nil, csr_percentage=nil, member_ids=nil)
+      plan_premium_vals         = build_plan_premium_values(family, $months_array, hbx)
+      aptc_applied_vals         = build_aptc_applied_values(family, $months_array, hbx, aptc_applied)
+      #avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array, hbx, aptc_applied, max_aptc, member_ids)
+      #max_aptc_vals             = build_max_aptc_values(family, months_array, max_aptc)
+      #csr_percentage_vals       = build_csr_percentage_values(family, months_array, csr_percentage)
+      #slcsp_values              = build_slcsp_values(family, months_array, member_ids)
+      #individuals_covered_vals  = build_individuals_covered_array(family, months_array)
+      #eligible_members_vals     = build_eligible_members(family, member_ids)
+
+      return { "plan_premium" => plan_premium_vals, "aptc_applied" => aptc_applied_vals }
     end
 
     def build_plan_premium_values(family, months_array, hbx_enrollment=nil)
