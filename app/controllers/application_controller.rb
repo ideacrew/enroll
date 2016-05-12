@@ -168,17 +168,12 @@ class ApplicationController < ActionController::Base
     end
 
     def page_alphabets(source, field)
-      if (fields = field.split(".")) && fields.count > 1
-        word_arr = source.map do |s|
-          fields.each do |f|
-            s = s.send(f)
-          end
-          s
-        end
-        word_arr.uniq.collect {|word| word.first.upcase}.uniq.sort
-      else
-        source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
-      end
+      # A good optimization would be an aggregate
+      # source.collection.aggregate([{ "$group" => { "_id" => { "$substr" => [{ "$toUpper" => "$#{field}"},0,1]}}}, "$sort" =>{"_id"=>1} ]).map do
+      #   |object| object["_id"]
+      # end
+      # but source.collection acts on the entire collection (Model.all) hence cant be used here as source is a Mongoid::Criteria
+    source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
     rescue
       ("A".."Z").to_a
     end
