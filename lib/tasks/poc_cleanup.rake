@@ -33,10 +33,10 @@ namespace :employers do
       ce = item[2]
       duplicates = Person.where(first_name: person.first_name, last_name: person.last_name).count
       puts "missing employee_role_id for ce #{ce.id} #{ce.first_name} #{ce.last_name} FEIN #{item[0]}" if !ce.employee_role_id
-      if duplicates != 2 || !ce.employee_role_id  
+      if duplicates < 2 || !ce.employee_role_id  
         puts "Not fixing for for #{fein},  #{person.first_name}, #{person.last_name}, census_employee: #{ce.id}, ce.employee_role_id #{ce.employee_role_id || ' no employee_role id    '}, duplicates #{duplicates}" 
       end
-      duplicates == 2  && ce.employee_role_id
+      duplicates > 1  && ce.employee_role_id
     end;nil
 
     puts fixme_dups.count
