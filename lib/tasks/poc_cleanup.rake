@@ -87,7 +87,7 @@ namespace :employers do
       if employee_role_id
         person2 = EmployeeRole.find(employee_role_id).person
         consolidate person1, person2, item[2].employer_profile_id
-        puts "FEIN #{fein} #{Organization.where(fein: fein).first.legal_rname}"
+        puts "FEIN #{fein} #{Organization.where(fein: fein).first.legal_name}"
       else
         puts "missing employee_role_id for ce #{ce.id} #{ce.first_name} #{ce.last_name} FEIN #{item[0]}"
       end
