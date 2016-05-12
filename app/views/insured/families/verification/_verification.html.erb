@@ -2,7 +2,7 @@
   <div class="col-xs-6">
     <h4>
       <% if enrollment_group_unverified?(@person) %>
-          Verification Due Date:&nbsp;&nbsp;
+          Documents Due Date:&nbsp;&nbsp;
           <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
               <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
           <% else %>
