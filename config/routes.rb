@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         post 'unblock'
+        delete 'delete_consumer_broker'
       end
 
       collection do
