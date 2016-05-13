@@ -36,7 +36,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     end.uniq
 
     people = family_members.map(&:person).uniq
-    people.reject!{|person| person.consumer_role.blank? || !person.consumer_role.verifications_outstanding? }
+    people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
 
     append_unverified_individuals(people)
     @notice.due_date = (enrollments.first.created_at + 95.days).strftime("%B %d, %Y")
@@ -44,11 +44,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_individuals(people)
     people.each do |person|
-      if person.consumer_role.lawful_presence_determination.ssa_responses.present?
+      if person.consumer_role.is_type_outstanding?("Social Security Number")
         @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name })
       end
 
-      if person.consumer_role.lawful_presence_determination.vlp_responses.present?
+      if person.consumer_role.is_type_outstanding?("Citizenship") || person.consumer_role.is_type_outstanding?("Immigration status")
         @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name })
       end
     end
