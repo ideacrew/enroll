@@ -49,6 +49,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
       config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
+      config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
     end
   end
 end

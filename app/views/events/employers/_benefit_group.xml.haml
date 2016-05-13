@@ -13,7 +13,7 @@
     %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{benefit_group.reference_plan.metal_level.downcase}"
     %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{benefit_group.reference_plan.coverage_kind}"
   %elected_plans
-    = render :partial => "events/employers/elected_plan", :collection => benefit_group.elected_plans
+    - benefit_group.is_offering_dental? ? dental_plans = benefit_group.elected_dental_plans : dental_plans = []
+    = render :partial => "events/employers/elected_plan", :collection => benefit_group.elected_plans + dental_plans
   %relationship_benefits
     = render :partial => "events/employers/relationship_benefit", :collection => benefit_group.relationship_benefits
-
