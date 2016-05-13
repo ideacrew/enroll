@@ -98,6 +98,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder1',
         notice_builder: 'IvlNotices::ConsumerNotice',
+        mpi_indicator: 'MPI_20A',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -118,6 +119,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder2',
         notice_builder: 'IvlNotices::ConsumerNotice',
+        mpi_indicator: 'MPI_20B',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -138,6 +140,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder3',
         notice_builder: 'IvlNotices::ConsumerNotice',
+        mpi_indicator: 'MPI_21',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -158,6 +161,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder4',
         notice_builder: 'IvlNotices::ConsumerNotice',
+        mpi_indicator: 'MPI_22',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

@@ -7,7 +7,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you
     to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong> "],
-    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> 42 CFR 435.952(c)(2), 45 CFR §155.315(f)(2).</span>', sub_heading: ''} %>
+    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> 45 CFR §155.315(f)(2)</span>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Here is the information that we need:"} %>
@@ -21,13 +21,13 @@
   not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<strong><i>Documents Showing Social Security Number</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
-  of every person who is applying for Medicaid and #{Settings.site.short_name}. We will only use your Social Security Number to verify the
+  content: "Under federal law 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
+  of every person who is applying for #{Settings.site.short_name}. We will only use your Social Security Number to verify the
   information you told us on your application or renewal form. We will check your information in the #{Settings.aca.state_name} and Federal databases,
   and the databases of other #{Settings.aca.state_name}, Federal agencies, and a consumer reporting agency."} %>
 
@@ -38,7 +38,7 @@
   #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.  "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<strong><i>Documents of Citizenship or Immigration Status</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
@@ -76,75 +76,124 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_underline}>Needed Information to Verify Immigration Status</span>"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong>"} %>
 
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "<span class='mar20'><strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong></span>",
+    listings: [
+      ["Permanent Resident Card (I-551, also known as Green Card)", 
+        ["Alien registration number", "Card number"]
+      ], 
+      ["Temporary I-551 Stamp (on passport or I-94, I-94A)", 
+        ["Alien registration number"]
+      ], 
+      ["Immigrant Visa (with temporary I-551 language)", 
+        ["Alien registration number", "Passport number"]
+      ], 
+      ["Employment Authorization Card (EAD or I-766)", 
+        ["Alien registration number", "Card number", "Expiration date", "Category code"]
+      ], 
+      ["Arrival/Departure Record (I-94 or I-94A)", 
+        ["I-94 number"]
+      ], 
+      ["Arrival/Departure Record in foreign passport (I-94)", 
+        ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
+      ], 
+      ["Foreign passport", 
+        ["Passport number", "Expiration date"]
+      ], 
+      ["Country of issuance Reentry Permit (I-327)", 
+        ["Alien registration number"]
+      ],
+      ["Refugee travel document (I-571)", 
+        ["Alien registration number"]
+      ],     
+      ["Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ],
+      ["Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)", 
+        ["SEVIS ID"]
+      ],
+      ["Notice of Action (I-797)", 
+        ["Alien registration number or an I-94 number"]
+      ], 
+      ["Other", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ]
+    ]
+    } %>
+
+
+<!--   <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Permanent Resident Card (I-551, also known as Green Card)",
     listings: ["Alien registration number",
                "Card number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Temporary I-551 Stamp (on passport or I-94, I-94A)",
     listings: ["Alien registration number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Immigrant Visa (with temporary I-551 language)",
     listings: ["Alien registration number", "Passport number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Employment Authorization Card (EAD or I-766)",
     listings: ["Alien registration number", "Card number", "Expiration date", "Category code"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Arrival/Departure Record (I-94 or I-94A)",
     listings: ["I-94 number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Arrival/Departure Record in foreign passport (I-94)",
     listings: ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Foreign passport",
     listings: ["Passport number", "Expiration date"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Country of issuance Reentry Permit (I-327)",
     listings: ["Alien registration number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Refugee travel document (I-571)",
     listings: ["Alien registration number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)",
     listings: ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)",
     listings: ["SEVIS ID"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Notice of Action (I-797)",
     listings: ["Alien registration number or an I-94 number"]
     } %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Other",
     listings: ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
-    } %>
+    } %> -->
+
+
+
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can also list these documents or statuses:",
@@ -281,16 +330,60 @@
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
     heading: 'How to Submit Your Documents', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
+<%#= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
-  listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.",
-             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{Settings.site.short_name}</span><br>
+  listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document."]
+} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="fssizeuser">
+        <td>
+          <div class='display:block; page-break-inside: avoid;'>
+            <ul style='list-style: circle solid;'><li>U.S. Postal Mail: <span style='margin-left: 10px;'><%= Settings.site.short_name %></span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
              <span style='margin-left:96px;'>Washington, DC 20090</span><br>
-             <i>Be sure to write your account number (<account number>) on your submission.</i>",
-            "<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
-            (call the #{Settings.contact_center.name} at #{Settings.contact_center.phone_number} for locations)."]
+             <i>Be sure to write your account number (<account number>) on your submission.</i></li>
+           </ul></div>
+        </td>
+      </tr>   
+    </tbody>
+  </table>
+</div>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office (call the <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> for locations).
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<%#= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: [""]
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

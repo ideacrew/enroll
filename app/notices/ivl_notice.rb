@@ -16,7 +16,7 @@ class IvlNotice < Notice
 
   def prepend_envelope
     envelope = Envelope.new
-    envelope.fill_envelope(@notice)
+    envelope.fill_envelope(@notice, @mpi_indicator)
     envelope.render_file(@envelope_path)
     join_pdfs [@envelope_path, @notice_path]
   end

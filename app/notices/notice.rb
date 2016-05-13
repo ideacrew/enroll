@@ -8,6 +8,7 @@ class Notice
     @notice_filename = "#{@subject.gsub(/\s*/, '')}"
     @notice_path = Rails.root.join("tmp", @notice_filename)
     @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
+    @mpi_indicator = args[:mpi_indicator]
     @layout = 'pdf_notice'
   end
 
@@ -57,7 +58,7 @@ class Notice
   end
 
   def save_html
-    File.open(Rails.root.join('pdfs','notice.html'), 'wb') do |file|
+    File.open(Rails.root.join("tmp", "notice.html"), 'wb') do |file|
       file << self.html
     end
   end

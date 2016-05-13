@@ -31,6 +31,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise "enrollment don't exists!!"
     end
 
+    @notice.enrollments << enrollments.first
+
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq

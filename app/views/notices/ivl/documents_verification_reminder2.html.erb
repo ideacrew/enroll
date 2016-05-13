@@ -21,8 +21,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You submitted an application or renewal for health insurance
-  through DC Health Link which we processed on [date of application/renewal].
+  content: "You enrolled in an insurance plan through DC Health Link on #{notice.enrollments.first.created_at.strftime('%B %d, %Y')}.
   The information you provided does not match our records or is not enough to
   make a final determination of your eligibility. This is your first reminder notice to provide documentation."} %>
 
