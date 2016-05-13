@@ -1,6 +1,6 @@
 <div class="panel panel-info">
   <div class="panel-heading">
-    <h2 class="panel-title"><b>Household</b></h2>
+    <h2 class="panel-title">Enrollment Level - Plan Name : <%=HbxEnrollment.find(hbx_id).plan.name%></h2>
   </div>
   <div class="panel-body">
 
@@ -15,7 +15,7 @@
         <th></th>
       </thead>  
       <tbody>
-        <%@household_info.keys.each do |attribute|%>
+        <%hbx_values.keys.each do |attribute|%>
           <tr>
             <td><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
             <% @household_info[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
@@ -31,15 +31,10 @@
                   <%= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px'%>
               <%end%> 
             </td>
-            <td ></td>
+            <td></td>
           </tr>
           <tr></tr>
         <%end%>
-        <tr><td colspan = "16" class="aptc-csr-grid-separator"></td></tr>
-        <tr>
-          <td>SLCSP</td>
-          <td colspan = "15"><%=@slcsp_value%></td>
-        </tr>
         <tr>
           <th colspan = "13">Individual Member(s)</th>
           <th></th>

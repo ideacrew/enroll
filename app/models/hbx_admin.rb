@@ -11,8 +11,8 @@ class HbxAdmin
       max_aptc_vals             = build_max_aptc_values(family, $months_array, max_aptc)
       avalaible_aptc_vals       = build_avalaible_aptc_values(family, $months_array, hbx, aptc_applied, max_aptc, member_ids)
       csr_percentage_vals       = build_csr_percentage_values(family, $months_array, csr_percentage)
-      slcsp_values              = build_slcsp_values(family, $months_array, member_ids)
-      return { "max_aptc" => max_aptc_vals, "available_aptc" => avalaible_aptc_vals, "csr_percentage" => csr_percentage_vals, "slcsp" => slcsp_values}#, "individuals_covered" =>  individuals_covered_vals}
+      #slcsp_values              = build_slcsp_values(family, $months_array, member_ids)
+      return { "max_aptc" => max_aptc_vals, "available_aptc" => avalaible_aptc_vals, "csr_percentage" => csr_percentage_vals}# "slcsp" => slcsp_values}#, "individuals_covered" =>  individuals_covered_vals}
     end
 
     def build_household_members(family)
@@ -231,7 +231,37 @@ class HbxAdmin
       return first_of_month_num_current_year
     end  
 
-    def build_slcsp_values(family, months_array, member_ids=nil)
+    # def build_slcsp_values(family, months_array, member_ids=nil)
+    #   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    #   eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+    #   benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    #   slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+
+    #   if member_ids.present?
+    #     aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
+    #   else
+    #     aptc_members = family.active_household.latest_active_tax_household.aptc_members
+    #   end
+
+    #   cost = aptc_members.map do |member|
+    #     slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+    #   end.inject(:+) || 0
+          
+    #   slcsp_hash = Hash.new
+    #   months_array.each_with_index do |month, ind|
+    #     eligibility_determinations.each do |ed|
+    #       first_of_month_num_current_year = first_of_month_converter(month)
+    #       if first_of_month_num_current_year >= ed.determined_on
+    #         slcsp_hash.store(month, cost)
+    #       else
+    #         slcsp_hash.store(month, "---")
+    #       end 
+    #     end
+    #   end
+    #   return slcsp_hash
+    # end
+
+    def calculate_slcsp_value(family, member_ids=nil)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
@@ -247,19 +277,18 @@ class HbxAdmin
         slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
           
-      slcsp_hash = Hash.new
-      months_array.each_with_index do |month, ind|
-        eligibility_determinations.each do |ed|
-          first_of_month_num_current_year = first_of_month_converter(month)
-            if first_of_month_num_current_year >= ed.determined_on
-              slcsp_hash.store(month, cost)
-            else
-              slcsp_hash.store(month, "---")
-            end  
-          
-        end
-      end
-      return slcsp_hash
+      # slcsp_hash = Hash.new
+      # months_array.each_with_index do |month, ind|
+      #   eligibility_determinations.each do |ed|
+      #     first_of_month_num_current_year = first_of_month_converter(month)
+      #     if first_of_month_num_current_year >= ed.determined_on
+      #       slcsp_hash.store(month, cost)
+      #     else
+      #       slcsp_hash.store(month, "---")
+      #     end 
+      #   end
+      # end
+      return cost
     end
 
     def build_individuals_covered_array(family, months_array)

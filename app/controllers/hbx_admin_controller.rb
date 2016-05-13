@@ -9,6 +9,7 @@ class HbxAdminController < ApplicationController
     @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year)
     @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbx)
+    @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
     @household_members = HbxAdmin.build_household_members(@family)
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
