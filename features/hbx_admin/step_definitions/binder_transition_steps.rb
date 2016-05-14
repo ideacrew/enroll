@@ -13,16 +13,8 @@ module BinderTransitionWorld
 end
 World(BinderTransitionWorld)
 
-Given(/^an HBX admin exists$/) do
-  hbx_admin :with_family, :hbx_staff
-end
-
 Given(/^a new employer, with insured employees, exists$/) do
   employer :with_insured_employees
-end
-
-Given(/^the HBX admin is logged in$/) do
-  login_as hbx_admin, scope: :user
 end
 
 Given(/^the HBX admin visits the Dashboard page$/) do

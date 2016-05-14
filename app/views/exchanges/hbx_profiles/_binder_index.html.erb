@@ -22,7 +22,7 @@
       <tbody>
         <% @organizations.each do |organization| %>
           <% employer = organization.employer_profile %>
-          <% if employer.is_new_employer? || employer.is_renewing_employer? %>
+          <% if employer.show_plan_year.present? && (employer.is_new_employer? || employer.is_renewing_employer?) %>
             <tr>
               <td>
                 <% if employer.aasm_state != "binder_paid" %>
