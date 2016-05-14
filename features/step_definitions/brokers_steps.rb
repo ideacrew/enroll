@@ -27,8 +27,6 @@ And(/^.+ enters broker agency information$/) do
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  fill_in 'organization[home_page]', with: 'www.logistics.example.com'
-
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
