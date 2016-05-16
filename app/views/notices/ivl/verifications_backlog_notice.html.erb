@@ -40,9 +40,9 @@
 
 <%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
-
+<% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<strong><i><span style='font-size:13px'>Documents Showing Social Security Number</span></i></strong><br>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
@@ -51,12 +51,11 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember your Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465."} %>
+<% end %>
 
-<%#= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span> <strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
-
+<% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents of Citizenship or Immigration Status.</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<strong><i><span style='font-size:13px'>Documents of Citizenship or Immigration Status</span></i></strong><br>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
@@ -64,7 +63,8 @@
   content: "<u>How to Prove US Citizenship</u><br>
   Two types of documentation are accepted to confirm citizenship status.  We call the two types “primary” and “secondary” documentation.  If you provide primary documentation, no other documents are required.  If you provide secondary documentation, other identification (ID) is required for verification.  Secondary documentation must be accompanied with an identification card containing a recent photo and other identifying information. <br>
 "} %>
-
+<% end %>
+<br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<u>Primary documentation</u>:  (Only One (1) is needed) ",
   listings: [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
@@ -98,60 +98,50 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<u>Needed Information to Verify Immigration Status</u>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong>"} %> 
-
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Permanent Resident Card (I-551, also known as Green Card)",
-  listings: ["Alien registration number","Card number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Temporary I-551 Stamp (on passport or I-94, I-94A)",
-  listings: ["Alien registration number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Immigrant Visa (with temporary I-551 language)",
-  listings: ["Alien registration number","Passport number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Employment Authorization Card (EAD or I-766)",
-  listings: ["Alien registration number","Card number","Expiration date","Category code"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Arrival/Departure Record (I-94 or I-94A)",
-  listings: ["I-94 number"]} %> 
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Arrival/Departure Record in foreign passport (I-94)",
-  listings: ["I-94 number","Passport number","Expiration date","Country of issuance"]} %> 
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Foreign passport",
-  listings: ["Passport number","Expiration date"]} %> 
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Country of issuance Reentry Permit (I-327)",
-  listings: ["Alien registration number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Refugee travel document (I-571)",
-  listings: ["Alien registration number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)",
-  listings: ["Alien registration number or an I-94 number","Description of the type or name of the document"]} %> 
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)",
-  listings: ["SEVIS ID"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Notice of Action (I-797)",
-  listings: ["Alien registration number or an I-94 number"]} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Other",
-  listings: ["Alien registration number or an I-94 number","Description of the type or name of the document"]} %>
+    previous: "<span class='mar20'><strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong></span>",
+    listings: [
+      ["Permanent Resident Card (I-551, also known as Green Card)", 
+        ["Alien registration number", "Card number"]
+      ], 
+      ["Temporary I-551 Stamp (on passport or I-94, I-94A)", 
+        ["Alien registration number"]
+      ], 
+      ["Immigrant Visa (with temporary I-551 language)", 
+        ["Alien registration number", "Passport number"]
+      ], 
+      ["Employment Authorization Card (EAD or I-766)", 
+        ["Alien registration number", "Card number", "Expiration date", "Category code"]
+      ], 
+      ["Arrival/Departure Record (I-94 or I-94A)", 
+        ["I-94 number"]
+      ], 
+      ["Arrival/Departure Record in foreign passport (I-94)", 
+        ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
+      ], 
+      ["Foreign passport", 
+        ["Passport number", "Expiration date"]
+      ], 
+      ["Country of issuance Reentry Permit (I-327)", 
+        ["Alien registration number"]
+      ],
+      ["Refugee travel document (I-571)", 
+        ["Alien registration number"]
+      ],     
+      ["Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ],
+      ["Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)", 
+        ["SEVIS ID"]
+      ],
+      ["Notice of Action (I-797)", 
+        ["Alien registration number or an I-94 number"]
+      ], 
+      ["Other", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ]
+    ]
+    } %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can also list these documents or statuses:",
@@ -172,18 +162,54 @@
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
     heading: 'How to Submit Your Documents', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "",
-  listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.",
-             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{Settings.site.short_name}</span><br>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="fssizeuser">
+        <td>
+          <div class='display:block; page-break-inside: avoid;'>
+            <ul style='list-style: circle solid;'><li>U.S. Postal Mail: <span style='margin-left: 10px;'><%= Settings.site.short_name %></span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
-             <span style='margin-left:96px;'>Washington, DC 20090</span><br>
-             <i>Be sure to write your account number (<account number>) on your submission.</i>",
-            "<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
-            (call the #{Settings.contact_center.name} at #{Settings.contact_center.phone_number} for locations)."]
-} %>
+             <span style='margin-left:96px;'>Washington, DC 20090</span><br><br>
+             <i>Be sure to write your account number (&#60;account number>) on your submission.</i></li>
+           </ul></div>
+        </td>
+      </tr>   
+    </tbody>
+  </table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office (call the <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> for locations).
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free <br>at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
