@@ -104,7 +104,7 @@ When(/^.+ registers? with valid information for staff$/) do
 end
 
 Then(/^.+ should see successful message with general agency home page$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
@@ -146,7 +146,7 @@ Then(/^.+ should receive an invitation email for ga flow$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page for ga flow$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   expect(page).to have_content('Broker Agency : CareFirst Inc')
 end
 
