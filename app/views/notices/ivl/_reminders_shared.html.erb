@@ -20,8 +20,9 @@
   content: "<span #{@style_color_text}>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could
   not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
 
+<% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents Showing Social Security Number</i></strong> The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<strong><i><span style='font-size:13px'>Documents Showing Social Security Number</span></i></strong><br>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
@@ -36,9 +37,11 @@
   Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a
   Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact
   #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.  "} %>
+<% end %>
 
+<% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i>Documents of Citizenship or Immigration Status</i></strong> We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<strong><i><span style='font-size:13px'>Documents of Citizenship or Immigration Status</span></i></strong><br>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
@@ -48,8 +51,8 @@
   If you provide primary documentation, no other documents are required. If you provide secondary documentation, other
   identification (ID) is required for verification. Secondary documentation must be accompanied with an identification
   card containing a recent photo and other identifying information."} %>
-
-
+<% end %>
+  <br>
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
     listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
@@ -288,8 +291,8 @@
             <ul style='list-style: circle solid;'><li>U.S. Postal Mail: <span style='margin-left: 10px;'><%= Settings.site.short_name %></span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
-             <span style='margin-left:96px;'>Washington, DC 20090</span><br>
-             <i>Be sure to write your account number (<account number>) on your submission.</i></li>
+             <span style='margin-left:96px;'>Washington, DC 20090</span><br><br>
+             <i>Be sure to write your account number (&#60;account number>) on your submission.</i></li>
            </ul></div>
         </td>
       </tr>   
@@ -297,6 +300,7 @@
   </table>
 </div>
 
+<div style="display:block; page-break-inside: avoid;">
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -310,14 +314,14 @@
     </tr>
   </tbody>
 </table>
-
+</div>
 <%#= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
   listings: [""]
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free<br>at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 
