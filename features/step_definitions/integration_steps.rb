@@ -408,7 +408,8 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # there is a flickering failure here due to over-lapping modals
   # find("#person_addresses_attributes_0_city").trigger('click')
   # find("#person_addresses_attributes_0_zip").trigger('click')
-  find_by_id("person_phones_attributes_0_full_phone_number") 
+  find_by_id("person_phones_attributes_0_full_phone_number")
+  puts "passsssed" 
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
