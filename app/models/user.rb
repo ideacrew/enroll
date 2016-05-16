@@ -332,8 +332,7 @@ class User
       announcements.concat(Announcement.current_msg_for_ga) if has_role?(:general_agency_staff)
     end
 
-    announcements.uniq!
-    announcements.present? ? ("Announcement:<br/>" + announcements.join("<br/>")) : ""
+    announcements.uniq
   end
 
   def self.get_saml_settings

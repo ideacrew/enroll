@@ -171,7 +171,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "GET show" do
     let(:user) { FactoryGirl.create(:user) }
-    let(:person){ double("Person") }
+    let(:person){ FactoryGirl.create(:person) }
     let(:employer_profile) {instance_double("EmployerProfile", id: double("id"))}
     let(:hbx_enrollment) {
       instance_double("HbxEnrollment",
@@ -219,7 +219,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:has_employer_staff_role?).and_return true
         get :show, id: employer_profile.id, tab: "home"
-        expect(flash.now[:warning]).to match /msg for Employer/
+        expect(flash.now[:warning]).to eq ["msg for Employer"]
       end
     end
   end

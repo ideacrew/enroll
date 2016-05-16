@@ -112,4 +112,12 @@ RSpec.describe Exchanges::AnnouncementsController do
       end
     end
   end
+
+  describe "GET dismiss" do
+    it "should update session" do
+      sign_in user
+      get :dismiss, content: "hello announcement"
+      expect(session[:dismiss_announcements]).to eq ["hello announcement"].to_json
+    end
+  end
 end

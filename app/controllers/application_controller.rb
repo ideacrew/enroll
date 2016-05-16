@@ -276,6 +276,15 @@ class ApplicationController < ActionController::Base
 
     def set_flash_by_announcement
       return if current_user.blank?
-      flash.now[:warning] = current_user.get_announcements_by_roles_and_portal(request.path) if flash.blank? || flash[:warning].blank?
+      if flash.blank? || flash[:warning].blank?
+        announcements = if current_user.has_hbx_staff_role?
+                          Announcement.get_announcements_by_portal(request.path, @person)
+                        else
+                          current_user.get_announcements_by_roles_and_portal(request.path)
+                        end
+        dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+        announcements -= dismiss_announcements
+        flash.now[:warning] = announcements
+      end
     end
 end

@@ -1,5 +1,15 @@
 class Exchanges::AnnouncementsController < ApplicationController
-  before_action :check_hbx_staff_role
+  before_action :check_hbx_staff_role, except: [:dismiss]
+
+  def dismiss
+    if params[:content].present?
+      dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+      dismiss_announcements << params[:content].strip
+      dismiss_announcements.uniq!
+      session[:dismiss_announcements] = dismiss_announcements.to_json
+    end
+    render json: 'ok'
+  end
 
   def index
     @filter = params[:filter] || 'current'

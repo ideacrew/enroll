@@ -125,7 +125,7 @@ RSpec.describe Insured::FamiliesController do
       end
 
       it "should get announcement" do
-        expect(flash.now[:warning]).to match /msg for Employee/
+        expect(flash.now[:warning]).to eq ["msg for Employee"]
       end
     end
 

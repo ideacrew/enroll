@@ -45,7 +45,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should get announcement" do
       FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       get :show, id: broker_agency_profile.id
-      expect(flash.now[:warning]).to match /msg for Broker/
+      expect(flash.now[:warning]).to eq ["msg for Broker"]
     end
   end
 
