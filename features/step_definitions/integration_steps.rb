@@ -394,17 +394,22 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # TODO: fix this bombing issue
   wait_for_ajax(10)
   person = people[named_person]
+  screenshot("before modal")
   find('.interaction-click-control-click-here').click
+  screenshot("during modal")
   find('.interaction-click-control-close').click
+  screenshot("after modal")
 
   sleep 3
   wait_for_ajax(10)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  find("#person_addresses_attributes_0_address_1").trigger('click')
-  find("#person_addresses_attributes_0_address_2").trigger('click')
-  find("#person_addresses_attributes_0_city").trigger('click')
-  find("#person_addresses_attributes_0_zip").trigger('click')
+  # find("#person_addresses_attributes_0_address_1").trigger('click')
+  # find("#person_addresses_attributes_0_address_2").trigger('click')
+  # there is a flickering failure here due to over-lapping modals
+  # find("#person_addresses_attributes_0_city").trigger('click')
+  # find("#person_addresses_attributes_0_zip").trigger('click')
 
+  sleep 2
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
