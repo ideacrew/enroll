@@ -182,6 +182,13 @@ class Insured::FamiliesController < FamiliesController
     @family.set(status: "aptc_unblock")
   end
 
+  def delete_consumer_broker
+    @family = Family.find(params[:id])
+    if @family.current_broker_agency.destroy
+      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    end
+  end
+
   private
 
   def check_employee_role

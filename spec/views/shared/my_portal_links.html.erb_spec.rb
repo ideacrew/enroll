@@ -2,8 +2,7 @@ require 'rails_helper'
 
 describe "shared/_my_portal_links.html.haml" do
   before :each do
-    sign_in(user)
-    render 'shared/my_portal_links'
+
   end
 
   context "with emploee role" do
@@ -11,10 +10,13 @@ describe "shared/_my_portal_links.html.haml" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role)}
 
     it "should have one portal link" do
+      all_er_profile = FactoryGirl.create(:employer_profile)
+      all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
+      person.employee_roles.first.census_employee = all_census_ee
+      person.employee_roles.first.save!
+      sign_in(user)
+      render 'shared/my_portal_links'
       expect(rendered).to have_content('My Insured Portal')
-    end
-
-    it "should not have a dropdown" do
       expect(rendered).to_not have_selector('dropdownMenu1')
     end
 
@@ -25,11 +27,14 @@ describe "shared/_my_portal_links.html.haml" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role, :with_employer_staff_role)}
 
     it "should have one portal link" do
+      all_er_profile = FactoryGirl.create(:employer_profile)
+      all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
+      person.employee_roles.first.census_employee = all_census_ee
+      person.employee_roles.first.save!
+      sign_in(user)
+      render 'shared/my_portal_links'
       expect(rendered).to have_content('My Insured Portal')
       expect(rendered).to have_content('My Employer Portal')
-    end
-
-    it "should have a dropdown" do
       expect(rendered).to have_selector('.dropdown-menu')
     end
 
