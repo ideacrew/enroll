@@ -91,7 +91,7 @@ gem 'bootstrap-slider-rails', '6.0.17'
 gem 'prawn', '~> 0.11.1'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
-gem 'wicked_pdf', '1.0.4'
+gem 'wicked_pdf', '1.0.6'
 
 # provide recaptcha services
 gem "recaptcha", '1.1.0'
