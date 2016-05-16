@@ -6,16 +6,18 @@ class HbxAdminController < ApplicationController
     @current_year = TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
+    #@hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present? This will be needed when we need to firure out which hbx we are editing when doing calculate available.
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year)
     @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbx)
     @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
     @household_members = HbxAdmin.build_household_members(@family)
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
-    @aptc_applied =  (@hbx.applied_aptc_amount || 0) if @hbx.present?
+    @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs)
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
+    @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
     @max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+
     @csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
 
     respond_to do |format|

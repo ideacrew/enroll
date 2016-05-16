@@ -28,7 +28,7 @@ class HbxAdmin
     end
 
     def build_enrollment_level_aptc_csr_data(family, hbx, max_aptc=nil, aptc_applied=nil, csr_percentage=nil, member_ids=nil)
-      plan_premium_vals         = build_plan_premium_values(family, $months_array, hbx)
+      #plan_premium_vals         = build_plan_premium_values(family, $months_array, hbx)
       aptc_applied_vals         = build_aptc_applied_values(family, $months_array, hbx, aptc_applied)
       #avalaible_aptc_vals       = build_avalaible_aptc_values(family, months_array, hbx, aptc_applied, max_aptc, member_ids)
       #max_aptc_vals             = build_max_aptc_values(family, months_array, max_aptc)
@@ -37,18 +37,26 @@ class HbxAdmin
       #individuals_covered_vals  = build_individuals_covered_array(family, months_array)
       #eligible_members_vals     = build_eligible_members(family, member_ids)
 
-      return { "plan_premium" => plan_premium_vals, "aptc_applied" => aptc_applied_vals }
+      return { "aptc_applied" => aptc_applied_vals} #"plan_premium" => plan_premium_vals,  }
     end
 
-    def build_plan_premium_values(family, months_array, hbx_enrollment=nil)
-      if hbx_enrollment.nil?
-        hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
-      else
-        hbx = hbx_enrollment
-      end    
+    # def build_plan_premium_values(family, months_array, hbx_enrollment=nil)
+    #   if hbx_enrollment.nil?
+    #     hbx = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year).last
+    #   else
+    #     hbx = hbx_enrollment
+    #   end    
+    #   plan_premium_hash = Hash.new
+    #   months_array.each_with_index do |month, ind|
+    #     plan_premium_hash.store(month, hbx.try(:total_premium) || false)
+    #   end
+    #   return plan_premium_hash
+    # end
+
+    def build_plan_premium_hash_for_enrollments(hbxs)
       plan_premium_hash = Hash.new
-      months_array.each_with_index do |month, ind|
-        plan_premium_hash.store(month, hbx.try(:total_premium) || false)
+      hbxs.each do |hbx| 
+        plan_premium_hash[hbx.id.to_s] = (hbx.try(:total_premium) || false)
       end
       return plan_premium_hash
     end
@@ -341,6 +349,15 @@ class HbxAdmin
         aptc_per_enrollment[hbx.id.to_s] = [hbx_applied_aptc, plan_name]
       end
       aptc_per_enrollment  
+    end
+
+
+    def build_current_aptc_applied_hash(hbxs)
+      current_aptc_applied_hash = Hash.new
+      hbxs.each do |hbx|
+        current_aptc_applied_hash[hbx.id.to_s] = (hbx.applied_aptc_amount || 0)
+      end
+      return current_aptc_applied_hash  
     end
     ###
 
