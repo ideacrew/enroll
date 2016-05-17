@@ -330,6 +330,14 @@ class ConsumerRole
     vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
   end
 
+  def can_receive_paper_communication?
+    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+  end
+
+  def can_receive_electronic_communication?
+    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+  end
+
   ## TODO: Move RIDP to user model
   aasm do
     state :verifications_pending, initial: true
