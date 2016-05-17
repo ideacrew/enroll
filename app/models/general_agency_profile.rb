@@ -119,8 +119,7 @@ class GeneralAgencyProfile
 
     def all_by_broker_role(broker_role, options={})
       favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue [] 
-      all_ga = all
-      all_ga = all_ga.select{|ga| ga.aasm_state == 'is_approved'} if options[:approved_only]
+      all_ga = all.select{|ga| ga.aasm_state == 'is_approved'} if options[:approved_only]
 
       if favorite_general_agency_ids.present?
         all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }

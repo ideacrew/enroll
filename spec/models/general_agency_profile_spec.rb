@@ -88,6 +88,38 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
         end
       end
     end
+
+    describe "all_by_broker_role" do
+      let(:broker_role) { FactoryGirl.build :broker_role }
+      let(:general_agency_profile_approved) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_approved"}
+      let(:general_agency_profile_applicant1) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_applicant"}
+      let(:general_agency_profile_applicant2) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_applicant"}
+      context "with approved general_agency_profiles" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_approved,general_agency_profile_applicant1])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq [general_agency_profile_approved]
+        end
+      end
+      context "with favorite general_agency_profile for broker_role" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_approved,general_agency_profile_applicant1])
+          allow(broker_role).to receive(:favorite_general_agencies).and_return([general_agency_profile_approved])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq [general_agency_profile_approved]
+        end
+      end
+      context "without approved general_agency_profiles" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_applicant1,general_agency_profile_applicant2])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq []
+        end
+      end
+    end
   end
 
   describe "instance method" do
