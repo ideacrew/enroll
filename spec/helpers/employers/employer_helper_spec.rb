@@ -98,8 +98,6 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
 
     context "return coverage kind for a census_employee" do
-
-
       it " when coverage kind is nil " do
         expect(helper.coverage_kind(nil)).to eq ""
       end
@@ -124,6 +122,20 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       it " when coverage kind is 'dental, health' " do
         allow(primary_family).to receive(:enrolled_including_waived_hbx_enrollments).and_return([dental_enrollment, health_enrollment])
         expect(helper.coverage_kind(census_employee)).to eq "Health, Dental"
+      end
+    end
+
+    context "invoice_formated_date" do
+      it "should return Month-Year format for a giving date" do
+        expect(helper.invoice_formated_date(Date.new(2001,2,10))).to eq "February-2001"
+        expect(helper.invoice_formated_date(Date.new(2016,4,14))).to eq "April-2016"
+      end
+    end
+
+    context "invoice_coverage_date" do
+      it "should return Month-Date-Year format for a giving date" do
+        expect(helper.invoice_coverage_date(Date.new(2001,2,10))).to eq "Mar-01-2001 to Mar-31-2001"
+        expect(helper.invoice_coverage_date(Date.new(2016,4,14))).to eq "May-01-2016 to May-31-2016"
       end
     end
 

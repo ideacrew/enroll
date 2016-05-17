@@ -212,7 +212,7 @@ class Organization
     invoice_date = get_invoice_date(file_path) rescue nil
     org = get_organization(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      s3file= Aws::S3Storage.save(file_path, "invoice")
+      s3file= Aws::S3Storage.save(file_path, "invoices")
       document = Document.new
       if s3file
         document.identifier = s3file
@@ -229,7 +229,7 @@ class Organization
     end
   end
 
-  # Expectes a file_path string with file_name format /hbxid_mmddyyyy_invoice_r.pdf
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
   # Returns Organization
   def self.get_organization(file_path)
     file_name = get_file_name(file_path)
@@ -237,7 +237,7 @@ class Organization
     Organization.where(hbx_id: hbx_id).first
   end
 
-  # Expectes a file_path string with file_name format /hbxid_mmddyyyy_invoice_r.pdf
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
   # Returns Date
   def self.get_invoice_date(file_path)
     file_name = get_file_name(file_path)

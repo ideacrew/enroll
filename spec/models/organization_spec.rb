@@ -352,7 +352,7 @@ RSpec.describe Organization, dbclean: :after_each do
 
   context "Invoice Upload" do
     before do
-      allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoice:asdds123123")
+      allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoices:asdds123123")
       allow(Organization).to receive(:get_organization).and_return(org)
     end
 
@@ -384,13 +384,13 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
-  # context "get_invoice_date" do 
-  #   context "with valid date in the file name" do
-  #     it "should parse the date" do
-  #       valid_file_names.each do | file_name |
-  #         expect(Invoice.get_invoice_date(file_name)).to  be_an_instance_of(Date)
-  #       end
-  #     end
-  #   end
-  # end
+  context "get_invoice_date" do 
+    context "with valid date in the file name" do
+      it "should parse the date" do
+        valid_file_names.each do | file_name |
+          expect(Organization.get_invoice_date(file_name)).to  be_an_instance_of(Date)
+        end
+      end
+    end
+  end
 end
