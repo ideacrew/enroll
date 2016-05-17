@@ -10,8 +10,8 @@
  		 <tbody>
 		  <tr>
 		  <% @invoices.each do |invoice|%>
-		 	<td><%= link_to(invoice.invoice_formated_date,download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") %></td>
-		 	<td><%=invoice.invoice_coverage_date%></td>
+		 	<td><%= link_to(invoice_formated_date(invoice.date),download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") %></td>
+		 	<td><%=invoice_coverage_date(invoice.date)%></td>
 		  <tr/>
 		  <%end%>
 		</tbody>

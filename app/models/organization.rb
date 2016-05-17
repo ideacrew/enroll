@@ -76,8 +76,6 @@ class Organization
 
   validate :office_location_kinds
 
-  BUCKET_NAME = "invoices"
-
   index({ hbx_id: 1 }, { unique: true })
   index({ legal_name: 1 })
   index({ dba: 1 }, {sparse: true})
@@ -214,11 +212,10 @@ class Organization
     invoice_date = get_invoice_date(file_path) rescue nil
     org = get_organization(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      s3file= Aws::S3Storage.save(file_path, BUCKET_NAME)
+      s3file= Aws::S3Storage.save(file_path, "invoice")
       document = Document.new
       if s3file
         document.identifier = s3file
-        document.type ="pdf"
         document.date = invoice_date
         document.format = 'application/pdf'
         document.subject = 'invoice'
