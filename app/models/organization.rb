@@ -209,17 +209,17 @@ class Organization
   end
 
   def self.upload_invoice(file_path)
-    invoice_date = get_invoice_date(file_path) rescue nil
-    org = get_organization(file_path) rescue nil
+    invoice_date = invoice_date(file_path) rescue nil
+    org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      s3file= Aws::S3Storage.save(file_path, "invoices")
-      document = Document.new
-      if s3file
-        document.identifier = s3file
+      doc_uri = Aws::S3Storage.save(file_path, "invoices")
+      if doc_uri
+        document = Document.new
+        document.identifier = doc_uri
         document.date = invoice_date
         document.format = 'application/pdf'
         document.subject = 'invoice'
-        document.title = get_file_name(file_path)
+        document.title = File.basename(file_path)
         org.documents << document
         logger.debug "associated file #{file_path} with the Organization"
         return document
@@ -231,27 +231,20 @@ class Organization
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
   # Returns Organization
-  def self.get_organization(file_path)
-    file_name = get_file_name(file_path)
-    hbx_id= file_name.split("_")[0]
+  def self.by_invoice_filename(file_path)
+    hbx_id= File.basename(file_path).split("_")[0]
     Organization.where(hbx_id: hbx_id).first
   end
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
   # Returns Date
-  def self.get_invoice_date(file_path)
-    file_name = get_file_name(file_path)
-    date_string= file_name.split("_")[1]
+  def self.invoice_date(file_path)
+    date_string= File.basename(file_path).split("_")[1]
     Date.strptime(date_string, "%m%d%Y")
-  end
-
-  def self.get_file_name(file_path)
-    File.basename(file_path)
   end
 
   def self.invoice_exist?(invoice_date,org)
     if org.documents.where("date" => invoice_date).count > 0
-      puts "Invoice already exists for the Org"
       return true
     end
   end
