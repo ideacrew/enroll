@@ -2,6 +2,31 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
+  describe "normal user" do
+
+    let(:household) { FactoryGirl.create(:household, family: family) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person )}
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:hbx_enrollment_one) { FactoryGirl.create(:hbx_enrollment, household: household) }
+
+    context "GET plans" do
+      before :each do
+        sign_in user
+        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_household).and_return(household)
+
+      end
+
+      it "returns http success" do
+        xhr :get, :plans, id: "hbx_id", format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+    end
+
+  end
+
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
   let(:household){ double("Household") }
