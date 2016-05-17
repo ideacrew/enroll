@@ -620,7 +620,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     it "should fail when terminated date not within 60 days" do
       census_employee.employment_terminated_on = TimeKeeper.date_of_record - 75.days
       expect(census_employee.valid?).to be_falsey
-      expect(census_employee.errors[:base].any?).to be_truthy
+      expect(census_employee.errors[:employment_terminated_on].any?).to be_truthy
     end
 
     it "should success" do
@@ -982,6 +982,87 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       eligible_date = (hired_on + 60.days)
       eligible_date = (hired_on + 60.days).end_of_month + 1.day if eligible_date.day != 1
       expect(census_employee.earliest_eligible_date).to eq eligible_date
+    end
+  end
+
+  context 'Validating CensusEmployee Termination Date' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+
+    it 'should return true when census employee is not terminated' do
+      expect(census_employee.valid?).to be_truthy
+    end
+
+    it 'should return false when census employee date is not within 60 days' do
+      census_employee.hired_on = TimeKeeper.date_of_record - 120.days
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 90.days
+      expect(census_employee.valid?).to be_falsey
+    end
+
+    it 'should return true when census employee is already terminated' do
+      census_employee.hired_on = TimeKeeper.date_of_record - 120.days
+      census_employee.save! # set initial state
+      census_employee.aasm_state = "employment_terminated"
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 90.days
+      expect(census_employee.valid?).to be_truthy
+    end
+
+  end
+
+  context '.find_or_create_benefit_group_assignment' do
+
+    let!(:plan_year) { FactoryGirl.create(:plan_year, start_on: Date.new(2015,10,1) ) }
+    let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, :premiums_for_2015, title: "blue collar benefit group", plan_year: plan_year) }
+    let!(:employer_profile) { plan_year.employer_profile }
+    let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, :premiums_for_2015, plan_year: plan_year, title: "white collar benefit group") }
+    let!(:census_employee) { CensusEmployee.create(**valid_params) }
+
+    context 'when benefit group assignment with benefit group already exists' do
+      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
+      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
+
+      it 'should activate existing benefit_group_assignment' do
+        expect(census_employee.benefit_group_assignments.size).to eq 2
+        expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
+        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        expect(census_employee.benefit_group_assignments.size).to eq 2
+        expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
+      end
+    end
+
+    context 'when multiple benefit group assignments with benefit group exists' do
+      let!(:blue_collar_benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 2.days, is_active: false) }
+      let!(:blue_collar_benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 1.day, is_active: false) }
+      let!(:blue_collar_benefit_group_assignment3)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
+      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
+
+      before do
+        blue_collar_benefit_group_assignment1.aasm_state = 'coverage_selected'
+        blue_collar_benefit_group_assignment1.save!(:validate => false)
+        blue_collar_benefit_group_assignment2.aasm_state = 'coverage_waived'
+        blue_collar_benefit_group_assignment2.save!(:validate => false)
+      end
+
+      it 'should activate benefit group assignment with valid enrollment status' do
+        expect(census_employee.benefit_group_assignments.size).to eq 4
+        expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
+        expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
+        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        expect(census_employee.benefit_group_assignments.size).to eq 4
+        expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment2
+        expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
+      end
+    end
+
+    context 'when none present with given benefit group' do
+      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true) }
+
+      it 'should create new benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.size).to eq 1
+        expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
+        census_employee.find_or_create_benefit_group_assignment(white_collar_benefit_group)
+        expect(census_employee.benefit_group_assignments.size).to eq 2
+        expect(census_employee.active_benefit_group_assignment.benefit_group).to eq white_collar_benefit_group
+      end
     end
   end
 end

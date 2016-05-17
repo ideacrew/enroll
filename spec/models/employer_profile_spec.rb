@@ -798,6 +798,77 @@ describe EmployerProfile, "Renewal Queries" do
   end
 end
 
+describe EmployerProfile, "For General Agency" do
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+  context "active_general_agency_account" do
+    it "should get active general_agency_account" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'inactive')
+      gaa = FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.general_agency_accounts.count).to eq 2
+      expect(employer_profile.active_general_agency_account).to eq gaa
+    end
+  end
+
+  context "active_general_agency_legal_name" do
+    it "with active general_agency_account" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'inactive')
+      gaa = FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.general_agency_accounts.count).to eq 2
+      expect(employer_profile.active_general_agency_legal_name).to eq gaa.legal_name
+    end
+
+    it "without active general_agency_account" do
+      expect(employer_profile.active_general_agency_legal_name).to eq nil
+    end
+  end
+
+  context "general_agency_profile" do
+    it "with active general_agency_account" do
+      gaa = FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.general_agency_profile).to eq gaa.general_agency_profile
+    end
+
+    it "without active general_agency_account" do
+      expect(employer_profile.general_agency_profile).to eq nil
+    end
+  end
+
+  context "hire_general_agency" do
+    it "should get active general_agency_account after hire" do
+      employer_profile.hire_general_agency(general_agency_profile, broker_role.id)
+      employer_profile.save
+      expect(employer_profile.general_agency_profile).to eq general_agency_profile
+      expect(employer_profile.active_general_agency_account.present?).to eq true
+      expect(employer_profile.active_general_agency_account.broker_role).to eq broker_role
+    end
+  end
+
+  context "fire_general_agency" do
+    it "when without active_general_agency_account" do
+      employer_profile.fire_general_agency!
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
+
+    it "when with active general_agency_profile" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.active_general_agency_account.blank?).to eq false
+      employer_profile.fire_general_agency!
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
+
+    it "when with multiple active general_agency_profile" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.general_agency_accounts.active.count).to eq 2
+      employer_profile.fire_general_agency!
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
+  end
+end
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }

@@ -54,14 +54,17 @@ class Organization
 
   scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
 
+  scope :by_general_agency_profile, -> (general_agency_profile_id) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
+
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
   embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
+  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
 
-  accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile
+  accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by
 
@@ -121,6 +124,7 @@ class Organization
   }
 
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  scope :has_general_agency_profile, ->{ exists(general_agency_profile: true) }
   scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
   scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
 
@@ -144,6 +148,10 @@ class Organization
 
   def primary_office_location
     office_locations.detect(&:is_primary?)
+  end
+
+  def self.search_by_general_agency(search_content)
+    Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
   end
 
   def self.default_search_order

@@ -118,13 +118,8 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
   end
 
-  def documents_index #changed
-    @time_to = Time.now + 90.days
+  def verification
     @family_members = @person.primary_family.family_members.active
-  end
-
-  def document_upload #changed
-    @person_family = @person.primary_family.family_members
   end
 
   def check_qle_date
@@ -180,6 +175,13 @@ class Insured::FamiliesController < FamiliesController
   def unblock
     @family = Family.find(params[:id])
     @family.set(status: "aptc_unblock")
+  end
+
+  def delete_consumer_broker
+    @family = Family.find(params[:id])
+    if @family.current_broker_agency.destroy
+      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    end
   end
 
   private

@@ -120,7 +120,8 @@ RSpec.describe User, :type => :model do
         employer_staff_role =FactoryGirl.create(:employer_staff_role, person: person)
         #allow(person).to receive(:employee_roles).and_return([role])
         FactoryGirl.create(:employer_staff_role, person: person)
-        expect(user.has_employee_role?).to be_truthy
+        #Deprecated. DO NOT USE.  Migrate to person.active_employee_roles.present?
+        #expect(user.has_employee_role?).to be_truthy
         expect(user.has_employer_staff_role?).to be_truthy
         expect(user.has_broker_role?).to be_truthy
         expect(user.has_hbx_staff_role?).to be_truthy
@@ -159,6 +160,40 @@ describe User do
     let(:decision_code_value) { User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE }
     it "should be considered identity_verified" do
       expect(subject.identity_verified?).to eq true
+    end
+  end
+end
+
+describe User do
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+
+  describe "can_change_broker?" do
+    context "with user" do
+      it "should return true when hbx staff" do
+        user.roles = ['hbx_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when employer staff" do
+        allow(person).to receive(:has_active_employer_staff_role?).and_return true
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker role" do
+        user.roles = ['broker']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker agency staff" do
+        user.roles = ['broker_agency_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return false when general agency staff" do
+        user.roles = ['general_agency_staff']
+        expect(user.can_change_broker?).to eq false
+      end
     end
   end
 end
