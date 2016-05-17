@@ -102,7 +102,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
       else
         @current_plan_year = @employer_profile.show_plan_year
-        @invoices = @employer_profile.organization.try(:invoices)
+        collect_and_sort_invoices(params[:sort_order])
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         enrollments = @employer_profile.enrollments_for_billing
         @premium_amt_total   = enrollments.map(&:total_premium).sum
         @employee_cost_total = enrollments.map(&:total_employee_cost).sum
@@ -251,6 +252,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   private
+
+  def collect_and_sort_invoices(sort_order='ASC')
+    @invoices = @employer_profile.organization.try(:invoices)
+    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
+  end
 
   def check_and_download_invoice
     @invoice = @employer_profile.organization.invoices.find(params[:invoice_id])

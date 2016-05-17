@@ -1,6 +1,14 @@
 class Invoice < Document
 	BUCKET_NAME = "invoices"
 
+	def formated_date
+		self.date.strftime("%B-%Y")
+	end
+
+	def coverage_date
+		"#{self.date.next_month.beginning_of_month.strftime('%b-%d-%Y')} to #{self.date.next_month.end_of_month.strftime('%b-%d-%Y')} " rescue nil
+	end
+
 	def self.upload_invoice(file_path)
 		invoice_date = get_invoice_date(file_path) rescue nil
 		org = get_organization(file_path) rescue nil

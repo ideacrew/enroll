@@ -1,11 +1,24 @@
-<div class="col-xs-12 documents-tab">
+<div class="col-xs-8 billing-tab">
   <h1>Invoices</h1>
-  <% @invoices.each do |invoice|%>
-  	<%=invoice.title %> ||  <%= link_to("Invoice",download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank") %> <br>
-  <%end%>
+  <table class="table table-bordered">
+  	<thead>
+      <tr>
+        <th><%= link_to "Statement Date",employers_employer_profile_path(@employer_profile, :tab => 'billing', :sort_order =>@sort_order)%></th>
+        <th>Coverage Date</th>
+      </tr>
+    </thead>
+ 		 <tbody>
+		  <tr>
+		  <% @invoices.each do |invoice|%>
+		 	<td><%= link_to(invoice.formated_date,download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") %></td>
+		 	<td><%=invoice.coverage_date%></td>
+		  <tr/>
+		  <%end%>
+		</tbody>
+ </table>
 </div>
 
-<div class="col-xs-12 documents-tab">
+<div class="col-xs-12 billing-tab">
   <h1>Billing</h1>
   <h4 class="starter">
   	<%= Settings.site.short_name %> will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
