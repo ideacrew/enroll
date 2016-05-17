@@ -167,4 +167,21 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       end
     end
   end
+
+  describe "class method" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+    context "all_by_broker_role" do
+      before :each do
+        10.times { FactoryGirl.create(:general_agency_profile) }
+        broker_role.favorite_general_agencies.create(general_agency_profile_id: general_agency_profile.id)
+      end
+
+      it "should return general_agency_profile that sort by favorite_general_agencies" do
+        sorted_general_agency_profiles = GeneralAgencyProfile.all.sort {|ga| [general_agency_profile.id].include?(ga.id) ? 0:1 }
+        expect(GeneralAgencyProfile.all_by_broker_role(broker_role)).to eq sorted_general_agency_profiles
+      end
+    end
+  end
 end
