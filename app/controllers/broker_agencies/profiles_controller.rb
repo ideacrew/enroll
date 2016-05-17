@@ -151,7 +151,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def general_agency_index
     @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def set_default_ga
