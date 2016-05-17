@@ -2,27 +2,25 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
-  describe "normal user" do
+  describe "not eligible for cost sharing or aptc / normal user" do
 
-    let(:household) { FactoryGirl.create(:household, family: family) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person )}
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person) }
-    let(:hbx_enrollment_one) { FactoryGirl.create(:hbx_enrollment, household: household) }
+    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:person) { FactoryGirl.build_stubbed(:person) }
+    let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+    let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
 
     context "GET plans" do
       before :each do
         sign_in user
         allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
         allow(person.primary_family).to receive(:active_household).and_return(household)
-
       end
 
       it "returns http success" do
         xhr :get, :plans, id: "hbx_id", format: :js
         expect(response).to have_http_status(:success)
       end
-
     end
 
   end
