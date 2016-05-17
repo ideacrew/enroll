@@ -61,4 +61,12 @@ class Document
     allow_blank: true,
     inclusion: { in: ACCESS_RIGHTS, message: "%{value} is not a valid access right" }
 
+  def invoice_formated_date
+    self.date.strftime("%B-%Y")
+  end
+
+  def invoice_coverage_date
+    "#{self.date.next_month.beginning_of_month.strftime('%b-%d-%Y')} to #{self.date.next_month.end_of_month.strftime('%b-%d-%Y')} " rescue nil
+  end
+
 end

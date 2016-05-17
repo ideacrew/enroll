@@ -254,12 +254,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   private
 
   def collect_and_sort_invoices(sort_order='ASC')
-    @invoices = @employer_profile.organization.try(:invoices)
-    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
+    @invoices = @employer_profile.organization.try(:documents)
+    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
   def check_and_download_invoice
-    @invoice = @employer_profile.organization.invoices.find(params[:invoice_id])
+    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
   end
 
   def paginate_employees
