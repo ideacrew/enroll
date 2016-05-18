@@ -238,9 +238,9 @@ class User
   end
 
   def can_change_broker?
-    if has_employer_staff_role? || has_hbx_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+    if has_employer_staff_role? || has_hbx_staff_role?
       true
-    elsif has_general_agency_staff_role?
+    elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
       false
     end
   end
