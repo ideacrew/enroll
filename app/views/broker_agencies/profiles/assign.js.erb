@@ -1,2 +1,5 @@
 setTabContent("<%= escape_javascript render "assign" %>");
 set_active_ontab("#assign-tab");
+<% if flash[:notice].present? %>
+	$(".flash_message").html("<div class='alert alert-success'><a class='close' data-dismiss='alert'>x</a> <%=flash[:notice]%></div>");
+<% end %>
