@@ -461,16 +461,23 @@ private
   end
 
   def date_of_hire_effective_on_for(date_of_hire)
-    [plan_year.start_on, date_of_hire].max
+    plan_year_for_coverage = plan_year
+    
+    if employer_profile.is_coversion_employer? && plan_year.coverage_period_contains?(employer_profile.registered_on)
+      plan_year_for_coverage = plan_year.employer_profile.renewing_plan_year
+    end
+
+    [plan_year_for_coverage.start_on, date_of_hire].max
   end
 
   def first_of_month_effective_on_for(date_of_hire)
-    if plan_year.employer_profile.profile_source.to_s == 'conversion'
-      if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
-        return [renewing_plan_year.start_on, date_of_hire].max
-      end
+    plan_year_for_coverage = plan_year
+
+    if employer_profile.is_coversion_employer? && plan_year.coverage_period_contains?(employer_profile.registered_on)
+      plan_year_for_coverage = plan_year.employer_profile.renewing_plan_year
     end
-    [plan_year.start_on, eligible_on(date_of_hire)].max
+
+    [plan_year_for_coverage.start_on, eligible_on(date_of_hire)].max
   end
 
   def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)

@@ -683,6 +683,10 @@ class HbxEnrollment
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
     if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
 
+      if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
+        raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
+      end
+
       census_employee = employee_role.census_employee
       benefit_group_assignment = plan_year.is_renewing? ?
       census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
