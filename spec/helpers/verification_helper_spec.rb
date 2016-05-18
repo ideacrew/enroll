@@ -252,4 +252,21 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
   end
+
+  describe "#show_docs_status" do
+    states_to_show = ["verified", "rejected"]
+    states_to_hide = ["not submitted", "downloaded", "any"]
+
+    states_to_show.each do |doc_state|
+      it "returns true if document status is #{doc_state}" do
+        expect(helper.show_doc_status(doc_state)).to eq true
+      end
+    end
+
+    states_to_hide.each do |doc_state|
+      it "returns true if document status is #{doc_state}" do
+        expect(helper.show_doc_status(doc_state)).to eq false
+      end
+    end
+  end
 end
