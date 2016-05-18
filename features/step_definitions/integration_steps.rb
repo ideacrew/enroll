@@ -242,7 +242,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
-  save_page
+
   find('.interaction-click-control-confirm').click
 end
 
@@ -300,7 +300,7 @@ When(/^I visit the Employer portal$/) do
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -389,6 +389,7 @@ When(/^.+ accepts? the matched employer$/) do
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
+  sleep 3
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax(10)
@@ -396,11 +397,13 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   find('.interaction-click-control-click-here').click
   find('.interaction-click-control-close').click
 
+  sleep 3
   wait_for_ajax(10)
-  find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  find("#person_addresses_attributes_0_address_2").click
-  find("#person_addresses_attributes_0_city").click
-  find("#person_addresses_attributes_0_zip").click
+  #find("#person_addresses_attributes_0_address_1", :wait => 10).click
+  find("#person_addresses_attributes_0_address_1").trigger('click')
+  find("#person_addresses_attributes_0_address_2").trigger('click')
+  find("#person_addresses_attributes_0_city").trigger('click')
+  find("#person_addresses_attributes_0_zip").trigger('click')
 
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
@@ -428,7 +431,7 @@ When(/^.+ clicks? delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
-Then(/^.+ should see (.*) dependents*$/) do |n|
+Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
@@ -437,6 +440,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
+  sleep 3
   expect(page).to have_content('Confirm Member')
 end
 
@@ -477,7 +481,7 @@ When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
 
-When(/^.+ clicks? continue on the group selection page$/) do
+When(/^(?:(?!Employee).)+ clicks? continue on the group selection page$/) do
   find('#btn-continue').click
 end
 
@@ -487,11 +491,11 @@ Then(/^.+ should see the plan shopping welcome page$/) do
 end
 
 Then(/^.+ should see the plan shopping page with no dependent$/) do
-  expect(page).to have_content('0 dependent(s)')
+  expect(page).to have_content("Soren White")
 end
 
 Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content('1 dependent(s)')
+  expect(page).to have_content("Soren White + 1 Dependent")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -531,7 +535,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
-  expect(page).to have_content('My DC Health Link')
+  expect(page).to have_content("My #{Settings.site.short_name}")
   screenshot("my_account")
 end
 
@@ -600,8 +604,8 @@ When(/^.+ clicks? on the add employee button$/) do
   find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 
-When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
-  find(:xpath, "//li[contains(., '#{tab_name}')]").click
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
+  find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -669,13 +673,15 @@ Then(/^I should see the dependents and group selection page$/) do
 end
 
 And(/I select three plans to compare/) do
+  wait_for_ajax
   expect(page).to have_content("Select Plan")
   if page.all("span.checkbox-custom-label").count > 3
     #modal plan data for IVL not really seeded in.
     page.all("span.checkbox-custom-label")[0].click
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
-    find(:xpath, '//*[@id="select_plan_wrapper"]/div/div[1]/div/div[1]/p[2]/a').click
+    all('.compare-selected-plans-link')[1].click
+    sleep 3
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')

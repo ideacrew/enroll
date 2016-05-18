@@ -120,7 +120,8 @@ RSpec.describe User, :type => :model do
         employer_staff_role =FactoryGirl.create(:employer_staff_role, person: person)
         #allow(person).to receive(:employee_roles).and_return([role])
         FactoryGirl.create(:employer_staff_role, person: person)
-        expect(user.has_employee_role?).to be_truthy
+        #Deprecated. DO NOT USE.  Migrate to person.active_employee_roles.present?
+        #expect(user.has_employee_role?).to be_truthy
         expect(user.has_employer_staff_role?).to be_truthy
         expect(user.has_broker_role?).to be_truthy
         expect(user.has_hbx_staff_role?).to be_truthy
@@ -164,9 +165,9 @@ describe User do
 end
 
 describe User do
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
   context "get_announcements_by_roles_and_portal" do
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person) }
     before :each do
       Announcement.destroy_all
       Announcement::AUDIENCE_KINDS.each do |kind|
@@ -230,6 +231,35 @@ describe User do
       it "with broker agency portal" do
         user.roles = ['consumer', 'broker']
         expect(user.get_announcements_by_roles_and_portal("dc.org/broker_agencies")).to eq ["msg for Broker"]
+      end
+    end
+  end
+
+  describe "can_change_broker?" do
+    context "with user" do
+      it "should return true when hbx staff" do
+        user.roles = ['hbx_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when employer staff" do
+        allow(person).to receive(:has_active_employer_staff_role?).and_return true
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker role" do
+        user.roles = ['broker']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return true when broker agency staff" do
+        user.roles = ['broker_agency_staff']
+        expect(user.can_change_broker?).to eq true
+      end
+
+      it "should return false when general agency staff" do
+        user.roles = ['general_agency_staff']
+        expect(user.can_change_broker?).to eq false
       end
     end
   end

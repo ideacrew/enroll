@@ -105,8 +105,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @premium_amt_total   = enrollments.map(&:total_premium).sum
         @employee_cost_total = enrollments.map(&:total_employee_cost).sum
         @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-
-        set_flash_by_announcement if @tab == 'home'
       end
     end
   end

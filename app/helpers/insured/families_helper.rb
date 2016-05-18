@@ -1,5 +1,18 @@
 module Insured::FamiliesHelper
 
+  def plan_shopping_dependent_text(hbx_enrollment)
+    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    if subscriber.present? && dependents.count == 0
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count == 1
+      ("<span class='dependent-text'>#{dependents.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count > 1
+      (link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    else
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>" + " + " + link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    end
+  end
+
   def current_premium hbx_enrollment
     if hbx_enrollment.kind == 'employer_sponsored'
       hbx_enrollment.total_employee_cost
@@ -16,7 +29,7 @@ module Insured::FamiliesHelper
   end
 
   def shift_purchase_time(policy)
-    policy.created_at.in_time_zone('Eastern Time (US & Canada)') 
+    policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
   def format_policy_purchase_date(policy)
@@ -49,9 +62,7 @@ module Insured::FamiliesHelper
     options = {class: 'qle-menu-item'}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
-      post_event_sep_in_days: qle.post_event_sep_in_days,
-      pre_event_sep_in_days: qle.pre_event_sep_in_days,
-      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested,
+      is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
 
@@ -89,4 +100,14 @@ module Insured::FamiliesHelper
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  end
+
+  def display_aasm_state?(aasm_state)
+    if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
+     true
+    end  
+  end  
 end

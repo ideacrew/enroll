@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include DataTablesAdapter
 
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -125,6 +126,25 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def general_agency_index
+    page_string = params.permit(:gas_page)[:gas_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+
+    @people = Person.exists(general_agency_staff_roles: true)
+
+    status_params = params.permit(:status)
+    @status = status_params[:status] || 'applicant'
+    @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
+
+    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.last.general_agency_profile }.uniq rescue []
+    @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
+
+    respond_to do |format|
+      format.html { render 'general_agency' }
+      format.js
+    end
+  end
+
   def issuer_index
     @issuers = CarrierProfile.all
 
@@ -132,6 +152,32 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.html { render "issuer_index" }
       format.js {}
     end
+  end
+
+  def verification_index
+    respond_to do |format|
+      format.html { render partial: "index_verification" }
+      format.js {}
+    end
+  end
+
+  def verifications_index_datatable
+    dt_query = extract_datatable_parameters
+    families = []
+    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    if dt_query.search_string.blank?
+      families = all_families
+    else
+      person_ids = Person.search(dt_query.search_string).pluck(:id)
+      families = all_families.where({
+        "family_members.person_id" => {"$in" => person_ids}
+      })
+    end
+    @draw = dt_query.draw
+    @total_records = all_families.count
+    @records_filtered = families.count
+    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    render 
   end
 
   def product_index

@@ -194,7 +194,6 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:authorize_show).and_return(true)
         allow(user).to receive(:last_portal_visited=).and_return("true")
-        allow(user).to receive(:has_employer_staff_role?).and_return true
         allow(user).to receive(:save).and_return(true)
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)

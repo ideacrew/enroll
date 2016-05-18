@@ -1,4 +1,4 @@
-<div id="qle-details" class='hidden'>
+<div id="qle-details" class='module hidden'>
   <div class="hbx-enrollment-panel panel panel-default">
     <div class="panel-heading">
       <div class="row">
@@ -24,10 +24,9 @@
             <div id='qle-date-chose'>
               <h3 class="qle-details-title">I got married</h3>
               <h5 class='qle-label'>Enter the date of the event.</h5>
-              <h5 class="qle-date-hint">(must fall between July 1st and August 30th)</h5>
               <div class="form-inline">
                 <div class="form-group">
-                  <%= text_field_tag 'qle_date', '', :'data-date-max'=> "+30d", :'data-date-min'=> "-30d", placeholder: "mm/dd/yyyy",
+                  <%= text_field_tag 'qle_date', '', placeholder: "mm/dd/yyyy",
                     class: "required date-picker qle-date-picker form-control", required: true %>
                 </div>
                 <div class="form-group">
@@ -60,9 +59,7 @@
                     Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.
                   </p>
                 </div>
-                <div class="center">
-                  <%= submit_tag 'Continue', disabled: true, class: 'btn' %>
-                </div>
+                <br/>
               </div>
             </div>
           </div>

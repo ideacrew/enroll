@@ -7,7 +7,6 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
 
   def home
-    set_flash_by_announcement
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -29,13 +28,12 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
-
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
     hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
-      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected'
+      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected' && enrollment.is_shop?
       memo[enrollment.coverage_kind].compact
       memo
     end
@@ -120,13 +118,8 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
   end
 
-  def documents_index #changed
-    @time_to = Time.now + 90.days
+  def verification
     @family_members = @person.primary_family.family_members.active
-  end
-
-  def document_upload #changed
-    @person_family = @person.primary_family.family_members
   end
 
   def check_qle_date
@@ -182,6 +175,13 @@ class Insured::FamiliesController < FamiliesController
   def unblock
     @family = Family.find(params[:id])
     @family.set(status: "aptc_unblock")
+  end
+
+  def delete_consumer_broker
+    @family = Family.find(params[:id])
+    if @family.current_broker_agency.destroy
+      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    end
   end
 
   private
