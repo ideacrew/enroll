@@ -181,7 +181,7 @@ describe User do
     end
 
     it "when employee_role" do
-      user.roles = ['employee']
+      allow(user).to receive(:has_employee_role?).and_return true
       expect(user.get_announcements_by_roles_and_portal("dc.org/employee")).to eq ["msg for Employee"]
     end
 
@@ -192,7 +192,8 @@ describe User do
     end
 
     it "when visit families/home" do
-      user.roles = ['employee', 'consumer']
+      allow(user).to receive(:has_employee_role?).and_return true
+      allow(user).to receive(:has_consumer_role?).and_return true
       expect(user.get_announcements_by_roles_and_portal("dc.org/families/home")).to eq ["msg for Employee", "msg for IVL"]
     end
 
@@ -202,13 +203,13 @@ describe User do
     end
 
     it "when consumer_role" do
-      user.roles = ['consumer']
+      allow(user).to receive(:has_consumer_role?).and_return true
       expect(user.get_announcements_by_roles_and_portal("dc.org/consumer")).to eq ["msg for IVL"]
     end
 
     it "when has active_consumer_roles, but without consumer_role role" do
       user.roles = []
-      allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:consumer_role).and_return true
       expect(user.get_announcements_by_roles_and_portal("dc.org/consumers")).to eq ["msg for IVL"]
     end
 
@@ -225,6 +226,7 @@ describe User do
 
       it "with consumer portal" do
         user.roles = ['consumer', 'broker']
+        allow(person).to receive(:consumer_role).and_return true
         expect(user.get_announcements_by_roles_and_portal("dc.org/consumer_role")).to eq ["msg for IVL"]
       end
 
