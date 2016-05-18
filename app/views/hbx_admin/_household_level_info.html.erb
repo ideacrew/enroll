@@ -1,6 +1,11 @@
 <div class="panel panel-info">
   <div class="panel-heading">
-    <h2 class="panel-title"><span class="glyphicon glyphicon-home">&nbsp;</span><b>Household</b></h2>
+    <h2 class="panel-title">
+      <span class="glyphicon glyphicon-home"></span>&nbsp;<b>Household</b>
+      <div style="float:right">
+        <b>SLCSP :</b> <%=@slcsp_value%>
+      </div>
+    </h2>
   </div>
   <div class="panel-body">
 
@@ -37,11 +42,7 @@
         <%end%>
         <tr><td colspan = "16" class="aptc-csr-grid-separator"></td></tr>
         <tr>
-          <td>SLCSP</td>
-          <td colspan = "15"><%=@slcsp_value%></td>
-        </tr>
-        <tr>
-          <th colspan = "13">Individual Member(s)</th>
+          <th colspan = "13">All Household Member(s)</th>
           <th></th>
           <th></th>
           <th></th>

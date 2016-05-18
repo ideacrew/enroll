@@ -2,64 +2,68 @@
   <div class="panel-heading">
     
     <h2 class="panel-title">
-      <a href="#<%=hbx_id.to_s%>" data-toggle="collapse"><span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span><b>Enrollment <%=enrollment_count%></b> - Plan Name: <%=HbxEnrollment.find(hbx_id).plan.name%>   
+      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse"><span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span><b>Enrollment <%=enrollment_count%></b> - Plan Name: <%=HbxEnrollment.find(hbx_id).plan.name%>   
       <div style="float:right">
-        <b>Plan Premium:</b> <%=@plan_premium_for_enrollments[hbx_id]%>
+        <b>Plan Premium :</b> <%=@plan_premium_for_enrollments[hbx_id]%>
       </div>
     </h2>
   </div>
-  <div id="<%=hbx_id.to_s%>" class="collapse in">
+  <div id="<%='enrollment_' + hbx_id.to_s%>" class="collapse in">
 
     <div class="panel-body">
 
+      <!-- APTC APPLIED PER ENROLLMENT -->
+      <div align = "right">
+        <table>
+         <head> 
+          <th>Total Applied APTC for Enrollment <%=enrollment_count%>&nbsp;&nbsp;</th> 
+          <th></th>
+           <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px'%></th>
+         </head> 
+        <tr>  
+        <tr>
+        </table>  
+      </div>
+      <hr style="margin:  1px 1px;"/>
       <table class="table table-border module edit-aptc-csr-table">
         <thead>
-          <th><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%=@current_year%></th>
+          <th>Member APTC</th>
           <% @months_array.each do |month| %>
             <th><%=month.capitalize%></th>
           <%end%>
-          <th> </th>
-          <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th>
-          <th></th>
         </thead>  
         <tbody>
-          <%hbx_values.keys.each do |attribute|%>
+          
+          <!-- BREAKDOWN OF APTC APPLIED PER MEMBER FOR THE ABOVE ENROLLMENT -->
+          <%hbx_values["aptc_applied_per_member"].each do |member_id, aptc_values|%>
             <tr>
-              <td><%= attribute.titleize.upcase%></td>
-              <% hbx_values[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
+              <td><%= full_name_of_person(member_id)%></td>
+              <% aptc_values.each do |month, val| %>  <!-- month and the corresponding values -->
                 <td class="<%=aptc_csr_data_type(month)%>"> 
-                  <%= text_field_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
+                  <%= text_field_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
                 </td>
               <%end%>
-              <td></td>
-              <td>
-                <%if attribute == "aptc_applied"%>
-                    <%#binding.pry%>
-                    <%= text_field_tag "#{attribute.to_s}", @current_aptc_applied_hash[hbx_id], placeholder: attribute.titleize.upcase, size: '8px'%>
-                <%end%> 
-              </td>
-              <td></td>
             </tr>
-            <tr></tr>
+
           <%end%>
+          
+         
+          <!--
           <tr>
-            <th colspan = "13">Individual Member(s)</th>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th colspan = "4">Member(s) Enrolled</th>
+            <th colspan = "9">Eligible?</th>
           </tr>
-          <%HbxEnrollment.find(hbx_id).hbx_enrollment_members.each do |hbx_member|%>
+          <%#HbxEnrollment.find(hbx_id).hbx_enrollment_members.each do |hbx_member|%>
             <tr>
-              <td colspan = "13"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%=full_name_of_person(hbx_member.family_member.person_id)%><%if primary_member(hbx_member.family_member.person_id.to_s)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%end%></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td colspan = "4"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%#=full_name_of_person(hbx_member.family_member.person_id)%><%#if primary_member(hbx_member.family_member.person_id.to_s)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%#end%></td>
+              <td colspan = "9"><%#=check_box_tag "#{hbx_id}_#{hbx_member.family_member.person_id.to_s}", 'accepted', placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%></td>
             </tr>
-          <%end%>
+          <%#end%>
+          -->
+          
         </tbody> 
       </table>
 
     </div>
   </div> <!--collapse div-->
 </div>
-
