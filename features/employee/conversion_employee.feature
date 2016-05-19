@@ -35,10 +35,13 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal
-      When Employee entered a QLE
+      When Employee click the "Married" in qle carousel
+      And Employee select a past qle date
+      Then Employee should see confirmation and clicks continue
+      Then Employee should see family members page and clicks continue
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
-      Then Employee should see error message
+      Then Employee should see "employer-sponsored benefits not found" error message
           
   Scenario: New Hire can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
@@ -56,7 +59,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Soren White should get plan year start date as coverage effective date
       Then Employee should see "my account" page with enrollment
 
-  Scenario: Old Employee should not get effective date before renewing plan year start date
+  Scenario: Existing Employee should not get effective date before renewing plan year start date
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
@@ -67,7 +70,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the matched employee record form
       Then Employee Soren White should see renewing plan year start date as earliest effective date
 
-  Scenario: Old Employee can't buy coverage before open enrollment of renewing plan year
+  Scenario: Existing Employee can't buy coverage before open enrollment of renewing plan year
      Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employer for Soren White published renewing plan year
       And Soren White already matched and logged into employee portal
@@ -75,15 +78,19 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       When Employee clicks continue on the group selection page
       Then Soren White should see "open enrollment not yet started" error message
 
-  Scenario: Old Employee can't buy coverage under off-exchange plan year using QLE
+  Scenario: Existing Employee can't buy coverage under off-exchange plan year using QLE
     Given Conversion Employer for Soren White exists with active and renewing plan year
+      And Employer for Soren White published renewing plan year
       And Soren White already matched and logged into employee portal
-      When Employee entered a QLE
+      When Employee click the "Married" in qle carousel
+      And Employee select a past qle date
+      Then Employee should see confirmation and clicks continue
+      Then Employee should see family members page and clicks continue
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
-      Then Employee should see error message
+      Then Soren White should see "open enrollment not yet started" error message
 
-  Scenario: Old Employee can buy coverage during open enrollment of renewing plan year
+  Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employer for Soren White is under open enrollment
       And Soren White already matched and logged into employee portal

@@ -77,3 +77,29 @@ Then(/(.*) should get plan year start date as coverage effective date/) do |name
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end
+
+When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
+  click_link "#{qle_event}"
+end
+
+When(/Employee select a past qle date/) do
+  expect(page).to have_content "Married"
+  screenshot("past_qle_date")
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    click_link "CONTINUE"
+  end
+end
+
+Then(/Employee should see confirmation and clicks continue/) do
+  expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+  screenshot("valid_qle")
+  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+end
+
+Then(/Employee should see family members page and clicks continue/) do
+  expect(page).to have_content "Household Info: Family Members" 
+  within '#dependent_buttons' do
+    click_link "Continue"
+  end
+end
