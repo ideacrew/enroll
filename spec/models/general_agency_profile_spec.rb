@@ -183,5 +183,36 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
         expect(GeneralAgencyProfile.all_by_broker_role(broker_role)).to eq sorted_general_agency_profiles
       end
     end
+
+    context "filter_by" do
+      let(:ga1) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_applicant') }
+      let(:ga2) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_approved') }
+      let(:ga3) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_suspended') }
+      before :each do
+        ga1
+        ga2
+        ga3
+      end
+
+      it "should get all general_agency_profile" do
+        expect(GeneralAgencyProfile.filter_by('all')).to eq GeneralAgencyProfile.all
+      end
+
+      it "should get applicant ga without params" do
+        expect(GeneralAgencyProfile.filter_by()).to eq [ga1]
+      end
+
+      it "should get approved ga" do
+        expect(GeneralAgencyProfile.filter_by('is_approved')).to eq [ga2]
+      end
+
+      it "should get suspend ga "do
+        expect(GeneralAgencyProfile.filter_by('is_suspended')).to eq [ga3]
+      end
+
+      it "should get blank" do
+        expect(GeneralAgencyProfile.filter_by('other')).to eq []
+      end
+    end
   end
 end

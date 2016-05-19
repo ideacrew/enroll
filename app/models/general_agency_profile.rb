@@ -144,6 +144,16 @@ class GeneralAgencyProfile
       organizations = Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.general_agency_profile : nil
     end
+
+    def filter_by(status="is_applicant")
+      if status == 'all'
+        all
+      else
+        list_embedded Organization.exists(general_agency_profile: true).where(:'general_agency_profile.aasm_state' => status).order_by([:legal_name]).to_a
+      end
+    rescue
+      []
+    end
   end
 
   aasm do

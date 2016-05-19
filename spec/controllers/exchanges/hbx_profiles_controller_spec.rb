@@ -324,5 +324,10 @@ RSpec.describe Exchanges::HbxProfilesController do
       xhr :get, :general_agency_index, format: :js
       expect(response).to have_http_status(:success)
     end
+
+    it "should get general_agencies" do
+      xhr :get, :general_agency_index, format: :js
+      expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
+    end
   end
 end
