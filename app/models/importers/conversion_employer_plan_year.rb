@@ -12,12 +12,11 @@ module Importers
       "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
     }
 
-    attr_reader :fein, :plan_selection
+    attr_reader :fein, :plan_selection, :carrier
 
     attr_accessor :action,
       :enrolled_employee_count,
       :new_coverage_policy,
-      :carrier,
       :default_plan_year_start,
       :most_common_hios_id,
       :single_plan_hios_id
@@ -25,14 +24,14 @@ module Importers
     validates_length_of :fein, is: 9
 
     validate :validate_fein
-    validate :validate_carrier
     validate :validate_new_coverage_policy
 
-    validates_presence_of :carrier, :allow_blank => false
     validates_presence_of :plan_selection, :allow_blank => false
     validates_numericality_of :enrolled_employee_count, :allow_blank => false
 
     attr_reader :warnings
+
+    include ::Importers::ConversionEmployerCarrierValue
 
     def initialize(opts = {})
       super(opts)
@@ -71,24 +70,10 @@ module Importers
       end
     end
 
-    def validate_carrier
-      return true if fein.blank?
-      found_carrier = find_carrier
-      if found_carrier.nil?
-        errors.add(:carrier, "does not exist with name #{carrier}")
-      end
-    end
-
     def find_employer
       org = Organization.where(:fein => fein).first
       return nil unless org
       org.employer_profile
-    end
-
-    def find_carrier
-      org = Organization.where("carrier_profile.abbrev" => carrier).first
-      return nil unless org
-      org.carrier_profile
     end
 
     def map_plan_year

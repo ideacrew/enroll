@@ -79,7 +79,11 @@ module Importers
         :ignore,
         :ignore,
         :broker_name,
-        :broker_npn
+        :broker_npn,
+        :ignore,
+        :ignore,
+        :ignore,
+        :carrier
       ]
     end
 
