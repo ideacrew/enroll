@@ -219,14 +219,15 @@ class EmployerProfile
     profile_source.to_s == 'conversion'
   end
 
-  def find_plan_year_for_coverage_effective_date(target_date)
-    plan_year = find_plan_year_by_effective_date(target_date)
-    (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? nil : plan_year  
-  end
-
   def find_plan_year_by_effective_date(target_date)
-    (plan_years.published + plan_years.renewing_published_state).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
+    end
+
+    if plan_year.present?
+      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.first : plan_year
+    else
+      plan_year
     end
   end
 
