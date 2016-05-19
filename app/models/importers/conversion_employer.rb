@@ -38,6 +38,8 @@ module Importers
 
     attr_reader :warnings
 
+    include ::Importers::ConversionEmployerCarrierValue
+
     def initialize(opts = {})
       super(opts)
       @warnings = ActiveModel::Errors.new(self)
