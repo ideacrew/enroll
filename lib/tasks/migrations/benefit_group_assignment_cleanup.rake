@@ -16,8 +16,7 @@ namespace :migrations do
       census_employees.each do |census_employee|
         enrollments = enrollments_for_census_empoyee(plan_year, census_employee)
         assignment_ids = enrollments.map(&:benefit_group_assignment_id).compact.uniq
-        next if assignment_ids.size > 1
-        next if assignment_ids.blank?
+        next unless assignment_ids.size == 1
         next if assignment_ids.include?(census_employee.active_benefit_group_assignment.try(:_id))
         enrollments.first.benefit_group_assignment.make_active
         puts "Fixed #{census_employee.full_name} under #{employer_profile.legal_name}"
