@@ -22,7 +22,7 @@
 
         <ul class="nav navbar-nav navbar-right">
           <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
-            <span>
+            <span class="header-text">
               Call Customer Service
             </span>
             <br/>
@@ -39,16 +39,18 @@
               <span class="my-portal-links">
                 <%= render partial: "shared/my_portal_links"%>
                 <span>
-                  <a href="https://dchealthlink.com/help" target="_blank">Help</a>
+                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a>
                 </span>
                 <span> | </span>
                 <span>
-                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "g14" %>
+                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
                 <br/>
-                <strong><%= user_full_name.titleize %></strong>
-                &nbsp;
-                <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                <strong class="users-name"><%= user_full_name.titleize %></strong>
+                <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                  &nbsp;
+                  <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                <% end %>
               </span>
             </li>
           <% end %>

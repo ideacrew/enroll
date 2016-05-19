@@ -19,7 +19,7 @@ module PortalHeaderHelper
     elsif current_user.has_general_agency_staff_role?
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
     else
-      "<a>#{Settings.site.header_message}</a>".html_safe
+      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
     end
   end
 
