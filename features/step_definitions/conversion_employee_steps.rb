@@ -55,6 +55,12 @@ And(/Employer for (.*) published renewing plan year/) do |named_person|
   employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_published')
 end
 
+And(/Employer for (.*) is under open enrollment/) do |named_person|
+  person = people[named_person]
+  employer_profile = EmployerProfile.find_by_fein(person[:fein])
+  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => TimeKeeper.date_of_record)
+end
+
 When(/Employee clicks on New Hire Badge/) do
   find('#shop_for_employer_sponsored_coverage').click
 end
@@ -64,4 +70,10 @@ Then(/(.*) should see \"open enrollment not yet started\" error message/) do |na
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   find('.alert', text: "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{employer_profile.renewing_plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage.")
   visit '/families/home'
+end
+
+Then(/(.*) should get plan year start date as coverage effective date/) do |named_person|
+  person = people[named_person]
+  employer_profile = EmployerProfile.find_by_fein(person[:fein])
+  find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end

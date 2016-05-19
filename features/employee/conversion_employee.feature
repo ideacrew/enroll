@@ -42,20 +42,21 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
           
   Scenario: New Hire can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
-      And Renewing Plan year is under open enrollment
+      And Employer for Soren White is under open enrollment
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal
       When Employee clicks on New Hire Badge
-      Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see the list of plans
       And I should not see any plan which premium is 0
       When Employee selects a plan on the plan shopping page
+      Then Soren White should get plan year start date as coverage effective date
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
+      And Soren White should get plan year start date as coverage effective date
       Then Employee should see "my account" page with enrollment
 
-  Scenario: Employee can't buy coverage before open enrollment of renewing plan year
+  Scenario: Old Employee should not get effective date before renewing plan year start date
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
@@ -64,15 +65,17 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee should see renewing plan year start date as earliest effective date
-      When Employee accepts the matched employer
-      When Employee completes the matched employee form for Soren White
-      When Employee clicks continue on the dependents page
-      Then Employee should see the group selection page
-      When Employee clicks continue on the group selection page
-      Then Employee should see error
+      Then Employee Soren White should see renewing plan year start date as earliest effective date
 
-  Scenario: Employee can't buy coverage under off-exchange plan year using QLE
+  Scenario: Old Employee can't buy coverage before open enrollment of renewing plan year
+     Given Conversion Employer for Soren White exists with active and renewing plan year
+      And Employer for Soren White published renewing plan year
+      And Soren White already matched and logged into employee portal
+      When Employee clicks "Shop for Plans" on my account page
+      When Employee clicks continue on the group selection page
+      Then Soren White should see "open enrollment not yet started" error message
+
+  Scenario: Old Employee can't buy coverage under off-exchange plan year using QLE
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Soren White already matched and logged into employee portal
       When Employee entered a QLE
@@ -80,7 +83,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       When Employee clicks continue on the group selection page
       Then Employee should see error message
 
-  Scenario: Employee can buy coverage during open enrollment of renewing plan year
+  Scenario: Old Employee can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Renewing Plan year is under open enrollment
       And Soren White already matched and logged into employee portal
@@ -94,7 +97,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the receipt page
       Then Employee should see "my account" page with enrollment
 
-  Scenario: Employee can't buy coverage after open enrollment of renewing plan year
+  Scenario: Old Employee can't buy coverage after open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Renewing Plan year is under open enrollment
       And Soren White already matched and logged into employee portal
