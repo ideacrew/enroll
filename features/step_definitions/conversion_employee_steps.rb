@@ -78,6 +78,22 @@ Then(/(.*) should get plan year start date as coverage effective date/) do |name
   find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end
 
+When(/(.+) should see coverage summary page with renewing plan year start date as effective date/) do |named_person|
+  step "#{named_person} should get plan year start date as coverage effective date"
+  find('.interaction-click-control-confirm').click
+end
+
+Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
+  expect(page).to have_content('Enrollment Submitted')
+  step "#{named_person} should get plan year start date as coverage effective date"
+  
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
+end
+
 When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
   click_link "#{qle_event}"
 end

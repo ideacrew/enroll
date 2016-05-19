@@ -53,10 +53,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the list of plans
       And I should not see any plan which premium is 0
       When Employee selects a plan on the plan shopping page
-      Then Soren White should get plan year start date as coverage effective date
-      When Employee clicks on Confirm button on the coverage summary page
-      Then Employee should see the receipt page
-      And Soren White should get plan year start date as coverage effective date
+      Then Soren White should see coverage summary page with renewing plan year start date as effective date
+      Then Soren White should see the receipt page with renewing plan year start date as effective date
       Then Employee should see "my account" page with enrollment
 
   Scenario: Existing Employee should not get effective date before renewing plan year start date
@@ -90,6 +88,23 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       When Employee clicks continue on the group selection page
       Then Soren White should see "open enrollment not yet started" error message
 
+  Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year using QLE
+    Given Conversion Employer for Soren White exists with active and renewing plan year
+      And Employer for Soren White is under open enrollment
+      And Soren White already matched and logged into employee portal
+      When Employee click the "Married" in qle carousel
+      And Employee select a past qle date
+      Then Employee should see confirmation and clicks continue
+      Then Employee should see family members page and clicks continue
+      Then Employee should see the group selection page
+      When Employee clicks continue on the group selection page
+      Then Employee should see the list of plans
+      And I should not see any plan which premium is 0
+      When Employee selects a plan on the plan shopping page
+      Then Soren White should see coverage summary page with renewing plan year start date as effective date
+      Then Soren White should see the receipt page with renewing plan year start date as effective date
+      Then Employee should see "my account" page with enrollment
+
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employer for Soren White is under open enrollment
@@ -99,8 +114,6 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the list of plans
       And I should not see any plan which premium is 0
       When Employee selects a plan on the plan shopping page
-      Then Soren White should get plan year start date as coverage effective date
-      When Employee clicks on Confirm button on the coverage summary page
-      Then Employee should see the receipt page
-      And Soren White should get plan year start date as coverage effective date
+      Then Soren White should see coverage summary page with renewing plan year start date as effective date
+      Then Soren White should see the receipt page with renewing plan year start date as effective date
       Then Employee should see "my account" page with enrollment
