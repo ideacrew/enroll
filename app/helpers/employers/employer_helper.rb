@@ -55,7 +55,7 @@ module Employers::EmployerHelper
 
 
   def invoice_formated_date(date)
-    date.strftime("%D")
+    date.strftime("%m/%d/%Y")
   end
 
   def invoice_coverage_date(date)
