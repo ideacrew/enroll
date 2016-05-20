@@ -55,11 +55,11 @@ module Employers::EmployerHelper
 
 
   def invoice_formated_date(date)
-    date.strftime("%B-%Y")
+    date.strftime("%D")
   end
 
   def invoice_coverage_date(date)
-    "#{date.next_month.beginning_of_month.strftime('%b-%d-%Y')} to #{date.next_month.end_of_month.strftime('%b-%d-%Y')}" rescue nil
+    "#{date.next_month.beginning_of_month.strftime('%b %Y')}" rescue nil
   end
 
   def coverage_kind(census_employee=nil)
