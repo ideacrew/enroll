@@ -1,53 +1,35 @@
 <div class="billing-tab">
-	<h1>Invoices</h1>
-	<div class="row">
-		<div class="col-xs-8">
-			<div style='max-height: 340px; overflow-y: scroll'>
-			  <table class="table table-bordered fixedheader-table">
-			  	<thead>
-			      <tr>
-			        <th><%= link_to "Statement Date",employers_employer_profile_path(@employer_profile, :tab => 'billing', :sort_order =>@sort_order)%></th>
-			        <th>Coverage Date</th>
-			      </tr>
-			    </thead>
-			 		 <tbody>
-					  <tr>
-					  <% @invoices.each do |invoice|%>
-					 	<td><%= link_to(invoice_formated_date(invoice.date),download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") %></td>
-					 	<td><%=invoice_coverage_date(invoice.date)%></td>
-					  <tr/>
-					  <%end%>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-<div class="col-xs-12 billing-tab">
-  <h1>Billing</h1>
+  <h1 class="darkblue no-buffer">Invoices</h1>
+	  <%= render partial: "employers/employer_profiles/employer_invoices_table" %>
+	<br/>
+  <h1 class="darkblue no-buffer">Billing</h1>
   <h4 class="starter">
-  	<%= Settings.site.short_name %> will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
+    <%= Settings.site.short_name %>
+    will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of
+    whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
   </h4>
-  	<h3><%= Settings.site.short_name %> offers multiple payment options including:</h3>
-  	<h4>
-  	<ol>
-			<li>Pay Online - <%= link_to 'How to Pay Online', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%></li>
-			<br/>
-			<li>Pay by Phone
-			<div class="row col-md-offset-1">
-			855-532-LINK, select "Small Business Employer" then "Make a Payment"</li>
-			<br/>
-			<li>Pay by Mail
-			<div class="row col-md-offset-1">
-			<%= Settings.site.short_name %></div>
-			<div class="row col-md-offset-1">
-			PO Box 97022</div>
-			<div class="row col-md-offset-1">
-			Washington, DC 20090</div></li>
-		</h4>
-  	</ol>
-  <h4>**Please include your account number on your check.</h4>
-  <h4>Check that your mailing address is up to date - click on Update Business Info.</h4>
+  <h3><%= Settings.site.short_name %>
+    offers multiple payment options including:</h3>
+  <h4>
+    <ol>
+      <li>Pay Online -
+        <%= link_to 'How to Pay Online', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%></li>
+      <br/>
+      <li>Pay by Phone
+        <div class="row col-md-offset-1">
+          855-532-LINK, select "Small Business Employer" then "Make a Payment"</li>
+        <br/>
+        <li>Pay by Mail
+          <div class="row col-md-offset-1">
+            <%= Settings.site.short_name %></div>
+          <div class="row col-md-offset-1">
+            PO Box 97022</div>
+          <div class="row col-md-offset-1">
+            Washington, DC 20090</div>
+        </li>
+      </h4>
+    </ol>
+    <h4>**Please include your account number on your check.</h4>
+    <h4>Check that your mailing address is up to date - click on Update Business Info.</h4>
+  </div>
 </div>
