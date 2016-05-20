@@ -828,6 +828,78 @@ describe Person do
     end
   end
 
+  describe "verification types" do
+    let(:person) {FactoryGirl.create(:person)}
+    context "consumer is us citizen with ssn" do
+      before :each do
+        allow(person).to receive(:ssn).and_return("2222222222")
+        allow(person).to receive(:us_citizen).and_return(false)
+      end
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with two elements" do
+        expect(person.verification_types.count).to eq(2)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Immigration status")
+      end
+
+    end
+
+    context "consumer is not us citizen with ssn" do
+      before :each do
+        allow(person).to receive(:ssn).and_return("2222222222")
+        allow(person).to receive(:us_citizen).and_return(true)
+      end
+
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with two elements" do
+        expect(person.verification_types.count).to eq(2)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Citizenship")
+      end
+
+    end
+
+    context "consumer is us citizen with no ssn" do
+      before :each do
+        allow(person).to receive(:us_citizen).and_return(true)
+      end
+
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with one elements" do
+        expect(person.verification_types.count).to eq(1)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).not_to include("SSN")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Citizenship")
+      end
+    end
+  end
+
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}
     let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
@@ -899,6 +971,49 @@ describe Person do
       it 'sets is_active to false' do
         expect(employer_staff_role.reload.is_active?).to eq false
       end
+    end
+  end
+
+  describe "person_has_an_active_enrollment?" do
+
+    let(:person) { FactoryGirl.create(:person) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    context 'person_has_an_active_enrollment?' do
+      let(:active_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: true
+                                       )}
+      it 'returns true if person has an active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([active_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_truthy
+      end
+    end
+
+    context 'person_has_an_inactive_enrollment?' do
+      let(:inactive_enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                           household: primary_family.latest_household,
+                                          employee_role_id: employee_role.id,
+                                          is_active: false
+                                       )}
+      it 'returns false if person does not have any active enrollment.' do
+        allow(person).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([inactive_enrollment])
+        expect(Person.person_has_an_active_enrollment?(person)).to be_falsey
+      end
+    end
+
+  end
+
+  describe "agent?" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return true with general_agency_staff_roles" do
+      person.general_agency_staff_roles << FactoryGirl.build(:general_agency_staff_role)
+      expect(person.agent?).to be_truthy
     end
   end
 end

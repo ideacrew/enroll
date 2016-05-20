@@ -17,6 +17,7 @@ class BenefitGroupAssignment
   field :coverage_end_on, type: Date
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
+  field :activated_at, type: DateTime
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -169,7 +170,7 @@ class BenefitGroupAssignment
       end
     end
 
-    update_attributes(is_active: true) unless is_active?
+    update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
   private

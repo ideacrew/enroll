@@ -111,6 +111,7 @@ class User
     hbx_staff: "hbx_staff",
     employer_staff: "employer_staff",
     broker_agency_staff: "broker_agency_staff",
+    general_agency_staff: "general_agency_staff",
     assister: 'assister',
     csr: 'csr',
   }
@@ -185,11 +186,11 @@ class User
   end
 
   def has_employee_role?
-    has_role?(:employee)
+    person && person.active_employee_roles.present?
   end
 
   def has_consumer_role?
-    has_role?(:consumer)
+    person && person.consumer_role
   end
 
   def has_employer_staff_role?
@@ -198,6 +199,10 @@ class User
 
   def has_broker_agency_staff_role?
     has_role?(:broker_agency_staff)
+  end
+
+  def has_general_agency_staff_role?
+    has_role?(:general_agency_staff)
   end
 
   def has_insured_role?
@@ -230,6 +235,14 @@ class User
 
   def has_agent_role?
     has_role?(:csr) || has_role?(:assister)
+  end
+
+  def can_change_broker?
+    if has_employer_staff_role? || has_hbx_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+      true
+    elsif has_general_agency_staff_role?
+      false
+    end
   end
 
   def agent_title
