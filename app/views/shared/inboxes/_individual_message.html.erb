@@ -10,10 +10,9 @@
     </td>
     <%- if @folder != 'Deleted' %>
     <td>
-      <%= link_to retrieve_show_path(provider, message), remote: true, method: :delete, title: 'Delete', data: {'toggle': 'tooltip'}, class: 'pull-right' do %>
-      <i aria-hidden="true" class="fa fa-trash-o fa-lg"></i>
-      <% end %>
-      <%= link_to "show", retrieve_show_path(provider, message), class: "hidden show-message" %>
+      <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>");' class='pull-right'>
+        <i aria-hidden="true" class="fa fa-trash-o fa-lg" title="Delete" data-toggle="tooltip"></i>
+      </span>
     </td>
     <% end %>
   </td>
@@ -21,5 +20,8 @@
 <script>
   function showMessage(url) {
     $.ajax({type: "GET", url: url, dataType: 'script'});
+  }
+  function deleteMessage(url, e) {
+    $.ajax({type: "DELETE", url: url, dataType: 'script'});
   }
 </script>
