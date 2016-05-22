@@ -135,5 +135,9 @@ module VerificationHelper
       "no enrollment"
     end
   end
+
+  def show_doc_status(status)
+    ["verified", "rejected"].include?(status)
+  end
 end
 

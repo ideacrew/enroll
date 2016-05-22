@@ -15,7 +15,7 @@
                       <i class="fa fa-comments-o fa-2x"></i>&nbsp;
                     </span>
                 <% end %>
-                  <% unless vlp_doc.status == "downloaded" %>
+                  <% if show_doc_status(vlp_doc.status) %>
                     <span class="label label-<%=doc_status_label(vlp_doc)%>"><%= vlp_doc.status.titleize %></span>
                   <% end %>
               </td>
