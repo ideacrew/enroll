@@ -16,7 +16,7 @@
       <div align = "right">
         <table>
          <head> 
-          <th>Total Applied APTC for Enrollment <%=enrollment_count%>&nbsp;&nbsp;</th> 
+          <th>Applied APTC<%#=enrollment_count%>&nbsp;&nbsp;</th> 
           <th></th>
            <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px'%></th>
          </head> 
@@ -28,7 +28,7 @@
       <table class="table table-border module edit-aptc-csr-table">
         <thead>
           <th>Member APTC</th>
-          <% @months_array.each do |month| %>
+          <% $months_array.each do |month| %>
             <th><%=month.capitalize%></th>
           <%end%>
         </thead>  
@@ -46,6 +46,16 @@
             </tr>
 
           <%end%>
+          <!--Total from all members / for Enrollment-->
+
+            <tr>
+              <td>Totals</td>
+                <%hbx_values["aptc_applied"].each do |month, aptc_value|%>
+                <td class="<%=aptc_csr_data_type(month)%>"> 
+                  <%= text_field_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
+                </td>
+              <%end%>
+            </tr>
           
          
           <!--
@@ -65,5 +75,7 @@
       </table>
 
     </div>
+
   </div> <!--collapse div-->
 </div>
+

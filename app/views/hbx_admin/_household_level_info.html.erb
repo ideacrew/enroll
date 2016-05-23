@@ -9,10 +9,12 @@
   </div>
   <div class="panel-body">
 
+    <%#= render 'applied_aptc_ratio.html.erb', :applied_aptc_ratio_percent => 85 if @no_enrollment%>
+
     <table class="table table-border module edit-aptc-csr-table">
       <thead>
         <th><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%=@current_year%></th>
-        <% @months_array.each do |month| %>
+        <% $months_array.each do |month| %>
           <th><%=month.capitalize%></th>
         <%end%>
         <th> </th>
@@ -33,7 +35,8 @@
               <%if attribute == "max_aptc"%>
                   <%= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px'%>
               <%elsif attribute == "csr_percentage"%>
-                  <%= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px'%>
+                  <%#= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px'%>
+                  <%= select_tag "#{attribute.to_s}", options_for_select([ 100, 94, 87, 73 ], @csr_percent_as_integer)%>
               <%end%> 
             </td>
             <td ></td>
