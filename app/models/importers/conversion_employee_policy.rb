@@ -120,10 +120,63 @@ module Importers
 
     PersonSlug = Struct.new(:name_pfx, :first_name, :middle_name, :last_name, :name_sfx, :ssn, :dob, :gender)
 
+    def examine_and_maybe_merge_poc(employer, employee)
+      staff_roles = employer.staff_roles
+      staff_roles_to_merge = staff_roles.select do |sr|
+        (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
+          (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
+      end
+      if staff_roles_to_merge.empty?
+        return true
+      end
+      if staff_roles_to_merge.count > 1
+        errors.add(:base, "this employee has the same personal data as multiple points of contact")
+        return false
+      end
+      merge_staff = staff_roles_to_merge.first
+      existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
+      if existing_people.count > 1
+        errors.add(:base, "matching conflict for this personal data")
+        return false
+      end
+      if existing_people.empty?
+        merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
+        return true
+      end
+      existing_person = existing_people.first
+      merge_poc_and_employee_person(merge_staff, existing_person, employer)
+      true
+    end
+
+    def merge_poc_and_employee_person(poc_person, employee_person, employer)
+      return true if poc_person.id == employee_person.id
+      staff_role_to_migrate = poc_person.employer_staff_roles.detect do |sr|
+        (sr.employer_profile_id == employer.id) && 
+          (sr.is_active?)
+      end
+      poc_person.employer_staff_roles.delete(staff_role_to_migrate)
+      poc_person.save!
+      employee_person.employer_staff_roles << staff_role_to_migrate
+      employee_person.save!
+      poc_user = poc_person.user
+      emp_user = employee_person.user
+      unless poc_user.nil? 
+        poc_person.unset(:user_id)
+        if emp_user.nil?
+          employee_person.set(:user_id, poc_user.id)
+        else
+          poc_user.destroy!
+        end 
+      end
+    end
+
     def save
       return false unless valid?
       employer = find_employer
       employee = find_employee
+      unless examine_and_maybe_merge_poc(employer, employee)
+        return false
+      end
       plan = find_plan
       bga = find_benefit_group_assignment
       person_data = PersonSlug.new(nil, employee.first_name, employee.middle_name,
