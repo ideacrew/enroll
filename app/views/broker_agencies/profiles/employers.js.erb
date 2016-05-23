@@ -3,7 +3,10 @@ set_active_ontab("#employers-tab");
 
 $(document).ready(function() {
     $('#employers_dataTable').DataTable( {
-      "order": [[ 2, "asc" ]]
+      "order": [[ 2, "asc" ]],
+      columnDefs: [
+      				{ targets: [0,1,3,4,8], sorting: false}
+      		      ]
     } );
     $('select').on('selectric-init', function(element){
 	  $('.selectric').closest('.small-6').find('span').remove();
