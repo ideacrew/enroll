@@ -81,7 +81,6 @@ CSV.foreach(filename, headers: :true) do |row|
 									}
 				person = Factories::EnrollmentFactory.initialize_person(nil,data_row["Name Prefix"],data_row["First Name"], data_row["Middle Name"],
                                data_row["Last Name"], data_row["Name Suffix"], data_row["SSN"].gsub("-",""), format_date(data_row["DOB"]), data_row["Gender"].downcase, nil, no_ssn=nil)
-				binding.pry
 			elsif data_row["Employer FEIN"] != nil # for SHOP
 				subscriber_params = {"name_pfx" => data_row["Name Prefix"],
 									 "first_name" => data_row["First Name"],
@@ -182,7 +181,6 @@ CSV.foreach(filename, headers: :true) do |row|
 		hbx_enrollment.effective_on = data_row["Benefit Begin Date"].to_date
 		year = data_row["Plan Year"]
 		plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
-		binding.pry
 		hbx_enrollment.plan_id = plan._id
 		hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
 		hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
