@@ -84,7 +84,3 @@ function applyJQDatePickers() {
         }
     });
 }
-
-$(function() {
-    applyJQDatePickers();
-});
