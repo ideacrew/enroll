@@ -395,9 +395,9 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   wait_for_ajax(10)
   person = people[named_person]
   screenshot("before modal")
-  find('.interaction-click-control-click-here').click
+  # find('.interaction-click-control-click-here').click
   screenshot("during modal")
-  find('.interaction-click-control-close').click
+  # find('.interaction-click-control-close').click
   screenshot("after modal")
 
   sleep 3
