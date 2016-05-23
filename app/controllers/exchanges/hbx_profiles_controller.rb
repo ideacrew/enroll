@@ -29,6 +29,30 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def employer_invoice
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+  def employer_invoice_dt
+    dt_query = extract_datatable_parameters
+    employers = []
+    all_employers = Organization.where(:employer_profile => {:$exists => 1})
+    if dt_query.search_string.blank?
+      employers = all_employers
+    else
+      employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
+      employers = all_employers.where({:id => {"$in" => employer_ids}})
+    end
+    @draw = dt_query.draw
+    @total_records = all_employers.count
+    @records_filtered = employers.count
+    @employers = employers.skip(dt_query.skip).limit(dt_query.take)
+    render
+  end
+
   def staff_index
     @q = params.permit(:q)[:q]
     @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])

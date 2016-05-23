@@ -1,0 +1,40 @@
+<div>
+  <%= link_to "All", "#", class: "btn btn-default" %>
+  <%= link_to "Renewing", "#", class: "btn btn-default" %>
+  <%= link_to "Non-Renewing", "#", class: "btn btn-default" %>
+</div>
+<br><br>
+<div class="module">
+  <table class="table table-striped" id="ER-invoices-dataTable">
+    <thead>
+    <tr>
+      <th><%= check_box_tag 'employer' %></th>
+      <th>FEIN</th>
+      <th>Employer Name</th>
+      <th>ER State</th>
+      <th>Plan Year</th>
+      <th>Conversion</th>
+      <th>EE Enrolled</th>
+      <th>EE Remaining</th>
+      <th>Error</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $('#ER-invoices-dataTable').DataTable( {
+      "processing": true,
+      "serverSide": true,
+      "ordering" : false,
+      "ajax": {
+        url: "<%= employer_invoice_dt_exchanges_hbx_profiles_path(:format => :json) %>",
+        type: "GET"
+      }
+    } );
+  });
+</script>
