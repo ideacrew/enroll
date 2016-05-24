@@ -12,6 +12,10 @@
         <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
           Shop for Plans
         </button>
+      </div>
+    </div>
+  </div>
+</div>
         <% else %>
 
         <% action_path = find_sep_insured_families_path  %>
@@ -40,12 +44,13 @@
               </div>
               <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                 <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
-                <% end %>
-                <% end %>
               </div>
             </div>
           </div>
         </div>
+                <% end %>
+                <% end %>
+
 
         <div aria-labelledby="myModalLabel" class="modal fade" id="choose_flow" role="dialog" tabindex="-1">
           <div class="modal-dialog" role="document">
