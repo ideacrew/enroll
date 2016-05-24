@@ -13,7 +13,7 @@
 <% end %>
 <%= raw rule.to_json %>,
 <% transmit_xml_button = capture do %>
-  <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}, disabled: employer.aasm_state != "binder_paid") %>
+  <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}, disabled: employer.can_transmit_xml?) %>
 <% end %>
 <%= raw transmit_xml_button.to_json %>
 ]

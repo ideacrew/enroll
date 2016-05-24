@@ -102,6 +102,32 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
+  context "can_transmit_xml?" do
+    context "for new employer" do
+      let(:new_plan_year){ FactoryGirl.build(:plan_year) }
+      let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+
+      it "should return true if its new employer and does not have binder paid status" do
+        expect(employer_profile.can_transmit_xml?).to be_truthy
+      end
+
+      it "should return false if employer has binder paid status" do
+        employer_profile.aasm_state = "binder_paid"
+        employer_profile.save
+        expect(employer_profile.can_transmit_xml?).to be_falsey
+      end
+    end
+
+    context "for renewing employer" do
+      let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
+      let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year]) }
+
+      it "should return false if its renewing employer" do
+        expect(employer_profile.can_transmit_xml?).to be_falsey
+      end
+    end
+  end
+
   context "has registered and enters initial application process" do
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }

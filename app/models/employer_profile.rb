@@ -282,6 +282,10 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
+  def can_transmit_xml?
+    !self.renewing_plan_year.present? && !self.binder_paid?
+  end
+
   def renewing_plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
   end

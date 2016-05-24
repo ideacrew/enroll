@@ -63,7 +63,11 @@ RSpec.describe "exchanges/hbx_profiles/_binder_index.html.erb" do
   before :each do
     assign(:organizations, organizations)
     allow(new_plan_year).to receive(:assigned_census_employees_without_owner).and_return(true)
+    allow(new_employer).to receive(:can_transmit_xml?).and_return(true)
+    allow(new_employer).to receive(:binder_paid?).and_return(true)
     allow(renewing_plan_year).to receive(:assigned_census_employees_without_owner).and_return(true)
+    allow(renewing_employer).to receive(:can_transmit_xml?).and_return(true)
+    allow(renewing_employer).to receive(:binder_paid?).and_return(true)
   end
 
   it "should match new employer information" do

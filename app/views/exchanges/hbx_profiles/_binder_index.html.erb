@@ -25,7 +25,7 @@
           <% if employer.show_plan_year.present? && (employer.is_new_employer? || employer.is_renewing_employer?) %>
             <tr>
               <td>
-                <% if employer.aasm_state != "binder_paid" %>
+                <% if !employer.binder_paid? %>
                   <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(employer), class: "binderCheckBox") %>
                 <% end %>
               </td>
@@ -34,7 +34,7 @@
               <td><%= employer.renewing_plan_year.present? ? "Renewing" : "New" %></td>
               <td><%= eligibility_criteria(employer) %></td>
               <td>
-                <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?'}, disabled: employer.aasm_state != "binder_paid") %>
+                <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: 'Are you sure you want to transmit the xml?' }, disabled: employer.can_transmit_xml? ) %>
               </td>
             </tr>
           <% end %>
