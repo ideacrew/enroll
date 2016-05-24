@@ -7,7 +7,7 @@ end
 World(VerificationUser)
 
 Then(/^Individual click continue button$/) do
-  click_button "CONTINUE"
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^I should see Documents link$/) do
