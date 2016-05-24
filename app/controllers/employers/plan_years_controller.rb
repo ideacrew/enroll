@@ -326,7 +326,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish!
+    @plan_year.publish! if @plan_year.may_publish?
     if @plan_year.publish_pending?
       respond_to do |format|
         format.js
