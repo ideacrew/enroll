@@ -16,7 +16,7 @@ describe Forms::GeneralAgencyProfile, "given nothing" do
   end
 end
 
-describe Forms::BrokerAgencyProfile, ".save" do
+describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
   let(:attributes) { {
