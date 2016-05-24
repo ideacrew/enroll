@@ -392,7 +392,8 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   sleep 3
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
-  wait_for_ajax(10)
+  wait_for_ajax
+  page.evaluate_script("window.location.reload()")
   person = people[named_person]
   screenshot("before modal")
   # find('.interaction-click-control-click-here').click
@@ -401,7 +402,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   screenshot("after modal")
 
   sleep 3
-  wait_for_ajax(10)
+  wait_for_ajax
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
