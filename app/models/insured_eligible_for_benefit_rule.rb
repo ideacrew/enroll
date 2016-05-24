@@ -71,7 +71,6 @@ class InsuredEligibleForBenefitRule
 
   def is_family_relationships_satisfied?
     age = age_on_next_effective_date(@role.dob)
-    #binding.pry
     relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
   end
 
