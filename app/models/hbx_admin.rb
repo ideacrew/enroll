@@ -112,15 +112,7 @@ class HbxAdmin
 
     # APTC APPLIED
     def update_aptc_applied_hash_for_month(aptc_applied_hash, hbx, month, ed, family, applied_aptc_array=nil)
-      # => binding.pry
-      # if hbx_enrollment.nil?
-      #   hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
-      #   applied_aptc = hbxs.map{|h| h.applied_aptc_amount.to_f}.sum
-      # else
-      #   hbx = hbx_enrollment
-      #   applied_aptc = aptc_applied.to_f || hbx.applied_aptc_amount.to_f
-      # end
-      applied_aptc = 0;
+      applied_aptc = 0
       if applied_aptc_array.present?
         applied_aptc_array.each do |one_hbx|
           applied_aptc = one_hbx[1]["aptc_applied"].to_f if hbx.id.to_s == one_hbx[1]["hbx_id"].gsub("aptc_applied_","")
@@ -139,20 +131,32 @@ class HbxAdmin
 
     # APTC APPLIED PER MEMBER, TODO : change eligibility_determination to be hbx_enrollment ....
     def build_aptc_applied_per_member_values_for_enrollment(family, hbx, applied_aptc_array=nil)
+      applied_aptc_for_enrollment = 0
+      if applied_aptc_array.present?
+        applied_aptc_array.each do |one_hbx|
+          applied_aptc_for_enrollment = one_hbx[1]["aptc_applied"].to_f if hbx.id.to_s == one_hbx[1]["hbx_id"].gsub("aptc_applied_","")
+        end
+      end 
+      aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
       aptc_applied_per_member = Hash.new
       hbx.hbx_enrollment_members.each do |hem|
-        eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-        eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
+        applied_aptc_for_member = hem.applied_aptc_amount.to_f
+        if applied_aptc_array.present?  # Use Transient value from AJAX call.
+           ratio_for_this_member = aptc_ratio_by_member[hem.applicant_id.to_s]
+           applied_aptc_for_member = ratio_for_this_member * applied_aptc_for_enrollment
+        end
+        #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+        #eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
         aptc_applied_hash = Hash.new
         $months_array.each_with_index do |month, ind|
-          eligibility_determinations.each do |ed|
-              first_of_month_num_current_year = first_of_month_converter(month)
-              if first_of_month_num_current_year >= ed.determined_on
-                aptc_applied_hash.store(month, '%.2f' % hem.applied_aptc_amount.to_f)
-              else
-                aptc_applied_hash.store(month, "---") #if aptc_applied_hash[month].blank? #dont mess with the past values
-              end 
-          end
+          #eligibility_determinations.each do |ed|
+              #first_of_month_num_current_year = first_of_month_converter(month)
+              #if first_of_month_num_current_year >= ed.determined_on
+                aptc_applied_hash.store(month,  '%.2f' % applied_aptc_for_member)
+              #else
+              #  aptc_applied_hash.store(month, "---") #if aptc_applied_hash[month].blank? #dont mess with the past values
+              #end 
+          #end
         end
         aptc_applied_per_member[hem.person.id.to_s] = aptc_applied_hash  
       end
@@ -318,10 +322,16 @@ class HbxAdmin
     end
 
 
-    def build_current_aptc_applied_hash(hbxs)
+    def build_current_aptc_applied_hash(hbxs, applied_aptcs_array=nil)
       current_aptc_applied_hash = Hash.new
       hbxs.each do |hbx|
-        current_aptc_applied_hash[hbx.id.to_s] = (hbx.applied_aptc_amount || 0)
+        if applied_aptcs_array.present?
+          applied_aptcs_array.each do |app_aptc|
+            current_aptc_applied_hash[hbx.id.to_s] =  app_aptc[1]["aptc_applied"].to_f if hbx.id.to_s == app_aptc[1]["hbx_id"].gsub("aptc_applied_","") 
+          end          
+        else
+          current_aptc_applied_hash[hbx.id.to_s] = (hbx.applied_aptc_amount || 0)
+        end
       end
       return current_aptc_applied_hash  
     end

@@ -8,10 +8,8 @@
       <%= f.hidden_field :person_id, value: @person.id %>
       <%= f.hidden_field :family_id, value: @family.id %>
       <%= f.hidden_field :hbx_enrollment_id, value: @hbx.id if @hbx.present?%>
-       <div align="center"> 
-         <a href="javascript:void(0)" class='btn btn-default' id='calculate_available_aptc'>Calculate Available APTC</a>
-      </div><br/>
 
+      <%= render 'filter_header.html.erb'%>
       <%= render 'household_level_info.html.erb'%>
       
       <div id = "enrollmentsDiv">

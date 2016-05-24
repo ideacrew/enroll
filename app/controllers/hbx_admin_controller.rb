@@ -6,13 +6,12 @@ class HbxAdminController < ApplicationController
     @current_year = params[:year_selected]  || TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present? #This will be needed when we need to firure out which hbx we are editing when doing calculate available.
+    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present? 
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).blank?
 
     @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
     @household_members = HbxAdmin.build_household_members(@family)
-    #@household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbx)
     @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbxs)
     #build_household_level_aptc_csr_data(family, hbxs=nil, max_aptc=nil, csr_percentage=nil, applied_aptcs_array=nil,  member_ids=nil)
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs) if @hbxs.present?
@@ -37,19 +36,13 @@ class HbxAdminController < ApplicationController
     @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).blank?
-    # @grid_vals = HbxAdmin.build_grid_values_for_aptc_csr(@family, @hbx, params[:max_aptc].to_f, params[:aptc_applied].to_f, params[:csr_percentage].to_i, params[:member_ids])
-    # @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).blank?
-    # #@aptc_applied = params[:aptc_applied] || @family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.date_of_record.year).try(:first).try(:applied_aptc_amount) || 0
-    # @aptc_applied = params[:aptc_applied] || @hbx.applied_aptc_amount || 0 
-    # @max_aptc = params[:max_aptc] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
-    # @csr_percent_as_integer = params[:csr_percentage] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
     @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:applied_aptcs_array])
-    # TODO : On the next line may not need to pass max_aptc and csr_percentage
+
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
     @household_members = HbxAdmin.build_household_members(@family)
-      
-    @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs)
+    
+    @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs, params[:applied_aptcs_array])
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
     @max_aptc = ('%.2f' % params[:max_aptc]) || @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc    
@@ -65,9 +58,8 @@ class HbxAdminController < ApplicationController
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
-    #hbx    = HbxEnrollment.find(params[:person][:hbx_enrollment_id]) if params[:person].present? && params[:person][:hbx_enrollment_id].present?
     
-    # Change this value so it is read from the dropdown params of years when implementing retro functionality
+    # Change this value so it is read from the dropdown params of years when implementing the retro functionality
     year = TimeKeeper.datetime_of_record.year
     if @family.present?
       # Update Max APTC and CSR Percentage
