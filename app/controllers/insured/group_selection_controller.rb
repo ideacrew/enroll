@@ -168,7 +168,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def insure_hbx_enrollment_for_shop_qle_flow
     if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled.detect { |hbx| hbx.may_terminate_coverage? }
+      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.detect { |hbx| hbx.may_terminate_coverage? }
     end
   end
 
