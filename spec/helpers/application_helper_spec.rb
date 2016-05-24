@@ -23,7 +23,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#eligiblity_participation_rule" do
+  describe "#participation_rule" do
     let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
 
     it "should return correct eligibility criteria" do

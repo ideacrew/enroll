@@ -14,23 +14,42 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
-     if type == 'Social Security Number' || type == 'Citizenship'
-        member.consumer_role.is_state_resident? ? "verified" : "outstanding"
-     elsif type == 'Immigration status'
-        member.consumer_role.lawful_presence_authorized? ? "verified" : "outstanding"
+     if type == 'Social Security Number'
+       if member.consumer_role.ssn_verified?
+         "verified"
+       elsif member.consumer_role.has_docs_for_type?(type)
+         "in review"
+       else
+         "outstanding"
+       end
+     elsif type == 'Citizenship' || type == 'Immigration status'
+       if member.consumer_role.lawful_presence_authorized?
+         "verified"
+       elsif member.consumer_role.has_docs_for_type?(type)
+         "in review"
+       else
+         "outstanding"
+       end
      end
   end
 
   def verification_type_class(type, member)
-    verification_type_status(type, member) == "verified" ? "success" : "danger"
+    case verification_type_status(type, member)
+      when "verified"
+        "success"
+      when "in review"
+        "warning"
+      else
+        "danger"
+    end
   end
 
   def unverified?(person)
     person.consumer_role.aasm_state != "fully_verified"
   end
 
-  def enrollment_group_verified?(person)
-    person.primary_family.active_family_members.all? {|member| member.person.consumer_role.aasm_state == "fully_verified"}
+  def enrollment_group_unverified?(person)
+    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verifications_outstanding"}
   end
 
   def verification_needed?(person)
@@ -115,6 +134,10 @@ module VerificationHelper
     else
       "no enrollment"
     end
+  end
+
+  def show_doc_status(status)
+    ["verified", "rejected"].include?(status)
   end
 end
 

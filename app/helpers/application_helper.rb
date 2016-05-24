@@ -531,6 +531,21 @@ module ApplicationHelper
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
   end
 
+  def favorite_class(broker_role, general_agency_profile)
+    return "" if broker_role.blank?
+
+    if broker_role.included_in_favorite_general_agencies?(general_agency_profile.id)
+      "glyphicon-star"
+    else
+      "glyphicon-star-empty"
+    end
+  end
+
+  def show_default_ga?(general_agency_profile, broker_agency_profile)
+    return false if general_agency_profile.blank? || broker_agency_profile.blank?
+    broker_agency_profile.default_general_agency_profile == general_agency_profile
+  end
+
   def eligibility_criteria(employer)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
@@ -556,21 +571,6 @@ module ApplicationHelper
     else
       "2. You have 0 non-owner employees on your roster"
     end
-  end
-
-  def favorite_class(broker_role, general_agency_profile)
-    return "" if broker_role.blank?
-
-    if broker_role.included_in_favorite_general_agencies?(general_agency_profile.id)
-      "glyphicon-star"
-    else
-      "glyphicon-star-empty"
-    end
-  end
-
-  def show_default_ga?(general_agency_profile, broker_agency_profile)
-    return false if general_agency_profile.blank? || broker_agency_profile.blank?
-    broker_agency_profile.default_general_agency_profile == general_agency_profile
   end
 
 end

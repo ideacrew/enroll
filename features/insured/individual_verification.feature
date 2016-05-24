@@ -22,7 +22,7 @@ Feature: Consumer verification process
     * I select a plan on plan shopping page
     * I click on purchase button on confirmation page
     * I click on continue button to go to the individual home page
-    * I should see verification outstanding label
+    * I should see Documents link
     * I click on verification link
     * I should see page for documents verification
     * I upload the file as vlp document

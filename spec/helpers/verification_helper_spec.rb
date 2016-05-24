@@ -20,23 +20,36 @@ RSpec.describe VerificationHelper, :type => :helper do
     before :each do
       assign(:person, person)
     end
-    context "SSN and Citizenship type" do
+    context "Social Security Number" do
       it "returns outstanding status for consumer without state residency" do
-        person.consumer_role.is_state_resident = false
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
       end
 
+      it "returns in review for outstanding with docs" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
+        expect(helper.verification_type_status("Social Security Number", person)).to eq "in review"
+      end
+
       it "returns verified status for consumer with state residency" do
+        person.consumer_role.ssn_validation = "valid"
         expect(helper.verification_type_status("Social Security Number", person)).to eq "verified"
       end
     end
 
-    context "Immigration status" do
+    context "Citizenship and Immigration status" do
       context "lawful presence determination successful" do
         let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination) }
         it "returns verified status for consumer with state residency" do
           person.consumer_role.lawful_presence_determination = lawful_presence_determination
           expect(helper.verification_type_status("Immigration status", person)).to eq "verified"
+        end
+      end
+      context "lawful presence determination fails with uploaded docs" do
+        let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_pending") }
+        it "returns verified status for consumer with state residency" do
+          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
+          person.consumer_role.lawful_presence_determination = lawful_presence_determination
+          expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
         end
       end
       context "lawful presence determination fails" do
@@ -57,10 +70,12 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     context "verification type status verified" do
       it "returns success SSN verified" do
+        person.consumer_role.ssn_validation = "valid"
         expect(helper.verification_type_class("Social Security Number", person)).to eq("success")
       end
 
       it "returns success for Citizenship verified" do
+        person.consumer_role.lawful_presence_determination = lawful_presence_determination
         expect(helper.verification_type_class("Citizenship", person)).to eq("success")
       end
 
@@ -70,10 +85,33 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
+    context "verification type status in review" do
+      let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_pending") }
+      before :each do
+        person.consumer_role.is_state_resident = false
+      end
+      it "returns success SSN verified" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
+        expect(helper.verification_type_class("Social Security Number", person)).to eq("warning")
+      end
+
+      it "returns success for Citizenship verified" do
+        person.consumer_role.lawful_presence_determination = lawful_presence_determination
+        expect(helper.verification_type_class("Citizenship", person)).to eq("warning")
+      end
+
+      it "returns success for Immigration status verified" do
+        person.consumer_role.lawful_presence_determination = lawful_presence_determination
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
+        expect(helper.verification_type_class("Immigration status", person)).to eq("warning")
+      end
+    end
+
     context "verification type status outstanding" do
       let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_pending") }
       before :each do
         person.consumer_role.is_state_resident = false
+        person.consumer_role.vlp_documents = []
       end
       it "returns danger outstanding SSN" do
         expect(helper.verification_type_class("SSN", person)).to eq("danger")
@@ -111,23 +149,23 @@ RSpec.describe VerificationHelper, :type => :helper do
     before :each do
       assign(:person, person)
     end
-    it "returns true if all family members are fully verified" do
+    it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
-        member.person.consumer_role.aasm_state="fully_verified"
+        member.person.consumer_role.aasm_state="verifications_outstanding"
         member.save
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
-      expect(helper.enrollment_group_verified?(person)).to eq true
+      expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
-    it "returns false if any of family members is not fully verified" do
+    it "returns false if all family members are fully verified or pending" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
-      expect(helper.enrollment_group_verified?(person)).to eq false
+      expect(helper.enrollment_group_unverified?(person)).to eq false
     end
   end
 
@@ -211,6 +249,23 @@ RSpec.describe VerificationHelper, :type => :helper do
 
       it "returns false without enrollments" do
         expect(helper.hbx_enrollment_incomplete).to be_falsey
+      end
+    end
+  end
+
+  describe "#show_docs_status" do
+    states_to_show = ["verified", "rejected"]
+    states_to_hide = ["not submitted", "downloaded", "any"]
+
+    states_to_show.each do |doc_state|
+      it "returns true if document status is #{doc_state}" do
+        expect(helper.show_doc_status(doc_state)).to eq true
+      end
+    end
+
+    states_to_hide.each do |doc_state|
+      it "returns true if document status is #{doc_state}" do
+        expect(helper.show_doc_status(doc_state)).to eq false
       end
     end
   end
