@@ -10,24 +10,32 @@ def select_benefit_package(title, benefit_coverage_period)
 	end
 end
 
+def select_benefit_group(benefit_group_title,benefit_groups)
+	benefit_groups.each do |benefit_group|
+		if benefit_group_title.to_s.strip == benefit_group.title.to_s.strip
+			return benefit_group
+		end
+	end
+end
+
+def select_benefit_group_assignment(correct_benefit_group,benefit_group_assignments)
+	benefit_group_assignments.each do |benefit_group_assignment|
+		if benefit_group_assignment.benefit_group_id == correct_benefit_group._id
+			return benefit_group_assignment
+		end
+	end
+end
 
 def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
 	benefit_group_assignments = census_employee.benefit_group_assignments
-	benefit_groups = organization.benefit_groups.plan_years.map(&:benefit_groups) # returns an array of arrays because one plan year can have multiple bgs.
-	correct_benefit_group = nil
-	benefit_groups.each do |bg_array|
-		bg_array.each do |bg|
-			if bg.title.strip == title.strip # this assumes that you can't have multiple benefit groups with the same name...hope that's true.
-				correct_benefit_group = bg
-			end # matches the benefit group based on the name.
-		end # loops through the plan year's benefit groups
-	end # loops through the array of benefit groups
-	correct_benefit_group_assignment = nil
-	benefit_group_assignments.each do |benefit_group_assignment|
-		if benefit_group_assignment.benefit_group_id == correct_benefit_group._id
-			correct_benefit_group_assignment = benefit_group_assignment
-		end # checks if we have the correct benefit group assignment
-	end # loops through each of the benefit group assignments
+	all_benefit_groups = []
+	organization.plan_years.each do |plan_year|
+		plan_year.benefit_groups.each do |benefit_group|
+			all_benefit_groups.push(benefit_group)
+		end
+	end
+	correct_benefit_group = select_benefit_group(benefit_group_title,all_benefit_groups)
+	correct_benefit_group_assignment = select_benefit_group_assignment(correct_benefit_group,benefit_group_assignments)
 	if correct_benefit_group_assignment = nil
 		correct_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(correct_benefit_group,census_employee)
 	end # creates the correct benefit group assignment if it doesn't exist.
