@@ -1,13 +1,16 @@
-### Redmine ticket(s) 
+### Redmine ticket(s)
 * (redmine links here)
 * (if more)
 
 ### Local build result
 
 ```
-bundle exec rake parallel:spec[4]  
+bundle exec rake parallel:spec[4]
 bundle exec cucumber
 ```
+
+### Latest rebase/merge tag
+*
 
 ---
 
@@ -21,7 +24,7 @@ bundle exec cucumber
 
 ### TODOs / Notes
 #### Peer Review
-* (For code review) 
+* (For code review)
 
 #### Functional Testing
 * (For testing locally)
