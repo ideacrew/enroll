@@ -96,7 +96,7 @@ gem 'wicked_pdf', '1.0.6'
 # provide recaptcha services
 gem "recaptcha", '1.1.0'
 
-gem 'jquery-datatables-rails', '~> 3.3.0'
+gem 'jquery-datatables-rails', '3.4.0'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

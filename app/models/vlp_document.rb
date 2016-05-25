@@ -94,7 +94,7 @@ class VlpDocument < Document
   # country which issued the document. e.g. passport issuing country
   field :issuing_country, type: String
 
-  # document verification status ::VlpDocument::VLP_DOCUMENT_KINDS
+  # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
   field :status, type: String, default: "not submitted"
 
   # verification type this document can support: Social Security Number, Citizenship, Immigration status
