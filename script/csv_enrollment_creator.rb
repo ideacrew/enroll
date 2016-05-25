@@ -174,7 +174,7 @@ CSV.foreach(filename, headers: :true) do |row|
 						dependent.save
 					end
 					family = subscriber.primary_family
-					household = person.primary_family.active_household
+					household = family.active_household
 					hbx_enrollment = HbxEnrollment.new
 					household.hbx_enrollments.push(hbx_enrollment)
 					coverage_household = household.immediate_family_coverage_household
