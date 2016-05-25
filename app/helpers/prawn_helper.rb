@@ -77,9 +77,9 @@ module PrawnHelper
       style(row(-1), :border_width => 2)
       style(column(1..-1), :align => :center)
       style(columns(0), :width => 40)
-      style(columns(1), :width => 60)
-      style(columns(2), :width => 60)
       style(columns(3), :width => 60)
+      style(columns(4), :width => 60)
+      style(columns(5), :width => 60)
       style(columns(6), :width => 70)
     end
   end

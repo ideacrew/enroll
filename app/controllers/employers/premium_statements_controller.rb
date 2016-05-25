@@ -105,9 +105,9 @@ class Employers::PremiumStatementsController < ApplicationController
     invoice_header_data = [ 
       ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
       ["INVOICE NUMBER:", "123123"],
-      ["INVOICE DATE:", "#{DateTime.now.strftime("%D")}"],
-      ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%B, %Y")}"],
-      ["TOTAL AMOUNT DUE:", "#{hbx_enrollments.map(&:total_premium).sum}"],
+      ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
+      ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
+      ["TOTAL AMOUNT DUE:", "$#{hbx_enrollments.map(&:total_premium).sum}"],
       ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
     ]
 
@@ -177,7 +177,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @pdf.image logopath, :width => 150
     @pdf.move_down 12    
 
-    @pdf.text_box "#{DateTime.now.next_month.strftime("%B, %Y")} Group Coverage Bill(Health & Dental)", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
+    @pdf.text_box "#{DateTime.now.next_month.strftime("%m/%Y")} Group Coverage Bill(Health & Dental)", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
 
     @pdf.move_down 48
 
@@ -185,14 +185,14 @@ class Employers::PremiumStatementsController < ApplicationController
       ["Insurance Carrier Plan", "Covered Subscribers", "Covered Dependents", "New Charges"]
     ]
     enrollment_summary.each do |name,plan_summary| 
-      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "#{plan_summary['total_premium']}"]
+      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{plan_summary['total_premium']}"]
 
     end
 
     dchbx_table_item_list(invoice_services_data)
     @pdf.move_down 5
     @pdf.text_box "New Charges Total", :at => [0, @pdf.cursor], :style => :bold
-    @pdf.text "#{hbx_enrollments.map(&:total_premium).sum}" , :align => :right, :style => :bold
+    @pdf.text "$#{hbx_enrollments.map(&:total_premium).sum}" , :align => :right, :style => :bold
 
     enrollment_summary.each do |name, summary| 
       carrier_plan_services_data = [ 
@@ -217,20 +217,20 @@ class Employers::PremiumStatementsController < ApplicationController
 
        @pdf.move_down 24
 
-       @pdf.text_box "Subscriber(s) and Adjustment(s) for Coverage Period: #{DateTime.now.next_month.strftime("%B, %Y")}", :style => :bold, :at => [0, @pdf.cursor]
+       @pdf.text_box "Subscriber(s) and Adjustment(s) for Coverage Period: #{DateTime.now.next_month.strftime("%m/%Y")}", :style => :bold, :at => [0, @pdf.cursor]
 
        @pdf.move_down 24
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_dependent_summary}", "Add","#{enrollment.total_employer_contribution}" ,"#{enrollment.total_employee_cost}"  ,"#{enrollment.total_premium}"]
+        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_dependent_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
       end
 
       dchbx_table_by_plan(carrier_plan_services_data)
 
       @pdf.move_down 5
       @pdf.text_box "PLAN TOTAL", :at => [0, @pdf.cursor], :style => :bold
-      @pdf.text "#{summary['total_premium']}", :align => :right, :style => :bold
+      @pdf.text "$#{summary['total_premium']}", :align => :right, :style => :bold
 
     end
     @pdf
