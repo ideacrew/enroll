@@ -16,7 +16,7 @@ describe Forms::GeneralAgencyProfile, "given nothing" do
   end
 end
 
-describe Forms::BrokerAgencyProfile, ".save" do
+describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
   let(:attributes) { {
@@ -183,7 +183,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
 end
 
 
-describe Forms::GeneralAgencyProfile, ".match_or_create_person" do
+describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :after_each do
   let(:attributes) { {
     first_name: "steve",
     last_name: "smith",
