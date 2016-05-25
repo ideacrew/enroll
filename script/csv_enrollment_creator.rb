@@ -29,7 +29,7 @@ end
 def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
 	benefit_group_assignments = census_employee.benefit_group_assignments
 	all_benefit_groups = []
-	organization.plan_years.each do |plan_year|
+	organization.employer_profile.plan_years.each do |plan_year|
 		plan_year.benefit_groups.each do |benefit_group|
 			all_benefit_groups.push(benefit_group)
 		end
@@ -122,7 +122,7 @@ CSV.foreach(filename, headers: :true) do |row|
 									}
 				census_employee = find_census_employee(subscriber_params)
 				person_details = create_person_details(subscriber_params)
-				organization = Organization.where(fein: data_row["FEIN"]).first
+				organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 				unless census_employee == nil
 					benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],
 																						 organization,census_employee)
@@ -218,9 +218,9 @@ CSV.foreach(filename, headers: :true) do |row|
 		hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
 		hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
 		if data_row["Date Plan Selected"] != nil
-			hbx_enrollment.submitted_at = data_row["Date Plan Selected"].to_time
+			hbx_enrollment.submitted_at = format_date(data_row["Date Plan Selected"]).to_datetime
 		else
-			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_time
+			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
 		end
 		hbx_enrollment.save
 		hbx_enrollment_member = HbxEnrollmentMember.new
