@@ -1,7 +1,6 @@
 require 'csv'
-include LegacyImporters
 
-filename = "May_17_From_Glue_test.csv"
+filename = "Redmine-7304.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -11,8 +10,29 @@ def select_benefit_package(title, benefit_coverage_period)
 	end
 end
 
-def select_benefit_group(title,benefit_coverage_period)
-end
+
+def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
+	benefit_group_assignments = census_employee.benefit_group_assignments
+	benefit_groups = organization.benefit_groups.plan_years.map(&:benefit_groups) # returns an array of arrays because one plan year can have multiple bgs.
+	correct_benefit_group = nil
+	benefit_groups.each do |bg_array|
+		bg_array.each do |bg|
+			if bg.title.strip == title.strip # this assumes that you can't have multiple benefit groups with the same name...hope that's true.
+				correct_benefit_group = bg
+			end # matches the benefit group based on the name.
+		end # loops through the plan year's benefit groups
+	end # loops through the array of benefit groups
+	correct_benefit_group_assignment = nil
+	benefit_group_assignments.each do |benefit_group_assignment|
+		if benefit_group_assignment.benefit_group_id == correct_benefit_group._id
+			correct_benefit_group_assignment = benefit_group_assignment
+		end # checks if we have the correct benefit group assignment
+	end # loops through each of the benefit group assignments
+	if correct_benefit_group_assignment = nil
+		correct_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(correct_benefit_group,census_employee)
+	end # creates the correct benefit group assignment if it doesn't exist.
+	return correct_benefit_group_assignment
+end # ends the function
 
 def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
@@ -94,7 +114,10 @@ CSV.foreach(filename, headers: :true) do |row|
 									}
 				census_employee = find_census_employee(subscriber_params)
 				person_details = create_person_details(subscriber_params)
+				organization = Organization.where(fein: data_row["FEIN"]).first
 				unless census_employee == nil
+					benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],
+																						 organization,census_employee)
 					employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
 					subscriber = employee_role.person
 					##  Give the subscriber the correct HBX ID.
@@ -146,6 +169,8 @@ CSV.foreach(filename, headers: :true) do |row|
 					hbx_enrollment.enrollment_kind = "open_enrollment"
 					hbx_enrollment.kind = data_row["Enrollment Kind"]
 					hbx_enrollment.effective_on = data_row["Benefit Begin Date"].to_date
+					hbx_enrollment.benefit_group_assignment_id = benefit_group_assignment._id
+					hbx_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
 					year = data_row["Plan Year"]
 					plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
 					hbx_enrollment.plan_id = plan._id
@@ -184,7 +209,7 @@ CSV.foreach(filename, headers: :true) do |row|
 		hbx_enrollment.plan_id = plan._id
 		hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
 		hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
-		if data_row["Plan Selected"] != nil
+		if data_row["Date Plan Selected"] != nil
 			hbx_enrollment.submitted_at = data_row["Date Plan Selected"].to_time
 		else
 			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_time
