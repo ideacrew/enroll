@@ -26,17 +26,22 @@ def select_benefit_group_assignment(correct_benefit_group,benefit_group_assignme
 	end
 end
 
-def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
-	benefit_group_assignments = census_employee.benefit_group_assignments
+def get_all_benefit_groups(organization)
 	all_benefit_groups = []
 	organization.employer_profile.plan_years.each do |plan_year|
 		plan_year.benefit_groups.each do |benefit_group|
 			all_benefit_groups.push(benefit_group)
 		end
 	end
+	return all_benefit_groups
+end
+
+def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
+	benefit_group_assignments = census_employee.benefit_group_assignments
+	all_benefit_groups = get_all_benefit_groups(organization)
 	correct_benefit_group = select_benefit_group(benefit_group_title,all_benefit_groups)
 	correct_benefit_group_assignment = select_benefit_group_assignment(correct_benefit_group,benefit_group_assignments)
-	if correct_benefit_group_assignment = nil
+	if correct_benefit_group_assignment == nil
 		correct_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(correct_benefit_group,census_employee)
 	end # creates the correct benefit group assignment if it doesn't exist.
 	return correct_benefit_group_assignment
