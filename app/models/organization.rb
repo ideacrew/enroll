@@ -120,6 +120,10 @@ class Organization
 
   default_scope -> {order("legal_name ASC")}
 
+
+
+  scope :er_invoice_data_table_order, -> {reorder(:"employer_profile.plan_years.start_on".desc, :"legal_name".asc)}
+
   scope :employer_by_hbx_id, ->(employer_id) {
     where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
   }
@@ -135,6 +139,7 @@ class Organization
 
   scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
   scope :all_employers_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
+  scope :all_employers_non_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
   scope :all_employers_enrolled,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
 
 
@@ -167,7 +172,8 @@ class Organization
     search_rex = Regexp.compile(Regexp.escape(s_rex), true)
     {
       "$or" => ([
-        {"legal_name" => search_rex}
+        {"legal_name" => search_rex},
+        {"fein" => search_rex},
       ])
     }
   end
