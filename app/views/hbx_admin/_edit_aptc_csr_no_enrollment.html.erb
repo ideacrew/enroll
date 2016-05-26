@@ -9,11 +9,11 @@
       <%= f.hidden_field :family_id, value: @family.id %>
       <%= f.hidden_field :hbx_enrollment_id, value: @hbx.id if @hbx.present?%>
 
-      <%= render 'filter_header.html.erb'%>
+      <%= render 'global_filter_header.html.erb'%>
       <%= render 'household_level_info.html.erb'%>
       
       <span class="glyphicon glyphicon-info-sign"> </span> No Active Enrollment (Assistance Receiving) for <%=@current_year%><br />
-      <div align="right"><%= f.submit "Confirm", class: "btn btn-primary btn-lg" %></div>
+      <div align="right"><%= f.submit "Update", class: "btn btn-primary btn-lg" %></div>
     <% end %>
   </div>
 </div>

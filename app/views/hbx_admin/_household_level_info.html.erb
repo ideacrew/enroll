@@ -1,7 +1,7 @@
 <div class="panel panel-info">
   <div class="panel-heading">
     <h2 class="panel-title">
-      <span class="glyphicon glyphicon-home"></span>&nbsp;<b>Household</b>
+      <i class="fa fa-home" aria-hidden="true"><b> Household</b></i>
       <div style="float:right">
         <b>SLCSP :</b> <%=@slcsp_value%>
       </div>
@@ -9,17 +9,15 @@
   </div>
   <div class="panel-body">
 
-    <%#= render 'applied_aptc_ratio.html.erb', :applied_aptc_ratio_percent => 85 if @no_enrollment%>
-
     <table class="table table-border module edit-aptc-csr-table">
       <thead>
-        <th><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%=@current_year%></th>
+        <th><!-- <span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%#=@current_year%>< --></th>
         <% $months_array.each do |month| %>
           <th><%=month.capitalize%></th>
         <%end%>
         <th> </th>
         <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th>
-        <th></th>
+        <!-- <th></th> -->
       </thead>  
       <tbody>
         <%@household_info.keys.each do |attribute|%>
@@ -39,16 +37,16 @@
                   <%= select_tag "#{attribute.to_s}", options_for_select([ 100, 94, 87, 73 ], @csr_percent_as_integer)%>
               <%end%> 
             </td>
-            <td ></td>
+            <!-- <td ></td> -->
           </tr>
           <tr></tr>
         <%end%>
         <tr><td colspan = "16" class="aptc-csr-grid-separator"></td></tr>
         <tr>
-          <th colspan = "13">All Household Member(s)</th>
+          <th colspan = "13">Household Member(s)</th>
           <th></th>
           <th></th>
-          <th></th>
+          <!-- <th></th> -->
         </tr>
         <% @household_members.each do |person_id| %>
           <tr>
@@ -61,7 +59,7 @@
             </td>
             <td></td>
             <td></td>
-            <td></td>
+            <!-- <td></td> -->
           </tr>
         <%end%>
       </tbody> 

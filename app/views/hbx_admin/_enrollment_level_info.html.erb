@@ -2,28 +2,21 @@
   <div class="panel-heading">
     
     <h2 class="panel-title">
-      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse"><span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span><b>Enrollment <%=enrollment_count%></b> - Plan Name: <%=HbxEnrollment.find(hbx_id).plan.name%>   
-      <div style="float:right">
-        <b>Plan Premium :</b> <%=@plan_premium_for_enrollments[hbx_id]%>
-      </div>
+      <!-- <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse"><span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span><b>Enrollment <%#=enrollment_count%></b> - Plan Name: <%#=HbxEnrollment.find(hbx_id).plan.name%> -->
+      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse"><span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span><b>Plan: </b> <%=HbxEnrollment.find(hbx_id).plan.name%>   
+      <!-- <div style="float:right">
+        <b>Plan Premium :</b> <%#=@plan_premium_for_enrollments[hbx_id]%>
+      </div> -->
     </h2>
   </div>
   <div id="<%='enrollment_' + hbx_id.to_s%>" class="collapse in">
 
     <div class="panel-body">
 
-      <!-- APTC APPLIED PER ENROLLMENT -->
-      <div align = "right">
-        <table>
-         <head> 
-          <th>Applied APTC<%#=enrollment_count%>&nbsp;&nbsp;</th> 
-          <th></th>
-           <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px'%></th>
-         </head> 
-        <tr>  
-        <tr>
-        </table>  
-      </div>
+
+      <%= render 'enrollment_filter_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
+      <%#= render 'enrollment_level_info.html.erb', :hbx_id => enrollment_info_key.to_s, :hbx_values => enrollment_info_value, :enrollment_count => count%>
+
       <hr style="margin:  1px 1px;"/>
       <table class="table table-border module edit-aptc-csr-table">
         <thead>
