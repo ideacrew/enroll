@@ -111,6 +111,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
       allow(person3).to receive(:consumer_role).and_return(consumer_role3)
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
+      allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_family_relationships_satisfied?).and_return(true)
+
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(benefit_package).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_year)
