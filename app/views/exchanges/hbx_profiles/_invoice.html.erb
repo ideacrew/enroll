@@ -1,7 +1,13 @@
-<div>
+<!--<div>
   <%= link_to "All", "#", class: "btn btn-default" %>
   <%= link_to "Renewing", "#", class: "btn btn-default" %>
   <%= link_to "Non-Renewing", "#", class: "btn btn-default" %>
+</div>-->
+
+<div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
+       <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="Renewing">Renewing</label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="Non-Renewing">Non-Renewing</label>
 </div>
 <br><br>
 <div class="module">
@@ -16,7 +22,6 @@
       <th>Conversion</th>
       <th>EE Enrolled</th>
       <th>EE Remaining</th>
-      <th>Error</th>
     </tr>
     </thead>
     <tbody>
@@ -28,13 +33,24 @@
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function() {
     $('#ER-invoices-dataTable').DataTable( {
+      //"buttons": {['a','c']},
       "processing": true,
       "serverSide": true,
       "ordering" : false,
       "ajax": {
         url: "<%= employer_invoice_dt_exchanges_hbx_profiles_path(:format => :json) %>",
-        type: "GET"
+        type: "GET",
+        data: function ( d ) {
+          d.criteria = $('#ERInvoiceFilter-Group input:radio:checked').val();
+        }
       }
     } );
   });
+
+  $('#ERInvoiceFilter-Group').change(function() {
+      var table = $('#ER-invoices-dataTable').dataTable().api();
+      table.draw();
+  });
+
+
 </script>
