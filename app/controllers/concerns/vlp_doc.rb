@@ -23,7 +23,11 @@ module VlpDoc
     end
 
     if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
-      params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+      if params[:dependent].present?
+        params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+      else
+        params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+      end
       doc_params = params.require(source).permit(*vlp_doc_params_list)
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
       document = consumer_role.find_document(vlp_doc_attribute[:subject])
