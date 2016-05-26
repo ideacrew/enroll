@@ -1,4 +1,5 @@
 And /^Hbx admin should see the link of announcements and click$/ do
+  click_link 'Config'
   expect(page).to have_content("Announcements")
   click_link 'Announcements'
 end
