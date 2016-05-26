@@ -4,8 +4,8 @@ describe "shared/_tab_panel.html.erb" do
     render template: "shared/_tab_panel.html.erb"
   end
 
-  it "should display the link of announcement" do
-    expect(rendered).to have_selector('a', text: 'Announcements')
+  it "should not display the link of announcement" do
+    expect(rendered).not_to have_selector('a', text: 'Announcements')
   end
 end
 
