@@ -28,6 +28,9 @@ class BrokerRole
   field :languages_spoken, type: Array, default: ["en"]
   field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
+  field :license, type: Boolean
+  field :training, type: Boolean
+  field :carrier_appointments, type: Hash , default: {:aetna => nil, :carefirst => nil, :united_health_care => nil, :kaiser => nil}
 
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :favorite_general_agencies, cascade_callbacks: true
@@ -222,9 +225,14 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated] do 
+    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do 
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
+
+    event :toapplicant  do 
+      transitions from: :broker_agency_pending, to: :applicant, :guard => :is_primary_broker?
+    end
+
 
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
       transitions from: :broker_agency_pending, to: :active
@@ -293,6 +301,15 @@ class BrokerRole
 
   def notify_broker_denial
     UserMailer.broker_denied_notification(self).deliver_now
+  end
+
+  def notify_broker_pending
+    reasons = []
+    reasons << "License not completed" if !self.license
+    reasons << "Training not completed" if !self.training
+    unchecked_carriers = self.carrier_appointments.select { |k,v| k if v != "true"}
+    reasons << "Carrier Appointments not completed #{unchecked_carriers.keys.join(',')}"  unless unchecked_carriers.empty?
+    UserMailer.broker_pending_notification(self,reasons).deliver_now
   end
 
   def applicant?

@@ -44,6 +44,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
     elsif params['pending']
+      # binding.pry
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else

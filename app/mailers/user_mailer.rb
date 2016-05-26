@@ -74,4 +74,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def broker_pending_notification(broker_role,reasons)
+    mail({to: broker_role.email_address, subject: "Broker application pending"}) do |format|
+      format.html { render "broker_pending", :locals => { :applicant_name => broker_role.person.full_name , :reasons => reasons}}
+    end
+  end
 end
