@@ -26,7 +26,7 @@
 
 
 - if @market_kind == 'shop'
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-transparent' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
 
 
 - if step == 3 && !no_purchase

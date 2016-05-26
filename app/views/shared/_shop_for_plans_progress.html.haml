@@ -22,7 +22,7 @@
 
 - if show_waive
   - enrollment = @hbx_enrollment || @enrollment
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?))
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-transparent' if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?))
 - if step == 2 && !no_purchase
   - enrollment = @hbx_enrollment || @enrollment
   - disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled'

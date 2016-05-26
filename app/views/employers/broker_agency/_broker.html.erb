@@ -2,7 +2,7 @@
 <td> <%= broker.npn if broker %></td>
 
 <td>
-<%= link_to 'Select Broker', '#', data: {toggle: "modal", target: "#broker_confirm_#{broker.id}"}, class: 'btn btn-default btn-trans' %>
+<%= link_to 'Select Broker', '#', data: {toggle: "modal", target: "#broker_confirm_#{broker.id}"}, class: 'btn btn-default btn-transparent' %>
 
 <div class="modal fade" id="broker_confirm_<%= broker.id %>" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
   <div class="modal-dialog">
@@ -20,7 +20,7 @@
         </div>
         <div class="modal-footer">
           <%= submit_tag "Confirm", class: 'btn btn-primary btn-br mtz' %>
-          <button type="button" class="btn btn-default btn-trans" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default btn-transparent" data-dismiss="modal">Close</button>
         </div>
       <% end %>
     </div>

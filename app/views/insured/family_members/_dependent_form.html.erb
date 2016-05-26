@@ -128,7 +128,7 @@
     <div class="clearfix"></div>
     <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
       <% if !dependent.persisted? %>
-      <a href="#" class="btn btn-trans remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
+      <a href="#" class="btn btn-transparent remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
         Cancel
       </a>
       <% else %>
