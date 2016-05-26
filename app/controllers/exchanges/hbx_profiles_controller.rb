@@ -55,10 +55,28 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     employers = employers.er_invoice_data_table_order
 
+    employers = employers.skip(dt_query.skip).limit(dt_query.take)
+
+    datatable_payload = employers.map { |employer_invoice|
+      {
+        :invoice_id => ('<input type="checkbox" name="invoiceId" value="' + employer_invoice.id.to_s + '">'),
+        :fein => employer_invoice.fein,
+        :legal_name => employer_invoice.employer_profile.legal_name,
+        :state => employer_invoice.employer_profile.aasm_state.humanize,
+        :plan_year => employer_invoice.employer_profile.published_plan_year.try(:effective_date),
+        :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
+        :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
+        :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i
+      }
+    }
+
+
+
     @draw = dt_query.draw
     @total_records = all_employers.count
     @records_filtered = employers.count
-    @employers = employers.skip(dt_query.skip).limit(dt_query.take)
+    @employers = employers
+    @payload = datatable_payload
 
     render
   end

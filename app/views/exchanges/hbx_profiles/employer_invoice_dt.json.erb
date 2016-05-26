@@ -2,7 +2,7 @@
   "draw" : <%= @draw %>,
   "recordsTotal" : <%= @total_records %>,
   "recordsFiltered" : <%= @records_filtered %>,
-  "data" : [
-  <%= render partial: "employer_invoice", collection: @employers, spacer_template: "shared/json_array_spacer" %>
-]
+  "data" :
+  <%=  @payload.to_json.html_safe %>
+
 }
