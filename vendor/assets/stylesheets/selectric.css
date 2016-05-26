@@ -13,16 +13,17 @@
 .selectric {
   position: relative;
   height: 46px;
+  max-width: 99%;
 }
 .selectric .label {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 0 20px 0 2px;
   line-height: 43px;
   color: #444;
   height: 46px;
+  max-width: 75%;
 }
 .selectric .button {
   display: block;
