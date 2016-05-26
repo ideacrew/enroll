@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Exchanges::HbxProfilesController do
+RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -70,7 +70,7 @@ RSpec.describe Exchanges::HbxProfilesController do
       xhr :get, :inbox, id: hbx_profile.id
       expect(response).to have_http_status(:success)
     end
-    
+
   end
 
   describe "#create" do
