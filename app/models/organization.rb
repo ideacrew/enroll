@@ -122,7 +122,7 @@ class Organization
 
 
 
-  scope :er_invoice_data_table_order, -> {reorder(:"employer_profile.plan_years.start_on".desc, :"legal_name".asc)}
+  scope :er_invoice_data_table_order, -> {reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
 
   scope :employer_by_hbx_id, ->(employer_id) {
     where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
@@ -137,10 +137,12 @@ class Organization
   scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
 
 
-  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
-  scope :all_employers_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
-  scope :all_employers_non_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
-  scope :all_employers_enrolled,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
+  scope :all_employers_by_plan_year_start_on,    ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
+  scope :all_employers_renewing,                 ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
+  scope :all_employers_non_renewing,             ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
+  scope :all_employers_enrolled,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
+  scope :all_employers_not_applicant,             ->{ unscoped.where(:"employer_profile.aasm_state".ne => "applicant") }
+  scope :all_employers_applicant,                 ->{ unscoped.where(:"employer_profile.aasm_state" => "applicant") }
 
 
   def generate_hbx_id
