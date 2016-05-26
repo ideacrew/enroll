@@ -39,7 +39,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_invoice_dt
     dt_query = extract_datatable_parameters
     employers = []
-    all_employers = Organization.where(:employer_profile => {:$exists => 1})
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing
     if dt_query.search_string.blank?
       employers = all_employers
     else
@@ -53,7 +53,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       employers = employers.all_employers_non_renewing
     end
 
-    employers = employers.all_employers_not_applicant.er_invoice_data_table_order + employers.all_employers_applicant.er_invoice_data_table_order
+    employers = employers.all_employers_not_applicant.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
 
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
@@ -78,7 +78,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @draw = dt_query.draw
     @total_records = all_employers.count
-    @records_filtered = employers.count
+    @records_filtered = all_employers.count#employers.count
     @employers = employers
     @payload = datatable_payload
 
