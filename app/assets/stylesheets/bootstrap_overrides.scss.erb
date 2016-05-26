@@ -109,6 +109,55 @@ fieldset[disabled] .btn-primary.active {
   background-color: #fff;
 }
 
+.btn-default {
+  color: $secondary-button-text;
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+  text-transform: $secondary-button-text-casing;
+  font-weight: $primary-bold;
+}
+.btn-default:hover,
+.btn-default:focus,
+.btn-default.focus,
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+  color: $secondary-button-text;
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+}
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+  background-image: none;
+}
+.btn-default.disabled,
+.btn-default[disabled],
+fieldset[disabled] .btn-default,
+.btn-default.disabled:hover,
+.btn-default[disabled]:hover,
+fieldset[disabled] .btn-default:hover,
+.btn-default.disabled:focus,
+.btn-default[disabled]:focus,
+fieldset[disabled] .btn-default:focus,
+.btn-default.disabled.focus,
+.btn-default[disabled].focus,
+fieldset[disabled] .btn-default.focus,
+.btn-default.disabled:active,
+.btn-default[disabled]:active,
+fieldset[disabled] .btn-default:active,
+.btn-default.disabled.active,
+.btn-default[disabled].active,
+fieldset[disabled] .btn-default.active {
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+}
+.btn-default .badge {
+  color: #337ab7;
+  background-color: $secondary-button-background;
+}
+
+
 .label-info {
   background-color: #007bc4;
 }

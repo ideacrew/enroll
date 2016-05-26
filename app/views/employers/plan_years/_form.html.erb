@@ -48,8 +48,8 @@
 
               <div class="col-xs-6">
                 <div class="row">
-              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width abg' %>
-              <a href="#" class="btn btn-transparent remove_fields">Remove Benefit Group</a>
+              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-default pull-left xs_full_width abg' %>
+              <a href="#" class="btn btn-default remove_fields">Remove Benefit Group</a>
             </div></div>
             <div class="col-xs-6">
               <div class="row">
@@ -60,7 +60,7 @@
                 <button class="btn btn-primary pull-right btn-br btn-right mtz disabled plan-year-primary" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>">
                   <%= "#{button_name}".html_safe %>
                 </button> &nbsp;&nbsp;
-              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-transparent pull-right' %>
+              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-default pull-right' %>
             </div>
             </div>
 
