@@ -53,7 +53,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       employers = employers.all_employers_non_renewing
     end
 
-    employers = employers.all_employers_renewing.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
+    employers = employers.all_employers_renewing_published.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
 
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
