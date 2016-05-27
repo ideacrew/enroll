@@ -53,7 +53,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       employers = employers.all_employers_non_renewing
     end
 
-    employers = employers.all_employers_not_applicant.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
+    employers = employers.all_employers_renewing.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
 
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
@@ -67,7 +67,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         #:legal_name => employer_invoice.employer_profile.legal_name,
         :legal_name => (view_context.link_to employer_invoice.legal_name, employers_employer_profile_path(employer_invoice)),
         :state => employer_invoice.employer_profile.aasm_state.humanize,
-        :plan_year => employer_invoice.employer_profile.published_plan_year.try(:effective_date).to_s,
+        :plan_year => employer_invoice.employer_profile.renewing_published_plan_year.try(:effective_date).to_s,
         :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
         :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i
