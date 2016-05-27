@@ -60,6 +60,9 @@ class Employers::PremiumStatementsController < ApplicationController
     end
   end
 
+  def mm2pt(mm)
+    return mm * (72 / 25.4)
+  end
   def pdf_for(hbx_enrollments)
     enrollment_summary = hbx_enrollments.inject({}) do |hash,enrollment| 
       if hash.include?(enrollment.plan.name)
@@ -89,9 +92,12 @@ class Employers::PremiumStatementsController < ApplicationController
     initialmove_y = 25
     address_x = 15
     lineheight_y = 12
-    font_size = 12
-  
-    @pdf.font "Helvetica"
+    font_size = 11
+    address_x_pos = mm2pt(21.83)
+    address_y_pos = 790.86 - mm2pt(57.15) - 65
+    mpi_x_pos = mm2pt(6.15)
+    mpi_y_pos = 57
+    @pdf.font "Times-Roman"
     @pdf.font_size font_size
 
     invoice_header_x = 275
@@ -99,11 +105,32 @@ class Employers::PremiumStatementsController < ApplicationController
     logo_x = 360
     cheque_amount_path_x = 350
 
+    last_measured_y = @pdf.cursor
+    @pdf.move_cursor_to @pdf.bounds.height
+    @pdf.move_cursor_to last_measured_y
+
+    @pdf.text_box "DC Health Link", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.move_down lineheight_y
+    @pdf.text_box "PO Box 97022", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.move_down lineheight_y
+    @pdf.text_box "Washington, DC 20090", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.move_down lineheight_y
+
+    address = @employer_profile.try(:organization).try(:office_locations).first.address 
+    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x_pos, address_y_pos]
+    if address
+      @pdf.text_box "#{address.address_1}, #{address.address_2}", :at => [address_x_pos, address_y_pos-12]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x_pos, address_y_pos-24]
+    end
+    @pdf.text_box "MPI_Cover", :at => [mpi_x_pos,  mpi_y_pos]
+
+    @pdf.start_new_page
+
     @pdf.move_down 36
     #Image
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
     invoice_header_data = [ 
-      ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
+      ["ACCOUNT NUMBER:", "100101"],
       ["INVOICE NUMBER:", "123123"],
       ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
       ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
@@ -113,14 +140,13 @@ class Employers::PremiumStatementsController < ApplicationController
 
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
     
-    @pdf.move_down 40
+    @pdf.move_down 60
 
     address = @employer_profile.try(:organization).try(:office_locations).first.address 
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 585]
     if address
-      @pdf.text_box "#{address.address_1}", :at => [address_x, 573]
-      @pdf.text_box "#{address.address_2}", :at => [address_x, 561]
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 549]
+      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 573]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 561]
     end
     
     @pdf.move_down 24
@@ -138,12 +164,8 @@ class Employers::PremiumStatementsController < ApplicationController
     @pdf.text_box "Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
-    stroke_dashed_horizontal_line(10, 250)
-    
-    @pdf.move_down 36
-    
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
-
+    stroke_dashed_horizontal_line(10, 250)
     @pdf.move_down 36
 
     @pdf.image logopath, :width => 150, :at => [logo_x, @pdf.cursor]
@@ -164,9 +186,7 @@ class Employers::PremiumStatementsController < ApplicationController
       @pdf.move_down lineheight_y
       @pdf.text_box "#{address.address_1}", :at => [address_x, 60]
       @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.address_2}", :at => [address_x, 48]
-      @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 36]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 48]
     end
 
 
@@ -204,7 +224,7 @@ class Employers::PremiumStatementsController < ApplicationController
       
       @pdf.image logopath, :width => 150
 
-      @pdf.move_down 48
+      @pdf.move_down lineheight_y
       @pdf.text_box "Carrier Plan Summary", :align => :center, :style => :bold, :at => [address_x, @pdf.cursor]
 
       @pdf.move_down 24
@@ -233,6 +253,26 @@ class Employers::PremiumStatementsController < ApplicationController
       @pdf.text "$#{summary['total_premium']}", :align => :right, :style => :bold
 
     end
+
+    @pdf.page_count.times do |i|
+      next if i < 2
+      @pdf.go_to_page(i+1)
+      @pdf.font_size 9
+      @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
+        @pdf.text_box "Questions? Call DC Health Link Customer Service at 855-532-5465, go online to http://www.dchealthlink.com/, or contact your broker.", :at => [address_x, @pdf.bounds.height - 10], :align => :center
+      }
+    end
+
+
+    @pdf.page_count.times do |i|
+      next if i < 1
+      @pdf.go_to_page(i+1)
+      @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
+        @pdf.text_box "Page #{i} of #{@pdf.page_count - 1}", :color => "#999999",:at => [455, @pdf.bounds.height - 30]
+        # @pdf.draw_text "#{Time.now.strftime("%B %d, %Y")}" ,:at => [455, @pdf.bounds.height - 20]
+      }
+    end
+
     @pdf
   end
 
