@@ -60,7 +60,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    @records_filtered = all_employers.count - employers.count
+    @records_filtered = is_search ? all_employers.count - employers.count : all_employers.count
 
     employers = employers.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
     array_from = dt_query.skip.to_i
