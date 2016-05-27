@@ -229,29 +229,31 @@ class EmployerProfile
     end
   end
 
-  def billing_plan_year(billing_report_date = nil)
-
+  def billing_plan_year(billing_date = nil)
+    billing_report_date = billing_date
     billing_report_date = TimeKeeper.date_of_record.next_month if billing_report_date.blank?
+
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
+    if billing_date.blank?
+      if plan_year.blank?
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+          billing_report_date = plan_year.start_on
+        end
+      end
 
-    # if plan_year.blank?
-    #   if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
-    #     billing_report_date = plan_year.start_on
-    #   end
-    # end
+      if plan_year.blank?
+        if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
+          billing_report_date = TimeKeeper.date_of_record
+        end
+      end
 
-    # if plan_year.blank?
-    #   if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
-    #     billing_report_date = TimeKeeper.date_of_record
-    #   end
-    # end
-
-    # if plan_year.blank? 
-    #   if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
-    #     billing_report_date = plan_year.start_on
-    #   end
-    # end
+      if plan_year.blank? 
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+          billing_report_date = plan_year.start_on
+        end
+      end
+    end
 
     return plan_year, billing_report_date
   end

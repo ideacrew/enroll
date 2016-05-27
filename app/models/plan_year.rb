@@ -78,18 +78,30 @@ class PlanYear
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
       :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-    }).limit(100) # limit census employees to 100 due to performance reasons
+      }).limit(100)
 
     families.inject([]) do |enrollments, family|
-
       valid_enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
-        :"effective_on".lte => date.end_of_month,
-        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+        :effective_on.lte => date.end_of_month,
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
       }).order_by(:'submitted_at'.desc)
 
-      enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
-      enrollments << valid_enrollments.where({:coverage_kind => 'dental'}).first
+      health_enrollments = valid_enrollments.where({:coverage_kind => 'health'})
+      dental_enrollments = valid_enrollments.where({:coverage_kind => 'dental'})
+
+      coverage_filter = lambda do |enrollments, date|
+        enrollments = enrollments.select{|e| e.terminated_on.blank? || e.terminated_on >= date}
+        
+        if enrollments.size > 1
+          enrollments.detect{|e| HbxEnrollment::ENROLLED_STATUSES.include?(e.aasm_state)}
+        else
+          enrollments.first
+        end
+      end
+
+      enrollments << coverage_filter.call(health_enrollments, date)
+      enrollments << coverage_filter.call(dental_enrollments, date)
     end.compact
   end
 
@@ -320,7 +332,7 @@ class PlanYear
 
   # Any employee who selected or waived coverage
   def enrolled
-    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage? }
+    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
   def total_enrolled_count
@@ -855,6 +867,8 @@ private
         "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
+    return if active?
+
     if is_renewing?
       if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
        errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
@@ -864,7 +878,6 @@ private
        errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
       end
     end
-
 
   end
 end
