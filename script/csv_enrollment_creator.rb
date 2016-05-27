@@ -240,6 +240,7 @@ CSV.foreach(filename, headers: :true) do |row|
 		else
 			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
 		end
+		hbx_enrollment.aasm_state = "coverage_selected"
 		hbx_enrollment.save
 		hbx_enrollment_member = HbxEnrollmentMember.new
 		hbx_enrollment_member.is_subscriber = true
