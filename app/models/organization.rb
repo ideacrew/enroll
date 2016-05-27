@@ -139,7 +139,7 @@ class Organization
 
   scope :all_employers_by_plan_year_start_on,    ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
   scope :all_employers_renewing,                 ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
-  scope :all_employers_renewing_published,                 ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
+  scope :all_employers_renewing_published,       ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
   scope :all_employers_non_renewing,             ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
   scope :all_employers_enrolled,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
   scope :all_employers_not_applicant,             ->{ unscoped.where(:"employer_profile.aasm_state".ne => "applicant") }
