@@ -120,6 +120,14 @@ class Family
 
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
+  
+  scope :all_active_assistance_receiving_for_current_year, ->{ unscoped.where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
+                                                                        :"households.tax_households.eligibility_determinations.determined_at".desc).and(
+                                                                        :"households.tax_households.effective_ending_on" => nil ).and(
+                                                                        :"households.tax_households.effective_starting_on".gte => Date.new(TimeKeeper.date_of_record.year)).and(
+                                                                        :"households.tax_households.effective_starting_on".lte => Date.new(TimeKeeper.date_of_record.year).end_of_year)
+                                                      }
+
   scope :active_assistance_receiving,   ->{ all_assistance_receiving.where(:"households.tax_households.effective_ending_on" => nil) }
   scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
 

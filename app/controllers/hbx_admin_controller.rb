@@ -19,9 +19,13 @@ class HbxAdminController < ApplicationController
     @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs)
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
-    @max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+    
+    @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+    #@max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+    @max_aptc = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:max_aptc)
 
-    @csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
+    #@csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
+    @csr_percent_as_integer = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:csr_percent_as_integer)
     respond_to do |format|
       format.js { render (@no_enrollment ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
       #format.js { render "edit_aptc_csr", person: @person, person_has_active_enrollment: @person_has_active_enrollment}

@@ -68,3 +68,4 @@
   </div>
 </div>
 
+<%if @active_tax_household_for_current_year.nil? %><span class="glyphicon glyphicon-info-sign"> </span> No Active Tax Household for <%=@current_year%><br /><%end%>

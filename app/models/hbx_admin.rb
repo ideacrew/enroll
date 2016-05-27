@@ -32,6 +32,7 @@ class HbxAdmin
 
     #   AVAILABLE APTC
     def update_available_aptc_hash_for_month(available_aptc_hash, month, ed, family, applied_aptcs_array=nil, max_aptc=nil, member_ids=nil)
+      available_aptc = 0
       first_of_month_num_current_year = first_of_month_converter(month)
       ## Populate IDs of all members in member_ids for now because we dont allow the changing of eligibility on an individual basis. all are eligible.
       member_ids = HbxAdmin.build_eligible_members(family)
@@ -299,9 +300,9 @@ class HbxAdmin
 
     def build_eligible_members(family, member_ids=nil)
       return member_ids if member_ids.present?
-
       eligible_members = Array.new
       tax_household_members = family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
+      return [] if tax_household_members.nil?
       tax_household_members.each do |member|
         if member.is_ia_eligible
           eligible_members << member.person.id.to_s
