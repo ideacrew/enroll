@@ -9,6 +9,11 @@ FactoryGirl.define do
     trait :with_primary_family_member do
       family_members { [FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person)] }
     end
+
+    after :create do |f, evaluator|
+      f.households.first.add_household_coverage_member(f.family_members.first)
+      f.save
+    end
   end
 end
 
