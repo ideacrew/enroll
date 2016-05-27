@@ -1,0 +1,167 @@
+$primary-blue: #007bc4;
+$primary-white: #ffffff;
+$primary-green: #69A30D;
+$primary-black: #5C5C5C;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+$primary-gray: #b7b7b7;
+$background-hover: #eeeeee;
+$primary-bold: 600;
+
+.text-muted {
+  color: $primary-gray;
+}
+
+.navbar {
+  margin-bottom: 0;
+  background-color: $primary-white;
+  border-bottom: 3px solid #007bc4;
+  .navbar-header {
+    .navbar-brand {
+      border-right: solid 1px #d7d7d7;
+      min-height: 70px;
+      img {
+        max-height: 40px;
+      }
+    }
+  }
+  .navbar-collapse {
+    .header-text {
+      color: $primary-gray;
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: $primary-bold;
+    }
+    .navbar-nav:first-of-type {
+      a.portal {
+        text-align: center;
+        vertical-align: middle;
+        line-height: 70px;
+        padding: 23px 15px;
+        font-weight: 600;
+        color: $primary-black;
+        &:hover {
+          background-color: $background-hover;
+        }
+      }
+    }
+    .navbar-right {
+      li:last-of-type {
+        text-align: right;
+      }
+      a.call-customer-service {
+        span:first-of-type {}
+        span:last-of-type {
+          .fa {
+            color: $primary-blue;
+          }
+          strong {
+            line-height: 0;
+            font-size: 16px;
+            color: $primary-black;
+          }
+        }
+      }
+      .my-portal-links {
+        min-height: 70px;
+        padding: 15px 15px;
+        display: block;
+        border-left: solid 1px #d7d7d7;
+        .users-name {
+          color: $primary-black;
+        }
+      }
+    }
+  }
+
+.label-info {
+  background-color: #007bc4;
+}
+.label-info[href]:hover,
+.label-info[href]:focus {
+  background-color: #007bc4;
+}
+
+.label-danger {
+  background-color: #e72b2d;
+}
+.label-danger[href]:hover,
+.label-danger[href]:focus {
+  background-color: #e72b2d;
+}
+
+.label-success {
+  background-color: $primary-green;
+}
+.label-success[href]:hover,
+.label-success[href]:focus {
+  background-color: $primary-green;
+}
+.btn {
+  border-radius: 4px;
+}
+.btn-success {
+  background-color: $primary-green;
+  border-color: #3e8f3e;
+}
+.btn-success:hover,
+.btn-success:focus {
+  background-color: #419641;
+  background-position: 0 -15px;
+  border-color: #419641;
+}
+.btn-success:active,
+.btn-success.active {
+  background-color: #419641;
+  border-color: $primary-green;
+}
+.btn-success:disabled,
+.btn-success[disabled] {
+  background-color: #419641;
+  background-image: none;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #e72b2d;
+}
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger.focus,
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #c9302c;
+}
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+  background-image: none;
+}
+.btn-danger.disabled,
+.btn-danger[disabled],
+fieldset[disabled] .btn-danger,
+.btn-danger.disabled:hover,
+.btn-danger[disabled]:hover,
+fieldset[disabled] .btn-danger:hover,
+.btn-danger.disabled:focus,
+.btn-danger[disabled]:focus,
+fieldset[disabled] .btn-danger:focus,
+.btn-danger.disabled.focus,
+.btn-danger[disabled].focus,
+fieldset[disabled] .btn-danger.focus,
+.btn-danger.disabled:active,
+.btn-danger[disabled]:active,
+fieldset[disabled] .btn-danger:active,
+.btn-danger.disabled.active,
+.btn-danger[disabled].active,
+fieldset[disabled] .btn-danger.active {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+.btn-danger .badge {
+  color: #d9534f;
+  background-color: #fff;
+}
