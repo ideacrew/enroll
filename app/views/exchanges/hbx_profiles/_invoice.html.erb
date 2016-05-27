@@ -42,6 +42,7 @@
         url: "<%= employer_invoice_dt_exchanges_hbx_profiles_path(:format => :json) %>",
         type: "GET",
         data: function ( d ) {
+          console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
           d.criteria = $('#ERInvoiceFilter-Group input:radio:checked').val();
         }
       },
