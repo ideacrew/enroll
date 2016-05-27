@@ -90,7 +90,8 @@ module Importers
 
     def select_most_common_plan(available_plans, most_expensive_plan)
         if !most_common_hios_id.blank?
-          found_single_plan = available_plans.detect { |pl| pl.hios_id == most_common_hios_id.strip }
+          mc_hios = most_common_hios_id.strip
+          found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01" }
           return found_single_plan if found_single_plan
           warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
         else
@@ -104,7 +105,8 @@ module Importers
       most_expensive_plan = plans_by_cost.last
       if (plan_selection == "single_plan")
         if !single_plan_hios_id.blank?
-          found_single_plan = available_plans.detect { |pl| pl.hios_id == single_plan_hios_id.strip }
+          sp_hios = single_plan_hios_id.strip
+          found_single_plan = available_plans.detect { |pl| (pl.hios_id == sp_hios) || (pl.hios_id == "#{sp_hios}-01") }
           return found_single_plan if found_single_plan
           warnings.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group defaulting to most common plan")
         else
