@@ -45,7 +45,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_invoice_dt
     dt_query = extract_datatable_parameters
     employers = []
-    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
+    all_employers = Organization.where(:employer_profile => {:$exists => 1})#.all_employers_renewing_published
     is_search = false
     if dt_query.search_string.blank?
       employers = all_employers
@@ -56,7 +56,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
 
     if !params[:criteria].blank? && params[:criteria] != "All"
-      employers = employers.all_employers_by_plan_year_start_on(params[:criteria])
+      employers = employers.all_employers_by_plan_year_start_on(Date.strptime(params[:criteria],"%m/%d/%Y"))
       is_search = true
     end
 
@@ -72,7 +72,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         #:legal_name => employer_invoice.employer_profile.legal_name,
         :legal_name => (view_context.link_to employer_invoice.legal_name, employers_employer_profile_path(employer_invoice)),
         :state => employer_invoice.employer_profile.aasm_state.humanize,
-        :plan_year => employer_invoice.employer_profile.renewing_published_plan_year.try(:effective_date).to_s,
+        :plan_year => employer_invoice.employer_profile.latest_plan_year.try(:effective_date).to_s,
         :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
         :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i
