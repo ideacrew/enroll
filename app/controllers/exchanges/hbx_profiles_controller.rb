@@ -30,6 +30,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def employer_invoice
+
+    @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
+    @next_60_day = @next_30_day.next_month
+    @next_90_day = @next_60_day.next_month
+
+
     respond_to do |format|
       format.html
       format.js
@@ -40,25 +46,24 @@ class Exchanges::HbxProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
     employers = []
     all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
+    is_search = false
     if dt_query.search_string.blank?
       employers = all_employers
     else
       employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
       employers = all_employers.where({:id => {"$in" => employer_ids}})
+      is_search = true
     end
 
-    if params[:criteria] == "Renewing"
-      employers = employers.all_employers_renewing_published
-    elsif params[:criteria] == "Non-Renewing"
-      employers = employers.all_employers_non_renewing
+    if !params[:criteria].blank?
+      employers = employers.all_employers_by_plan_year_start_on(params[:criteria])
+      is_search = true
     end
 
     employers = employers.all_employers_renewing_published.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
-
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
     employers = employers[array_from..array_to]
-
 
     datatable_payload = employers.map { |employer_invoice|
       {
@@ -78,7 +83,12 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @draw = dt_query.draw
     @total_records = all_employers.count
-    @records_filtered = all_employers.count#employers.count
+
+    if is_search
+      @records_filtered = employers.count
+    else
+      @records_filtered = all_employers.count
+    end
     @employers = employers
     @payload = datatable_payload
 

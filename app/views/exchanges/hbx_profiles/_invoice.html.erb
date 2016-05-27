@@ -6,8 +6,9 @@
 
 <div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
        <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
-       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="Renewing">Renewing</label>
-       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="Non-Renewing">Non-Renewing</label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_30_day.to_s %>"><%= @next_30_day.to_s %></label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_60_day.to_s %>"><%= @next_60_day.to_s %></label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_90_day.to_s %>"><%= @next_90_day.to_s %></label>
 </div>
 <br><br>
 <div class="module">
