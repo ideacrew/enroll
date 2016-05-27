@@ -112,50 +112,33 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:person) { FactoryGirl.build_stubbed(:person)}
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-    let(:hbx_enrollment1) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
-    let(:hbx_enrollment2) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
-    let(:hbx_enrollment3) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
-    let(:hbx_enrollment4) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
-    
-    it "should return true" do
-      allow(hbx_enrollment1).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment2).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment3).to receive(:is_shop?).and_return(false)
-      hbx_enrollment1.aasm_state = "coverage_selected"
-      hbx_enrollment2.aasm_state = "coverage_canceled"
-      hbx_enrollment3.aasm_state = "coverage_terminated"
-      expect(helper.display_aasm_state?(hbx_enrollment1)).to eq true
-      expect(helper.display_aasm_state?(hbx_enrollment2)).to eq true
-      expect(helper.display_aasm_state?(hbx_enrollment3)).to eq true
-      
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
+
+    context "IVL market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      end
+      states.each do |status|
+        it "returns #{show_for_ivl.include?(status)} for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq show_for_ivl.include?(status)
+        end
+      end
     end
 
-    it "should return false" do
-      allow(hbx_enrollment1).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment2).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment3).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment4).to receive(:is_shop?).and_return(false)
-      hbx_enrollment1.aasm_state = "shopping"
-      hbx_enrollment2.aasm_state = "inactive"
-      hbx_enrollment3.aasm_state = "unverified"
-      hbx_enrollment4.aasm_state = "coverage_enrolled"
-      expect(helper.display_aasm_state?(hbx_enrollment1)).to be_falsey
-      expect(helper.display_aasm_state?(hbx_enrollment2)).to be_falsey
-      expect(helper.display_aasm_state?(hbx_enrollment3)).to be_falsey
-      expect(helper.display_aasm_state?(hbx_enrollment4)).to be_falsey
-    end  
-
-
-    it "should return true for any shop enrollment" do
-      hbx_enrollment1.aasm_state = "shopping"
-      hbx_enrollment2.aasm_state = "inactive"
-      hbx_enrollment3.aasm_state = "unverified"
-      hbx_enrollment4.aasm_state = "coverage_enrolled"
-      expect(helper.display_aasm_state?(hbx_enrollment1)).to eq true
-      expect(helper.display_aasm_state?(hbx_enrollment2)).to eq true
-      expect(helper.display_aasm_state?(hbx_enrollment3)).to eq true
-      expect(helper.display_aasm_state?(hbx_enrollment4)).to eq true
+    context "SHOP market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      end
+      states.each do |status|
+        it "returns true for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq true
+        end
+      end
     end
   end
 end
