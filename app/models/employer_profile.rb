@@ -230,9 +230,7 @@ class EmployerProfile
   end
 
   def billing_plan_year(billing_date = nil)
-    billing_report_date = billing_date
-    billing_report_date = TimeKeeper.date_of_record.next_month if billing_report_date.blank?
-
+    billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
     if billing_date.blank?

@@ -362,11 +362,7 @@ class CensusEmployee < CensusMember
     bg_assignment = active_benefit_group_assignment if benefit_group_ids.include?(active_benefit_group_assignment.try(:benefit_group_id))
     bg_assignment = renewal_benefit_group_assignment if benefit_group_ids.include?(renewal_benefit_group_assignment.try(:benefit_group_id))
 
-    if bg_assignment.present?
-      HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
-    else
-      false
-    end
+    bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
   class << self
