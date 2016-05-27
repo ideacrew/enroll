@@ -2,7 +2,44 @@ $primary-blue: #007bc4;
 $primary-green: #69A30D;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
+$primary-white: #fff;
+$primary-black: #333;
+
 .module {
+  &.footer {
+    font-size: 14px;
+    color: $primary-white;
+    background-color: #003260;
+    padding: 15px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    a {
+      color: $primary-white;
+    }
+    &>.container {
+      display: table;
+      .col-md-6 {
+        display: table-cell;
+        float: none;
+        vertical-align: middle;
+      }
+      .col-md-6:last-of-type {
+        a, span {
+          display: inline-block;
+        }
+        ul {
+          margin: 0;
+        }
+      }
+    }
+  }
+  &.welcome {
+    h1 {
+      color: $primary-black;
+    }
+  }
   &.update-browser-warning {
     color: #000;
     position: relative;
