@@ -85,7 +85,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @total_records = all_employers.count
 
     if is_search
-      @records_filtered = employers.count
+      @records_filtered = all_employers.count - employers.count
     else
       @records_filtered = all_employers.count
     end
