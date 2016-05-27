@@ -77,7 +77,7 @@ class PlanYear
     id_list = benefit_groups.collect(&:_id).uniq
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
-      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
     }).limit(100) # limit census employees to 100 due to performance reasons
 
     families.inject([]) do |enrollments, family|
@@ -85,7 +85,7 @@ class PlanYear
       valid_enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
         :"effective_on".lte => date.end_of_month,
-        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
       }).order_by(:'submitted_at'.desc)
 
       enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
