@@ -60,6 +60,8 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
+    @records_filtered = employers.count
+
     employers = employers.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
@@ -84,11 +86,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @draw = dt_query.draw
     @total_records = all_employers.count
 
-    if is_search
-      @records_filtered = all_employers.count - employers.count
-    else
-      @records_filtered = all_employers.count
-    end
     @employers = employers
     @payload = datatable_payload
 
