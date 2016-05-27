@@ -78,6 +78,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/verifications_backlog_notice',
         notice_builder: 'IvlNotices::ConsumerNotice',
+        mpi_indicator: 'MPI_5B',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
