@@ -39,7 +39,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_invoice_dt
     dt_query = extract_datatable_parameters
     employers = []
-    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
     if dt_query.search_string.blank?
       employers = all_employers
     else
@@ -48,7 +48,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
 
     if params[:criteria] == "Renewing"
-      employers = employers.all_employers_renewing
+      employers = employers.all_employers_renewing_published
     elsif params[:criteria] == "Non-Renewing"
       employers = employers.all_employers_non_renewing
     end
