@@ -45,7 +45,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_invoice_dt
     dt_query = extract_datatable_parameters
     employers = []
-    all_employers = Organization.where(:employer_profile => {:$exists => 1})#.all_employers_renewing_published
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
     is_search = false
     if dt_query.search_string.blank?
       employers = all_employers
