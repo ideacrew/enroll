@@ -23,7 +23,7 @@ $(document).on('click', "a#calculate_available_aptc", function(){
   if (!isNaN(csr_percentage) && !isNaN(max_aptc)){
     $.ajax({
       type: "GET",
-      //data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, applied_aptcs_array: applied_aptcs_array, hbx_enrollment_id: hbx_enrollment_id,  aptc_applied: aptc_applied,  member_ids: member_ids},
+      //data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, applied_aptcs_array: applied_aptcs_array, member_ids: member_ids},
       data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, applied_aptcs_array: applied_aptcs_array},
       url: "/hbx_admin/calculate_aptc_csr"
     });
@@ -31,7 +31,8 @@ $(document).on('click', "a#calculate_available_aptc", function(){
 });
 
 // RESET
-$(document).on('click', "a#reset_aptc_changes", function(){
+//$(document).on('click', "a#reset_aptc_changes", function(){
+function resetFormData()  { 
   var person_id = $("#person_person_id").val();
   var family_id = $("#person_family_id").val();
   $.ajax({
@@ -39,7 +40,8 @@ $(document).on('click', "a#reset_aptc_changes", function(){
     data:{person_id: person_id, family_id: family_id},
     url: "/hbx_admin/edit_aptc_csr"
   });
-});
+} 
+//});
 
 // Compute Applied APTC when the slider ratio changes.
 function computeAppliedAPTC(hbx_id_for_slider, aptc_ratio, max_aptc) {
@@ -71,7 +73,8 @@ function computePercentageAndSliderRatio(hbx_id, applied_aptc_amount, max_aptc) 
 // explicitly return public methods when this object is instantiated
 return {
   computeAppliedAPTC : computeAppliedAPTC,
-  computePercentageAndSliderRatio : computePercentageAndSliderRatio
+  computePercentageAndSliderRatio : computePercentageAndSliderRatio,
+  resetFormData : resetFormData
 };
 
 } )( window );

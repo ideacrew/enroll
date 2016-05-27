@@ -18,12 +18,12 @@ module HbxAdminHelper
   	hbx_enrollment_members = hbx.hbx_enrollment_members
   	aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
   	hbx_enrollment_members.each do |hem|
-    	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s] * max_aptc_for_household)
+    	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
   	end
-  	if max_aptc_for_enrollment > max_aptc_for_household
-  		max_aptc_for_household
+  	if max_aptc_for_enrollment > max_aptc_for_household.to_f
+  		max_aptc_for_household.to_f
   	else
-  		max_aptc_for_enrollment
+  		max_aptc_for_enrollment.to_f
   	end
   end
 

@@ -328,7 +328,7 @@ class HbxAdmin
       hbxs.each do |hbx|
         if applied_aptcs_array.present?
           applied_aptcs_array.each do |app_aptc|
-            current_aptc_applied_hash[hbx.id.to_s] =  app_aptc[1]["aptc_applied"].to_f if hbx.id.to_s == app_aptc[1]["hbx_id"].gsub("aptc_applied_","") 
+            current_aptc_applied_hash[hbx.id.to_s] =  '%.2f' % app_aptc[1]["aptc_applied"].to_f if hbx.id.to_s == app_aptc[1]["hbx_id"].gsub("aptc_applied_","") 
           end          
         else
           current_aptc_applied_hash[hbx.id.to_s] = (hbx.applied_aptc_amount || 0)

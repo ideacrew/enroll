@@ -29,7 +29,7 @@
       <td style="text-align:center"><%=max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc)%></td>
       <th></th>
       <th>Applied APTC &nbsp;&nbsp;</th>
-      <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px', onkeyup: "computePercentageAndSliderRatio('#{hbx_id}', this.value, #{@max_aptc} )"%></th>
+      <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px', onkeyup: "APTCModule.computePercentageAndSliderRatio('#{hbx_id}', this.value, #{@max_aptc} )"%></th>
     </tr>
    </head> 
   <tr>

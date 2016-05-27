@@ -49,6 +49,8 @@ class HbxAdminController < ApplicationController
     @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs, params[:applied_aptcs_array])
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
+    @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+    
     @max_aptc = ('%.2f' % params[:max_aptc]) || @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc    
     @csr_percent_as_integer = params[:csr_percentage] || @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
 
