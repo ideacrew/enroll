@@ -67,6 +67,7 @@ describe "employers/premium_statements/show.js.erb" do
     assign :current_plan_year, current_plan_year
     assign :hbx_enrollments, hbx_enrollments
     assign :employer_profile, employer_profile
+    assign :billing_date, TimeKeeper.date_of_record.beginning_of_month
     render file: "employers/premium_statements/show.js.erb"
   end
 
