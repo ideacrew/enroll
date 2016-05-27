@@ -55,12 +55,12 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    if !params[:criteria].blank?
+    if !params[:criteria].blank? && params[:criteria] != "All"
       employers = employers.all_employers_by_plan_year_start_on(params[:criteria])
       is_search = true
     end
 
-    employers = employers.all_employers_renewing_published.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
+    employers = employers.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
     employers = employers[array_from..array_to]
