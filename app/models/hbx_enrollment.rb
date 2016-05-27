@@ -290,20 +290,20 @@ class HbxEnrollment
 
   def cancel_previous(year)
 
-    #Perform cancel of previous enrollments for the same plan year
+    #Perform cancel/terms of previous enrollments for the same plan year
     self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |p|
 
       p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.carrier_profile_id && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || p.kind == "employer_sponsored"
+      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
         if p.may_cancel_coverage?
           p.cancel_coverage!
           p.update_current(terminated_on: p.effective_on)
         end
-      elsif p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.carrier_profile_id && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on
+      elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
         if p.may_terminate_coverage?
-          term_date = self.effective_on - 1
-          term_date = TimeKeeper.date_of_record + 14 if (TimeKeeper.date_of_record + 14) > term_date
+          term_date = self.effective_on - 1.day
+          term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days and p.kind == "individual") > term_date
 
           p.terminate_coverage
           p.update_current(terminated_on: term_date)
