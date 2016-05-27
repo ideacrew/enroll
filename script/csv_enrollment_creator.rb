@@ -87,6 +87,11 @@ def find_dependent(ssn,dob,first_name,middle_name,last_name)
 	end
 end
 
+def select_employee_role(employer_profile_id, employee_roles)
+	correct_employee_role = employee_roles.detect{|employee_role| employee_role.employer_profile_id == employer_profile_id}
+	return correct_employee_role
+end
+
 ## Just for clarification 
 # EnrollmentFactory#construct_consumer_role
 # EnrollmentFactory#initialize_dependent
@@ -132,6 +137,7 @@ CSV.foreach(filename, headers: :true) do |row|
 					benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],
 																						 organization,census_employee)
 					employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
+					employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
 					subscriber = employee_role.person
 					##  Give the subscriber the correct HBX ID.
 					subscriber.hbx_id = data_row["HBX ID"]
@@ -181,18 +187,19 @@ CSV.foreach(filename, headers: :true) do |row|
 					hbx_enrollment.coverage_household_id = coverage_household._id
 					hbx_enrollment.enrollment_kind = "open_enrollment"
 					hbx_enrollment.kind = data_row["Enrollment Kind"]
-					hbx_enrollment.effective_on = data_row["Benefit Begin Date"].to_date
+					hbx_enrollment.effective_on = format_date(data_row["Benefit Begin Date"])
 					hbx_enrollment.benefit_group_assignment_id = benefit_group_assignment._id
 					hbx_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
+					hbx_enrollment.employee_role_id = employee_role._id
 					year = data_row["Plan Year"]
 					plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
 					hbx_enrollment.plan_id = plan._id
 					hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
 					hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
 					if data_row["Plan Selected"] != nil
-						hbx_enrollment.submitted_at = data_row["Date Plan Selected"].to_time
+						hbx_enrollment.submitted_at = format_date(data_row["Date Plan Selected"]).to_datetime
 					else
-						hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_time
+						hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
 					end
 					hbx_enrollment.save
 					hbx_enrollment_member = HbxEnrollmentMember.new
@@ -202,15 +209,21 @@ CSV.foreach(filename, headers: :true) do |row|
 					hbx_enrollment_member.eligibility_date = hbx_enrollment_member.coverage_start_on.prev_month + 14.days
 					hbx_enrollment.hbx_enrollment_members.push(hbx_enrollment_member)
 					hbx_enrollment_member.save
+					hbx_enrollment.aasm_state = "coverage_selected"
 					hbx_enrollment.save
 				else
 					raise ArgumentError.new("census employee does not exist for provided person details")
 				end
 			end
 		end
+		benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],organization,census_employee)
+		hbx_enrollment.employee_role_id = select_employee_role(organization.employer_profile._id,subscriber.employee_roles)
 		family = subscriber.primary_family
 		household = subscriber.primary_family.active_household
 		hbx_enrollment = HbxEnrollment.new
+		if benefit_group_assignment.hbx_enrollment_id == nil
+			benefit_group_assignment.hbx_enrollment_id = hbx_enrollment._id
+		end
 		household.hbx_enrollments.push(hbx_enrollment)
 		coverage_household = household.immediate_family_coverage_household
 		hbx_enrollment.coverage_household_id = coverage_household._id
