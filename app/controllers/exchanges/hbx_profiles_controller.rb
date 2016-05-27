@@ -60,7 +60,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    @records_filtered = employers.count
+    @records_filtered = all_employers.count - employers.count
 
     employers = employers.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
     array_from = dt_query.skip.to_i
@@ -85,7 +85,6 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @draw = dt_query.draw
     @total_records = all_employers.count
-
     @employers = employers
     @payload = datatable_payload
 
