@@ -29,6 +29,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def generate_invoice
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def employer_invoice
 
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -64,14 +70,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     employers = employers.er_invoice_data_table_order
     @records_filtered = is_search ? employers.count : all_employers.count
 
-    # + employers.all_employers_applicant.er_invoice_data_table_order
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
     employers = employers[array_from..array_to]
 
     datatable_payload = employers.map { |employer_invoice|
       {
-        :invoice_id => ('<input type="checkbox" name="invoiceId" value="' + employer_invoice.id.to_s + '">'),
+        :invoice_id => ('<input type="checkbox" name="employerId[]" value="' + employer_invoice.id.to_s + '">'),
         :fein => employer_invoice.fein,
         #:legal_name => employer_invoice.employer_profile.legal_name,
         :legal_name => (view_context.link_to employer_invoice.legal_name, employers_employer_profile_path(employer_invoice)),
@@ -82,8 +87,6 @@ class Exchanges::HbxProfilesController < ApplicationController
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i
       }
     }
-
-    #binding.pry
 
     @draw = dt_query.draw
     @total_records = all_employers.count
