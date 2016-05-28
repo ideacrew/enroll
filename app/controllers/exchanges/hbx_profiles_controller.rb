@@ -37,6 +37,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def employer_invoice
 
+    # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
@@ -48,14 +49,20 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def employer_invoice_dt
+  # This method provides the jquery datatable payload for the ajax call
+  def employer_invoice_datatable
+
     dt_query = extract_datatable_parameters
     employers = []
+
+    # datatable records with no filter should default to scope "all_employers_renewing_published"
     all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
     is_search = false
+
     if dt_query.search_string.blank?
       employers = all_employers
     else
+      #this will search on FEIN or Legal Name of an employer
       employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
       employers = all_employers.where({:id => {"$in" => employer_ids}})
       is_search = true
@@ -66,12 +73,15 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-
+    #order records by plan_year.start_on and by legal_name
     employers = employers.er_invoice_data_table_order
+
+    #records_filtered is for datatable required so it nows how many records were filtered.
     @records_filtered = is_search ? employers.count : all_employers.count
 
-    array_from = dt_query.skip.to_i
-    array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
+    #slice resultset so it returns the records in the desiged page number
+    array_from = dt_query.skip.to_i #starting index
+    array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1 #to index
     employers = employers[array_from..array_to]
 
     datatable_payload = employers.map { |employer_invoice|
@@ -82,7 +92,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         :state => employer_invoice.employer_profile.aasm_state.humanize,
         :plan_year => employer_invoice.employer_profile.latest_plan_year.try(:effective_date).to_s,
         :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
-        :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
+        :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i.to_s + "/" + employer_invoice.employer_profile.try(:latest_plan_year).try(:waived_count).to_i.to_s,
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
         :eligible => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i,
         :enrollment_ratio => (employer_invoice.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i
@@ -91,9 +101,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @draw = dt_query.draw
     @total_records = all_employers.count
-    @employers = employers
     @payload = datatable_payload
-
     render
   end
 

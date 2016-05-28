@@ -1,11 +1,6 @@
-<!--<div>
-  <%= link_to "All", "#", class: "btn btn-default" %>
-  <%= link_to "Renewing", "#", class: "btn btn-default" %>
-  <%= link_to "Non-Renewing", "#", class: "btn btn-default" %>
-</div>-->
 
 
-      <%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
+<%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
 
 <div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
        <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
@@ -18,15 +13,19 @@
   <table class="table table-striped" id="ER-invoices-dataTable">
     <thead>
     <tr>
+      <th colspan="6" class="text-center" style="background-color: #f8f8f8;">Employer</th>
+      <th colspan="4" class="text-center" style="background-color: #e8e8e8;">Employee</th>
+    </tr>
+    <tr>
       <th><%= check_box_tag 'ER-Invoice-check-all' %></th>
       <th>FEIN</th>
-      <th>Employer Name</th>
-      <th>ER State</th>
+      <th>Legal Name</th>
+      <th>State</th>
       <th>Plan Year</th>
       <th>Conversion</th>
-      <th>EE Enrolled</th>
-      <th>EE Remaining</th>
-      <th>EE Eligible</th>
+      <th>Enrolled/Waived</th>
+      <th>Remaining</th>
+      <th>Eligible</th>
       <th>Participation %</th>
     </tr>
     </thead>
@@ -41,6 +40,7 @@
 </div>
 
 <script type="text/javascript" charset="utf-8">
+  // datatables setup
   $(document).ready(function() {
     $('#ER-invoices-dataTable').DataTable( {
       "processing": true,
@@ -48,9 +48,9 @@
       "ordering" : false,
       "paging": true,
       "searchDelay": 800,
-      "lengthMenu": [ 25, 50, 100],
+      "lengthMenu": [ 10, 25, 50, 100],
       "ajax": {
-        url: "<%= employer_invoice_dt_exchanges_hbx_profiles_path(:format => :json) %>",
+        url: "<%= employer_invoice_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
         type: "POST",
         data: function ( d ) {
           console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
@@ -72,11 +72,13 @@
     } );
   });
 
+  // Trigger datatable redraw on 90 day (30,60,90) filter buttons
   $('#ERInvoiceFilter-Group').change(function() {
       var table = $('#ER-invoices-dataTable').dataTable().api();
       table.draw();
   });
 
+  // Check/Uncheck All Checkboxes
   $('#ER-Invoice-check-all').click(function() {
       var action = $(this).is(':checked') ? true : false;
       var group = $('input[name="employerId[]"]');
