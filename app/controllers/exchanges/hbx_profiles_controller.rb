@@ -29,6 +29,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def generate_invoice
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def employer_invoice
 
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -60,28 +66,28 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    @records_filtered = is_search ? all_employers.count - employers.count : all_employers.count
 
-    employers = employers.er_invoice_data_table_order# + employers.all_employers_applicant.er_invoice_data_table_order
+    employers = employers.er_invoice_data_table_order
+    @records_filtered = is_search ? employers.count : all_employers.count
+
     array_from = dt_query.skip.to_i
     array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
     employers = employers[array_from..array_to]
 
     datatable_payload = employers.map { |employer_invoice|
       {
-        :invoice_id => ('<input type="checkbox" name="invoiceId" value="' + employer_invoice.id.to_s + '">'),
+        :invoice_id => ('<input type="checkbox" name="employerId[]" value="' + employer_invoice.id.to_s + '">'),
         :fein => employer_invoice.fein,
-        #:legal_name => employer_invoice.employer_profile.legal_name,
-        :legal_name => (view_context.link_to employer_invoice.legal_name, employers_employer_profile_path(employer_invoice)),
+        :legal_name => (view_context.link_to employer_invoice.legal_name, employers_employer_profile_path(employer_invoice.employer_profile)+"?tab=home"),
         :state => employer_invoice.employer_profile.aasm_state.humanize,
         :plan_year => employer_invoice.employer_profile.latest_plan_year.try(:effective_date).to_s,
         :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
         :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
-        :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i
+        :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
+        :eligible => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i,
+        :enrollment_ratio => (employer_invoice.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i
       }
     }
-
-    #binding.pry
 
     @draw = dt_query.draw
     @total_records = all_employers.count

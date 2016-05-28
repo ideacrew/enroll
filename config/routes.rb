@@ -28,7 +28,8 @@ Rails.application.routes.draw do
         get :family_index
         get :employer_index
         get :employer_invoice
-        get :employer_invoice_dt
+        post :employer_invoice_dt
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -172,7 +173,7 @@ Rails.application.routes.draw do
         get :approve
       end
     end
-    
+
     #TODO REFACTOR
     resources :people do
       collection do
