@@ -47,11 +47,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
   def append_unverified_individuals(people)
     people.each do |person|
       if person.consumer_role.is_type_outstanding?("Social Security Number")
-        @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name })
+        @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
 
       if person.consumer_role.is_type_outstanding?("Citizenship") || person.consumer_role.is_type_outstanding?("Immigration status")
-        @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name })
+        @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
     end
   end
