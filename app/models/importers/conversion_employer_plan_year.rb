@@ -91,7 +91,7 @@ module Importers
     def select_most_common_plan(available_plans, most_expensive_plan)
         if !most_common_hios_id.blank?
           mc_hios = most_common_hios_id.strip
-          found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01" }
+          found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01") }
           return found_single_plan if found_single_plan
           warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
         else
