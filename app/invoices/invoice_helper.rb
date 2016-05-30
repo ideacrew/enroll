@@ -1,5 +1,5 @@
 #NOTE : Intention is to make the styles and parts of the code reusable. But there is a lot more scope for improvment  -VBATTULA
-module PrawnHelper
+module InvoiceHelper
 # module Prawn::Graphics
 
 	def default_options 
@@ -8,7 +8,7 @@ module PrawnHelper
 		}
 	end
 
-  def generate_invoice
+  def build_pdf
     enrollment_summary = @hbx_enrollments.inject({}) do |hash,enrollment| 
       if hash.include?(enrollment.plan.name)
          hash[enrollment.plan.name]["employee_count"] += 1

@@ -30,6 +30,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
+    @organizations= Organization.where(:id.in => params[:employerId]).all
+    @organizations.each do |org| 
+      org.employer_profile.generate_invoice
+    end
     respond_to do |format|
       format.js
     end
@@ -350,6 +354,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
+  
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
       insured = Person.find(params[:person])
