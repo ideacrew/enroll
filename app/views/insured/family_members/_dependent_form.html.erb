@@ -141,9 +141,7 @@
 
   <script>
     $(document).ready(function() {
-      $('.floatlabel').floatlabel({
-        slideInput: false
-      });
+      Freebies.floatlabels();
       if($("input#dependent_same_with_primary").is(":checked")){
         $("#address_info .address_required").removeAttr('required');
       };
