@@ -190,6 +190,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "#generate_invoice" do
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { double("EmployerProfile", id: double("id"))}
+    let(:organization){ Organization.new }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+
+    before :each do
+      sign_in(user)
+      allow(organization).to receive(:employer_profile?).and_return(employer_profile)
+      allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
+    end
+
+    it "create new organization if params valid" do
+      xhr :get, :generate_invoice, {"employerId"=>[organization.id]} ,  format: :js
+      expect(response).to have_http_status(:success)
+      # expect(organization.invoices.size).to eq 1
+    end
+  end
+
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
     let(:person) { double("person")}

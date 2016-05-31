@@ -1,9 +1,13 @@
 class EmployerInvoice
 	include InvoiceHelper
+
+	attr_reader :errors
+
 	def initialize(organization)
 		@organization= organization
 		@employer_profile= organization.employer_profile
 		@hbx_enrollments=@employer_profile.enrollments_for_billing
+		@errors=[]
 	end
 
 	def pdf_doc
@@ -11,14 +15,36 @@ class EmployerInvoice
 	end
 
 	def save
-		unless File.directory?(invoice_folder_path)
-  		FileUtils.mkdir_p(invoice_folder_path)
+		begin
+			unless File.directory?(invoice_folder_path)
+  			FileUtils.mkdir_p(invoice_folder_path)
+			end
+			pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)	
+		rescue Exception => e
+			@errors << "Unable to create PDF for #{@organization.hbx_id}."
 		end
-		pdf_doc.render_file(invoice_absolute_file_path)
+
 	end
 
 	def save_to_cloud
+		begin
+			Organization.upload_invoice(invoice_absolute_file_path) if File.exist?(invoice_absolute_file_path)
+		rescue Exception => e
+			@errors << "Unable to upload PDF for. #{@organization.hbx_id}"
+		end
+	end
 
+	def send_email_notice
+		subject= "Dc Health links" #TODO change the name
+		@organization.employer_profile.staff_roles.each do |staff_role|
+			UserMailer.employer_invoice_generation_notification(staff_role.user,subject).deliver_now
+    end
+  end
+
+	def save_and_notify
+		save
+		save_to_cloud
+		send_email_notice
 	end
 
 	private 
