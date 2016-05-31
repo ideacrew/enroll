@@ -201,6 +201,7 @@ module Importers
         end
         return false
       end
+      cancel_other_enrollments_for_bga(bga)
       hh = family.active_household
       ch = hh.immediate_family_coverage_household
       en = hh.new_hbx_enrollment_from({
@@ -223,6 +224,18 @@ module Importers
         coverage_kind: 'health'
       })
       true
+    end
+
+    def cancel_other_enrollments_for_bga(bga)
+      enrollments = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bga)
+      enrollments.each do |en|
+        en.hbx_enrollment_members.each do |hen|
+           hen.coverage_end_on = hen.coverage_start_on
+        end
+        en.terminated_on = en.effective_on
+        en.aasm_state = "coverage_cancelled"
+        en.save!
+      end
     end
   end
 end
