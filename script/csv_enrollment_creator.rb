@@ -104,6 +104,21 @@ CSV.foreach(filename, headers: :true) do |row|
 	begin
 		data_row = row.to_hash
 		subscriber = Person.where(hbx_id: data_row['HBX ID']).first
+		subscriber_params = {"name_pfx" => data_row["Name Prefix"],
+									 "first_name" => data_row["First Name"],
+									 "middle_name" => data_row["Middle Name"],
+									 "last_name" => data_row["Last Name"],
+									 "name_sfx" => data_row["Name Suffix"],
+									 "ssn" => data_row["SSN"].gsub("-",""),
+									 "dob" => format_date(data_row["DOB"]),
+									 "gender" => data_row["Gender"].downcase,
+									 "no_ssn" => 0
+									}
+		census_employee = find_census_employee(subscriber_params)
+		person_details = create_person_details(subscriber_params)
+		unless data_row["Employer FEIN"] == nil
+			organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
+		end
 		if subscriber == nil
 			if data_row["Employer FEIN"] == nil # for IVL
 				next
@@ -120,19 +135,6 @@ CSV.foreach(filename, headers: :true) do |row|
 				person = Factories::EnrollmentFactory.initialize_person(nil,data_row["Name Prefix"],data_row["First Name"], data_row["Middle Name"],
                                data_row["Last Name"], data_row["Name Suffix"], data_row["SSN"].gsub("-",""), format_date(data_row["DOB"]), data_row["Gender"].downcase, nil, no_ssn=nil)
 			elsif data_row["Employer FEIN"] != nil # for SHOP
-				subscriber_params = {"name_pfx" => data_row["Name Prefix"],
-									 "first_name" => data_row["First Name"],
-									 "middle_name" => data_row["Middle Name"],
-									 "last_name" => data_row["Last Name"],
-									 "name_sfx" => data_row["Name Suffix"],
-									 "ssn" => data_row["SSN"].gsub("-",""),
-									 "dob" => format_date(data_row["DOB"]),
-									 "gender" => data_row["Gender"].downcase,
-									 "no_ssn" => 0
-									}
-				census_employee = find_census_employee(subscriber_params)
-				person_details = create_person_details(subscriber_params)
-				organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 				unless census_employee == nil
 					benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],
 																						 organization,census_employee)
