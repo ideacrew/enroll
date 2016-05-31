@@ -233,7 +233,7 @@ module Importers
            hen.coverage_end_on = hen.coverage_start_on
         end
         en.terminated_on = en.effective_on
-        en.aasm_state = "coverage_cancelled"
+        en.aasm_state = "coverage_canceled"
         en.save!
       end
     end
