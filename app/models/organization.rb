@@ -256,7 +256,6 @@ class Organization
 
   def self.invoice_exist?(invoice_date,org)
     documents =org.documents.where("date" => invoice_date)
-    binding.pry
     matching_documents = documents.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
     return true if matching_documents.count > 0 
   end
