@@ -35,7 +35,7 @@ class EmployerInvoice
 	end
 
 	def send_email_notice
-		subject= "Dc Health links" #TODO change the name
+		subject= "DC Health Link - Invoice Alert" #TODO change the name
 		@organization.employer_profile.staff_roles.each do |staff_role|
 			UserMailer.employer_invoice_generation_notification(staff_role.user,subject).deliver_now
     end
@@ -58,7 +58,7 @@ class EmployerInvoice
  	end
 
  	def invoice_absolute_file_path
- 		"#{invoice_folder_path}/#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_R_INVOICES.pdf"
+ 		"#{invoice_folder_path}/#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
  	end
 	
 end

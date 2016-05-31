@@ -75,7 +75,7 @@ module InvoiceHelper
     #Image
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
     invoice_header_data = [ 
-      ["ACCOUNT NUMBER:", "100101"],
+      ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
       ["INVOICE NUMBER:", "123123"],
       ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
       ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
@@ -94,19 +94,24 @@ module InvoiceHelper
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 561]
     end
     
-    @pdf.move_down 24
-
+    @pdf.move_down 12
     @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
-    @pdf.text_box "Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
     @pdf.text_box "https://www.e-BillExpress.com/ebpp/DCHealthPay", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
-    @pdf.text_box "Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "DC Health Link", :at => [240, @pdf.cursor]
+    @pdf.move_down lineheight_y
+    @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
+    @pdf.move_down lineheight_y
+    @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
+    @pdf.move_down 24
+    @pdf.text_box "\u2022 Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -204,7 +209,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call DC Health Link Customer Service at 855-532-5465, go online to http://www.dchealthlink.com/, or contact your broker.", :at => [address_x, @pdf.bounds.height - 10], :align => :center
+        @pdf.text_box "Questions? Call DC Health Link Customer Service at 855-532-5465, go online to http://www.dchealthlink.com/, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -213,7 +218,7 @@ module InvoiceHelper
       next if i < 1
       @pdf.go_to_page(i+1)
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Page #{i} of #{@pdf.page_count - 1}", :color => "#999999",:at => [455, @pdf.bounds.height - 30]
+        @pdf.draw_text "Page #{i} of #{@pdf.page_count - 1}",:at => [480, @pdf.bounds.height - 30]
         # @pdf.draw_text "#{Time.now.strftime("%B %d, %Y")}" ,:at => [455, @pdf.bounds.height - 20]
       }
     end
