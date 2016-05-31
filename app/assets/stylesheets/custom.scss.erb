@@ -659,7 +659,7 @@ p.information{
   top: 4px;
 }
 .key p i{
-  background-image: url('<%= asset_path('secure-lock.png') %>') no-repeat;
+  background-image: url('<%= asset_path("secure-lock.png") %>') no-repeat;
   height: 26px;
   width: 20px;
 }
@@ -690,10 +690,6 @@ label.label-floatlabel {
 }
 input.floatlabe{
   font-size: 14px;
-}
-.form-control{
-  color: #616161;
-  border: 1px solid #e3e3e3;
 }
 .radio label, .checkbox label{
   margin: 0 auto;
@@ -893,7 +889,7 @@ div#house_info > p {
   margin: 0;
 }
 .no-result-row .row .fa_exclamation_triangle {
-  background: url('<%= asset_path('warning.png') %>') no-repeat;
+  background: url('<%= asset_path("warning.png") %>') no-repeat;
   display: block;
   width: 37px;
   height: 35px;
@@ -1177,7 +1173,7 @@ p.success-text {
 }
 
 .result-row .list-group .badge i {
-  background: url('<%= asset_path('checkmark.png') %>') no-repeat;
+  background: url('<%= asset_path("checkmark.png") %>') no-repeat;
   display: block;
   height: 14px;
   margin: 7px auto 0;
@@ -1439,27 +1435,6 @@ a.close-1, a.close-2{
 /*  Home Page css start  */
 .welcome .home, .welcome .signin{
   text-align: center;
-}
-.home h1, .home h3{
-  text-align: center;
-  margin-top: 10px;
-  color: #616161;
-}
-.home-page {
-  padding-top: 5%;
-  text-align: center;
-}
-.home-page h1, .home-page h3{
-  text-align: center;
-  margin-top: 10px;
-  color: #616161;
-}
-.home-page p button{
-  padding: 7px 30px;
-  margin-top: 20px;
-}
-.home-page p button:not(:first-child){
-  margin-left: 45px;
 }
 .navbar-nav li li{
   display: block;
@@ -2342,30 +2317,6 @@ ul.navbar-nav.top-menu li {
     float: none;
 }
 
-ul.user-info {
-    float: right;
-    padding: 0;
-    width: auto;
-}
-
-ul.user-info li:first-child {
-    padding-top: 0;
-    vertical-align: middle;
-}
-
-ul.user-info li {
-    color: #414141;
-    float: left;
-    font-size: 12px;
-    font-weight: 300;
-    list-style-type: none;
-    vertical-align: top;
-}
-
-ul.user-info li strong {
-    font-size: 16px;
-}
-
 #profile-content .panel .page-header {
   margin: 0;
   border-bottom: none;
@@ -3015,7 +2966,7 @@ ul.list-qle li a:hover {
   top: 6px;
 }
 .compare-slctd-plan .compare table input[type="radio"] + span{
-  background-image: url("<%= asset_path("compare-radio-img.png") %>");
+  background-image: url('<%= asset_path("compare-radio-img.png") %>');
   background-repeat: no-repeat;
   padding: 0 0 5px 30px;
   position: relative;
@@ -3595,31 +3546,6 @@ table.table tr.gray-row {background-color: ivory;}
 
 /* Footer */
 
-footer.footer-wrapper {
-    background-color: #003260;
-    padding: 15px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-}
-footer.footer-wrapper p {
-    color: #ffffff;
-    font-family: "Open Sans",sans-serif;
-    font-size: 12px;
-    font-weight: 200;
-    margin: 5px 0;
-    text-align: left;
-}
-footer.footer-wrapper ul {
-    margin: 0;
-}
-footer.footer-wrapper a {
-    color: #ffffff;
-    font-family: "Open Sans",sans-serif;
-    font-size: 12px;
-    font-weight: 200;
-}
 .form-wrapper h3 {
     color: #003260;
     font-size: 18px;
@@ -3627,9 +3553,7 @@ footer.footer-wrapper a {
     margin-bottom: 15px;
     margin-top: 0;
 }
-footer.footer-wrapper .container {
-    vertical-align: middle;
-}
+
 
 /* Sidebar */
 .right-section h3 {
@@ -4081,13 +4005,6 @@ label.checkbox-custom-label {
     display: inline-block;
     padding: 8px 0;
 }
-input.form-control {
-    border: 1px solid #b7b7b7;
-    border-radius: 0;
-    box-shadow: none;
-    display: inline-block;
-    font-weight: 100;
-}
 h3.text-blue {
     font-size: 20px;
     font-weight: 500;
@@ -4410,44 +4327,10 @@ span.text_style {color: #616161 !important;}
 
 /* Custom Buttons */
 
-.btn {
-  box-shadow: none;
-  text-shadow: none;
-  border-radius: 2px;
-  transition: all 0.3s ease 0s;
-}
 .btn-wd {padding-left: 25px; padding-right: 25px;}
-.btn-br {border-bottom-width: medium;}
-.btn-lg {border-radius: 3px;}
 .btn-waive {
     width: 100%;
     margin-top: 10px;
-}
-
-.btn-primary {
-  background-color: #e72b2d;
-  border-color: #b7191b;
-}
-
-.btn-primary:hover, .btn-primary:focus {
-  background-color: #b7191b;
-  border-color: #b7191b;
-}
-
-.btn-primary.disabled, .btn-primary.disabled.active, .btn-primary.disabled.focus, .btn-primary.disabled:active, .btn-primary.disabled:focus, .btn-primary.disabled:hover, .btn-primary[disabled], .btn-primary.active[disabled], .btn-primary.focus[disabled], .btn-primary[disabled]:active, .btn-primary[disabled]:focus, .btn-primary[disabled]:hover, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary.active, fieldset[disabled] .btn-primary.focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:hover {
-  background-color: #c9302c;
-  border-color: #ac2925;
-}
-
-.btn-transparent {
-    border-color: #b2b2b2;
-    color: #007bc4;
-}
-
-.btn-transparent:hover, .btn-transparent:focus {
-    background-color: #ffffff;
-    color: #007bc4;
-    border-color: #007bc4;
 }
 
 .btn-select {

@@ -46,7 +46,7 @@
                   <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
                 <br/>
-                <strong class="users-name"><%= user_full_name.titleize %></strong>
+                <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
                 <% unless current_user.try(:person).try(:hbx_id).nil? %>
                   &nbsp;
                   <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
