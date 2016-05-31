@@ -218,8 +218,10 @@ class Organization
   end
 
   def self.upload_invoice(file_path)
+    puts "file_path **  #{file_path}"
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
+    puts " *** step 2 "
     if invoice_date && org && !invoice_exist?(invoice_date,org)
       doc_uri = Aws::S3Storage.save(file_path, "invoices")
       if doc_uri
@@ -253,9 +255,10 @@ class Organization
   end
 
   def self.invoice_exist?(invoice_date,org)
-    if org.documents.where("date" => invoice_date).count > 0
-      return true
-    end
+    documents =org.documents.where("date" => invoice_date)
+    binding.pry
+    matching_documents = documents.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
+    return true if matching_documents.count > 0 
   end
 
   def office_location_kinds

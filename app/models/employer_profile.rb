@@ -8,7 +8,6 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
-  include EmployerProfileInvoiceModule
   
   embedded_in :organization
 

@@ -28,7 +28,7 @@ class EmployerInvoice
 
 	def save_to_cloud
 		begin
-			Organization.upload_invoice(invoice_absolute_file_path) if File.exist?(invoice_absolute_file_path)
+			Organization.upload_invoice(invoice_absolute_file_path)
 		rescue Exception => e
 			@errors << "Unable to upload PDF for. #{@organization.hbx_id}"
 		end
@@ -54,7 +54,7 @@ class EmployerInvoice
 	end
 
  	def invoice_folder_path
- 		Rails.root.join('invoices',current_month)
+ 		Rails.root.join('tmp',current_month)
  	end
 
  	def invoice_absolute_file_path
