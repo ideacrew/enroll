@@ -26,7 +26,7 @@ And(/Individual asks how to make an email account$/) do
 end
 
 Then(/Individual creates HBX account$/) do
-  click_button 'Create account'
+  click_button 'Create account', :wait => 10
   fill_in "user[email]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
