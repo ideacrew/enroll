@@ -262,7 +262,7 @@ class EmployerProfile
 
     if plan_year.present?
       hbx_enrollments = plan_year.hbx_enrollments_by_month(billing_report_date).compact
-      hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
+      # hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
     hbx_enrollments

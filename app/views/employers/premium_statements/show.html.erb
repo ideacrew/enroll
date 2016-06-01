@@ -20,16 +20,16 @@
         </div>
       </div>
 
-<!--       <h1>Enrollment Report <%#= billing_date.beginning_of_month %> - <%#= billing_date.end_of_month %></h1>
- -->
-      
+      <%= form_tag employers_premium_statement_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
+        <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
+      <% end %>
+
     <% end %>
   </div>
+
   <div class="premium-reports-table">
     <%= render 'show' %>
-    
   </div>
-
 <br>
 <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-trans mz' %>
   <a class='btn btn-trans' data-toggle='modal' data-target='#downloadCsv'>Download</a>
@@ -37,15 +37,18 @@
 
 <script>
 $(function() {
-  $('#enrollment_report_dropdown').on('change', function(){
-    $('#loader').removeClass('hidden');
-    $.ajax({ type: "GET",
-      url: "/employers/premium_statements/<%= @employer_profile.id%>",
-      data: { billing_date: $('option:selected', this).val() },
-      dataType : "script"
-    }).done(function(data) {
+  $('#billing_date_form').bind({
+    'ajax:before': function () {
+      $('#loader').removeClass('hidden');
+    },
+    'ajax:complete': function () {
       $('#loader').addClass('hidden');
-    });
+    }
+  });
+
+  $('#enrollment_report_dropdown').on('change', function(){
+    $('#billing_date').val($('option:selected', this).val());
+    $("#billing_date_form").submit();
   });
 });
 </script>

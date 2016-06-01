@@ -1,6 +1,7 @@
 <% if @hbx_enrollments.present? %>
 <div class="row no-buffer">
-  <div class="col-xs-4 text-danger">This is not an invoice.</div>
+  <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
+  <div class="text-danger">This is not an invoice.</div>
 </div>
 
 <div class="row no-buffer table-responsive">

@@ -94,7 +94,8 @@ class PlanYear
         enrollments = enrollments.select{|e| e.terminated_on.blank? || e.terminated_on >= date}
         
         if enrollments.size > 1
-          enrollments.detect{|e| HbxEnrollment::ENROLLED_STATUSES.include?(e.aasm_state)}
+          enrollment = enrollments.detect{|e| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(e.aasm_state.to_s)}
+          enrollment || enrollments.detect{|e| HbxEnrollment::RENEWAL_STATUSES.include?(e.aasm_state.to_s)}
         else
           enrollments.first
         end

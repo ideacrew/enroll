@@ -15,15 +15,16 @@ namespace :reports do
 
       organizations = Organization.all.where(:"employer_profile.plan_years" => {
         :$elemMatch => {
-          :start_on => @billing_date, 
-          :aasm_state => 'renewing_enrolling'
+          :start_on => @billing_date,
+          :open_enrollment_start_on.lt => TimeKeeper.date_of_record, 
+          :aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)
         }})
 
       count = 0
 
       CSV.open("#{Rails.root}/public/invoice_reprot.csv", "w", force_quotes: true) do |csv|
 
-        csv << ["EE first name","EE last name","Conversion Employer","ER legal name","ER FEIN","Benefit Group","SSN","Date of Birth","Date of Hire","Employment status","Plan Name","Carrier Name","Effective Date","Enrollment Status","Coverage Kind","No. Of Enrollees","Employee Cost", "Employer Contribution","Total Premium"]
+        csv << ["EE first name","EE last name","Employer Type","ER legal name","ER FEIN","Benefit Group","SSN","Date of Birth","Date of Hire","Employment status","Plan Name","Carrier Name","Effective Date","Enrollment Status","Coverage Kind","No. Of Enrollees","Employee Cost", "Employer Contribution","Total Premium"]
         organizations.each do |organization|
           employer_profile = organization.employer_profile
           puts "Processing #{employer_profile.legal_name}"
@@ -45,7 +46,7 @@ namespace :reports do
       data = [
         employee.first_name,
         employee.last_name,
-        employer_profile.profile_source.to_s == 'conversion' ? 'True' : 'False',
+        employer_type(employer_profile),
         employer_profile.legal_name,
         employer_profile.fein,
         enrollment.benefit_group.title,
@@ -65,6 +66,24 @@ namespace :reports do
       ]
 
       data
+    end
+
+    def employer_type(employer_profile)
+      if employer_profile.profile_source.to_s == 'conversion'
+        'Conversion'
+      else
+        py = employer_profile.plan_years.detect{|py| (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(py.aasm_state.to_s) && py.start_on == @billing_date}
+
+        if py.blank?
+          raise 'error'
+        end
+
+        if PlanYear::RENEWING_PUBLISHED_STATE.include?(py.aasm_state.to_s)
+          'Renewing'
+        else
+          'Newly Registered'
+        end
+      end
     end
 
     def employment_status(aasm_state)
