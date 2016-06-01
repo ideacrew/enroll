@@ -351,9 +351,10 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   context "Invoice Upload" do
+    let(:organization) {FactoryGirl.build(:organization, :hbx_id => 'hbxid')}
     before do
       allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoices:asdds123123")
-      allow(Organization).to receive(:by_invoice_filename).and_return(org)
+      allow(Organization).to receive(:by_invoice_filename).and_return(organization)
     end
 
     context "with valid arguments" do
@@ -361,16 +362,15 @@ RSpec.describe Organization, dbclean: :after_each do
         Organization.upload_invoice(file_path)
       end
        it "should upload invoice to the organization" do
-        expect(org.documents.count).to eq 1
+        expect(organization.documents.size).to eq 1
       end
     end
     context "with duplicate files" do
-      before do
-        Organization.upload_invoice(file_path)
-        Organization.upload_invoice(file_path)
-      end
+
        it "should upload invoice to the organization only once" do
-        expect(org.documents.count).to eq 1
+        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path)
+        expect(organization.documents.size).to eq 1
       end
     end
 
@@ -379,7 +379,7 @@ RSpec.describe Organization, dbclean: :after_each do
         Organization.upload_invoice('dummyfile.pdf')
       end
        it "should Not Upload invoice" do
-        expect(org.documents.count).to eq 0
+        expect(organization.documents.size).to eq 0
       end
     end
   end
