@@ -118,15 +118,10 @@ module Insured::FamiliesHelper
   end
 
   def display_aasm_state?(enrollment)
-    unless enrollment.is_shop?
-       aasm_state = enrollment.aasm_state
-      if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
-        true
-      else
-        false  
-      end 
+    if enrollment.is_shop?
+      true
     else
-      true  
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
     end
   end
       
