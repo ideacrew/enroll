@@ -6,7 +6,7 @@ class HbxAdminController < ApplicationController
     @current_year = params[:year_selected]  || TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present? 
+    @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
     @no_enrollment = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).blank?
 
@@ -88,8 +88,7 @@ class HbxAdminController < ApplicationController
                                                                       }).save!
       end
 
-       
-      result = HbxAdmin.update_aptc_applied_for_enrollments(params, year)
+      result = HbxAdmin.update_aptc_applied_for_enrollments(params)
 
     end
 

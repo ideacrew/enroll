@@ -2,7 +2,7 @@
   <tr>
     <td align="right"><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span></td>
     <td align="left">
-      <%= select_year(Date.today, :start_year => TimeKeeper.date_of_record.year, :end_year => TimeKeeper.date_of_record.year) %>
+      <%= select_year(Date.today, :start_year => TimeKeeper.date_of_record.year, :end_year => TimeKeeper.date_of_record.year, :prefix => "year", :discard_type => true) %>
     </td>
     <td align="center" class="calculate_available_aptc">
       <a href="javascript:void(0)" class='btn btn-info' id='calculate_available_aptc'>Calculate Available APTC</a>

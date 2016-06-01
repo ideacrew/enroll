@@ -1,3 +1,9 @@
+<style>
+  td#firstcol {
+      max-width:67%;
+    }
+</style>
+
 <div class="panel panel-info">  
   <div class="panel-heading">
     
@@ -33,7 +39,7 @@
               <td><%= full_name_of_person(member_id)%></td>
               <% aptc_values.each do |month, val| %>  <!-- month and the corresponding values -->
                 <td class="<%=aptc_csr_data_type(month)%>"> 
-                  <%= text_field_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
+                  <%= label_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
                 </td>
               <%end%>
             </tr>
@@ -45,7 +51,7 @@
               <td>Totals</td>
                 <%hbx_values["aptc_applied"].each do |month, aptc_value|%>
                 <td class="<%=aptc_csr_data_type(month)%>"> 
-                  <%= text_field_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
+                  <%= label_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
                 </td>
               <%end%>
             </tr>

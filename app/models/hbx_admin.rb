@@ -338,16 +338,53 @@ class HbxAdmin
     end
 
 
-    def update_aptc_applied_for_enrollments(params, year)
+    def update_aptc_applied_for_enrollments(params)
+      # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       family = Family.find(params[:person][:family_id])
-      active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(year)
+      active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
       params.each do |key, aptc_value|
         if key.include?('aptc_applied_')
           hbx_id = key.sub("aptc_applied_", "")
-            #TODO : Update Enrollments
+          updated_aptc_value = aptc_value.to_f
+          actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
+          duplicate_enrollment_and_update_aptc(family, hbx_id, updated_aptc_value) if actual_aptc_value != updated_aptc_value
+
         end 
       end  
     end  
+
+      
+    def duplicate_enrollment_and_update_aptc(family, hbx_id, updated_aptc_value)
+      original_hbx = HbxEnrollment.find(hbx_id)
+      aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+      
+      # Duplicate Enrollment
+      duplicate_hbx = original_hbx.dup
+      duplicate_hbx.updated_at = TimeKeeper.datetime_of_record
+      
+      # Duplicate all Enrollment Members
+      duplicate_hbx.hbx_enrollment_members = original_hbx.hbx_enrollment_members.collect {|hem| hem.dup}
+      duplicate_hbx.hbx_enrollment_members.each{|hem| hem.updated_at = TimeKeeper.datetime_of_record}
+
+      # Update Applied APTC on the enrolllment level.
+      duplicate_hbx.applied_aptc_amount = updated_aptc_value
+      
+      # Update the correct breakdown of Applied APTC on the individual level.
+      duplicate_hbx.hbx_enrollment_members.each do |hem|
+        aptc_pct_for_member = aptc_ratio_by_member[hem.applicant_id.to_s]
+        hem.applied_aptc_amount = aptc_pct_for_member * updated_aptc_value
+      end
+
+      family.active_household.hbx_enrollments << duplicate_hbx
+      family.save
+
+      # Cancel or Terminate Coverage.
+      if original_hbx.can_cancel_coverage?
+        original_hbx.cancel_coverage!
+      else
+        original_hbx.terminate_coverage!
+      end
+    end 
 
     ###
 

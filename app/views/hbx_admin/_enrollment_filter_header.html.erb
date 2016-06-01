@@ -5,7 +5,7 @@
    <head>
     <tr>
       
-      <th> <span class="glyphicon glyphicon-list-alt"></a>&nbsp;</span> <b>Plan</b></th>
+      <th colspan ="2" style="text-align:center"></a>&nbsp;</span> <b>Plan <br /> Name </b></th>
       <th style="padding:38px;"></th>
       <th>&nbsp;&nbsp;&nbsp;&nbsp;Plan <br /> Premium</th>
       <th style="padding:38px;"></th>
@@ -20,7 +20,7 @@
       </th>
     </tr> 
     <tr>
-      <td style="text-align:center"><%=HbxEnrollment.find(hbx_id).plan.name%></td>
+      <td colspan = "2" style="text-align:center"><%=HbxEnrollment.find(hbx_id).plan.name%></td>
       <th></th>
       <td style="text-align:center"><%=@plan_premium_for_enrollments[hbx_id]%></td>
       <th></th>
