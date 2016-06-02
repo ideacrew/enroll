@@ -440,7 +440,7 @@ class CensusEmployee < CensusMember
   end
 
   def self.to_csv
-    attributes = %w{employee_name, dob, hired, status, renewal_benefit_package, benefit_package, enrollment_status, termination_date}
+    attributes = %w{employee_name dob hired status renewal_benefit_package benefit_package enrollment_status termination_date}
 
     CSV.generate(headers: true) do |csv|
       csv << attributes
