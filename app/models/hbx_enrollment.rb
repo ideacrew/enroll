@@ -1121,6 +1121,12 @@ class HbxEnrollment
     !(shopping_plan_year.start_on == effective_on)
   end
 
+  def update_coverage_kind_by_plan
+    if plan.present? && coverage_kind != plan.coverage_kind
+      self.update(coverage_kind: plan.coverage_kind)
+    end
+  end
+
   private
 
   def benefit_group_assignment_valid?(coverage_effective_date)

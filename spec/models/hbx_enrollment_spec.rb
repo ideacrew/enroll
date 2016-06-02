@@ -1698,6 +1698,28 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
       expect(rs).to be_empty
     end
   end
+
+  context "update_coverage_kind_by_plan" do
+    let(:plan) { FactoryGirl.create(:plan, coverage_kind: 'health') }
+    attr_reader :enrollment, :household, :coverage_household
+    before :all do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      @enrollment = household.create_hbx_enrollment_from(
+        employee_role: mikes_employee_role,
+        coverage_household: coverage_household,
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
+      )
+    end
+
+    it "should update coverage_kind by plan" do
+      enrollment.plan = plan
+      enrollment.coverage_kind = 'dental'
+      enrollment.update_coverage_kind_by_plan
+      expect(enrollment.coverage_kind).to eq enrollment.plan.coverage_kind
+    end
+  end
 end
 
 context "A cancelled external enrollment", :dbclean => :after_each do
