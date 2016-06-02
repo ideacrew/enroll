@@ -356,7 +356,7 @@ class HbxAdmin
               # Duplicate Enrollment
               duplicate_hbx = original_hbx.dup
               duplicate_hbx.updated_at = TimeKeeper.datetime_of_record
-              duplicate_hbx.effective_on = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record)
+              duplicate_hbx.effective_on = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) # Populate the effective_on date based on the 15th day rule.
 
               # Duplicate all Enrollment Members
               duplicate_hbx.hbx_enrollment_members = original_hbx.hbx_enrollment_members.collect {|hem| hem.dup}
