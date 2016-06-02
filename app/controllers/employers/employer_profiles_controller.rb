@@ -91,7 +91,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-        @plan_years = @employer_profile.plan_years.order(id: :desc)
+        sort_plan_years(@employer_profile.plan_years)
       when 'documents'
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
@@ -253,6 +253,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
+
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
@@ -260,6 +261,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def check_and_download_invoice
     @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+  end
+
+  def sort_plan_years(plans)
+    renewing_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::RENEWING
+    renewing = plans.select { |plan_year| renewing_states.include? plan_year.aasm_state }
+    ineligible_plans, active_plans = plans.partition { |plan_year| PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state }
+    ineligible_plans = ineligible_plans.select { |plan_year| renewing.exclude? plan_year }
+    active_plans = active_plans.partition { |plan_year| PlanYear::PUBLISHED.include? plan_year.aasm_state }.flatten
+    active_plans = active_plans.select { |plan_year| renewing.exclude? plan_year }
+    @plan_years = renewing + active_plans + ineligible_plans
   end
 
   def paginate_employees

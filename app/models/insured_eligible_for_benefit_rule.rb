@@ -70,7 +70,8 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_family_relationships_satisfied?
-    true
+    age = age_on_next_effective_date(@role.dob)
+    relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
   end
 
   def is_benefit_categories_satisfied?
@@ -146,4 +147,14 @@ class InsuredEligibleForBenefitRule
   def is_person_vlp_verified?
     @role.aasm_state == "fully_verified" ? true : false
   end
+
+  def primary_applicant
+    @role.person.families.last.family_members.select {|s| s.is_primary_applicant}.first || nil
+  end
+
+  def relation_ship_with_primary_applicant
+    primary_applicant.person.person_relationships.select {|r|r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
+  # @role.person.person_relationships.select {|r| r.person.id.to_s == primary_applicant.person_id.to_s }.first.try(:kind) || nil
+  end
+
 end

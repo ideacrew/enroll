@@ -336,6 +336,16 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
+  def first_name_last_name_and_suffix
+    [first_name, last_name, name_sfx].compact.join(" ")
+    case name_sfx
+      when "ii" ||"iii" || "iv" || "v"
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      else
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+      end
+  end
+
   def age_on(date)
     age = date.year - dob.year
     if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
@@ -634,7 +644,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
