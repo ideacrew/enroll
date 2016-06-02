@@ -90,7 +90,7 @@
             <br>
             <button type="submit" class="btn btn-primary pull-left mtz sm_full_width"> <%= "Save".html_safe %></button>
             <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default pull-left' %>
-   
+
       <% end %>
 
 
@@ -115,8 +115,8 @@
             <% end %>
             <br/>
             <div class="form-inputs">
-              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default pull-left' %>
-              <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default pull-left' %>
+              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
+              <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default' %>
             </div>
             <div class="top-row no-border">
               <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
