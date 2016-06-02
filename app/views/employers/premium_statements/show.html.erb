@@ -1,7 +1,7 @@
 <% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<div class="col-xs-12 premium-reports-tab">
+<div class="premium-reports-tab">
   <div class="row no-buffer">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
     <% if plan_year.present? && billing_date.present? %>
