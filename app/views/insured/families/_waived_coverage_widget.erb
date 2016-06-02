@@ -29,12 +29,6 @@
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-
-      <div class="row" style="padding: 0 0 5px;">
-        <div class="col-xs-5 btn-stack pull-right">
-          <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default pull-right" %>
-=======
       <table>
         <tr>
           <td>
@@ -52,7 +46,6 @@
       <div class="row">
         <div class="col-xs-5 pull-right">
           <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-trans pull-right" %>
->>>>>>> 69b4990... refs #5300 add waived date to coverage waived widget, clean up coverage waived widget template and enrollment panel styles, add spec
         </div>
       </div>
     </div>
