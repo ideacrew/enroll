@@ -29,7 +29,7 @@
   content: "When you enrolled in your insurance plan(s) through DC Health Link, some of your information did not match all the electronic data sources we are required by law to check.  As a result, we now need you to submit documents verifying the information you provided on your application. This notice lists the documents that we need below."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "We need your documents by #{notice.due_date}. If we do not have your documents by then, your insurance plan(s) may be terminated."} %>
+  content: "We need your documents <strong>by #{notice.due_date}</strong>. If we do not have your documents by then, your insurance plan(s) may be terminated."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong>"],
@@ -186,7 +186,8 @@
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
              <span style='margin-left:96px;'>Washington, DC 20090</span><br><br>
-             <i>Be sure to write your account number (&#60;account number>) on your submission.</i></li>
+<!--              <i>Be sure to write your account number (&#60;account number>) on your submission.</i>
+ -->           </li>
            </ul></div>
         </td>
       </tr>   

@@ -78,7 +78,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/verifications_backlog_notice',
         notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_5B',
+        mpi_indicator: 'MPI_IVLV5B',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -99,7 +99,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder1',
         notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_20A',
+        mpi_indicator: 'MPI_IVLV20A',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -120,7 +120,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder2',
         notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_20B',
+        mpi_indicator: 'MPI_IVLV20B',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -141,7 +141,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder3',
         notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_21',
+        mpi_indicator: 'MPI_IVLV21',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -162,7 +162,7 @@ ivl_notice_triggers = [
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder4',
         notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_22',
+        mpi_indicator: 'MPI_IVLV22',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

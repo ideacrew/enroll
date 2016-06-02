@@ -41,7 +41,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
 
     append_unverified_individuals(people)
-    @notice.due_date = (enrollments.first.created_at + 95.days).strftime("%B %d, %Y")
+    @notice.due_date = (enrollments.first.special_verification_period || (enrollments.first.created_at + 95.days)).strftime("%m/%d/%Y")
   end
 
   def append_unverified_individuals(people)
