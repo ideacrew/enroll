@@ -347,48 +347,53 @@ class HbxAdmin
           hbx_id = key.sub("aptc_applied_", "")
           updated_aptc_value = aptc_value.to_f
           actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
-          duplicate_enrollment_and_update_aptc(family, hbx_id, updated_aptc_value) if actual_aptc_value != updated_aptc_value
+
+          # Only create enrollments if the APTC values were updated.
+          if actual_aptc_value != updated_aptc_value
+              original_hbx = HbxEnrollment.find(hbx_id)
+              aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+              
+              # Duplicate Enrollment
+              duplicate_hbx = original_hbx.dup
+              duplicate_hbx.updated_at = TimeKeeper.datetime_of_record
+              duplicate_hbx.effective_on = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record)
+
+              # Duplicate all Enrollment Members
+              duplicate_hbx.hbx_enrollment_members = original_hbx.hbx_enrollment_members.collect {|hem| hem.dup}
+              duplicate_hbx.hbx_enrollment_members.each{|hem| hem.updated_at = TimeKeeper.datetime_of_record}
+
+              # Update Applied APTC on the enrolllment level.
+              duplicate_hbx.applied_aptc_amount = updated_aptc_value
+              
+              # Update the correct breakdown of Applied APTC on the individual level.
+              duplicate_hbx.hbx_enrollment_members.each do |hem|
+                aptc_pct_for_member = aptc_ratio_by_member[hem.applicant_id.to_s]
+                hem.applied_aptc_amount = aptc_pct_for_member * updated_aptc_value
+              end
+
+              family.active_household.hbx_enrollments << duplicate_hbx
+              family.save
+
+              # Cancel or Terminate Coverage.
+              if original_hbx.can_terminate_coverage?
+                original_hbx.terminate_coverage!
+              else
+                original_hbx.cancel_coverage!
+              end
+          end
 
         end 
       end  
     end  
-
-      
-    def duplicate_enrollment_and_update_aptc(family, hbx_id, updated_aptc_value)
-      original_hbx = HbxEnrollment.find(hbx_id)
-      aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
-      
-      # Duplicate Enrollment
-      duplicate_hbx = original_hbx.dup
-      duplicate_hbx.updated_at = TimeKeeper.datetime_of_record
-      
-      # Duplicate all Enrollment Members
-      duplicate_hbx.hbx_enrollment_members = original_hbx.hbx_enrollment_members.collect {|hem| hem.dup}
-      duplicate_hbx.hbx_enrollment_members.each{|hem| hem.updated_at = TimeKeeper.datetime_of_record}
-
-      # Update Applied APTC on the enrolllment level.
-      duplicate_hbx.applied_aptc_amount = updated_aptc_value
-      
-      # Update the correct breakdown of Applied APTC on the individual level.
-      duplicate_hbx.hbx_enrollment_members.each do |hem|
-        aptc_pct_for_member = aptc_ratio_by_member[hem.applicant_id.to_s]
-        hem.applied_aptc_amount = aptc_pct_for_member * updated_aptc_value
-      end
-
-      family.active_household.hbx_enrollments << duplicate_hbx
-      family.save
-
-      # Cancel or Terminate Coverage.
-      if original_hbx.can_cancel_coverage?
-        original_hbx.cancel_coverage!
+  
+    def find_enrollment_effective_on_date(hbx_created_datetime)
+      if TimeKeeper.datetime_of_record.day <= 15
+        offset_month = 1
       else
-        original_hbx.terminate_coverage!
+        offset_month = 2
       end
-    end 
+      return DateTime.new(TimeKeeper.datetime_of_record.year, TimeKeeper.datetime_of_record.month + offset_month, 1)
+    end
 
-    ###
-
-  end
-
-
-end
+  end #  end of class << self
+end # end of class HbxAdmin

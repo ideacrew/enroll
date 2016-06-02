@@ -1,0 +1,16 @@
+<!-- APTC APPLIED PER ENROLLMENT -->
+
+<div align = "right">
+  <table>
+    <tr>
+      <th>Max APTC</th>
+      <td width = "20px;" ></td>
+      <td><%= text_field_tag "max_aptc", max_aptc, class: 'form-control', size: '8px'%></td>
+      <td width="50px;"></td>
+
+      <th>CSR % AS INTEGER</th>
+      <td width = "20px;" ></td>
+      <td style="border-left: thin solid; border-top: thin solid; border-bottom: thin solid; border-right: thin solid;"> <%= select_tag "csr_percentage", options_for_select([ 100, 94, 87, 73 ], csr_percent_as_integer)%></td>
+    </tr>
+  </table>  
+</div>

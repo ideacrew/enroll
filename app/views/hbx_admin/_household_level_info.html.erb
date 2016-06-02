@@ -8,6 +8,9 @@
     </h2>
   </div>
   <div class="panel-body">
+    
+    <%= render 'household_header.html.erb', :max_aptc => @max_aptc, :csr_percent_as_integer => @csr_percent_as_integer%>
+    <hr style="margin:  2px 1px;"/>
 
     <table class="table table-border module edit-aptc-csr-table">
       <thead>
@@ -15,37 +18,37 @@
         <% $months_array.each do |month| %>
           <th><%=month.capitalize%></th>
         <%end%>
-        <th> </th>
-        <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th>
+        <!-- <th> </th> -->
+        <!-- <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th> -->
         <!-- <th></th> -->
       </thead>  
       <tbody>
         <%@household_info.keys.each do |attribute|%>
           <tr>
-            <td><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
+            <td width="140px;" ><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
             <% @household_info[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
               <td class="<%=aptc_csr_data_type(month)%>"> 
                 <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
               </td>
             <%end%>
-            <td></td>
-            <td>
-              <%if attribute == "max_aptc"%>
-                  <%= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px'%>
-              <%elsif attribute == "csr_percentage"%>
+            <!-- <td></td> -->
+            <!-- <td>
+              <%#if attribute == "max_aptc"%>
+                  <%#= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px'%>
+              <%#elsif attribute == "csr_percentage"%>
                   <%#= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px'%>
-                  <%= select_tag "#{attribute.to_s}", options_for_select([ 100, 94, 87, 73 ], @csr_percent_as_integer)%>
-              <%end%> 
-            </td>
+                  <%#= select_tag "#{attribute.to_s}", options_for_select([ 100, 94, 87, 73 ], @csr_percent_as_integer)%>
+              <%#end%> 
+            </td> -->
             <!-- <td ></td> -->
           </tr>
           <tr></tr>
         <%end%>
-        <tr><td colspan = "16" class="aptc-csr-grid-separator"></td></tr>
+        <tr><td colspan = "13" class="aptc-csr-grid-separator"></td></tr>
         <tr>
           <th colspan = "13">Household Member(s)</th>
-          <th></th>
-          <th></th>
+          <!-- <th></th>
+          <th></th> -->
           <!-- <th></th> -->
         </tr>
         <% @household_members.each do |person_id| %>
@@ -57,8 +60,8 @@
                 &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  
               <%end%>
             </td>
-            <td></td>
-            <td></td>
+            <!-- <td></td>
+            <td></td> -->
             <!-- <td></td> -->
           </tr>
         <%end%>

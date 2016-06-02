@@ -20,10 +20,10 @@
     <div class="panel-body">
 
 
-      <%= render 'enrollment_filter_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
+      <%= render 'enrollment_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
       <%#= render 'enrollment_level_info.html.erb', :hbx_id => enrollment_info_key.to_s, :hbx_values => enrollment_info_value, :enrollment_count => count%>
 
-      <hr style="margin:  1px 1px;"/>
+      <hr style="margin:  2px 2px;"/>
       <table class="table table-border module edit-aptc-csr-table">
         <thead>
           <th>Member APTC</th>
@@ -36,7 +36,7 @@
           <!-- BREAKDOWN OF APTC APPLIED PER MEMBER FOR THE ABOVE ENROLLMENT -->
           <%hbx_values["aptc_applied_per_member"].each do |member_id, aptc_values|%>
             <tr>
-              <td><%= full_name_of_person(member_id)%></td>
+              <td width="140px;"><%= full_name_of_person(member_id)%></td>
               <% aptc_values.each do |month, val| %>  <!-- month and the corresponding values -->
                 <td class="<%=aptc_csr_data_type(month)%>"> 
                   <%= label_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
@@ -48,7 +48,7 @@
           <!--Total from all members / for Enrollment-->
 
             <tr>
-              <td>Totals</td>
+              <td width="140px;">Totals</td>
                 <%hbx_values["aptc_applied"].each do |month, aptc_value|%>
                 <td class="<%=aptc_csr_data_type(month)%>"> 
                   <%= label_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%>
