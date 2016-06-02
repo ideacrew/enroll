@@ -291,6 +291,7 @@ end
 
 When(/^a CSR exists/) do
   p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
+  sleep 2
   FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
 end
 
