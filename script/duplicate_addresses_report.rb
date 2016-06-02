@@ -19,10 +19,16 @@ def clean_fields(address)
 	return address
 end
 
+count = 0
+
+timestamp = Time.now.strftime('%Y%m%d%H%M')
+
 CSV.open("2016_enrollments_with_multiple_addresses_#{timestamp}_enroll.csv", "w") do |csv|
 	csv << ["Enrollment Group ID", "Subscriber", "HBX ID", "Home Address","","","","", "Mailing Address"]
 	csv << ["","","","Address 1","Address 2","City","State","Zip","Address 1","Address 2","City","State","Zip"]
 	Person.all.each do |person|
+		count += 1
+		puts count if count % 10000 == 0
 		next if person.families.size == 0
 		next if person.addresses.size < 2
 		person.families.each do |family|
@@ -31,10 +37,12 @@ CSV.open("2016_enrollments_with_multiple_addresses_#{timestamp}_enroll.csv", "w"
 				next if household.hbx_enrollments.size == 0
 				household.hbx_enrollments.each do |hbx_enrollment|
 					next if hbx_enrollment.effective_on.year != 2016
+					next if hbx_enrollment.hbx_enrollment_members.size == 0
+					next if hbx_enrollment.subscriber == nil
 					next if hbx_enrollment.subscriber.person != person
 					## Lets get all of the data and put it into the CSV!
 					eg_id = hbx_enrollment.hbx_id
-					subscriber_name = person.name
+					subscriber_name = person.full_name
 					subscriber_hbx_id = person.hbx_id
 					home_address = person.home_address
 					mailing_address = person.mailing_address
