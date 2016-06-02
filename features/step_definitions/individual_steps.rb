@@ -321,7 +321,7 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  expect(page).to have_content "I'm a Trained Expert"
+  expect(page).to have_content "I'm a Trained Expert", :wait => 10
   click_link "I'm a Trained Expert"
 end
 
