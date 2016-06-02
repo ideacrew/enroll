@@ -256,7 +256,7 @@ GEM
     method_source (0.8.2)
     mime-types (2.99.1)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     monetize (1.1.0)
       money (~> 6.5.0)
     money (6.5.1)
@@ -289,7 +289,7 @@ GEM
     mongoid-versioning (2.0.0)
       activesupport (~> 4.0)
       mongoid (>= 4.0.0, <= 6.0.0)
-    multi_json (1.12.0)
+    multi_json (1.12.1)
     multi_test (0.1.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -594,4 +594,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (= 0.12.3.0)
 
 BUNDLED WITH
-   1.11.2
+   1.12.1

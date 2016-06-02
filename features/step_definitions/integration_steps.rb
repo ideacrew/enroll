@@ -324,7 +324,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  click_link "LOGOUT"
+  click_link "Logout"
   visit "/"
 end
 
@@ -392,19 +392,24 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   sleep 3
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
-  wait_for_ajax(10)
+  wait_for_ajax
+  page.evaluate_script("window.location.reload()")
   person = people[named_person]
-  find('.interaction-click-control-click-here').click
-  find('.interaction-click-control-close').click
+  screenshot("before modal")
+  # find('.interaction-click-control-click-here').click
+  screenshot("during modal")
+  # find('.interaction-click-control-close').click
+  screenshot("after modal")
 
   sleep 3
-  wait_for_ajax(10)
+  wait_for_ajax
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  find("#person_addresses_attributes_0_address_1").trigger('click')
-  find("#person_addresses_attributes_0_address_2").trigger('click')
-  find("#person_addresses_attributes_0_city").trigger('click')
-  find("#person_addresses_attributes_0_zip").trigger('click')
-
+  # find("#person_addresses_attributes_0_address_1").trigger('click')
+  # find("#person_addresses_attributes_0_address_2").trigger('click')
+  # there is a flickering failure here due to over-lapping modals
+  # find("#person_addresses_attributes_0_city").trigger('click')
+  # find("#person_addresses_attributes_0_zip").trigger('click')
+  find_by_id("person_phones_attributes_0_full_phone_number")
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
