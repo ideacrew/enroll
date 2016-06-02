@@ -71,7 +71,6 @@ module InvoiceHelper
 
     @pdf.start_new_page
 
-    @pdf.move_down 36
     #Image
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
     invoice_header_data = [ 
@@ -85,26 +84,36 @@ module InvoiceHelper
 
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
     
-    @pdf.move_down 60
+    @pdf.move_down 36
 
     address = @organization.try(:office_locations).first.address 
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 585]
+    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 620]
     if address
-      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 573]
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 561]
+      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 608]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 596]
     end
-    
-    @pdf.move_down 12
+    @pdf.move_down 24
     @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 48
+    @pdf.move_down 36
+
+    if @employer_profile.is_conversion? #employer_profile.plan_years.map(&:aasm_state).include?("renewing_published")
+      @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+      @pdf.move_down 60
+      @pdf.text_box "You will now receive a monthly invoice from DC Health Link. Payments should be directed to DC Health Link for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of DC Health Link. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
+    else
+      @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+      @pdf.move_down 12
+    end
+
+    @pdf.move_down 60
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
+    @pdf.move_down 24
     @pdf.text_box "https://www.e-BillExpress.com/ebpp/DCHealthPay", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
+    @pdf.move_down 24
     @pdf.text_box "DC Health Link", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
@@ -115,28 +124,27 @@ module InvoiceHelper
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
-    stroke_dashed_horizontal_line(10, 250)
-    @pdf.move_down 36
+    stroke_dashed_horizontal_line(10, 225)
+    @pdf.move_down 24
 
     @pdf.image logopath, :width => 150, :at => [logo_x, @pdf.cursor]
 
     dchbx_table_light_blue(invoice_header_data,address_x)
 
-    @pdf.move_down 18
-    @pdf.text_box "Amount Enclosed:", :at => [address_x, 112], :align => :center, :style => :bold
-    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 122]
+    @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
+    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
 
-    @pdf.text_box "DC Health Link", :at => [320,  72]
-    @pdf.text_box "PO Box 97022", :at => [320,  60]
-    @pdf.text_box "Washington, DC 20090", :at => [320,  48]
+    @pdf.text_box "DC Health Link", :at => [320,  48]
+    @pdf.text_box "PO Box 97022", :at => [320,  36]
+    @pdf.text_box "Washington, DC 20090", :at => [320,  24]
     
     address = @organization.try(:office_locations).first.address 
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 72]
+    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
     if address
       @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.address_1}", :at => [address_x, 60]
+      @pdf.text_box "#{address.address_1}", :at => [address_x, 36]
       @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 48]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 24]
     end
 
 
@@ -156,13 +164,9 @@ module InvoiceHelper
     ]
     enrollment_summary.each do |name,plan_summary| 
       invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{plan_summary['total_premium']}"]
-
     end
-
+    invoice_services_data << ["New charges total", "", "", "$#{@hbx_enrollments.map(&:total_premium).sum}"]
     dchbx_table_item_list(invoice_services_data)
-    @pdf.move_down 5
-    @pdf.text_box "New Charges Total", :at => [0, @pdf.cursor], :style => :bold
-    @pdf.text "$#{@hbx_enrollments.map(&:total_premium).sum}" , :align => :right, :style => :bold
 
     enrollment_summary.each do |name, summary| 
       carrier_plan_services_data = [ 
@@ -195,13 +199,8 @@ module InvoiceHelper
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
         carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_dependent_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
       end
-
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium']}"]
       dchbx_table_by_plan(carrier_plan_services_data)
-
-      @pdf.move_down 5
-      @pdf.text_box "PLAN TOTAL", :at => [0, @pdf.cursor], :style => :bold
-      @pdf.text "$#{summary['total_premium']}", :align => :right, :style => :bold
-
     end
 
     @pdf.page_count.times do |i|
@@ -282,10 +281,11 @@ module InvoiceHelper
       style(row(0).columns(0..-1), :borders => [:top, :bottom])
       style(row(0).columns(0), :borders => [:top, :left, :bottom])
       style(row(0).columns(-1), :borders => [:top, :right, :bottom])
-      style(row(-1), :border_width => 2)
+      style(row(-1), :border_width => 2, :font_style => :bold)
       style(column(1..-1), :align => :center)
       style(columns(0), :width => 270)
       style(columns(1), :width => 80)
+      style(columns(-1), :align => :right)
     end
   end
 
@@ -297,9 +297,10 @@ module InvoiceHelper
       style(row(0).columns(0..-1), :borders => [:top, :bottom])
       style(row(0).columns(0), :borders => [:top, :left, :bottom])
       style(row(0).columns(-1), :borders => [:top, :right, :bottom])
-      style(row(-1), :border_width => 2)
+      style(row(-1), :border_width => 2, :font_style => :bold)
       style(column(1..-1), :align => :center)
-      style(columns(0), :width => 40)
+      style(columns(-1), :align => :right)
+      style(columns(0).row(-1), :width => 80)
       style(columns(3), :width => 60)
       style(columns(4), :width => 60)
       style(columns(5), :width => 60)
