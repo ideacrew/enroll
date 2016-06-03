@@ -99,12 +99,8 @@ module Importers
     def create_model(record_attrs)
       row_action = record_attrs[:action]
       row_action ||= "add"
-      case row_action.downcase.strip
-      when "update"
-        ::Importers::ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
-      else
-        ::Importers::ConversionEmployer.new(record_attrs.merge({:registered_on => @conversion_date}))
-      end
+
+      ::Importers::ConversionEmployer.new(record_attrs.merge({:registered_on => @conversion_date}))
     end
   end
 end
