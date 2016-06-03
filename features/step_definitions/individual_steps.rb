@@ -291,6 +291,7 @@ end
 
 When(/^a CSR exists/) do
   p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
+  sleep 2
   FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
 end
 
@@ -320,8 +321,8 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  expect(page).to have_content "I'm a Trained Expert"
-  click_link "I'm a Trained Expert"
+  expect(page).to have_content "I'm a Trained Expert", :wait => 10
+  find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").trigger('click')
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do

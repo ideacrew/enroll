@@ -152,10 +152,10 @@
   <div class="row">
   <br/>
   <% if current_user.can_change_broker? %>
-  <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-block btn-lg starter", id: 'browse_brokers_link',
+  <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-block btn-lg starter", id: 'browse_brokers_link',
     onclick: '$("#brokers-empty").hide(); $("#active_broker_tab").hide(); $("#browse_brokers_link").hide()' %>
   <% else %>
-    <%= link_to 'Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary  disabled" %>
+    <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary disabled" %>
   <% end %>
   </div>
 </div>
