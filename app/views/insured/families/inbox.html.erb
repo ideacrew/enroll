@@ -2,10 +2,9 @@
 <%= render 'navigation' %>
 <% end %>
 
-<div class="my-account-page col-md-12">
+<div class="my-account-page">
   <h1>Messages</h1>
 </div>
 
-<div class="col-md-12">
+
   <%= render 'inbox', provider: current_user.person %>
-</div>

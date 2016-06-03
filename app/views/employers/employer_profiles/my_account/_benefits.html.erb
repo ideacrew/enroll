@@ -1,4 +1,4 @@
-<div class="col-xs-12 benefits-tab">
+<div class="benefits-tab">
   <div class="row">
     <div class="col-xs-8">
       <h1>Benefits - Coverage You Offer</h1>
@@ -49,14 +49,14 @@
       <div class="row">
         <% if plan_year.draft? || plan_year.renewing_draft? %>
         <% if plan_year.overlapping_published_plan_years.empty? %>
-        <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans pull-right" %>
+        <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
         <% end %>
-        <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans pull-right mrz"%>
+        <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
         <% end %>
 
         <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
-        <span class="btn btn-trans pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
-        <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->
+        <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
+        <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
         <% end %>
       </div>
     </div>
@@ -433,7 +433,7 @@
         <br class="clear"/>
       </div>
       <div class="below clear">
-        <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-trans' if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
+        <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-default' if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
         <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
       </div>
       <% end %>
