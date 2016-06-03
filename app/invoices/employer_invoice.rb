@@ -29,6 +29,7 @@ class EmployerInvoice
 	def save_to_cloud
 		begin
 			Organization.upload_invoice(invoice_absolute_file_path)
+			clear_tmp(invoice_absolute_file_path)
 		rescue Exception => e
 			@errors << "Unable to upload PDF for. #{@organization.hbx_id}"
 		end
@@ -49,6 +50,10 @@ class EmployerInvoice
 		@organization.employer_profile.staff_roles.each do |staff_role|
 			UserMailer.employer_invoice_generation_notification(staff_role.user,subject).deliver_now
     end
+  end
+
+  def clear_tmp(file)
+		File.delete(file)
   end
 
 	def save_and_notify
