@@ -154,6 +154,10 @@ class Organization
     documents.select{ |document| document.subject == 'invoice' }
   end
 
+  def current_month_invoice
+    documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+  end
+
   # Strip non-numeric characters
   def fein=(new_fein)
     write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
