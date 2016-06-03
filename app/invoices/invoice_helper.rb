@@ -80,7 +80,7 @@ module InvoiceHelper
       ["INVOICE NUMBER:", "123123"],
       ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
       ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-      ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum}"],
+      ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"],
       ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
     ]
 
@@ -165,9 +165,9 @@ module InvoiceHelper
       ["Insurance Carrier Plan", "Covered Subscribers", "Covered Dependents", "New Charges"]
     ]
     enrollment_summary.each do |name,plan_summary| 
-      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{plan_summary['total_premium']}"]
+      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{plan_summary['total_premium'].round(2)}"]
     end
-    invoice_services_data << ["New charges total", "", "", "$#{@hbx_enrollments.map(&:total_premium).sum}"]
+    invoice_services_data << ["New charges total", "", "", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"]
     dchbx_table_item_list(invoice_services_data)
 
     enrollment_summary.each do |name, summary| 
@@ -201,7 +201,7 @@ module InvoiceHelper
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
         carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_dependent_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
       end
-      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium']}"]
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium'].round(2)}"]
       dchbx_table_by_plan(carrier_plan_services_data)
     end
 
