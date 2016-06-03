@@ -1687,3 +1687,29 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
     end
   end
 end
+
+context "A cancelled external enrollment", :dbclean => :after_each do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:enrollment) do
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       kind: "employer_sponsored",
+                       submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                       created_at: TimeKeeper.datetime_of_record - 3.day
+                      )
+  end
+
+  before :each do
+    enrollment.aasm_state = "coverage_canceled"
+    enrollment.terminated_on = enrollment.effective_on
+    enrollment.external_enrollment = true
+    enrollment.hbx_enrollment_members.each do |em|
+      em.coverage_end_on = em.coverage_start_on
+    end
+    enrollment.save!
+  end
+
+  it "should not be visible to the family" do
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+end

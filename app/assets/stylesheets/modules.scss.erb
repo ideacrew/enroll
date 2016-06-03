@@ -5,6 +5,35 @@ $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 $grayed-out: #b7b7b7;
 .module {
+  &.footer {
+    font-size: 14px;
+    color: $primary-white;
+    background-color: #003260;
+    padding: 15px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    a {
+      color: $primary-white;
+    }
+    &>.container {
+      display: table;
+      .col-md-6 {
+        display: table-cell;
+        float: none;
+        vertical-align: middle;
+      }
+      .col-md-6:last-of-type {
+        a, span {
+          display: inline-block;
+        }
+        ul {
+          margin: 0;
+        }
+      }
+    }
+  }
   &.employer-invoices {
     max-width: 660px;
     thead th {

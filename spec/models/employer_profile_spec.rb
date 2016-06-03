@@ -274,6 +274,11 @@ describe EmployerProfile, dbclean: :after_each do
   end
 
   context ".benefit_group_assignments" do
+
+    before do
+      DatabaseCleaner.clean
+    end
+
     let(:benefit_group) { FactoryGirl.build(:benefit_group)}
     let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }

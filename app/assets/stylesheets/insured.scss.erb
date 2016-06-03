@@ -1,26 +1,38 @@
 
 $primary-blue: #007bc4;
 $primary-green: #69A30D;
+$primary-color: #007bc4;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 
 .module {
-  &.brokers-widget {
-    word-break:break-all;
-    .col-xs-8 {
-      padding-top: 10px;
-      padding-right: 10px;
-      padding-left: 0;
-      h4 {
-        padding: 15px 0 0 0;
-        margin: 0;
-        font-weight: 600;
+  &#qle-details {
+    .error-info {
+      margin-top: 0;
+    }
+  }
+  &.shop-for-plans-widget {
+    a {
+      width: 100%;
+      margin-bottom: 2.5%;
+      &.btn {
+        padding: 6px 0;
       }
     }
-
-    h4, .fa {
-      color: #007bc4;
+  }
+}
+.brokers-widget {
+  .col-xs-8 {
+    padding-top: 10px;
+    h4 {
+      padding: 15px 0 0 0;
+      margin: 0;
+      font-weight: 600;
     }
+
+  h4, .fa {
+    color: $primary-color;
+  }
 
     .col-xs-4 {
       cursor: pointer;
@@ -40,16 +52,14 @@ $primary-bold: 600;
         color: #007bc4;
       }
     }
-  }
-  &#qle-details {
-    .error-info {
-      margin-top: 0;
+    span {
+      color: $primary-color;
     }
   }
 }
 .help-signup {
   h4 {
-    color: #007bc4;
+    color: $primary-color;
     margin-bottom: 0;
     font-weight: 600;
     &+small {
@@ -71,7 +81,7 @@ $primary-bold: 600;
   }
   i {
     text-align: center;
-    color: #007bc4;
+    color: $primary-color;
     display: block;
   }
   .fa-phone {
@@ -88,7 +98,7 @@ $primary-bold: 600;
   padding-top: 4.45%;
 }
 .fa-icon-link, .fa-icon-label, a {
-  color: #007bc4;
+  color: $primary-color;
   cursor: pointer;
   &:hover {
     color: #23527c;
@@ -102,7 +112,7 @@ $primary-bold: 600;
 
   .benefits-tab, .home-tab, .hbx-enrollment-panel {
     .fa {
-      color: #007bc4;
+      color: $primary-color;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
