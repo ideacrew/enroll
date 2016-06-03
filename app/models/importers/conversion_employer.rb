@@ -157,6 +157,39 @@ module Importers
       Person.create!(person_attrs)
     end
 
+    def update_poc(emp)
+      return true if contact_first_name.blank? || contact_last_name.blank?
+      
+      matching_staff_role = emp.staff_roles.detect{|staff| 
+        staff.first_name.match(/#{contact_first_name}/i) && staff.last_name.match(/#{contact_last_name}/i)
+      }
+
+      if emp.staff_roles.present? && matching_staff_role.blank?
+        emp.staff_roles.each do |person|
+          person.employer_staff_roles.where(employer_profile_id: emp.id).each{|role| role.close_role!}
+        end
+      end
+
+      if matching_staff_role.present?
+        matching_staff_role.phones = [
+          Phone.new({
+            :kind => "work",
+            :full_phone_number => contact_phone
+          })
+        ]
+
+        if contact_email.present?
+          matching_staff_role.emails = [
+            Email.new(:kind => "work", :address => contact_email)
+          ]
+        end
+
+        matching_staff_role.save!
+      else
+        map_poc(emp)
+      end
+    end
+
     def save
       return false unless valid?
       new_organization = Organization.new({
@@ -178,6 +211,31 @@ module Importers
       end
       propagate_errors(new_organization)
       return save_result
+    end
+
+    def update
+      organization = Organization.where(:fein => fein).first
+      if organization.blank?
+        errors.add(:fein, "employer don't exists with given fein")
+      end
+
+      broker_exists_if_specified
+
+      organization.legal_name = legal_name
+      organization.dba = dba
+      organization.office_locations = map_office_locations
+
+      br = BrokerRole.by_npn(broker_npn).first
+      if br.present? && organization.employer_profile.broker_agency_accounts.where(:writing_agent_id => br.id).blank?
+        organization.employer_profile.broker_agency_accounts = assign_brokers
+      end
+
+      if update_result = organization.save
+        update_poc(organization.employer_profile)
+      end
+
+      propagate_errors(organization)
+      return update_result
     end
 
     def propagate_errors(org)

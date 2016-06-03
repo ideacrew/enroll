@@ -31,9 +31,13 @@ module Importers
           record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/,"")
         end
       end
+
       record = create_model(record_attrs)
+
       import_details = []
-      if record.save
+
+      result = (record_attrs[:action].downcase == 'update' ? record.update : record.save)
+      if result
         if record.warnings.any?
           import_details = ["imported with warnings", JSON.dump(record.warnings.to_hash)]
         else
