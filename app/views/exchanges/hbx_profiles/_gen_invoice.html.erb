@@ -8,5 +8,10 @@
 	<%=
   params[:employerId].inspect
 %>
+<% @organizations.each do |organization| %>
+	<%=organization.fein %>
+	<%=organization.legal_name %>
+<%end%>
+
 <%end%>
 
