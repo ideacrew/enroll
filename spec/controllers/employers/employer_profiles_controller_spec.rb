@@ -198,13 +198,13 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
+        allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
   
         sign_in(user)
       end
 
       it "should render the show template" do
         allow(user).to receive(:person).and_return(person)
-        allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         get :show, id: employer_profile.id, tab: "home"
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
