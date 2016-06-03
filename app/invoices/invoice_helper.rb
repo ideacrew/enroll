@@ -71,6 +71,8 @@ module InvoiceHelper
 
     @pdf.start_new_page
 
+    @pdf.start_new_page
+
     #Image
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
     invoice_header_data = [ 
@@ -204,7 +206,7 @@ module InvoiceHelper
     end
 
     @pdf.page_count.times do |i|
-      next if i < 2
+      next if i < 3
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
@@ -214,11 +216,10 @@ module InvoiceHelper
 
 
     @pdf.page_count.times do |i|
-      next if i < 1
+      next if i < 2
       @pdf.go_to_page(i+1)
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.draw_text "Page #{i} of #{@pdf.page_count - 1}",:at => [480, @pdf.bounds.height - 30]
-        # @pdf.draw_text "#{Time.now.strftime("%B %d, %Y")}" ,:at => [455, @pdf.bounds.height - 20]
+        @pdf.draw_text "Page #{i-1} of #{@pdf.page_count - 2}",:at => [480, @pdf.bounds.height - 30]
       }
     end
 
