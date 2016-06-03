@@ -322,7 +322,7 @@ end
 
 When(/I click on the header link to return to CSR page/) do
   expect(page).to have_content "I'm a Trained Expert", :wait => 10
-  click_link "I'm a Trained Expert"
+  find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").trigger('click')
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
