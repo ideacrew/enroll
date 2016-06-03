@@ -69,7 +69,7 @@ shop_notice_triggers = [
 ivl_notice_triggers = [
   {
     hbx_id: 'VerificationBacklog',
-    title: 'Verification Backlog Notification',
+    title: 'Documents Needed',
     description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
     resource_name: 'consumer_role',
     event_name: 'verifications_backlog',
@@ -90,13 +90,13 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20A',
-    title: 'Outstanding Verification Notification - First Reminder',
+    title: 'First Reminder of Documents Needed',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
     notice_triggers: [
       {
-        name: 'Outstanding Verification Notification',
+        name: 'First Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder1',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLV20A',
@@ -111,13 +111,13 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20B',
-    title: 'Outstanding Verification Notification - Second Reminder',
+    title: 'Second Reminder of Documents Needed',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
     notice_triggers: [
       {
-        name: 'Outstanding Verification Notification',
+        name: 'Second Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder2',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLV20B',
@@ -132,13 +132,13 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice21',
-    title: 'Outstanding Verification Notification - Third Reminder',
+    title: 'Third Reminder of Documents Needed',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
     notice_triggers: [
       {
-        name: 'Outstanding Verification Notification',
+        name: 'Third Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder3',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLV21',
@@ -153,13 +153,13 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice22',
-    title: 'Outstanding Verification Notification - Fourth Reminder',
+    title: 'Fourth Reminder of Documents Needed',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
     notice_triggers: [
       {
-        name: 'Outstanding Verification Notification',
+        name: 'Fourth Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder4',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLV22',

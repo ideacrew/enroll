@@ -19,7 +19,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     @family = @recipient.primary_family    
     @notice.primary_fullname = @recipient.full_name.titleize
     @notice.primary_identifier = @recipient.hbx_id
-    append_address(@recipient.addresses[0])
+    append_address(@recipient.mailing_address)
 
     append_unverified_family_members
   end
@@ -44,13 +44,23 @@ class IvlNotices::ConsumerNotice < IvlNotice
     @notice.due_date = (enrollments.first.special_verification_period || (enrollments.first.created_at + 95.days)).strftime("%m/%d/%Y")
   end
 
+  def verification_type_outstanding?(person, verification_type)
+    verification_pending = false
+    if person.verification_types.include?(verification_type)
+      if person.consumer_role.is_type_outstanding?(verification_type)
+        verification_pending = true
+      end
+    end
+    verification_pending
+  end
+
   def append_unverified_individuals(people)
     people.each do |person|
-      if person.consumer_role.is_type_outstanding?("Social Security Number")
+      if verification_type_outstanding?(person, 'Social Security Number')
         @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
 
-      if person.consumer_role.is_type_outstanding?("Citizenship") || person.consumer_role.is_type_outstanding?("Immigration status")
+      if verification_type_outstanding?(person, 'Citizenship') || verification_type_outstanding?(person, 'Immigration status')
         @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
     end
