@@ -18,7 +18,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
   def build
     @family = @recipient.primary_family    
     @notice.primary_fullname = @recipient.full_name.titleize
-    @notice.primary_identifier = @recipient.hbx_id
+    # @notice.primary_identifier = @recipient.hbx_id
     append_address(@recipient.mailing_address)
 
     append_unverified_family_members
@@ -68,11 +68,15 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_address(primary_address)
     @notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
+      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
       city: primary_address.city.titleize,
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def capitalize_quadrant(address_line)
+    address_line.strip.gsub!(/\s+NW$|\s+NE$|\s+SE$|\s+SW$/i){|quadrant| " #{quadrant.strip.upcase()}"} || address_line
   end
 end 
