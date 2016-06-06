@@ -183,49 +183,50 @@ CSV.foreach(filename, headers: :true) do |row|
 						dependent.hbx_id = data_row["HBX ID (Dep 6)"]
 						dependent.save
 					end
-					family = subscriber.primary_family
-					household = family.active_household
-					hbx_enrollment = HbxEnrollment.new
-					household.hbx_enrollments.push(hbx_enrollment)
-					coverage_household = household.immediate_family_coverage_household
-					hbx_enrollment.coverage_household_id = coverage_household._id
-					hbx_enrollment.enrollment_kind = "open_enrollment"
-					hbx_enrollment.kind = data_row["Enrollment Kind"]
-					hbx_enrollment.effective_on = format_date(data_row["Benefit Begin Date"])
-					hbx_enrollment.benefit_group_assignment_id = benefit_group_assignment._id
-					hbx_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
-					hbx_enrollment.employee_role_id = employee_role._id
-					year = data_row["Plan Year"]
-					plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
-					hbx_enrollment.plan_id = plan._id
-					hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
-					hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
-					if data_row["Plan Selected"] != nil
-						hbx_enrollment.submitted_at = format_date(data_row["Date Plan Selected"]).to_datetime
-					else
-						hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
-					end
-					hbx_enrollment.save
-					hbx_enrollment_member = HbxEnrollmentMember.new
-					hbx_enrollment_member.is_subscriber = true
-					hbx_enrollment_member.coverage_start_on = hbx_enrollment.effective_on
-					hbx_enrollment_member.applicant_id = family.family_members.first._id
-					hbx_enrollment_member.eligibility_date = hbx_enrollment_member.coverage_start_on.prev_month + 14.days
-					hbx_enrollment.hbx_enrollment_members.push(hbx_enrollment_member)
-					hbx_enrollment_member.save
-					hbx_enrollment.aasm_state = "coverage_selected"
-					hbx_enrollment.save
 				else
 					raise ArgumentError.new("census employee does not exist for provided person details")
 				end
 			end
 		end
+		family = subscriber.primary_family
+		household = family.active_household
+		hbx_enrollment = HbxEnrollment.new
 		benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],organization,census_employee)
-		## Maybe use EnrollmentFactory#build_employee_role if none exists
-		hbx_enrollment.employee_role_id = select_employee_role(organization.employer_profile._id,subscriber.employee_roles)
+		if subscriber.employee_roles.size == 0
+			Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details)
+		end
+		hbx_enrollment.employee_role_id = select_employee_role(organization.employer_profile._id,subscriber.employee_roles)._id
+		household.hbx_enrollments.push(hbx_enrollment)
+		coverage_household = household.immediate_family_coverage_household
+		hbx_enrollment.coverage_household_id = coverage_household._id
+		hbx_enrollment.enrollment_kind = "open_enrollment"
+		hbx_enrollment.kind = data_row["Enrollment Kind"]
+		hbx_enrollment.effective_on = format_date(data_row["Benefit Begin Date"])
+		hbx_enrollment.benefit_group_assignment_id = benefit_group_assignment._id
+		hbx_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
+		year = data_row["Plan Year"]
+		plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: year).first
+		hbx_enrollment.plan_id = plan._id
+		hbx_enrollment.carrier_profile_id = plan.carrier_profile._id
+		hbx_enrollment.hbx_id = data_row["Enrollment Group ID"].to_s
+		if data_row["Plan Selected"] != nil
+			hbx_enrollment.submitted_at = format_date(data_row["Date Plan Selected"]).to_datetime
+		else
+			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
+		end
+		hbx_enrollment.save
+		hbx_enrollment_member = HbxEnrollmentMember.new
+		hbx_enrollment_member.is_subscriber = true
+		hbx_enrollment_member.coverage_start_on = hbx_enrollment.effective_on
+		hbx_enrollment_member.applicant_id = family.family_members.first._id
+		hbx_enrollment_member.eligibility_date = hbx_enrollment_member.coverage_start_on.prev_month + 14.days
+		hbx_enrollment.hbx_enrollment_members.push(hbx_enrollment_member)
+		hbx_enrollment_member.save
+		hbx_enrollment.aasm_state = "coverage_selected"
+		hbx_enrollment.save
+		
 		family = subscriber.primary_family
 		household = subscriber.primary_family.active_household
-		hbx_enrollment = HbxEnrollment.new
 		if benefit_group_assignment.hbx_enrollment_id == nil
 			benefit_group_assignment.hbx_enrollment_id = hbx_enrollment._id
 		end
@@ -257,7 +258,9 @@ CSV.foreach(filename, headers: :true) do |row|
 		hbx_enrollment.save
 	rescue Exception=>e
 		puts e.inspect
-		puts e.backtrace
+		binding.pry
+		puts "-"*100
+		#puts e.backtrace
 	end
 end
 
