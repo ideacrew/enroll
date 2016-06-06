@@ -5,7 +5,7 @@ class Notice
   def initialize(args = {})
     random_str = rand(10**10).to_s
     @subject = args[:subject] || "notice_#{random_str}.pdf"
-    @notice_filename = "#{@subject.gsub(/\s*/, '')}"
+    @notice_filename = "#{@subject.titleize.gsub(/\s*/, '')}"
     @notice_path = Rails.root.join("tmp", @notice_filename)
     @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @mpi_indicator = args[:mpi_indicator]
