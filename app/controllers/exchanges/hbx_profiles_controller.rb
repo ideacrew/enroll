@@ -72,17 +72,21 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    if dt_query.search_string.blank? && params[:invoice_date_criteria].blank?
+
+
+
+    if dt_query.search_string.blank? && (params[:invoice_date_criteria].blank? || params[:invoice_date_criteria] == "All")
       employers = all_employers
     else
       #this will search on FEIN or Legal Name of an employer
       employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
-      employers = all_employers.where({:id => {"$in" => employer_ids}})
+      employers = employers.where({:id => {"$in" => employer_ids}})
       is_search = true
     end
 
     #order records by plan_year.start_on and by legal_name
     employers = employers.er_invoice_data_table_order
+
 
     #records_filtered is for datatable required so it nows how many records were filtered.
     @records_filtered = is_search ? employers.count : all_employers.count
