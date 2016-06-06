@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  devise_for :users, :controllers => { :registrations => "users/registrations" }
+  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -20,6 +20,9 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
+    resources :announcements, only: [:index, :create, :destroy] do
+      get :dismiss, on: :collection
+    end
     resources :agents_inboxes, only: [:show, :destroy]
     resources :hbx_profiles do
       root 'hbx_profiles#show'
@@ -172,7 +175,7 @@ Rails.application.routes.draw do
         get :approve
       end
     end
-    
+
     #TODO REFACTOR
     resources :people do
       collection do
@@ -206,6 +209,7 @@ Rails.application.routes.draw do
         post 'force_publish'
         get 'search_reference_plan', on: :collection
         post 'make_default_benefit_group'
+        post 'delete_benefit_group'
         get 'calc_employer_contributions', on: :collection
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
@@ -331,7 +335,6 @@ Rails.application.routes.draw do
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
-    get 'person_landing'
 
     collection do
       post 'person_confirm'

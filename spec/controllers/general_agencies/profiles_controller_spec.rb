@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe GeneralAgencies::ProfilesController do
+RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:general_agency_staff) { FactoryGirl.create(:general_agency_staff_role) }
   let(:person) { FactoryGirl.create(:person) }
@@ -79,6 +79,8 @@ RSpec.describe GeneralAgencies::ProfilesController do
 
   describe "GET show" do
     before(:each) do
+      FactoryGirl.create(:announcement, content: "msg for GA", audiences: ['GA'])
+      allow(user).to receive(:has_general_agency_staff_role?).and_return true
       sign_in(user)
       get :show, id: general_agency_profile.id
     end
@@ -97,6 +99,10 @@ RSpec.describe GeneralAgencies::ProfilesController do
 
     it "should get staff_role" do
       expect(assigns[:staff_role]).to eq user.has_general_agency_staff_role?
+    end
+
+    it "should get announcement" do
+      expect(flash.now[:warning]).to eq ["msg for GA"]
     end
   end
 
@@ -147,8 +153,8 @@ RSpec.describe GeneralAgencies::ProfilesController do
         expect(assigns[:families]).to eq general_agency_profile.families
         expect(assigns[:families]).to eq [family,family2]
       end
-      
-      it "should assign uniq page_alphabets" do 
+
+      it "should assign uniq page_alphabets" do
         expect(assigns[:page_alphabets]).to eq ["S"]
       end
     end

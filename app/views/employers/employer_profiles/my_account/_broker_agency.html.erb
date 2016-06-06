@@ -1,4 +1,4 @@
-<div class="col-xs-12 brokers-tab">
+<div class="brokers-tab">
   <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
     <%= render partial: "employers/broker_agency/active_broker", locals: {direct_terminate: true} %>
   <% else %>
@@ -12,7 +12,7 @@
       Select 'Browse Brokers' to continue.
     </h4>
     <br/>
-    <%#= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", onclick: '$("#brokers-empty").hide();' %>
+    <%#= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary ", onclick: '$("#brokers-empty").hide();' %>
   </div>
   <div class="row">
     <div class="col-xs-12" id="browse_brokers">
