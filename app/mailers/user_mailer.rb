@@ -51,7 +51,7 @@ class UserMailer < ApplicationMailer
   end
 
   def generic_notice_alert(first_name, notice_subject, email)
-    message = mail({to: email, subject: "You have a DC Marketplace notice waiting!", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
   end
