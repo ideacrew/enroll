@@ -56,7 +56,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     employers = []
 
     # datatable records with no filter should default to scope "all_employers_renewing_published"
-    all_employers = Organization.where(:employer_profile => {:$exists => 1})#.all_employers_renewing_published
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all
     is_search = false
 
     if dt_query.search_string.blank?
