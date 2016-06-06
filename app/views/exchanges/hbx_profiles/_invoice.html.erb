@@ -1,18 +1,6 @@
 
 <%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
 
-<!--<div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
->>>>>>> er-invoice-view-5387
-       <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
-       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_30_day.to_s %>"><%= @next_30_day.to_s %></label>
-       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_60_day.to_s %>"><%= @next_60_day.to_s %></label>
-       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_90_day.to_s %>"><%= @next_90_day.to_s %></label>
-<<<<<<< HEAD
-</div>
-=======
-</div>-->
-
-
 <select id="ERInvoiceFilter-Dropdown">
 <%= options_for_select([
   ['All','All'],
