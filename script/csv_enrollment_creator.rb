@@ -19,11 +19,13 @@ def select_benefit_group(benefit_group_title,benefit_groups)
 end
 
 def select_benefit_group_assignment(correct_benefit_group,benefit_group_assignments)
+	correct_benefit_group_assignment = nil
 	benefit_group_assignments.each do |benefit_group_assignment|
 		if benefit_group_assignment.benefit_group_id == correct_benefit_group._id
-			return benefit_group_assignment
+			correct_benefit_group_assignment = benefit_group_assignment
 		end
 	end
+	return correct_benefit_group_assignment
 end
 
 def get_all_benefit_groups(organization)
@@ -219,6 +221,7 @@ CSV.foreach(filename, headers: :true) do |row|
 			end
 		end
 		benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],organization,census_employee)
+		## Maybe use EnrollmentFactory#build_employee_role if none exists
 		hbx_enrollment.employee_role_id = select_employee_role(organization.employer_profile._id,subscriber.employee_roles)
 		family = subscriber.primary_family
 		household = subscriber.primary_family.active_household
