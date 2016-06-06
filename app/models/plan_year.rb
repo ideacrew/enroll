@@ -9,6 +9,8 @@ class PlanYear
   PUBLISHED = %w(published enrolling enrolled active suspended)
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
+  INVOICE_VIEW_RENEWING = %w(enewing_published renewing_enrolling)
+  INVOICE_VIEW_INITIAL = %w(published enrolling)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
 
@@ -44,6 +46,7 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
@@ -658,7 +661,7 @@ class PlanYear
       transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
     end
 
-    event :cancel_renewal, :after => :record_transition do 
+    event :cancel_renewal, :after => :record_transition do
       transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
   end

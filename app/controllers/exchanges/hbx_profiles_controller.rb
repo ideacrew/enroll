@@ -56,7 +56,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     employers = []
 
     # datatable records with no filter should default to scope "all_employers_renewing_published"
-    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
+    all_employers = Organization.where(:employer_profile => {:$exists => 1})#.all_employers_renewing_published
     is_search = false
 
     if dt_query.search_string.blank?
@@ -68,8 +68,16 @@ class Exchanges::HbxProfilesController < ApplicationController
       is_search = true
     end
 
-    if !params[:criteria].blank? && params[:criteria] != "All"
-      employers = employers.all_employers_by_plan_year_start_on(Date.strptime(params[:criteria],"%m/%d/%Y"))
+    if !params[:invoice_date_criteria].blank? && params[:invoice_date_criteria] != "All"
+      invoice_date = params[:invoice_date_criteria].split(":")[0]
+      invoice_state = params[:invoice_date_criteria].split(":")[1]
+
+      employers = employers.all_employers_by_plan_year_start_on(Date.strptime(invoice_date,"%m/%d/%Y"))
+      if invoice_state == "R"
+        employers = employers.invoice_view_renewing
+      elsif invoice_state == "I"
+        employers = employers.invoice_view_initial
+      end
       is_search = true
     end
 

@@ -142,6 +142,9 @@ class Organization
   scope :all_employers_non_renewing,             ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
   scope :all_employers_enrolled,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
 
+  scope :invoice_view_renewing,                 ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::INVOICE_VIEW_RENEWING) }
+  scope :invoice_view_initial,                 ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::INVOICE_VIEW_INITIAL) }
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
   end

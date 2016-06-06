@@ -2,12 +2,22 @@
 
 <%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
 
-<div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
+<!--<div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
        <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
        <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_30_day.to_s %>"><%= @next_30_day.to_s %></label>
        <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_60_day.to_s %>"><%= @next_60_day.to_s %></label>
        <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_90_day.to_s %>"><%= @next_90_day.to_s %></label>
-</div>
+</div>-->
+
+
+<select id="ERInvoiceFilter-Dropdown">
+<%= options_for_select([
+  ['All','All'],
+  ['Renewing ' + @next_30_day.to_s, @next_30_day.to_s + ':R'], ['Renewing ' + @next_60_day.to_s, @next_60_day.to_s + ':R'], ['Renewing ' + @next_90_day.to_s, @next_90_day.to_s + ':R'],
+  ['Initial ' + @next_30_day.to_s, @next_30_day.to_s + ':I'], ['Initial ' + @next_60_day.to_s, @next_60_day.to_s + ':I'], ['Initial ' + @next_90_day.to_s, @next_90_day.to_s + ':I']
+  ]) %>
+</select>
+
 <br><br>
 <div class="module">
   <table class="table table-striped" id="ER-invoices-dataTable">
@@ -47,14 +57,14 @@
       "serverSide": true,
       "ordering" : false,
       "paging": true,
-      "searchDelay": 800,
       "lengthMenu": [ 10, 25, 50, 100],
       "ajax": {
         url: "<%= employer_invoice_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
         type: "POST",
         data: function ( d ) {
           console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
-          d.criteria = $('#ERInvoiceFilter-Group input:radio:checked').val();
+          d.criteria = $('#ERInvoiceFilter-Group option:selected').val();
+          d.invoice_date_criteria = $('#ERInvoiceFilter-Dropdown option:selected').val();
         }
       },
       "columns": [
@@ -73,7 +83,7 @@
   });
 
   // Trigger datatable redraw on 90 day (30,60,90) filter buttons
-  $('#ERInvoiceFilter-Group').change(function() {
+  $('#ERInvoiceFilter-Dropdown').change(function() {
       var table = $('#ER-invoices-dataTable').dataTable().api();
       table.draw();
   });
