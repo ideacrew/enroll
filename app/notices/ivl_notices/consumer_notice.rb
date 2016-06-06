@@ -77,6 +77,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def capitalize_quadrant(address_line)
-    address_line.strip.gsub!(/\s+NW$|\s+NE$|\s+SE$|\s+SW$/i){|quadrant| " #{quadrant.strip.upcase()}"} || address_line
+    address_line.split(/\s/).map do |x| 
+      x.strip.match(/NW|NE|SE|SW/i).present? ? x.strip.upcase : x.strip
+    end.join(' ')
   end
 end 
