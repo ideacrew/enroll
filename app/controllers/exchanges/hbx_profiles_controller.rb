@@ -115,11 +115,9 @@ class Exchanges::HbxProfilesController < ApplicationController
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
         :eligible => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i,
         :enrollment_ratio => (employer_invoice.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i,
-        :is_current_month_invoice_generated => employer_invoice.current_month_invoice.present? ? '<i class="fa fa-check-square" aria-hidden="true"></i>' : nil.to_s
+        :is_current_month_invoice_generated => employer_invoice.current_month_invoice.present? ? '<i class="fa fa-check-square" style="color:green" aria-hidden="true"></i>' : nil.to_s
       }
     }
-
-#:is_current_month_invoice_generated => employer_invoice.current_month_invoice.present? ? '<i class="fa fa-check-square" style="color:green" aria-hidden="true"></i>' : nil.to_s
 
     @draw = dt_query.draw
     @total_records = all_employers.count
