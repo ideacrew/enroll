@@ -69,7 +69,7 @@ shop_notice_triggers = [
 ivl_notice_triggers = [
   {
     hbx_id: 'VerificationBacklog',
-    title: 'Documents Needed',
+    title: 'Documents needed to confirm eligibility for your plan',
     description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
     resource_name: 'consumer_role',
     event_name: 'verifications_backlog',
@@ -90,7 +90,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20A',
-    title: 'First Reminder of Documents Needed',
+    title: 'Request for Additional Information First Reminder',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
@@ -111,7 +111,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20B',
-    title: 'Second Reminder of Documents Needed',
+    title: 'Request for Additional Information Second Reminder',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
@@ -132,7 +132,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice21',
-    title: 'Third Reminder of Documents Needed',
+    title: 'Request for Additional Information Third Reminder',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
@@ -153,7 +153,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice22',
-    title: 'Fourth Reminder of Documents Needed',
+    title: 'Request for Additional Information Fourth Reminder',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
