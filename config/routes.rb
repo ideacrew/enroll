@@ -31,7 +31,7 @@ Rails.application.routes.draw do
         get :family_index
         get :employer_index
         get :employer_invoice
-        post :employer_invoice_dt
+        post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
@@ -192,7 +192,7 @@ Rails.application.routes.draw do
       get 'consumer_override'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
-      member do 
+      member do
         get "download_invoice"
       end
       collection do

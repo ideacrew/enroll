@@ -31,10 +31,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def generate_invoice
     @organizations= Organization.where(:id.in => params[:employerId]).all
-    @organizations.each do |org| 
+    @organizations.each do |org|
       @employer_invoice = EmployerInvoice.new(org)
       @employer_invoice.save_and_notify
     end
+
     respond_to do |format|
       format.js
     end
@@ -42,6 +43,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def employer_invoice
 
+    # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
@@ -53,30 +55,52 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def employer_invoice_dt
+
+  # This method provides the jquery datatable payload for the ajax call
+  def employer_invoice_datatable
+
     dt_query = extract_datatable_parameters
     employers = []
-    all_employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_renewing_published
+
+    # datatable records with no filter should default to scope "invoice_view_all"
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all
+    employers = all_employers
     is_search = false
-    if dt_query.search_string.blank?
+
+    if !params[:invoice_date_criteria].blank? && params[:invoice_date_criteria] != "All"
+      invoice_date = params[:invoice_date_criteria].split(":")[0]
+      invoice_state = params[:invoice_date_criteria].split(":")[1]
+
+      employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_by_plan_year_start_on(Date.strptime(invoice_date,"%m/%d/%Y"))
+      if invoice_state == "R"
+        employers = employers.invoice_view_renewing
+      elsif invoice_state == "I"
+        employers = employers.invoice_view_initial
+      end
+      is_search = true
+    end
+
+
+    if dt_query.search_string.blank? && (params[:invoice_date_criteria].blank? || params[:invoice_date_criteria] == "All")
       employers = all_employers
     else
+      #this will search on FEIN or Legal Name of an employer
       employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
-      employers = all_employers.where({:id => {"$in" => employer_ids}})
+      employers = employers.where({:id => {"$in" => employer_ids}})
       is_search = true
+
     end
 
-    if !params[:criteria].blank? && params[:criteria] != "All"
-      employers = employers.all_employers_by_plan_year_start_on(Date.strptime(params[:criteria],"%m/%d/%Y"))
-      is_search = true
-    end
-
-
+    #order records by plan_year.start_on and by legal_name
     employers = employers.er_invoice_data_table_order
+
+
+    #records_filtered is for datatable required so it nows how many records were filtered.
     @records_filtered = is_search ? employers.count : all_employers.count
 
-    array_from = dt_query.skip.to_i
-    array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1
+    #slice resultset so it returns the records in the desiged page number
+    array_from = dt_query.skip.to_i #starting index
+    array_to = dt_query.skip.to_i + [dt_query.take.to_i,employers.count.to_i].min - 1 #to index
     employers = employers[array_from..array_to]
 
     datatable_payload = employers.map { |employer_invoice|
@@ -87,19 +111,19 @@ class Exchanges::HbxProfilesController < ApplicationController
         :state => employer_invoice.employer_profile.aasm_state.humanize,
         :plan_year => employer_invoice.employer_profile.latest_plan_year.try(:effective_date).to_s,
         :is_conversion => (employer_invoice.employer_profile.is_conversion? ? '<i class="fa fa-check-square-o" aria-hidden="true"></i>' : nil.to_s),
-        :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
+        :enrolled => employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i.to_s + "/" + employer_invoice.employer_profile.try(:latest_plan_year).try(:waived_count).to_i.to_s,
         :remaining => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
         :eligible => employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i,
-        :enrollment_ratio => (employer_invoice.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i,
-        :is_current_month_invoice_generated => employer_invoice.current_month_invoice.present? ? '<i class="fa fa-check-square" style="color:green" aria-hidden="true"></i>' : nil.to_s
+        :enrollment_ratio => (employer_invoice.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i
       }
     }
 
+#:is_current_month_invoice_generated => employer_invoice.current_month_invoice.present? ? '<i class="fa fa-check-square" style="color:green" aria-hidden="true"></i>' : nil.to_s
+
     @draw = dt_query.draw
     @total_records = all_employers.count
-    @employers = employers
-    @payload = datatable_payload
 
+    @payload = datatable_payload
     render
   end
 
@@ -357,7 +381,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
-  
+
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
       insured = Person.find(params[:person])

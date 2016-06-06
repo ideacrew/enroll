@@ -73,6 +73,33 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe "employer_invoice" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders employer_invoice datatable" do
+      xhr :get, :employer_invoice
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders employer_invoice datatable payload" do
+      xhr :post, :employer_invoice_datatable
+      expect(response).to have_http_status(:success)
+    end
+
+  end
+
   describe "#create" do
     let(:user) { double("User")}
     let(:person) { double("Person")}

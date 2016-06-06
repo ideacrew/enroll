@@ -8,7 +8,7 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
-  
+
   embedded_in :organization
 
   attr_accessor :broker_role_id
