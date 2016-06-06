@@ -55,18 +55,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
     employers = []
 
-    # datatable records with no filter should default to scope "all_employers_renewing_published"
+    # datatable records with no filter should default to scope "invoice_view_all"
     all_employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all
     is_search = false
-
-    if dt_query.search_string.blank?
-      employers = all_employers
-    else
-      #this will search on FEIN or Legal Name of an employer
-      employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
-      employers = all_employers.where({:id => {"$in" => employer_ids}})
-      is_search = true
-    end
 
     if !params[:invoice_date_criteria].blank? && params[:invoice_date_criteria] != "All"
       invoice_date = params[:invoice_date_criteria].split(":")[0]
@@ -78,6 +69,15 @@ class Exchanges::HbxProfilesController < ApplicationController
       elsif invoice_state == "I"
         employers = employers.invoice_view_initial
       end
+      is_search = true
+    end
+
+    if dt_query.search_string.blank? && params[:invoice_date_criteria].blank?
+      employers = all_employers
+    else
+      #this will search on FEIN or Legal Name of an employer
+      employer_ids = Organization.where(:employer_profile => {:$exists => 1}).search(dt_query.search_string).pluck(:id)
+      employers = all_employers.where({:id => {"$in" => employer_ids}})
       is_search = true
     end
 
