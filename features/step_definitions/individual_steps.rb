@@ -125,7 +125,7 @@ And(/Individual clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION *')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is Your *')]").click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[3]/div[4]/div/div/div[3]/div/ul/li[3]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -144,7 +144,7 @@ And(/Individual again clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION *')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is Your *')]").click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[3]/div[4]/div/div/div[3]/div/ul/li[4]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
