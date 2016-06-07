@@ -47,10 +47,6 @@ class EmployerInvoice
       body: body
       }
 			create_secure_message message_params, @organization.employer_profile, :inbox
-		@organization.employer_profile.staff_roles.each do |staff_role|
-			next if staff_role.user.try(:email).nil?
-			UserMailer.employer_invoice_generation_notification(staff_role.user,subject).deliver_now
-    end
   end
 
   def clear_tmp(file)
