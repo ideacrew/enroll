@@ -145,7 +145,7 @@ class Organization
 
   scope :invoice_view_all,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL) }
   scope :invoice_view_renewing,            ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING) }
-  scope :invoice_view_initial,             ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING) }
+  scope :invoice_view_initial,             ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_INITIAL) }
   scope :invoice_starting,                 ->{ unscoped.where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
 
   def generate_hbx_id
