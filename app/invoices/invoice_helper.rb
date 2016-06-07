@@ -98,16 +98,18 @@ module InvoiceHelper
     @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
 
-    if @employer_profile.is_conversion? #employer_profile.plan_years.map(&:aasm_state).include?("renewing_published")
+    if @employer_profile.is_conversion?
       @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
       @pdf.move_down 60
-      @pdf.text_box "You will now receive a monthly invoice from DC Health Link. Payments should be directed to DC Health Link for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of DC Health Link. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
-    else
+      @pdf.text_box "You will now receive a monthly invoice from DC Health Link. Payments should be directed to DC Health Link for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of DC Health Link. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]      
+      @pdf.move_down 72
+    elsif @employer_profile.published_plan_year && @employer_profile.published_plan_year.is_renewing?
       @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
-      @pdf.move_down 12
+      @pdf.move_down 60
+    else
+      @pdf.move_down 36
     end
 
-    @pdf.move_down 60
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
