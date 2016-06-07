@@ -19,9 +19,10 @@ class EmployerInvoice
 			unless File.directory?(invoice_folder_path)
   			FileUtils.mkdir_p(invoice_folder_path)
 			end
-			pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)	
+			pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
 		rescue Exception => e
 			@errors << "Unable to create PDF for #{@organization.hbx_id}."
+			@errors << e.inspect
 		end
 
 	end
@@ -59,7 +60,7 @@ class EmployerInvoice
 		send_email_notice
 	end
 
-	private 
+	private
 
 	def create_secure_message(message_params, inbox_provider, folder)
     message = Message.new(message_params)
@@ -80,5 +81,5 @@ class EmployerInvoice
  	def invoice_absolute_file_path
  		"#{invoice_folder_path}/#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
  	end
-	
+
 end
