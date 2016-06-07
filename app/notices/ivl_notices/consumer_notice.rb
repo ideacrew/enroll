@@ -128,7 +128,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
       @notice.enrollments.first.effective_on,
       @notice.ssa_unverified.map{|individual| individual.full_name }.join(','),
       @notice.dhs_unverified.map{|individual| individual.full_name }.join(','),
-      @secure_message_recipient.consumer_role.contact_method
+      @secure_message_recipient.consumer_role.contact_method,
+      @secure_message_recipient.home_email.try(:address) || @secure_message_recipient.user.try(:email)
     ]
   end
 end 

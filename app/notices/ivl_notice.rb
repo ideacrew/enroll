@@ -11,7 +11,14 @@ class IvlNotice < Notice
     attach_dchl_rights
     prepend_envelope
     upload_and_send_secure_message
-    send_generic_notice_alert if @secure_message_recipient.consumer_role.can_receive_electronic_communication?
+
+    if @secure_message_recipient.consumer_role.can_receive_electronic_communication?
+      send_generic_notice_alert
+    end
+
+    if @secure_message_recipient.consumer_role.can_receive_paper_communication?
+      store_paper_notice
+    end
   end
 
   def prepend_envelope

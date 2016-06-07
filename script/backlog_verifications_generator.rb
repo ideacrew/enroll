@@ -1,3 +1,10 @@
+def create_directory(path)
+  if Dir.exists?(path)
+    FileUtils.rm_rf(path)
+  end
+  Dir.mkdir path
+end
+
 people_to_check = Person.where("consumer_role.lawful_presence_determination.aasm_state" => "verification_outstanding")
 puts "Candidate People: #{people_to_check.count}"
 
@@ -7,20 +14,17 @@ puts "Candidate Families: #{families.count}"
 mailing_address_missing = []
 coverage_not_found = []
 pending_ssa_validation = []
+others = []
 
-CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
+create_directory "#{Rails.root.to_s}/public/paper_notices/"
+
+CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
+    'Family Id',
+    'Family ECase ID',
     'Primary Firstname', 
-    'Primary Lastname',
-    'Address',
-    'Verification Due Date', 
-    'Enrollment Submitted On', 
-    'Coverage Start Date', 
-    'SSN Unverified', 
-    'Citizenship/Immigration Unverified',
-    'Communication Preference',
-    'EMail'
+    'Primary Lastname'
   ]
 
   count   = 0
@@ -43,10 +47,9 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
         template: notice_trigger.notice_template, 
         subject: event_kind.title, 
         mpi_indicator: notice_trigger.mpi_indicator
-        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
-      builder.build
-      csv << builder.to_csv 
+      csv << [family.id, family.e_case_id, person.full_name]
 
     rescue Exception  => e
       case e.to_s 
@@ -56,6 +59,8 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
         mailing_address_missing << person.full_name
       when 'active coverage not found!'
         coverage_not_found << person.full_name
+      else 
+        others << person.full_name 
       end
     end
 
@@ -64,9 +69,12 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
     end
   end
 
-  puts "#{count} families skipped due to missing consumer role"
+  if count > 0
+    puts "#{count} families skipped due to missing consumer role"
+  end
 
   puts pending_ssa_validation.count 
   puts mailing_address_missing.count
   puts coverage_not_found.count
+  puts others.count
 end

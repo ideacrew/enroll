@@ -94,6 +94,12 @@ class Notice
     end
   end
 
+  def store_paper_notice
+    paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
+    FileUtils.cp(@notice_path, "#{Rails.root.to_s}/public/paper_notices/")
+    File.rename( paper_notices_folder + @notice_filename, paper_notices_folder + "#{@secure_message_recipient.hbx_id}_" + @notice_filename + File.extname(@notice_path))
+  end
+
   def create_recipient_document(doc_uri)
     notice = @secure_message_recipient.documents.build({
       title: @notice_filename, 
