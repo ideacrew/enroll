@@ -71,7 +71,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       invoice_date = params[:invoice_date_criteria].split(":")[0]
       invoice_state = params[:invoice_date_criteria].split(":")[1]
 
-      employers = Organization.where(:employer_profile => {:$exists => 1}).all_employers_by_plan_year_start_on(Date.strptime(invoice_date,"%m/%d/%Y"))
+      employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all.all_employers_by_plan_year_start_on(Date.strptime(invoice_date,"%m/%d/%Y"))
       if invoice_state == "R"
         employers = employers.invoice_view_renewing
       elsif invoice_state == "I"
