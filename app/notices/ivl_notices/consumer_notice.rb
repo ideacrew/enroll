@@ -19,26 +19,52 @@ class IvlNotices::ConsumerNotice < IvlNotice
     @family = @recipient.primary_family    
     @notice.primary_fullname = @recipient.full_name.titleize
     # @notice.primary_identifier = @recipient.hbx_id
-    append_address(@recipient.mailing_address)
+    if @recipient.mailing_address
+      append_address(@recipient.mailing_address)
+    else
+      raise 'mailing address not present'
+    end
 
     append_unverified_family_members
   end
 
   def append_unverified_family_members
-    enrollments = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a
+    # enrollments = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a
     
-    if enrollments.empty?
-      raise "enrollment don't exists!!"
-    end
+    # if enrollments.empty?
+    #   raise "enrollment don't exists!!"
+    # end
 
-    @notice.enrollments << enrollments.first
+    # @notice.enrollments << enrollments.first
+
+    # family_members = enrollments.inject([]) do |family_members, enrollment|
+    #   family_members += enrollment.hbx_enrollment_members.map(&:family_member)
+    # end.uniq
+
+    # people = family_members.map(&:person).uniq
+    # people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
+
+
+    enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
+    contingent_enrollment = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').first
+
+    @notice.enrollments << (contingent_enrollment || enrollments.first)
 
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
 
     people = family_members.map(&:person).uniq
-    people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
+
+    if people.any?{|p| (p.consumer_role.lawful_presence_determination.vlp_authority == 'dhs' && !p.ssn.blank?) }
+      raise 'needs ssa validation!'
+    end
+
+    people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
+
+    if people.empty?
+      raise 'active coverage not found!'
+    end
 
     append_unverified_individuals(people)
     @notice.due_date = (enrollments.first.special_verification_period || (enrollments.first.created_at + 95.days)).strftime("%m/%d/%Y")
@@ -54,13 +80,23 @@ class IvlNotices::ConsumerNotice < IvlNotice
     verification_pending
   end
 
+  def ssn_outstanding?(person)
+    person.consumer_role.ssn_validation == 'outstanding'
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.lawful_presence_determination.aasm_state == 'verification_outstanding'
+  end
+
   def append_unverified_individuals(people)
     people.each do |person|
-      if verification_type_outstanding?(person, 'Social Security Number')
+      # if verification_type_outstanding?(person, 'Social Security Number')
+      if ssn_outstanding?(person)
         @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
 
-      if verification_type_outstanding?(person, 'Citizenship') || verification_type_outstanding?(person, 'Immigration status')
+      # if verification_type_outstanding?(person, 'Citizenship') || verification_type_outstanding?(person, 'Immigration status')
+      if lawful_presence_outstanding?(person)
         @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
     end
@@ -78,7 +114,21 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def capitalize_quadrant(address_line)
     address_line.split(/\s/).map do |x| 
-      x.strip.match(/NW|NE|SE|SW/i).present? ? x.strip.upcase : x.strip
+      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
+  end
+
+  def to_csv
+    [
+      @recipient.first_name,
+      @recipient.last_name,
+      @notice.primary_address.attributes.values.reject{|x| x.blank?}.compact.join(','),
+      @notice.due_date,
+      (@notice.enrollments.first.submitted_at || @notice.enrollments.first.created_at),
+      @notice.enrollments.first.effective_on,
+      @notice.ssa_unverified.map{|individual| individual.full_name }.join(','),
+      @notice.dhs_unverified.map{|individual| individual.full_name }.join(','),
+      @secure_message_recipient.consumer_role.contact_method
+    ]
   end
 end 

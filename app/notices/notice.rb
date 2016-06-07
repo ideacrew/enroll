@@ -87,7 +87,11 @@ class Notice
   end
 
   def send_generic_notice_alert
-    UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, @secure_message_recipient.user.email).deliver_now
+    email_address = @secure_message_recipient.home_email.try(:address) || @secure_message_recipient.user.try(:email)
+
+    if email_address.present?
+      UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, email_address).deliver_now
+    end
   end
 
   def create_recipient_document(doc_uri)
