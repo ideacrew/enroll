@@ -44,7 +44,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_invoice
 
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals
-    @next_30_day = TimeKeeper.date_of_record.beginning_of_month
+    @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
