@@ -158,6 +158,7 @@ Given /^a general agency, approved, confirmed, exists$/ do
   general_agency(legal_name: 'Rooxo')
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
@@ -356,6 +357,7 @@ Given /^another general agency-ga2, approved, confirmed, exists$/ do
   general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 

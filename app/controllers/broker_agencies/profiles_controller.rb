@@ -147,12 +147,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
     @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def general_agency_index
     @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def set_default_ga
@@ -171,7 +171,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
       @broker_role = current_user.person.broker_role || nil
-      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
     end
 
     respond_to do |format|
@@ -189,7 +189,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.by_broker_role(broker_role_id)
     end
     @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
 
     @employers = @orgs.map(&:employer_profile)
     @employers = Kaminari.paginate_array(@employers).page page_no
