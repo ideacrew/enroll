@@ -379,11 +379,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
     context "when we Assign agency" do
       before :each do
         sign_in user
-        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
       end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
+      it "should render" do
+        expect(response).to render_template(:update_assign)
       end
 
       it "should get notice" do
