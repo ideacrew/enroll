@@ -18,7 +18,7 @@ class CuramUser
   end
 
   def self.match_username(value)
-    where(username: value)
+    where(username: /^#{value}$/i)
   end
 
   def self.encrypt_ssn(val)

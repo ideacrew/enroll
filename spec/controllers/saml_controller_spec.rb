@@ -31,7 +31,7 @@ RSpec.describe SamlController do
 
     context "with valid saml response" do
       sample_xml = File.read("spec/saml/invalid_saml_response.xml")
-      let(:name_id) { user.email}
+      let(:name_id) { user.oim_id }
       let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
       let(:attributes_double) { { 'mail' => user.email} }
 
@@ -91,8 +91,8 @@ RSpec.describe SamlController do
         end
       end
 
-      context "with no mail attribute" do
-        let(:attributes_double) {{ }}
+      context "with no name id attribute" do
+         let(:name_id) { nil }
 
         it "should render a 403 and log the error as critical" do
           expect(subject).to receive(:log) do |arg1, arg2|

@@ -249,8 +249,10 @@ module Factories
         user.roles << role_type unless user.roles.include?(role_type)
         user.save
         unless person.emails.count > 0
-          person.emails.build(kind: "home", address: user.email)
-          person.save
+          if user.email.present?
+            person.emails.build(kind: "home", address: user.email)
+            person.save
+          end
         end
       end
       return person, is_new

@@ -4,22 +4,32 @@ class User
   include Mongoid::Timestamps
   include Acapi::Notifiers
 
+  attr_accessor :login
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+         :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
-
+  validates_presence_of :oim_id
+  validates_uniqueness_of :oim_id
   validate :password_complexity
+  validates_presence_of     :password, if: :password_required?
+  validates_confirmation_of :password, if: :password_required?
+  validates_length_of       :password, within: Devise.password_length, allow_blank: true
 
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
-    elsif password.present? and password.include? email
+    elsif password.present? and password.include? oim_id
       errors.add :password, "password cannot contain username"
     elsif password.present? and password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
     end
+  end
+
+  def password_required?
+    !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
   def self.generate_valid_password
@@ -30,6 +40,15 @@ class User
       password = generate_valid_password
     else
       password
+    end
+  end
+
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    if login = conditions.delete(:login).downcase
+      where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+    else
+      where(conditions).first
     end
   end
 
@@ -329,7 +348,7 @@ class User
   def get_announcements_by_roles_and_portal(portal_path="")
     announcements = []
 
-    case 
+    case
     when portal_path.include?("employers/employer_profiles")
       announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
     when portal_path.include?("families/home")

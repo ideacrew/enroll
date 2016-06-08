@@ -175,7 +175,7 @@ class Insured::EmployeeRolesController < ApplicationController
     #PATH REACHED FOR UNKNOWN REASONS, POSSIBLY DUPLICATE PERSONS SO USER, URL ARE LOGGED
     message={}
     message[:message] ="insured/employee_role/show is not a valid route, "
-    message[:user] = current_user.email
+    message[:user] = current_user.oim_id
     message[:url] = request.original_url
     log(message, severity: 'error')
 

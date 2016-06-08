@@ -189,10 +189,10 @@ When(/^General Agency staff logs on the General Agency Portal$/) do
   find("a.interaction-click-control-general-agency-portal").click
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: "jack.martin@example.com"
-  find('#user_email').set("jack.martin@example.com")
+  fill_in "user[login]", with: "jack.martin@example.com"
+  find('#user_login').set("jack.martin@example.com")
   fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[email]", :with => "jack.martin@example.com" unless find(:xpath, '//*[@id="user_email"]').value == "jack.martin@example.com"
+  fill_in "user[login]", :with => "jack.martin@example.com" unless find(:xpath, '//*[@id="user_login"]').value == "jack.martin@example.com"
   find('.interaction-click-control-sign-in').click
 end
 

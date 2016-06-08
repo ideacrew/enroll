@@ -300,7 +300,7 @@ When(/^CSR accesses the HBX portal$/) do
   click_link 'HBX Portal'
 
   find('.interaction-click-control-sign-in-existing-account').click
-  fill_in "user[email]", :with => "sherry.buckner@dc.gov"
+  fill_in "user[login]", :with => "sherry.buckner@dc.gov"
   find('#user_email').set("sherry.buckner@dc.gov")
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
@@ -373,7 +373,7 @@ end
 
 When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In Existing Account'
-  fill_in 'user[email]', with: (@u.find 'email' + person)
+  fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   click_button 'Sign in'
