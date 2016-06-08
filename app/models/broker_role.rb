@@ -30,7 +30,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
   field :license, type: Boolean
   field :training, type: Boolean
-  field :carrier_appointments, type: Hash , default: {:aetna => nil, :carefirst => nil, :united_health_care => nil, :kaiser => nil}
+  field :carrier_appointments, type: Hash , default: {:aetna_health_inc => nil, :aetna_life_insurance_company => nil, :carefirst_bluechoice_inc => nil, :group_hospitalization_and_medical_services_inc => nil, :kaiser_foundation => nil, :optimum_choice => nil, :united_health_care_insurance => nil, :united_health_care_mid_atlantic => nil}
 
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :favorite_general_agencies, cascade_callbacks: true

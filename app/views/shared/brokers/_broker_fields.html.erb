@@ -94,7 +94,7 @@
           <th class="remove-top-bdr">Carrier Appointments:</th>
           <td class="remove-top-bdr">
               <% broker_role_fields.object.carrier_appointments.each do |name,value| %>
-              <div class="col-xs-3">
+              <div class="col-xs-5">
                 <div class="row">
                 <%= hidden_field_tag "person[broker_role_attributes][carrier_appointments][#{name}]" , false %>
                 <div class="enroll-checkbox">
