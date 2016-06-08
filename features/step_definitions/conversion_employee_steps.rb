@@ -15,13 +15,14 @@ Given(/Conversion Employer for (.*) exists with active and renewing plan year/) 
   end_on = start_on + 1.year - 1.day
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year 
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on 
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   employee.add_renew_benefit_group_assignment benefit_group
-
+  
+  
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
 end
@@ -58,7 +59,13 @@ end
 And(/Employer for (.*) is under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => TimeKeeper.date_of_record)
+
+  open_enrollment_start_on = TimeKeeper.date_of_record
+  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 12.days
+  start_on = open_enrollment_start_on.end_of_month + 1.day + 1.month
+  end_on = start_on + 1.year - 1.day
+  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => open_enrollment_start_on,
+    :open_enrollment_end_on => open_enrollment_end_on, :start_on => start_on, :end_on => end_on)
 end
 
 When(/Employee clicks on New Hire Badge/) do
