@@ -142,13 +142,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     page_string = params.permit(:gas_page)[:gas_page]
     page_no = page_string.blank? ? nil : page_string.to_i
 
-    @people = Person.exists(general_agency_staff_roles: true)
-
     status_params = params.permit(:status)
-    @status = status_params[:status] || 'applicant'
-    @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
-
-    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.map(&:general_agency_profile) }.flatten.uniq rescue []
+    @status = status_params[:status] || 'is_applicant'
+    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
@@ -227,7 +223,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render 
+    render
   end
 
   def product_index

@@ -15,6 +15,7 @@ class LawfulPresenceDetermination
   field :vlp_authority, type: String
   field :vlp_document_id, type: String
   field :citizen_status, type: String
+  field :citizenship_result, type: String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -78,14 +79,14 @@ class LawfulPresenceDetermination
         end
       end
     end
-    self.citizen_status = approval_information.citizen_status
+    self.citizenship_result = approval_information.citizen_status
   end
 
   def record_denial_information(*args)
     denial_information = args.first
     self.vlp_verified_at = denial_information.determined_at
     self.vlp_authority = denial_information.vlp_authority
-    #    self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+    self.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
   end
 
   def record_transition(*args)

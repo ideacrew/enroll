@@ -1,7 +1,7 @@
 module ApplicationHelper
 
   def copyright_notice
-    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.</span>")
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
   end
 
   def menu_tab_class(a_tab, current_tab)

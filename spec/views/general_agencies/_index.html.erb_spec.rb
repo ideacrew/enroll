@@ -28,4 +28,16 @@ RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_e
     expect(rendered).to have_content('Pending')
     expect(rendered).to have_content('All')
   end
+
+  it "should show the state of general_agency_profile" do
+    expect(rendered).to have_selector('td', text: "#{general_agency_profile.current_state}")
+  end
+
+  it "should have input for status" do
+    expect(rendered).to have_selector('input[value="is_applicant"]')
+    expect(rendered).to have_selector('input[value="is_approved"]')
+    expect(rendered).to have_selector('input[value="is_rejected"]')
+    expect(rendered).to have_selector('input[value="is_suspended"]')
+    expect(rendered).to have_selector('input[value="all"]')
+  end
 end
