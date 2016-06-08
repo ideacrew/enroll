@@ -44,12 +44,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # people = family_members.map(&:person).uniq
     # people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
 
-
     enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
-    contingent_enrollment = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').first
-
-    @notice.enrollments << (contingent_enrollment || enrollments.first)
-
+    enrollments.each {|e| e.update_attributes(special_verification_period: Date.new(2016,9,11))}
+  
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
@@ -61,13 +58,27 @@ class IvlNotices::ConsumerNotice < IvlNotice
     end
 
     people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
-
     if people.empty?
       raise 'active coverage not found!'
     end
 
+    ## Skip families who already uploaded verification documents
+    people.each do |person|
+      if person.consumer_role.vlp_documents.any? { |vlpd| !vlpd.identifier.blank? }
+        raise 'documents already uploaded'
+      end
+    end
+
     append_unverified_individuals(people)
-    @notice.due_date = (enrollments.first.special_verification_period || (enrollments.first.created_at + 95.days)).strftime("%m/%d/%Y")
+    
+    contingent_enrollment = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').first
+    enrollment = (contingent_enrollment || enrollments.first)
+    @notice.enrollments << enrollment
+
+    # Re-enable this condition after done with initial verification notifications
+    # ((enrollment.submitted_at.present? ? enrollment.submitted_at : enrollment.created_at) + 95.days)
+
+    @notice.due_date = enrollment.special_verification_period.strftime("%m/%d/%Y")
   end
 
   def verification_type_outstanding?(person, verification_type)
@@ -90,12 +101,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_individuals(people)
     people.each do |person|
-      # if verification_type_outstanding?(person, 'Social Security Number')
       if ssn_outstanding?(person)
         @notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
 
-      # if verification_type_outstanding?(person, 'Citizenship') || verification_type_outstanding?(person, 'Immigration status')
       if lawful_presence_outstanding?(person)
         @notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end

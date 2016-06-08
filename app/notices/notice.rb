@@ -4,9 +4,9 @@ class Notice
 
   def initialize(args = {})
     random_str = rand(10**10).to_s
-    @subject = args[:subject] || "notice_#{random_str}.pdf"
+    @subject = "#{args[:subject]}" || "notice_#{random_str}"
     @notice_filename = "#{@subject.titleize.gsub(/\s*/, '')}"
-    @notice_path = Rails.root.join("tmp", @notice_filename)
+    @notice_path = Rails.root.join("tmp", "#{@notice_filename}.pdf")
     @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @mpi_indicator = args[:mpi_indicator]
     @layout = 'pdf_notice'
@@ -97,11 +97,11 @@ class Notice
   def store_paper_notice
     paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
     FileUtils.cp(@notice_path, "#{Rails.root.to_s}/public/paper_notices/")
-    File.rename( paper_notices_folder + @notice_filename, paper_notices_folder + "#{@secure_message_recipient.hbx_id}_" + @notice_filename + File.extname(@notice_path))
+    File.rename(paper_notices_folder + "#{@notice_filename}.pdf", paper_notices_folder + "#{@secure_message_recipient.hbx_id}_" + @notice_filename + File.extname(@notice_path))
   end
 
   def create_recipient_document(doc_uri)
-    notice = @secure_message_recipient.documents.build({
+    notice = @family.documents.build({
       title: @notice_filename, 
       creator: "hbx_staff",
       subject: "notice",
@@ -118,7 +118,7 @@ class Notice
 
   def create_secure_inbox_message(notice)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@secure_message_recipient.class.to_s, @secure_message_recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@family.class.to_s, @family.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     message = @secure_message_recipient.inbox.messages.build({ subject: @subject, body: body, from: 'DC Health Link' })
     message.save!
   end

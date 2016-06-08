@@ -7,6 +7,7 @@ puts "Candidate Families: #{families.count}"
 mailing_address_missing = []
 coverage_not_found = []
 pending_ssa_validation = []
+docs_uploaded = []
 
 CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
 
@@ -56,6 +57,8 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
         mailing_address_missing << person.full_name
       when 'active coverage not found!'
         coverage_not_found << person.full_name
+      when 'documents already uploaded'
+        docs_uploaded << person.full_name
       end
     end
 
@@ -69,4 +72,6 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
   puts pending_ssa_validation.count 
   puts mailing_address_missing.count
   puts coverage_not_found.count
+  puts docs_uploaded.inspect
+  puts docs_uploaded.count
 end

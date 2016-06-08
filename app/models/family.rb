@@ -44,6 +44,7 @@ class Family
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts, :general_agency_accounts
 
