@@ -249,14 +249,14 @@ describe User do
         expect(user.can_change_broker?).to eq true
       end
 
-      it "should return true when broker role" do
+      it "should return false when broker role" do
         user.roles = ['broker']
-        expect(user.can_change_broker?).to eq true
+        expect(user.can_change_broker?).to eq false
       end
 
-      it "should return true when broker agency staff" do
+      it "should return false when broker agency staff" do
         user.roles = ['broker_agency_staff']
-        expect(user.can_change_broker?).to eq true
+        expect(user.can_change_broker?).to eq false
       end
 
       it "should return false when general agency staff" do
