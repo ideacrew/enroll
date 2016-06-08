@@ -5,8 +5,9 @@
       <%= select_year(Date.today, :start_year => TimeKeeper.date_of_record.year, :end_year => TimeKeeper.date_of_record.year, :prefix => "year", :discard_type => true) %>
     </td>
     <td align="center" class="calculate_available_aptc">
-      <a href="javascript:void(0)" class='btn btn-info' id='calculate_available_aptc'>Calculate Available APTC</a>
+      <a href="" class='btn btn-info' id='calculate_available_aptc' data-toggle="modal" data-target="#loading-modal" style="display:none">Calculate Available APTC</a>
     </td>
+    <td align="right"><div id="reset-aptc"></div></td>
     <td align="right">
       <a href="javascript:void(0)" class='btn btn-warning reset_aptc_change' id='reset_aptc_changes' onclick="APTCModule.resetFormData()">Reset</a>
     </td>  

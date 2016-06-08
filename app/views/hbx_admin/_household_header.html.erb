@@ -1,16 +1,23 @@
-<!-- APTC APPLIED PER ENROLLMENT -->
-
-<div align = "right">
+<div id = "household-header" class = "module household-header" align = "right">
   <table>
     <tr>
-      <th>Max APTC</th>
-      <td width = "20px;" ></td>
-      <td><%= text_field_tag "max_aptc", max_aptc, class: 'form-control', size: '8px'%></td>
+      <td><b>SLCSP</b></td>
+      <td width = "15px;" ></td>
+      <td><%=@slcsp_value%></span></td>
+
+      <td width="50px;"></td>
+      
+      <th >Max APTC</th>
+      <td width = "15px;" ></td>
+      <td><%= text_field_tag "max_aptc", max_aptc, class: @aptc_errors.present? ? 'form-control error-styling': 'form-control', size: '8px', onchange: "APTCModule.calculateAvailableAPTC('household')"%></td>
+
       <td width="50px;"></td>
 
-      <th>CSR % AS INTEGER</th>
-      <td width = "20px;" ></td>
-      <td style="border-left: thin solid; border-top: thin solid; border-bottom: thin solid; border-right: thin solid;"> <%= select_tag "csr_percentage", options_for_select([ 100, 94, 87, 73 ], csr_percent_as_integer)%></td>
+      <th>CSR % as Integer</th>
+      <td width = "15px;" ></td>
+      <td style="border: thin solid;">
+        <%= select_tag "csr_percentage", options_for_select([ 100, 94, 87, 73, 0 ], csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
+      </td>
     </tr>
   </table>  
 </div>

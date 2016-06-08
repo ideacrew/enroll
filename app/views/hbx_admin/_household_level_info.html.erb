@@ -3,7 +3,8 @@
     <h2 class="panel-title">
       <i class="fa fa-home" aria-hidden="true"><b> Household</b></i>
       <div style="float:right">
-        <b>SLCSP :</b> <%=@slcsp_value%>
+       <!--  <b>SLCSP :</b> <%#=@slcsp_value%> -->
+       <div id="loading-household-aptc"></div>
       </div>
     </h2>
   </div>
@@ -14,13 +15,10 @@
 
     <table class="table table-border module edit-aptc-csr-table">
       <thead>
-        <th><!-- <span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span><%#=@current_year%>< --></th>
+        <th></th>
         <% $months_array.each do |month| %>
           <th style="text-align:center"><%=month.capitalize%></th>
         <%end%>
-        <!-- <th> </th> -->
-        <!-- <th><span class="glyphicon glyphicon-pencil"></span> Edit Fields</th> -->
-        <!-- <th></th> -->
       </thead>  
       <tbody>
         <%@household_info.keys.each do |attribute|%>
@@ -31,25 +29,12 @@
                 <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
               </td>
             <%end%>
-            <!-- <td></td> -->
-            <!-- <td>
-              <%#if attribute == "max_aptc"%>
-                  <%#= text_field_tag "#{attribute.to_s}", @max_aptc, placeholder: attribute.titleize.upcase, size: '8px'%>
-              <%#elsif attribute == "csr_percentage"%>
-                  <%#= text_field_tag "#{attribute.to_s}", @csr_percent_as_integer, placeholder: attribute.titleize.upcase, size: '8px'%>
-                  <%#= select_tag "#{attribute.to_s}", options_for_select([ 100, 94, 87, 73 ], @csr_percent_as_integer)%>
-              <%#end%> 
-            </td> -->
-            <!-- <td ></td> -->
           </tr>
           <tr></tr>
         <%end%>
         <tr><td colspan = "13" class="aptc-csr-grid-separator"></td></tr>
         <tr>
           <th colspan = "13">Household Member(s)</th>
-          <!-- <th></th>
-          <th></th> -->
-          <!-- <th></th> -->
         </tr>
         <% @household_members.each do |person_id| %>
           <tr>
@@ -60,9 +45,6 @@
                 &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  
               <%end%>
             </td>
-            <!-- <td></td>
-            <td></td> -->
-            <!-- <td></td> -->
           </tr>
         <%end%>
       </tbody> 

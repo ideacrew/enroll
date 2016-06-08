@@ -21,9 +21,9 @@ module HbxAdminHelper
     	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
   	end
   	if max_aptc_for_enrollment > max_aptc_for_household.to_f
-  		max_aptc_for_household.to_f
+  		'%.2f' % max_aptc_for_household.to_f
   	else
-  		max_aptc_for_enrollment.to_f
+  		'%.2f' % max_aptc_for_enrollment.to_f
   	end
   end
 
@@ -36,6 +36,11 @@ module HbxAdminHelper
     else
       td_style="current-aptc-csr-data"
     end
+  end
+
+  def find_applied_aptc_percent(aptc_applied, max_aptc)
+    return 0 if max_aptc == 0.to_f
+    ((aptc_applied/max_aptc)*100).round
   end
 
 end
