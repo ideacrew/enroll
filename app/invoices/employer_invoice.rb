@@ -33,6 +33,7 @@ class EmployerInvoice
 			clear_tmp(invoice_absolute_file_path)
 		rescue Exception => e
 			@errors << "Unable to upload PDF for. #{@organization.hbx_id}"
+			Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
 		end
 	end
 
