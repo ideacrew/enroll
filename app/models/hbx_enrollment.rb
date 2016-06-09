@@ -212,23 +212,23 @@ class HbxEnrollment
 
     def advance_day(new_date)
 
-      families_with_contingent_enrollments.each do |family|
-        enrollment = family.enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a.first
-        consumer_role = family.primary_applicant.person.consumer_role
-        if enrollment.present? && consumer_role.present? && consumer_role.verifications_outstanding?
-          case (TimeKeeper.date_of_record - enrollment.created_at).to_i
-          when 10
-            consumer_role.first_verifications_reminder
-          when 25
-            consumer_role.second_verifications_reminder
-          when 50
-            consumer_role.third_verifications_reminder
-          when 65
-            consumer_role.fourth_verifications_reminder
-          else
-          end
-        end
-      end
+      # families_with_contingent_enrollments.each do |family|
+      #   enrollment = family.enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a.first
+      #   consumer_role = family.primary_applicant.person.consumer_role
+      #   if enrollment.present? && consumer_role.present? && consumer_role.verifications_outstanding?
+      #     case (TimeKeeper.date_of_record - enrollment.created_at).to_i
+      #     when 10
+      #       consumer_role.first_verifications_reminder
+      #     when 25
+      #       consumer_role.second_verifications_reminder
+      #     when 50
+      #       consumer_role.third_verifications_reminder
+      #     when 65
+      #       consumer_role.fourth_verifications_reminder
+      #     else
+      #     end
+      #   end
+      # end
 
       # #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
