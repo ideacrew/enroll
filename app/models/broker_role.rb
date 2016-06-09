@@ -229,11 +229,6 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
-    event :toapplicant  do 
-      transitions from: :broker_agency_pending, to: :applicant, :guard => :is_primary_broker?
-    end
-
-
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
       transitions from: :broker_agency_pending, to: :active
     end
