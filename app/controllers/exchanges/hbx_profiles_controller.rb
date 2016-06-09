@@ -84,7 +84,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
     if role
-      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
+      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
       if find_email(agent, role)
         agent_assistance_messages(params,agent,role)
       else
@@ -130,13 +130,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     page_string = params.permit(:gas_page)[:gas_page]
     page_no = page_string.blank? ? nil : page_string.to_i
 
-    @people = Person.exists(general_agency_staff_roles: true)
-
     status_params = params.permit(:status)
-    @status = status_params[:status] || 'applicant'
-    @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
-
-    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.map(&:general_agency_profile) }.flatten.uniq rescue []
+    @status = status_params[:status] || 'is_applicant'
+    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
@@ -177,7 +173,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render 
+    render
   end
 
   def product_index
@@ -202,7 +198,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     if current_user.has_csr_role? || current_user.try(:has_assister_role?)
       redirect_to home_exchanges_agents_path
       return
-    else 
+    else
       unless current_user.has_hbx_staff_role?
         redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
         return
@@ -291,15 +287,15 @@ private
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-      body = 
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
+      body =
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
         "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
         "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
-        "<a href='" + root+"phone'>Assist Customer</a>  <br>" 
+        "<a href='" + root+"phone'>Assist Customer</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
-      name = first_name.to_s + ' ' + last_name.to_s 
+      name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
       body =  "Please contact #{first_name} #{last_name}. <br/>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
@@ -320,7 +316,7 @@ private
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
     result.deliver_now
     puts result.to_s if Rails.env.development?
-   end  
+   end
 
   def find_hbx_profile
     @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
@@ -353,7 +349,7 @@ private
   end
 
   def authorize_for_instance
-    authorize @hbx_profile, "#{action_name}?".to_sym 
+    authorize @hbx_profile, "#{action_name}?".to_sym
   end
 
   def call_customer_service(first_name, last_name)
