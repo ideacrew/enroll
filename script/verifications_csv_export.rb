@@ -12,6 +12,7 @@ docs_uploaded = []
 CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
 
   csv << [
+    'Primary HbxId',
     'Primary Firstname', 
     'Primary Lastname',
     'Address',

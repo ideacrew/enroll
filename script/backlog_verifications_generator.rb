@@ -32,6 +32,8 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
   families.each do |family|
     counter += 1
+
+    next if family.id.to_s == "564d098469702d174fa10000"
     person = family.primary_applicant.person
 
     if person.consumer_role.blank?
@@ -50,6 +52,8 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
       csv << [family.id, family.e_case_id, person.full_name]
+
+      puts 'processed--' + person.full_name
 
     rescue Exception  => e
       case e.to_s 

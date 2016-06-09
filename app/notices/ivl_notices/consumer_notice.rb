@@ -129,6 +129,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def to_csv
     [
+      @recipient.hbx_id,
       @recipient.first_name,
       @recipient.last_name,
       @notice.primary_address.attributes.values.reject{|x| x.blank?}.compact.join(','),
