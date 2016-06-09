@@ -8,6 +8,12 @@ module InvoiceHelper
 		}
 	end
 
+  def currency_format(number)
+    number_string = "%.2f"%number
+    while number_string.sub!(/(\d+)(\d\d\d)/,'\1,\2'); end
+    number_string
+  end
+
   def build_pdf
     enrollment_summary = @hbx_enrollments.inject({}) do |hash,enrollment| 
       if hash.include?(enrollment.plan.name)
@@ -96,9 +102,9 @@ module InvoiceHelper
       ["Insurance Carrier Plan", "Covered Subscribers", "Covered Dependents", "New Charges"]
     ]
     enrollment_summary.each do |name,plan_summary| 
-      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{plan_summary['total_premium'].round(2)}"]
+      invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{currency_format(plan_summary['total_premium'])}"]
     end
-    invoice_services_data << ["New charges total", "", "", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"]
+    invoice_services_data << ["New charges total", "", "", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"]
     dchbx_table_item_list(invoice_services_data)
 
     enrollment_summary.each do |name, summary| 
@@ -130,7 +136,7 @@ module InvoiceHelper
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
+        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
       end
       carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium'].round(2)}"]
       dchbx_table_by_plan(carrier_plan_services_data)
@@ -168,7 +174,7 @@ module InvoiceHelper
 		  style(row(0).column(0), :borders => [:left,:top, :bottom])
 		  style(row(0).column(2), :borders => [:right,:top, :bottom])
 		  style(columns(0), :font_style => :bold, :width => 125, )
-		  style(columns(2), :width => 200, :align => :right)
+		  style(columns(2), :width => 400, :align => :right)
 		end
 	end
 
@@ -251,7 +257,7 @@ module InvoiceHelper
         ["INVOICE NUMBER:", "123123"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-        ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"],
+        ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
         ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
@@ -336,7 +342,7 @@ module InvoiceHelper
         ["INVOICE NUMBER:", "123123"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-        ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"],
+        ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
         ["DATE DUE:", "#{DateTime.now.end_of_month.strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
@@ -424,7 +430,7 @@ module InvoiceHelper
         ["INVOICE NUMBER:", "123123"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-        ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"],
+        ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
         ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
