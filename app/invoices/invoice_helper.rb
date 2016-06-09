@@ -138,7 +138,7 @@ module InvoiceHelper
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
         carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
       end
-      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium'].round(2)}"]
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
       dchbx_table_by_plan(carrier_plan_services_data)
     end
 
