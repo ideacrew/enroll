@@ -337,7 +337,7 @@ module InvoiceHelper
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{@hbx_enrollments.map(&:total_premium).sum.round(2)}"],
-        ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
+        ["DATE DUE:", "#{DateTime.now.end_of_month.strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
