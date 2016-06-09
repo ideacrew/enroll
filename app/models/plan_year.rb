@@ -603,6 +603,14 @@ class PlanYear
     # Plan as submitted failed eligibility check
     event :force_publish, :after => :record_transition do
       transitions from: :publish_pending, to: :published_invalid
+
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :publish_pending
+
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Employer requests review of invalid application determination
