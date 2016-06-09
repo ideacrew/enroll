@@ -331,17 +331,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(response).to have_http_status(:success)
     end
 
-    it "should get status" do
+    it "should get general_agencies" do
       xhr :get, :general_agency_index, format: :js
-      expect(assigns(:status)).to eq 'applicant'
-    end
-
-    it "should get general_agency_profiles" do
-      person = FactoryGirl.create(:person)
-      2.times.each { FactoryGirl.create(:general_agency_staff_role, person: person) }
-      xhr :get, :general_agency_index, status: 'all', format: :js
-      expect(GeneralAgencyProfile.all.count).to be > 0
-      expect(assigns(:general_agency_profiles).count).to eq GeneralAgencyProfile.all.count
+      expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
     end
   end
 end

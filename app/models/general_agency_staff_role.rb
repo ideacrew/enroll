@@ -28,15 +28,15 @@ class GeneralAgencyStaffRole
     state :general_agency_declined
     state :general_agency_terminated
 
-    event :approve, :after => [:record_transition, :send_invitation] do
-      transitions from: :applicant, to: :active
+    event :approve, :after => [:record_transition, :send_invitation, :update_general_agency_profile] do
+      transitions from: :applicant, to: :active 
     end
 
-    event :deny, :after => :record_transition  do
-      transitions from: :applicant, to: :denied
+    event :deny, :after => [:record_transition, :update_general_agency_profile ]  do
+      transitions from: :applicant, to: :denied 
     end
 
-    event :decertify, :after => :record_transition  do
+    event :decertify, :after => [:record_transition , :update_general_agency_profile] do
       transitions from: :active, to: :decertified
     end
 
@@ -92,6 +92,18 @@ class GeneralAgencyStaffRole
   end
 
   private
+
+  def update_general_agency_profile
+    case aasm.to_state
+     when :active
+       general_agency_profile.approve!
+      when :denied
+        general_agency_profile.reject!
+      when :decertified
+        general_agency_profile.close!
+    end
+  end
+
   def latest_transition_time
     if self.workflow_state_transitions.any?
       self.workflow_state_transitions.first.transition_at

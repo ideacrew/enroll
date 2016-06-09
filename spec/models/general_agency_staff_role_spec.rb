@@ -101,6 +101,31 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
         expect(staff_role.current_state).to eq "Applicant"
       end
     end
+
+    context "state changed to" do
+      context "active" do
+        it "should update the state of staff role and general_agency_profile to approved" do
+          staff_role.approve!
+          expect(staff_role.applicant?).to be_falsey
+          expect(staff_role.general_agency_profile.applicant?).to be_falsey
+        end
+      end
+      context "denied" do
+        it "should update the state of staff role and general_agency_profile to denied" do
+          staff_role.deny!
+          expect(staff_role.aasm_state).to eq('denied')
+          expect(staff_role.general_agency_profile.aasm_state).to eq('is_rejected')
+        end
+      end
+      context "decertify" do
+        it "should update the state of staff role and general_agency_profile to denied" do
+          staff_role.approve! #change the state to approved
+          staff_role.decertify!
+          expect(staff_role.aasm_state).to eq('decertified')
+          expect(staff_role.general_agency_profile.aasm_state).to eq('is_closed')
+        end
+      end
+    end
   end
 
   context "instance method" do
