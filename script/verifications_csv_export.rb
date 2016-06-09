@@ -9,7 +9,7 @@ coverage_not_found = []
 pending_ssa_validation = []
 docs_uploaded = []
 
-CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
+CSV.open("verification_backlog_report_rev8.csv", "w") do |csv|
 
   csv << [
     'Primary HbxId',
@@ -30,6 +30,8 @@ CSV.open("verification_backlog_report_rev3.csv", "w") do |csv|
 
   families.each do |family|
     counter += 1
+
+    next if family.id.to_s == "564d098469702d174fa10000"
     person = family.primary_applicant.person
 
     if person.consumer_role.blank?

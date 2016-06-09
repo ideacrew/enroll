@@ -33,7 +33,9 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   families.each do |family|
     counter += 1
 
+    # next unless family.id.to_s == "5619ca5554726532e58b2201"
     next if family.id.to_s == "564d098469702d174fa10000"
+
     person = family.primary_applicant.person
 
     if person.consumer_role.blank?

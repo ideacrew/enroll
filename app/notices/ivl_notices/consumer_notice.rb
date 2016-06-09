@@ -45,7 +45,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
 
     enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
-    enrollments.each {|e| e.update_attributes(special_verification_period: Date.new(2016,9,11))}
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
