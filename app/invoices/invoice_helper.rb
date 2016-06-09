@@ -88,7 +88,7 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150
     @pdf.move_down 12    
 
-    @pdf.text_box "#{DateTime.now.next_month.strftime("%m/%Y")} Group Coverage Bill(Health & Dental)", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
+    @pdf.text_box "#{DateTime.now.next_month.strftime("%m/%Y")} Group Coverage Bill", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
 
     @pdf.move_down 48
 
@@ -130,7 +130,7 @@ module InvoiceHelper
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_dependent_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
+        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{enrollment.total_employer_contribution}" ,"$#{enrollment.total_employee_cost}"  ,"$#{enrollment.total_premium}"]
       end
       carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{summary['total_premium'].round(2)}"]
       dchbx_table_by_plan(carrier_plan_services_data)
