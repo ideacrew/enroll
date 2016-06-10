@@ -63,7 +63,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     employers = []
 
     # datatable records with no filter should default to scope "invoice_view_all"
-    all_employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all.invoice_starting
+    all_employers = Organization.where(:employer_profile => {:$exists => 1}).invoice_view_all
     employers = all_employers
     is_search = false
 

@@ -143,10 +143,10 @@ class Organization
   scope :all_employers_non_renewing,             ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
   scope :all_employers_enrolled,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
 
-  scope :invoice_view_all,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL) }
+  scope :invoice_view_all,                 ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
   scope :invoice_view_renewing,            ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING) }
   scope :invoice_view_initial,             ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_INITIAL) }
-  scope :invoice_starting,                 ->{ unscoped.where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+  #scope :invoice_starting,                 ->{ unscoped.where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
