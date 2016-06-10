@@ -1,7 +1,4 @@
-<div class="col-md-2">
-  <br class="clear"/>
-</div>
-<nav class="row" style="position: fixed;">
+<nav>
   <ul>
     <li <%= menu_tab_class(active_tab, "home") %>>
       <%= link_to "My #{Settings.site.short_name}", employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
@@ -29,13 +26,13 @@
     <% unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
       <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
-      Inbox
+      Messages
       <span class="badge message-unread"><%= @employer_profile.inbox.unread_messages.try(:count) || 0 %></span>
 
       <% end %>
       <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
       <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
-      <small>Inbox</small>
+      <small>Messages</small>
       <% end %>
     </li>
     <% end %>

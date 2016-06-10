@@ -1,26 +1,41 @@
 
 $primary-blue: #007bc4;
 $primary-green: #69A30D;
+$primary-color: #007bc4;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 
 .module {
-  &.brokers-widget {
-    word-break:break-all;
-    .col-xs-8 {
-      padding-top: 10px;
-      padding-right: 10px;
-      padding-left: 0;
-      h4 {
-        padding: 15px 0 0 0;
-        margin: 0;
-        font-weight: 600;
+  &.inbox {
+    .fa {
+      color: $primary-blue;
+    }
+  }
+  &#qle-details {
+    .error-info {
+      margin-top: 0;
+    }
+  }
+  &.shop-for-plans-widget {
+    a {
+      width: 100%;
+      margin-bottom: 2.5%;
+      &.btn {
+        padding: 6px 0;
       }
     }
-
-    h4, .fa {
-      color: #007bc4;
+  }
+}
+.brokers-widget {
+    h4 {
+      padding: 15px 0 0 0;
+      margin: 0;
+      font-weight: 600;
     }
+
+  h4, .fa {
+    color: $primary-color;
+  }
 
     .col-xs-4 {
       cursor: pointer;
@@ -40,16 +55,13 @@ $primary-bold: 600;
         color: #007bc4;
       }
     }
-  }
-  &#qle-details {
-    .error-info {
-      margin-top: 0;
+    span {
+      color: $primary-color;
     }
-  }
 }
 .help-signup {
   h4 {
-    color: #007bc4;
+    color: $primary-color;
     margin-bottom: 0;
     font-weight: 600;
     &+small {
@@ -71,7 +83,7 @@ $primary-bold: 600;
   }
   i {
     text-align: center;
-    color: #007bc4;
+    color: $primary-color;
     display: block;
   }
   .fa-phone {
@@ -88,7 +100,7 @@ $primary-bold: 600;
   padding-top: 4.45%;
 }
 .fa-icon-link, .fa-icon-label, a {
-  color: #007bc4;
+  color: $primary-color;
   cursor: pointer;
   &:hover {
     color: #23527c;
@@ -102,7 +114,7 @@ $primary-bold: 600;
 
   .benefits-tab, .home-tab, .hbx-enrollment-panel {
     .fa {
-      color: #007bc4;
+      color: $primary-color;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
@@ -129,40 +141,8 @@ $primary-bold: 600;
     .alert {
       padding: 15px 40px 15px 15px;
     }
-    .btn-primary {
-      text-transform: uppercase;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 16px;
-      letter-spacing: 1px;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-      margin-top: 5px;
-      &.mtz {
-        margin-top: 0;
-      }
-    }
-    .btn.pull-right {
-      width: 100%;
-      max-width: 75%;
-    }
         .bg-title {
           font-weight: bold;
-        }
-        .panel-body {
-          .col-xs-12 {
-            padding-top: 15px;
-            &.btn-stack {
-              padding-top: 0;
-              a {
-                margin-top: 0;
-              }
-            }
-            &.btn-stack:last-of-type {
-              padding-top: 5px;
-            }
-          }
         }
         .panel-body {
           h4 {
@@ -369,7 +349,7 @@ $primary-bold: 600;
                 width: 100%;
                 .button {
                   overflow: hidden;
-                  width:62.5%;
+                  width:74%;
                   position:relative;
                 }
                 input[type=submit] {
@@ -396,9 +376,6 @@ $primary-bold: 600;
 								border-radius: 5px;
 								max-width: 140px;
 								width: 140px;
-							}
-							.btn-trans {
-								background-color: transparent;
 							}
 						}
             &.table-functions {

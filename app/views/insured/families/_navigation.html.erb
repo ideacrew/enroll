@@ -1,4 +1,4 @@
-<nav class="row">
+<nav>
   <ul>
     <li <%= menu_tab_class(@tab, 'home') %>>
       <%= link_to "My #{Settings.site.short_name}", family_account_path(tab: 'home') %>
@@ -21,7 +21,7 @@
     <% end %>
     <li <%= menu_tab_class(@tab, 'messages') %>>
       <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
-        Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>
+        Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.size %></span>
       <% end %>
     </li>
   </ul>
@@ -39,18 +39,16 @@
 	<span class="lg ttu">
 	  Your Household of <%= @family_members.count %>
         </span>
-
+        <br/>
         <% @family_members.each do |f| %>
 	  <span class="twelve ttc blue">
 	    <%= f.first_name %> <%= f.last_name %><br/>
 	  </span>
         <% end %>
       <% else %>
-        <br/>
       <% end %>
 	<br/>
-	<%= link_to "Manage Family", manage_family_insured_families_path(tab: 'family'), class: 'btn btn-trans ttc', style: 'padding: 10px 5%;' %>
-	<br/>
+	<%= link_to "Manage Family", manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block' %>
 	<br/>
 </div>
   </div>

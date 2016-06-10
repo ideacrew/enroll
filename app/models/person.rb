@@ -87,6 +87,7 @@ class Person
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -334,6 +335,16 @@ class Person
 
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
+  end
+
+  def first_name_last_name_and_suffix
+    [first_name, last_name, name_sfx].compact.join(" ")
+    case name_sfx
+      when "ii" ||"iii" || "iv" || "v"
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      else
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+      end
   end
 
   def age_on(date)
@@ -634,7 +645,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
