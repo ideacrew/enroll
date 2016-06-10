@@ -173,7 +173,8 @@ class EmployerProfile
   end
 
   def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
-    # commented out the start_on and terminate_on 
+
+    # commented out the start_on and terminate_on
     # which is same as broker calculation, However it will cause problem
     # start_on later than end_on
     #
@@ -651,6 +652,10 @@ class EmployerProfile
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
+  end
+
+  def is_conversion?
+    self.profile_source == "conversion"
   end
 
 private

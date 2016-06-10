@@ -73,6 +73,33 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe "employer_invoice" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders employer_invoice datatable" do
+      xhr :get, :employer_invoice
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders employer_invoice datatable payload" do
+      xhr :post, :employer_invoice_datatable
+      expect(response).to have_http_status(:success)
+    end
+
+  end
+
   describe "#create" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
@@ -193,6 +220,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should clear session for dismiss_announcements" do
       get :show
       expect(session[:dismiss_announcements]).to eq nil
+    end
+  end
+
+  describe "#generate_invoice" do
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { double("EmployerProfile", id: double("id"))}
+    let(:organization){ Organization.new }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+
+    before :each do
+      sign_in(user)
+      allow(organization).to receive(:employer_profile?).and_return(employer_profile)
+      allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
+    end
+
+    it "create new organization if params valid" do
+      xhr :get, :generate_invoice, {"employerId"=>[organization.id]} ,  format: :js
+      expect(response).to have_http_status(:success)
+      # expect(organization.invoices.size).to eq 1
     end
   end
 
