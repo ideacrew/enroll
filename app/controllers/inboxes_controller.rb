@@ -22,16 +22,20 @@ class InboxesController < ApplicationController
   end
 
   def show
-    @message.update_attributes(message_read: true)
     respond_to do |format|
       format.html
       format.js
     end
   end
 
+
   def destroy
     #@message.destroy
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
+    flash[:notice] = "Successfully deleted inbox message."
+    if params[:url].present?
+      @inbox_url = params[:url]
+    end
   end
 
   private

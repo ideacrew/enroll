@@ -6,6 +6,23 @@ $primary-bold: 600;
 $primary-white: #fff;
 $grayed-out: #b7b7b7;
 .module {
+  &.inbox {
+    .inboxes {
+      margin-bottom: 1.25%;
+    }
+    .table {
+      td {
+        vertical-align: middle;
+      }
+      tr.msg-inbox-unread {
+        font-weight: bold;
+        cursor: pointer;
+      }
+      tr.msg-inbox-read {
+        cursor: pointer;
+      }
+    }
+  }
   &.footer {
     font-size: 14px;
     color: $primary-white;

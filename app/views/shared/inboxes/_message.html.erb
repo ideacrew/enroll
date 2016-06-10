@@ -1,13 +1,19 @@
-<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 padding_none">
-  <h3 style="margin-top: 0;"> Message Details </h3>
-</div>
 <%- if message.present? %>
-<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 padding_none">
+<div class="col-xs-12">
   <ul class="list-group">
-    <li class="list-group-item"> Sent By:  <%= "System Admin" %> <br></li>
-    <li class="list-group-item"> Subject:  <%= message.try(:subject).html_safe %> <br></li>
-    <li class="list-group-item"> <%= message.try(:body).html_safe %> <br></li>
+    <li class="list-group-item">
+      Sent By:
+      <%= "System Admin" %>
+      <br></li>
+    <li class="list-group-item">
+      Subject:
+      <%= message.try(:subject).html_safe %>
+      <br></li>
+    <li class="list-group-item">
+      <%= message.try(:body).html_safe %>
+      <br></li>
   </ul>
-  <a class="btn btn-danger msg_cancel_btn" href="#"><i class="fa fa-times interaction-control-inbox-cancel"></i> Cancel</a>
+  <br class="clear"/>
+  <%= link_to "<i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>".html_safe, :back, class: 'btn btn-default' %>
 </div>
 <% end %>
