@@ -1,0 +1,18 @@
+%benefit_group
+  %name= benefit_group.title
+  %reference_plan
+    %id
+      %id= benefit_group.reference_plan.hios_id
+    %name= benefit_group.reference_plan.name
+    %active_year= benefit_group.reference_plan.active_year
+    %is_dental_only= benefit_group.reference_plan.is_dental_only?
+    = render :partial => "events/v2/shared/carrier", :object => benefit_group.reference_plan.carrier_profile
+    %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{benefit_group.reference_plan.metal_level.downcase}"
+    %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{benefit_group.reference_plan.coverage_kind}"
+    %ehb_percent= benefit_group.reference_plan.ehb*100
+  %elected_plans
+    - benefit_group.is_offering_dental? ? dental_plans = benefit_group.elected_dental_plans : dental_plans = []
+    = render :partial => "events/v2/employers/elected_plan", :collection => benefit_group.elected_plans + dental_plans
+  -#%federal_contributions= " " filed not available in benefit group modal
+  %relationship_benefits
+    = render :partial => "events/v2/employers/relationship_benefit", :collection => benefit_group.relationship_benefits

@@ -1,0 +1,6 @@
+!!! XML
+%ssa_verification_request{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %id
+    %id= individual.id
+  = render :partial => "events/v2/individuals/person", :object => individual
+  = render :partial => "events/v2/individuals/person_demographics", :object => individual
