@@ -22,7 +22,7 @@
           <%= render 'enrollment_level_info.html.erb', :hbx_id => enrollment_info_key.to_s, :hbx_values => enrollment_info_value, :max_aptc  => @max_aptc, :enrollment_count => count%>
         <%end%>
       </div>
-        <div id = "update-btn" align="right"><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination and/or creation of enrollments with the updated APTC values.' } , class: "btn btn-primary btn-lg"%></div>
+        <div id = "update-btn" align="right"><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination and/or creation of enrollments with the updated APTC values. Are you sure ? ' } , class: "btn btn-primary btn-lg"%></div>
     <% end %>
   </div>
 

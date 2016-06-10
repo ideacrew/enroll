@@ -268,8 +268,31 @@ class HbxAdmin
       return current_aptc_applied_hash  
     end
 
+    def redetermine_eligibility_with_updated_values(family, params)
+      eligibility_redetermination_result = false
+      max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
+      csr_percent_as_integer = family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer 
+      existing_latest_eligibility_determination = family.active_household.latest_active_tax_household.latest_eligibility_determination
+      latest_active_tax_household = family.active_household.latest_active_tax_household
+
+      if !(params[:max_aptc].to_f == max_aptc && params[:csr_percentage].to_i == csr_percent_as_integer) # IF NOT
+        eligibility_redetermination_result = true
+        # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
+        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => TimeKeeper.datetime_of_record, 
+                                                                      "determined_on"                 => TimeKeeper.datetime_of_record, 
+                                                                      "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
+                                                                      "premium_credit_strategy_kind"  => existing_latest_eligibility_determination.premium_credit_strategy_kind, 
+                                                                      "csr_percent_as_integer"        => params[:csr_percentage].to_i, 
+                                                                      "max_aptc"                      => params[:max_aptc].to_f, 
+                                                                      "benchmark_plan_id"             => existing_latest_eligibility_determination.benchmark_plan_id,
+                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id  
+                                                                      }).save!
+      end
+      eligibility_redetermination_result
+    end
 
     def update_aptc_applied_for_enrollments(params)
+      enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       family = Family.find(params[:person][:family_id])
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
@@ -281,6 +304,7 @@ class HbxAdmin
           actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
           if actual_aptc_value != updated_aptc_value
+              enrollment_update_result = true
               original_hbx = HbxEnrollment.find(hbx_id)
               aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
               
@@ -314,7 +338,8 @@ class HbxAdmin
           end
 
         end 
-      end  
+      end
+      enrollment_update_result  
     end  
   
     def find_enrollment_effective_on_date(hbx_created_datetime)

@@ -25,36 +25,15 @@ class HbxAdminController < ApplicationController
     end
   end
 
-
   def update_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
-    
     # Change this value so it is read from the dropdown params of years when implementing the retro functionality
-    year = TimeKeeper.datetime_of_record.year
+    #year = TimeKeeper.datetime_of_record.year
     if @family.present?
-      # Update Max APTC and CSR Percentage
-      max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
-      csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
-      
-      existing_latest_eligibility_determination = @family.active_household.latest_active_tax_household.latest_eligibility_determination
-      latest_active_tax_household = @family.active_household.latest_active_tax_household
-      if !(params[:max_aptc].to_f == max_aptc && params[:csr_percentage].to_i == csr_percent_as_integer)
-        # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
-        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => TimeKeeper.datetime_of_record, 
-                                                                      "determined_on"                 => TimeKeeper.datetime_of_record, 
-                                                                      "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
-                                                                      "premium_credit_strategy_kind"  => existing_latest_eligibility_determination.premium_credit_strategy_kind, 
-                                                                      "csr_percent_as_integer"        => params[:csr_percentage].to_i, 
-                                                                      "max_aptc"                      => params[:max_aptc].to_f, 
-                                                                      "benchmark_plan_id"             => existing_latest_eligibility_determination.benchmark_plan_id,
-                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id  
-                                                                      }).save!
-      end
-
-      result = HbxAdmin.update_aptc_applied_for_enrollments(params)
-
+      @eligibility_redetermination_result = HbxAdmin.redetermine_eligibility_with_updated_values(@family, params)
+      @enrollment_update_result = HbxAdmin.update_aptc_applied_for_enrollments(params)
     end
 
     respond_to do |format|
@@ -64,10 +43,8 @@ class HbxAdminController < ApplicationController
 
   # For AJAX Calculations.
   def calculate_aptc_csr
-
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @aptc_errors = HbxAdmin::build_error_messages(params[:max_aptc], params[:csr_percentage], params[:applied_aptcs_array])
-    #return if @aptc_errors.present?
     @current_year = params[:year_selected]  || TimeKeeper.date_of_record.year
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])

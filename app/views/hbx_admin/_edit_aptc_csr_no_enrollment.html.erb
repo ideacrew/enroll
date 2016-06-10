@@ -17,7 +17,7 @@
       
       <span class="glyphicon glyphicon-info-sign"> </span> No Active Enrollment (Assistance Receiving) for <%=@current_year%><br />
 
-      <div id = "update-btn" align="right"><%= f.submit "Update", class: "btn btn-primary btn-lg"%></div>
+      <div id = "update-btn" align="right"><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination. Are you sure ? ' } , class: "btn btn-primary btn-lg"%></div>
     <% end %>
   </div>
 </div>
