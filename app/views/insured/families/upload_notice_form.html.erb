@@ -1,0 +1,34 @@
+<% %>
+<% content_for :navigation do %>
+    <%= render 'navigation' %>
+<% end %>
+
+
+<div class="col-xs-12 documents-tab">
+  <div class="row">
+    <div class="col-xs-8">
+      <h1>Upload Notices</h1>
+      <h4 class="starter">
+      </h4>
+    </div>
+  </div>
+  <%= form_for @person, :url => upload_notice_insured_families_path, html: {multipart: true}, method: :post do |f| %>
+      <%= file_field_tag :file %>
+      <%= f.submit %>
+  <% end %>
+
+  <br><br>
+  <h1>Uploaded Notices</h1>
+  <ul>
+  <% @notices.each do |notice|%>
+      <li>
+        <%= link_to(notice.title, authorized_document_download_path('Person', @person.id, 'documents', notice.id ) + "?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") %>
+      </li>
+  <% end %>
+    </ul>
+</div>
+
+
+
+
+

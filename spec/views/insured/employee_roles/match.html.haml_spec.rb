@@ -19,11 +19,11 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
 
     expect(rendered).to have_selector('h1', text: 'Personal Information')
     expect(rendered).to have_selector("input[type='text']", count: 5)
-    expect(rendered).to have_selector("input[type='radio']", count: 2)
+    expect(rendered).to have_selector("input[type='radio']", count: 3)
 
     # expect(rendered).to have_selector("input[type=submit][value='This is my employer']")
     # expect(rendered).to have_selector('dt', text: 'Employer :')
     # expect(rendered).to have_selector("input", value: 'This is my employer')
-    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact DC Health Link's Customer Care Center: 1-855-532-5465.")
+    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact #{Settings.site.short_name}'s Customer Care Center: 1-855-532-5465.")
   end
 end

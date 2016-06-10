@@ -4,6 +4,7 @@
       <h1></h1>
       <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-success pull-left' %>
       &nbsp;&nbsp;
+      <!-- should this be using @person instead of current_user? -->
       <%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-success' %>
     </div>
   </div>

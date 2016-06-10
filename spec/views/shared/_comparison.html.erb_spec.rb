@@ -4,7 +4,7 @@ describe "shared/_comparison.html.erb" do
 
   random_value = rand(999_999_999)
   let(:mock_person){ instance_double("Person",full_name: "John Doe:#{random_value}", age_on: 21, dob: double("dob"))}
-  let(:mock_member){ instance_double("HbxEnrollmentMember",primary_relationship: "self:#{random_value}", person: mock_person)}
+  let(:mock_member){ instance_double("HbxEnrollmentMember",primary_relationship: "self:#{random_value}", person: mock_person, is_subscriber: true)}
   let(:mock_organization){ instance_double("Oganization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
   let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [mock_member, mock_member], :id => "3241251524", plan: mock_plan) }
@@ -61,6 +61,12 @@ describe "shared/_comparison.html.erb" do
     it "should not have copay text" do
       expect(rendered).not_to have_selector('th', text: 'CO-PAY')
     end
+
+    it "should not have download link" do
+      expect(rendered).not_to have_selector('a', text: 'Download')
+      expect(rendered).not_to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=dental"]', text: "Download")
+    end
+
   end
 
   context "with no rx_formulary_url and provider urls for coverage_kind = health" do
@@ -90,6 +96,7 @@ describe "shared/_comparison.html.erb" do
 
     it "should have download link" do
       expect(rendered).to have_selector('a', text: 'Download')
+      expect(rendered).to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=health"]', text: "Download")
     end
 
     it "should not have Out of Network text" do

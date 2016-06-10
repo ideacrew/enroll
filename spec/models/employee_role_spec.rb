@@ -528,4 +528,18 @@ describe EmployeeRole, dbclean: :after_each do
       end
     end
   end
+
+  context "can_select_coverage?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+
+    it "should return true when hired_on is less than two monthes ago" do
+      employee_role.hired_on = TimeKeeper.date_of_record - 15.days
+      expect(employee_role.can_select_coverage?).to eq true
+    end
+
+    it "should return false when hired_on is more than two monthes ago" do
+      employee_role.hired_on = TimeKeeper.date_of_record - 75.days
+      expect(employee_role.can_select_coverage?).to eq false
+    end
+  end
 end

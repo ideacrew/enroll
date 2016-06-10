@@ -9,7 +9,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   let(:plan_year){ FactoryGirl.create(:plan_year) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:relationship_benefit){ RelationshipBenefit.new(relationship: "employee") }
-  let(:benefit_group) {BenefitGroup.new(title: "plan name", relationship_benefits: [relationship_benefit], plan_year: plan_year )}
+  let(:benefit_group) {BenefitGroup.new(title: "plan name", relationship_benefits: [relationship_benefit], dental_relationship_benefits: [relationship_benefit], plan_year: plan_year )}
   let(:benefit_group_assignment) { BenefitGroupAssignment.new(benefit_group: benefit_group) }
   let(:reference_plan){ double("Reference Plan") }
   let(:address){ Address.new(address_1: "1111 spalding ct", address_2: "apt 444", city: "atlanta", state: "ga", zip: "30338") }
@@ -60,26 +60,19 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   it "should not show the plan" do
-    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(nil)
-    assign(:hbx_enrollments, nil)
+    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
+    assign(:hbx_enrollments, [])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
   it "should show waiver" do
-    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
+    hbx_enrollment.update_attributes(:aasm_state => 'inactive', )
+    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Coverage Waived/
-  end
-
-  it "should show waiver reason" do
-    allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
-    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
-
-    render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Waiver Reason: this is the reason/
   end
 
@@ -120,7 +113,9 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
     before do
-      assign(:hbx_enrollments, [hbx_enrollment_two, hbx_enrollment_three])
+      allow(benefit_group).to receive(:dental_reference_plan).and_return(hbx_enrollment_three.plan)
+      hbx_enrollment_two.update_attributes(:aasm_state => :inactive)
+      assign(:hbx_enrollments, [hbx_enrollment_three, hbx_enrollment_two])
       render template: 'employers/census_employees/show.html.erb'
     end
 

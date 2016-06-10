@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.3'
 
 # Use SCSS for stylesheets
-# gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '~> 5.0'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -53,12 +53,11 @@ gem 'symmetric-encryption', '~> 3.6.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
+gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 
-gem 'aasm', '~> 4.0.7'
+gem 'aasm', '~> 4.8.0'
 gem 'haml'
-gem 'sass', '3.4.21'
 # gem 'bh'
 
 # spreadsheet support
@@ -88,17 +87,20 @@ gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
 
-gem 'prawn', '~> 0.11.1'
+gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'
 gem 'virtus'
-gem 'wkhtmltopdf-binary-edge', '~> 0.12.2.1'
-gem 'wicked_pdf', '1.0.4'
+gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
+gem 'wicked_pdf', '1.0.6'
 
 # provide recaptcha services
 gem "recaptcha", '1.1.0'
 
+gem 'jquery-datatables-rails', '3.4.0'
+
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
+  gem "parallel_tests"
 end
 
 group :development, :test do
@@ -119,15 +121,16 @@ group :development, :test do
   gem 'ruby-progressbar', '1.6.0'
 
   # Keep these in Development and Test environments for access by rails generators
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.4.2'
   gem 'factory_girl_rails', "4.6.0"
   gem 'forgery'
   gem 'email_spec', '2.0.0'
   gem 'byebug', '8.2.2'
+  gem 'rspec_junit_formatter', '0.2.3'
 end
 
 group :test do
-  gem 'mongoid-rspec'
+  gem 'mongoid-rspec', '3.0.0'
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'poltergeist'
@@ -151,3 +154,4 @@ end
 
 gem 'aws-sdk', '2.2.4'
 gem 'ruby-saml', '~> 1.0.0'
+gem 'combine_pdf'

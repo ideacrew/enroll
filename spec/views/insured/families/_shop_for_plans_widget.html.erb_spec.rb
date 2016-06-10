@@ -49,7 +49,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should have link without change_plan" do
-      expect(rendered).to have_selector("a[href='/insured/consumer_role/search?build_consumer_role=true']")
+      expect(rendered).to have_selector("a[href='/insured/consumer_role/build']")
     end
   end
 

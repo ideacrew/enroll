@@ -23,6 +23,13 @@ FactoryGirl.define do
 
   trait :hbx_staff do
     roles ["hbx_staff"]
+
+    after :create do |user, evaluator|
+      if user.person.present?
+      user.person.hbx_staff_role = FactoryGirl.build :hbx_staff_role
+      user.save
+      end
+    end
   end
 
   trait :consumer do
@@ -68,9 +75,19 @@ FactoryGirl.define do
     end
   end
 
+  trait :general_agency_staff do
+    roles ['general_agency_staff']
+  end
+
   trait :with_consumer_role do
     after :create do |user|
       FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+    end
+  end
+
+  trait :with_csr_sub_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_csr_role, :with_family, :user => user
     end
   end
 

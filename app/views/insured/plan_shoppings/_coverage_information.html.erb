@@ -29,7 +29,7 @@
       </tr>
       <tr>
         <td colspan="5" class="text-right">Your coverage start date :</td>
-        <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+        <td><span class="coverage_effective_date"><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></span></td>
       </tr>
     </tbody>
   </table>

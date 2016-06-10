@@ -57,7 +57,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the title" do
       expect(rendered).to match /#{plan.active_year} #{plan.coverage_kind} Coverage/
-      expect(rendered).to match /DC Health Link/
+      expect(rendered).to match /#{Settings.site.short_name}/
     end
 
     it "should display the link of view detail" do
@@ -68,6 +68,17 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('label', text: 'Effective date:')
       expect(rendered).to have_selector('strong', text: '08/10/2015')
     end
+
+    it "should display the effective date" do
+      expect(rendered).to have_selector('label', text: 'Effective date:')
+      expect(rendered).to have_selector('strong', text: '08/10/2015')
+    end
+
+    it "should display effective date when terminated enrollment" do
+      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
+      expect(rendered).to match /effective date/i
+    end
+
   end
 
   context "with consumer_role" do
@@ -96,7 +107,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the title" do
       expect(rendered).to match /#{plan.active_year} health Coverage/i
-      expect(rendered).to match /DC Health Link/
+      expect(rendered).to match /#{Settings.site.short_name}/
     end
 
     it "should display the aptc amount" do

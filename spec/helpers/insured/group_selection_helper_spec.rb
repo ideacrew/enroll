@@ -27,6 +27,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
     context "with active employee role" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+      before do
+        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+      end
+
       it "should have active employee role" do
         expect(subject.can_shop_shop?(person)).to be_truthy
       end
@@ -38,6 +42,9 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     let(:person) { FactoryGirl.create(:person) }
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+      before do
+        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+      end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).to be_truthy
       end

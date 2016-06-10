@@ -1,4 +1,5 @@
 require 'csv'
+require 'prawn/table'
 class Employers::PremiumStatementsController < ApplicationController
   layout "two_column", only: [:show]
 
@@ -52,4 +53,5 @@ class Employers::PremiumStatementsController < ApplicationController
     end
   end
 
+  
 end

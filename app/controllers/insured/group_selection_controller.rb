@@ -16,9 +16,7 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
-    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
-    @employee_role = @person.employee_roles.active.last if @employee_role.blank? && @person.has_active_employee_role?
-
+    @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
 
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
@@ -33,8 +31,10 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
+    elsif @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.active.detect { |hbx| hbx.may_terminate_coverage? } unless @hbx_enrollment.present?
     end
-
+    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
       qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
@@ -125,7 +125,7 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
       end
-      @employee_role = @person.employee_roles.active.last if @employee_role.blank? && @person.has_active_employee_role?
+      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,

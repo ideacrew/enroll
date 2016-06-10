@@ -14,16 +14,6 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
         FactoryGirl.build(:broker_agency_account, family: f)
       ]
       f.save
-      wa = f.broker_agency_accounts.first.writing_agent.person
-      wa.emails = [
-        FactoryGirl.build(:email, kind: "work")
-      ]
-
-      wa.phones = [
-        FactoryGirl.build(:phone, kind: "home")
-      ]
-
-      wa.save
       f
     end
     let(:family_member) { family.family_members.last }
@@ -37,6 +27,11 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
     it "should display broker widget for consumer" do
       expect(rendered).to have_selector('h4', "Your Broker")
     end
+
+    it "should display brokers email" do
+      expect(rendered).to match("mailto")
+    end
+
   end
 
 end

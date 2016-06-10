@@ -2,6 +2,7 @@ class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
+  include ErrorBubble
 
   def welcome
   end
@@ -21,7 +22,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
-      found_census_employees = @employee_candidate.match_census_employees
+      found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if found_census_employees.empty?
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
@@ -29,7 +30,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { render 'no_match' }
         end
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
+        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
         respond_to do |format|
           format.html { render 'match' }
         end
@@ -64,11 +65,11 @@ class Insured::EmployeeRolesController < ApplicationController
     set_employee_bookmark_url
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
-      if @employee_role.new_census_employee.address.present? && @person.addresses.empty?
-        @person.addresses << @employee_role.new_census_employee.address.clone
-      end
-      if @employee_role.new_census_employee.email.present? && @employee_role.new_census_employee.email.kind == "work" && @person.emails.count < 2
-        @person.emails << @employee_role.new_census_employee.email.clone
+      @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
+      if @employee_role.new_census_employee.email.present?
+        new_employee_email = @employee_role.new_census_employee.email
+        email_kind = new_employee_email.kind.present? ? new_employee_email.kind : "home"
+        @person.emails = [Email.new(kind: email_kind, address: new_employee_email.address)]
       end
       @family = @person.primary_family
       build_nested_models
@@ -105,6 +106,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
+        bubble_address_errors_by_person(@person)
         build_nested_models
         respond_to do |format|
           format.html { render "edit" }

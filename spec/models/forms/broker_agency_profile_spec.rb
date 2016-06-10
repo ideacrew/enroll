@@ -34,7 +34,7 @@ describe Forms::BrokerAgencyProfile, "given nothing" do
 end
 
 
-describe Forms::BrokerAgencyProfile, ".save" do
+describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
 
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency, fein: "223230323") }
   let(:employer_profile) { FactoryGirl.create(:employer_profile, fein: "333230323") }
@@ -184,6 +184,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
       expect(organization).to be_truthy
       expect(organization.broker_agency_profile).to be_truthy
       expect(organization.broker_agency_profile.primary_broker_role).to eq(person.broker_role)
+      expect(person.broker_role.market_kind).to eq(attributes[:market_kind])
       expect(person.broker_role.broker_agency_profile).to eq(organization.broker_agency_profile)
     end
   end

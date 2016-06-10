@@ -10,6 +10,9 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
+  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled)
+  INVOICE_VIEW_INITIAL = %w(published enrolling enrolled active suspended)
+
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
 
   # Plan Year time period
@@ -44,6 +47,7 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
@@ -315,20 +319,20 @@ class PlanYear
 
   # Employees who selected or waived and are not owners or direct family members of owners
   def non_business_owner_enrolled
-    enrolled.non_business_owner
-  end
-
-  def non_business_owner_enrollment_count
-    non_business_owner_enrolled.size
+    enrolled.select{|ce| !ce.is_business_owner}
   end
 
   # Any employee who selected or waived coverage
   def enrolled
-    eligible_to_enroll.enrolled
+    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage? }
   end
 
   def total_enrolled_count
-    enrolled.count { |e| e.has_active_health_coverage? }
+    if self.employer_profile.census_employees.count < 100
+      enrolled.count
+    else
+      0
+    end
   end
 
   def enrollment_ratio
@@ -369,8 +373,8 @@ class PlanYear
     end
 
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < eligible_to_enroll_count
-      if non_business_owner_enrollment_count < Settings.aca.shop_market.non_owner_participation_count_minimum
+    if non_business_owner_enrolled.count < eligible_to_enroll_count
+      if non_business_owner_enrolled.count < Settings.aca.shop_market.non_owner_participation_count_minimum
         errors.merge!(non_business_owner_enrollment_count: "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll")
       end
     end
@@ -548,6 +552,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => :trigger_passive_renewals
     state :renewing_enrolled
     state :renewing_publish_pending
+    state :renewing_canceled
 
     state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated     # Coverage under this application is terminated
@@ -653,8 +658,12 @@ class PlanYear
     end
 
     # Admin ability to reset renewing plan year application
-   event :revert_renewal, :after => :record_transition do
+    event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
+    end
+
+    event :cancel_renewal, :after => :record_transition do
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
   end
 
@@ -672,7 +681,14 @@ class PlanYear
     record_transition
   end
 
+  def adjust_open_enrollment_date
+    if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
+      update_attributes(:open_enrollment_start_on => TimeKeeper.date_of_record)
+    end
+  end
+
   def accept_application
+    adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
     send_employee_invites if transition_success && !is_renewing?
   end

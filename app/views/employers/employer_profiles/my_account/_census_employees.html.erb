@@ -1,4 +1,4 @@
-<div class="col-xs-12 employees-tab">
+<div class="employees-tab">
 
 <div class="employees-section">
     <div class="row">
@@ -45,8 +45,8 @@
 <!--  non javascript click when clicked on new employee -->
 
 <!-- javascript click when clicked on new employee -->
-<%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-trans" %>
-<%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-trans" %>
+<%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default btn-lg" %>
+<%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-default btn-lg" %>
 
 
       </div>
@@ -89,8 +89,9 @@
     <% if @employer_profile.census_employees.count > 0 %>
 
 <div class="row">
-
-    <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+  <div class="module census-employees-table">
+      <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+  </div>
 </div>
     <div id="employee_roster">
 
@@ -129,8 +130,8 @@
       If you plan to make an optional contribution towards employee family coverage and need an accurate cost estimate, you’ll also need the date of birth for all family members because monthly premiums are based on age.
     </h4>
     <br/>
-    <%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary btn-br"  %>
-    <%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-primary btn-br" %>
+    <%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary "  %>
+    <%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-primary " %>
 
 
   </div>

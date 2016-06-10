@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
+
   describe "#dob_in_words" do
     it "returns date of birth in words for < 1 year" do
       expect(helper.dob_in_words(0, "20/06/2015".to_date)).to eq time_ago_in_words("20/06/2015".to_date)
@@ -29,6 +30,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
+
+    context ">100 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+
+      it "does not display" do
+        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+      end
+    end
+
   end
 
   describe "#fein helper methods" do
@@ -221,6 +231,28 @@ RSpec.describe ApplicationHelper, :type => :helper do
   describe "qualify_qle_notice" do
     it "should return notice" do
       expect(helper.qualify_qle_notice).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
+    end
+  end
+
+  describe "show_default_ga?", dbclean: :after_each do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+
+    it "should return false without broker_agency_profile" do
+      expect(helper.show_default_ga?(general_agency_profile, nil)).to eq false
+    end
+
+    it "should return false without general_agency_profile" do
+      expect(helper.show_default_ga?(nil, broker_agency_profile)).to eq false
+    end
+
+    it "should return true" do
+      broker_agency_profile.default_general_agency_profile = general_agency_profile
+      expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq true
+    end
+
+    it "should return false when the default_general_agency_profile of broker_agency_profile is not general_agency_profile" do
+      expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
 end

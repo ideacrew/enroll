@@ -24,6 +24,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     }
 
   context "a new instance" do
+
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     context "with no arguments" do
       let(:params) {{}}
 
@@ -237,7 +242,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     it "when satisfied" do
       allow(rule).to receive(:satisfied?).and_return [true, 'ok']
       plans = [plan1, plan3]
-      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).to include(plan3)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
     end
 
     it "when not satisfied" do

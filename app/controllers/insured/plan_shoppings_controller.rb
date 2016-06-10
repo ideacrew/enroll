@@ -108,9 +108,22 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params[:waiver_reason]
 
-    if hbx_enrollment.may_waive_coverage? && waiver_reason.present? && hbx_enrollment.valid?
-      hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-      hbx_enrollment.propogate_waiver
+    # Create a new hbx_enrollment for the waived enrollment.
+    unless hbx_enrollment.shopping?
+      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
+      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+
+      waived_enrollment.generate_hbx_signature
+
+      if waived_enrollment.save!
+        hbx_enrollment = waived_enrollment
+        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+      end
+    end
+
+    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
@@ -169,13 +182,36 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
-    @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      if is_eligibility_determined_and_not_csr_100?(@person)
+        sort_for_csr(@plans)
+      else
+        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+      end
+    else
+      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
+  def sort_for_csr(plans)
+    silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}
+    standard_plans, non_standard_plans = silver_plans.partition{|a| a.is_standard_plan == true}
+    @plans = standard_plans + non_standard_plans + non_silver_plans
+  end
+
+  def is_eligibility_determined_and_not_csr_100?(person)
+      csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
+      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+        return true
+      else
+        return false
+      end
+  end
 
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now

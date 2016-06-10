@@ -52,6 +52,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def edit
     @census_employee.build_address unless @census_employee.address.present?
+    @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
@@ -59,8 +60,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+
       if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+        @census_employee.find_or_create_benefit_group_assignment(benefit_group)
       end
     end
 
@@ -152,7 +154,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
-          new_census_employee.benefit_group_assignments.build if new_census_employee.benefit_group_assignments.blank?
+          new_census_employee.add_default_benefit_group_assignment          
+          new_census_employee.construct_employee_role_for_match_person
+          
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -169,9 +173,10 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @benefit_group_assignment = @census_employee.active_benefit_group_assignment if @census_employee.employee_role.present?
-    @hbx_enrollments = @benefit_group_assignment.active_hbx_enrollments(@census_employee) if @benefit_group_assignment.present?
-    @benefit_group = @benefit_group_assignment.try(:benefit_group)
+    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
+      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
+      @benefit_group = @benefit_group_assignment.benefit_group
+    end
 
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end

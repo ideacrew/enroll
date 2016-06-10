@@ -1,9 +1,12 @@
 $(document).ready(function() {
 	$('#new_person_wrapper #btn-continue').on('click', function() {
-		if ( $('#employee-sponsored-benefits').is(':checked') ) {
-			$('#new_employment_relationship').submit();
-		} else {
-			$('.new_person:last').submit();
+		if ( $('.select-employer input').is(':checked') ) {
+			if ( $('.select-employer input:checked').hasClass('employer-sponsored') ) {
+				var form_class = $('.select-employer input:checked').attr('id');
+				$('form.'+form_class).submit();
+			} else {
+				$('.new_person:last').submit();
+			}
 		}
 	});
 });

@@ -27,6 +27,7 @@ context "shows families" do
 
     it 'should check employee role' do
       family1.primary_applicant.person.employee_roles = [FactoryGirl.build(:employee_role)]
+      allow(family1.primary_applicant.person).to receive(:active_employee_roles).and_return(true)
       render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
       expect(rendered).to have_selector(".employee_role_present", text: 'Yes')
     end

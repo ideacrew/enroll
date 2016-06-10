@@ -1,7 +1,7 @@
 <% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<div class="col-xs-12 premium-reports-tab">
+<div class="premium-reports-tab">
   <div class="row no-buffer">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
     <% if plan_year.present? && billing_date.present? %>
@@ -45,7 +45,7 @@
     </table>
   </div>
 </div><br>
-<%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-trans mz' %>
-  <a class='btn btn-trans' data-toggle='modal' data-target='#downloadCsv'>Download</a>
+<%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
+  <a class='btn btn-default' data-toggle='modal' data-target='#downloadCsv'>Download</a>
 </div>
 <%= render "download_csv_modal" %>
