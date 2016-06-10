@@ -16,14 +16,14 @@ RSpec.describe User, :type => :model do
   end
 
   describe 'user' do
-    #wait for oim_id validation requirements
-    # context 'when email' do
-    #   let(:params){valid_params.deep_merge!({email: "test"})}
-    #   it 'is invalid' do
-    #     expect(User.create(**params).errors[:email].any?).to be_truthy
-    #     expect(User.create(**params).errors[:email]).to eq ["is invalid"]
-    #   end
-    # end
+
+    context 'when oim_id' do
+      let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
+      it 'contains invalid characters' do
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special charcters ; # % = | + , \" > < \\ \/"]
+      end
+    end
 
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: ""})}

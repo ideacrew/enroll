@@ -14,9 +14,16 @@ class User
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id
   validate :password_complexity
+  validate :oim_id_rules
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
+
+  def oim_id_rules
+    if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
+      errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
+    end
+  end
 
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
