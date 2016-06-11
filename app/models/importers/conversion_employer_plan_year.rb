@@ -19,7 +19,9 @@ module Importers
       :new_coverage_policy,
       :default_plan_year_start,
       :most_common_hios_id,
-      :single_plan_hios_id
+      :single_plan_hios_id,
+      :reference_plan_hios_id,
+      :coverage_start
 
     validates_length_of :fein, is: 9
 
@@ -58,13 +60,14 @@ module Importers
       if found_employer.nil?
         errors.add(:fein, "does not exist")
       else
-        if found_employer.plan_years.any? && (found_employer.profile_source == "conversion")
-          errors.add(:fein, "employer already has conversion plan years")
-        end
+        # if found_employer.plan_years.any? && (found_employer.profile_source == "conversion")
+        #   errors.add(:fein, "employer already has conversion plan years")
+        # end
       end
     end
 
     def validate_new_coverage_policy
+      return true if new_coverage_policy.blank?
       if new_coverage_policy.blank?
         warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(",")}), defaulting to first of month following date of hire")
       end
@@ -83,7 +86,7 @@ module Importers
       plan_year_attrs[:fte_count] = enrolled_employee_count
       plan_year_attrs[:employer_profile] = employer
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
-#      plan_year_attrs[:imported_plan_year] = true
+      # plan_year_attrs[:imported_plan_year] = true
       plan_year_attrs[:aasm_state] = "active"
       PlanYear.new(plan_year_attrs)
     end
@@ -159,6 +162,72 @@ module Importers
         end
       end
       return save_result
+    end
+
+    def find_and_update_plan_year
+      employer = find_employer
+      found_carrier = find_carrier
+
+      current_coverage_start = Date.strptime(coverage_start, "%m/%d/%y")
+
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
+      reference_plan = select_reference_plan(available_plans)
+
+      if reference_plan.blank?
+        errors.add(:base, 'Unable to find a Reference plan with given Hios ID')
+      end
+
+      if single_plan_hios_id.blank? && most_common_hios_id.blank? && reference_plan_hios_id.blank?
+        errors.add(:base, 'Reference Plan Hios Id missing')
+      end
+
+      plan_year = employer.plan_years.where(:start_on => current_coverage_start - 1.year).first
+      if plan_year.blank?
+        errors.add(:base, 'Plan year not imported')
+      end
+
+      if plan_year && plan_year.benefit_groups.size > 1
+        errors.add(:base, 'Employer offering more than 1 benefit package')
+      end
+
+      renewing_plan_year = employer.plan_years.where(:start_on => (current_coverage_start)).first
+      if renewing_plan_year.blank?
+        errors.add(:base, 'Renewing plan year not present')
+      end
+
+      if renewing_plan_year && PlanYear::RENEWING_PUBLISHED_STATE.include?(renewing_plan_year.aasm_state)
+        errors.add(:base, "Renewing plan year already published. Reference plan can't be updated")
+      end
+
+      return false if errors.present?
+
+      if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
+        plan_year.benefit_groups.each do |benefit_group|
+          benefit_group.reference_plan= reference_plan
+          benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
+          benefit_group.save!
+        end
+
+        renewal_reference_plan_id = reference_plan.renewal_plan_id
+        renewal_reference_plan = Plan.find(renewal_reference_plan_id)
+
+        renewing_plan_year.benefit_groups.each do |benefit_group|
+          benefit_group.reference_plan= renewal_reference_plan
+          benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
+          benefit_group.save!
+        end
+
+        return true
+      else
+        errors.add(:base, "Reference plan is same")
+        return false
+      end
+    end
+
+    def update
+      return false unless valid?
+      puts "processing --- #{fein}"
+      find_and_update_plan_year
     end
 
     def map_employees_to_benefit_groups(employer, plan_year)
