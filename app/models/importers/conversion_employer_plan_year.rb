@@ -171,7 +171,7 @@ module Importers
       puts "Processing....#{employer.legal_name}...#{employer.fein}"
 
       current_coverage_start = Date.strptime(coverage_start, "%m/%d/%y")
-
+      
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
       reference_plan = select_reference_plan(available_plans)
 
@@ -202,7 +202,6 @@ module Importers
       end
 
       return false if errors.present?
-
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
         update_reference_plan(plan_year, reference_plan)
         renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
