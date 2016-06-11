@@ -171,7 +171,7 @@ module Importers
       puts "Processing....#{employer.legal_name}...#{employer.fein}"
 
       current_coverage_start = Date.strptime(coverage_start, "%m/%d/%y")
-
+      
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
       reference_plan = select_reference_plan(available_plans)
 
@@ -181,6 +181,10 @@ module Importers
 
       if single_plan_hios_id.blank? && most_common_hios_id.blank? && reference_plan_hios_id.blank?
         errors.add(:base, 'Reference Plan Hios Id missing')
+      end
+
+      if plan_selection == 'single_plan' && single_plan_hios_id.blank?
+        errors.add(:base, 'Single Plan Hios Id missing')
       end
 
       plan_year = employer.plan_years.where(:start_on => current_coverage_start - 1.year).first
@@ -202,7 +206,6 @@ module Importers
       end
 
       return false if errors.present?
-
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
         update_reference_plan(plan_year, reference_plan)
         renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
