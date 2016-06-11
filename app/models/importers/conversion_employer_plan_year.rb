@@ -183,6 +183,10 @@ module Importers
         errors.add(:base, 'Reference Plan Hios Id missing')
       end
 
+      if plan_selection == 'single_plan' && single_plan_hios_id.blank?
+        errors.add(:base, 'Single Plan Hios Id missing')
+      end
+
       plan_year = employer.plan_years.where(:start_on => current_coverage_start - 1.year).first
       if plan_year.blank?
         errors.add(:base, 'Plan year not imported')
