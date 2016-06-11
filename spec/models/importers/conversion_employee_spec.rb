@@ -52,10 +52,28 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
 
   describe "functional validation at the record level" do
     context "an employee without dependents is added" do
-      context "and the sponsor employer is not found" do
+      context "and the referenced employer is not found" do
+        it "adds an 'employer not found' error"
+        it "adds the error to the instance's error[:base] array"
       end
 
-      context "and the sponsor employer is found" do
+      context "and the referenced employer is found" do
+
+        context "and the employee date of birth is in the future" do
+          it "adds an 'employee date of birth in the future not allowed' error"
+          it "adds the error to the instance's error[:base] array"
+        end
+
+        context "and the hire date is in the future" do
+          it "adds an 'employee hire date in the future not allowed' error"
+          it "adds the error to the instance's error[:base] array"
+        end
+
+        context "and the benefit begin date is in the future" do
+          it "adds an 'benefit begin date in the future not allowed' error"
+          it "adds the error to the instance's error[:base] array"
+        end
+
       end
     end
 
@@ -89,7 +107,7 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
             end
 
             context "and the employee's record has changed since import" do
-              it "adds an 'update inconsistancy: employee record changed' error to the instance"
+              it "adds an 'update inconsistancy: employee record changed' error"
               it "adds the error to the instance's error[:base] array"
             end
           end
@@ -100,7 +118,7 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
             end
 
             context "and the employee's address record has changed since import" do
-              it "adds an 'update inconsistancy: employee address record changed' error to the instance"
+              it "adds an 'update inconsistancy: employee address record changed' error"
               it "adds the error to the instance's error[:base] array"
             end
           end
@@ -117,13 +135,18 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
               end
 
               context "and the employee has changed renewal enrollment" do
-                it "adds an 'update inconsistancy: employee enrollment record changed' error to the instance"
+                it "adds an 'update inconsistancy: employee enrollment record changed' error"
                 it "adds the error to the instance's error[:base] array"
               end
             end
           end
 
           context "and a dependent is added" do
+            context "and the dependent date of birth is in the future" do
+              it "adds an 'dependent date of birth in the future not allowed' error"
+              it "adds the error to the instance's error[:base] array"
+            end
+
             context "and the dependent is a spouse" do
               it "should add the dependent spouse"
             end
@@ -131,7 +154,7 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
             context "and the dependent is a child" do
               context "and the child is 26 years of age or older on the renewal effective date" do
                 it "should not add the child dependent"
-                it "adds a 'overage dependent add failure' error to the instance"
+                it "adds a 'over-age dependent add failure' error"
               end
 
               context "and the child is under age 26 on the renewal effective date" do
@@ -139,7 +162,7 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
               end
             end
 
-            context "and the dependent is any relationship besides spouse or child" do
+            context "and the dependent is any relationship besides spouse, child or domestic partner" do
               it "should not add the dependent"
               it "adds a 'dependent add failure: invalid relationship' error to the instance"
             end
@@ -166,6 +189,10 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
             it "should add the spouse dependent"
           end
 
+          context "and the dependent is a domestic partner" do
+            it "should add the domestic partner dependent"
+          end
+
           context "and the dependent is a child" do
             context "and the child is 26 years of age or older on the renewal effective date" do
               context "and the child is disabled" do
@@ -174,7 +201,7 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
 
               context "and the child is not disabled" do
                 it "should not add the child dependent"
-                it "adds a 'dependent add failure: overage child' error to the instance"
+                it "adds a 'dependent add failure: over-age child' error to the instance"
               end
             end
 
@@ -227,16 +254,11 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
     end
   end
 
-
   describe "functional validation at the imported set level" do
-    context "" do
-    end
-
     context "file contains more than one record for the same employee" do
       it "raises an error 'invalid file composition: more than one employee add or update per file not allowed"
     end
   end
-
 
   describe "persisting the imported set level" do
     context "and at least one record has a [:base] level error" do
