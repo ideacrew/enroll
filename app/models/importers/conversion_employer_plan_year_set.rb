@@ -105,12 +105,12 @@ module Importers
 
     def create_model(record_attrs)
       the_action = record_attrs["action"].blank? ? "add" : records_attrs["action"].to_s.strip.downcase
-      case the_action
-      when "update"
-        ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
-      else
-        ::Importers::ConversionEmployerPlanYear.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
-      end
+      # case the_action
+      # when "update"
+      #   ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+      # else
+      ::Importers::ConversionEmployerPlanYear.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+      # end
     end
   end
 end
