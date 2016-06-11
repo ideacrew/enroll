@@ -168,6 +168,8 @@ module Importers
       employer = find_employer
       found_carrier = find_carrier
 
+      puts "Processing....#{employer.legal_name}...#{employer.fein}"
+
       current_coverage_start = Date.strptime(coverage_start, "%m/%d/%y")
 
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
@@ -202,21 +204,9 @@ module Importers
       return false if errors.present?
 
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
-        plan_year.benefit_groups.each do |benefit_group|
-          benefit_group.reference_plan= reference_plan
-          benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
-          benefit_group.save!
-        end
-
-        renewal_reference_plan_id = reference_plan.renewal_plan_id
-        renewal_reference_plan = Plan.find(renewal_reference_plan_id)
-
-        renewing_plan_year.benefit_groups.each do |benefit_group|
-          benefit_group.reference_plan= renewal_reference_plan
-          benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
-          benefit_group.save!
-        end
-
+        update_reference_plan(plan_year, reference_plan)
+        renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
+        update_reference_plan(renewing_plan_year, renewal_reference_plan)
         return true
       else
         errors.add(:base, "Reference plan is same")
@@ -224,9 +214,16 @@ module Importers
       end
     end
 
+    def update_reference_plan(plan_year, reference_plan)
+      plan_year.benefit_groups.each do |benefit_group|
+        benefit_group.reference_plan= reference_plan
+        benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
+        benefit_group.save!
+      end
+    end
+
     def update
       return false unless valid?
-      puts "processing --- #{fein}"
       find_and_update_plan_year
     end
 
