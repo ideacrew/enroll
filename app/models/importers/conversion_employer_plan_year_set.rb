@@ -82,13 +82,15 @@ module Importers
       :ignore,
       :ignore,
       :ignore,
-      :ignore,
+      :coverage_start,
       :carrier,
       :plan_selection,
       :ignore,
       :single_plan_hios_id,
       :ignore,
-      :most_common_hios_id
+      :most_common_hios_id,
+      :ignore,
+      :reference_plan_hios_id
     ]
     end
 
