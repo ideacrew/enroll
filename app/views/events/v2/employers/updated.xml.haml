@@ -17,13 +17,18 @@
     %contacts
       = render :partial => "events/v2/employers/owner_contact", :collection => pocs
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
-  = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile
+  = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if employer.broker_agency_profile
   %employer_profile
     %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.entity_kind}"
     - if !employer.sic_code.blank?
       %sic_code= employer.sic_code
-    %brokers
-      = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts
-    %plan_years
-      = render :partial => "events/v2/employers/plan_year", :collection => employer.plan_years.select(&:eligible_for_export?)
+    - if employer.broker_agency_accounts.present?
+      %brokers
+        = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts
+    - plan_years = employer.plan_years.select(&:eligible_for_export?)
+    - if plan_years
+      %plan_years
+        - if carrier.present?
+          - plan_years = plan_years.select do |plan_year| plan_year.benefit_groups.flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq.include? carrier end
+        = render :partial => "events/v2/employers/plan_year", :collection => plan_years, locals:{carrier:carrier}
   = render :partial => "events/v2/shared/versioned_resource", :object => employer
