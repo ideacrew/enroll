@@ -3,12 +3,16 @@ module Importers
     include ActiveModel::Validations
     include ActiveModel::Model
 
-    attr_reader :warnings, :fein, :subscriber_ssn, :subscriber_dob, :subscriber_gender, :hire_date, :subscriber_zip
+    include ::Importers::ImportDsl
+
+    attr_converter :subscriber_ssn, :fein, :as => :optimistic_ssn
+    attr_converter :subscriber_gender, :as => :gender
+
+    attr_reader :warnings, :subscriber_dob, :hire_date, :subscriber_zip
 
     attr_accessor :action,
       :employer_name,
       :benefit_begin_date,
-      :subscriber_gender,
       :subscriber_name_first,
       :subscriber_name_middle,
       :subscriber_name_last,
@@ -21,8 +25,12 @@ module Importers
       :default_hire_date
 
       (1..8).to_a.each do |num|
-        attr_reader "dep_#{num}_ssn".to_sym, "dep_#{num}_dob".to_sym,
-          "dep_#{num}_gender".to_sym, "dep_#{num}_relationship".to_sym,
+        attr_converter "dep_#{num}_ssn".to_sym, :as => :optimistic_ssn
+        attr_converter "dep_#{num}_gender".to_sym, :as => :gender
+      end
+      (1..8).to_a.each do |num|
+        attr_reader "dep_#{num}_dob".to_sym,
+          "dep_#{num}_relationship".to_sym,
           "dep_#{num}_zip".to_sym
       end
       (1..8).to_a.each do |num|
@@ -37,7 +45,6 @@ module Importers
           "dep_#{num}_state".to_sym
       end
 
-      include ValueParsers::OptimisticSsnParser.on(:subscriber_ssn, :fein)
 
       validate :validate_fein
       validate :validate_relationships
@@ -89,21 +96,6 @@ module Importers
         end
       end
 
-      def subscriber_gender=(val)
-        if val.blank?
-          @subscriber_gender = nil
-        else
-          stripped_value = val.strip.downcase
-          if stripped_value =~ /\Am/i
-            @subscriber_gender = "male"
-          elsif stripped_value =~ /\Af/i
-            @subscriber_gender = "female"
-          else
-            @subscriber_gender = val
-          end
-        end
-      end
-
       (1..8).to_a.each do |num|
         class_eval(<<-RUBYCODE)
       def dep_#{num}_zip=(val)
@@ -118,23 +110,6 @@ module Importers
           end 
         end
       end
-
-      include ValueParsers::OptimisticSsnParser.on(:dep_#{num}_ssn)
-
-          def dep_#{num}_gender=(val)
-            if val.blank?
-              @dep_#{num}_gender = nil
-            else
-              stripped_value = val.strip.downcase
-              if stripped_value =~ /\\Am/i
-                @dep_#{num}_gender = "male"
-              elsif stripped_value =~ /\\Af/i
-                @dep_#{num}_gender = "female"
-              else
-                @dep_#{num}_gender = val
-              end
-            end
-          end
 
           def dep_#{num}_relationship=(val)
             dep_rel = Maybe.new(val).strip.downcase.extract_value

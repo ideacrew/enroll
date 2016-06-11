@@ -2,8 +2,11 @@ module Importers
   class ConversionEmployer
     include ActiveModel::Validations
     include ActiveModel::Model
+    include ::Importers::ImportDsl
 
-    attr_reader :fein, :broker_npn, :primary_location_zip, :mailing_location_zip
+    attr_converter :fein, :as => :optimistic_ssn
+
+    attr_reader :broker_npn, :primary_location_zip, :mailing_location_zip
 
     attr_accessor :action,
       :dba,
@@ -45,7 +48,6 @@ module Importers
       @warnings = ActiveModel::Errors.new(self)
     end
     
-    include ValueParsers::OptimisticSsnParser.on(:fein)
 
     def broker_npn=(val)
       @broker_npn = Maybe.new(val).strip.extract_value
