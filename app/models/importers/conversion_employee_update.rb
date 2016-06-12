@@ -1,6 +1,5 @@
 module Importers
-  class ConversionEmployeeCreate < ConversionEmployeeCommon
-
+  class ConversionEmployeeUpdate < ConversionEmployeeCommon
       validate :validate_fein
       validate :validate_relationships
       validates_length_of :fein, is: 9
@@ -119,14 +118,7 @@ module Importers
 
       def save
         return false unless valid?
-        census_employee = map_subscriber
-        census_employee.employer_profile = find_employer
-        census_employee.census_dependents = map_dependents
-        save_result = census_employee.save
-        unless save_result
-          propagate_errors(census_employee)
-        end
-        return save_result
+        return false
       end
 
       def propagate_errors(census_employee)
