@@ -8,7 +8,7 @@ describe ::Importers::ConversionEmployeeSet do
 
   subject { ::Importers::ConversionEmployeeSet.new(file_name, out_stream, Date.new(2015,3,1)) }
   before :each do
-    allow(::Importers::ConversionEmployee).to receive(:new).with(employee_data).and_return(employee_record)
+    allow(::Importers::ConversionEmployeeCreate).to receive(:new).with(employee_data).and_return(employee_record)
     subject.import!
     out_stream.rewind
   end
