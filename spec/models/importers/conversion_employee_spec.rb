@@ -123,24 +123,6 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
             end
           end
 
-          context "and the employee's plan HIOS ID is changed" do
-            context "and the employee's enrollment is not auto-renewed" do
-              it "should change the employee enrollment plan HIOS ID"
-            end
-
-            context "and the employee's enrollment is auto-renewed" do
-              context "and the employee has not changed renewal enrollment" do
-                it "should change the employee enrollment plan HIOS ID"
-                it "should change the employee auto-renewed enrollment to mapped plan HIOS ID"
-              end
-
-              context "and the employee has changed renewal enrollment" do
-                it "adds an 'update inconsistancy: employee enrollment record changed' error"
-                it "adds the error to the instance's error[:base] array"
-              end
-            end
-          end
-
           context "and a dependent is added" do
             context "and the dependent date of birth is in the future" do
               it "adds an 'dependent date of birth in the future not allowed' error"

@@ -93,3 +93,7 @@ RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
     end
   end
 end
+
+RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
+
+end
