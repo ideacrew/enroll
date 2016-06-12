@@ -1,5 +1,5 @@
 module Importers
-  class ConversionEmployee
+  class ConversionEmployeeCreate
     include ActiveModel::Validations
     include ActiveModel::Model
 
