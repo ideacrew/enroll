@@ -96,11 +96,6 @@ module Importers
     def find_person
       employee = find_employee
 
-      if employee.blank?
-        errors.add(:base, "unable to find census empoyee!")
-        return false
-      end
-
       role = employee.employee_role
       person = role.try(:person)
 
@@ -175,11 +170,8 @@ module Importers
     end
 
     def save 
+      return false unless valid?
       employer = find_employer
-      if employer.blank?
-        errors.add(:base, "unable to find employer record!")
-        return false
-      end
 
       person = find_person
       return false unless person
@@ -188,12 +180,6 @@ module Importers
       family = person.primary_family
       enrollment = find_current_enrollment(family, employer)
       return false unless enrollment
-
-      plan = find_plan
-      if plan.blank?
-        errors.add(:base, "unable to find plan with given hios id")
-        return false
-      end
 
       if enrollment.plan_id != plan.id
         enrollment.update_attributes(plan_id: plan.id)
