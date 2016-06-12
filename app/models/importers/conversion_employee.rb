@@ -3,7 +3,7 @@ module Importers
     include ActiveModel::Validations
     include ActiveModel::Model
 
-    include ::Importers::ImportDsl
+    include ::Etl::ValueParsers
 
     attr_converter :subscriber_ssn, :fein, :as => :optimistic_ssn
     attr_converter :subscriber_gender, :as => :gender

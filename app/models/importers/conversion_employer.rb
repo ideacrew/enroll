@@ -2,7 +2,7 @@ module Importers
   class ConversionEmployer
     include ActiveModel::Validations
     include ActiveModel::Model
-    include ::Importers::ImportDsl
+    include ::Etl::ValueParsers
 
     attr_converter :fein, :as => :optimistic_ssn
 

@@ -254,37 +254,4 @@ RSpec.describe Importers::ConversionEmployee, type: :model do
     end
   end
 
-  describe "functional validation at the imported set level" do
-    context "file contains more than one record for the same employee" do
-      it "raises an error 'invalid file composition: more than one employee add or update per file not allowed"
-    end
-  end
-
-  describe "persisting the imported set level" do
-    context "and at least one record has a [:base] level error" do
-      context "and the persistance flag is set to 'atomicity' (all or nothing)" do
-        it "should not persist the set"
-      end
-
-      context "and the persistance flag is set to 'permissive'" do
-        it "should persist all records that do not have a [:base] level error"
-      end
-    end
-
-    context "and at least one record has only non-[:base] level errors" do
-      context "and the persistance flag is set to 'atomicity' (all or nothing)" do
-        it "should not persist the set"
-      end
-      
-      context "and the persistance flag is set to 'permissive'" do
-        it "should persist all records that don't have a [:base] error"
-      end
-    end
-
-    context "and there are no errors" do
-        it "should persist all records"
-    end
-  end
-
-
 end
