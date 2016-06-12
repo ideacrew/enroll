@@ -227,35 +227,48 @@ module Importers
       true
     end
 
-    def update
-      employer = find_employer
-      if employer.blank?
-        errors.add(:base, "unable to find employer record!")
-        return false
-      end
-
+    def find_person
       employee = find_employee
+
       if employee.blank?
         errors.add(:base, "unable to find census empoyee!")
         return false
       end
 
-      people = Person.where(:'employee_roles.census_employee_id' => employee.id)
-      if people.size == 0 || people.size > 1
-        errors.add(:base, "found mutliple people linked to the census employee record")
+      role = employee.employee_role
+      person = role.try(:person)
+
+      if person.blank?
+        people = Person.where(:'employee_roles.census_employee_id' => employee.id)
+
+        if people.size > 1
+          errors.add(:base, "found mutliple people linked to the census employee record")
+          return false
+        end
+
+        person = people.first
+      end
+
+      if person.blank?
+        errors.add(:base, "unable to find person")
         return false
       end
 
-      puts '----processing ' + people.first.full_name
-      family = people.first.primary_family
-      plan_year = employer.plan_years.published_plan_years_by_date(benefit_begin_date).first
+      person
+    end
 
+    def find_current_enrollment(family, employer)
+      plan_year = employer.plan_years.published_plan_years_by_date(benefit_begin_date).first || employer.plan_years.published.first
+  
       if plan_year.blank?
         errors.add(:base, "plan year missing")
         return false
       end
 
-      enrollments = family.active_household.hbx_enrollments.where(:benefit_group_id.in => plan_year.benefit_group_ids).enrolled
+      enrollments = family.active_household.hbx_enrollments.where({
+        :benefit_group_id.in => plan_year.benefit_group_ids,
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+        })
 
       if enrollments.empty?
         errors.add(:base, "enrollment missing!")
@@ -267,38 +280,60 @@ module Importers
         return false
       end
 
+      enrollments[0]
+    end
+
+    def update_plan_for_passive_renewal(family, renewing_plan_year, renewal_plan)
+      enrollments = family.active_household.hbx_enrollments.where(:benefit_group_id.in => renewing_plan_year.benefit_group_ids)
+
+      if enrollments.enrolled.present?
+        errors.add(:base, "employee already made plan selection")
+        return false
+      end
+
+      if enrollments.renewing.size > 1
+        errors.add(:base, "duplicate passive renewals found!")
+        return false        
+      end
+
+      if enrollments.renewing.blank?
+        return true
+      else
+        if renewal_plan.blank?
+          errors.add(:base, "renewal plan missing!")
+          return false  
+        end
+        enrollments.renewing.first.update_attributes(plan_id: renewal_plan.id)
+        return true
+      end
+    end
+
+    def update
+      employer = find_employer
+      if employer.blank?
+        errors.add(:base, "unable to find employer record!")
+        return false
+      end
+
+      person = find_person
+      return false unless person
+     
+      puts '----processing ' + person.full_name
+      family = person.primary_family
+      enrollment = find_current_enrollment(family, employer)
+      return false unless enrollment
+
       plan = find_plan
       if plan.blank?
         errors.add(:base, "unable to find plan with given hios id")
         return false
       end
 
-      if enrollments.first.plan.hios_id != hios_id
-        enrollments.first.update_attributes(plan_id: plan.id)
+      if enrollment.plan_id != plan.id
+        enrollment.update_attributes(plan_id: plan.id)
 
-        renewing_plan_year = employer.plan_years.renewing.first
-        enrollments = family.active_household.hbx_enrollments.where(:benefit_group_id.in => renewing_plan_year.benefit_group_ids)
-        
-        if enrollments.enrolled.present?
-          errors.add(:base, "employee already made plan selection")
-          return false
-        end
-
-        if enrollments.renewing.size > 1
-          errors.add(:base, "duplicate passive renewals found!")
-          return false        
-        end
-
-        if enrollments.renewing.blank?
-          return true
-        else
-          renewal_plan = plan.renewal_plan
-          if renewal_plan.blank?
-            errors.add(:base, "renewal plan missing!")
-            return false  
-          end
-          enrollments.renewing.first.update_attributes(plan_id: renewal_plan.id)
-          return true
+        if renewing_plan_year = employer.plan_years.renewing.first
+          update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
         end
       else
         errors.add(:base, "already have coverage with same hios id")
