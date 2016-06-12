@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Import::ConversionEmployeeUpdate do
+describe Importers::ConversionEmployeeUpdate do
   describe "an employee without dependents is updated" do
     context "and the sponsor employer is not found" do
       it "adds a 'employer not found' error to the instance"
