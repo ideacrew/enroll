@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
+RSpec.describe Importers::ConversionEmployerPlanYearUpdate, dbclean: :after_each do
 
-  describe ".update" do
+  describe ".save" do
     context 'when employer already imported and renewing plan year not published' do
 
       let!(:employer_profile)      { FactoryGirl.create(:employer_profile, profile_source: 'conversion') }
@@ -83,8 +83,8 @@ RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
       }
 
       it 'should update both current and renewing plan year with new reference plans' do 
-        record = ::Importers::ConversionEmployerPlanYear.new(record_attrs)
-        record.update
+        record = ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs)
+        record.save
         plan_year.reload
         renewing_plan_year.reload
         expect(plan_year.benefit_groups.first.reference_plan_id).to eq(new_current_health_plan.id)
@@ -92,8 +92,4 @@ RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
       end 
     end
   end
-end
-
-RSpec.describe Importers::ConversionEmployerPlanYear, type: :model do
-
 end
