@@ -3,10 +3,11 @@ class EmployerInvoice
 
 	attr_reader :errors
 
-	def initialize(organization)
+	def initialize(organization,folder_name=nil)
 		@organization= organization
 		@employer_profile= organization.employer_profile
 		@hbx_enrollments=@employer_profile.enrollments_for_billing
+		@folder_name = folder_name
 		@errors=[]
 	end
 
@@ -30,7 +31,6 @@ class EmployerInvoice
 	def save_to_cloud
 		begin
 			Organization.upload_invoice(invoice_absolute_file_path)
-			clear_tmp(invoice_absolute_file_path)
 		rescue Exception => e
 			@errors << "Unable to upload PDF for. #{@organization.hbx_id}"
 			Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
@@ -55,6 +55,13 @@ class EmployerInvoice
 		File.delete(file)
   end
 
+	def save_and_notify_with_clean_up
+		save
+		save_to_cloud
+		send_email_notice
+		clear_tmp(invoice_absolute_file_path)
+	end
+
 	def save_and_notify
 		save
 		save_to_cloud
@@ -76,8 +83,12 @@ class EmployerInvoice
 	end
 
  	def invoice_folder_path
- 		Rails.root.join('tmp',current_month)
- 	end
+		if @folder_name
+			Rails.root.join(@folder_name)
+		else
+			Rails.root.join('tmp',current_month)
+		end
+	end
 
  	def invoice_absolute_file_path
  		"#{invoice_folder_path}/#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
