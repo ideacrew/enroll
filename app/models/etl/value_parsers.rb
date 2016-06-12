@@ -1,10 +1,10 @@
-module Importers
-  module ImportDsl
+module Etl
+  module ValueParsers
 
     def self.included(base)
       base.class_eval do
-        extend(::Importers::ImportDsl::ClassMethods)
-        include(::Importers::ImportDsl::ConverterMethods)
+        extend(::Etl::ValueParsers::ClassMethods)
+        include(::Etl::ValueParsers::ConverterMethods)
       end
     end
 
@@ -48,7 +48,7 @@ module Importers
             RUBY_CODE
           end
         else
-          raise ::Importers::ImportDsl::UnknownParserTypeError, "#{as} is not a recognized parser"
+          raise ::Etl::ValueParsers::UnknownParserTypeError, "#{as} is not a recognized parser"
         end
       end
     end
