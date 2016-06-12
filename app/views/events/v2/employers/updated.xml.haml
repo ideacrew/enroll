@@ -28,7 +28,5 @@
     - plan_years = employer.plan_years.select(&:eligible_for_export?)
     - if plan_years
       %plan_years
-        - if carrier.present?
-          - plan_years = plan_years.select do |plan_year| plan_year.benefit_groups.flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq.include? carrier end
-        = render :partial => "events/v2/employers/plan_year", :collection => plan_years, locals:{carrier:carrier}
+        = render :partial => "events/v2/employers/plan_year", :collection => plan_years
   = render :partial => "events/v2/shared/versioned_resource", :object => employer

@@ -12,11 +12,7 @@
     %ehb_percent= benefit_group.reference_plan.ehb*100
   %elected_plans
     - benefit_group.is_offering_dental? ? dental_plans = benefit_group.elected_dental_plans : dental_plans = []
-    - if carrier.present?
-      - health_plans = benefit_group.elected_plans.select do |plan| plan.carrier_profile == carrier end
-      - dental_plans = dental_plans.select do |plan| plan.carrier_profile == carrier end
-    - else
-      - health_plans = benefit_group.elected_plans
+    - health_plans = benefit_group.elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => health_plans + dental_plans
   -#%federal_contributions= " " filed not available in benefit group modal
   %relationship_benefits
