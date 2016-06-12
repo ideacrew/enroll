@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Imports::ConversionEmployeePolicy do
+describe Imports::ConversionEmployeePolicyUpdate do
   describe "given an existing employee and valid employer" do
     context "and the employee's plan HIOS ID is changed" do
       context "and the employee's enrollment is not auto-renewed" do
