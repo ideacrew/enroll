@@ -36,7 +36,7 @@ module Importers
 
       import_details = []
 
-      result = (record_attrs[:action].downcase == 'update' ? record.update : record.save)
+      result = record.save
       if result
         if record.warnings.any?
           import_details = ["imported with warnings", JSON.dump(record.warnings.to_hash)]

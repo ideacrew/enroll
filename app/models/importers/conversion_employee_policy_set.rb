@@ -194,7 +194,13 @@ module Importers
     end
 
     def create_model(record_attrs)
-      ::Importers::ConversionEmployeePolicy.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
+      the_action = record_attrs["action"].blank? ? "add" : records_attrs["action"].to_s.strip.downcase
+      case the_action
+      when "update"
+        ::Importers::ConversionEmployeePolicyUpdate.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
+      else
+        ::Importers::ConversionEmployeePolicy.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
+      end
     end
   end
 end

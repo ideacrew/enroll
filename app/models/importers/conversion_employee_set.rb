@@ -326,7 +326,15 @@ module Importers
     end
 
     def create_model(record_attrs)
-      ::Importers::ConversionEmployee.new(record_attrs.merge({:default_hire_date => @default_hire_date}))
+      the_action = record_attrs["action"].blank? ? "add" : records_attrs["action"].to_s.strip.downcase
+      case the_action
+      when "update"
+        ::Importers::ConversionEmployeeUpdate.new(record_attrs.merge({:default_hire_date => @default_hire_date}))
+      when "delete"
+        ::Importers::ConversionEmployeeDelete.new(record_attrs.merge({:default_hire_date => @default_hire_date}))
+      else
+        ::Importers::ConversionEmployeeCreate.new(record_attrs.merge({:default_hire_date => @default_hire_date}))
+      end
     end
   end
 end
