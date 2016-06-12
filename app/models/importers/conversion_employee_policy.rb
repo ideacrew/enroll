@@ -1,16 +1,5 @@
 module Importers
-  class ConversionEmployeePolicy
-    include ActiveModel::Validations
-    include ActiveModel::Model
-
-    attr_reader :warnings, :fein, :subscriber_ssn, :subscriber_dob, :benefit_begin_date
-
-    attr_accessor :action,
-      :default_policy_start,
-      :hios_id,
-      :plan_year
-
-    include ValueParsers::OptimisticSsnParser.on(:subscriber_ssn, :fein)
+  class ConversionEmployeePolicy < ConversionEmployeePolicyCommon
 
     validate :validate_benefit_group_assignment
     validate :validate_census_employee
@@ -19,23 +8,6 @@ module Importers
     validates_length_of :fein, is: 9
     validates_length_of :subscriber_ssn, is: 9
     validates_presence_of :hios_id
-
-    def initialize(opts = {})
-      super(opts)
-      @warnings = ActiveModel::Errors.new(self)
-    end
-
-    def subscriber_dob=(val)
-      @subscriber_dob = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
-    end
-
-    def benefit_begin_date=(val)
-      @benefit_begin_date = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
-    end
-
-    def start_date
-      [default_policy_start].detect { |item| !item.blank? }
-    end
 
     def validate_fein
       return true if fein.blank?
