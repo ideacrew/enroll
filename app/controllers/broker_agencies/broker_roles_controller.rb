@@ -4,7 +4,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def new_broker
     @broker_candidate = Forms::BrokerCandidate.new
-
+    @organization = Forms::BrokerAgencyProfile.new
     respond_to do |format|
       format.html { render 'new' }
       format.js
@@ -88,7 +88,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def assign_filter_and_agency_type
     @filter = params[:filter] || 'broker'
-    @agency_type = params[:agency_type] || 'existing'
+    @agency_type = params[:agency_type] || 'new'
   end
 
   def primary_broker_role_params

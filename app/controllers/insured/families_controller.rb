@@ -118,6 +118,7 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
+    @provider = @person
   end
 
   def verification

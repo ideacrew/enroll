@@ -56,6 +56,12 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def employer_invoice_generation_notification(employer,subject)
+    message = mail({to: employer.email, subject: subject, from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
+    end
+  end
+
   def broker_denied_notification(broker_role)
     mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
       format.html { render "broker_denied", :locals => { :applicant_name => broker_role.person.full_name }}
