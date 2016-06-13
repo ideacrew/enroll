@@ -79,6 +79,10 @@ module Importers
         end
       end
 
+      def start_date
+        [@hire_date, @default_hire_date].detect { |val| !val.blank? }
+      end
+
       (1..8).to_a.each do |num|
         class_eval(<<-RUBYCODE)
       def dep_#{num}_zip=(val)
