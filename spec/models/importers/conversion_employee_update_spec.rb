@@ -3,11 +3,21 @@ require "rails_helper"
 describe Importers::ConversionEmployeeUpdate do
   describe "an employee without dependents is updated" do
     context "and the sponsor employer is not found" do
-      it "adds a 'employer not found' error to the instance"
-      it "adds the error to the instance's error[:base] array"
+      let(:bogus_employer_fein) { "000093939" }
+      subject { Importers::ConversionEmployeeUpdate.new(:fein => bogus_employer_fein) }
+
+      before(:each) do
+        allow(Organization).to receive(:where).with({:fein => bogus_employer_fein}).and_return([])
+        subject.valid?
+      end
+
+      it "adds an 'employer not found' error to the instance" do
+        expect(subject.errors.get(:fein)).to include("does not exist")
+      end
     end
 
     context "and the sponsor employer is found" do
+
       context "and a pre-existing employee record is not found" do
         it "adds the employee record"
       end
