@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Importers::ConversionEmployeeUpdate do
+describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
   describe "an employee without dependents is updated" do
     context "and the sponsor employer is not found" do
       let(:bogus_employer_fein) { "000093939" }
@@ -18,15 +18,88 @@ describe Importers::ConversionEmployeeUpdate do
 
     context "and the sponsor employer is found" do
 
+
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion') }
+
+      let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
+
+      let(:renewal_health_plan)   {
+        FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2016, carrier_profile_id: carrier_profile.id)
+      }
+
+      let(:current_health_plan)   {
+        FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2015, renewal_plan_id: renewal_health_plan.id, carrier_profile_id: carrier_profile.id)
+      }
+
+      let(:plan_year)            {
+        py = FactoryGirl.create(:plan_year,
+          start_on: Date.new(2015, 7, 1),
+          end_on: Date.new(2016, 6, 30),
+          open_enrollment_start_on: Date.new(2015, 6, 1),
+          open_enrollment_end_on: Date.new(2015, 6, 10),
+          employer_profile: employer_profile
+          )
+
+        py.benefit_groups = [
+          FactoryGirl.build(:benefit_group,
+            title: "blue collar",
+            plan_year: py,
+            reference_plan_id: current_health_plan.id,
+            elected_plans: [current_health_plan]
+            )
+        ]
+        py.save(:validate => false)
+        py.update_attributes({:aasm_state => 'active'})
+        py
+      }
+
+      let(:employer_fein) { 
+        employer_profile.fein
+      } 
+
       context "and a pre-existing employee record is not found" do
         it "adds the employee record"
       end
 
       context "and a pre-existing employee record is found" do
 
+        before :each do
+          conversion_employee_update.save
+        end
+
+        let(:conversion_employee_props) do
+           {
+              :fein => employer_fein,
+              :subscriber_ssn => census_employee.ssn,
+              :subscriber_dob => census_employee.dob
+           } 
+        end
+
+        let(:census_employee) {
+           FactoryGirl.create(:census_employee, :employer_profile => employer_profile)
+        }
+
         context "and the employee's name is changed" do
+
+          let(:new_employee_f_name) {
+             census_employee.first_name + "dkfjklasdf"
+          }
+
+          let(:conversion_employee_update) { Importers::ConversionEmployeeUpdate.new(changed_name_props) }
+
+          let(:changed_name_props) {
+             conversion_employee_props.merge(:subscriber_name_first => new_employee_f_name)
+          }
+
           context "and the employee's record has not changed since import" do
-            it "should change the employee name"
+
+            let(:updated_census_employee) {
+               CensusEmployee.find(census_employee.id)
+            }
+
+            it "should change the employee name" do
+               expect(updated_census_employee.first_name).to eq new_employee_f_name
+            end
           end
 
           context "and the employee's record has changed since import" do
