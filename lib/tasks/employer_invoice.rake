@@ -26,8 +26,8 @@ namespace :employer_invoice do
        }}
     })
 
-    generate_invoices(conversion_employers)
-    generate_invoices(new_employers)
+    generate_invoices(conversion_employers, false)
+    generate_invoices(new_employers, true)
    
     #Create a tar file 
     puts "creating a tar file now"
@@ -36,11 +36,16 @@ namespace :employer_invoice do
 
   end
 
-  def generate_invoices(organizations)
+  def generate_invoices(organizations, clean_up = nil )
      organizations.each do |org|
         unless DO_NOT_INVOICE_LIST.include?(org.fein)
-          employer_invoice = EmployerInvoice.new(org,@folder_name)
-          employer_invoice.save_and_notify
+          if clean_up
+            employer_invoice = EmployerInvoice.new(org,@folder_name)
+            employer_invoice.save_and_notify_with_clean_up
+          else
+            employer_invoice = EmployerInvoice.new(org,@folder_name)
+            employer_invoice.save_and_notify
+          end
         end
       end
   end
