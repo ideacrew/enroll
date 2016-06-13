@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Exchanges::HbxProfilesController do
+RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -70,7 +70,34 @@ RSpec.describe Exchanges::HbxProfilesController do
       xhr :get, :inbox, id: hbx_profile.id
       expect(response).to have_http_status(:success)
     end
-    
+
+  end
+
+  describe "employer_invoice" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders employer_invoice datatable" do
+      xhr :get, :employer_invoice
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders employer_invoice datatable payload" do
+      xhr :post, :employer_invoice_datatable
+      expect(response).to have_http_status(:success)
+    end
+
   end
 
   describe "#create" do
@@ -180,13 +207,38 @@ RSpec.describe Exchanges::HbxProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      session[:dismiss_announcements] = 'hello'
       sign_in(user)
-      get :show
     end
 
     it "renders 'show' " do
+      get :show
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/show")
+    end
+
+    it "should clear session for dismiss_announcements" do
+      get :show
+      expect(session[:dismiss_announcements]).to eq nil
+    end
+  end
+
+  describe "#generate_invoice" do
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { double("EmployerProfile", id: double("id"))}
+    let(:organization){ Organization.new }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+
+    before :each do
+      sign_in(user)
+      allow(organization).to receive(:employer_profile?).and_return(employer_profile)
+      allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
+    end
+
+    it "create new organization if params valid" do
+      xhr :get, :generate_invoice, {"employerId"=>[organization.id]} ,  format: :js
+      expect(response).to have_http_status(:success)
+      # expect(organization.invoices.size).to eq 1
     end
   end
 
@@ -323,6 +375,11 @@ RSpec.describe Exchanges::HbxProfilesController do
     it "should returns http success" do
       xhr :get, :general_agency_index, format: :js
       expect(response).to have_http_status(:success)
+    end
+
+    it "should get general_agencies" do
+      xhr :get, :general_agency_index, format: :js
+      expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
     end
   end
 end

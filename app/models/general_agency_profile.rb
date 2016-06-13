@@ -104,6 +104,10 @@ class GeneralAgencyProfile
     aasm_state.humanize.titleize
   end
 
+  def applicant?
+    aasm_state == "is_applicant"
+  end
+
   class << self
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.general_agency_profile }
@@ -113,12 +117,18 @@ class GeneralAgencyProfile
       list_embedded Organization.exists(general_agency_profile: true).order_by([:legal_name]).to_a
     end
 
-    def all_by_broker_role(broker_role)
-      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue []
+    def all_by_broker_role(broker_role, options={})
+      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue [] 
+      all_ga = if options[:approved_only]
+                 all.select{|ga| ga.aasm_state == 'is_approved'}
+               else
+                 all
+               end
+
       if favorite_general_agency_ids.present?
-        all.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
+        all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
       else
-        all
+        all_ga
       end
     end
 
@@ -133,6 +143,16 @@ class GeneralAgencyProfile
     def find(id)
       organizations = Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.general_agency_profile : nil
+    end
+
+    def filter_by(status="is_applicant")
+      if status == 'all'
+        all
+      else
+        list_embedded Organization.exists(general_agency_profile: true).where(:'general_agency_profile.aasm_state' => status).order_by([:legal_name]).to_a
+      end
+    rescue
+      []
     end
   end
 

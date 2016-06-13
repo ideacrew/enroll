@@ -6,10 +6,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
   let(:broker_agency_profile) { broker_agency.broker_agency_profile }
 
   describe "GET new" do
-    let(:user) { double("user", last_portal_visited: "test.com")}
+    let(:user) { FactoryGirl.create(:user) }
     let(:person) { double("person")}
 
     it "should render the new template" do
+      allow(user).to receive(:last_portal_visited).and_return 'test.com'
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
       allow(user).to receive(:has_broker_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=).and_return("true")
@@ -21,13 +22,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET show" do
-    let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:person) { FactoryGirl.create(:person) }
 
     before(:each) do
-      allow(user).to receive(:has_broker_role?)
+      allow(user).to receive(:has_broker_role?).and_return true
       allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       sign_in(user)
       get :show, id: broker_agency_profile.id
     end
@@ -38,6 +40,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should render the show template" do
       expect(response).to render_template("show")
+    end
+
+    it "should get announcement" do
+      expect(flash.now[:warning]).to eq ["msg for Broker"]
     end
   end
 
@@ -283,7 +289,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET assign" do
+  describe "GET assign", dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role) }
     let(:person) { broker_role.person }
@@ -370,21 +376,21 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when we Assign agency" do 
+    context "when we Assign agency" do
       before :each do
         sign_in user
-        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
       end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
+      it "should render" do
+        expect(response).to render_template(:update_assign)
       end
 
       it "should get notice" do
         expect(flash[:notice]).to eq 'Assign successful.'
       end
     end
-    context "when we Unassign agency" do 
+    context "when we Unassign agency" do
       before :each do
         sign_in user
         post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
@@ -398,7 +404,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
         expect(flash[:notice]).to eq 'Unassign successful.'
       end
       it "should update aasm_state" do
-        employer_profile.reload 
+        employer_profile.reload
         expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
       end
     end
@@ -417,7 +423,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should set default_general_agency_profile" do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
-      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile 
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
     end
 
     it "should clear default general_agency_profile" do

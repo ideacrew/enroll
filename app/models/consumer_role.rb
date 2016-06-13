@@ -7,6 +7,7 @@ class ConsumerRole
   include Acapi::Notifiers
   include AASM
   include Mongoid::Attributes::Dynamic
+  include StateTransitionPublisher
 
   embedded_in :person
 
@@ -45,8 +46,8 @@ class ConsumerRole
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
   field :aasm_state, type: String, default: "verifications_pending"
 
-  delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
-  delegate :citizen_status=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
+  delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
+  delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
   field :is_state_resident, type: Boolean
   field :residency_determined_at, type: DateTime
@@ -94,6 +95,10 @@ class ConsumerRole
     inclusion: { in: VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
 
   validates :citizen_status,
+    allow_blank: true,
+    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+
+  validates :citizenship_result,
     allow_blank: true,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
@@ -148,7 +153,7 @@ class ConsumerRole
 
   def is_aca_enrollment_eligible?
     is_hbx_enrollment_eligible? &&
-    Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
+      Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
   end
 
   #check if consumer has uploaded documents for verification type
@@ -329,6 +334,14 @@ class ConsumerRole
     vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
   end
 
+  def can_receive_paper_communication?
+    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+  end
+
+  def can_receive_electronic_communication?
+    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+  end
+
   ## TODO: Move RIDP to user model
   aasm do
     state :verifications_pending, initial: true
@@ -372,6 +385,26 @@ class ConsumerRole
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+    end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
     end
   end
 
@@ -441,7 +474,15 @@ class ConsumerRole
     nil
   end
 
-private
+  def is_native?
+    US_CITIZEN_STATUS == citizen_status
+  end
+
+  def is_non_native?
+    !is_native?
+  end
+
+  private
   def notify_of_eligibility_change
     CoverageHousehold.update_individual_eligibilities_for(self)
   end

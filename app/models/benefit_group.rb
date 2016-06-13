@@ -19,6 +19,7 @@ class BenefitGroup
   ]
 
   field :title, type: String, default: ""
+  field :description, type: String, default: ""
   field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :dental_plan_option_kind, type: String
@@ -439,6 +440,23 @@ class BenefitGroup
     end
   end
 
+  ## Conversion employees are not allowed to buy coverage through off-exchange plan year
+  def valid_plan_year    
+    if employer_profile.is_coversion_employer?
+      plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
+    else
+      plan_year
+    end
+  end
+
+  def date_of_hire_effective_on_for(date_of_hire)
+    [valid_plan_year.start_on, date_of_hire].max
+  end
+
+  def first_of_month_effective_on_for(date_of_hire)
+    [valid_plan_year.start_on, eligible_on(date_of_hire)].max
+  end
+
 private
 
   def set_congress_defaults
@@ -458,19 +476,6 @@ private
 
   def cents_to_dollars(amount_in_cents)
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
-  end
-
-  def date_of_hire_effective_on_for(date_of_hire)
-    [plan_year.start_on, date_of_hire].max
-  end
-
-  def first_of_month_effective_on_for(date_of_hire)
-    if plan_year.employer_profile.profile_source.to_s == 'conversion'
-      if renewing_plan_year = plan_year.employer_profile.renewing_plan_year
-        return [renewing_plan_year.start_on, date_of_hire].max
-      end
-    end
-    [plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
   def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
