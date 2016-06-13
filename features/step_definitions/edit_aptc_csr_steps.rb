@@ -1,11 +1,22 @@
 
-When(/^Hbx Admin clicks on the Update APTC \/ CSR button$/) do
-  click_link "Update APTC / CSR"
+Then (/^Hbx Admin sees Families link$/) do
+  expect(page).to have_text("Families")
 end
 
-Then(/^Hbx Admin should see the list of APTC \/ CSR Enrollments and an Edit button$/) do
-  expect(page).to have_content('Update APTC / CSR - Search')
-  expect(page).to have_content('APTC / CSR Enrollments')
+When(/^Hbx Admin clicks on Families link$/) do
+  click_link "Families"
+end
+
+Then (/^Hbx Admin should see Switch to APTC \/ CSR Families link$/) do
+  expect(page).to have_text("Switch to APTC / CSR Families")
+end
+
+When(/^Hbx Admin clicks Switch to APTC \/ CSR Families link$/) do
+  click_link("Switch to APTC / CSR Families")
+end
+
+Then(/^Hbx Admin sees Families with APTC enrollments and edit button$/) do
+  expect(page).to have_text("Families with APTC / CSR")
 end
 
 When(/^Hbx Admin clicks on the Edit button$/) do
@@ -15,13 +26,13 @@ When(/^Hbx Admin clicks on the Edit button$/) do
   visit "hbx_admin/edit_aptc_csr?family_id=#{@family.id}&person_id=#{@family.person.id}"
 end
 
-Then(/^Hbx Admin should see the edit APTC \/ CSR form for the individual$/) do
+Then(/^Hbx Admin should see the edit APTC \/ CSR tool for the individual$/) do
   expect(page).to have_content('Editing APTC / CSR for:')
 end
 
 Then(/^Hbx Admin should see a text saying there is no Active Enrollment$/) do
-  @current_year = TimeKeeper.date_of_record.year
-  expect(page).to have_content("No Active Enrollment (Assistance Receiving) for #{@current_year}.")
+  expect(page).to have_content("No Active Enrollment (Assistance Receiving) for #{TimeKeeper.date_of_record.year}")
+
 end
 
 Then(/^Hbx Admin should see APTC and CSR as editable fields$/) do

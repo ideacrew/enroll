@@ -285,7 +285,8 @@ class HbxAdmin
                                                                       "csr_percent_as_integer"        => params[:csr_percentage].to_i, 
                                                                       "max_aptc"                      => params[:max_aptc].to_f, 
                                                                       "benchmark_plan_id"             => existing_latest_eligibility_determination.benchmark_plan_id,
-                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id  
+                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id,
+                                                                      "source"                        => "Admin"  
                                                                       }).save!
       end
       eligibility_redetermination_result
@@ -310,6 +311,7 @@ class HbxAdmin
               
               # Duplicate Enrollment
               duplicate_hbx = original_hbx.dup
+              duplicate_hbx.created_at = current_datetime
               duplicate_hbx.updated_at = current_datetime
               duplicate_hbx.effective_on = find_enrollment_effective_on_date(current_datetime) # Populate the effective_on date based on the 15th day rule.
 

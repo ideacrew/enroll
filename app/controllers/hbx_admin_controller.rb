@@ -16,9 +16,7 @@ class HbxAdminController < ApplicationController
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
-    #@max_aptc = @family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
     @max_aptc = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:max_aptc)
-    #@csr_percent_as_integer = @family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer
     @csr_percent_as_integer = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:csr_percent_as_integer)
     respond_to do |format|
       format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
@@ -29,13 +27,10 @@ class HbxAdminController < ApplicationController
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
-    # Change this value so it is read from the dropdown params of years when implementing the retro functionality
-    #year = TimeKeeper.datetime_of_record.year
     if @family.present?
       @eligibility_redetermination_result = HbxAdmin.redetermine_eligibility_with_updated_values(@family, params)
       @enrollment_update_result = HbxAdmin.update_aptc_applied_for_enrollments(params)
     end
-
     respond_to do |format|
       format.js { render "update_aptc_csr", person: @person}
     end
