@@ -3,6 +3,23 @@ module Importers
       validate :validate_fein
       validate :validate_relationships
       validates_length_of :fein, is: 9
+      validates_length_of :subscriber_ssn, is: 9
+      validate :employee_exists
+
+      def employee_exists
+        found_employer = find_employer
+        return true if found_employer.nil?
+        return true if subscriber_ssn.blank?
+        found_employee = CensusEmployee.where(
+          :employer_profile_id => found_employer.id,
+          :encrypted_ssn => subscriber_ssn
+        )
+        if found_employee.count > 1
+          errors.add(:subscriber_ssn, "too many matching employees")
+        elsif found_employee.count < 1
+          errors.add(:subscriber_ssn, "no such employee for this employer")
+        end
+      end
 
       def validate_relationships
         (1..8).to_a.each do |num|
