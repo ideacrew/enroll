@@ -13,7 +13,6 @@ class UserMailer < ApplicationMailer
   end
 
   def invitation_email(email, person_name, invitation)
-
     mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
       format.html { render "invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
@@ -51,9 +50,28 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def generic_notice_alert(first_name, notice_subject, email)
+    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
+    end
+  end
+
+  def employer_invoice_generation_notification(employer,subject)
+    message = mail({to: employer.email, subject: subject, from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
+    end
+  end
+
   def broker_denied_notification(broker_role)
     mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
       format.html { render "broker_denied", :locals => { :applicant_name => broker_role.person.full_name }}
     end
   end
+
+  def notice_uploaded_notification(person)
+    mail({to: person.user.email, subject: "New Notice Uploaded"}) do |format|
+      format.html { render "notice_uploaded", :locals => { :person_name => person.full_name }}
+    end
+  end
+
 end

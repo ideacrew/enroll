@@ -1,4 +1,4 @@
-class ShopNotices::ShopPdfNotice < Notice
+class ShopNotice < Notice
 
   def initialize(args = {})
     super(args)
@@ -7,6 +7,8 @@ class ShopNotices::ShopPdfNotice < Notice
   def deliver
     build
     generate_pdf_notice
+    upload_and_send_secure_message
+    send_generic_notice_alert
   end
 
   def append_hbe
@@ -14,7 +16,7 @@ class ShopNotices::ShopPdfNotice < Notice
       url: "www.dhs.dc.gov",
       phone: "(855) 532-5465",
       fax: "(855) 532-5465",
-      email: "#{Settings.contant_center.email_address}",
+      email: "#{Settings.contact_center.email_address}",
       address: PdfTemplates::NoticeAddress.new({
         street_1: "100 K ST NE",
         street_2: "Suite 100",
@@ -27,21 +29,23 @@ class ShopNotices::ShopPdfNotice < Notice
 
   def append_broker(broker)
     return if broker.blank?
-
     location = broker.organization.primary_office_location
     broker_role = broker.primary_broker_role
+    person = broker_role.person if broker_role
+    return if person.blank? || location.blank?
+    
     @notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: broker_role.try(:person).try(:full_name),
+      primary_fullname: person.full_name,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
-      email: broker_role.email_address,
+      email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,
       address: PdfTemplates::NoticeAddress.new({
-        street_1: location.try(:address).try(:address_1),
-        street_2: location.try(:address).try(:address_2),
-        city: location.try(:address).try(:city),
-        state: location.try(:address).try(:state),
-        zip: location.try(:address).try(:zip)
+        street_1: location.address.address_1,
+        street_2: location.address.address_2,
+        city: location.address.city,
+        state: location.address.state,
+        zip: location.address.zip
       })
     })
   end

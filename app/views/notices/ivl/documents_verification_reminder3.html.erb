@@ -21,10 +21,11 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You submitted an application for health insurance through #{Settings.site.short_name} on <date of application>.
+  content: "You enrolled in an insurance plan through #{Settings.site.short_name} on #{notice.enrollments.first.created_at.strftime('%B %d, %Y')}.
+
   The information you provided does not match our records or is not enough to process your application.
-  If you do not provide this information <strong>by [Date of Original Eligibility Notice +95 calendar days]</strong>, you and/or others
+  If you do not provide this information <strong>by #{notice.due_date}</strong>, you and/or others
   in your household could get less or no financial help paying for <span style='text-decoration:underline;'>your
   #{Settings.site.short_name} coverage or your #{Settings.site.short_name} coverage may be cancelled.</span> <strong>This is your third reminder notice.</strong>"} %>
 
-<%= render partial: 'notices/ivl/reminders_shared' %>
+<%= render 'notices/ivl/reminders_shared', notice: notice %>
