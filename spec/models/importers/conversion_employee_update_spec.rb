@@ -59,15 +59,15 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
 
       context "and a pre-existing employee record is found" do
 
-        before :each do
-          conversion_employee_update.save
-        end
-
         let(:conversion_employee_props) do
            {
               :fein => employer_fein,
               :subscriber_ssn => census_employee.ssn,
-              :subscriber_dob => census_employee.dob
+              :subscriber_dob => census_employee.dob.strftime("%m/%d/%Y"),
+              :subscriber_name_first => census_employee.first_name,
+              :subscriber_name_last => census_employee.last_name,
+              :hire_date => census_employee.hired_on.strftime("%m/%d/%Y"),
+              :subscriber_gender => census_employee.gender
            } 
         end
 
@@ -93,7 +93,12 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
                CensusEmployee.find(census_employee.id)
             }
 
+            it "should save succesfully" do
+              expect(conversion_employee_update.save).to be_truthy
+            end
+
             it "should change the employee name" do
+               conversion_employee_update.save
                expect(updated_census_employee.first_name).to eq new_employee_f_name
             end
           end
