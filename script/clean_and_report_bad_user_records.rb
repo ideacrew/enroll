@@ -20,7 +20,11 @@ CSV.foreach(csv_file, headers: true) do |row|
     end
   else
     # If user record is missing oim_id, populate it from the CSV
-    user.update_attributes!(oim_id: iam_username)
+    begin
+      user.update_attributes!(oim_id: iam_username)
+    rescue
+      blank_oim_and_invalid_users.puts "INVALID USER [ #{user.email} ]. Caught during user.update_attributes!(oim_id: iam_username)"
+    end
     oim_blank_report.puts "OIM ID IS BLANK [ #{user.email} ]  -  Updated with the OIM ID from the CSV file."
     blank_count += 1
   end
