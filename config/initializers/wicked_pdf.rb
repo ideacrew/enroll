@@ -14,6 +14,6 @@ module WickedPdfHelper
       raise 'Invalid platform. Must be running linux or intel-based Mac OS.'
     end
 
-    WickedPdf.config = { exe_path: "/Users/Zoheb2/.rbenv/shims/wkhtmltopdf" }
+    # WickedPdf.config = { exe_path: "/usr/local/bin/wkhtmltopdf" }
   end
 end
