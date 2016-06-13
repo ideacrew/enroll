@@ -29,6 +29,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
+  after_save :generate_family_search
 
   belongs_to  :person
 
@@ -42,8 +43,10 @@ class Family
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   embeds_many :broker_agency_accounts
+  embeds_many :general_agency_accounts
+  embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts
+  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts, :general_agency_accounts
 
   index({person_id: 1})
   index({e_case_id: 1}, { sparse: true })
@@ -114,7 +117,7 @@ class Family
 
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
   scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
-
+  scope :by_general_agency_profile_id,         -> (general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
@@ -555,6 +558,11 @@ class Family
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {
+        "$and" => [
+          {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}},
+          {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}
+        ]}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
@@ -587,6 +595,9 @@ class Family
       :allow_disk_use => true)
   end
 
+  def generate_family_search
+    ::MapReduce::FamilySearchForFamily.populate_for(self)
+  end
 private
   def build_household
     if households.size == 0

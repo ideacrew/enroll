@@ -52,6 +52,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def edit
     @census_employee.build_address unless @census_employee.address.present?
+    @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
@@ -59,8 +60,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+
       if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+        @census_employee.find_or_create_benefit_group_assignment(benefit_group)
       end
     end
 

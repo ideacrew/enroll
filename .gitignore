@@ -40,8 +40,6 @@ config/saml.yml
 # Ignore the gem folder
 /gems
 
-# Ignore the vendor folder
-/vendor
 
 # Ignore OS generated files
 */.DS_Store
@@ -52,3 +50,6 @@ tags
 
 spec/vocabularies
 plan_xmls.zip
+
+# Ignore .idea
+.idea

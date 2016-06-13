@@ -123,8 +123,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-      hbx_enrollment.propogate_waiver
+      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"

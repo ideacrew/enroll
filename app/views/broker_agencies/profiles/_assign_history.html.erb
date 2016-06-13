@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="row">
+    <div class="profile-content top-pd">
+      <h2>Assign History</h2>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>general_agency</th>
+                <th>Employer</th>
+                <th>Broker</th>
+                <th>start on</th>
+                <th>end on</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @general_agency_account_history.each do |gaa| %>
+                <tr>
+                  <td><%= gaa.legal_name %></td>
+                  <td><%= gaa.employer_profile.try(:legal_name) %></td>
+                  <td><%= gaa.broker_role_name %></td>
+                  <td><%= gaa.start_on %></td>
+                  <td><%= gaa.end_on %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row container">
+        <div class="col-md-12" id="paginator">
+          <%= paginate @general_agency_account_history, :remote => true, :param_name => "gas_page" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

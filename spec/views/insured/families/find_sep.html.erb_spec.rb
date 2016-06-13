@@ -1,8 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/find_sep.html.erb" do
+RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
   let(:current_user) {FactoryGirl.create(:user)}
-
 
   before do
     qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual')
@@ -36,7 +35,6 @@ RSpec.describe "insured/families/find_sep.html.erb" do
     expect(rendered).to have_selector('form#qle_form')
     expect(rendered).to have_selector('h3.qle-details-title')
     expect(rendered).to have_selector('h5.qle-label')
-    expect(rendered).to have_selector('h5.qle-date-hint')
     expect(rendered).to have_selector("input[name='qle_date']", count: 1)
   end
 

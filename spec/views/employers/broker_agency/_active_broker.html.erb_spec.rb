@@ -15,9 +15,12 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   let(:office_location) { double(primary_office_location: primary_office_location )}
   let(:primary_office_location) { double(address: address)}
   let(:address) {double(address_1: "somewhere", city: "Washington", state: "DC", zip: 20002)}
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
 
 
   before :each do
+    sign_in user
     assign(:employer_profile, employer_profile)
     assign(:broker_agency_accounts, broker_agency_accounts)
   end
@@ -60,6 +63,45 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
     it "show should the Broker phone" do
       expect(rendered).to match(/3015551212/)
+    end
+
+    it "should see button of change broker" do
+      expect(rendered).to have_selector('a.btn', text: 'Change Broker')
+    end
+  end
+
+  context "can_change_broker?" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    context "without broker" do
+      before :each do
+        user.roles = [:general_agency_staff]
+        sign_in user
+        @employer_profile = employer_profile
+        render "employers/broker_agency/active_broker.html.erb"
+      end
+
+      it "should have disabled button" do
+        expect(rendered).to have_selector('a.disabled', text: 'Browse Brokers')
+      end
+    end
+
+    context "without broker" do
+      before :each do
+        user.roles = [:general_agency_staff]
+        sign_in user
+        allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+        @employer_profile = employer_profile
+        render "employers/broker_agency/active_broker.html.erb"
+      end
+
+      it "should have disabled button of browser brokers" do
+        expect(rendered).to have_selector('a.disabled', text: 'Browse Brokers')
+      end
+
+      it "should have disabled button of change broker" do
+        expect(rendered).to have_selector('a.disabled', text: 'Change Broker')
+      end
     end
   end
 end
