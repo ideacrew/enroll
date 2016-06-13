@@ -83,6 +83,14 @@ module ApplicationHelper
     date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
+  def group_xml_transmitted_message(employer)
+    employer.xml_transmitted_timestamp.present? ? "The group xml for employer #{employer.legal_name} was transmitted on #{format_time_display(employer.xml_transmitted_timestamp)}. Are you sure you want to transmit again?" : "Are you sure you want to transmit the group xml for employer #{employer.legal_name}?"
+  end
+
+  def format_time_display(timestamp)
+    timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array

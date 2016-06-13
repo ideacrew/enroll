@@ -27,6 +27,7 @@ class EmployerProfile
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true

@@ -99,7 +99,9 @@ class HbxProfile
     def transmit_group_xml(employer_profile_ids)
       hbx_ids = []
       employer_profile_ids.each do |empr_id|
-        hbx_ids << EmployerProfile.find(empr_id).hbx_id
+        empr = EmployerProfile.find(empr_id)
+        hbx_ids << empr.hbx_id
+        empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
       end
       notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
     end
