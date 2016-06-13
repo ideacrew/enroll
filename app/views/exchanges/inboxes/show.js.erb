@@ -6,3 +6,5 @@ $(".btn-danger").click(function(){
   $("#inbox_form, #message_list_form").show();
   set_tab_content("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
 });
+$("#myTab").load(location.href+" #myTab>*", "");
+$("#inbox_form").load(location.href+" #inbox_form>*", "");

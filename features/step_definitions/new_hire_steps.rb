@@ -64,7 +64,7 @@ When(/Employee clicks continue on the group selection page/) do
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', :wait => 5).click
+    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
 end
 

@@ -8,6 +8,7 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include StateTransitionPublisher
 
   embedded_in :organization
 
@@ -49,6 +50,7 @@ class EmployerProfile
   embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
@@ -171,7 +173,8 @@ class EmployerProfile
   end
 
   def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
-    # commented out the start_on and terminate_on 
+
+    # commented out the start_on and terminate_on
     # which is same as broker calculation, However it will cause problem
     # start_on later than end_on
     #
@@ -241,38 +244,40 @@ class EmployerProfile
     end
   end
 
-  def billing_plan_year
-    billing_report_date = TimeKeeper.date_of_record.next_month
+  def billing_plan_year(billing_date = nil)
+    billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
-        billing_report_date = plan_year.start_on
+    if billing_date.blank?
+      if plan_year.blank?
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+          billing_report_date = plan_year.start_on
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
-        billing_report_date = TimeKeeper.date_of_record
+      if plan_year.blank?
+        if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
+          billing_report_date = TimeKeeper.date_of_record
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
-        billing_report_date = plan_year.start_on
+      if plan_year.blank? 
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+          billing_report_date = plan_year.start_on
+        end
       end
     end
 
     return plan_year, billing_report_date
   end
 
-  def enrollments_for_billing
-    plan_year, billing_report_date = billing_plan_year
+  def enrollments_for_billing(billing_date = nil)
+    plan_year, billing_report_date = billing_plan_year(billing_date)
     hbx_enrollments = []
 
     if plan_year.present?
       hbx_enrollments = plan_year.hbx_enrollments_by_month(billing_report_date).compact
-      hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
+      # hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
     hbx_enrollments
@@ -643,6 +648,16 @@ class EmployerProfile
 
   def notify_binder_paid
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
+  end
+
+  def self.by_hbx_id(an_hbx_id)
+    org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
+    return nil unless org.any?
+    org.first.employer_profile
+  end
+
+  def is_conversion?
+    self.profile_source == "conversion"
   end
 
 private

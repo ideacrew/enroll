@@ -1,11 +1,28 @@
 $primary-blue: #007bc4;
 $primary-green: #69A30D;
+$primary-black: #333333;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 $primary-white: #fff;
-$primary-black: #5C5C5C;
-
+$grayed-out: #b7b7b7;
 .module {
+  &.inbox {
+    .inboxes {
+      margin-bottom: 1.25%;
+    }
+    .table {
+      td {
+        vertical-align: middle;
+      }
+      tr.msg-inbox-unread {
+        font-weight: bold;
+        cursor: pointer;
+      }
+      tr.msg-inbox-read {
+        cursor: pointer;
+      }
+    }
+  }
   &.footer {
     font-size: 14px;
     color: $primary-white;
@@ -35,15 +52,78 @@ $primary-black: #5C5C5C;
       }
     }
   }
-  &.welcome {
-    h1 {
-      color: $primary-black;
+  &.employer-invoices {
+    max-width: 660px;
+    thead th {
+      height: 34px;
     }
-  }
-  &.signin {
-    .actions {
-      span {
-        margin-top: 2.5%;
+    tbody {
+      height: 220px;
+      overflow-y: auto;
+      tr {
+        a {
+          color: $primary-black;
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        &:hover {
+          .fa {
+            color: $primary-blue;
+          }
+        }
+        .fa {
+          color: $grayed-out;
+        }
+      }
+    }
+    thead {
+        /* fallback */
+    }
+    tbody td, thead th {
+      width: 50%;
+      float: left;
+    }
+    table {
+      width: 100%;
+    }
+    thead, tbody, tr { display: block; }
+    tr {
+      width: 100%;
+    }
+    tr:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+    .sorter {
+      a {
+        color: $primary-black;
+
+      }
+      &:hover {
+        .fa-stack-1x {
+          color: $primary-blue;
+        }
+      }
+      .fa {
+        color: $grayed-out;
+      }
+      .fa-stack {
+        position: relative;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        line-height: 1em;
+        vertical-align: middle;
+        font-size: 1.15em;
+      }
+      .fa-stack-1x:first-of-type {
+        margin-top: -6px;
+      }
+      .fa-stack-1x:last-of-type {
+        padding-top: 3px;
       }
     }
   }

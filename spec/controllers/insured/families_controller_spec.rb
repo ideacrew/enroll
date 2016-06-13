@@ -23,9 +23,9 @@ RSpec.describe Insured::FamiliesController do
       expect(response).to be_redirect
     end
   end
- context "set_current_user  as agent" do
+  context "set_current_user  as agent" do
     let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com', person: person) }
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person) }
 
     it "should raise the error on invalid person_id" do
       allow(session).to receive(:[]).and_return(33)
@@ -43,7 +43,7 @@ RSpec.describe Insured::FamiliesController do
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
-  let(:family_members){[double("FamilyMember")]}
+  let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
   # let(:coverage_wavied) { double("CoverageWavied") }
@@ -424,7 +424,7 @@ RSpec.describe Insured::FamiliesController do
     context 'when its change of plan' do
 
       before :each do
-        allow(@family).to receive(:enrolled_hbx_enrollments).and_return([ double ])
+        allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
@@ -467,9 +467,9 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "GET check_qle_date" do
-      let(:user) {FactoryGirl.create(:user)}
-      let(:person) {FactoryGirl.build(:person)}
-      let(:family) {FactoryGirl.build(:family)}
+      let(:user) { FactoryGirl.create(:user) }
+      let(:person) { FactoryGirl.build(:person) }
+      let(:family) { FactoryGirl.build(:family) }
       before :each do
         allow(user).to receive(:person).and_return person
         allow(person).to receive(:primary_family).and_return family
@@ -540,7 +540,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "post unblock" do
-      let(:family) {FactoryGirl.build(:family)}
+      let(:family) { FactoryGirl.build(:family) }
       before :each do
         allow(Family).to receive(:find).and_return family
       end
@@ -549,6 +549,80 @@ RSpec.describe Insured::FamiliesController do
         xhr :post, :unblock, id: family.id, format: :js
         expect(response).to have_http_status(:success)
         expect(assigns(:family).status).to eq "aptc_unblock"
+      end
+    end
+  end
+
+
+  describe "GET upload_notice_form" do
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:person) { FactoryGirl.create(:person) }
+
+    before(:each) do
+      sign_in(user)
+    end
+
+    it "displays the upload_notice_form view" do
+      xhr :get, :upload_notice_form
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_notice_form)
+    end
+  end
+
+  describe "GET upload_notice" do
+
+    let(:person2) { FactoryGirl.create(:person) }
+    let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }
+    let(:file) { double }
+    let(:temp_file) { double }
+    let(:file_path) { File.dirname(__FILE__) }
+    let(:bucket_name) { 'notices' }
+    let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
+
+    before(:each) do
+      @controller = Insured::FamiliesController.new
+      allow(file).to receive(:original_filename).and_return("some-filename")
+      allow(file).to receive(:tempfile).and_return(temp_file)
+      allow(temp_file).to receive(:path)
+      allow(@controller).to receive(:set_family)
+      @controller.instance_variable_set(:@person, person2)
+      allow(@controller).to receive(:file_path).and_return(file_path)
+      allow(@controller).to receive(:file_name).and_return("sample-filename")
+      allow(@controller).to receive(:file_content_type).and_return("application/pdf")
+      allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
+      person2.consumer_role =   FactoryGirl.create(:consumer_role)
+      person2.consumer_role.gender = 'male'
+      person2.save
+      request.env["HTTP_REFERER"] = "/insured/families/upload_notice_form"
+      sign_in(user2)
+    end
+
+    it "when successful displays 'File Saved'" do
+      post :upload_notice, {:file => file}
+      expect(flash[:notice]).to include("File Saved")
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to request.env["HTTP_REFERER"]
+    end
+
+    it "when failure displays 'File not uploaded'" do
+      post :upload_notice
+      expect(flash[:error]).to include("File not uploaded")
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to request.env["HTTP_REFERER"]
+    end
+
+    context "notice_upload_secure_message" do
+
+      let(:notice) {Document.new({ title: "file_name", creator: "hbx_staff", subject: "notice", identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+                                   format: "file_content_type" })}
+
+      before do
+        allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
+        @controller.send(:notice_upload_secure_message, notice)
+      end
+
+      it "adds a message to person inbox" do
+        expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
     end
   end
