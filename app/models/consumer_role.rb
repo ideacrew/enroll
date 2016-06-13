@@ -7,6 +7,7 @@ class ConsumerRole
   include Acapi::Notifiers
   include AASM
   include Mongoid::Attributes::Dynamic
+  include StateTransitionPublisher
 
   embedded_in :person
 
@@ -333,6 +334,14 @@ class ConsumerRole
     vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
   end
 
+  def can_receive_paper_communication?
+    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+  end
+
+  def can_receive_electronic_communication?
+    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+  end
+
   ## TODO: Move RIDP to user model
   aasm do
     state :verifications_pending, initial: true
@@ -376,6 +385,26 @@ class ConsumerRole
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+    end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
     end
   end
 

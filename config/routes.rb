@@ -30,6 +30,9 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_invoice
+        post :employer_invoice_datatable
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -123,6 +126,8 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'purchase'
         get 'family'
+        get 'upload_notice_form'
+        post 'upload_notice'
       end
 
       resources :people do
@@ -193,6 +198,9 @@ Rails.application.routes.draw do
       get 'consumer_override'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      member do
+        get "download_invoice"
+      end
       collection do
         get 'welcome'
         get 'search'
@@ -374,6 +382,8 @@ Rails.application.routes.draw do
   resources :office_locations, only: [:new]
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
+  get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+
 
   resources :documents, only: [:update, :destroy, :update] do
     collection do

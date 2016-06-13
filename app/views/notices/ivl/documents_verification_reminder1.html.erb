@@ -21,16 +21,15 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You submitted an application or renewal for health insurance
-  through #{Settings.site.short_name} which we processed on [date of application/renewal].
+  content: "You enrolled in an insurance plan through #{Settings.site.short_name} on #{notice.enrollments.first.created_at.strftime('%B %d, %Y')}.
   The information you provided does not match our records or is not enough to
   make a final determination of your eligibility. This is your first reminder notice to provide documentation."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["We need the documents by [Date=Date of Notice +95 days] in order
+  contents: ["We need the documents <strong>by #{notice.due_date}</strong> in order
     to make a final decision on your eligibility for your health plan and for tax credits.
     If you do not provide the documents by this deadline, we will assume that our records are correct.
     <span style='text-decoration: underline;'>Your health insurance coverage and/or tax credits may be terminated.</span> "],
     heading: 'When We Need Your Documents', sub_heading: ''} %>
 
-<%= render partial: 'notices/ivl/reminders_shared' %>
+<%= render 'notices/ivl/reminders_shared', notice: notice %>

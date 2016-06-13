@@ -190,6 +190,18 @@ class HbxEnrollment
 
   class << self
 
+    def families_with_contingent_enrollments
+      Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
+        :$elemMatch => {
+          :aasm_state => "enrolled_contingent",
+          :$or => [
+            {:"terminated_on" => nil},
+            {:"terminated_on".gt => TimeKeeper.date_of_record}
+          ]
+        }
+      })
+    end
+
     def by_hbx_id(policy_hbx_id)
       families = Family.with_enrollment_hbx_id(policy_hbx_id)
       households = families.flat_map(&:households)
@@ -199,6 +211,24 @@ class HbxEnrollment
     end
 
     def advance_day(new_date)
+
+      # families_with_contingent_enrollments.each do |family|
+      #   enrollment = family.enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a.first
+      #   consumer_role = family.primary_applicant.person.consumer_role
+      #   if enrollment.present? && consumer_role.present? && consumer_role.verifications_outstanding?
+      #     case (TimeKeeper.date_of_record - enrollment.created_at).to_i
+      #     when 10
+      #       consumer_role.first_verifications_reminder
+      #     when 25
+      #       consumer_role.second_verifications_reminder
+      #     when 50
+      #       consumer_role.third_verifications_reminder
+      #     when 65
+      #       consumer_role.fourth_verifications_reminder
+      #     else
+      #     end
+      #   end
+      # end
 
       # #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
@@ -272,6 +302,13 @@ class HbxEnrollment
     return false unless (effective_on <= TimeKeeper.date_of_record)
     return true if terminated_on.blank?
     terminated_on >= TimeKeeper.date_of_record
+  end
+
+  def future_active?
+    return false if shopping?
+    return false unless (effective_on > TimeKeeper.date_of_record)
+    return true if terminated_on.blank?
+    terminated_on >= effective_on   
   end
 
   def generate_hbx_id
@@ -926,8 +963,16 @@ class HbxEnrollment
     #   transitions from: :coverage_enrolled, to: :coverage_canceled, after: :propogate_terminate
     # end
 
-    event :terminate_coverage, :after => :record_transition do
+    # event :cancel_coverage, :after => :record_transition do
+    #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
+    # end
 
+    event :cancel_coverage, :after => :record_transition do
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
+      transitions from: :renewing_waived, to: :inactive
+    end
+
+    event :terminate_coverage, :after => :record_transition do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :auto_renewing, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :renewing_coverage_selected, to: :coverage_terminated, after: :propogate_terminate
@@ -978,11 +1023,6 @@ class HbxEnrollment
 
     event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
-    end
-
-    event :cancel_coverage, :after => :record_transition do
-      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
-      transitions from: :renewing_waived, to: :inactive
     end
   end
 
