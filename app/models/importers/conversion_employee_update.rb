@@ -10,14 +10,9 @@ module Importers
         found_employer = find_employer
         return true if found_employer.nil?
         return true if subscriber_ssn.blank?
-        found_employee = CensusEmployee.where(
-          :employer_profile_id => found_employer.id,
-          :encrypted_ssn => subscriber_ssn
-        )
-        if found_employee.count > 1
-          errors.add(:subscriber_ssn, "too many matching employees")
-        elsif found_employee.count < 1
-          errors.add(:subscriber_ssn, "no such employee for this employer")
+        found_employee = find_employee
+        if found_employee.nil?
+          errors.add(:subscriber_ssn, "unable to find employee")
         end
       end
 
@@ -33,7 +28,8 @@ module Importers
         end
       end
 
-      def map_subscriber
+      def update_subscriber 
+        found_employee = find_employee
         last_name = subscriber_name_last
         first_name = subscriber_name_first
         middle_name = subscriber_name_middle
@@ -63,6 +59,7 @@ module Importers
         unless ssn.blank?
           attr_hash[:ssn] = ssn
         end
+=begin
         unless email.blank?
           attr_hash[:email] = Email.new(:kind => "work", :address => email)
         end
@@ -79,7 +76,9 @@ module Importers
           end
           attr_hash[:address] = Address.new(addy_attr)
         end
-        CensusEmployee.new(attr_hash)
+=end
+        result = found_employee.update_attributes(attr_hash)
+        [result, found_employee]
       end
 
       def map_dependent(dep_idx)
@@ -135,7 +134,9 @@ module Importers
 
       def save
         return false unless valid?
-        return false
+        result, census_employee = update_subscriber
+        propagate_errors(census_employee)
+        result
       end
 
       def propagate_errors(census_employee)
