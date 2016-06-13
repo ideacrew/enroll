@@ -326,7 +326,7 @@ module Importers
     end
 
     def create_model(record_attrs)
-      the_action = record_attrs["action"].blank? ? "add" : records_attrs["action"].to_s.strip.downcase
+      the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
       case the_action
       when "update"
         ::Importers::ConversionEmployeeUpdate.new(record_attrs.merge({:default_hire_date => @default_hire_date}))

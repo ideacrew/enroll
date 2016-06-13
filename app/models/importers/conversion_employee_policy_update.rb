@@ -169,18 +169,19 @@ module Importers
       end
     end
 
-    def save 
+    def save
       return false unless valid?
       employer = find_employer
 
       person = find_person
       return false unless person
-     
+
       puts '----processing ' + person.full_name
       family = person.primary_family
       enrollment = find_current_enrollment(family, employer)
       return false unless enrollment
 
+      plan = find_plan
       if enrollment.plan_id != plan.id
         enrollment.update_attributes(plan_id: plan.id)
 
