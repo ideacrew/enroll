@@ -59,13 +59,17 @@
         Broker Mail
        <% end %>
       </li>
-      <% if current_user.has_hbx_staff_role? %>
-      <% else %>
-      <li role="presentation">
-        <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
-        Individual-Assisted Dashboard
-       <% end %>
-      </li>
+      <div class="nav-right pull-right">
+        <% if current_user.has_hbx_staff_role? %>
+        <% else %>
+        <li role="presentation" class="multi-line">
+          <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
+          First Time Applications for Medicaid
+          <br/>
+          and Premium Tax Credits
+        </li>
+         <% end %>
+      </div>
       <% end %>
     </ul>
   </div>
