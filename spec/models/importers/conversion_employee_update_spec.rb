@@ -57,10 +57,6 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
         employer_profile.fein
       } 
 
-      context "and a pre-existing employee record is not found" do
-        it "adds the employee record"
-      end
-
       context "and a pre-existing employee record is found" do
 
         before :each do
