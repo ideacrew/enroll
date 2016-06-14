@@ -301,7 +301,6 @@ class User
     all.order(:"email".asc).select() {|u| u.person.blank?}
   end
 
-
   def self.send_reset_password_instructions(attributes={})
     recoverable = find_or_initialize_with_errors(reset_password_keys, attributes, :not_found)
     if !recoverable.approved?
@@ -349,6 +348,9 @@ class User
     self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
     self.identity_response_description_text = "curam payload"
     self.identity_verified_date = TimeKeeper.date_of_record
+    unless self.oim_id.present?
+      self.oim_id = self.email
+    end
     self.save!
   end
 
