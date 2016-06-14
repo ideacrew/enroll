@@ -30,6 +30,8 @@
           <br/>
 	        <div class="actions text-center">
   	          <%= f.submit "Create account", class: "btn btn-primary btn-lg " %>
+              <br/>
+              <br/>
             <span>
               <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
             </span>
