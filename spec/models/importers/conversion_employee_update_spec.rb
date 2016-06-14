@@ -53,9 +53,15 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
         py
       }
 
-      let(:employer_fein) { 
+      let(:employer_fein) {
         employer_profile.fein
-      } 
+      }
+
+      let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: plan_year.benefit_groups.first) }
+
+      let(:census_employee) {
+        FactoryGirl.create(:census_employee, :employer_profile => employer_profile)
+      }
 
       context "and a pre-existing employee record is found" do
 
@@ -68,12 +74,26 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
               :subscriber_name_last => census_employee.last_name,
               :hire_date => census_employee.hired_on.strftime("%m/%d/%Y"),
               :subscriber_gender => census_employee.gender
-           } 
+           }
         end
 
-        let(:census_employee) {
-           FactoryGirl.create(:census_employee, :employer_profile => employer_profile)
-        }
+        context "and the employee's record has changed since import" do
+          let(:conversion_employee_update) { Importers::ConversionEmployeeUpdate.new(conversion_employee_props) }
+
+          before do
+            benefit_group_assignment
+            census_employee.updated_at = census_employee.benefit_group_assignments.first.created_at + 2.days
+          end
+
+          after do
+            census_employee.updated_at = census_employee.benefit_group_assignments.first.created_at
+          end
+
+          it "adds an 'update inconsistancy: employee record changed' error to the instance error[:base] array" do
+            expect(conversion_employee_update.valid?).not_to be_truthy
+            expect(conversion_employee_update.errors[:base]).to include("update inconsistancy: employee record changed")
+          end
+        end
 
         context "and the employee's name is changed" do
 
@@ -102,32 +122,17 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
                expect(updated_census_employee.first_name).to eq new_employee_f_name
             end
           end
-
-          context "and the employee's record has changed since import" do
-            it "adds an 'update inconsistancy: employee record changed' error to the instance"
-            it "adds the error to the instance's error[:base] array"
-          end
         end
 
         context "and the employee's gender and dob are changed" do
           context "and the employee's record has not changed since import" do
             it "should change the employee gender and dob"
           end
-
-          context "and the employee's record has changed since import" do
-            it "adds an 'update inconsistancy: employee record changed' error"
-            it "adds the error to the instance's error[:base] array"
-          end
         end
 
         context "and the employee's address is changed" do
           context "and the employee's address record has not changed since import" do
             it "should change the employee address"
-          end
-
-          context "and the employee's address record has changed since import" do
-            it "adds an 'update inconsistancy: employee address record changed' error"
-            it "adds the error to the instance's error[:base] array"
           end
         end
 
@@ -208,21 +213,11 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
       context "and the employee dependent's record has not changed since import" do
         it "should change the employee dependent name and ssn"
       end
-
-      context "and the employee dependent's record has changed since import" do
-        it "adds an 'update inconsistancy: employee dependent record changed' error to the instance"
-        it "adds the error to the instance's error[:base] array"
-      end
     end
 
     context "and the employee dependent's gender and dob are changed" do
       context "and the employee dependent's record has not changed since import" do
         it "should change the employee dependent gender and dob"
-      end
-
-      context "and the employee dependent's record has changed since import" do
-        it "adds an 'update inconsistancy: employee dependent record changed' error to the instance"
-        it "adds the error to the instance's error[:base] array"
       end
     end
 
@@ -230,11 +225,6 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
       context "and the employee dependent's record has not changed since import" do
         it "should change the employee dependent address"
         it "should not change the employee address"
-      end
-
-      context "and the employee dependent's record has changed since import" do
-        it "adds an 'update inconsistancy: employee dependent record changed' error to the instance"
-        it "adds the error to the instance's error[:base] array"
       end
     end
   end
