@@ -77,6 +77,12 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
            }
         end
 
+        let(:updated_census_employee) {
+           CensusEmployee.find(census_employee.id)
+        }
+
+        let(:conversion_employee_update) { Importers::ConversionEmployeeUpdate.new(changed_props) }
+
         context "and the employee's record has changed since import" do
           let(:conversion_employee_update) { Importers::ConversionEmployeeUpdate.new(conversion_employee_props) }
 
@@ -101,18 +107,11 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
              census_employee.first_name + "dkfjklasdf"
           }
 
-          let(:conversion_employee_update) { Importers::ConversionEmployeeUpdate.new(changed_name_props) }
-
-          let(:changed_name_props) {
+          let(:changed_props) {
              conversion_employee_props.merge(:subscriber_name_first => new_employee_f_name)
           }
 
           context "and the employee's record has not changed since import" do
-
-            let(:updated_census_employee) {
-               CensusEmployee.find(census_employee.id)
-            }
-
             it "should save succesfully" do
               expect(conversion_employee_update.save).to be_truthy
             end
@@ -125,14 +124,38 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
         end
 
         context "and the employee's gender and dob are changed" do
+          let(:changed_props) {
+            conversion_employee_props.merge({subscriber_gender: "female", subscriber_dob: (census_employee.dob + 777.days).strftime("%m/%d/%Y") })
+          }
+
           context "and the employee's record has not changed since import" do
-            it "should change the employee gender and dob"
+            it "should change the employee gender and dob" do
+              conversion_employee_update.save
+              expect(updated_census_employee.gender).to eq "female"
+              expect(updated_census_employee.dob).to eq (census_employee.dob + 777.days)
+            end
           end
         end
 
-        context "and the employee's address is changed" do
+        context "and the employee's address and email is changed" do
+          let(:changed_props) {
+            conversion_employee_props.merge( {subscriber_address_1: "1007 Mountain Drive",
+                                              subscriber_city: "Gotham",
+                                              subscriber_state: "NJ",
+                                              subscriber_zip: "07974",
+                                              subscriber_email: "batman@batcave.com"
+                                              })
+          }
+
           context "and the employee's address record has not changed since import" do
-            it "should change the employee address"
+            it "should change the employee address" do
+              conversion_employee_update.save
+              expect(updated_census_employee.address.address_1).to eq "1007 Mountain Drive"
+              expect(updated_census_employee.address.city).to eq "Gotham"
+              expect(updated_census_employee.address.state).to eq "NJ"
+              expect(updated_census_employee.address.zip).to eq "07974"
+              expect(updated_census_employee.email.address).to eq "batman@batcave.com"
+            end
           end
         end
 
@@ -143,6 +166,17 @@ describe Importers::ConversionEmployeeUpdate, :dbclean => :after_each do
           end
 
           context "and the dependent is a spouse" do
+            #TODODODODODODODODO
+            # let(:changed_props) {
+            #   conversion_employee_props.merge( {dep_1_name_last: census_employee.last_name,
+            #                                     dep_1_name_first: "spousy",
+            #                                     dep_1_relationship: "spouse",
+            #                                     dep_1_dob: (census_employee.dob + 5.years).strftime("%m/%d/%Y"),
+            #                                     dep_1_ssn: "123443212",
+            #                                     dep_1_gender: "female"
+            #                                     })
+            # }
+
             it "should add the dependent spouse"
           end
 
