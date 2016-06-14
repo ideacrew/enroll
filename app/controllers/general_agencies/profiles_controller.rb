@@ -7,6 +7,8 @@ class GeneralAgencies::ProfilesController < ApplicationController
   before_action :check_general_agency_profile_permissions_index, only: [:index]
   before_action :check_general_agency_profile_permissions_new, only: [:new]
 
+  layout 'single_column'
+
   def new
     flash[:notice] = "You don't have a General Agency Profile associated with your Account!! Please register your General Agency first."
   end

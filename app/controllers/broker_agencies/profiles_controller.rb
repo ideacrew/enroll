@@ -9,6 +9,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
+  layout 'single_column'
+
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
   end
