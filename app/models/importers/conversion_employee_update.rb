@@ -4,7 +4,22 @@ module Importers
       validate :validate_relationships
       validates_length_of :fein, is: 9
       validates_length_of :subscriber_ssn, is: 9
-      validate :employee_exists
+      validate :has_not_changed_since_import
+
+      def has_not_changed_since_import
+        return true unless found_employee = find_employee
+        if found_employee.benefit_group_assignments.present?
+          latest_bga = found_employee.benefit_group_assignments.max_by{|bga| bga.created_at }
+          if latest_bga.created_at > found_employee.updated_at
+            errors.add(:base, "update inconsistancy: employee record changed")
+            return false
+          else
+            true
+          end
+        else
+          true
+        end
+      end
 
       def employee_exists
         found_employer = find_employer
@@ -28,7 +43,7 @@ module Importers
         end
       end
 
-      def update_subscriber 
+      def update_subscriber
         found_employee = find_employee
         last_name = subscriber_name_last
         first_name = subscriber_name_first
