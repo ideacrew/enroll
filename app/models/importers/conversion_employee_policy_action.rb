@@ -34,7 +34,7 @@ module Importers
       return true if subscriber_ssn.blank?
       found_employee = find_employee
       return true unless find_employee
-      found_bga = oind_benefit_group_assignment
+      found_bga = find_benefit_group_assignment
       if found_bga.nil?
         errors.add(:subscriber_ssn, "no benefit group assignment found")
       end
@@ -101,11 +101,11 @@ module Importers
       employer = find_employer
       employee = find_employee
       plan = find_plan
-      bga = find_benefit_group_assignment
+      benefit_group_assignment = find_benefit_group_assignment
       employee_role = find_employee_role
       is_new = true
       if !employee_role.nil?
-        if find_enrollment(employee_role, benefit_group_assignment).any?
+        if find_enrollments(employee_role, benefit_group_assignment).any?
           is_new = false
         end
       end
@@ -137,7 +137,7 @@ module Importers
       person = employee_role.person
       family = person.primary_family
     
-      family.households.flat_map(&:hbx_enrollments).select do |hbe|
+      family.households.flat_map(&:hbx_enrollments).select do |hbx|
         (hbx.benefit_group_assignment_id == benefit_group_assignment.id) &&
           (hbx.employee_role_id == employee_role.id)
       end
