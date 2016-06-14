@@ -26,12 +26,10 @@ RSpec.describe "events/employer/updated.haml.erb" do
       expect(rendered).to have_xpath("//plan_years/plan_year")
     end
 
-# commenting since CV had changed
-=begin
+
     it "should be schema valid" do
       expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
     end
-=end
 
     context "with dental plans" do
 
@@ -76,8 +74,6 @@ RSpec.describe "events/employer/updated.haml.erb" do
 
   end
 
-# commenting since CV had changed
-=begin
   (1..15).to_a.each do |rnd|
 
     describe "given a generated employer, round #{rnd}" do
@@ -88,8 +84,10 @@ RSpec.describe "events/employer/updated.haml.erb" do
       end
 
       let(:employer) { FactoryGirl.build_stubbed :generative_employer_profile }
+      let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
 
       before :each do
+        allow(employer).to receive(:staff_roles).and_return([staff])
         render :template => "events/employers/updated", :locals => { :employer => employer }
       end
 
@@ -100,5 +98,4 @@ RSpec.describe "events/employer/updated.haml.erb" do
     end
 
   end
-=end
 end
