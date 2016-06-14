@@ -31,10 +31,10 @@ namespace :migrations do
 
     if employer_profile.blank?
       puts "employer profile not found!"
-      return
+      exit
     end
 
-    plan_year_start_on = Date.strptime(plan_year_start_on, "%m/%d/%Y")
+    plan_year_start_on = Date.strptime(args[:plan_year_start_on], "%m/%d/%Y")
 
     if plan_year = employer_profile.plan_years.where(:start_on => plan_year_start_on).published.first
         enrollments = enrollments_for_plan_year(plan_year)
