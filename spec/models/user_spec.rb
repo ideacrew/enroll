@@ -7,7 +7,7 @@ RSpec.describe User, :type => :model do
   let(:valid_params) do
     {
       email: "test@test.com",
-      oim_id: "test",
+      oim_id: "testtest",
       password: gen_pass,
       password_confirmation: gen_pass,
       approved: true,
@@ -22,6 +22,14 @@ RSpec.describe User, :type => :model do
       it 'contains invalid characters' do
         expect(User.create(**params).errors[:oim_id].any?).to be_truthy
         expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special charcters ; # % = | + , \" > < \\ \/"]
+      end
+    end
+
+    context 'when oim_id' do
+      let(:params){valid_params.deep_merge!({oim_id: "user"})}
+      it 'is too short' do
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["must be at least 8 characters"]
       end
     end
 
