@@ -7,6 +7,7 @@ namespace :migrations do
 
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
+      raise 'more than 1 employer found with given fein'
     end
 
     puts "Processing #{organizations.first.legal_name}"
@@ -39,7 +40,7 @@ namespace :migrations do
           if hbx_enrollment.may_terminate_coverage?
             hbx_enrollment.update_attributes(:terminated_on => termination_date)
             hbx_enrollment.terminate_coverage!
-            hbx_enrollment.propogate_terminate(termination_date)
+            # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
 
