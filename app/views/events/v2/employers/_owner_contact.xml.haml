@@ -7,5 +7,6 @@
       = render :partial => "events/v2/addresses/address", :collection => owner_contact.addresses
   %emails
     = render :partial => "events/v2/emails/email", :locals => {email:owner_contact.work_email_or_best}
-  %phones
-    = render :partial => "events/v2/phones/phone", :collection => owner_contact.phones
+  - if owner_contact.phones.present?
+    %phones
+      = render :partial => "events/v2/phones/phone", :collection => owner_contact.phones

@@ -21,7 +21,7 @@
           = render partial: 'events/v2/addresses/address', collection: broker_agency_account.writing_agent.person.addresses
       - if broker_agency_account.writing_agent.person.emails.present?
         %emails
-          = render partial: "events/v2/emails/email", collection: broker_agency_account.writing_agent.person.emails
+          = render partial: "events/v2/emails/email", :locals => { email:broker_agency_account.writing_agent.person.work_email_or_best }
       - if broker_agency_account.writing_agent.person.phones.present?
         %phones
           = render partial: "events/v2/phones/phone", collection: broker_agency_account.writing_agent.person.phones

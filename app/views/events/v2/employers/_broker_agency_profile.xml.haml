@@ -12,9 +12,8 @@
       - if broker_agency_profile.primary_broker_role.person.addresses.present?
         %addresses
           = render partial: 'events/v2/addresses/address', collection: broker_agency_profile.primary_broker_role.person.addresses
-      - if broker_agency_profile.primary_broker_role.person.emails.present?
-        %emails
-          = render partial: "events/v2/emails/email", collection: broker_agency_profile.primary_broker_role.person.emails
+      %emails
+        = render partial: "events/v2/emails/email", :locals => {email:broker_agency_profile.primary_broker_role.person.work_email_or_best}
       - if broker_agency_profile.primary_broker_role.person.phones.present?
         %phones
           = render partial: "events/v2/phones/phone", collection: broker_agency_profile.primary_broker_role.person.phones
@@ -35,7 +34,7 @@
               = render partial: "events/v2/addresses/address", collection: broker.person.addresses
           - if broker.person.emails.present?
             %emails
-              = render partial: "events/v2/emails/email", collection: broker.person.emails
+              = render partial: "events/v2/emails/email",  :locals => {email:broker.person.work_email_or_best}
           - if broker.person.phones.present?
             %phones
               = render partial: "events/v2/phones/phone", collection: broker.person.phones

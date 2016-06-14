@@ -5,9 +5,8 @@
   - if person.addresses.any?
     %addresses
       = render :partial => "events/v2/addresses/address", :collection => person.addresses
-  - if person.emails.any?
-    %emails
-      = render :partial => "events/v2/emails/email", :collection => person.emails
+  %emails
+    = render :partial => "events/v2/emails/email", :locals => { email: person.work_email_or_best}
   - if person.phones.any?
     %phones
       = render :partial => "events/v2/phones/phone", :collection => person.phones
