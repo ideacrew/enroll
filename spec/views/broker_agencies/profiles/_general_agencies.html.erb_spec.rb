@@ -43,6 +43,10 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb", dbclean: :
       render template: "broker_agencies/profiles/_general_agencies.html.erb"
     end
 
+    it "should have general_agency_list area" do
+      expect(rendered).to have_selector('div#general_agency_list')
+    end
+
     it 'should have title' do
       expect(rendered).to have_selector('h3', text: 'General Agencies')
     end
