@@ -1,10 +1,12 @@
 feins = [] #Organization.where(:"employer_profile".exists=>true).map(&:fein)
 
+Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2")
+
 carrier_abbreviations = {
     "CareFirst":"AHI", "Aetna":"GHMSI", "Kaiser":"KFMASI", "United Health Care": "UHIC", "Delta Dental":"DDPA",
   "Dentegra":"DTGA", "Dominion":"DMND", "Guardian":"GARD", "BestLife":"BLHI", "MetLife":"META"}
 
-plan_year = { "start_date":"20160801", "end_date":"20170731" }
+plan_year = { "start_date":"20160701", "end_date":"20170630" }
 
 XML_NS = "http://openhbx.org/api/terms/1.0"
 
@@ -71,20 +73,21 @@ organizations_hash = {} # key is carrier name, value is the return object of rem
 # 3 using remove_other_carrier_nodes, remove the carrier plans of carriers other then 'carrier'
 # create a hash with key as carrier and value as array [organization_xml, carrier, plan year end date, plan year start date]
 feins.each do |fein|
-  employer_profile = Organization.where(:fein => fein.gsub("-","")).first.employer_profile
+    employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
 
-  #carriers = employer_profile.plan_years.select(&:eligible_for_export?).flat_map(&:benefit_groups).flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq! || []
+    #carriers = employer_profile.plan_years.select(&:eligible_for_export?).flat_map(&:benefit_groups).flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq! || []
 
-  carriers = employer_profile.plan_years.select(&:eligible_for_export?).select do |py| py.start_on == Date.parse(plan_year[:start_date]) end.flat_map(&:benefit_groups).flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq! || []
+    carriers = employer_profile.plan_years.select(&:eligible_for_export?).select do |py|
+      py.start_on == Date.parse(plan_year[:start_date])
+    end.flat_map(&:benefit_groups).flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq! || []
 
-  carriers.each do |carrier|
-    @carrier = carrier
-    puts carrier.legal_name
-    cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {carrier: nil, employer: employer_profile}
+    carriers.each do |carrier|
+      puts "Processing fein #{fein} for #{carrier.legal_name}"
+      cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile}
 
-    organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
-    organizations_hash[carrier.legal_name] << remove_other_carrier_nodes(cv_xml, carrier.legal_name, plan_year[:end_date], plan_year[:start_date])
-  end
+      organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
+      organizations_hash[carrier.legal_name] << remove_other_carrier_nodes(cv_xml, carrier.legal_name, plan_year[:end_date], plan_year[:start_date])
+    end
 end
 
 # iterate the hash and generate group xml v2 for each carrier, including all employers for that carrier
