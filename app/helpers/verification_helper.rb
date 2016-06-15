@@ -23,7 +23,7 @@ module VerificationHelper
          "outstanding"
        end
      elsif type == 'Citizenship' || type == 'Immigration status'
-       if member.consumer_role.lawful_presence_authorized?
+       if member.consumer_role.lawful_presence_verified?
          "verified"
        elsif member.consumer_role.has_docs_for_type?(type)
          "in review"
