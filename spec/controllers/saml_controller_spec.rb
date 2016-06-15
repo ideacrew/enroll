@@ -111,7 +111,7 @@ RSpec.describe SamlController do
   describe "GET navigate_to_assistance" do
 
     context "logged on user" do
-      let(:user) { FactoryGirl.create(:user, last_portal_visited: family_account_path, oim_id: '00001')}
+      let(:user) { FactoryGirl.create(:user, last_portal_visited: family_account_path, oim_id: 'some_curam_id')}
 
       it "should redirect user to curam URL" do
         sign_in user
