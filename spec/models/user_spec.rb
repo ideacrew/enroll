@@ -34,6 +34,14 @@ RSpec.describe User, :type => :model do
     end
 
     context 'when oim_id' do
+      let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
+      it 'is too long' do
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["can NOT exceed 60 characters"]
+      end
+    end
+
+    context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: ""})}
       it 'is empty' do
         expect(User.create(**params).errors[:oim_id].any?).to be_truthy

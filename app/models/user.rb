@@ -1,6 +1,7 @@
 class User
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
+  MAX_USERNAME_LENGTH = 60
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
@@ -25,6 +26,8 @@ class User
       errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
     elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
       errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
+    elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
+      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
     end
   end
 
