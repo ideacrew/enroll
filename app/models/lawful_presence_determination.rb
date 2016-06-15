@@ -45,18 +45,6 @@ class LawfulPresenceDetermination
     end
   end
 
-  def start_determination_process(requested_start_date)
-    if should_use_ssa?
-      start_ssa_process
-    else
-      start_vlp_process(requested_start_date)
-    end
-  end
-
-  def should_use_ssa?
-    ::ConsumerRole::US_CITIZEN_STATUS == self.citizen_status
-  end
-
   def start_ssa_process
     notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person})
   end

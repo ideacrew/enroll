@@ -387,7 +387,7 @@ class HbxEnrollment
     end
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
+        hem.person.consumer_role.invoke_verification!(effective_on)
       end
       notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
       self.published_to_bus_at = Time.now
