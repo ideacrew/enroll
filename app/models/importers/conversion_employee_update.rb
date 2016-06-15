@@ -4,7 +4,22 @@ module Importers
       validate :validate_relationships
       validates_length_of :fein, is: 9
       validates_length_of :subscriber_ssn, is: 9
-      validate :employee_exists
+      validate :has_not_changed_since_import
+
+      def has_not_changed_since_import
+        return true unless found_employee = find_employee
+        if found_employee.benefit_group_assignments.present?
+          latest_bga = found_employee.benefit_group_assignments.max_by{|bga| bga.created_at }
+          if latest_bga.created_at > found_employee.updated_at
+            errors.add(:base, "update inconsistancy: employee record changed")
+            return false
+          else
+            true
+          end
+        else
+          true
+        end
+      end
 
       def employee_exists
         found_employer = find_employer
@@ -28,7 +43,7 @@ module Importers
         end
       end
 
-      def update_subscriber 
+      def update_subscriber
         found_employee = find_employee
         last_name = subscriber_name_last
         first_name = subscriber_name_first
@@ -46,7 +61,7 @@ module Importers
           first_name: first_name,
           last_name: last_name,
           dob: dob,
-          gender: gender
+          gender: gender,
         }
         if hire_date.blank?
           attr_hash[:hired_on] = default_hire_date
@@ -59,24 +74,26 @@ module Importers
         unless ssn.blank?
           attr_hash[:ssn] = ssn
         end
-=begin
-        unless email.blank?
-          attr_hash[:email] = Email.new(:kind => "work", :address => email)
-        end
         unless address_1.blank?
-          addy_attr = {
-            kind: "home",
-            city: city,
-            state: state,
-            address_1: address_1,
-            zip: zip
-          }
-          unless address_2.blank?
-            addy_attr[:address_2] = address_2
-          end
-          attr_hash[:address] = Address.new(addy_attr)
+          attr_hash.merge!({
+            address: {
+              kind: "home",
+              address_1: address_1,
+              address_2: address_2,
+              city: city,
+              state: state,
+              zip: zip,
+            }
+          })
         end
-=end
+        unless email.blank?
+          attr_hash.merge!({
+            email: {
+              kind: "work",
+              address: email
+            }
+          })
+        end
         result = found_employee.update_attributes(attr_hash)
         [result, found_employee]
       end
