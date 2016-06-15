@@ -87,6 +87,7 @@ class Person
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -181,6 +182,7 @@ class Person
 
   scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_applicant,     -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
+  scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
@@ -335,6 +337,16 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
+  def first_name_last_name_and_suffix
+    [first_name, last_name, name_sfx].compact.join(" ")
+    case name_sfx
+      when "ii" ||"iii" || "iv" || "v"
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      else
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+      end
+  end
+
   def age_on(date)
     age = date.year - dob.year
     if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
@@ -350,6 +362,18 @@ class Person
 
   def is_active?
     is_active
+  end
+
+  # collect all verification types user can have based on information he provided
+  def verification_types
+    verification_types = []
+    verification_types << 'Social Security Number' if self.ssn
+    if self.us_citizen
+      verification_types << 'Citizenship'
+    else
+      verification_types << 'Immigration status'
+    end
+    verification_types
   end
 
   def relatives
@@ -621,7 +645,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
@@ -764,7 +788,7 @@ class Person
     welcome_subject = "Welcome to #{Settings.site.short_name}"
     welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
   end
 
   def update_full_name

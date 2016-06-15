@@ -395,7 +395,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double, may_publish?: true)}
 
     before :each do
       sign_in
@@ -449,11 +449,46 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(plan_year_proxy).to receive(:enrolling?).and_return(false)
         allow(plan_year_proxy).to receive(:renewing_published?).and_return(false)
         allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
+        allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
       end
 
       it "should redirect with errors" do
         xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
         expect(flash[:error]).to match(/Plan Year failed to publish/)
+      end
+    end
+
+    context "plan year successfully published when renewing published" do
+      before :each do
+        allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+        allow(plan_year_proxy).to receive(:published?).and_return(false)
+        allow(plan_year_proxy).to receive(:enrolling?).and_return(false)
+        allow(plan_year_proxy).to receive(:renewing_published?).and_return(true)
+        allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
+        allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
+        allow(plan_year_proxy).to receive(:assigned_census_employees_without_owner).and_return([double])
+      end
+
+      it "should redirect with success message" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to match(/Plan Year successfully published./)
+      end
+    end
+
+    context "plan year successfully published when enrolling" do
+      before :each do
+        allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+        allow(plan_year_proxy).to receive(:published?).and_return(false)
+        allow(plan_year_proxy).to receive(:enrolling?).and_return(true)
+        allow(plan_year_proxy).to receive(:renewing_published?).and_return(false)
+        allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
+        allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
+        allow(plan_year_proxy).to receive(:assigned_census_employees_without_owner).and_return([double])
+      end
+
+      it "should redirect with success message" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to match(/Plan Year successfully published./)
       end
     end
   end

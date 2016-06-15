@@ -26,17 +26,15 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   find('.interaction-field-control-organization-email').click
   fill_in 'organization[email]', with: Forgery(:email).address
   fill_in 'organization[npn]', with: '2222222222'
-
   fill_in 'organization[legal_name]', with: (company_name = Forgery(:name).company_name)
   fill_in 'organization[dba]', with: company_name
   fill_in 'organization[fein]', with: '333333333'
-
   find(:xpath, "//p[contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
-
-  find(:xpath, "//div[@class='language_multi_select']//p[@class='label']").click
+  find('.selectric-items').find('.interaction-choice-control-organization-market-kind-1').click
+  find('.multiselect').click
   find(:xpath, "//li[contains(., 'English')]").click
-
+  find('.multiselect').trigger('click')
+  find('input.interaction-field-control-organization-legal-name').click
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', with: Forgery(:address).street_address
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', with: 'Washington'
 
@@ -148,7 +146,7 @@ When /^they complete the account creation form and hit the 'Submit' button$/ do
 end
 
 Then /^they should see a welcome message$/ do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   screenshot("general_agency_homepage_for_staff")
 end
 
@@ -160,6 +158,7 @@ Given /^a general agency, approved, confirmed, exists$/ do
   general_agency(legal_name: 'Rooxo')
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
@@ -358,6 +357,7 @@ Given /^another general agency-ga2, approved, confirmed, exists$/ do
   general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 

@@ -1,6 +1,7 @@
 Given(/I set the eligibility rule to (.*)/) do |rule|
   offsets = {
     'first of month following or coinciding with date of hire' => 0,
+    'first of the month following date of hire' => 1,
     'first of month following 30 days' => 30,
     'first of month following 60 days' => 60
   }
@@ -63,7 +64,7 @@ When(/Employee clicks continue on the group selection page/) do
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan').click
+    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
 end
 
@@ -111,4 +112,3 @@ When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
   sleep 1
 end
-

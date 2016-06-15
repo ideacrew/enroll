@@ -1,4 +1,4 @@
-class ShopNotices::EmployeeRenewalNotice < ShopNotices::ShopPdfNotice
+class ShopNotices::EmployeeRenewalNotice < ShopNotice
 
   def initialize(employee, args = {})
     super(args)

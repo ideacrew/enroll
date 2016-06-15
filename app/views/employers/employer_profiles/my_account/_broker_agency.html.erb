@@ -1,4 +1,4 @@
-<div class="col-xs-12 brokers-tab">
+<div class="brokers-tab">
   <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
     <%= render partial: "employers/broker_agency/active_broker", locals: {direct_terminate: true} %>
   <% else %>
@@ -7,12 +7,12 @@
     <h4 class="starter">
       You have no active Broker. A Broker is your personal advocate and trusted adviser who at no cost to you, can help you set up and administer your Health Benefits Program. You can get help from a Broker at any time.
       <br/><br/>
-      To learn more about what a Broker can do for you, Download DC Health Link's <%= link_to 'Guidance for Business Owners', "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf", {:target => 'pdfWindow'} %>.
+      To learn more about what a Broker can do for you, Download <%= Settings.site.short_name %>'s <%= link_to 'Guidance for Business Owners', "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf", {:target => 'pdfWindow'} %>.
       <br/><br/>
       Select 'Browse Brokers' to continue.
     </h4>
     <br/>
-    <%#= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", onclick: '$("#brokers-empty").hide();' %>
+    <%#= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary ", onclick: '$("#brokers-empty").hide();' %>
   </div>
   <div class="row">
     <div class="col-xs-12" id="browse_brokers">

@@ -44,6 +44,7 @@ class Family
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts, :general_agency_accounts
 
@@ -547,6 +548,11 @@ class Family
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {
+        "$and" => [
+          {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}},
+          {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}
+        ]}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
