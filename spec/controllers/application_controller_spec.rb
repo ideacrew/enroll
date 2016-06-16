@@ -111,4 +111,42 @@ RSpec.describe ApplicationController do
         end
       end
   end
+
+  context "require_login" do
+    let(:person) {FactoryGirl.create(:person);}
+    let(:user) { FactoryGirl.create(:user, :person=>person); }
+
+    before do
+      sign_in(user)
+      @request.session['person_id'] = person.id
+      allow(person).to receive(:agent?).and_return(true)
+      allow(controller).to receive(:redirect_to).with(String)
+      allow(controller).to receive(:current_user).and_return(nil)
+      allow(controller.request).to receive(:format).and_raise("")
+    end
+
+    it "writes an error log message exception occures" do
+      expect(controller).to receive(:log) do |msg, severity|
+        expect(severity[:severity]).to eq('error')
+        expect(msg[:session_person_id]).to eq(person.id)
+        expect(msg[:message]).to include("Application Exception")
+      end
+      controller.instance_eval{require_login}
+    end
+  end
+
+  context "page_alphabets" do
+    let(:person) { FactoryGirl.create(:person); }
+    let(:user) { FactoryGirl.create(:user, :person => person); }
+    let(:alphabet_array) { Person.distinct('last_name').collect { |word| word.first.upcase }.uniq.sort }
+
+    before do
+      sign_in(user)
+    end
+
+    it "return array of 1st alphabets of given field" do
+      pagination = subject.instance_eval { page_alphabets(Person.all, 'last_name') }
+      expect(pagination).to eq alphabet_array
+    end
+  end
 end

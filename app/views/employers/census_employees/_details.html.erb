@@ -45,7 +45,6 @@
         <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
         <% if @census_employee.employee_role.try(:present?) && employee_role = @census_employee.employee_role %>
         <p>HIRED: <%= employee_role.try(:hired_on) %></p>
-        <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
         <% end %>
         <% if @plan.present? && @hbx_enrollment.present? %>
 
@@ -136,5 +135,5 @@
 <br><br>
 <div class="col-xs-12">
   <br/>
-<%= link_to 'Back'.html_safe, 'javascript:;', class: 'btn btn-trans return_to_employee_roster' %>
+<%= link_to 'Back'.html_safe, 'javascript:;', class: 'btn btn-default return_to_employee_roster' %>
 </div>

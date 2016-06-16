@@ -30,6 +30,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :favorite_general_agencies, cascade_callbacks: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
@@ -59,6 +60,14 @@ class BrokerRole
       pr.broker_role.present? && 
         (pr.broker_role.npn == broker_npn)
     end.map(&:broker_role)
+  end
+
+  def search_favorite_general_agencies(general_agency_profile_id)
+    favorite_general_agencies.where(general_agency_profile_id: general_agency_profile_id)
+  end
+
+  def included_in_favorite_general_agencies?(general_agency_profile_id)
+    favorite_general_agencies.present? && favorite_general_agencies.map(&:general_agency_profile_id).include?(general_agency_profile_id)
   end
 
   def email_address
@@ -104,7 +113,7 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone
+    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone rescue ""
   end  
 
   def email=(new_email)
@@ -209,7 +218,12 @@ class BrokerRole
 
     event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
       transitions from: :applicant, to: :active, :guard => :is_primary_broker?
+      transitions from: :broker_agency_pending, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
+    end
+
+    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated] do 
+      transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
@@ -226,6 +240,7 @@ class BrokerRole
 
     event :deny, :after => [:record_transition, :notify_broker_denial]  do
       transitions from: :applicant, to: :denied
+      transitions from: :broker_agency_pending, to: :denied
     end
 
     event :decertify, :after => :record_transition  do

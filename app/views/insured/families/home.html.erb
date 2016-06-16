@@ -10,9 +10,10 @@
     <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
 
-  <div class="my-account-page col-xs-12">
-    <h1>My DC Health Link</h1>
+  <div class="my-account-page">
+    <h1>My <%= Settings.site.short_name %></h1>
   </div>
+  <div class="row">
   <div class="col-md-8">
     <%= render partial: 'qle_detail' %>
     <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
@@ -29,5 +30,6 @@
   <div class="col-md-4 right-column">
     <%= render 'right_column' %>
   </div>
+</div>
 </div>
 <%= render 'insured/plan_shoppings/help_with_plan' %>

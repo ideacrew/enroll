@@ -20,7 +20,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
       it "should assign variables" do
         expect(assigns(:broker_candidate)).to be_kind_of(Forms::BrokerCandidate)
         expect(assigns(:filter)).to eq('broker')
-        expect(assigns(:agency_type)).to eq('existing')
+        expect(assigns(:agency_type)).to eq('new')
       end
     end
 

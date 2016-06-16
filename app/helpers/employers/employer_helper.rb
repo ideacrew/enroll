@@ -4,9 +4,17 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+  end
+
+  def renewal_enrollment_state(census_employee=nil)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+  end
+
+  def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
-    if benefit_group_assignment = census_employee.active_benefit_group_assignment
+    if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
 
       %W(health dental).each do |coverage_kind|
@@ -17,7 +25,8 @@ module Employers::EmployerHelper
       enrollment_states << '' if enrollment_states.compact.empty?
     end
 
-    enrollment_states.compact.join(', ').titleize
+    "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
+    
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -33,6 +42,24 @@ module Employers::EmployerHelper
         return bgsm_state
       end
     end
+  end
+
+  def render_plan_offerings(benefit_group)
+
+    assignment_mapping.each do |bgsm_state, enrollment_statuses|
+      if enrollment_statuses.include?(enrollment_status.to_s)
+        return bgsm_state
+      end
+    end
+  end
+
+
+  def invoice_formated_date(date)
+    date.strftime("%m/%d/%Y")
+  end
+
+  def invoice_coverage_date(date)
+    "#{date.next_month.beginning_of_month.strftime('%b %Y')}" rescue nil
   end
 
   def coverage_kind(census_employee=nil)
@@ -71,19 +98,10 @@ module Employers::EmployerHelper
     end
   end
 
-
   def get_benefit_groups_for_census_employee
-    # if @employer_profile.active_plan_year.blank?
-    #   return [], []
-    # end
-
-    all_benefit_groups = @employer_profile.plan_years.select{|py| !py.renewing_draft? }.map(&:benefit_groups).try(:flatten)
-    if all_benefit_groups.empty?
-      return [], []
-    end
-
-    current_benefit_groups = all_benefit_groups #@employer_profile.active_plan_year.benefit_groups
+    plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
+    benefit_groups = plan_years.flat_map(&:benefit_groups)
     renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
-    return current_benefit_groups, renewing_benefit_groups || []
+    return benefit_groups, (renewing_benefit_groups || [])
   end
 end

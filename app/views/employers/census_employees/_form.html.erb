@@ -17,8 +17,10 @@
                 <li> <%= msg %> </li>
               <% end %>
             <% end %>
+            <% if @census_employee.address.present? %>
             <% @census_employee.address.errors.full_messages.each do |msg| %>
               <li> <%= msg %> </li>
+            <% end %>
             <% end %>
             <% @census_employee.benefit_group_assignments.each do |bg| %>
               <% bg.errors.full_messages.each do |msg| %>
@@ -32,7 +34,7 @@
 
         <% unless @census_employee.persisted? %>
         <h4 class="pull-left">
-          Enter employee information. You'll select a benefit group later. Select 'Add Family Member' if applicable. When you're finished, select 'Create Employee' to continue.
+          Enter employee information. Select 'Add Family Member' if applicable. When you're finished, select 'Create Employee' to continue.
         </h4>
         <% end %>
 
@@ -55,7 +57,7 @@
 
           <div class="key-btn">
             <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
-            <button class="btn btn-primary btn-br pull-right" type="submit">
+            <button class="btn btn-primary  pull-right" type="submit">
               <%= "#{button_label}".html_safe %>
             </button>
           </div>

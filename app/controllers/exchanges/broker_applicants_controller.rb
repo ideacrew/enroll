@@ -1,4 +1,6 @@
 class Exchanges::BrokerApplicantsController < ApplicationController
+  include Exchanges::BrokerApplicantsHelper
+
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
 
@@ -16,7 +18,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       page_no = cur_page_no(@page_alphabets.first)
       @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
     else
-      @broker_applicants = @people.to_a.first(20)
+      @broker_applicants = sort_by_latest_transition_time(@people).last(20)
     end
 
     respond_to do |format|
@@ -41,6 +43,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     elsif params['decertify']
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
+    elsif params['pending']
+      broker_role.pending!
+      flash[:notice] = "Broker applicant is now pending."
     else
       broker_role.approve!
       broker_role.reload
@@ -61,7 +66,6 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   private
-
 
   def send_secure_message_to_broker_agency(broker_role)
     hbx_admin = HbxProfile.all.first

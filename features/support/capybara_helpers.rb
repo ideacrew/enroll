@@ -3,9 +3,9 @@ module CapybaraHelpers
     start_time = Time.now
     Capybara.default_max_wait_time = delta
     Timeout.timeout(Capybara.default_max_wait_time) do
-      until(finished_all_ajax_requests?) do
+      until finished_all_ajax_requests? do
         sleep(0.01)
-      end
+      end 
     end
     end_time = Time.now
     Capybara.default_max_wait_time = 2

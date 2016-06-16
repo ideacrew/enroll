@@ -188,6 +188,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "returns true if insured_eligible_for_benefit_rule satisfies all criteria" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+        allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [true, []]
       end
@@ -229,6 +230,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "returns false if insured_eligible_for_benefit_rule fails" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+        allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]

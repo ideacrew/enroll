@@ -24,7 +24,13 @@ class SbcProcessor2015
     counter = 0
     CSV.foreach(@csv_path, :headers => true) do |row|
       hios_id = row[0].gsub(/\A\p{Space}*|\p{Space}*\z/, '')
-      plans = Plan.where(active_year:'2015').and(hios_id:/#{hios_id}/)
+
+      if hios_id.include? '-'
+        plans = Plan.where(active_year:'2015').and(hios_id:hios_id)
+      else
+        plans = Plan.where(active_year:'2015').and(hios_id:/#{hios_id}/)
+      end
+
       plans.each do |plan|
         file_name = row[1].strip
 

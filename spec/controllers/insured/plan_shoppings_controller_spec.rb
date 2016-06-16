@@ -229,8 +229,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:update_current).and_return(true)
-      allow(hbx_enrollment).to receive(:propogate_waiver).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
+      allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       sign_in user
     end
 

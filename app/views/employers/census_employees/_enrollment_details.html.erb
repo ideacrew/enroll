@@ -9,7 +9,6 @@
       <p>Plan Start: <%= enrollment.try(:effective_on) %></p>
       <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
         <p>Hired: <%= @census_employee.employee_role.try(:hired_on) %></p>
-        <p>Eligible For Coverage: <em><%= @census_employee.employee_role.try(:effective_on) %></em></p>
       <% end %>
   </div>
 
@@ -53,5 +52,5 @@
         </tr>
       </tbody>
     </table>
-  </div>
   <% end %>
+</div>
