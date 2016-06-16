@@ -20,24 +20,24 @@ RSpec.describe User, :type => :model do
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
-        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
-        expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special charcters ; # % = | + , \" > < \\ \/"]
+        expect(User.create(**params).errors[:login].any?).to be_truthy
+        expect(User.create(**params).errors[:login]).to eq ["username cannot contain special charcters ; # % = | + , \" > < \\ \/"]
       end
     end
 
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user"})}
       it 'is too short' do
-        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
-        expect(User.create(**params).errors[:oim_id]).to eq ["must be at least 8 characters"]
+        expect(User.create(**params).errors[:login].any?).to be_truthy
+        expect(User.create(**params).errors[:login]).to eq ["username must be at least 8 characters"]
       end
     end
 
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
       it 'is too long' do
-        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
-        expect(User.create(**params).errors[:oim_id]).to eq ["can NOT exceed 60 characters"]
+        expect(User.create(**params).errors[:login].any?).to be_truthy
+        expect(User.create(**params).errors[:login]).to eq ["username can NOT exceed 60 characters"]
       end
     end
 
