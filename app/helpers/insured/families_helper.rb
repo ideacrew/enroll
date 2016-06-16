@@ -118,7 +118,7 @@ module Insured::FamiliesHelper
     family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
   end
 
-  def hbx_memeber_names(hbx_enrollment_members)
+  def hbx_member_names(hbx_enrollment_members)
     member_names = Array.new
     hbx_enrollment_members.each do |hem|
       member_names.push(Person.find(hem.family_member.person_id.to_s).full_name)
