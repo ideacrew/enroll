@@ -4,7 +4,7 @@
     <div class="top-pd" id="inbox_provider_form">
       <span class="flash_message"></span>
 
-      <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post) do %>
+      <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
         <table id="employers_dataTable" class="table table-striped table-bordered dataTable">
           <thead>
             <tr>
