@@ -5,13 +5,24 @@ initial_feins = ["451431314", "274551672", "273208144", "200457331", "811095280"
 
 def write_to_csv(file_name, feins)
   csv = CSV.open(file_name, "wb")
+  csv << %w[employer.legal_name, employer.hbx_id, employer.fein,
+          employer.active_broker_agency_account.writing_agent.person.full_name ,
+          employer.active_broker_agency_account.writing_agent.npn,
+          general_agency_account.legal_name,
+          general_agency_account.broker_role_name,
+          general_agency_account.broker_role.npn,
+          general_agency_account.general_agency_profile.fein]
 
   feins.each do |fein|
-    puts fein
+    puts "#{fein} Processing"
     org = Organization.where(fein: fein).first
-    next if org.nil?
+
+    if org.nil?
+      puts "#{fein} Organization not found"
+      next
+    end
+
     employer = org.employer_profile
-    next if employer.general_agency_profile.nil?
 
     employer.general_agency_accounts.each do |general_agency_account|
     csv << [employer.legal_name, employer.hbx_id, employer.fein,
