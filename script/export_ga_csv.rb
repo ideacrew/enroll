@@ -8,13 +8,12 @@ def write_to_csv(file_name, feins)
   csv << %w[employer.legal_name, employer.hbx_id, employer.fein,
           employer.active_broker_agency_account.writing_agent.person.full_name,
           employer.active_broker_agency_account.writing_agent.npn,
-          general_agency_account.legal_name,
-          general_agency_account.broker_role_name,
-          general_agency_account.broker_role.npn,
-          general_agency_account.general_agency_profile.fein]
+          active_general_agency_account.legal_name,
+          active_general_agency_account.broker_role_name,
+          active_general_agency_account.broker_role.npn,
+          active_general_agency_account.general_agency_profile.fein]
 
   feins.each do |fein|
-    puts "#{fein} Processing"
     org = Organization.where(fein: fein).first
 
     if org.nil?
@@ -24,15 +23,18 @@ def write_to_csv(file_name, feins)
 
     employer = org.employer_profile
 
-    employer.general_agency_accounts.each do |general_agency_account|
-      csv << [employer.legal_name, employer.hbx_id, employer.fein,
+    if employer.active_general_agency_account.nil?
+      puts "FEIN #{fein} active_general_agency_account = nil. general_agency_accounts.count = #{employer.general_agency_accounts.count}"
+      next
+    end
+
+    csv << [employer.legal_name, employer.hbx_id, employer.fein,
             (employer.active_broker_agency_account.writing_agent.person.full_name rescue ("")),
             (employer.active_broker_agency_account.writing_agent.npn rescue ("")),
-            general_agency_account.legal_name,
-            (general_agency_account.broker_role_name rescue ("")) ,
-            (general_agency_account.broker_role.npn rescue ("")),
-            (general_agency_account.general_agency_profile.fein rescue (""))]
-      end
+            employer.active_general_agency_account.legal_name,
+            (employer.active_general_agency_account.broker_role_name rescue ("")),
+            (employer.active_general_agency_account.broker_role.npn rescue ("")),
+            (employer.active_general_agency_account.general_agency_profile.fein rescue (""))]
   end
 end
 
