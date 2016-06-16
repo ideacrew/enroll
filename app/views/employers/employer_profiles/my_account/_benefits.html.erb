@@ -100,6 +100,14 @@
                     <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
                   </p>
                 </td>
+                <td>
+                  <header>Terminated On</header>
+                </td>
+                <td>
+                 <p>
+                    <%= plan_year.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                 </p>
+                </td> 
               </tr>
               <tr>
                 <td>
