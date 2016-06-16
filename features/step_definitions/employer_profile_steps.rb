@@ -149,9 +149,8 @@ Then /(\w+) enters data for Turner Agency, Inc/ do |name|
 end
 
 Then /(\w+) is notified about Employer Staff Role (.*)/ do |name, alert|
-   find('.interaction-click-control-confirm').click
-   expect(find('.alert-notice').text).to match /#{alert}/
-   expect(find('h2').text).to match /Thank you for logging into your DC/
+   expect(page).to have_content("Thank you for submitting your request to access the employer account. Your application for access is pending.")
+   expect(page).to have_css("a", :text => /back/i)
    screenshot('pending_person_stays_on_new_page')
  end
 

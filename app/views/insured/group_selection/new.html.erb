@@ -196,13 +196,6 @@ function setGroupSelectionHandlers(){
     $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
   }
 
-  $('#group-selection-form').on('change', function() {
-    if ( $('#market_kind_shop').is(':checked') ) {
-    } else {
-      $('#coverage_kind_dental').closest('.n-radio-row').slideDown();
-    }
-  })
-
 <% if can_shop_both_markets?(@person) %>
   <% if @market_kind == 'individual' %>
     $('#market_kind_individual').prop("checked", true);
@@ -211,7 +204,7 @@ function setGroupSelectionHandlers(){
 
   $('#market_kind_shop').on('change', function() {
     <% if !@employee_role.benefit_group.is_offering_dental? %>
-      $('#dental-radio-button').hide();
+      $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
     $('#ivl-coverage-household').hide();
@@ -226,7 +219,7 @@ function setGroupSelectionHandlers(){
   });
 
   $('#market_kind_individual').on('change', function() {
-    $('#dental-radio-button').show();
+    $('#dental-radio-button').slideDown();
     $('#ivl-coverage-household').show();
     $('#shop-coverage-household').hide();
     $('#shop-coverage-household input').removeProp('checked');
