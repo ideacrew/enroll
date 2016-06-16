@@ -15,7 +15,7 @@
 
       <th>CSR % as Integer</th>
       <td width = "15px;" ></td>
-      <td style="border: thin solid;">
+      <td width="18%" style="border: thin solid;">
         <div class="selectric-labeled">
           <%= select_tag "csr_percentage", options_for_select([ 100, 94, 87, 73, 0 ], csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
         </div>
