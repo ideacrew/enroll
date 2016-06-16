@@ -1,6 +1,6 @@
   <h4><%= enrollment.coverage_kind.capitalize %> Plan</h4>
   <div class="form-border">
-    <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
+    <p>Benefit Group: <%= enrollment.benefit_group.try(:title) %></p>
     <% if enrollment.is_coverage_waived? %>
     <p>Enrollment Status: Coverage Waived</p>
     <p>Waiver Reason: <%= enrollment.waiver_reason %></p>

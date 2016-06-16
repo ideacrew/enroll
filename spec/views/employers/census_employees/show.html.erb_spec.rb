@@ -39,11 +39,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     assign(:employer_profile, employer_profile)
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
-    assign(:hbx_enrollment, hbx_enrollment)
-    assign(:hbx_enrollments, [hbx_enrollment])
-    assign(:benefit_group, benefit_group)
-    assign(:plan, plan)
-    assign(:active_benefit_group_assignment, benefit_group_assignment)
     allow(hbx_enrollment_member).to receive(:person).and_return(person)
     allow(hbx_enrollment_member).to receive(:primary_relationship).and_return("self")
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
@@ -51,6 +46,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
+    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
   end
 
   it "should show the address of census employee" do
@@ -69,7 +65,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should show waiver" do
     hbx_enrollment.update_attributes(:aasm_state => 'inactive', )
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Coverage Waived/
@@ -78,8 +73,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should show plan name" do
     allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
-    allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
-    allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /#{hbx_enrollment.plan.name}/
@@ -87,7 +80,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should show plan cost" do
     allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
-    allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     assign(:plan, plan)
 
     render template: "employers/census_employees/show.html.erb"
@@ -97,7 +89,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should show the info of employee role" do
     allow(hbx_enrollment).to receive(:waiver_reason?).and_return(false)
-    allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(census_employee).to receive(:employee_role).and_return(double(hired_on: Date.new, effective_on: Date.new))
     render template: "employers/census_employees/show.html.erb"
   end
@@ -128,7 +119,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     let(:census_dependent2) {double(relationship: 'child_26_and_over', first_name: 'jack', last_name: 'White', dob: Date.today, gender: 'male')}
     before :each do
       allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
-      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
     end
 
     it "should get dependents title" do
@@ -153,6 +143,5 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /Owner:/
     end
-
   end
 end

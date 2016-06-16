@@ -29,21 +29,9 @@
           </div>
         </div>
       <% end %>
+    </div>
 
-    </div>
-    <% if @hbx_enrollments.present? %>
-    <div class="row">
-      <div class="col-xs-6">
-        <% health_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'} %>
-        <%= render 'enrollment_details', enrollment: health_coverage if health_coverage %>
-      </div>
-      <div class="col-xs-6">
-        <% dental_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental'} %>
-        <%= render 'enrollment_details', enrollment: dental_coverage if dental_coverage %>
-      </div>
-    </div>
-    <% end %>
-    <div class="row">
+        <div class="row">
       <div class="col-xs-6">
         <h4>Dependents</h4>
         <div class="form-border">
@@ -83,6 +71,14 @@
           <% end %>
         </div>
       </div>
+    </div>
+
+    <div class="row">
+      <% ce_enrollments_to_display.each do |enrollment| %>
+      <div class="col-xs-6">
+        <%= render 'enrollment_details', enrollment: enrollment %>
+      </div>
+      <% end %>
     </div>
 
     <div class="col-xs-12 row">
