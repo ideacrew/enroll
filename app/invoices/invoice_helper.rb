@@ -73,7 +73,7 @@ module InvoiceHelper
       @pdf.text_box "#{address.address_1}, #{address.address_2}", :at => [address_x_pos, address_y_pos-12]
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x_pos, address_y_pos-24]
     end
-    @pdf.text_box "MPI_Cover", :at => [mpi_x_pos,  mpi_y_pos]
+    @pdf.text_box "MPI_SHOPINV", :at => [mpi_x_pos,  mpi_y_pos]
 
     @pdf.start_new_page
 
@@ -254,7 +254,7 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "123123"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
@@ -334,12 +334,12 @@ module InvoiceHelper
     activity_header_x = 275
     logo_x = 360
     cheque_amount_path_x = 350
-    @pdf.move_down 24
+    @pdf.move_down 12
 
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "123123"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
@@ -348,17 +348,17 @@ module InvoiceHelper
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
     address = @organization.try(:office_locations).first.address
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 620]
+    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 632]
     if address
-      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 608]
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 596]
+      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 620]
+      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 608]
     end
 
     @pdf.move_down 36
     @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
     @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 60
+    @pdf.move_down 72
     @pdf.text_box "You will now receive a monthly invoice from DC Health Link. Payments should be directed to DC Health Link for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of DC Health Link. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 72
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
@@ -427,7 +427,7 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "123123"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
