@@ -22,7 +22,7 @@ var APTCModule = ( function( window, undefined ) {
       applied_aptcs_array.push(one_enrollment_hash);
     }
     
-    $('#loading-'+caller_input+'-aptc').html('<img src="/assets/loading_aptc.gif" height="30" width="30">  &nbsp;&nbsp; <b>Recalculating...</b>');
+    $('#loading-'+caller_input+'-aptc').html("<i class=\'fa fa-spinner fa-spin fa-2x\'></i>  &nbsp;&nbsp; <b>Recalculating...</b>");
 
     $.ajax({
       type: "GET",
@@ -38,7 +38,7 @@ var APTCModule = ( function( window, undefined ) {
   function resetFormData()  { 
     var person_id = $("#person_person_id").val();
     var family_id = $("#person_family_id").val();
-    $('#reset-aptc').html('<img src="/assets/loading_aptc.gif" height="30" width="30">  &nbsp;&nbsp; <b>Resetting Data...</b>');
+    $('#reset-aptc').html("<i class=\'fa fa-spinner fa-spin fa-2x\'> </i> &nbsp;&nbsp; <b>Resetting Data...</b>");
     $.ajax({
       type: "GET",
       data:{person_id: person_id, family_id: family_id},
