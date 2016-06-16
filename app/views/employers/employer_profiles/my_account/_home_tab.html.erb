@@ -94,18 +94,13 @@
     <% @current_plan_year.benefit_groups.each do |bg| %>
     <div class="benefit-packages">
     <div class="panel benefitgroup benefit-group col-xs-12">
-      <section class="col-xs-6">
+      <section class="col-xs-10">
         <header class="row">
           <h3 class="title no-buffer"><%= bg.title.capitalize %></h3>
           <% if bg.description.present? %>
           <h5 class="description no-buffer"><%= bg.description %></h5>
           <% end %>
         </header>
-      </section>
-      <section class="col-xs-6">
-        <!--<header class="row">
-          <a class="details" onclick="$(this).closest('.benefitgroup').next().toggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
-        </header>-->
       </section>
       <table>
         <tr>
