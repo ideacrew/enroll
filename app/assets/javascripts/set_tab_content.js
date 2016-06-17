@@ -1,4 +1,5 @@
 function set_tab_content(partial) {
+  $('.flash').remove();
   $('#inbox .col-md-10').html(partial);
 }
 
@@ -15,5 +16,6 @@ function set_broker_agency_content(partial) {
 
 
 function setTabContent(partial) {
+  $('.flash').remove();
   $('#myTabContent').html(partial);
 }
