@@ -25,7 +25,13 @@ end
 
 hbx_ids = File.read("policies_to_pull.txt").split("\n").map(&:strip)
 
+total_count = hbx_ids.size
+
+count = 0
+
 hbx_ids.each do |pid|
+  count += 1
+  puts "#{Time.now} - #{count}/#{total_count}" if count % 100 == 0
   pol = HbxEnrollment.by_hbx_id(pid).first
   if pol.nil?
     raise "NO SUCH POLICY #{pid}"
