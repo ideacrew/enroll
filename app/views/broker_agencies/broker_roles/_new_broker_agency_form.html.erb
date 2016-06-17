@@ -6,20 +6,16 @@
     <div class="row">
       <div class="col-md-9 col-sm-9 col-xs-12">
         <h4>Broker Agency Information</h4>
+        <h5>NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator's Information.</h5>
         <div class="row no-buffer row-form-wrapper">
           <%= render "shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3] %>
-        </div>
-        <div class="row no-buffer row-form-wrapper">
-          <div class="col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-            <%= f.text_field :home_page, class: "floatlabel form-control interaction-field-control-broker-home-page", placeholder: 'WEBSITE URL' %>
-          </div>
         </div>
         <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
           <%= render "shared/broker_agency_profile_fields", f: f%>
         </div><br>
         <div class="row no-buffer row-form-wrapper no-border">
           <!-- recaptcha_tags -->
-        </div><br>
+        </div>
         <div class="action-group">
           <%= render "shared/office_locations", f: f %>
           <div class="row no-buffer">

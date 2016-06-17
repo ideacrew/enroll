@@ -58,7 +58,7 @@ development:
 test:
   clients:
     default:
-      database: enroll_test
+      database: enroll_test<%= ENV['TEST_ENV_NUMBER'] %>
       hosts:
         - localhost:27017
       options:

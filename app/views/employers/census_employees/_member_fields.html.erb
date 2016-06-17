@@ -1,4 +1,4 @@
-<div id="employer_info" class="row">
+<div id="employer_info" class="row module">
   <div class="col-md-12 col-sm-12 col-xs-12">
 
     <div class="row row-form-wrapper no-buffer">
@@ -12,7 +12,10 @@
         <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :prompt => 'SUFFIX', class: "floatlabel form-control" %>
+        <div class="selectric-labeled">
+          <span><strong>Suffix</strong></span>
+          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
+        </div>
       </div>
     </div>
 
@@ -44,8 +47,6 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $('.field_with_errors > *').unwrap();
-    $('.floatlabel').floatlabel({
-         slideInput: false
-    });
+    Freebies.floatlabels();
   });
 </script>

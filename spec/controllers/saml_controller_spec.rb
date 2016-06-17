@@ -22,6 +22,7 @@ RSpec.describe SamlController do
           expect(arg1).to match(/ERROR: SAMLResponse assertion errors/)
           expect(arg2).to eq(:severity => 'error')
         end
+
         post :login, :SAMLResponse => invalid_xml
         expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
         expect(response).to have_http_status(403)
@@ -87,6 +88,21 @@ RSpec.describe SamlController do
             expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
             expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
           end
+        end
+      end
+
+      context "with no mail attribute" do
+        let(:attributes_double) {{ }}
+
+        it "should render a 403 and log the error as critical" do
+          expect(subject).to receive(:log) do |arg1, arg2|
+            expect(arg1).to match(/ERROR: SAMLResponse has missing required mail attribute/)
+            expect(arg2).to eq(:severity => 'critical')
+          end
+
+          post :login, :SAMLResponse => sample_xml
+          expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
+          expect(response).to have_http_status(403)
         end
       end
     end

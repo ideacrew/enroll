@@ -108,6 +108,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         effective_on_kind: "first_of_month",
         effective_on_offset: "30",
         plan_option_kind: "plan_option_kind_1",
+        description: "my first benefit group",
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_1,
         reference_plan_id: double("id"),
@@ -131,6 +132,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         effective_on_kind: "date_of_hire",
         effective_on_offset: "0",
         plan_option_kind: "plan_option_kind_2",
+        description: "my first benefit group",
         relationship_benefits: [relationship_benefits],
         reference_plan: reference_plan_2,
         reference_plan_id: double("id"),
@@ -170,7 +172,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         waived_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
-        non_business_owner_enrollment_count: 10,
+        non_business_owner_enrolled: 10.times.map{|i| double },
         hbx_enrollments: [hbx_enrollment],
         additional_required_participants_count: 5,
         benefit_groups: benefit_groups,
@@ -234,6 +236,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     it "should display benefit groups" do
       current_plan_year.benefit_groups.each do |bg|
         expect(rendered).to match(/.*#{bg.title}.*/mi)
+        expect(rendered).to match(/.*#{bg.description}.*/mi)
         expect(rendered).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
       end
     end

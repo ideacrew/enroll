@@ -4,19 +4,24 @@ RSpec.describe "insured/show" do
   let(:employee_role){FactoryGirl.create(:employee_role)}
   let(:plan){FactoryGirl.create(:plan)}
   let(:benefit_group){ FactoryGirl.build(:benefit_group) }
+  let(:hbx_enrollment_member_one) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
+  let(:family) { FactoryGirl.build_stubbed(:family, person: person, family_members: [hbx_enrollment_member_one]) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group,
-    hbx_enrollment_members: [],
+    hbx_enrollment_members: [hbx_enrollment_member_one],
     employee_role: employee_role,
     effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
   let(:broker_person){ FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
   let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
+  let(:consumer_role) {FactoryGirl.create(:consumer_role, person: person)}
   let(:current_broker_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
  		:person => broker_person) }
   let(:consumer_user){FactoryGirl.create(:user, :roles => ['consumer'], :person => person)}
 
   before :each do
+    allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
     allow(hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
+    allow(hbx_enrollment).to receive_message_chain("household.family").and_return(family)
     @person = person
     @hbx_enrollment = hbx_enrollment
     @benefit_group = hbx_enrollment.benefit_group
@@ -34,8 +39,8 @@ RSpec.describe "insured/show" do
   it 'should display information about the employee when signed in as Broker' do
     sign_in current_broker_user
     render :template => "insured/plan_shoppings/show.html.erb"
-    expect(rendered).to have_selector('p', text:  @person.full_name)
-    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.legal_name)
+    expect(rendered).to have_selector('span', text:  @person.full_name)
+    expect(rendered).to match(@benefit_group.plan_year.employer_profile.legal_name)
   end
 
   it 'should be identify Broker control in the header when signed in as Broker' do
@@ -50,15 +55,15 @@ RSpec.describe "insured/show" do
   it 'should display information about the employee when signed in as Consumer' do
     sign_in consumer_user
     render :template => "insured/plan_shoppings/show.html.erb"
-    expect(rendered).to have_selector('p', text:  @person.full_name)
-    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.legal_name)
+    expect(rendered).to have_selector('span', text:  @person.full_name)
+    expect(rendered).to match(@benefit_group.plan_year.employer_profile.legal_name)
 
   end
 
   it 'should not identify Broker control in the header when signed in as Consumer' do
+    FactoryGirl.create(:consumer_role, person: consumer_user.person)
+    allow(consumer_user).to receive(:identity_verified_date).and_return(true)
     sign_in consumer_user
-
-
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to_not match(/I'm a Broker/)
     expect(rendered).to match(/Individual and Family/i)

@@ -74,7 +74,7 @@ class EmployeeRole
   end
 
   def is_under_open_enrollment?
-    employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def is_eligible_to_enroll_without_qle?
@@ -105,6 +105,10 @@ class EmployeeRole
 
   def is_active?
     census_employee && census_employee.is_active?
+  end
+
+  def can_select_coverage?
+    hired_on + 60.days >= TimeKeeper.date_of_record
   end
 
   class << self

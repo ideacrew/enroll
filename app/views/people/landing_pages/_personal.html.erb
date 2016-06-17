@@ -1,6 +1,6 @@
 <%= form_for @person do |f|%>
   <div class="row no-buffer">
-    <div id="personal_info">
+    <div id="personal_info" class="module">
       <div class="col-md-12 no-pd col-sm-12 col-xs-12">
         <div class="row row-form-wrapper no-buffer">
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
@@ -13,7 +13,10 @@
             <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME" %>
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :prompt => 'SUFFIX', class: "floatlabel form-control" %>
+            <div class="selectric-labeled">
+              <span><strong>Suffix</strong></span>
+              <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
+            </div>
           </div>
         </div>
         <div class="row row-form-wrapper no-buffer">
@@ -67,7 +70,7 @@
     <% end %>
 
   <div class="row no-buffer">
-    <button type="submit" class="btn btn-primary btn-br"><i class="fa fa-user-plus"></i> Save</button>
+    <button type="submit" class="btn btn-primary "><i class="fa fa-user-plus"></i> Save</button>
   </div>
 
 <% end %><br>

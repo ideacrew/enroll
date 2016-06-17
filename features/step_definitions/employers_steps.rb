@@ -93,7 +93,7 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   fill_in 'census_employee[first_name]', with: 'John'
   fill_in 'census_employee[middle_name]', with: 'K'
   fill_in 'census_employee[last_name]', with: 'Doe'
-  find(:xpath, "//p[contains(., 'SUFFIX')]").click
+  find(:xpath, "//p[contains(., 'NONE')]").click
   find(:xpath, "//li[contains(., 'Jr.')]").click
 
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
@@ -149,7 +149,9 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
-  find(:xpath, "//div[@class='employees-table']//tr[1][td[contains(., 'John K Doe Jr')]]").click
+  within '.census-employees-table' do
+    find('.top').click
+  end
   find('.fa-pencil').click
 end
 
@@ -186,8 +188,8 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
 
   find("#census_employee_is_business_owner").click
 
-  find(:xpath, "//div[@id='dependent_info']//div[@class='selectric']/p[@class='label']").click
-  find(:xpath, "//div[@id='dependent_info']//li[contains(., 'Child')]").click
+  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
+  find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")
   click_button 'Update Employee'

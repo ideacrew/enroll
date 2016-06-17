@@ -3,15 +3,13 @@ When(/^.+ visits the HBX Broker Registration form$/) do
   find(".interaction-click-control-broker-registration").click
 end
 
-When(/^Primary Broker clicks on New Broker Agency Tab$/) do
-  find(:xpath, "//label[input[@id='new_broker_agency']]").click
-end
-
 When(/^Primary Broker should see the New Broker Agency form$/) do
   expect(page).to have_css("#broker_agency_form")
 end
 
 When(/^.+ enters personal information$/) do
+  visit "/broker_registration"
+
   fill_in 'organization[first_name]', with: 'Ricky'
   fill_in 'organization[last_name]', with: 'Martin'
   fill_in 'jq_datepicker_ignore_organization[dob]', with: '10/10/1984'
@@ -25,10 +23,9 @@ And(/^.+ enters broker agency information$/) do
   fill_in 'organization[dba]', with: "Logistics Inc"
   fill_in 'organization[fein]', with: "890890891"
 
-  find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
-  find(:xpath, "//li[contains(., 'C Corporation')]").click
-
-  fill_in 'organization[home_page]', with: 'www.logistics.example.com'
+  # this field was hidden 4/13/2016
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
+  # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
@@ -41,12 +38,8 @@ And(/^.+ enters broker agency information$/) do
   find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
 end
 
-And(/^(.+) enters? office locations information$/) do |named_person|
-  enter_office_location(default_office_location)
-end
-
 And(/^.+ clicks? on Create Broker Agency$/) do
-  find('.interaction-click-control-create-broker-agency').click
+  click_button "Create Broker Agency"
 end
 
 Then(/^.+ should see broker registration successful message$/) do
@@ -74,7 +67,7 @@ end
 And(/^.+ should receive an invitation email$/) do
   open_email("ricky.martin@example.com")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
-  #current_email.should have_subject('Invitation from your Employer to Sign up for Health Insurance at DC Health Link ')
+  #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -103,7 +96,7 @@ When(/^.+ registers? with valid information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
 
   expect(page).to have_content('Broker Agency : Logistics Inc')
 end
@@ -117,7 +110,9 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  expect(page).to have_content('Broker Agencies')
+  #TODO add AJAX handling
+  wait_for_ajax(3)
+  expect(page).to have_content('Broker Agencies', :wait => 5)
 end
 
 When(/^.+ searches broker agency by name$/) do
@@ -152,7 +147,7 @@ end
 
 And (/^.+ should see broker active for the employer$/) do
   expect(page).to have_content('Logistics Inc')
-  expect(page).to have_content('RICKY MARTIN')
+  expect(page).to have_content(/RICKY MARTIN/i)
 end
 
 When(/^.+ terminates broker$/) do
@@ -194,13 +189,12 @@ Then(/^.* creates and publishes a plan year$/) do
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  sleep 1
+  wait_for_ajax(10)
   find('.carriers-tab a').click
-  sleep 1
+  wait_for_ajax(10)
   find('.reference-plan label').click
-  sleep 1
+  wait_for_ajax(10)
   find('.interaction-click-control-create-plan-year').trigger('click')
-
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
@@ -210,20 +204,21 @@ Then(/^.+ sees employer census family created$/) do
   expect(page).to have_content('successfully created')
 end
 
-Then(/^.+ should see the matched employee record form$/) do
+Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
   screenshot("broker_employer_search_results")
   expect(page).to have_content('Legal LLC')
 end
 
 Then(/^Broker Assisted is a family$/) do
-  sleep 1
+  #sleep 1
+  wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
 end
 
 Then(/^.+ goes to the Consumer page$/) do
   click_link 'Consumer'
-  expect(page).to have_content('My DC Health Link')
+  expect(page).to have_content("My #{Settings.site.short_name}")
 end
 
 # Then(/^.+ is on the consumer home page$/) do

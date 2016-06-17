@@ -1,12 +1,14 @@
 class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
+  include ApplicationHelper
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
 
   def home
+    set_flash_by_announcement
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -28,16 +30,16 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
-
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
 
     hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
-      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected'
+      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected' && enrollment.is_shop?
       memo[enrollment.coverage_kind].compact
       memo
     end
+
 
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
@@ -116,15 +118,11 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
+    @provider = @person
   end
 
-  def documents_index #changed
-    @time_to = Time.now + 90.days
+  def verification
     @family_members = @person.primary_family.family_members.active
-  end
-
-  def document_upload #changed
-    @person_family = @person.primary_family.family_members
   end
 
   def check_qle_date
@@ -141,6 +139,9 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    if @person.has_active_employee_role?
+    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+    end
   end
 
   def purchase
@@ -180,6 +181,51 @@ class Insured::FamiliesController < FamiliesController
   def unblock
     @family = Family.find(params[:id])
     @family.set(status: "aptc_unblock")
+  end
+
+  # admin manually uploads a notice for person
+  def upload_notice
+
+    if params.permit![:file]
+      doc_uri = Aws::S3Storage.save(file_path, 'notices')
+
+      if doc_uri.present?
+        notice_document = Document.new({ title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+                                         format: file_content_type })
+        begin
+          @person.documents << notice_document
+          @person.save!
+
+          send_notice_upload_notifications(notice_document)
+
+          flash[:notice] = "File Saved"
+          redirect_to(:back)
+          return
+        rescue => e
+          flash[:error] = "Could not save file. "
+          redirect_to(:back)
+          return
+        end
+      else
+        flash[:error] = "Could not save file"
+        redirect_to(:back)
+      end
+    else
+      flash[:error] = "File not uploaded"
+      redirect_to(:back)
+    end
+  end
+
+  # displays the form to upload a notice for a person
+  def upload_notice_form
+    @notices = @person.documents.where(subject: 'notice')
+  end
+
+  def delete_consumer_broker
+    @family = Family.find(params[:id])
+    if @family.current_broker_agency.destroy
+      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    end
   end
 
   private
@@ -231,5 +277,35 @@ class Insured::FamiliesController < FamiliesController
       changing_hbxs = hbxs.changing
       changing_hbxs.update_all(changing: false) if changing_hbxs.present?
     end
+  end
+
+  def file_path
+    params.permit(:file)[:file].tempfile.path
+  end
+
+  def file_name
+    params.permit![:file].original_filename
+  end
+
+  def file_content_type
+    params.permit![:file].content_type
+  end
+
+  def send_notice_upload_notifications(notice)
+    notice_upload_email
+    notice_upload_secure_message(notice)
+  end
+
+  def notice_upload_email
+    UserMailer.notice_uploaded_notification(@person).deliver_now
+  end
+
+  def notice_upload_secure_message(notice)
+    subject = "New Notice Available"
+    body = "<br>You can download the notice by clicking this link " +
+            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
+    @person.save!
   end
 end

@@ -23,14 +23,14 @@ RSpec.describe Insured::FamiliesController do
       expect(response).to be_redirect
     end
   end
- context "set_current_user  as agent" do
+  context "set_current_user  as agent" do
     let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com', person: person) }
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person) }
 
     it "should raise the error on invalid person_id" do
       allow(session).to receive(:[]).and_return(33)
       allow(person).to receive(:agent?).and_return(true)
-      expect{get :home}.to raise_error
+      expect{get :home}.to raise_error(ArgumentError)
     end
   end
 end
@@ -38,12 +38,12 @@ end
 RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
-  let(:user) { double("User", last_portal_visited: "test.com") }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
+  let(:user) { FactoryGirl.create(:user) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
-  let(:family_members){[double("FamilyMember")]}
+  let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
   # let(:coverage_wavied) { double("CoverageWavied") }
@@ -55,7 +55,9 @@ RSpec.describe Insured::FamiliesController do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(user).to receive(:person).and_return(person)
+    allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
+    allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
@@ -97,10 +99,11 @@ RSpec.describe Insured::FamiliesController do
       let(:employee_role) { [double("EmployeeRole")] }
 
       before :each do
-        sign_in user
+        FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
+        sign_in user
         get :home
       end
 
@@ -121,17 +124,25 @@ RSpec.describe Insured::FamiliesController do
       it "should get shop market events" do
         expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.shop_market_events
       end
+
+      it "should get announcement" do
+        expect(flash.now[:warning]).to eq ["msg for Employee"]
+      end
     end
 
     context "for IVL market" do
-      let(:user) { double(identity_verified?: true, idp_verified?: true, last_portal_visited: '') }
+      let(:user) { FactoryGirl.create(:user) }
       let(:employee_roles) { double }
 
       before :each do
+        allow(user).to receive(:idp_verified?).and_return true
+        allow(user).to receive(:identity_verified?).and_return true
+        allow(user).to receive(:last_portal_visited).and_return ''
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
+        sign_in user
         get :home
       end
 
@@ -155,12 +166,17 @@ RSpec.describe Insured::FamiliesController do
 
       context "who has not passed ridp" do
         let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
+        let(:user) { FactoryGirl.create(:user) }
 
         before do
+          allow(user).to receive(:idp_verified?).and_return false
+          allow(user).to receive(:identity_verified?).and_return false
+          allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
           allow(person).to receive(:has_active_consumer_role?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return([])
+          sign_in user
           get :home
         end
 
@@ -168,6 +184,99 @@ RSpec.describe Insured::FamiliesController do
           expect(response).to have_http_status(:redirect)
         end
       end
+    end
+
+    context "for both ivl and shop" do
+      let(:employee_roles) { double }
+      let(:employee_role) { [double("EmployeeRole")] }
+      let(:enrollments) { double }
+
+      before :each do
+        sign_in user
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+        allow(employee_roles).to receive(:first).and_return(employee_role)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(employee_roles).to receive(:active).and_return([employee_role])
+        allow(family).to receive(:coverage_waived?).and_return(true)
+        allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
+        allow(family).to receive(:enrollments).and_return(enrollments)
+        allow(enrollments).to receive(:order).and_return([display_hbx])
+        allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
+        allow(controller).to receive(:update_changing_hbxs).and_return(true)
+      end
+
+      context "with waived_hbx when display_hbx is employer_sponsored" do
+        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
+        let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        before :each do
+          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          get :home
+        end
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render my account page" do
+          expect(response).to render_template("home")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:employee_role)).to eq(employee_role)
+        end
+
+        it "waived should be false" do
+          expect(assigns(:waived)).to eq false
+        end
+      end
+
+      context "with waived_hbx when display_hbx is individual" do
+        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
+        let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        before :each do
+          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          get :home
+        end
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render my account page" do
+          expect(response).to render_template("home")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:employee_role)).to eq(employee_role)
+        end
+
+        it "waived should be true" do
+          expect(assigns(:waived)).to eq true
+        end
+      end
+    end
+  end
+
+  describe "GET verification" do
+
+    it "should be success" do
+      get :verification
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders verification template" do
+      get :verification
+      expect(response).to render_template("verification")
+    end
+
+    it "assign variables" do
+      get :verification
+      expect(assigns(:family_members)).to be_an_instance_of(Array)
+      expect(assigns(:family_members)).to eq(family_members)
     end
   end
 
@@ -315,7 +424,7 @@ RSpec.describe Insured::FamiliesController do
     context 'when its change of plan' do
 
       before :each do
-        allow(@family).to receive(:enrolled_hbx_enrollments).and_return([ double ])
+        allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
@@ -358,9 +467,9 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "GET check_qle_date" do
-      let(:user) {FactoryGirl.create(:user)}
-      let(:person) {FactoryGirl.build(:person)}
-      let(:family) {FactoryGirl.build(:family)}
+      let(:user) { FactoryGirl.create(:user) }
+      let(:person) { FactoryGirl.build(:person) }
+      let(:family) { FactoryGirl.build(:family) }
       before :each do
         allow(user).to receive(:person).and_return person
         allow(person).to receive(:primary_family).and_return family
@@ -414,8 +523,24 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "post unblock" do
+    context "delete delete_consumer_broker" do 
       let(:family) {FactoryGirl.build(:family)}
+      before :each do 
+        family.broker_agency_accounts = [
+          FactoryGirl.build(:broker_agency_account, family: family)
+        ]
+        allow(Family).to receive(:find).and_return family
+        delete :delete_consumer_broker , :id => family.id
+      end
+
+      it "should delete consumer broker" do 
+        expect(response).to have_http_status(:redirect)
+        expect(family.current_broker_agency).to be nil
+      end
+    end
+
+    context "post unblock" do
+      let(:family) { FactoryGirl.build(:family) }
       before :each do
         allow(Family).to receive(:find).and_return family
       end
@@ -424,6 +549,80 @@ RSpec.describe Insured::FamiliesController do
         xhr :post, :unblock, id: family.id, format: :js
         expect(response).to have_http_status(:success)
         expect(assigns(:family).status).to eq "aptc_unblock"
+      end
+    end
+  end
+
+
+  describe "GET upload_notice_form" do
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:person) { FactoryGirl.create(:person) }
+
+    before(:each) do
+      sign_in(user)
+    end
+
+    it "displays the upload_notice_form view" do
+      xhr :get, :upload_notice_form
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_notice_form)
+    end
+  end
+
+  describe "GET upload_notice" do
+
+    let(:person2) { FactoryGirl.create(:person) }
+    let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }
+    let(:file) { double }
+    let(:temp_file) { double }
+    let(:file_path) { File.dirname(__FILE__) }
+    let(:bucket_name) { 'notices' }
+    let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
+
+    before(:each) do
+      @controller = Insured::FamiliesController.new
+      allow(file).to receive(:original_filename).and_return("some-filename")
+      allow(file).to receive(:tempfile).and_return(temp_file)
+      allow(temp_file).to receive(:path)
+      allow(@controller).to receive(:set_family)
+      @controller.instance_variable_set(:@person, person2)
+      allow(@controller).to receive(:file_path).and_return(file_path)
+      allow(@controller).to receive(:file_name).and_return("sample-filename")
+      allow(@controller).to receive(:file_content_type).and_return("application/pdf")
+      allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
+      person2.consumer_role =   FactoryGirl.create(:consumer_role)
+      person2.consumer_role.gender = 'male'
+      person2.save
+      request.env["HTTP_REFERER"] = "/insured/families/upload_notice_form"
+      sign_in(user2)
+    end
+
+    it "when successful displays 'File Saved'" do
+      post :upload_notice, {:file => file}
+      expect(flash[:notice]).to include("File Saved")
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to request.env["HTTP_REFERER"]
+    end
+
+    it "when failure displays 'File not uploaded'" do
+      post :upload_notice
+      expect(flash[:error]).to include("File not uploaded")
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to request.env["HTTP_REFERER"]
+    end
+
+    context "notice_upload_secure_message" do
+
+      let(:notice) {Document.new({ title: "file_name", creator: "hbx_staff", subject: "notice", identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+                                   format: "file_content_type" })}
+
+      before do
+        allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
+        @controller.send(:notice_upload_secure_message, notice)
+      end
+
+      it "adds a message to person inbox" do
+        expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
     end
   end

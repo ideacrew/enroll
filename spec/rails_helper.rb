@@ -41,10 +41,6 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
-  config.after(:suite, :dbclean => :after_all) do
-    DatabaseCleaner.clean
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
-  end
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
@@ -70,3 +66,8 @@ RSpec.configure do |config|
   config.include Capybara::DSL
 
 end
+
+# These are included here because map/reduce flips out if the collections don't exist
+# This interacts strangely with db cleaner in some circumstances (i.e. multiple dbs)
+Person.create_indexes
+Family.create_indexes

@@ -116,6 +116,22 @@ describe Invitation do
     end
   end
 
+  describe "#claim_broker_agency_staff_role" do
+    let(:user) { FactoryGirl.create :user }
+    let(:redirection_obj) { instance_double(InvitationsController) }
+    let(:general_agency_staff_role) { FactoryGirl.create :general_agency_staff_role }
+    let(:invitation) { FactoryGirl.create :invitation, :general_agency_staff_role, source_id: general_agency_staff_role.id }
+
+    subject { invitation.claim_general_agency_staff_role user, redirection_obj }
+
+    it "runs the create_sso_account method on the redirection_obj with 'general_agent'" do
+      expect(redirection_obj).to receive(:create_sso_account).with(
+        user, general_agency_staff_role.person, 15, 'general_agent'
+      )
+      subject
+    end
+  end
+
   describe "valid, in the sent state" do
     let(:source_id) { BSON::ObjectId.new }
     let(:valid_params) {
@@ -151,6 +167,28 @@ describe Invitation do
     describe "invite_broker!" do
       it "returns an Invitation" do
         expect(Invitation.invite_broker!(broker_role)).to be_a_kind_of(Invitation)
+      end
+    end
+  end
+
+  context "general_agency_staff_role invitation email" do
+    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role) }
+    let(:person) { general_agency_staff_role.person }
+    let(:invitation) { Invitation.new }
+    before :each do
+      person.add_work_email('test@dc.com') if person.work_email.blank?
+      person.save
+    end
+
+    describe "invite_general_agency_staff!" do
+      it "returns an Invitation" do
+        expect(Invitation.invite_general_agency_staff!(general_agency_staff_role)).to be_a_kind_of(Invitation)
+      end
+
+      it "should call send_agent_invitation" do
+        allow(Invitation).to receive(:create).and_return invitation
+        expect(invitation).to receive(:send_agent_invitation!)
+        Invitation.invite_general_agency_staff!(general_agency_staff_role)
       end
     end
   end

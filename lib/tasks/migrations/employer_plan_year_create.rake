@@ -2,17 +2,23 @@ namespace :migrations do
   desc "create employer plan year"
   task :employer_plan_year_create => :environment do
 
+    benefit_group_assignment_create = Proc.new do |employer_profile|
+      plan_year = employer_profile.plan_years.where(:start_on => Date.new(2015,11,1), :aasm_state => 'active').first
+      benefit_group = plan_year.benefit_groups.first
+      employer_profile.census_employees.non_terminated.each{|ce| ce.add_benefit_group_assignment(benefit_group)}
+    end
+
     plan_year_create = Proc.new do |organization|
       puts "Processing #{organization.legal_name}"
       employer_profile = organization.employer_profile
-      prev_plan_year = employer_profile.plan_years.published.first
+      prev_plan_year = employer_profile.plan_years.first
 
       new_plan_year = employer_profile.plan_years.build({
         start_on: Date.new(2015, 11, 1),
         end_on: Date.new(2015, 11, 1) + 1.year - 1.day,
         open_enrollment_start_on: Date.new(2015, 10, 1),
         open_enrollment_end_on: Date.new(2015, 10, 10),
-        fte_count: prev_plan_year.fte_count,
+        fte_count: 10,
         pte_count: prev_plan_year.pte_count,
         msp_count: prev_plan_year.msp_count
       })
@@ -22,11 +28,15 @@ namespace :migrations do
       add_benefit_groups(prev_plan_year, new_plan_year, employer_profile)
     end
     
-    plan_year_create.call Organization.where(:legal_name => 'ACE').first
-    plan_year_create.call Organization.where(:legal_name => /JSP Companies/i).first
-    plan_year_create.call Organization.where(:legal_name => /Colapinto LLP/i).first
-    plan_year_create.call Organization.where(:legal_name => /Preventive Measures of/i).first
+    organization = Organization.where(:legal_name => 'ACE').first
+    plan_year_create.call organization
+    benefit_group_assignment_create.call organization.employer_profile
 
+    ['JSP Companies', 'Colapinto LLP', 'Preventive Measures of'].each do |legal_name|
+      organization = Organization.where(:legal_name => /#{legal_name}/i).first
+      plan_year_create.call organization
+      benefit_group_assignment_create.call organization.employer_profile
+    end
 
     new_plan_year_create = Proc.new do |organization|
       puts "Processing #{organization.legal_name}"
@@ -36,15 +46,50 @@ namespace :migrations do
         start_on: Date.new(2015, 11, 1),
         end_on: Date.new(2015, 11, 1) + 1.year - 1.day,
         open_enrollment_start_on: Date.new(2015, 10, 1),
-        open_enrollment_end_on: Date.new(2015, 10, 10)
+        open_enrollment_end_on: Date.new(2015, 10, 10),
+        fte_count: 10
       })
 
       new_plan_year.save!
+      new_plan_year.update_attributes({:aasm_state => 'active'})
     end
 
-    new_plan_year_create.call Organization.where(:legal_name => /Civic Nation/i).first
-    new_plan_year_create.call Organization.where(:legal_name => /Association of Proposal Management Professionals/i).first
+    organization = Organization.where(:legal_name => /Civic Nation/i).first
+    new_plan_year_create.call organization
+    reference_plan = Plan.where(:name => /HealthyBlue Advantage \$1\,500/i, :active_year => 2015).first
+    add_new_benefit_group(organization.employer_profile.plan_years.first, reference_plan.id, { "employee" => 100, "dependent" => 0 })
+    benefit_group_assignment_create.call organization.employer_profile
+   
+    organization = Organization.where(:legal_name => /Association of Proposal Management Professionals/i).first
+    new_plan_year_create.call organization
+    reference_plan = Plan.where(:name => /HealthyBlue Advantage \$300/i, :active_year => 2015).first
+    add_new_benefit_group(organization.employer_profile.plan_years.first, reference_plan.id, { "employee" => 100, "dependent" => 100 })
+    benefit_group_assignment_create.call organization.employer_profile
   end
+end
+
+def add_new_benefit_group(plan_year, reference_plan_id, offered)
+  benefit_group = plan_year.benefit_groups.build({
+      title: "DC LOCATION",
+      effective_on_kind: "first_of_month",
+      plan_option_kind: "single_carrier",
+      default: true,
+      effective_on_offset: 0,
+      reference_plan_id: reference_plan_id,
+      is_congress: false
+  })
+
+  benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+  benefit_group.build_relationship_benefits
+  offered.each do |relation, percent|
+    relationships = [relation]
+    relationships = ['spouse', 'child_under_26'] if relation == 'dependent'      
+    benefit_group.relationship_benefits.where(:relationship.in => relationships).each do |relationship_benefit|
+      relationship_benefit.premium_pct = percent
+    end
+  end
+  benefit_group.relationship_benefits.where(:relationship => 'child_26_and_over').first.offered = false
+  benefit_group.save!
 end
 
 def add_benefit_groups(active_plan_year, new_plan_year, employer_profile)

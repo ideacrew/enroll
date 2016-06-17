@@ -139,6 +139,17 @@ private
       when "fixed_first_of_next_month"
         fixed_first_of_next_month_effective_date
     end
+    validate_and_set_effective_on if is_shop?
+  end
+
+  def validate_and_set_effective_on
+    person = self.family.primary_applicant.person if self.family
+    employee_role = person.active_employee_roles.first if person.present?
+    employer_profile = employee_role.employer_profile if employee_role.present?
+    if employee_role && employer_profile.plan_years.published_plan_years_by_date(effective_on).blank? && employer_profile.show_plan_year.present?
+      plan_year_start_on = employer_profile.show_plan_year.start_on
+      self.effective_on = plan_year_start_on if effective_on < plan_year_start_on
+    end
   end
 
   def first_of_month_effective_date
