@@ -3,15 +3,12 @@ conversion_feins =["521131199", "455373892", "203977558", "020769309", "13424954
 initial_feins = ["451431314", "274551672", "273208144", "200457331", "811095280", "205150809", "812341035", "320397845", "000000011", "263412575", "454028722", "980227419", "472482633", "473089352", "475031574", "522007895", "274415158", "521541060", "050373312", "410976048", "811160808", "454495950", "460988928", "474325410", "201115618", "530225257", "811397590", "475437882", "010860025", "810971614", "273067305", "611690874", "364827426", "203235972"]
 
 
-def write_to_csv(file_name, feins)
-  csv = CSV.open(file_name, "wb")
-  csv << %w[employer.legal_name, employer.hbx_id, employer.fein,
-          employer.active_broker_agency_account.writing_agent.person.full_name,
-          employer.active_broker_agency_account.writing_agent.npn,
-          active_general_agency_account.legal_name,
-          active_general_agency_account.broker_role_name,
-          active_general_agency_account.broker_role.npn,
-          active_general_agency_account.general_agency_profile.fein]
+def write_to_csv(type, feins)
+  dir = "ga_files"
+
+  Dir.mkdir(dir) unless File.exists?(dir)
+
+  csv_hash = {}
 
   feins.each do |fein|
     org = Organization.where(fein: fein).first
@@ -24,21 +21,41 @@ def write_to_csv(file_name, feins)
     employer = org.employer_profile
 
     if employer.active_general_agency_account.nil?
-      puts "FEIN #{fein} active_general_agency_account = nil. general_agency_accounts.count = #{employer.general_agency_accounts.count}"
       next
     end
 
-    csv << [employer.legal_name, employer.hbx_id, employer.fein,
-            (employer.active_broker_agency_account.writing_agent.person.full_name rescue ("")),
-            (employer.active_broker_agency_account.writing_agent.npn rescue ("")),
-            employer.active_general_agency_account.legal_name,
-            (employer.active_general_agency_account.broker_role_name rescue ("")),
-            (employer.active_general_agency_account.broker_role.npn rescue ("")),
-            (employer.active_general_agency_account.general_agency_profile.fein rescue (""))]
+    carriers = employer.plan_years.select(&:eligible_for_export?).flat_map(&:benefit_groups).flat_map(&:elected_plans).flat_map(&:carrier_profile).uniq! || []
+
+    carriers.each do |carrier|
+      csv_hash[carrier.legal_name] = [] if csv_hash[carrier.legal_name].nil?
+
+      csv_hash[carrier.legal_name] << [employer.legal_name, employer.hbx_id, employer.fein,
+                                       (employer.active_broker_agency_account.writing_agent.person.full_name rescue ("")),
+                                       (employer.active_broker_agency_account.writing_agent.npn rescue ("")),
+                                       employer.active_general_agency_account.legal_name,
+                                       (employer.active_general_agency_account.broker_role_name rescue ("")),
+                                       (employer.active_general_agency_account.broker_role.npn rescue ("")),
+                                       (employer.active_general_agency_account.general_agency_profile.fein rescue (""))]
+    end
+  end
+
+  csv_hash.each do |carrier, csv_rows|
+    csv = CSV.open(dir + "/" + "#{carrier}_#{type}.csv", "wb")
+    csv << %w[employer.legal_name, employer.hbx_id, employer.fein,
+          employer.active_broker_agency_account.writing_agent.person.full_name,
+          employer.active_broker_agency_account.writing_agent.npn,
+          active_general_agency_account.legal_name,
+          active_general_agency_account.broker_role_name,
+          active_general_agency_account.broker_role.npn,
+          active_general_agency_account.general_agency_profile.fein]
+
+    csv_rows.each do |row|
+      csv << row
+    end
   end
 end
 
 
-write_to_csv("renewal_ga.csv", renewal_feins)
-write_to_csv("conversion_ga.csv", conversion_feins)
-write_to_csv("initial_ga.csv", initial_feins)
+write_to_csv("renewal", renewal_feins)
+write_to_csv("conversion", conversion_feins)
+write_to_csv("initial", initial_feins)
