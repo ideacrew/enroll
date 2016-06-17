@@ -121,9 +121,8 @@ CSV.foreach(filename, headers: :true) do |row|
 									}
 		census_employee = find_census_employee(subscriber_params)
 		person_details = create_person_details(subscriber_params)
-		unless data_row["Employer FEIN"] == nil
-			organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
-		end
+
+		organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 
 
 		# if subscriber == nil
@@ -164,51 +163,20 @@ CSV.foreach(filename, headers: :true) do |row|
 					subscriber.hbx_id = data_row["HBX ID"]
 					subscriber.save
 
+					6.times do |i|
+						if data_row["HBX ID (Dep #{i+1})"] != nil
+							dependent = find_dependent(data_row["SSN (Dep #{i+1})"].gsub("-",""), data_row["DOB (Dep #{i+1})"],
+								data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
+							dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
+							dependent.save
+						end
+					end
 
-					## Do the same for any dependents. 
-					if data_row["HBX ID (Dep 1)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 1)"].gsub("-",""), data_row["DOB (Dep 1)"],
-									   data_row["First Name (Dep 1)"],data_row["Middle Name (Dep 1)"],data_row["Last Name (Dep 1)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 1)"]
-						dependent.save
-					end
-					if data_row["HBX ID (Dep 2)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 2)"].gsub("-",""), data_row["DOB (Dep 2)"],
-									   data_row["First Name (Dep 2)"],data_row["Middle Name (Dep 2)"],data_row["Last Name (Dep 2)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 2)"]
-						dependent.save
-					end
-					if data_row["HBX ID (Dep 3)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 3)"].gsub("-",""), data_row["DOB (Dep 3)"],
-									   data_row["First Name (Dep 3)"],data_row["Middle Name (Dep 3)"],data_row["Last Name (Dep 3)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 3)"]
-						dependent.save
-					end
-					if data_row["HBX ID (Dep 4)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 4)"].gsub("-",""), data_row["DOB (Dep 4)"],
-									   data_row["First Name (Dep 4)"],data_row["Middle Name (Dep 4)"],data_row["Last Name (Dep 4)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 4)"]
-						dependent.save
-					end
-					if data_row["HBX ID (Dep 5)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 5)"].gsub("-",""), data_row["DOB (Dep 5)"],
-									   data_row["First Name (Dep 5)"],data_row["Middle Name (Dep 5)"],data_row["Last Name (Dep 5)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 5)"]
-						dependent.save
-					end
-					if data_row["HBX ID (Dep 6)"] != nil
-						dependent = find_dependent(data_row["SSN (Dep 6)"].gsub("-",""), data_row["DOB (Dep 6)"],
-									   data_row["First Name (Dep 6)"],data_row["Middle Name (Dep 6)"],data_row["Last Name (Dep 6)"])
-						dependent.hbx_id = data_row["HBX ID (Dep 6)"]
-						dependent.save
-					end
 			# 	else
 			# 		raise ArgumentError.new("census employee does not exist for provided person details")
 			# 	end
 			# end
 		# end
-
-
 
 		family = subscriber.primary_family
 		household = family.active_household
@@ -217,6 +185,8 @@ CSV.foreach(filename, headers: :true) do |row|
 		if subscriber.employee_roles.size == 0
 			Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details)
 		end
+
+		
 		hbx_enrollment.employee_role_id = select_employee_role(organization.employer_profile._id,subscriber.employee_roles)._id
 		household.hbx_enrollments.push(hbx_enrollment)
 		coverage_household = household.immediate_family_coverage_household
@@ -250,6 +220,7 @@ CSV.foreach(filename, headers: :true) do |row|
 		else
 			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
 		end
+
 		hbx_enrollment.save
 	# rescue Exception=>e
 	# 	puts e.inspect
