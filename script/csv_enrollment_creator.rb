@@ -38,16 +38,19 @@ def get_all_benefit_groups(organization)
 	return all_benefit_groups
 end
 
-def select_or_create_benefit_group_assignment(benefit_group_title,organization,census_employee)
-	benefit_group_assignments = census_employee.benefit_group_assignments
-	all_benefit_groups = get_all_benefit_groups(organization)
-	correct_benefit_group = select_benefit_group(benefit_group_title,all_benefit_groups)
-	correct_benefit_group_assignment = select_benefit_group_assignment(correct_benefit_group,benefit_group_assignments)
-	if correct_benefit_group_assignment == nil
-		correct_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(correct_benefit_group,census_employee)
-	end # creates the correct benefit group assignment if it doesn't exist.
-	return correct_benefit_group_assignment
-end # ends the function
+def select_benefit_group_assignment(correct_benefit_group, census_employee)  
+
+	if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.benefit_group == correct_benefit_group
+		return census_employee.active_benefit_group_assignment
+	end
+
+  if match = census_employee.benefit_group_assignments.detect{|assignment| assignment.benefit_group == correct_benefit_group}
+  	match.make_active
+  	return match
+  end
+
+	return nil
+end
 
 def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
@@ -103,7 +106,7 @@ end
 # dependent_person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
 
 CSV.foreach(filename, headers: :true) do |row|
-	begin
+	# begin
 		data_row = row.to_hash
 		subscriber = Person.where(hbx_id: data_row['HBX ID']).first
 		subscriber_params = {"name_pfx" => data_row["Name Prefix"],
@@ -121,31 +124,47 @@ CSV.foreach(filename, headers: :true) do |row|
 		unless data_row["Employer FEIN"] == nil
 			organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 		end
-		if subscriber == nil
-			if data_row["Employer FEIN"] == nil # for IVL
-				next
-				subscriber_params = {"name_pfx" => data_row["Name Prefix"],
-									 "first_name" => data_row["First Name"],
-									 "middle_name" => data_row["Middle Name"],
-									 "last_name" => data_row["Last Name"],
-									 "name_sfx" => data_row["Name Suffix"],
-									 "ssn" => data_row["SSN"].gsub("-",""),
-									 "dob" => format_date(data_row["DOB"]),
-									 "gender" => data_row["Gender"].downcase,
-									 "no_ssn" => 0
-									}
-				person = Factories::EnrollmentFactory.initialize_person(nil,data_row["Name Prefix"],data_row["First Name"], data_row["Middle Name"],
-                               data_row["Last Name"], data_row["Name Suffix"], data_row["SSN"].gsub("-",""), format_date(data_row["DOB"]), data_row["Gender"].downcase, nil, no_ssn=nil)
-			elsif data_row["Employer FEIN"] != nil # for SHOP
-				unless census_employee == nil
-					benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],
-																						 organization,census_employee)
+
+
+		# if subscriber == nil
+			# if data_row["Employer FEIN"] == nil # for IVL
+			# 	next
+			# 	subscriber_params = {"name_pfx" => data_row["Name Prefix"],
+			# 						 "first_name" => data_row["First Name"],
+			# 						 "middle_name" => data_row["Middle Name"],
+			# 						 "last_name" => data_row["Last Name"],
+			# 						 "name_sfx" => data_row["Name Suffix"],
+			# 						 "ssn" => data_row["SSN"].gsub("-",""),
+			# 						 "dob" => format_date(data_row["DOB"]),
+			# 						 "gender" => data_row["Gender"].downcase,
+			# 						 "no_ssn" => 0
+			# 						}
+			# 	person = Factories::EnrollmentFactory.initialize_person(nil,data_row["Name Prefix"],data_row["First Name"], data_row["Middle Name"],
+   #                             data_row["Last Name"], data_row["Name Suffix"], data_row["SSN"].gsub("-",""), format_date(data_row["DOB"]), data_row["Gender"].downcase, nil, no_ssn=nil)
+			# elsif data_row["Employer FEIN"] != nil # for SHOP
+				# unless census_employee == nil
+
+
+				  benefit_begin_date = format_date(data_row["Benefit Begin Date"])
+				  plan_year = organization.employer_profile.plan_years.published_plan_years_by_date(benefit_begin_date).first
+
+	        correct_benefit_group = select_benefit_group(data_row["Benefit Package/Benefit Group"], plan_year.benefit_groups)
+					benefit_group_assignment = select_benefit_group_assignment(data_row["Benefit Package/Benefit Group"], census_employee)
+
+					if benefit_group_assignment.blank?
+						benefit_group_assignment = census_employee.benefit_group_assignments.new(benefit_group: correct_benefit_group, start_on: benefit_begin_date)
+						benefit_group_assignment.save!
+						benefit_group_assignment.make_active
+					end
+
 					employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
 					employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
 					subscriber = employee_role.person
 					##  Give the subscriber the correct HBX ID.
 					subscriber.hbx_id = data_row["HBX ID"]
 					subscriber.save
+
+
 					## Do the same for any dependents. 
 					if data_row["HBX ID (Dep 1)"] != nil
 						dependent = find_dependent(data_row["SSN (Dep 1)"].gsub("-",""), data_row["DOB (Dep 1)"],
@@ -183,15 +202,18 @@ CSV.foreach(filename, headers: :true) do |row|
 						dependent.hbx_id = data_row["HBX ID (Dep 6)"]
 						dependent.save
 					end
-				else
-					raise ArgumentError.new("census employee does not exist for provided person details")
-				end
-			end
-		end
+			# 	else
+			# 		raise ArgumentError.new("census employee does not exist for provided person details")
+			# 	end
+			# end
+		# end
+
+
+
 		family = subscriber.primary_family
 		household = family.active_household
 		hbx_enrollment = HbxEnrollment.new
-		benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],organization,census_employee)
+		# benefit_group_assignment = select_or_create_benefit_group_assignment(data_row["Benefit Package/Benefit Group"],organization,census_employee)
 		if subscriber.employee_roles.size == 0
 			Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details)
 		end
@@ -229,12 +251,12 @@ CSV.foreach(filename, headers: :true) do |row|
 			hbx_enrollment.submitted_at = hbx_enrollment.effective_on.to_datetime
 		end
 		hbx_enrollment.save
-	rescue Exception=>e
-		puts e.inspect
-		binding.pry
-		puts "-"*100
-		#puts e.backtrace
-	end
+	# rescue Exception=>e
+	# 	puts e.inspect
+	# 	binding.pry
+	# 	puts "-"*100
+	# 	#puts e.backtrace
+	# end
 end
 
 # CSV.foreach(filename, headers: true) do |row|
