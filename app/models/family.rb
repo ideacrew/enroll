@@ -299,6 +299,22 @@ class Family
     special_enrollment_periods.individual_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def latest_shop_sep
+    special_enrollment_periods.shop_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def terminate_date_for_shop
+    if latest_shop_sep.present?
+      if latest_shop_sep.qualifying_life_event_kind.reason == 'death'
+        latest_shop_sep.qle_on
+      else
+        latest_shop_sep.qle_on.end_of_month
+      end
+    else
+      TimeKeeper.date_of_record.end_of_month
+    end
+  end
+
   # List of SEPs active for this Application Group today, or passed date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }

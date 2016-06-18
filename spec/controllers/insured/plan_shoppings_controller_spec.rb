@@ -209,7 +209,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       #allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
       allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
-      sign_in
+      allow(person).to receive(:primary_family).and_return(Family.new)
+      sign_in user
     end
 
     it "returns http success" do
