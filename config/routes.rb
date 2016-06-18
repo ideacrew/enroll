@@ -30,6 +30,9 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_invoice
+        post :employer_invoice_datatable
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -189,8 +192,12 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      member do
+        get "download_invoice"
+      end
       collection do
         get 'welcome'
         get 'search'

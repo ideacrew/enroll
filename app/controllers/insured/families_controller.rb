@@ -118,6 +118,7 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
+    @provider = @person
   end
 
   def verification
@@ -138,6 +139,9 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    if @person.has_active_employee_role?
+    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+    end
   end
 
   def purchase

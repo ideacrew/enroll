@@ -173,7 +173,8 @@ class EmployerProfile
   end
 
   def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
-    # commented out the start_on and terminate_on 
+
+    # commented out the start_on and terminate_on
     # which is same as broker calculation, However it will cause problem
     # start_on later than end_on
     #
@@ -243,38 +244,40 @@ class EmployerProfile
     end
   end
 
-  def billing_plan_year
-    billing_report_date = TimeKeeper.date_of_record.next_month
+  def billing_plan_year(billing_date = nil)
+    billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
-        billing_report_date = plan_year.start_on
+    if billing_date.blank?
+      if plan_year.blank?
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+          billing_report_date = plan_year.start_on
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
-        billing_report_date = TimeKeeper.date_of_record
+      if plan_year.blank?
+        if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
+          billing_report_date = TimeKeeper.date_of_record
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
-        billing_report_date = plan_year.start_on
+      if plan_year.blank? 
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+          billing_report_date = plan_year.start_on
+        end
       end
     end
 
     return plan_year, billing_report_date
   end
 
-  def enrollments_for_billing
-    plan_year, billing_report_date = billing_plan_year
+  def enrollments_for_billing(billing_date = nil)
+    plan_year, billing_report_date = billing_plan_year(billing_date)
     hbx_enrollments = []
 
     if plan_year.present?
       hbx_enrollments = plan_year.hbx_enrollments_by_month(billing_report_date).compact
-      hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
+      # hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
     hbx_enrollments
@@ -404,6 +407,16 @@ class EmployerProfile
       })
     end
 
+    def organizations_for_force_publish(new_date)
+      Organization.where({
+        :'employer_profile.plan_years' => 
+        { :$elemMatch => {
+          :start_on => new_date.next_month.beginning_of_month, 
+          :aasm_state => 'renewing_draft'
+          }}
+      })
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
@@ -437,6 +450,13 @@ class EmployerProfile
         organizations_for_plan_year_end(new_date).each do |organization|
           employer_enroll_factory.employer_profile = organization.employer_profile
           employer_enroll_factory.end
+        end
+
+        if new_date.day == 11
+          organizations_for_force_publish(new_date).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            plan_year.force_publish!
+          end
         end
       end
 
@@ -651,6 +671,10 @@ class EmployerProfile
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
+  end
+
+  def is_conversion?
+    self.profile_source == "conversion"
   end
 
 private
