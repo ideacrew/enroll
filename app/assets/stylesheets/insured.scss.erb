@@ -1,11 +1,30 @@
-
-$primary-blue: #007bc4;
-$primary-green: #69A30D;
-$primary-color: #007bc4;
-$primay-active-button-text-color: #ffffff;
-$primary-bold: 600;
-
 .module {
+  &.consumer-broker-widget, &.employee-broker-widget {
+    .panel-heading {
+      background-image: none;
+      background-color: transparent;
+      .panel-title {
+        color: $primary-blue;
+      }
+    }
+    .panel-body {
+      display: table;
+      width: 100%;
+      > * {
+        display: table-cell;
+        vertical-align: middle;
+        &.text-center {
+          width: 25%;
+        }
+        &.text-left {
+          padding-left: 7.5%;
+          .broker-information {
+            word-break: break-all;
+          }
+        }
+      }
+    }
+  }
   &.inbox {
     .fa {
       color: $primary-blue;
@@ -34,7 +53,7 @@ $primary-bold: 600;
     }
 
   h4, .fa {
-    color: $primary-color;
+    color: $primary-blue;
   }
 
     .col-xs-4 {
@@ -56,12 +75,12 @@ $primary-bold: 600;
       }
     }
     span {
-      color: $primary-color;
+      color: $primary-blue;
     }
 }
 .help-signup {
   h4 {
-    color: $primary-color;
+    color: $primary-blue;
     margin-bottom: 0;
     font-weight: 600;
     &+small {
@@ -83,7 +102,7 @@ $primary-bold: 600;
   }
   i {
     text-align: center;
-    color: $primary-color;
+    color: $primary-blue;
     display: block;
   }
   .fa-phone {
@@ -100,7 +119,7 @@ $primary-bold: 600;
   padding-top: 4.45%;
 }
 .fa-icon-link, .fa-icon-label, a {
-  color: $primary-color;
+  color: $primary-blue;
   cursor: pointer;
   &:hover {
     color: #23527c;
@@ -114,7 +133,7 @@ $primary-bold: 600;
 
   .benefits-tab, .home-tab, .hbx-enrollment-panel {
     .fa {
-      color: $primary-color;
+      color: $primary-blue;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
