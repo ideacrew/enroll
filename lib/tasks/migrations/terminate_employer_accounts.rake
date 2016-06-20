@@ -29,7 +29,8 @@ namespace :migrations do
       end
 
       # Terminate current active plan years
-      organization.employer_profile.plan_years.published.where(:"end_on".gt => TimeKeeper.date_of_record).each do |plan_year|
+      organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
+
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
           puts "Terminating employees coverage for employer #{organization.legal_name}"
