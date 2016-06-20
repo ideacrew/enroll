@@ -21,6 +21,9 @@ class CensusEmployee < CensusMember
   # Employee linked to this roster record
   field :employee_role_id, type: BSON::ObjectId
 
+  field :existing_cobra, type: Boolean, default: false
+  field :cobra_begin_date, type: Date
+
   embeds_many :census_dependents,
     cascade_callbacks: true,
     validate: true
@@ -60,6 +63,7 @@ class CensusEmployee < CensusMember
   scope :active,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :by_cobra,    ->{ where(existing_cobra: true) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }

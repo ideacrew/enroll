@@ -60,8 +60,11 @@
           <% end %>
           <td class="table-functions">
           <% if census_employee.employment_terminated? %>
-            <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id}">
+            <a class="show_confirm btn btn-green-2" id="show_confirm_<%= census_employee.id %>">
               <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').next().show();">Rehire</span>
+            </a>
+            <a class="show_confirm btn btn-green-2" id="show_cobra_confirm_<%= census_employee.id %>">
+              <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').nextAll('.cobra_confirm_<%= census_employee.id %>').toggle();">COBRA</span>
             </a>
           <% else %>
           <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
@@ -76,6 +79,21 @@
             <span class="confirm-terminate" style="display:inline;">
               <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
               <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </span>
+          </td>
+        </tr>
+        <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+          <td class="confirm-terminate-wrapper" colspan="4">
+            <span>Employment Termination Date: </span>
+            <span><%= format_date census_employee.employment_terminated_on %></span>
+          </td>
+          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="4" id="enter-date">
+            <span>COBRA/Continuation Effective Date: </span>
+            <span class="confirm-terminate" style="display:inline;">
+              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
+              <a class="cobra_confirm" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>">
                 <strong>&nbsp;Submit</strong>
               </a>
             </span>

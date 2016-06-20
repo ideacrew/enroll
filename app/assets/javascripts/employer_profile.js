@@ -409,6 +409,18 @@ $(document).on('click', ".rehire_confirm", function(){
   });
 });
 
+$(document).on('click', "a.cobra_confirm", function(){
+  var cobra_date = $(this).siblings().val();
+  var cobra_link = $(this).data('link');
+  $.ajax({
+    type: 'get',
+    datatype : 'js',
+    url: cobra_link,
+    data: {cobra_date: cobra_date},
+  });
+});
+
+
 $(document).on('change', '.dependent_info input.dob-picker', function(){
   var element = $(this).val().split("/");
   year = parseInt(element[2]);
@@ -520,3 +532,13 @@ function checkAreaCode(textbox) {
   }
   return true;
 }
+
+
+$(document).on('click', '#census_employee_existing_cobra', function() {
+  if($(this).prop("checked") == true){
+    $(this).parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
+  }else if($(this).prop("checked") == false){
+    $(this).parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
+  }
+});
+
