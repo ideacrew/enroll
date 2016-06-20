@@ -712,7 +712,7 @@ class PlanYear
   def accept_application
     adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
-    send_employee_invites if transition_success && !is_renewing?
+    send_employee_invites if transition_success
   end
 
   def decline_application
