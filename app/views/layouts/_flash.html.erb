@@ -1,6 +1,8 @@
-<div class="row">
-	<div class="alert alert-<%= type %>">
-		<a href="#" data-dismiss="alert" class="close">×</a>
-		<%= raw message %>
-	</div>
+<div class="row flash">
+  <div class="alert alert-<%= type %>">
+    <div class="container">
+			<a class="close" data-dismiss="alert" href="#">×</a>
+			<%= raw message %>
+    </div>
+  </div>
 </div>
