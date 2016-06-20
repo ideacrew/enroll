@@ -17,7 +17,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,
       :metal_level => "Silver",
-      :active_year => 2015,
+      #:active_year => 2015,
       :coverage_kind => "health",
       :hios_id => "19393939399",
       :plan_type => "A plan type",
@@ -81,9 +81,24 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to_not have_selector('.cna') 
     end
 
-    context "when outside Employers open enrollment period" do
+    context "when outside Employers open enrollment period but new hire" do
       before :each do
         allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+      end
+
+      it "should disable the Make Changes button" do 
+        expect(rendered).to_not have_selector('.cna') 
+      end
+
+    end
+
+    context "when outside Employers open enrollment period and not a new hire" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
+        allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+        allow(census_employee).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
+        
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
       end
 

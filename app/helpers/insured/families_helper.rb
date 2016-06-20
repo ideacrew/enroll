@@ -98,15 +98,20 @@ module Insured::FamiliesHelper
   end
 
   def disable_make_changes_button?(hbx_enrollment)
-    if hbx_enrollment.census_employee.blank?
-      return false
-    else
-      if !hbx_enrollment.census_employee.employee_role.blank? && hbx_enrollment.census_employee.employee_role.is_under_open_enrollment? && hbx_enrollment.plan.active_year == TimeKeeper.date_of_record.year
-        return false
-      else
-        return true
-      end
-    end  
+    # return false if IVL
+    return false if hbx_enrollment.census_employee.blank?
+
+    # Enable the button under these conditions
+      # 1) plan year under open enrollment period
+      # 2) new hire covered under enrolment period
+      # 3) qle enrolmlent period check
+
+    return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record) if hbx_enrollment.is_special_enrollment?
+
+    # Disable only  if non of the above conditions match
+    return true
   end
 
   def has_writing_agent?(employee_role)
