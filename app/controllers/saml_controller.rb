@@ -16,7 +16,7 @@ class SamlController < ApplicationController
     if response.is_valid? && response.name_id.present?
       username = response.name_id.downcase
 
-      oim_user = User.where(oim_id: /#{username}/i).first
+      oim_user = User.where(oim_id: /^#{Regexp.quote(username)}$/i).first
 
       if oim_user.present?
         oim_user.idp_verified = true
