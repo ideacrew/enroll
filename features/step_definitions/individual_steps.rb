@@ -48,10 +48,11 @@ When(/user goes to register as an individual$/) do
   find(:xpath, '//label[@for="radio_male"]').click
 
   screenshot("register")
-  find('.interaction-click-control-continue').click
+  find('.btn', text: 'CONTINUE').click
 end
 
 When(/^\w+ clicks? on continue button$/) do
+  sleep(2)
   click_link "Continue"
 end
 
@@ -60,8 +61,8 @@ Then(/^user should see heading labeled personal information/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
-  expect(page).to have_button("CONTINUE")
-  click_button "CONTINUE"
+  expect(page).to have_button("CONTINUE", visible: false)
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/Individual should see a form to enter personal information$/) do
@@ -92,7 +93,7 @@ end
 
 Then (/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD')
-  click_button "CONTINUE"
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^\w+ agrees? to the privacy agreeement/) do
@@ -131,9 +132,8 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
   screenshot("add_member")
-  click_button "Confirm Member"
+  all(:css, ".mz").last.click
 end
 
 And(/Individual again clicks on add member button/) do
@@ -154,7 +154,7 @@ And(/Individual again clicks on add member button/) do
 
   #testing
   screenshot("added member")
-  click_button "Confirm Member"
+  all(:css, ".mz").last.click
 end
 
 
@@ -232,7 +232,7 @@ Then(/^Individual ads address for dependent$/) do
   find('#address_info .selectric p.label').trigger 'click'
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
-  click_button 'Confirm Member'
+  all(:css, ".mz").last.click
   find('#btn-continue').click
 end
 

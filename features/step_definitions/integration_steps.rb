@@ -459,7 +459,7 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
 end
 
 When(/^.+ clicks? confirm member$/) do
-  click_button 'Confirm Member'
+  all(:css, ".mz").last.click
   expect(page).to have_link('Add Member')
 end
 
