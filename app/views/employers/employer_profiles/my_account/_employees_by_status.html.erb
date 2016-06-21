@@ -26,6 +26,9 @@
           <th>
             &nbsp;
           </th>
+          <th>
+            &nbsp;
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -58,14 +61,18 @@
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <td><%= renewal_enrollment_state(census_employee) %></td>
           <% end %>
-          <td class="table-functions">
+          
           <% if census_employee.employment_terminated? %>
-            <a class="show_confirm btn btn-green-2" id="show_confirm_<%= census_employee.id %>">
-              <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').next().show();">Rehire</span>
-            </a>
-            <a class="show_confirm btn btn-green-2" id="show_cobra_confirm_<%= census_employee.id %>">
-              <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').nextAll('.cobra_confirm_<%= census_employee.id %>').toggle();">COBRA</span>
-            </a>
+            <td class="table-functions">
+              <a class="show_confirm btn btn-primary" id="show_confirm_<%= census_employee.id %>">
+                <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;" onclick="$(this).closest('tr').next().show();">Rehire</span>
+              </a>
+            </td>
+            <td class="table-functions">
+              <a class="show_confirm btn btn-primary" id="show_cobra_confirm_<%= census_employee.id %>">
+                <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;" onclick="$(this).closest('tr').nextAll('.cobra_confirm_<%= census_employee.id %>').toggle();">COBRA</span>
+              </a>
+            </td>
           <% else %>
           <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
             <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
@@ -93,11 +100,11 @@
             <span>COBRA/Continuation Effective Date: </span>
             <span class="confirm-terminate" style="display:inline;">
               <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
-              <a class="cobra_confirm" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>">
-                <strong>&nbsp;Submit</strong>
-              </a>
             </span>
           </td>
+          <td><a class="btn btn-default" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>">
+                <strong>&nbsp;Submit</strong>
+              </a></td>
         </tr>
             <tr></tr>
             <% else %>
