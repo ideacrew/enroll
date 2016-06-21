@@ -475,6 +475,10 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def is_under_cobra?
+    existing_cobra && cobra_begin_date <= TimeKeeper.date_of_record
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)

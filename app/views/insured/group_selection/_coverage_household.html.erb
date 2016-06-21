@@ -2,6 +2,7 @@
   <tbody>
 
     <% offered_relationship_benefits = (coverage_kind == 'health') ? health_relationship_benefits(@employee_role) : dental_relationship_benefits(@employee_role) %>
+    <% offered_relationship_benefits = ["employee"] if @employee_role.is_under_cobra? %>
 
     <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>

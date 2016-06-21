@@ -283,6 +283,14 @@ class HbxEnrollment
     end
   end
 
+  def is_under_cobra?
+    if census_employee.present?
+      census_employee.is_under_cobra?
+    else
+      false
+    end
+  end
+
   def benefit_sponsored?
     benefit_group.present?
   end
