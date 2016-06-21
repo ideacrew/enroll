@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "employers/broker_agency/_active_broker.html.erb" do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:broker_agency_account) {
-    double(writing_agent: double(
+    double(start_on: TimeKeeper.date_of_record, writing_agent: double(
       person: FactoryGirl.create(:person),
       phone: '3015551212',
       email: double('email', address: 'stuff@dc.gov')
@@ -63,6 +63,10 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
     it "show should the Broker phone" do
       expect(rendered).to match(/3015551212/)
+    end
+
+    it "should show the broker assignment date" do
+      expect(rendered).to match (broker_agency_accounts.first.start_on).to_time.strftime("%m/%d/%Y %H:%M %Z %:z")
     end
 
     it "should see button of change broker" do
