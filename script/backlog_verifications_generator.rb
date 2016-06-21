@@ -34,7 +34,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     counter += 1
 
     # next unless family.id.to_s == "5619ca5554726532e58b2201"
-    next if family.id.to_s == "564d098469702d174fa10000"
+    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
 
     person = family.primary_applicant.person
 
@@ -44,7 +44,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     end
 
     begin
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {

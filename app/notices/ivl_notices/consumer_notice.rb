@@ -29,23 +29,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    # enrollments = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a
-    
-    # if enrollments.empty?
-    #   raise "enrollment don't exists!!"
-    # end
+    enrollments = @family.enrollments.individual_market.select{|e| e.currently_active? || e.future_active?}
 
-    # @notice.enrollments << enrollments.first
-
-    # family_members = enrollments.inject([]) do |family_members, enrollment|
-    #   family_members += enrollment.hbx_enrollment_members.map(&:family_member)
-    # end.uniq
-
-    # people = family_members.map(&:person).uniq
-    # people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
-
-    enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    # this is for inital backlog notices. no longer needed for reminders 
+    # enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
@@ -58,8 +45,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
     end
 
     people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
+
     if people.empty?
-      raise 'active coverage not found!'
+      raise 'no family member found with outstanding verification'
     end
 
     ## Skip families who already uploaded verification documents
@@ -69,16 +57,22 @@ class IvlNotices::ConsumerNotice < IvlNotice
       end
     end
 
+    # people.reject!{|person| person.consumer_role.vlp_documents.any?{|vlpd| !vlpd.identifier.blank? }}
+    # if people.empty?
+    #   raise 'no family member found without uploaded documents'
+    # end
+
+    if enrollments.map(&:special_verification_period).uniq.size > 1
+      raise 'found multiple enrollments with different due dates'
+    end
+
     append_unverified_individuals(people)
-    
-    contingent_enrollment = @family.active_household.hbx_enrollments.where('aasm_state' => 'enrolled_contingent').first
-    enrollment = (contingent_enrollment || enrollments.first)
-    @notice.enrollments << enrollment
+    @notice.enrollments << enrollments.first
 
     # Re-enable this condition after done with initial verification notifications
     # ((enrollment.submitted_at.present? ? enrollment.submitted_at : enrollment.created_at) + 95.days)
 
-    @notice.due_date = enrollment.special_verification_period.strftime("%m/%d/%Y")
+    @notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
   end
 
   def verification_type_outstanding?(person, verification_type)
