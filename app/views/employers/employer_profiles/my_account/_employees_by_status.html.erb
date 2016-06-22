@@ -97,10 +97,7 @@
             <span><%= format_date census_employee.employment_terminated_on %></span>
           </td>
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="4" id="enter-date">
-            <span>COBRA/Continuation Effective Date: </span>
-            <span class="confirm-terminate" style="display:inline;">
-              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
-            </span>
+            <%=cobra_effective_date(census_employee) %>
           </td>
           <td><a class="btn btn-default" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>">
                 <strong>&nbsp;Submit</strong>

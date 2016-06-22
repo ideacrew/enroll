@@ -104,4 +104,15 @@ module Employers::EmployerHelper
     renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
     return benefit_groups, (renewing_benefit_groups || [])
   end
+
+
+  def cobra_effective_date(census_employee)
+    disabled =  current_user.has_hbx_staff_role? ? false : true
+    content_tag(:div) do 
+     content_tag(:span,"COBRA/Continuation Effective Date:  ") +
+      content_tag(:span, :class=>"confirm-terminate" ,:style=>"display:inline;") do 
+        content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled ) 
+      end
+    end.html_safe
+  end
 end
