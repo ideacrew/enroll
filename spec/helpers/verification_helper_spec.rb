@@ -17,6 +17,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification_type_status" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
     before :each do
       assign(:person, person)
     end
@@ -39,20 +40,20 @@ RSpec.describe VerificationHelper, :type => :helper do
     context "Citizenship and Immigration status" do
       context "lawful presence valid" do
         it "returns verified status" do
-          person.consumer_role.lawful_presence_validation = "valid"
+          person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
           expect(helper.verification_type_status("Immigration status", person)).to eq "verified"
         end
       end
       context "lawful presence with uploaded docs" do
         it "returns in review status" do
-          person.consumer_role.lawful_presence_validation = "pending"
+          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
           person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
           expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
         end
       end
       context "lawful presence determination fails" do
         it "returns outstanding status" do
-          person.consumer_role.lawful_presence_validation = "pending"
+          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
           expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
         end
       end
@@ -71,12 +72,12 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
 
       it "returns success for Citizenship verified" do
-        person.consumer_role.lawful_presence_validation = "valid"
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         expect(helper.verification_type_class("Citizenship", person)).to eq("success")
       end
 
       it "returns success for Immigration status verified" do
-        person.consumer_role.lawful_presence_validation = "valid"
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         expect(helper.verification_type_class("Immigration status", person)).to eq("success")
       end
     end
@@ -88,13 +89,13 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
 
       it "returns warning for Citizenship outstanding with docs" do
-        person.consumer_role.lawful_presence_validation = "pending"
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Citizenship")
         expect(helper.verification_type_class("Citizenship", person)).to eq("warning")
       end
 
       it "returns warning for Immigration status outstanding with docs" do
-        person.consumer_role.lawful_presence_validation = "pending"
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
         expect(helper.verification_type_class("Immigration status", person)).to eq("warning")
       end

@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :person }
@@ -240,6 +241,143 @@ context "Verification process and notices" do
         it "returns false for #{type} and documents for this type" do
           person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)
           expect(person.consumer_role.is_type_outstanding?(type)).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "state machine" do
+    let(:consumer) { person.consumer_role }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
+    context "import" do
+      all_states.each do |state|
+        it "changes #{state} to fully_verified" do
+          expect(consumer).to transition_from(state).to(:fully_verified).on_event(:import)
+        end
+      end
+    end
+
+    context "coverage_purchased" do
+      it "changes state to dhs_pending on coverage_purchased! for non_native without ssn" do
+        person.ssn=nil
+        consumer.citizen_status = "not_us"
+        expect(consumer).to transition_from(:unverified).to(:dhs_pending).on_event(:coverage_purchased)
+      end
+
+      it "changes state to ssa_pending on coverage_purchased! for non_native with SSN" do
+        consumer.citizen_status = "not_us"
+        expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
+      end
+
+      it "changes state to ssa_pending on coverage_purchased! for native" do
+        expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
+      end
+    end
+
+    context "ssn_invalid" do
+      it "changes state to verification_outstanding" do
+        expect(consumer).to transition_from(:ssa_pending).to(:verification_outstanding).on_event(:ssn_invalid, verification_attr)
+        expect(consumer.ssn_validation).to eq("outstanding")
+      end
+    end
+
+    context "ssn_valid_citizenship_invalid" do
+      it "changes state to verification_outstanding for native citizen" do
+        expect(consumer).to transition_from(:ssa_pending).to(:verification_outstanding).on_event(:ssn_valid_citizenship_invalid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+      end
+      it "changes state to dhs_pending for non native citizen" do
+        consumer.citizen_status = "not_us"
+        expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+        expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
+        expect(consumer.lawful_presence_determination.citizenship_result).to eq("ssn_pass_citizenship_fails_with_SSA")
+      end
+    end
+
+    context "ssn_valid_citizenship_valid" do
+      before :each do
+        consumer.lawful_presence_determination.deny! verification_attr
+      end
+      it "changes state to fully_verified from unverified for native citizen or non native with ssn" do
+        expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+      it "changes state to fully_verified from ssa_pending" do
+        expect(consumer).to transition_from(:ssa_pending).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+      it "changes state to fully_verified from verification_outstanding" do
+        expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+      it "changes state to fully_verified from fully_verified" do
+        expect(consumer).to transition_from(:fully_verified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
+        expect(consumer.ssn_validation).to eq("valid")
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+    end
+
+    context "fail_dhs" do
+      it "changes state from dhs_pending to verification_outstanding" do
+        expect(consumer).to transition_from(:dhs_pending).to(:verification_outstanding).on_event(:fail_dhs, verification_attr)
+        expect(consumer.lawful_presence_determination.verification_outstanding?).to eq true
+      end
+
+    end
+
+    context "pass_dhs" do
+      before :each do
+        consumer.lawful_presence_determination.deny! verification_attr
+      end
+      it "changes state from dhs_pending to fully_verified" do
+        person.ssn=nil
+        consumer.citizen_status = "not_us"
+        expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+      it "changes state from dhs_pending to fully_verified" do
+        expect(consumer).to transition_from(:dhs_pending).to(:fully_verified).on_event(:pass_dhs, verification_attr)
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+      it "changes state from dhs_pending to fully_verified" do
+        expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:pass_dhs, verification_attr)
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+
+    end
+
+    context "revert" do
+      before :each do
+        consumer.lawful_presence_determination.authorize! verification_attr
+      end
+      all_states.each do |state|
+        it "change #{state} to unverified" do
+          expect(consumer).to transition_from(state).to(:unverified).on_event(:revert, verification_attr)
+          expect(consumer.lawful_presence_determination.verification_pending?).to eq true
+        end
+      end
+    end
+
+    context "redetermine" do
+      before :each do
+        consumer.lawful_presence_determination.authorize! verification_attr
+      end
+      all_states.each do |state|
+        it "change #{state} to ssa_pending if SSA applied" do
+          expect(consumer).to transition_from(state).to(:ssa_pending).on_event(:redetermine, verification_attr)
+          expect(consumer.lawful_presence_determination.verification_pending?).to eq true
+        end
+
+        it "change #{state} to dhs_pending if DHS applied" do
+          person.ssn=nil
+          consumer.citizen_status = "not_us"
+          expect(consumer).to transition_from(state).to(:dhs_pending).on_event(:redetermine, verification_attr)
+          expect(consumer.lawful_presence_determination.verification_pending?).to eq true
         end
       end
     end

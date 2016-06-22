@@ -34,6 +34,12 @@ class LawfulPresenceDetermination
       transitions from: :verification_pending, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_outstanding, after: :record_denial_information
     end
+
+    event :revert, :after => :record_transition do
+      transitions from: :verification_pending, to: :verification_pending, after: :record_denial_information
+      transitions from: :verification_outstanding, to: :verification_pending, after: :record_denial_information
+      transitions from: :verification_successful, to: :verification_pending
+    end
   end
 
   def latest_denial_date
