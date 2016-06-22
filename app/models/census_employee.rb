@@ -125,6 +125,12 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def suggested_cobra_effective_date
+    return nil if self.employment_terminated_on.nil?
+    self.employment_terminated_on.next_month.beginning_of_month
+  end
+
+
   def new_hire_enrollment_period
     start_on = [hired_on, created_at].max
     end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
