@@ -35,8 +35,8 @@ class DocumentsController < ApplicationController
       @person.consumer_role.update_attributes(:ssn_validation => "valid",
                                               :ssn_update_reason => params[:verification_reason])
     else
-     @person.consumer_role.update_attributes(:lawful_presence_validation => "valid",
-                                             :lawful_presence_update_reason =>
+      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
+      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
                                              {:v_type => v_type,
                                               :update_reason => params[:verification_reason]
                                              } )
@@ -169,6 +169,12 @@ class DocumentsController < ApplicationController
 
   def set_person
     @person = Person.find(params[:person_id])
+  end
+
+  def verification_attr
+    OpenStruct.new({:determined_at => Time.now,
+                    :authority => "hbx"
+                   })
   end
 
 end

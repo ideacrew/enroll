@@ -64,7 +64,6 @@ class ConsumerRole
 
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
-  field :lawful_presence_validation, type: String, default: "pending"
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
@@ -185,7 +184,7 @@ class ConsumerRole
   end
 
   def lawful_presence_verified?
-    self.lawful_presence_validation == "valid"
+    self.lawful_presence_determination.verification_successful?
   end
 
   def is_hbx_enrollment_eligible?
@@ -355,7 +354,7 @@ class ConsumerRole
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
-      transitions from: :dhs_pending, to: :fullY_verified
+      transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
       transitions from: :verification_period_ended, to: :fully_verified
       transitions from: :fully_verified, to: :fully_verified
@@ -372,7 +371,7 @@ class ConsumerRole
 
     event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
-      transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs]
+      transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end
 
     event :ssn_valid_citizenship_valid, :after => [:pass_ssn, :pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -402,14 +401,14 @@ class ConsumerRole
     end
 
     event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
-      transitions from: :verification_outstanding, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
-      transitions from: :ssa_pending, to: :ssa_pending, :guard => [:call_ssa?]
-      transitions from: :dhs_pending, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_outstanding, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :ssa_pending, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :ssa_pending, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :dhs_pending, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :dhs_pending, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :fully_verified, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :fully_verified, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :verification_period_ended, to: :dhs_pending, :guard => [:call_dhs?]
@@ -417,7 +416,7 @@ class ConsumerRole
     end
   end
 
-  def invoke_verification!(requested_start_date)
+  def invoke_verification!(requested_start_date=requested_coverage_start_date)
     if person.ssn || is_native?
       invoke_ssa
     else
@@ -515,7 +514,7 @@ class ConsumerRole
   end
 
   private
-  def notify_of_eligibility_change
+  def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
   end
 
@@ -565,25 +564,28 @@ class ConsumerRole
     lawful_presence_determination.start_ssa_process
   end
 
-  def invoke_dhs(requested_start_date)
+  def invoke_dhs(requested_start_date=requested_coverage_start_date)
     lawful_presence_determination.start_vlp_process(requested_start_date)
   end
 
-  def pass_ssn
+  def pass_ssn(*args)
     self.ssn_validation = "valid"
   end
 
-  def fail_ssn
+  def fail_ssn(*args)
     self.ssn_validation = "outstanding"
   end
 
   def pass_lawful_presence(*args)
-    self.lawful_presence_validation = "valid"
     lawful_presence_determination.authorize!(*args)
   end
 
+  def record_partial_pass(*args)
+    lawful_presence_determination.citizen_status = "non_native_not_lawfully_present_in_us"
+    lawful_presence_determination.citizenship_result = "ssn_pass_citizenship_fails_with_SSA"
+  end
+
   def fail_lawful_presence(*args)
-    self.lawful_presence_validation = "outstanding"
     lawful_presence_determination.deny!(*args)
   end
 
@@ -591,8 +593,8 @@ class ConsumerRole
     self.ssn_validation = "pending"
   end
 
-  def revert_lawful_presence
-    self.lawful_presence_validation = "pending"
+  def revert_lawful_presence(*args)
+    self.lawful_presence_determination.revert!(*args)
   end
 
   def record_transition(*args)
@@ -603,8 +605,8 @@ class ConsumerRole
   end
 
   def verification_attr
-    OpenStruct.new({:verified_at => Time.now,
-                    :authority => "hbx"
+    OpenStruct.new({:determined_at => Time.now,
+                    :vlp_authority => "hbx"
                    })
   end
 end
