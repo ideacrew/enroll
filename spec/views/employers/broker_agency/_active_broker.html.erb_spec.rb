@@ -66,7 +66,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
 
     it "should show the broker assignment date" do
-      expect(rendered).to match (broker_agency_accounts.first.start_on).to_time.strftime("%m/%d/%Y %H:%M %Z %:z")
+      expect(rendered).to match (broker_agency_accounts.first.start_on).strftime("%m/%d/%Y") 
     end
 
     it "should see button of change broker" do
