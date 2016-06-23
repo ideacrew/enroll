@@ -413,9 +413,9 @@ describe Family do
     end
   end
 
-  context "terminate_date_for_shop" do
+  context "terminate_date_for_shop_by_enrollment" do
     it "without latest_shop_sep" do
-      expect(family.terminate_date_for_shop).to eq TimeKeeper.date_of_record.end_of_month
+      expect(family.terminate_date_for_shop_by_enrollment).to eq TimeKeeper.date_of_record.end_of_month
     end
 
     context "with latest_shop_sep" do
@@ -423,14 +423,21 @@ describe Family do
       let(:date) { TimeKeeper.date_of_record - 10.days }
       let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date) }
       let(:death_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date, qualifying_life_event_kind: qlek) }
+      let(:hbx) { HbxEnrollment.new }
+
       it "normal sep" do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
-        expect(family.terminate_date_for_shop).to eq date.end_of_month
+        expect(family.terminate_date_for_shop_by_enrollment).to eq date.end_of_month
       end
 
       it "death sep" do
         allow(family).to receive(:latest_shop_sep).and_return death_sep
-        expect(family.terminate_date_for_shop).to eq date
+        expect(family.terminate_date_for_shop_by_enrollment).to eq date
+      end
+
+      it "when original terminate date before hbx effective_on" do
+        allow(hbx).to receive(:effective_on).and_return (date.end_of_month + 5.days)
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq (TimeKeeper.date_of_record.end_of_month)
       end
     end
   end
