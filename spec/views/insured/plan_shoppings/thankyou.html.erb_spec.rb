@@ -16,6 +16,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
@@ -50,6 +51,7 @@ RSpec.describe "insured/thankyou.html.erb" do
 
     it 'should display the correct plan selection text' do
       allow(@enrollment).to receive(:employee_role).and_return(false)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
       expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
@@ -58,12 +60,14 @@ RSpec.describe "insured/thankyou.html.erb" do
 
     it 'should render agreement partial' do
       allow(@enrollment).to receive(:employee_role).and_return(false)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(response).to render_template(:partial => "insured/plan_shoppings/_individual_agreement")
     end
 
     it 'should render waive_confirmation partial' do
       allow(@enrollment).to receive(:employee_role).and_return(double)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('div#waive_confirm')
       expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
@@ -71,6 +75,7 @@ RSpec.describe "insured/thankyou.html.erb" do
 
     it "should not render waive_confirmation partial" do
       allow(@enrollment).to receive(:employee_role).and_return(false)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).not_to have_selector('div#waive_confirm')
       expect(response).not_to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})

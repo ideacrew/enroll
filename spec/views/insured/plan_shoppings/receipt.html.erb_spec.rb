@@ -18,6 +18,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       hbx_enrollment_members: members,
       effective_on: TimeKeeper.date_of_record.beginning_of_month,
       plan: new_plan,
+      is_under_cobra?: false,
+      coverage_kind: 'health',
       employee_role: double("EmployeeRole")
     )
   end

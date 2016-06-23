@@ -476,7 +476,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_under_cobra?
-    existing_cobra && cobra_begin_date <= TimeKeeper.date_of_record
+    existing_cobra
   end
 
   private

@@ -258,6 +258,36 @@ RSpec.describe Employers::CensusEmployeesController do
     end
   end
 
+  describe "GET cobra" do
+    before do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(CensusEmployee).to receive(:find).and_return(census_employee)
+    end
+    it "should be redirect" do
+      xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: Date.today.to_s, :format => :js
+      expect(flash[:notice]).to eq "Successfully update Census Employee."
+      expect(response).to have_http_status(:success)
+    end
+
+    context "with cobra date" do
+      it "should cobra census employee" do
+        xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: Date.today.to_s, :format => :js
+        expect(response).to have_http_status(:success)
+        expect(assigns[:cobra_date]).to eq Date.today
+      end
+    end
+
+    context "without cobra date" do
+      it "should throw error" do
+        xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: "", :format => :js
+        expect(response).to have_http_status(:success)
+        expect(assigns[:cobra_date]).to eq ""
+        expect(flash[:error]).to eq "Please enter cobra date."
+      end
+    end
+  end
+
   describe "GET rehire" do
     it "should be error without rehiring_date" do
       sign_in

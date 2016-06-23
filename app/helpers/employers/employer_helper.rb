@@ -107,10 +107,10 @@ module Employers::EmployerHelper
 
 
   def cobra_effective_date(census_employee)
-    disabled =  current_user.has_hbx_staff_role? ? false : true
+    disabled = current_user.has_hbx_staff_role? ? false : true
     content_tag(:div) do 
      content_tag(:span,"COBRA/Continuation Effective Date:  ") +
-      content_tag(:span, :class=>"confirm-terminate" ,:style=>"display:inline;") do 
+      content_tag(:span, :class=>"confirm-cobra" ,:style=>"display:inline;") do 
         content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled ) 
       end
     end.html_safe

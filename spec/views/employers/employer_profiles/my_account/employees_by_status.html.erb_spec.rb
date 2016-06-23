@@ -52,12 +52,26 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   context 'when employee coverage terminated' do
     before do
       allow(census_employee2).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment2)
+      allow(census_employee2).to receive(:employment_terminated?).and_return true
+      allow(census_employee2).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
     end
 
     it "should displays enrollment state as coverage terminated" do
       assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Coverage Terminated/)
+    end
+
+    it "should displays rehire function" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('span', text: 'Rehire')
+    end
+
+    it "should displays cobra function" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('span', text: 'COBRA')
     end
   end
 
