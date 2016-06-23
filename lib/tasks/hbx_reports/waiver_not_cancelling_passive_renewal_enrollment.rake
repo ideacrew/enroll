@@ -8,7 +8,7 @@ namespace :reports do
       count = 0
       renewal_policy_date = Date.new(2016,7,1)
       # All Renewing Employers - Includes Conversion Employers too.
-      all_renewing_employers = Organization.all.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => renewal_policy_date, :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE}})
+      all_renewing_employers = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => renewal_policy_date, :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE}})
 
       file_name = "#{Rails.root}/public/waiver_not_cancelling_passive_renewals.csv"
       field_names  = %w(Employer_Name Employee_First_Name Employee_Last_Name SSN DOB)
