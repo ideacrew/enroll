@@ -155,9 +155,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
-          new_census_employee.add_default_benefit_group_assignment          
+          new_census_employee.add_default_benefit_group_assignment
           new_census_employee.construct_employee_role_for_match_person
-          
+
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -178,7 +178,8 @@ class Employers::CensusEmployeesController < ApplicationController
       @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
       @benefit_group = @benefit_group_assignment.benefit_group
     end
-
+    @new_census_dependent = @census_employee.census_dependents.build
+    @family = @census_employee.employee_role.person.primary_family
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 

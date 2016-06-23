@@ -102,11 +102,22 @@
       color: rgb(131, 135, 128);
       text-transform: uppercase;
       text-align: left;
+      line-height: 1.2;
     }
     .selectric-wrapper {
       width:100%;
       max-width: 75%;
       display: inline-block;
+    }
+  }
+  .vertically-aligned-row {
+    display: table;
+    width: 100%;
+
+    >* {
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
     }
   }
 }
