@@ -23,7 +23,7 @@ namespace :reports do
             renewing_enrollments = ce.try(:renewal_benefit_group_assignment).try(:hbx_enrollments)
             next if renewing_enrollments.blank?
             renewing_enrollment_statuses = renewing_enrollments.map(&:aasm_state)
-            puts "renewing_enrollments.map(&:aasm_state) : #{renewing_enrollments.map(&:aasm_state)}"
+
             # If there are renewing enrollments with both [ Waived(inactive) and Renewing ] statuses for an employee, we want to report them.
             if (renewing_enrollment_statuses &  HbxEnrollment::RENEWAL_STATUSES).present? && (renewing_enrollment_statuses &  HbxEnrollment::WAIVED_STATUSES).present?
               count += 1
