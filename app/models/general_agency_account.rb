@@ -44,6 +44,15 @@ class GeneralAgencyAccount
     broker_role.present? ? broker_role.person.full_name : ""
   end
 
+  def for_broker_agency_account?(ba_account)
+    return false unless (broker_role_id == ba_account.writing_agent_id)
+    return false unless general_agency_profile.present?
+    if !ba_account.end_on.blank?
+      return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
+    end
+    (start_on >= ba_account.start_on)
+  end
+
   aasm do
     state :active, initial: true
     state :inactive
