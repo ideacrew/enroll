@@ -4,8 +4,8 @@
     	<h1>Sign In</h1>
     	<%= form_for(resource, as: resource_name, url: session_path(resource_name), html: {class: 'input-no-pd'}) do |f| %>
 			<div class="form-group required">
-				<%= f.label :email %>
-				<%= f.email_field :email, autofocus: true, class: "form-control" %>
+				<%= f.label :username %>
+				<%= f.text_field :login, autofocus: true, class: "form-control" %>
 			</div>
 
 			<div class="form-group required">

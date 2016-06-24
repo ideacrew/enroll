@@ -6,7 +6,7 @@ namespace :migrations do
       begin
         primary = family.primary_applicant.person
 
-        next if primary.employee_roles.any?
+        # next if primary.employee_roles.any?
         next if primary.consumer_role.blank?
 
         coverage_household = family.active_household.immediate_family_coverage_household
