@@ -273,6 +273,13 @@ context "Verification process and notices" do
       it "changes state to ssa_pending on coverage_purchased! for native" do
         expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
       end
+
+      it "changes state to outstanding for native consumer with NO ssn without calling hub" do
+        person.ssn=nil
+        expect(consumer).to transition_from(:unverified).to(:verification_outstanding).on_event(:coverage_purchased)
+        expect(consumer.ssn_validation).to eq("outstanding")
+        expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
+      end
     end
 
     context "ssn_invalid" do

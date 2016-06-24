@@ -360,9 +360,10 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :coverage_purchased, :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change] do
-      transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
-      transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
+    event :coverage_purchased do
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn, :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
     end
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -513,6 +514,10 @@ class ConsumerRole
     no_ssn? && is_non_native?
   end
 
+  def native_no_ssn?
+    is_native? && no_ssn?
+  end
+
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
@@ -574,6 +579,11 @@ class ConsumerRole
 
   def fail_ssn(*args)
     self.ssn_validation = "outstanding"
+  end
+
+  def fail_ssa_for_no_ssn(*args)
+    self.ssn_validation = "outstanding"
+    self.ssn_update_reason = "no_ssn_for_native"
   end
 
   def pass_lawful_presence(*args)
