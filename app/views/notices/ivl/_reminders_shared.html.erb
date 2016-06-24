@@ -53,7 +53,7 @@
   card containing a recent photo and other identifying information."} %>
 <% end %>
   <br>
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
     listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
     "Certificate of Citizenship", "Consular report of Birth Abroad of U.S. Citizen", "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security
@@ -61,6 +61,18 @@
     ["Identify the Tribe issuing the document;", "Identify the individual by name; and", "Confirm the individual’s enrollment in or affiliation with the Tribe.",
       "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]
     } %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "<u>Primary documentation</u>:  (Only One (1) is needed) ",
+  listings: [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
+    "Certificate of Naturalization", 
+    "Certificate of Citizenship",
+    "Consular report of Birth Abroad of U.S. Citizen",
+    "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license.",
+    ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
+        ["Identify the Tribe issuing the document;",
+          "Identify the individual by name; and",
+          "Confirm the individual’s enrollment in or affiliation with the Tribe.",
+          "<strong>Examples</strong>: tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
@@ -288,12 +300,17 @@
       <tr class="fssizeuser">
         <td>
           <div class='display:block; page-break-inside: avoid;'>
-            <ul style='list-style: circle solid;'><li>U.S. Postal Mail: <span style='margin-left: 10px;'><%= Settings.site.short_name %></span><br>
-             <span style='margin-left:96px;'>Department of Human Services</span><br>
-             <span style='margin-left:96px;'>P.O. Box 91560</span><br>
-             <span style='margin-left:96px;'>Washington, DC 20090</span><br><br>
-<!--              <i>Be sure to write your account number (&#60;account number>) on your submission.</i>
- -->           </li>
+            <ul style='list-style: circle solid;'>
+              <li>
+                <span style="width: 300px;">
+                 <span style="float: left; width: 95px;">U.S. Postal Mail:</span>
+                 <span style="float: left; width: 205px;">
+                  DC Health Link Exchange Contact Center<br>
+                  PO Box 44018<br>
+                  Washington, DC 20026<br><br>
+                </span>
+              </span>    
+            </li>
            </ul></div>
         </td>
       </tr>   
