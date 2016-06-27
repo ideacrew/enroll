@@ -31,7 +31,6 @@ require 'csv'
          csv << field_names
  
          families.each do |family|
-          # binding.pry
            hbx_enrollment = family.households.first.hbx_enrollments.select{|hbx| hbx.terminated_on && hbx.terminated_on == date_of_termination}.first
            if hbx_enrollment
              csv << [
