@@ -230,7 +230,8 @@ class PlanYear
   end
 
   def is_publish_date_valid?
-    TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
   end
 
   # Check plan year for violations of model integrity relative to publishing
@@ -257,7 +258,7 @@ class PlanYear
       errors.merge!({publish: "You may only have one published plan year at a time"})
     end
 
-    if !is_publish_date_valid?
+    if !is_publish_date_valid? 
       errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
@@ -620,6 +621,14 @@ class PlanYear
     # Plan as submitted failed eligibility check
     event :force_publish, :after => :record_transition do
       transitions from: :publish_pending, to: :published_invalid
+
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :publish_pending
+
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Employer requests review of invalid application determination

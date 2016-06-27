@@ -331,7 +331,7 @@ describe EmployerProfile, dbclean: :after_each do
 
     let(:benefit_group) { FactoryGirl.build(:benefit_group)}
     let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
+    let(:employer_profile) { plan_year.employer_profile }
     let!(:census_employees) { FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment])}
     let!(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
     let!(:people) { FactoryGirl.create_list(:person, 2) }
