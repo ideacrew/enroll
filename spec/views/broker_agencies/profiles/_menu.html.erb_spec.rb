@@ -17,7 +17,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
     it "should not have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-      expect(rendered).to_not have_selector('li.multi-line')
+      view.content_for(:horizontal_menu).should_not include('multi-line')
     end
   end
 
@@ -25,9 +25,9 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["broker"]) }
     let(:person) { FactoryGirl.create(:person, :with_broker_role) }
 
-    it "should not have a dropdown" do
+    it "should have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-      expect(rendered).to have_selector('li.multi-line')
+      view.content_for(:horizontal_menu).should include('multi-line')
     end
   end
 

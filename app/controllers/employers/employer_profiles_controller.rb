@@ -101,6 +101,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'inbox'
 
       else
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
         @current_plan_year = @employer_profile.show_plan_year
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"

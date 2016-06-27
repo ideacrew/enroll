@@ -287,13 +287,13 @@ module ApplicationHelper
 
   def user_full_name
     if signed_in?
-      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.email
+      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.oim_id
     end
   end
 
   def user_first_name_last_name_and_suffix
     if signed_in?
-      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.email).downcase
+      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.oim_id).downcase
     end
   end
 

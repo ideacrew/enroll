@@ -371,7 +371,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     it 'should log user email and url' do
       expect(subject).to receive(:log) do |msg, severity|
         expect(severity[:severity]).to eq('error')
-        expect(msg[:user]).to eq(user.email)
+        expect(msg[:user]).to eq(user.oim_id)
         expect(msg[:url]).to match /insured\/employee\/888/
       end
       get :show, id: 888

@@ -12,7 +12,7 @@ class FamiliesController < ApplicationController
     # page_no = page_string.blank? ? nil : page_string.to_i
     # @families = Family.search(@q).exists(employer_profile: true).page page_no
     @families = Family.all
-    
+
   end
 
   def show
@@ -57,14 +57,16 @@ private
   # Use callbacks to share common setup or constraints between actions.
   def set_family
     set_current_person
-    @family = @person.primary_family if @person.present?
+    return if not @person.present?
     # @family = Family.find(params[:id])
-    if @person.blank? || @person.primary_family.blank?
+    if @person.primary_family.present?
+      @family = @person.primary_family
+    else
       message = {}
       message[:message] = '@family was set to nil'
       message[:session_person_id] = session[:person_id]
       message[:user_id] = current_user.id
-      message[:email] = current_user.email
+      message[:oim_id] = current_user.oim_id
       message[:url] = request.original_url
       log(message, :severity=>'error')
       redirect_to "/500.html"
