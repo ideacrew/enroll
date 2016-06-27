@@ -429,6 +429,10 @@ class CensusEmployee < CensusMember
       transitions from: [:employment_terminated], to: :cobra_employee
     end
 
+    event :cobra_terminate, :after => :record_transition do
+      transitions from: [:cobra_employee], to: :employment_terminated
+    end
+
     event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
     end

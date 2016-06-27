@@ -196,9 +196,12 @@ Rails.application.routes.draw do
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      
       member do
         get "download_invoice"
+        put 'update_to_cobra'
       end
+
       collection do
         get 'welcome'
         get 'search'

@@ -91,9 +91,10 @@
           <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
             <%=cobra_effective_date(census_employee) %>
           </td>
-          <td><a class="btn btn-default" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>">
-                <strong>&nbsp;Submit</strong>
-              </a></td>
+          <td>
+              <%= link_to 'Submit', update_to_cobra_employers_employer_profile_path(census_employee.id), 
+              type: 'clear' , method: :put, remote: true, class: 'btn btn-min' %>
+         </td>
         </tr>
             <tr></tr>
             <% else %>

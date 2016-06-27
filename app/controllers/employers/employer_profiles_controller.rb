@@ -134,6 +134,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+
   def new
     @organization = Forms::EmployerProfile.new
   end
@@ -231,7 +232,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
+  end
 
+  def update_to_cobra
+    @employee= CensusEmployee.find(params[:id])
+    @employee.cobra_employee!
   end
 
   def download_invoice
