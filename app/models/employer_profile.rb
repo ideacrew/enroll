@@ -690,7 +690,7 @@ class EmployerProfile
 
   def self.filter_employers_for_binder_paid
     # filter employers that have next month plan year
-    orgs = Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+    orgs = Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day + 1.month)
   end
 
   def is_eligible_to_enroll?

@@ -3,7 +3,9 @@
 <% if employer.show_plan_year.present? && (employer.is_new_employer? || employer.is_renewing_employer?) %>
   [
   <% checkboxes = capture do %>
-    <% if !employer.binder_paid? %>
+    <% if employer.binder_paid? %>
+      <%= "" %>
+    <% else %>
       <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(employer), class: "binderCheckBox") %>
     <% end %>
   <% end %>
