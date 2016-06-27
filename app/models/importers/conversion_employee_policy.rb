@@ -181,9 +181,10 @@ module Importers
         coverage_household: ch,
         employee_role: role,
         benefit_group: bga.benefit_group,
-        benefit_group_assignment: bga
+        benefit_group_assignment: bga,
+        coverage_start: start_date,
+        enrollment_kind: "open_enrollment"
       })
-      en.effective_on = start_date
       en.external_enrollment = true
       en.hbx_enrollment_members.each do |mem|
         mem.eligibility_date = start_date
