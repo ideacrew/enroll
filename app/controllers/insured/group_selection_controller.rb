@@ -71,6 +71,7 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
+    hbx_enrollment.is_cobra = true if @employee_role.present? && @employee_role.is_under_cobra?
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away

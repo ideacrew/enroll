@@ -1721,3 +1721,23 @@ context "A cancelled external enrollment", :dbclean => :after_each do
     expect(family.enrollments_for_display.to_a).to eq([])
   end
 end
+
+context "for cobra", :dbclean => :after_each do
+  let(:enrollment) { HbxEnrollment.new }
+
+  context "is_under_cobra?" do
+    it "should return false" do
+      expect(enrollment.is_under_cobra?).to be_falsey
+    end
+
+    it "should return true" do
+      enrollment.is_cobra = true
+      expect(enrollment.is_under_cobra?).to be_truthy
+    end
+  end
+
+  it "can_select_coverage?" do
+    enrollment.is_cobra = true
+    expect(enrollment.can_select_coverage?).to be_truthy
+  end
+end

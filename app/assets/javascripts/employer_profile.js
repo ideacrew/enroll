@@ -364,13 +364,6 @@ $(function() {
   })
 })
 
-$(document).on('click', ".show_confirm", function(){
-  var el_id = $(this).attr('id');
-  $( "td." + el_id ).toggle();
-  $( "#confirm-terminate-2" ).hide();
-  return false
-});
-
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
   var link_to_delete = $(this).data('link');
@@ -409,8 +402,8 @@ $(document).on('click', ".rehire_confirm", function(){
   });
 });
 
-$(document).on('click', "a.cobra_confirm", function(){
-  var cobra_date = $(this).siblings().val();
+$(document).on('click', "a.cobra_confirm_submit", function(){
+  var cobra_date = $(this).parents('tr.cobra_confirm').find('input.date-picker').val();
   var cobra_link = $(this).data('link');
   $.ajax({
     type: 'get',

@@ -375,6 +375,39 @@ class CensusEmployee < CensusMember
     bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
+  def update_for_cobra(cobra_date)
+    self.cobra_employee_role
+    self.cobra_begin_date = cobra_date
+    self.existing_cobra = true
+    self.save
+  end
+
+  def build_hbx_enrollment_for_cobra
+    household = employee_role.person.primary_family.latest_household
+    coverage_household = household.immediate_family_coverage_household
+    enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| hbx.may_terminate_coverage? && !hbx.is_cobra }
+
+    enrollments.each do |hbx|
+      new_hbx = household.new_hbx_enrollment_from(
+        employee_role: employee_role,
+        benefit_group: hbx.benefit_group,
+        coverage_household: coverage_household,
+        benefit_group_assignment: hbx.benefit_group_assignment)
+      new_hbx.generate_hbx_signature
+      new_hbx.plan = hbx.plan
+      new_hbx.is_cobra = true 
+      new_hbx.effective_on = cobra_begin_date
+      new_hbx.select_coverage
+      new_hbx.save
+      new_hbx.benefit_group_assignment.update(hbx_enrollment_id: new_hbx.id) if new_hbx.benefit_group_assignment.present?
+      term_date = cobra_begin_date
+      hbx.terminate_benefit(term_date)
+      hbx.propogate_terminate(term_date)
+    end
+  rescue => e
+    logger.error(e)
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
@@ -414,24 +447,16 @@ class CensusEmployee < CensusMember
     state :eligible, initial: true
     state :employee_role_linked
     state :employment_terminated
-    state :cobra_employee
-    state :cobra_employee_terminated
+    state :cobra
+    state :cobra_terminated
     state :rehired
 
     event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :cobra_rehire, :after => :record_transition do
-      transitions from: [:cobra_employee], to: :rehired
-    end
-
-    event :cobra_employee, :after => :record_transition do
-      transitions from: [:employment_terminated], to: :cobra_employee
-    end
-
-    event :cobra_terminate, :after => :record_transition do
-      transitions from: [:cobra_employee], to: :cobra_employee_terminated
+    event :cobra_employee_role, :after => :record_transition do
+      transitions from: [:employment_terminated, :cobra_terminated], to: :cobra
     end
 
     event :link_employee_role, :after => :record_transition do
@@ -444,6 +469,7 @@ class CensusEmployee < CensusMember
 
     event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
+      transitions from: :cobra,  to: :cobra_terminated
     end
   end
 
@@ -490,7 +516,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_under_cobra?
-    existing_cobra
+    existing_cobra || aasm_state == 'cobra'
   end
 
   private

@@ -263,6 +263,8 @@ RSpec.describe Employers::CensusEmployeesController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      census_employee.update(aasm_state: 'employment_terminated')
+      allow(census_employee).to receive(:build_hbx_enrollment_for_cobra).and_return(true)
     end
     it "should be redirect" do
       xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: Date.today.to_s, :format => :js

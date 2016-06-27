@@ -106,6 +106,8 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
+  field :is_cobra, type: Boolean, default: false
+
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
@@ -284,11 +286,7 @@ class HbxEnrollment
   end
 
   def is_under_cobra?
-    if census_employee.present?
-      census_employee.is_under_cobra?
-    else
-      false
-    end
+    is_cobra
   end
 
   def benefit_sponsored?
@@ -597,7 +595,7 @@ class HbxEnrollment
   end
 
   def update_current(updates)
-    household.hbx_enrollments.where(id: id).update_all(updates)
+    household && household.hbx_enrollments.where(id: id).update_all(updates)
   end
 
   def update_hbx_enrollment_members_premium(decorated_plan)
@@ -1045,6 +1043,7 @@ class HbxEnrollment
 
   def can_select_coverage?
     return true unless is_shop?
+    return true if is_under_cobra?
 
     if employee_role.can_enroll_as_new_hire?
       coverage_effective_date = employee_role.coverage_effective_on
