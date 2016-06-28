@@ -110,7 +110,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def send_general_agency_assign_msg(general_agency, employer_profile, broker_agency_profile, status)
-    subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name} (#{status})"
+    subject = "You are associated to #{broker_agency_profile.organization.legal_name}- #{general_agency.legal_name} (#{status})"
     body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
     secure_message(broker_agency_profile, general_agency, subject, body)
     secure_message(broker_agency_profile, employer_profile, subject, body)
