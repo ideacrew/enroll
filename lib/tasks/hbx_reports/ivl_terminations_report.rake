@@ -6,7 +6,7 @@ require 'csv'
      desc "List of IVL terminations for today"
      task :terminations_report => :environment do
  
-       date_of_termination = TimeKeeper.date_of_record
+       date_of_termination = TimeKeeper.date_of_record.yesterday
  
        families = Family.where(:"households.hbx_enrollments" =>
        	  { :$elemMatch => {
@@ -34,8 +34,9 @@ require 'csv'
          families.each do |family|
            # reject if doesn't have consumer role
            next unless family.primary_family_member.person.consumer_role
-           hbx_enrollment = family.households.first.hbx_enrollments.select{|hbx| hbx.terminated_on && hbx.terminated_on == date_of_termination}.first
-           if hbx_enrollment
+           hbx_enrollments = family.households.first.hbx_enrollments.select{|hbx| hbx.terminated_on && hbx.terminated_on == date_of_termination}
+            hbx_enrollments.each do |hbx_enrollment|
+              if hbx_enrollment
              csv << [
                  hbx_enrollment.id,
                  family.primary_family_member.person.last_name,
@@ -48,6 +49,7 @@ require 'csv'
                  hbx_enrollment.terminated_on
              ]
            end
+          end
            processed_count += 1
          end
        end
