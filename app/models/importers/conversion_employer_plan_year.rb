@@ -4,6 +4,7 @@ module Importers
 
     validate :validate_fein
     validate :validate_new_coverage_policy
+    validate :validate_is_conversion_employer
 
     validates_presence_of :plan_selection, :allow_blank => false
     validates_numericality_of :enrolled_employee_count, :allow_blank => false
@@ -17,6 +18,22 @@ module Importers
         # if found_employer.plan_years.any? && (found_employer.profile_source == "conversion")
         #   errors.add(:fein, "employer already has conversion plan years")
         # end
+      end
+    end
+
+    def plan_years_are_active?(plan_years)
+      return false if plan_years.empty?
+      plan_years.any? do |py|
+        PlanYear::PUBLISHED.include?(py.aasm_state) ||
+          PlanYear::RENEWING.include?(py.aasm_state)
+      end
+    end
+
+    def validate_is_conversion_employer
+      found_employer = find_employer
+      return true unless found_employer
+      if found_employer.plan_years.any?
+        errors.add(:fein, "already has active plan years")
       end
     end
 
