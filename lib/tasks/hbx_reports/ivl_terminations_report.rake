@@ -11,8 +11,9 @@ require 'csv'
        families = Family.where(:"households.hbx_enrollments" =>
        	  { :$elemMatch => {
            :"aasm_state" => "coverage_terminated",
-           :"terminated_on" => date_of_termination }
-       	})
+           :"terminated_on" => date_of_termination 
+          }
+       	  })
  
        field_names  = %w(
            HBX_ID
@@ -21,6 +22,7 @@ require 'csv'
            SSN
            Plan_Name
            HIOS_ID
+           Policy_ID
            Effective_Start_Date
            End_Date
          )
@@ -31,6 +33,8 @@ require 'csv'
          csv << field_names
  
          families.each do |family|
+           # reject if doesn't have consumer role
+           next unless family.primary_family_member.person.consumer_role
            hbx_enrollment = family.households.first.hbx_enrollments.select{|hbx| hbx.terminated_on && hbx.terminated_on == date_of_termination}.first
            if hbx_enrollment
              csv << [
@@ -40,6 +44,7 @@ require 'csv'
                  family.primary_family_member.person.ssn,
                  hbx_enrollment.plan.name,
                  hbx_enrollment.plan.hios_id,
+                 hbx_enrollment.hbx_id,
                  hbx_enrollment.effective_on,
                  hbx_enrollment.terminated_on
              ]
