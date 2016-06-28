@@ -11,21 +11,20 @@ require 'csv'
        families = Family.where(:"households.hbx_enrollments" =>
        	  { :$elemMatch => {
            :"aasm_state" => "coverage_terminated",
-           :"terminated_on" => date_of_termination 
-          }
+           :"terminated_on" => date_of_termination }
        	  })
  
-       field_names  = %w(
-           HBX_ID
-           Last_Name
-           First_Name
-           SSN
-           Plan_Name
-           HIOS_ID
-           Policy_ID
-           Effective_Start_Date
-           End_Date
-         )
+           field_names  = %w(
+               HBX_ID
+               Last_Name
+               First_Name
+               SSN
+               Plan_Name
+               HIOS_ID
+               Policy_ID
+               Effective_Start_Date
+               End_Date
+             )
        processed_count = 0
        file_name = "#{Rails.root}/public/ivl_terminations.csv"
  
