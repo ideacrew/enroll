@@ -1,7 +1,10 @@
 <div id = "household-header" class = "module household-header" align = "right">
   <table>
     <tr>
-      <td><b>SLCSP</b></td>
+      <td>
+        <b>SLCSP</b>
+        <i class="fa fa-question-circle" data-toggle="tooltip" title="Second Lowest Cost Silver Plan. The second-lowest priced Marketplace health plan in the Silver category that applies to you. It’s not necessarily the plan you enrolled in."></i>
+      </td>
       <td width = "15px;" ></td>
       <td><%=@slcsp_value%></span></td>
 
@@ -9,7 +12,7 @@
       
       <th >Max APTC</th>
       <td width = "15px;" ></td>
-      <td><%= text_field_tag "max_aptc", max_aptc, class: @aptc_errors.present? ? 'form-control error-styling': 'form-control', size: '8px', onchange: "APTCModule.calculateAvailableAPTC('household')"%></td>
+      <td><%= text_field_tag "max_aptc", max_aptc, class: @aptc_errors.present? ? 'form-control error-styling': 'form-control', size: '8px', onchange: "APTCModule.calculateAvailableAPTC('household')", max: 2000%></td>
 
       <td width="50px;"></td>
 

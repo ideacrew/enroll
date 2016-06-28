@@ -355,8 +355,10 @@ class HbxAdmin
       applied_aptcs_array.each {|hbx| sum_of_all_applied += hbx[1]["aptc_applied"].to_f} if applied_aptcs_array.present?
       if max_aptc == "NaN"
         aptc_errors["MAX_APTC_NON_NUMERIC"] = "Max APTC needs to be a numeric value."
-      else
-        aptc_errors["MAX_APTC_TOO_SMALL"] = "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments." if sum_of_all_applied.to_f > max_aptc.to_f if applied_aptcs_array.present?
+      elsif applied_aptcs_array.present? && sum_of_all_applied.to_f > max_aptc.to_f
+        aptc_errors["MAX_APTC_TOO_SMALL"] = "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
+      elsif max_aptc.to_f > 9999.99
+        aptc_errors["MAX_APTC_TOO_BIG"]  = "Max APTC should be less than 9999.99"
       end
       return aptc_errors
     end
