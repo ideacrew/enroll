@@ -26,7 +26,7 @@
           <tr>
             <td>
               <p><b>New DOB</b></p> 
-              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication(#{@person.id}, this.value)"} %>
+              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value)"} %>
             </td>  
             <td>
                <p><b>New SSN</b></p>  
