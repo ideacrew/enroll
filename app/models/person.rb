@@ -645,8 +645,8 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
-        role.update_attributes!(:aasm_state => :is_closed)
+      if (roles = person.employer_staff_roles.select{ |role| role.employer_profile_id.to_s == employer_profile_id.to_s }).present?
+        roles.each { |role| role.update_attributes!(:aasm_state => :is_closed) }
         return true, 'Employee Staff Role is inactive'
       else
         return false, 'No matching employer staff role'
