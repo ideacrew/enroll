@@ -415,6 +415,7 @@ class CensusEmployee < CensusMember
     state :employee_role_linked
     state :employment_terminated
     state :cobra_employee
+    state :cobra_employee_terminated
     state :rehired
 
     event :rehire_employee_role, :after => :record_transition do
@@ -430,7 +431,7 @@ class CensusEmployee < CensusMember
     end
 
     event :cobra_terminate, :after => :record_transition do
-      transitions from: [:cobra_employee], to: :employment_terminated
+      transitions from: [:cobra_employee], to: :cobra_employee_terminated
     end
 
     event :link_employee_role, :after => :record_transition do
