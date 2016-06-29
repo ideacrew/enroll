@@ -31,8 +31,7 @@ $('#stay-logged-in').on('click', function() {
       },
       error: function(response){
         if ( true == <%= current_user.has_employer_staff_role? %> ) {
-          alert('matt use the commented line below to redirect as needed for employers');
-          //window.location.replace('<%= url_for(SamlInformation.iam_login_url) %>');
+          // alert('matt use the commented line below to redirect as needed for employers');
 
         } else {
           window.location.replace('<%= url_for(SamlInformation.iam_login_url) %>');
