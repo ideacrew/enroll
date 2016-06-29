@@ -446,6 +446,20 @@ $(document).ready(function () {
   }
   // ----- Finish Focus Effect & Progress -----
 
+  function check_dob_change_implication(new_dob, )  {
+    alert("check dob change impication!"); 
+    var person_id = $("#person_person_id").val();
+    var family_id = $("#person_family_id").val();
+    $.ajax({
+      type: "GET",
+      data:{person_id: person_id, family_id: family_id},
+      url: "/hbx_admin/edit_aptc_csr",
+      success: function (d) {
+              $('#loading').html("");
+      }
+    });
+  }
+
   //Employee Dependents Page
   $('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
   $("#dependents_info a.one, #dependents_info a.two, #dependents_info a.three, #dependents_info a.four, #dependents_info a.five").css("color","#00b420");

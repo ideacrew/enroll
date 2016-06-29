@@ -19,13 +19,15 @@
 
   <div class="row input-no-pd">
     <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
+      <%= f.hidden_field :person_id, value: @person.id %>
+      <%= f.hidden_field :family_id, value: @family.id %>
       <table class="table table-border">
         <thead></thead>
         <tbody>
           <tr>
             <td>
               <p><b>New DOB</b></p> 
-              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true} %>
+              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, onchange="check_dob_change_implication(<%=@person.id%>, this.value)"} %>
             </td>  
             <td>
                <p><b>New SSN</b></p>  
@@ -36,11 +38,15 @@
             <td></td>
             <td>
               <%if @error_on_save %> <div id = "save_error_msg"><%=@error_on_save%></div><%end%>
+
                 <%= f.submit "Update", :class => "btn btn-primary pull-right"%>
             </td>
         </tbody>
       </table>
     <% end %>
   </div>
-  <%if @person_has_active_enrollment%><span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premiums.<%end%>
+  <%=%>
+<!--   <%#if @person_has_active_enrollment%><span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premiums.<%#end%> -->
 </div>
+
+<%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path, remote: true, class: 'btn btn-default' %>

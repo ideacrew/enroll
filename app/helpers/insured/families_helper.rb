@@ -109,5 +109,14 @@ module Insured::FamiliesHelper
     if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
      true
     end  
-  end  
+  end
+
+  def dob_change_has_premium_implication?(person, new_dob)
+    if Person.person_has_an_active_enrollment?(person) && person.dob !=  Date.parse(new_dob)
+      age = calculate_age_by_dob(new_dob)
+      return true if (age >= 20 && age <= 61)
+    end
+    return false
+  end
+
 end

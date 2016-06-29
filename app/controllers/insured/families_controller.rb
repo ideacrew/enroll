@@ -255,7 +255,6 @@ class Insured::FamiliesController < FamiliesController
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
       end
     end
-
   end
 
   def check_for_address_info
