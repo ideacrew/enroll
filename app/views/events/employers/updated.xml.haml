@@ -18,8 +18,11 @@
     - if !employer.sic_code.blank?
       %sic_code= employer.sic_code
     %brokers
-      = render :partial => "events/employers/broker_agency_account", :collection => employer.broker_agency_accounts
+      = render :partial => "events/employers/broker_agency_account", :collection => employer.broker_agency_accounts, :locals => { :employer_profile => employer }
     %plan_years
       = render :partial => "events/employers/plan_year", :collection => employer.plan_years.select(&:eligible_for_export?)
+    - if employer.is_coversion_employer?
+      %shop_transfer
+        %hbx_active_on= employer.created_at.strftime("%Y-%m-%d")
     %employer_census_families
   = render :partial => "events/shared/versioned_resource", :object => employer

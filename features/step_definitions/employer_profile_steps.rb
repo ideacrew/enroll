@@ -1,7 +1,8 @@
 Given /(\w+) is a person$/ do |name|
   person = FactoryGirl.create(:person, first_name: name)
   @pswd = 'aA1!aA1!aA1!'
-  user = User.create(email: Forgery('email').address, password: @pswd, password_confirmation: @pswd, person: person)
+  email = Forgery('email').address
+  user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
@@ -14,11 +15,11 @@ end
 
 Then  /(\w+) signs in to portal/ do |name|
   person = Person.where(first_name: name).first
-  fill_in "user[email]", :with => person.user.email
-  find('#user_email').set(person.user.email)
+  fill_in "user[login]", :with => person.user.email
+  find('#user_login').set(person.user.email)
   fill_in "user[password]", :with => @pswd
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => person.user.email unless find(:xpath, '//*[@id="user_email"]').value == person.user.email
+  fill_in "user[login]", :with => person.user.email unless find(:xpath, '//*[@id="user_login"]').value == person.user.email
   find('.interaction-click-control-sign-in').click
 end
 
@@ -201,7 +202,7 @@ Then /(\w+) becomes an Employer/ do |name|
   find('a', text: "I'm an Employer")
 end
 
-Then /there is a linked POC/ do 
+Then /there is a linked POC/ do
   find('td', text: /Linked/)
 end
 

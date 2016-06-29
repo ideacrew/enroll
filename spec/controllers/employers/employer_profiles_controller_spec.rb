@@ -190,6 +190,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:policy) {double("policy")}
 
     context "it should return published plan year " do
+      let(:broker_agency_account) { FactoryGirl.build_stubbed(:broker_agency_account) }
+
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:authorize_show).and_return(true)
@@ -198,6 +200,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
+        allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         sign_in(user)
       end
@@ -212,6 +215,7 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(assigns(:premium_amt_total)).to eq hbx_enrollment.total_premium
         expect(assigns(:employee_cost_total)).to eq hbx_enrollment.total_employee_cost
       end
+
 
       it "should get announcement" do
         FactoryGirl.create(:announcement, content: "msg for Employer", audiences: ['Employer'])

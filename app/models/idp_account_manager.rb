@@ -21,7 +21,7 @@ class IdpAccountManager
     )
   end
 
-  def create_account(email, password, personish, account_role, timeout = 15)
+  def create_account(email, username, password, personish, account_role, timeout = 15)
     account_role_val = "individual"
     system_flag = "1"
     case account_role
@@ -35,6 +35,7 @@ class IdpAccountManager
     end
     provider.create_account({
       :email => email,
+      :username => username,
       :password => password,
       :first_name => personish.first_name,
       :last_name => personish.last_name,
@@ -63,8 +64,8 @@ class IdpAccountManager
     self.instance.check_existing_account(personish, timeout)
   end
 
-  def self.create_account(email, password, personish, account_role, timeout = 15)
-    self.instance.create_account(email, password, personish, account_role, timeout)
+  def self.create_account(email, username, password, personish, account_role, timeout = 15)
+    self.instance.create_account(email, username, password, personish, account_role, timeout)
   end
 
   class AmqpSource
