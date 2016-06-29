@@ -55,8 +55,6 @@ class Employers::BrokerAgencyController < ApplicationController
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
   rescue => e
-    puts e.message
-    puts e.backtrace
     if @employer_profile.errors
       error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages)
     end

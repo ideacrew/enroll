@@ -62,7 +62,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
     context 'with out search string' do
       before(:each) do
-        allow(HbxProfile).to receive(:all) { [FactoryGirl.create(:hbx_profile)]}
         sign_in(@user)
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
@@ -118,7 +117,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should terminate broker and redirect to my_account with broker tab actived" do
         get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
-        allow_any_instance_of(EmployerProfile).to receive_message_chain("active_broker.full_name") { "broker agency" }
         expect(flash[:notice]).to eq("Broker terminated successfully.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
       end
@@ -133,7 +131,6 @@ RSpec.describe Employers::BrokerAgencyController do
           invalid_plan=FactoryGirl.build(:plan_year, open_enrollment_end_on: Date.today)
           @employer_profile.plan_years << invalid_plan
           @employer_profile.save!(validate:false)
-          allow(HbxProfile).to receive(:all) { [FactoryGirl.create(:hbx_profile)]}
     end
 
     it "should be a success" do
