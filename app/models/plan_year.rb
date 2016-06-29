@@ -859,9 +859,10 @@ private
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
+    
 
-    if (start_on - open_enrollment_start_on).to_i > 63
-      errors.add(:open_enrollment_start_on, "can't occur before 62 days before start date")
+    if open_enrollment_start_on < (start_on - 2.months)
+      errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end    
 
     if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
