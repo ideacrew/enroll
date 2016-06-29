@@ -41,7 +41,8 @@
               <span class="glyphicon glyphicon-user"></span>
                 &nbsp;&nbsp;&nbsp;<%=full_name_of_person(person_id.keys.first)%>
               <%if primary_member(person_id.keys.first)%> 
-                &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  
+                &nbsp;&nbsp;&nbsp;
+                <i class="fa fa-asterisk" aria-hidden="true" data-toggle="tooltip" title="Primary Family Member"></i>
               <%end%>
             </td>
           </tr>

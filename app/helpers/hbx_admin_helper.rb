@@ -21,9 +21,9 @@ module HbxAdminHelper
     	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
   	end
   	if max_aptc_for_enrollment > max_aptc_for_household.to_f
-  		'%.2f' % max_aptc_for_household.to_f
+        max_aptc_for_household.to_f
   	else
-  		'%.2f' % max_aptc_for_enrollment.to_f
+      max_aptc_for_enrollment.to_f
   	end
   end
 

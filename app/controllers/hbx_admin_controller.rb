@@ -25,10 +25,12 @@ class HbxAdminController < ApplicationController
 
   def update_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    year = params[:year]  || TimeKeeper.date_of_record.year
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
+    @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(year.to_i)
     if @family.present?
-      @eligibility_redetermination_result = HbxAdmin.redetermine_eligibility_with_updated_values(@family, params)
+      @eligibility_redetermination_result = HbxAdmin.redetermine_eligibility_with_updated_values(@family, params, @hbxs)
       @enrollment_update_result = HbxAdmin.update_aptc_applied_for_enrollments(params)
     end
     respond_to do |format|
@@ -45,7 +47,7 @@ class HbxAdminController < ApplicationController
     @family = Family.find(params[:family_id])
     @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
-    @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:applied_aptcs_array])
+    @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage], params[:applied_aptcs_array])
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
     @household_members = HbxAdmin.build_household_members(@family)

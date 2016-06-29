@@ -2,8 +2,8 @@
   <table>
     <tr>
       <td>
-        <b>SLCSP</b>
         <i class="fa fa-question-circle" data-toggle="tooltip" title="Second Lowest Cost Silver Plan. The second-lowest priced Marketplace health plan in the Silver category that applies to you. It’s not necessarily the plan you enrolled in."></i>
+        <b>SLCSP</b>
       </td>
       <td width = "15px;" ></td>
       <td><%=@slcsp_value%></span></td>
@@ -20,7 +20,7 @@
       <td width = "15px;" ></td>
       <td width="18%" style="border: thin solid;">
         <div class="selectric-labeled">
-          <%= select_tag "csr_percentage", options_for_select([ 100, 94, 87, 73, 0 ], csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
+          <%= select_tag "csr_percentage", options_for_select(EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.keys.map{|variant| variant.gsub('csr_','')} , csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
         </div>
         
       </td>

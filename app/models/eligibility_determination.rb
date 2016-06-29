@@ -15,6 +15,8 @@ class EligibilityDetermination
       "csr_94"  => "06",
       "csr_87"  => "05",
       "csr_73"  => "04",
+      "csr_0"   => "02",
+      "limited" => "03"
     }
   CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
 
