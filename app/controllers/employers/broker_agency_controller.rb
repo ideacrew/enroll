@@ -55,6 +55,8 @@ class Employers::BrokerAgencyController < ApplicationController
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
   rescue => e
+    puts e.message
+    puts e.backtrace
     if @employer_profile.errors
       error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages)
     end
@@ -117,13 +119,12 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def send_broker_assigned_msg(employer_profile, broker_agency_profile)
-    hbx_admin = HbxProfile.all.first
     broker_subject = "#{employer_profile.legal_name} has selected you as the broker on DC Health Link"
     broker_body = "<br><p>Associated details<br>Employer : #{employer_profile.try(:legal_name)}</p>"
     employer_subject = "You have selected #{broker_agency_profile.organization.legal_name} as the broker."
     employer_body = "<br><p>Associated details<br>Broker Agency : #{broker_agency_profile.organization.try(:legal_name)}</p>"
-    secure_message(hbx_admin, broker_agency_profile, broker_subject, broker_body)
-    secure_message(hbx_admin, employer_profile, employer_subject, employer_body)
+    secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
+    secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
   end
 
   def find_employer
