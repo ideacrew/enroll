@@ -261,7 +261,6 @@ class HbxAdmin
           current_aptc_applied_hash[hbx.id.to_s] = (hbx.applied_aptc_amount || 0)
         end
       end
-      binding.pry
       return current_aptc_applied_hash  
     end
 
