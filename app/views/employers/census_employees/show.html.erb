@@ -16,7 +16,11 @@
             SSN: <%= number_to_obscured_ssn @census_employee.ssn %><br/>
             Hired On: <%= format_date @census_employee.hired_on %><br/>
             Date Added to Roster: <%= format_date @census_employee.created_at %><br/>
-            Owner: <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
+            Owner: <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %><br/>
+            <%if  @census_employee.coverage_terminated_on %>
+            Plan End Date: <%= @census_employee.coverage_terminated_on %><br/>
+            Employee Termination Date: <%= @census_employee.employment_terminated_on%>
+            <%end%>
           </p>
         </div>
       </div>
