@@ -742,8 +742,9 @@ class HbxEnrollment
     enrollment = HbxEnrollment.new
 
     enrollment.household = coverage_household.household
-    enrollment.submitted_at = submitted_at
 
+
+    enrollment.submitted_at = submitted_at
     case
     when employee_role.present?
       if benefit_group.blank?
@@ -1119,7 +1120,9 @@ class HbxEnrollment
 
 
  def set_submitted_at
-   write_attribute(:submitted_at, TimeKeeper.date_of_record) if submitted_at.blank?
+   if submitted_at.blank?
+      write_attribute(:submitted_at, TimeKeeper.date_of_record) 
+   end
  end
 
   private
