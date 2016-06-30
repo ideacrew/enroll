@@ -26,7 +26,7 @@
           <tr>
             <td>
               <p><b>New DOB</b></p> 
-              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value)"} %>
+              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :value => @new_dob.present? ? @new_dob : @person.dob, :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value)"} %>
             </td>  
             <td>
                <p><b>New SSN</b></p>  
@@ -44,8 +44,9 @@
       </table>
     <% end %>
   </div>
-  <%=%>
-<!--   <%#if @person_has_active_enrollment%><span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premiums.<%#end%> -->
+  <%if @has_premium_implication%> 
+    <div class="alert alert-warning"> <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premium. </div>
+  <%end%>
 </div>
 
 <%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path, remote: true, class: 'btn btn-default' %>

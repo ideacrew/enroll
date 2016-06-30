@@ -577,6 +577,16 @@ class Person
       Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
     end
 
+    def dob_change_has_premium_implication?(person, new_dob)
+      dob = Date.strptime(new_dob, '%m/%d/%Y')
+      if Person.person_has_an_active_enrollment?(person) && person.dob !=  dob
+        now = TimeKeeper.date_of_record
+        age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+        return true if (age >= 20 && age <= 61)
+      end
+      return false
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
@@ -645,8 +655,8 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if (roles = person.employer_staff_roles.select{ |role| role.employer_profile_id.to_s == employer_profile_id.to_s }).present?
-        roles.each { |role| role.update_attributes!(:aasm_state => :is_closed) }
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
+        role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
         return false, 'No matching employer staff role'

@@ -294,26 +294,23 @@ class Exchanges::HbxProfilesController < ApplicationController
   def edit_dob_ssn
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:id])
-    @person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
     end
   end
 
   def verify_dob_change
-    person = Person.find(params[:id])
-    new_dob = params[:person][:dob]
-    implications = dob_change_has_premium_implication?(person, new_dob)
+    @person = Person.find(params[:person_id])
+    @new_dob = params[:new_dob]
+    @has_premium_implication = Person.dob_change_has_premium_implication?(@person, @new_dob)
     respond_to do |format|
-      format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment, new_dob: new_dob, implications: implications}
+      format.js { render "edit_enrollment"}
     end
   end
 
   def update_dob_ssn
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
-    @person_has_active_enrollment = Person.person_has_an_active_enrollment?(@person)
-    @alert_premium_when_dob_change = @person_has_active_enrollment && ( @person.dob !=  Date.parse(params[:person][:dob]) )
     @ssn_match = Person.find_by_ssn(params[:person][:ssn])
 
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.

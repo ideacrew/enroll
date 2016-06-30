@@ -1,5 +1,5 @@
 <div class="container bottom-pd">
-  <%if !@dont_allow_change%>
+  <%if not @dont_allow_change%>
     <div class="row">
     </span><h3 class="title-inline">DOB / SSN Update Successful</h3>
     </div>
@@ -18,9 +18,9 @@
         </tbody>
       </table>
     </div>
-      <%if @alert_premium_when_dob_change%>
-      <span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> Please note that the DOB change may affect the premium of an active policy.
-      <%end%>
+      <%#if @alert_premium_when_dob_change%>
+      <!-- <span class="glyphicon glyphicon-warning-sign gi-2x" aria-hidden="true"></span> Please note that the DOB change may affect the premium of an active policy. -->
+      <%#end%>
   <%else%>
     <div class="row">
         <h3 class="title-inline">DOB / SSN Update Failed</h3>
