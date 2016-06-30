@@ -377,7 +377,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return false
       sign_in(user)
       xhr :get, :edit_dob_ssn
-      expect { raise NotAuthorizedError }.to raise_error
+      expect { HbxProfile.update_dob_ssn }.to raise_error(StandardError)
     end
 
     it "should render the edit_dob_ssn partial for logged in users with an admin role" do
@@ -401,13 +401,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_profile) { double("hbx_profile")}
     let(:invalid_ssn) { "234-45-839" }
     let(:valid_ssn) { "234-45-8390" }
-    let(:valid_dob) { "03/17/1986" }
+    let(:valid_dob) { "03/17/1987" }
 
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(user).to receive(:has_hbx_staff_role?).and_return true
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob}, :format => 'js'}
+      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
     end 
@@ -416,7 +416,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return true
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob }, :format => 'js'}
+      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('update_enrollment')
     end 
@@ -426,7 +426,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return false
       sign_in(user)
       xhr :get, :update_dob_ssn
-      expect { raise NotAuthorizedError }.to raise_error
+      expect { HbxProfile.update_dob_ssn }.to raise_error(StandardError)
     end
 
   end
