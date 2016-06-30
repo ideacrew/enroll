@@ -167,12 +167,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(person).to receive(:addresses).and_return([])
       expect(person.addresses.empty?).to eq true
     end
-
-    it "takes address from ER roaster" do
-      allow(person).to receive(:addresses).and_return([])
-      get :edit, id: employee_role.id
-      expect(person.addresses.count).to eq 1
-    end
   end
 
   describe "POST create" do
