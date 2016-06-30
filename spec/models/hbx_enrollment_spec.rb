@@ -271,6 +271,9 @@ describe HbxEnrollment, dbclean: :after_all do
         benefit_group_assignment: @mikes_benefit_group_assignments
       )
     end
+    it "should have a submitted at date" do
+      expect(enrollment.submitted_at).not_to eq nil   
+    end
 
     it "should assign the benefit group assignment" do
       expect(enrollment.benefit_group_assignment_id).not_to be_nil

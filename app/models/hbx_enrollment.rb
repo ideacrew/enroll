@@ -170,7 +170,7 @@ class HbxEnrollment
       message: "%{value} is not a valid coverage type"
     }
 
-  before_save :generate_hbx_id
+  before_save :generate_hbx_id, :set_submitted_at
 
   def generate_hbx_signature
     if self.subscriber
@@ -1116,6 +1116,11 @@ class HbxEnrollment
     return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
     !(shopping_plan_year.start_on == effective_on)
   end
+
+
+ def set_submitted_at
+   write_attribute(:submitted_at, TimeKeeper.date_of_record) if submitted_at.blank?
+ end
 
   private
 
