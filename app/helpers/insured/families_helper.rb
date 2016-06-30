@@ -33,7 +33,7 @@ module Insured::FamiliesHelper
   end
 
   def shift_waived_time(policy)
-    policy.submitted_at.in_time_zone('Eastern Time (US & Canada)')
+    (policy.submitted_at || policy.created_at).in_time_zone('Eastern Time (US & Canada)')
   end
 
   def format_policy_purchase_date(policy)
