@@ -308,12 +308,8 @@ class BrokerRole
   end
 
   def notify_broker_pending
-    reasons = []
-    reasons << "License not completed" if !self.license
-    reasons << "Training not completed" if !self.training
     unchecked_carriers = self.carrier_appointments.select { |k,v| k if v != "true"}
-    reasons << "Carrier Appointments not completed #{unchecked_carriers.keys.join(',')}"  unless unchecked_carriers.empty?
-    UserMailer.broker_pending_notification(self,reasons).deliver_now
+    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present?  || !self.license  || !self.training
   end
 
   def applicant?
