@@ -81,7 +81,7 @@ module Importers
         :broker_name,
         :broker_npn,
         :ignore,
-        :ignore,
+        :tpa_fein,
         :ignore,
         :carrier
       ]

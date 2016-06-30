@@ -5,6 +5,7 @@ module Importers
     include ::Etl::ValueParsers
 
     attr_converter :fein, :as => :optimistic_ssn
+    attr_converter :tpa_fein, :as => :optimistic_ssn
 
     attr_reader :broker_npn, :primary_location_zip, :mailing_location_zip
 
@@ -38,6 +39,7 @@ module Importers
 
     validate :validate_new_fein
     validate :broker_exists_if_specified
+    validate :validate_tpa_if_specified
 
     attr_reader :warnings
 
@@ -51,6 +53,32 @@ module Importers
 
     def broker_npn=(val)
       @broker_npn = Maybe.new(val).strip.extract_value
+    end
+
+    def validate_tpa_if_specified
+      return true if broker_npn.blank?
+      return true if tpa_fein.blank?
+      unless find_broker
+        warnings.add(:tpa_fein, "specified, but could not find Broker")
+      end
+      unless find_ga
+        warnings.add(:tpa_fein, "is not an existing General Agency")
+      end
+    end
+
+    def find_broker
+      return nil if broker_npn.blank?
+      BrokerRole.by_npn(broker_npn).first
+    end
+
+    def find_ga
+      return nil if tpa_fein.blank?
+      org = Organization.where({
+        :fein => tpa_fein,
+        :general_agency_profile => {"$exists" => true}
+      }).first
+      return nil unless org
+      org.general_agency_profile
     end
 
     def validate_new_fein
@@ -128,7 +156,7 @@ module Importers
         br = BrokerRole.by_npn(broker_npn).first
         if !br.nil?
           broker_agency_accounts << BrokerAgencyAccount.new({
-            start_on: Time.mktime(2016,4,1,0,0,0),
+            start_on: Time.now,
             writing_agent_id: br.id,
             broker_agency_profile_id: br.broker_agency_profile_id
           })
@@ -192,6 +220,24 @@ module Importers
       end
     end
 
+    def assign_general_agencies
+      broker = find_broker
+      return [] unless broker
+      general_agency = find_ga
+      return [] unless general_agency
+      general_agency_accounts = []
+      if broker
+        if general_agency
+           general_agency_accounts << GeneralAgencyAccount.new(
+             :start_on => Time.now,
+             :general_agency_profile_id => general_agency.id,
+             :broker_role_id => broker.id
+           )
+        end
+      end
+      return general_agency_accounts
+    end
+
     def save
       return false unless valid?
       new_organization = Organization.new({
@@ -201,6 +247,7 @@ module Importers
         :office_locations => map_office_locations,
         :employer_profile => EmployerProfile.new({
           :broker_agency_accounts => assign_brokers,
+          :general_agency_accounts => assign_general_agencies,
           :entity_kind => "c_corporation",
           :profile_source => "conversion",
           :registered_on => registered_on
