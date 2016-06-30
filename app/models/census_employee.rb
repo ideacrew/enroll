@@ -4,10 +4,16 @@ class CensusEmployee < CensusMember
   include Searchable
   # include Validations::EmployeeInfo
   include Autocomplete
+  include Acapi::Notifiers
   require 'roo'
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
+  COBRA_STATES = %w(cobra cobra_terminated)
+
+  EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
+  EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
+
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -42,6 +48,7 @@ class CensusEmployee < CensusMember
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
   validate :no_duplicate_census_dependent_ssns
+  validate :check_cobra_begin_date
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   index({aasm_state: 1})
@@ -375,6 +382,18 @@ class CensusEmployee < CensusMember
     bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
+  def current_state
+    if existing_cobra?
+      if COBRA_STATES.include? aasm_state
+        aasm_state.humanize
+      else
+        'Cobra'
+      end
+    else
+      aasm_state.humanize
+    end
+  end
+
   def update_for_cobra(cobra_date)
     self.cobra_employee_role
     self.cobra_begin_date = cobra_date
@@ -468,8 +487,8 @@ class CensusEmployee < CensusMember
     end
 
     event :terminate_employee_role, :after => :record_transition do
-      transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
-      transitions from: :cobra,  to: :cobra_terminated
+      transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
+      transitions from: :cobra,  to: :cobra_terminated, after: :notify_cobra_terminated
     end
   end
 
@@ -557,6 +576,12 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def check_cobra_begin_date
+    if existing_cobra && hired_on > cobra_begin_date
+      errors.add(:cobra_begin_date, 'Cobra Begin Date should later than Hire Date')
+    end
+  end
+
 
   def no_duplicate_census_dependent_ssns
     dependents_ssn = census_dependents.map(&:ssn).select(&:present?)
@@ -611,6 +636,14 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def notify_terminated
+    notify(EMPLOYEE_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
+  end
+
+  def notify_cobra_terminated
+    notify(EMPLOYEE_COBRA_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
   end
 end
 

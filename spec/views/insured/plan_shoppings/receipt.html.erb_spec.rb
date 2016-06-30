@@ -20,6 +20,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       plan: new_plan,
       is_under_cobra?: false,
       coverage_kind: 'health',
+      benefit_package_name: 'benefit_package',
+      market_name: 'market_name',
       employee_role: double("EmployeeRole")
     )
   end
@@ -87,5 +89,19 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should have print area" do
     expect(rendered).to have_selector('#printArea')
     expect(rendered).to have_selector('a#btnPrint')
+  end
+
+  it "should have market" do
+    expect(rendered).to match('Market')
+    expect(rendered).to match('market_name')
+  end
+
+  it "should have benefit_package" do
+    expect(rendered).to match('Benefit Package:')
+    expect(rendered).to match('benefit_package')
+  end
+
+  it "should not have cobra msg" do
+    expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
 end

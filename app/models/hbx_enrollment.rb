@@ -275,6 +275,20 @@ class HbxEnrollment
     read_attribute(:coverage_kind) || self.plan.coverage_kind
   end
 
+  def benefit_package_name
+    if is_shop? && benefit_group
+      benefit_group.title
+    end
+  end
+
+  def market_name
+    if is_shop?
+      is_under_cobra? ? 'Employer Sponsored COBRA/Continuation' : 'Employer Sponsored'
+    else
+      'Individual'
+    end
+  end
+
   def census_employee
     if employee_role.present?
       employee_role.census_employee

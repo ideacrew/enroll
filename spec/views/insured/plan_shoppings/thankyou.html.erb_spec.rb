@@ -16,7 +16,9 @@ RSpec.describe "insured/thankyou.html.erb" do
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
-      allow(@enrollment).to receive(:is_under_cobra?).and_return(false)
+      allow(@enrollment).to receive(:is_under_cobra?).and_return(true)
+      allow(@enrollment).to receive(:market_name).and_return('market_name')
+      allow(@enrollment).to receive(:benefit_package_name).and_return('benefit_package')
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
@@ -29,6 +31,20 @@ RSpec.describe "insured/thankyou.html.erb" do
 
     it 'should render coverage_information partial' do
       expect(response).to render_template(:partial => "insured/plan_shoppings/_coverage_information")
+    end
+
+    it "should have market" do
+      expect(rendered).to match('Market')
+      expect(rendered).to match('market_name')
+    end
+
+    it "should have benefit_package" do
+      expect(rendered).to match('Benefit Package:')
+      expect(rendered).to match('benefit_package')
+    end
+
+    it "should have cobra msg" do
+      expect(rendered).to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
     end
   end
 

@@ -136,6 +136,31 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         end
       end
 
+      context "check_cobra_begin_date" do
+        it "should not have errors when existing_cobra is false" do
+          initial_census_employee.cobra_begin_date = initial_census_employee.hired_on - 5.days
+          initial_census_employee.existing_cobra = false
+          expect(initial_census_employee.save).to be_truthy
+        end
+
+        context "when existing_cobra is true" do
+          before do
+            initial_census_employee.existing_cobra = true
+          end
+
+          it "should not have errors when hired_on earlier than cobra_begin_date" do
+            initial_census_employee.cobra_begin_date = initial_census_employee.hired_on + 5.days
+            expect(initial_census_employee.save).to be_truthy
+          end
+
+          it "should have errors when hired_on later than cobra_begin_date" do
+            initial_census_employee.cobra_begin_date = initial_census_employee.hired_on - 5.days
+            expect(initial_census_employee.save).to be_falsey
+            expect(initial_census_employee.errors[:cobra_begin_date].to_s).to match(/Cobra Begin Date should later than Hire Date/)
+          end
+        end
+      end
+
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -1062,6 +1087,31 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         census_employee.find_or_create_benefit_group_assignment(white_collar_benefit_group)
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq white_collar_benefit_group
+      end
+    end
+  end
+
+  context "current_state" do
+    let(:census_employee) { CensusEmployee.new }
+
+    context "existing_cobra is true" do
+      before :each do 
+        census_employee.existing_cobra = true
+      end
+
+      it "should return cobra" do
+        expect(census_employee.current_state).to eq 'Cobra'
+      end
+
+      it "should return cobra_terminated" do
+        census_employee.aasm_state = CensusEmployee::COBRA_STATES.last
+        expect(census_employee.current_state).to eq CensusEmployee::COBRA_STATES.last.humanize
+      end
+    end
+
+    context "existing_cobra is false" do
+      it "should return aasm_state" do
+        expect(census_employee.current_state).to eq 'eligible'.humanize
       end
     end
   end

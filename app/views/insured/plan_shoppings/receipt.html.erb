@@ -20,8 +20,12 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
+            <% if @enrollment.benefit_package_name.present? %>
+              <strong>Benefit Package: <%= @enrollment.benefit_package_name %></strong><br>
+            <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Benefit: <%= @enrollment.coverage_kind %><br>
+            Market: <%= @enrollment.market_name %><br>
             Metal level : <%= display_dental_metal_level @plan %>
           </p>
 

@@ -526,7 +526,6 @@ function checkAreaCode(textbox) {
   return true;
 }
 
-
 $(document).on('click', '#census_employee_existing_cobra', function() {
   if($(this).prop("checked") == true){
     $(this).parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
@@ -535,3 +534,20 @@ $(document).on('click', '#census_employee_existing_cobra', function() {
   }
 });
 
+function checkCobraBeginDate() {
+  var hired_on_str = $('#census_employee_hired_on_jq_datepicker_plain_field').val();
+  var cobra_begin_date_str = $('#census_employee_cobra_begin_date_jq_datepicker_plain_field').val();
+  if($('#census_employee_existing_cobra').prop("checked") == true){
+    if (hired_on_str != '' && cobra_begin_date_str != ''){
+      var hired_on = new Date(hired_on_str);
+      var cobra_begin_date = new Date(cobra_begin_date_str);
+      if (hired_on > cobra_begin_date) {
+        alert('Hire Date must before Cobra Begin Date.');
+      }
+    }
+  }
+}
+
+$(document).on('change', '#jq_datepicker_ignore_census_employee_hired_on, #jq_datepicker_ignore_census_employee_cobra_begin_date', function() {
+  checkCobraBeginDate();
+});

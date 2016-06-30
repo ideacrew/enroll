@@ -1740,4 +1740,34 @@ context "for cobra", :dbclean => :after_each do
     enrollment.is_cobra = true
     expect(enrollment.can_select_coverage?).to be_truthy
   end
+
+  context "benefit_package_name" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_package) { BenefitPackage.new(title: 'benefit package title') }
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      enrollment.benefit_group = benefit_group
+      expect(enrollment.benefit_package_name).to eq benefit_group.title
+    end
+  end
+
+  context "market_name" do
+    context "for shop" do
+      it "under cobra" do
+        enrollment.kind = 'employer_sponsored'
+        enrollment.is_cobra = true
+        expect(enrollment.market_name).to eq 'Employer Sponsored COBRA/Continuation'
+      end
+
+      it "not under cobra" do
+        enrollment.kind = 'employer_sponsored'
+        enrollment.is_cobra = false
+        expect(enrollment.market_name).to eq 'Employer Sponsored'
+      end
+    end
+
+    it "for individual" do
+      expect(enrollment.market_name).to eq 'Individual'
+    end
+  end
 end
