@@ -19,27 +19,22 @@ namespace :reports do
           state
           zip
           address_updated_at
-
           phone_kind
           area_code
           number
           phone_number_updated_at
-
           old_broker_agency_legal_name
           old_broker_npn
           old_broker_created_at
           old_broker_updated_at
-
           new_broker_agency_legal_name
           new_broker_npn
           new_broker_created_at
-
           old_poc_first_name
           old_poc_last_name
           old_poc_dob
           old_poc_created
           old_poc_updated
-
           new_poc_first_name
           new_poc_last_name
           new_poc_dob
@@ -52,34 +47,43 @@ namespace :reports do
         csv << field_names
         organizations.each do |organization|
 
+          # find address updated in date range(Date.today - 7.days..Date.today) for a employer profile where address.kind => primary,mailing,branch
+
           address_change = organization.office_locations.
               where(:"address.kind".in => ["primary","mailing","branch"],:"address.updated_at" => date_range).flat_map(&:address).
-              select{|addres| addres.updated_at.strftime('%Y-%m-%d') != addres.office_location.organization.created_at.strftime('%Y-%m-%d')}
+              select{|address| address.updated_at.strftime('%Y-%m-%d') != address.office_location.organization.created_at.strftime('%Y-%m-%d')}
 
+          # find phone_number updated in date range(Date.today - 7.days..Date.today) for a employer profile where address.kind => phone main
 
           phone_number_change = organization.office_locations.
               where(:"phone.kind".in => ["phone main"],:"phone.updated_at" => date_range).flat_map(&:phone).
-              select{|phon| phon.updated_at.strftime('%Y-%m-%d') != organization.created_at.strftime('%Y-%m-%d')}
+              select{|phone| phone.updated_at.strftime('%Y-%m-%d') != organization.created_at.strftime('%Y-%m-%d')}
+
+          # find old broker agency who assigned for a employer profile before broker agency changed in date range(Date.today - 7.days..Date.today)
 
           old_broker = organization.employer_profile.broker_agency_accounts.unscoped.
-              where(:"updated_at" => date_range).select{|a| (a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d') && a.is_active == false)}.last.to_a
+              where(:"updated_at" => date_range).select{|broker_agency| (broker_agency.updated_at.strftime('%Y-%m-%d') != broker_agency.employer_profile.created_at.strftime('%Y-%m-%d') && broker_agency.is_active == false)}.last.to_a
+
+          # find updated active broker agency for a employer profile if exists in date range(Date.today - 7.days..Date.today)
 
           new_broker = organization.employer_profile.broker_agency_accounts.
-              where(:"updated_at" => date_range).select{|a| a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d')}.first.to_a
+              where(:"updated_at" => date_range).select{|broker_agency| broker_agency.updated_at.strftime('%Y-%m-%d') != broker_agency.employer_profile.created_at.strftime('%Y-%m-%d')}.first.to_a
+
+          # find deleted poc's for a employer profile in date range(Date.today - 7.days..Date.today)
 
           old_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
                                  :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
               select{|employer_staff_role| employer_staff_role.aasm_state == "is_closed"}
 
+          # find newly added poc's for a employer profile in date range(Date.today - 7.days..Date.today)
+
           new_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
                                  :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
-              select{|employer_staff_role| employer_staff_role.aasm_state == "is_active"}
-
+              select{|employer_staff_role| employer_staff_role.aasm_state == "is_active" && employer_staff_role.created_at.strftime('%Y-%m-%d') != organization.employer_profile.created_at.strftime('%Y-%m-%d')}
 
           if (address_change.present? || phone_number_change.present? || old_broker.present? || new_broker.present? || old_poc.present? || new_poc.present? )
 
             max_size = [address_change.length, phone_number_change.length, old_broker.length, new_broker.length, old_poc.length, new_poc.length].max
-
             max_size.times do |index|
 
               if address_change[index].present?
@@ -139,35 +143,30 @@ namespace :reports do
                   state,
                   zip,
                   address_updated_at,
-
                   phone_kind,
                   area_code,
                   number,
                   phone_number_updated_at,
-
                   old_broker_agency_legal_name,
                   old_broker_npn,
                   old_broker_created_at,
                   old_broker_updated_at,
-
                   new_broker_agency_legal_name,
                   new_broker_npn,
                   new_broker_created_at,
-
                   old_poc_first_name,
                   old_poc_last_name,
                   old_poc_dob,
                   old_poc_created,
                   old_poc_updated,
-
                   new_poc_first_name,
                   new_poc_last_name,
                   new_poc_dob,
                   new_poc_created,
 
               ]
-              processed_count += 1
             end
+            processed_count += 1
           end
         end
       end
