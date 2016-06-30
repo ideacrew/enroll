@@ -83,7 +83,7 @@ def get_case_7_people
   Person.where('consumer_role' => {'$exists' => true},
                'consumer_role.lawful_presence_determination.aasm_state' => 'verification_pending',
                'consumer_role.lawful_presence_determination.citizen_status' => 'us_citizen',
-               'encrypted_ssn' => {'$exists' => false}).count
+               'encrypted_ssn' => {'$exists' => false})
 end
 
 # verified, NO native, NO ssn  | count: 441
