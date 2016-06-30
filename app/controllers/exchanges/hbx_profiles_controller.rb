@@ -317,7 +317,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       @dont_allow_change = true
     else
       begin
-        @person.update_attributes!(dob: params[:person][:dob], encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
       rescue Exception => e
         @error_on_save = "SSN must be 9 digits long."
       end
