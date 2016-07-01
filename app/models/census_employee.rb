@@ -395,7 +395,7 @@ class CensusEmployee < CensusMember
   end
 
   def update_for_cobra(cobra_date)
-    self.cobra_employee_role
+    self.cobra_employee_role!
     self.cobra_begin_date = cobra_date
     self.existing_cobra = true
     self.save
@@ -490,6 +490,11 @@ class CensusEmployee < CensusMember
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
       transitions from: :cobra,  to: :cobra_terminated, after: :notify_cobra_terminated
     end
+
+    event :reinstate_cobra_terminated , :after => :record_transition do 
+      transitions from: :cobra_terminated,  to: :eligible
+    end
+
   end
 
   def self.roster_import_fallback_match(f_name, l_name, dob, bg_id)

@@ -22,11 +22,9 @@
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Benefit: <%= @enrollment.coverage_kind %><br>
-            Market: <%= @enrollment.market_name %><br>
-            Metal level : <%= display_dental_metal_level @plan %>
-             <% if @enrollment.is_under_cobra? %>
-             Employer Sponsored | Employer Sponsered Cobra/Continuation | Individual | Cover All
-             <%end%>
+            Metal level : <%= display_dental_metal_level @plan %><br>
+            Market: <%= @enrollment.market_name %>
+             
           </p>
 
           <br>

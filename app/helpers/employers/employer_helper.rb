@@ -119,10 +119,15 @@ module Employers::EmployerHelper
 
   def cobra_button(census_employee)
     disabled = current_user.has_hbx_staff_role? || census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    button_text = census_employee.cobra_terminated? ? 'COBRA REINSTATE' : 'COBRA'
+    button_text = 'COBRA'
+    toggle_class = ".cobra_confirm_"
+    if census_employee.cobra_terminated? 
+      button_text = 'COBRA REINSTATE' 
+      toggle_class = ".cobra_reinstate_"
+    end
     content_tag(:a, :class => "show_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
       content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg", 
-        :onclick => "$(this).closest('tr').nextAll('.cobra_confirm_#{census_employee.id}').toggle()")
+        :onclick => "$(this).closest('tr').nextAll('#{toggle_class}#{census_employee.id}').toggle()")
     end
   end
 end

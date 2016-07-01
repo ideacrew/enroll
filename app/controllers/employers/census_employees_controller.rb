@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group, :cobra]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group, :cobra ,:cobra_reinstate]
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -186,6 +186,14 @@ class Employers::CensusEmployeesController < ApplicationController
       flash[:notice] = "Successfully update Census Employee."
     else
       flash[:error] = "Please enter cobra date."
+    end
+  end
+
+  def cobra_reinstate
+    if @census_employee.reinstate_cobra_terminated!
+      flash[:notice] = "Successfully update Census Employee."
+    else
+      flash[:error] = "Unable to update Census Employee."
     end
   end
 
