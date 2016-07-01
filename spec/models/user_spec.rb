@@ -59,7 +59,7 @@ RSpec.describe User, :type => :model do
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: valid_params[:oim_id] + "aA1!"})}
+      let(:params){valid_params.deep_merge!({password: valid_params[:oim_id].capitalize + "aA1!"})}
       it 'contains username' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["password cannot contain username"]

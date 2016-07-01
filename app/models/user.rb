@@ -34,7 +34,7 @@ class User
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
-    elsif password.present? and password.include? oim_id
+    elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
       errors.add :password, "password cannot contain username"
     elsif password.present? and password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
