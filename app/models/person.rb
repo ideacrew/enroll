@@ -187,7 +187,7 @@ class Person
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
-  scope :unverified_persons,        -> {Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending'])}
+  scope :unverified_persons,        -> { where(:'consumer_role.aasm_state' => { "$ne" => "fully_verified" })}
   scope :matchable,                 ->(ssn, dob, last_name) { where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name: last_name) }
 
   scope :general_agency_staff_applicant,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :applicant })}

@@ -386,7 +386,6 @@ Rails.application.routes.draw do
     collection do
       put :change_person_aasm_state
       get :show_docs
-      get :update_individual
       put :update_verification_type
       get :enrollment_verification
       put :enrollment_docs_state
