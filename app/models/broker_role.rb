@@ -309,7 +309,7 @@ class BrokerRole
 
   def notify_broker_pending
     unchecked_carriers = self.carrier_appointments.select { |k,v| k if v != "true"}
-    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present?  || !self.license  || !self.training
+    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present?  || !self.training
   end
 
   def applicant?
