@@ -33,7 +33,6 @@ namespace :reports do
           new_broker_agency_legal_name
           new_broker_npn
           new_broker_created_at
-          new_broker_updated_at
 
           old_poc_first_name
           old_poc_last_name
@@ -42,10 +41,9 @@ namespace :reports do
           old_poc_updated
 
           new_poc_first_name
-          new_added_poc_last_name
+          new_poc_last_name
           new_poc_dob
           new_poc_created
-          new_poc_updated
         )
       processed_count = 0
       file_name = "#{Rails.root}/public/employer_profile_info_change.csv"
@@ -64,18 +62,18 @@ namespace :reports do
               select{|phon| phon.updated_at.strftime('%Y-%m-%d') != organization.created_at.strftime('%Y-%m-%d')}
 
           old_broker = organization.employer_profile.broker_agency_accounts.unscoped.
-                            where(:"updated_at" => date_range).select{|a| (a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d') && a.is_active == false)}.last.to_a
+              where(:"updated_at" => date_range).select{|a| (a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d') && a.is_active == false)}.last.to_a
 
           new_broker = organization.employer_profile.broker_agency_accounts.
-                            where(:"updated_at" => date_range).select{|a| a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d')}.first.to_a
+              where(:"updated_at" => date_range).select{|a| a.updated_at.strftime('%Y-%m-%d') != a.employer_profile.created_at.strftime('%Y-%m-%d')}.first.to_a
 
           old_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
                                  :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
-                                      select{|employer_staff_role| employer_staff_role.aasm_state == "is_closed"}
+              select{|employer_staff_role| employer_staff_role.aasm_state == "is_closed"}
 
           new_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
                                  :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
-                                      select{|employer_staff_role| employer_staff_role.aasm_state == "is_active"}
+              select{|employer_staff_role| employer_staff_role.aasm_state == "is_active"}
 
 
           if (address_change.present? || phone_number_change.present? || old_broker.present? || new_broker.present? || old_poc.present? || new_poc.present? )
@@ -113,7 +111,6 @@ namespace :reports do
                 new_broker_agency_legal_name = new_broker[index].try(:broker_agency_profile).try(:legal_name)
                 new_broker_npn = new_broker[index].try(:broker_agency_profile).try(:primary_broker_role).try(:npn)
                 new_broker_created_at = new_broker[index].try(:created_at)
-                new_broker_updated_at = new_broker[index].try(:updated_at)
               end
 
               if old_poc[index].present?
@@ -129,7 +126,6 @@ namespace :reports do
                 new_poc_last_name = new_poc[index].try(:person).try(:last_name)
                 new_poc_dob = new_poc[index].try(:person).try(:dob)
                 new_poc_created = new_poc[index].try(:created_at)
-                new_poc_updated = new_poc[index].try(:updated_at)
               end
 
               csv << [
@@ -157,7 +153,6 @@ namespace :reports do
                   new_broker_agency_legal_name,
                   new_broker_npn,
                   new_broker_created_at,
-                  new_broker_updated_at,
 
                   old_poc_first_name,
                   old_poc_last_name,
@@ -169,7 +164,6 @@ namespace :reports do
                   new_poc_last_name,
                   new_poc_dob,
                   new_poc_created,
-                  new_poc_updated
 
               ]
               processed_count += 1
