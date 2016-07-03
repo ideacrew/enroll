@@ -1,9 +1,5 @@
-<% if @census_employee.census_dependents.all? {|census_dependent| !census_dependent.valid?} %>
-  <h4>
-    <%= @census_employee.first_name.capitalize %> <%= @census_employee.last_name.capitalize %> has 0 dependents
-  </h4>
-<% end %>
 <div class="form-inputs">
   <%= link_to_add_fields 'add dependent', f, :census_dependents, 'btn btn-default' %>
   <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'btn btn-default return_to_employee_roster' %>
+  <span>&nbsp;</span>
 </div>

@@ -1,21 +1,25 @@
 @import "variables";
 .census-employee {
+  .census-employee-aasm {
+    font-size: 100%;
+  }
   .module {
     .panel-body {
-      padding: 0;
       border: 0;
       .row-form-wrapper {
         border-left: 0;
         border-right: 0;
       }
       .row-form-wrapper:last-of-type {
-        border-bottom: 0;
       }
       .row-form-wrapper:first-of-type, #email_info {
         border-top: 0;
       }
     }
     &.census-employee-details {
+      .panel-body {
+        padding: 0;
+      }
       .panel-heading {
         background-image: none;
         background-color: transparent;
@@ -25,23 +29,61 @@
       }
     }
     &.census-employee-fields {
-      .row-form-wrapper:last-of-type {
-        border-botom: 1px solid #ddd;
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper {
+        border-bottom: 0;
       }
     }
     &.census-employee-address {
+      .panel-body {
+        padding: 0;
+      }
       .address {
         .row-form-wrapper:first-of-type {
           display: none;
         }
+        .row-form-wrapper:last-of-type {
+          border-bottom: none;
+        }
       }
     }
-
+    &.census-employee-email {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.census-employee-dependents {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.hbx-enrollment-panel {
+      .panel-body {
+        padding-bottom: 15px;
+      }
+      .panel-footer {
+        padding-bottom: 15px;
+      }
+    }
   }
   .form-inputs {
-    float: none;
+    display: block;
+    .add_fields {
+      float: right;
+    }
     .btn-default.return_to_employee_roster {
       display: none;
+    }
+    span {
+      clear: both;
     }
   }
 }
