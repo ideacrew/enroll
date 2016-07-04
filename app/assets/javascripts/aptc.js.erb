@@ -50,7 +50,7 @@ var APTCModule = ( function( window, undefined ) {
   }
 
   // Compute Applied APTC when the slider ratio changes.
-  function computeAppliedAPTC(hbx_id_for_slider, aptc_ratio, max_aptc) {
+  function computeAppliedAPTC(hbx_id_for_slider, aptc_ratio, max_aptc, max_for_this_enrollment) {
     // Find All Enrollments
     var aptc_applied_input_elements = $('#enrollmentsDiv').find("input[name^='aptc_applied_']");
     //var applied_aptcs_array = [];
@@ -62,17 +62,17 @@ var APTCModule = ( function( window, undefined ) {
         // update applied_aptc_ratio percent when slider changes
         $( "#aptc_applied_pct_"+hbx_id_for_slider ).val((aptc_ratio*100).toFixed(0)+'%');   
         // update applied_aptc text value to match the percent.
-        $("#"+hbx_id).val((aptc_ratio * max_aptc).toFixed(2));
+        $("#"+hbx_id).val((aptc_ratio * max_for_this_enrollment).toFixed(2));
       }
     }
 
   }
 
-  function computePercentageAndSliderRatio(hbx_id, applied_aptc_amount, max_aptc) {
+  function computePercentageAndSliderRatio(hbx_id, applied_aptc_amount, max_aptc, max_aptc_that_can_be_applied_for_this_enrollment) {
     // update applied_aptc_ratio on the slider bar
-    $( "#applied_pct_"+hbx_id).val(applied_aptc_amount/max_aptc);
+    $( "#applied_pct_"+hbx_id).val(applied_aptc_amount/max_aptc_that_can_be_applied_for_this_enrollment);
     // update applied_aptc_ratio percent when aptc_applied_amount on the textbox changes.
-    $( "#aptc_applied_pct_"+hbx_id ).val((applied_aptc_amount/max_aptc*100).toFixed(0)+'%');
+    $( "#aptc_applied_pct_"+hbx_id ).val((applied_aptc_amount/max_aptc_that_can_be_applied_for_this_enrollment*100).toFixed(0)+'%');
           
   }
 

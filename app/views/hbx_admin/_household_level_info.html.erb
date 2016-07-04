@@ -33,11 +33,12 @@
         <%end%>
         <tr><td colspan = "13" class="aptc-csr-grid-separator"></td></tr>
         <tr>
-          <th colspan = "13">Household Member(s)</th>
+          <th colspan = "4">Household Member(s)</th>
+          <th colspan = "9">APTC Amount / Percent Ratio</th>
         </tr>
         <% @household_members.each do |person_id| %>
           <tr>
-            <td colspan = "13">
+            <td colspan = "4">
               <span class="glyphicon glyphicon-user"></span>
                 &nbsp;&nbsp;&nbsp;<%=full_name_of_person(person_id.keys.first)%>
               <%if primary_member(person_id.keys.first)%> 
@@ -45,6 +46,7 @@
                 <i class="fa fa-asterisk" aria-hidden="true" data-toggle="tooltip" title="Primary Family Member"></i>
               <%end%>
             </td>
+            <td colspan = "9"> <%='%.2f' % person_id[person_id.keys[0]]%>  &nbsp;&nbsp; ( <%=(person_id[person_id.keys[0]][0]/person_id[person_id.keys[0]][1]*100).round(2)%> % ) </td>
           </tr>
         <%end%>
       </tbody> 

@@ -50,7 +50,7 @@ class HbxAdminController < ApplicationController
     @household_info = HbxAdmin.build_household_level_aptc_csr_data(@family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage], params[:applied_aptcs_array])
     @enrollments_info = HbxAdmin.build_enrollments_data(@family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = HbxAdmin.calculate_slcsp_value(@family)
-    @household_members = HbxAdmin.build_household_members(@family)
+    @household_members = HbxAdmin.build_household_members(@family, params[:max_aptc].to_f)
     @current_aptc_applied_hash =  HbxAdmin.build_current_aptc_applied_hash(@hbxs, params[:applied_aptcs_array])
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = HbxAdmin.build_plan_premium_hash_for_enrollments(@hbxs)
