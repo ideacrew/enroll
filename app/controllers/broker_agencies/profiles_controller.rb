@@ -102,7 +102,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @q.nil?
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      @staff = @staff.where(last_name: @q)
+      @staff = @staff.where(last_name: /^#{@q}/i)
     end
   end
 
