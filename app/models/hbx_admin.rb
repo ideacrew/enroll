@@ -31,7 +31,7 @@ class HbxAdmin
       max_aptc = max_aptc.present? ? max_aptc.to_f : family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc.to_f 
       ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
       family.family_members.each_with_index do |one_member, index|
-        individuals_covered_array << {one_member.person.id.to_s => [ratio_by_member[one_member.id.to_s] * max_aptc, max_aptc]}  # Individuals and their assigned APTC Ratio
+        individuals_covered_array << {one_member.person.id.to_s => [ratio_by_member[one_member.id.to_s] * max_aptc, max_aptc]}  rescue nil # Individuals and their assigned APTC Ratio
       end
       return individuals_covered_array
     end
