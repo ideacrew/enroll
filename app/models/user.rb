@@ -2,6 +2,7 @@ class User
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
+  MAX_SAME_CHAR_LIMIT = 4
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
@@ -36,12 +37,18 @@ class User
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
     elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
       errors.add :password, "cannot contain username"
-    elsif password.present?
-      binding.pry
-      errors.add :password, "cannot repeat any character more than 4 times"
+    elsif password.present? and password_repeated_chars_limit(password)
+      errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
     elsif password.present? and password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
+    elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
+      errors.add :password, "must have at least 4 alphabetical characters"
     end
+  end
+
+  def password_repeated_chars_limit(password)
+    return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+    false
   end
 
   def password_required?
