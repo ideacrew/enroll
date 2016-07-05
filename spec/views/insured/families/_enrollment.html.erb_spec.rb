@@ -48,8 +48,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+<<<<<<< HEAD
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+=======
+
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+>>>>>>> 310c82a... refs #7917 green specs for census employee show
     end
     it "should open the sbc pdf" do
       expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
@@ -65,13 +70,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the effective date" do
-      expect(rendered).to have_selector('label', text: 'Effective date:')
-      expect(rendered).to have_selector('strong', text: '08/10/2015')
+      expect(rendered).to have_selector('strong', text: 'Effective date:')
+      expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display the effective date" do
-      expect(rendered).to have_selector('label', text: 'Effective date:')
-      expect(rendered).to have_selector('strong', text: '08/10/2015')
+      expect(rendered).to have_selector('strong', text: 'Effective date:')
+      expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display effective date when terminated enrollment" do
@@ -99,8 +104,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+<<<<<<< HEAD
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+=======
+
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+>>>>>>> 310c82a... refs #7917 green specs for census employee show
     end
 
     it "should display the title" do
@@ -132,8 +142,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+<<<<<<< HEAD
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
+=======
+
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+>>>>>>> 310c82a... refs #7917 green specs for census employee show
     end
 
     it "should not display family_members info" do

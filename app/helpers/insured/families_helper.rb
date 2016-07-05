@@ -118,7 +118,11 @@ module Insured::FamiliesHelper
   end
 
   def display_aasm_state?(enrollment)
-    ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
+    if enrollment.is_shop?
+      true
+    else
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
+    end
   end
 
 end

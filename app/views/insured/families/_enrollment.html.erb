@@ -3,9 +3,7 @@
 <div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="no-buffer">
-      <%= hbx_enrollment.coverage_year %>
-      <%= plan.coverage_kind %>
-      Coverage
+      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
       <span class="separator">
         <%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
       </span>
