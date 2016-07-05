@@ -62,15 +62,23 @@ RSpec.describe User, :type => :model do
       let(:params){valid_params.deep_merge!({password: valid_params[:oim_id].capitalize + "aA1!"})}
       it 'contains username' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["password cannot contain username"]
+        expect(User.create(**params).errors[:password]).to eq ["cannot contain username"]
       end
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "1234566746464DDss"})}
+      let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
       it 'does not contain valid complexity' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"]
+        expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"]
+      end
+    end
+
+    context 'when password' do
+      let(:params){valid_params.deep_merge!({password: "11E11@ss"})}
+      it 'has a character more than 4 times' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["cannot repeat any character more than 4 times"]
       end
     end
 
