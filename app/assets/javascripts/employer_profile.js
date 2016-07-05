@@ -403,7 +403,7 @@ $(document).on('click', ".rehire_confirm", function(){
 });
 
 $(document).on('click', "a.cobra_confirm_submit", function(){
-  var cobra_date = $(this).parents('tr.cobra_confirm').find('input.date-picker').val();
+  var cobra_date = $(this).parents('tr.cobra_confirm,div.cobra_confirm').find('input.date-picker').val();
   var cobra_link = $(this).data('link');
   $.ajax({
     type: 'get',
