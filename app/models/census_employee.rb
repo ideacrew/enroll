@@ -491,7 +491,7 @@ class CensusEmployee < CensusMember
       transitions from: :cobra,  to: :cobra_terminated, after: :notify_cobra_terminated
     end
 
-    event :reinstate_cobra_terminated , :after => :record_transition do 
+    event :reinstate_cobra_terminated , :after => [:record_transition , :toggle_existing_cobra] do 
       transitions from: :cobra_terminated,  to: :eligible
     end
 
@@ -603,6 +603,11 @@ class CensusEmployee < CensusMember
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)
     end
+  end
+
+  def toggle_existing_cobra
+    self.existing_cobra = self.existing_cobra ? false : true
+    self.save
   end
 
   def check_census_dependents_relationship
