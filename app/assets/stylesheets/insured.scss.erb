@@ -1,5 +1,31 @@
 @import "variables";
 .module {
+  &.consumer-broker-widget, &.employee-broker-widget {
+    .panel-heading {
+      background-image: none;
+      background-color: transparent;
+      .panel-title {
+        color: $primary-blue;
+      }
+    }
+    .panel-body {
+      display: table;
+      width: 100%;
+      > * {
+        display: table-cell;
+        vertical-align: middle;
+        &.text-center {
+          width: 25%;
+        }
+        &.text-left {
+          padding-left: 7.5%;
+          .broker-information {
+            word-break: break-all;
+          }
+        }
+      }
+    }
+  }
   &.hbx-enrollment-panel {
     .panel-heading {
       background-color: transparent;

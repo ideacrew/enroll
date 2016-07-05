@@ -66,7 +66,7 @@ module Insured::FamiliesHelper
     end
 
     plan_details.inject([]) do |data, element|
-      data << "<label>#{element}</label>"
+      data << "#{element}"
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
@@ -118,11 +118,7 @@ module Insured::FamiliesHelper
   end
 
   def display_aasm_state?(enrollment)
-    if enrollment.is_shop?
-      true
-    else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
-    end
+    ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
   end
-      
+
 end

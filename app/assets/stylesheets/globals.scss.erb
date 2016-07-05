@@ -1,5 +1,6 @@
 @import "variables";
 .module, .modal {
+<<<<<<< HEAD
   .enroll-checkbox {
     input[type=checkbox] {
       display: none;
@@ -62,6 +63,14 @@
       &:last-of-type {
         display: none;
       }
+=======
+  .label {
+    &.inactive, &.canceled {
+      background-color: $primary-gray;
+    }
+    &.employment_terminated {
+      background-color: $primary-red;
+>>>>>>> c8bb180... refs #7917 finish census employee show/edit, enrollment tiles, and related tweaks
     }
   }
   &.flash {
@@ -113,11 +122,16 @@
   .vertically-aligned-row {
     display: table;
     width: 100%;
-
+    &.auto-width {
+      width: auto !important;
+    }
     >* {
       display: table-cell;
       float: none;
       vertical-align: middle;
+      &.vertical-align-top {
+        vertical-align: top !important;
+      }
     }
   }
 }
