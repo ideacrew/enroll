@@ -116,7 +116,7 @@
             </a>
         </span>
         </div>
-          
+      <% if @census_employee.may_rehire_employee_role? %>          
         <div class="unbrd  rehire_<%= @census_employee.id %> dn">
           <div class="confirm-terminate-wrapper show_confirm_<%= @census_employee.id %>" colspan="11" id="enter-date">
             <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
@@ -128,6 +128,7 @@
             </span>
           </div>
         </div> 
+      <%end%>
     </div>
     </div>
     <span class="clear-fix">&nbsp;</span>
