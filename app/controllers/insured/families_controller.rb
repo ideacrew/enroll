@@ -252,7 +252,7 @@ class Insured::FamiliesController < FamiliesController
       if @person.active_employee_roles.present?
         @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
       else @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
       end
     end
 
