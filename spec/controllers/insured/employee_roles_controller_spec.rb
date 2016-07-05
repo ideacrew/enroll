@@ -371,4 +371,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       get :show, id: 888
     end
   end
+
+  describe "GET welcome" do
+    it "return success http status" do
+      expect(response).to have_http_status(:success)
+      get :welcome
+    end
+  end
+
 end
