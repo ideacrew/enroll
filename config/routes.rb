@@ -151,6 +151,7 @@ Rails.application.routes.draw do
         post :match
         get 'search'
         get 'privacy'
+        get 'welcome'
       end
     end
 
