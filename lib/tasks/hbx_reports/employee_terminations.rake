@@ -6,9 +6,7 @@ namespace :reports do
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
 
-      date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
-
-      census_employees = CensusEmployee.find_all_terminated(date_range: date_range)
+      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => Date.new(2015,10,1))
 
       field_names  = %w(
           employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at 
