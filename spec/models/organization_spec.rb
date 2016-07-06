@@ -176,7 +176,6 @@ RSpec.describe Organization, dbclean: :after_each do
       before do
         renewing_employer.save!
         new_employer.save!
-        ineligible_employer.save!
       end
 
       it "should return correct number of records" do
