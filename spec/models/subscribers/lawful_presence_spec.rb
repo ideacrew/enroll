@@ -26,11 +26,11 @@ describe Subscribers::LawfulPresence do
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
 
-    let(:person) { person = FactoryGirl.create(:person);
-    consumer_role = person.build_consumer_role;
-    consumer_role = FactoryGirl.build(:consumer_role);
-    person.consumer_role = consumer_role;
-    person.consumer_role.aasm_state=:verifications_pending;
+    let(:person) { person = FactoryGirl.create(:person)
+    consumer_role = person.build_consumer_role
+    consumer_role = FactoryGirl.build(:consumer_role)
+    person.consumer_role = consumer_role
+    person.consumer_role.aasm_state = "dhs_pending"
     person
     }
 
@@ -53,7 +53,7 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash3)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
-          expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
+          expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
           expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
@@ -67,7 +67,7 @@ describe Subscribers::LawfulPresence do
         allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
