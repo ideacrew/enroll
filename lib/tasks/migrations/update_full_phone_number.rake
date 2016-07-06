@@ -11,7 +11,7 @@ namespace :migrations do
                     map(&:office_locations).flatten.map(&:phone).flatten.compact
     phones = person_phones + office_phones
     phones.each do |phone|
-      phone.update_attribute(:full_phone_number, phone.to_s)
+      phone.set(full_phone_number: phone.to_s)
       count += 1
     end
     puts "updated #{person_phones.count} full phone number for persons"
