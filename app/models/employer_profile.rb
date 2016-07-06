@@ -688,11 +688,6 @@ class EmployerProfile
     show_plan_year.present? && (show_plan_year.start_on == (TimeKeeper.date_of_record.next_month).beginning_of_month)
   end
 
-  def self.filter_employers_for_binder_paid
-    # filter employers that have next month plan year
-    orgs = Organization.all_employers_by_plan_year_start_on_with_published_renewing(TimeKeeper.date_of_record.end_of_month + 1.day)
-  end
-
   def is_eligible_to_enroll?
     published_plan_year.enrolling?
   end

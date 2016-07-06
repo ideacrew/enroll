@@ -268,7 +268,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def binder_index
-    @organizations = EmployerProfile.filter_employers_for_binder_paid
+    @organizations = Organization.retrieve_employers_eligible_for_binder_paid
 
     respond_to do |format|
       format.html { render "employers/employer_profiles/binder_index" }
@@ -280,14 +280,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
     organizations = []
 
-    all_organizations = EmployerProfile.filter_employers_for_binder_paid
+    all_organizations = Organization.retrieve_employers_eligible_for_binder_paid
 
-    if dt_query.search_string.blank?
-      organizations = all_organizations#.map(&:employer_profile)
-      # employers = EmployerProfile.find("57238d89006d7c7c3c00002f")
+    organizations = if dt_query.search_string.blank?
+      all_organizations
     else
       org_ids = Organization.search(dt_query.search_string).pluck(:id)
-      organizations = all_organizations.where({
+      all_organizations.where({
         "id" => {"$in" => org_ids}
       })
     end
