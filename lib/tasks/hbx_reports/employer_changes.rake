@@ -9,7 +9,7 @@ namespace :reports do
     desc "Identify employer's updated account information"
     task :employer_changes => :environment do
       # dange range =past 7 days changes from current date
-      date_range = Date.today - 7.days..Date.today
+      date_range = (Date.today - 7.days)..Date.today
       # collect active organizations
       organizations = Organization.where(:'employer_profile'.exists=>true, :"employer_profile.aasm_state".in => ["applicant", "registered", "eligible", "binder_paid", "enrolled"])
 
@@ -38,13 +38,15 @@ namespace :reports do
           old_poc_first_name
           old_poc_last_name
           old_poc_dob
-          old_poc_created
-          old_poc_updated
-          new_poc_first_name
-          new_poc_last_name
-          new_poc_dob
-          new_poc_created_at
-          new_poc_updated_at
+          old_poc_aasm_state
+          old_poc_created_at
+          old_poc_updated_at
+          new_added_poc_first_name
+          new_added_poc_last_name
+          new_added_poc_dob
+          new_added_poc_aasm_state
+          new_added_poc_created_at
+          new_added_poc_updated_at
         )
       processed_count = 0
 
@@ -74,14 +76,14 @@ namespace :reports do
           old_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
                                  :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
               select{|employer_staff_role| employer_staff_role.aasm_state == "is_closed"}
-          # select orgainzation poc whose aasm_state == "is_active" and updated date in date range
-          new_poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
-                                 :"employer_staff_roles.is_active" => true, :"employer_staff_roles.updated_at" => date_range). flat_map(&:employer_staff_roles).
+          # select orgainzation poc whose aasm_state == "is_active" and created date in date range
+          new_poc_added = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,
+                                 :"employer_staff_roles.is_active" => true, :"employer_staff_roles.created_at" => date_range). flat_map(&:employer_staff_roles).
               select{|employer_staff_role| employer_staff_role.aasm_state == "is_active" && employer_staff_role.created_at.strftime('%Y-%m-%d') != organization.employer_profile.created_at.strftime('%Y-%m-%d')}
 
-          if (address_change.present? || phone_number_change.present? || old_broker.present? || new_broker.present? || old_poc.present? || new_poc.present? )
+          if (address_change.present? || phone_number_change.present? || old_broker.present? || new_broker.present? || old_poc.present? || new_poc_added.present? )
 
-            max_size = [address_change.length, phone_number_change.length, old_broker.length, new_broker.length, old_poc.length, new_poc.length].max
+            max_size = [address_change.length, phone_number_change.length, old_broker.length, new_broker.length, old_poc.length, new_poc_added.length].max
             max_size.times do |index|
 
               if address_change[index].present?
@@ -119,16 +121,18 @@ namespace :reports do
                 old_poc_first_name = old_poc[index].try(:person).try(:first_name)
                 old_poc_last_name = old_poc[index].try(:person).try(:last_name)
                 old_poc_dob = old_poc[index].try(:person).try(:dob)
+                old_poc_aasm_state = old_poc[index].try(:aasm_state)
                 old_poc_created = old_poc[index].try(:created_at)
                 old_poc_updated = old_poc[index].try(:updated_at)
               end
 
-              if new_poc[index].present?
-                new_poc_first_name = new_poc[index].try(:person).try(:first_name)
-                new_poc_last_name = new_poc[index].try(:person).try(:last_name)
-                new_poc_dob = new_poc[index].try(:person).try(:dob)
-                new_poc_created_at = new_poc[index].try(:created_at)
-                new_poc_updated_at = new_poc[index].try(:updated_at)
+              if new_poc_added[index].present?
+                new_poc_added_first_name = new_poc_added[index].try(:person).try(:first_name)
+                new_poc_added_last_name = new_poc_added[index].try(:person).try(:last_name)
+                new_poc_added_dob = new_poc_added[index].try(:person).try(:dob)
+                new_poc_added_aasm_state = new_poc_added[index].try(:aasm_state)
+                new_poc_added_created_at = new_poc_added[index].try(:created_at)
+                new_poc_added_updated_at = new_poc_added[index].try(:updated_at)
               end
 
               csv << [
@@ -153,16 +157,20 @@ namespace :reports do
                   new_broker_agency_legal_name,
                   new_broker_npn,
                   new_broker_created_at,
+
                   old_poc_first_name,
                   old_poc_last_name,
                   old_poc_dob,
+                  old_poc_aasm_state,
                   old_poc_created,
                   old_poc_updated,
-                  new_poc_first_name,
-                  new_poc_last_name,
-                  new_poc_dob,
-                  new_poc_created_at,
-                  new_poc_updated_at
+
+                  new_poc_added_first_name,
+                  new_poc_added_last_name,
+                  new_poc_added_dob,
+                  new_poc_added_aasm_state,
+                  new_poc_added_created_at,
+                  new_poc_added_updated_at,
 
               ]
             end
