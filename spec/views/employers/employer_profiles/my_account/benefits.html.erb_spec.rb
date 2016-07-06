@@ -49,7 +49,6 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     end
   end
 
-<<<<<<< HEAD
   context "Plan year" do
     let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
     let(:plan_year) { FactoryGirl.build_stubbed(:plan_year, :aasm_state => 'renewing_draft') }
@@ -141,6 +140,6 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       render "employers/employer_profiles/my_account/benefits"
       expect(rendered).to match /first of month/i
     end
-    
+
   end
 end
