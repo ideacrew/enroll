@@ -1,9 +1,11 @@
 class Insured::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :privacy, :search]
+  before_action :check_employee_role, only: [:new, :privacy, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
   include ErrorBubble
 
+  def welcome
+  end
 
   def privacy
   end

@@ -2,6 +2,7 @@ class User
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
+  MAX_SAME_CHAR_LIMIT = 4
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
@@ -23,22 +24,31 @@ class User
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
-      errors.add :login, "username cannot contain special charcters ; # % = | + , \" > < \\ \/"
+      errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
     elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
-      errors.add :login, "username must be at least #{MIN_USERNAME_LENGTH} characters"
+      errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
     elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
-      errors.add :login, "username can NOT exceed #{MAX_USERNAME_LENGTH} characters"
+      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
     end
   end
 
   def password_complexity
-    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
-      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
-    elsif password.present? and password.include? oim_id
-      errors.add :password, "password cannot contain username"
+    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
+      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
+    elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
+      errors.add :password, "cannot contain username"
+    elsif password.present? and password_repeated_chars_limit(password)
+      errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
     elsif password.present? and password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
+    elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
+      errors.add :password, "must have at least 4 alphabetical characters"
     end
+  end
+
+  def password_repeated_chars_limit(password)
+    return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+    false
   end
 
   def password_required?
