@@ -4,20 +4,18 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
 
-  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: ce.renewal_benefit_group_assignment.benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
-  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: ce.active_benefit_group_assignment.benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
-
+  benefit_group = ce.active_benefit_group_assignment.benefit_group
   FactoryGirl.create(:hbx_enrollment,
     household: person_rec.primary_family.active_household,
     coverage_kind: "health",
-    effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
+    effective_on: benefit_group.start_on,
     enrollment_kind: "open_enrollment",
     kind: "employer_sponsored",
-    submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
-    benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
+    submitted_at: benefit_group.start_on - 20.days,
+    benefit_group_id: benefit_group.id,
     employee_role_id: person_rec.active_employee_roles.first.id,
     benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-    plan_id: plan.id
+    plan_id: benefit_group.elected_plan_ids.first
     )
 
   factory = Factories::FamilyEnrollmentRenewalFactory.new
