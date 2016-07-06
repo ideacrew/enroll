@@ -40,9 +40,9 @@ class BrokerRole
 
   validates_presence_of :npn, :provider_kind
 
-  validates :npn, 
+  validates :npn,
     numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },    
+    length: { minimum: 1, maximum: 10 },
     uniqueness: true,
     allow_blank: false
 
@@ -57,7 +57,7 @@ class BrokerRole
     person_records = Person.by_broker_role_npn(broker_npn)
     return [] unless person_records.any?
     person_records.select do |pr|
-      pr.broker_role.present? && 
+      pr.broker_role.present? &&
         (pr.broker_role.npn == broker_npn)
     end.map(&:broker_role)
   end
@@ -74,7 +74,7 @@ class BrokerRole
     return nil unless email.present?
     email.address
   end
-  
+
   def parent
     # raise "undefined parent: Person" unless self.person?
     self.person
@@ -114,7 +114,7 @@ class BrokerRole
 
   def phone
     parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone rescue ""
-  end  
+  end
 
   def email=(new_email)
     parent.emails << new_email
@@ -126,7 +126,7 @@ class BrokerRole
 
   ## Class methods
   class << self
-    
+
     def find(id)
       return nil if id.blank?
       people = Person.where("broker_role._id" => BSON::ObjectId.from_string(id))
@@ -222,19 +222,19 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated] do 
+    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
-    event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do
       transitions from: :broker_agency_pending, to: :active
     end
 
-    event :broker_agency_decline, :after => :record_transition do 
+    event :broker_agency_decline, :after => :record_transition do
       transitions from: :broker_agency_pending, to: :broker_agency_declined
     end
 
-    event :broker_agency_terminate, :after => :record_transition do 
+    event :broker_agency_terminate, :after => :record_transition do
       transitions from: :active, to: :broker_agency_terminated
     end
 
@@ -250,12 +250,12 @@ class BrokerRole
     # Attempt to achieve or return to good standing with HBX
     event :reapply, :after => :record_transition  do
       transitions from: [:applicant, :decertified, :denied, :broker_agency_declined], to: :applicant
-    end  
+    end
 
     # Moves between broker agency organizations that don't require HBX re-certification
     event :transfer, :after => :record_transition  do
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
-    end  
+    end
   end
 
   def notify_updated
