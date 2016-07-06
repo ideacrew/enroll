@@ -170,7 +170,7 @@ class HbxEnrollment
       message: "%{value} is not a valid coverage type"
     }
 
-  before_save :generate_hbx_id
+  before_save :generate_hbx_id, :set_submitted_at
 
   def generate_hbx_signature
     if self.subscriber
@@ -387,7 +387,7 @@ class HbxEnrollment
     end
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
+        hem.person.consumer_role.invoke_verification!(effective_on)
       end
       notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
       self.published_to_bus_at = Time.now
@@ -742,8 +742,9 @@ class HbxEnrollment
     enrollment = HbxEnrollment.new
 
     enrollment.household = coverage_household.household
-    enrollment.submitted_at = submitted_at
 
+
+    enrollment.submitted_at = submitted_at
     case
     when employee_role.present?
       if benefit_group.blank?
@@ -1116,6 +1117,13 @@ class HbxEnrollment
     return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
     !(shopping_plan_year.start_on == effective_on)
   end
+
+
+ def set_submitted_at
+   if submitted_at.blank?
+      write_attribute(:submitted_at, TimeKeeper.date_of_record) 
+   end
+ end
 
   private
 
