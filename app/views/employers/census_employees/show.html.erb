@@ -109,7 +109,7 @@
       <h3>
         <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
       </h3>
-      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+      <% if @census_employee.census_dependents.present? %>
       <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
       <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
       <% end %>
@@ -119,7 +119,7 @@
         <%= render 'shared/add_dependents', { f: f } %>
       </div>
       <% end %>
-      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+      <% if @census_employee.census_dependents.present? %>
       <%= render 'shared/add_dependents', { f: f } %>
       <% end %>
     </div>
@@ -130,7 +130,7 @@
         Health Enrollment
       </h3>
       <% if @census_employee.active_benefit_group_assignment.present? %>
-      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'health' }).present? %>
+      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'health' }) %>
       <%= render partial: "insured/families/enrollment", locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'}} %>
       <% else %>
       <h4>

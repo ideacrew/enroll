@@ -180,7 +180,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => 'Patrick'
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
-
+  find('.darkblue').click
   find(:xpath, '//p[@class="label"][contains(., "GA")]').click
   find(:xpath, "//li[contains(., 'VA')]").click
 
