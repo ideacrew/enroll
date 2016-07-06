@@ -354,7 +354,7 @@ class HbxAdmin
         applied_aptcs_array.each do |hbx|
           max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx[1]["hbx_id"].gsub("aptc_applied_",""), max_aptc)
           applied_aptc = hbx[1]["aptc_applied"].to_f
-          aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = "MAX Applied APTC for any Enrollment cannot be smaller than the Applied APTC. [NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc.round > max_for_hbx
+          aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = "MAX Applied APTC for any Enrollment cannot be smaller than the Applied APTC. [NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f
         end
       end  
