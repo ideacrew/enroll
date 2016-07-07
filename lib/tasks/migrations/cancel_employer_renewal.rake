@@ -36,6 +36,7 @@ namespace :migrations do
   task :cancel_employer_incorrect_renewal, [:fein, :plan_year_start_on] => [:environment] do |task, args|
 
     employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    organization = Organization.where(fein: args[:fein])
 
     if employer_profile.blank?
       puts "employer profile not found!"
