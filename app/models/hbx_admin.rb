@@ -90,7 +90,7 @@ class HbxAdmin
       end
 
       first_of_month_num_current_year = first_of_month_converter(month)
-      if first_of_month_num_current_year >= hbx_iter.effective_on
+      if first_of_month_num_current_year >= hbx_iter.effective_on.to_date
         aptc_applied_hash.store(month, '%.2f' % applied_aptc)
       else
         aptc_applied_hash.store(month, '%.2f' % 0.00) if aptc_applied_hash[month].blank? #dont mess with the past values
@@ -103,7 +103,7 @@ class HbxAdmin
       aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
 
       current_hbx.hbx_enrollment_members.each do |member|
-        percent_sum += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s]
+        percent_sum += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0  
       end
 
       current_hbx.hbx_enrollment_members.each do |hem|
@@ -123,6 +123,7 @@ class HbxAdmin
         # iterate over all the EligibilityDeterminations and store the correct max_aptc value for each month. Account for any monthly change in Eligibility Determination.
         eligibility_determinations.each do |ed|
           update_max_aptc_hash_for_month(max_aptc_hash, month, ed, max_aptc, hbxs)
+           #if month == "Jul" || month == "Aug" || month == "Sep"
         end  
       end
       return max_aptc_hash
@@ -138,7 +139,8 @@ class HbxAdmin
         max_aptc_value = ed.max_aptc.to_f
       end
       # Check if  'month' >= EligibilityDetermination.determined_on date?
-      if first_of_month_num_current_year >= ed.determined_on
+
+      if first_of_month_num_current_year >= ed.determined_on.to_date
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
         max_aptc_hash.store(month, '%.2f' % max_aptc_value)
       else
@@ -175,7 +177,7 @@ class HbxAdmin
         csr_percentage_value = ed.csr_percent_as_integer == -1 ? "limited" : ed.csr_percent_as_integer
       end
       # Check if  'month' >= EligibilityDetermination.determined_on date?
-      if first_of_month_num_current_year >= ed.determined_on
+      if first_of_month_num_current_year >= ed.determined_on.to_date
         # assign that month with csr_percent value from this ed (EligibilityDetermination)
         csr_percentage_hash.store(month, csr_percentage_value)
       else
@@ -261,8 +263,7 @@ class HbxAdmin
 
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         eligibility_redetermination_result = true
-        eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment. 
-
+        eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
         latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date, 
                                                                       "determined_on"                 => eligibility_date, 
@@ -316,18 +317,17 @@ class HbxAdmin
 
               # This (and the division using percent_sum_for_all_enrolles in the next block) is needed to get the right ratio for members to use in an enrollment. (ratio of the applied_aptc for an enrollment)
               duplicate_hbx.hbx_enrollment_members.each do |member|
-                percent_sum_for_all_enrolles += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s]
+                percent_sum_for_all_enrolles += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0
               end
 
               # Update the correct breakdown of Applied APTC on the individual level.
               duplicate_hbx.hbx_enrollment_members.each do |hem|
-                aptc_pct_for_member = aptc_ratio_by_member[hem.applicant_id.to_s]
+                aptc_pct_for_member = aptc_ratio_by_member[hem.applicant_id.to_s] || 0.0
                 hem.applied_aptc_amount = updated_aptc_value * aptc_pct_for_member / percent_sum_for_all_enrolles
               end
 
               family.active_household.hbx_enrollments << duplicate_hbx
               family.save
-
               # Cancel or Terminate Coverage.
               if original_hbx.can_terminate_coverage?
                 original_hbx.terminate_coverage!
@@ -343,8 +343,15 @@ class HbxAdmin
     
     # 15th of the month rule
     def find_enrollment_effective_on_date(hbx_created_datetime)
-      offset_month = TimeKeeper.datetime_of_record.day <= 15 ? 1 : 2
-      return DateTime.new(TimeKeeper.datetime_of_record.year, TimeKeeper.datetime_of_record.month + offset_month, 1)
+      offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+      year = TimeKeeper.datetime_of_record.year
+      month = TimeKeeper.datetime_of_record.month + offset_month
+      day = 1
+      hour = TimeKeeper.datetime_of_record.hour
+      min = TimeKeeper.datetime_of_record.min
+      sec = TimeKeeper.datetime_of_record.sec
+      return DateTime.new(year, month, day, hour, min, sec)
+      #return DateTime.new(year, month, day)
     end
 
     def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array)
