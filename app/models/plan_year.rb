@@ -545,7 +545,7 @@ class PlanYear
 
     state :renewing_draft
     state :renewing_published
-    state :renewing_enrolling, :after_enter => :trigger_passive_renewals
+    state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled
     state :renewing_publish_pending
     state :renewing_canceled
@@ -670,7 +670,6 @@ class PlanYear
     open_enrollment_factory.date = TimeKeeper.date_of_record
     open_enrollment_factory.renewing_plan_year = self
     open_enrollment_factory.process_family_enrollment_renewals
-    send_employee_invites
   end
 
   def revert_employer_profile_application
