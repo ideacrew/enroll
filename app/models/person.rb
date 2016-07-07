@@ -201,7 +201,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
+  
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end

@@ -19,6 +19,11 @@ class HbxStaffRole
 
   alias_method :is_active?, :is_active
 
+  field :permission_id, type: BSON::ObjectId
+  def permission
+    Permission.find(permission_id)
+  end
+
   def self.find(id)
     return nil if id.blank?
     people = Person.where("hbx_staff_role._id" => BSON::ObjectId.from_string(id))
