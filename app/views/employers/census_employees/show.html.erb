@@ -76,7 +76,7 @@
   <div class="row">
     <div class="col-md-6 col-sm-12">
       <h3>
-        <%= @census_employee.address.kind.capitalize %>
+        <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
         Address
       </h3>
       <div class="panel panel-default module census-employee-address">
@@ -109,18 +109,15 @@
       <h3>
         <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
       </h3>
-      <% if @census_employee.census_dependents.present? %>
-      <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
-      <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
-      <% end %>
+      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+        <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
+          <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
+        <% end %>
       <% else %>
       <div class="vertically-aligned-row">
         <h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>
         <%= render 'shared/add_dependents', { f: f } %>
       </div>
-      <% end %>
-      <% if @census_employee.census_dependents.present? %>
-      <%= render 'shared/add_dependents', { f: f } %>
       <% end %>
     </div>
   </div>
