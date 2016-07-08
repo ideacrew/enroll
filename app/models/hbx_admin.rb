@@ -78,7 +78,7 @@ class HbxAdmin
       applied_aptc = 0.0 
       if applied_aptc_array.present?
         #if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
-        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) # Following the 15 day rule for calculations
+        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date # Following the 15 day rule for calculations
           applied_aptc_array.each do |one_hbx|
             applied_aptc = one_hbx[1]["aptc_applied"].to_f if current_hbx.id.to_s == one_hbx[1]["hbx_id"].gsub("aptc_applied_","")
           end
@@ -134,7 +134,7 @@ class HbxAdmin
       max_aptc_value = ""
       if max_aptc.present?
         max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
-        max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
+        max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
       else
         max_aptc_value = ed.max_aptc.to_f
       end
@@ -263,9 +263,10 @@ class HbxAdmin
 
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         eligibility_redetermination_result = true
+        # TODO: Maybe dont follow the 15th day rule here ??
         eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
-        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date, 
+        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
                                                                       "determined_on"                 => eligibility_date, 
                                                                       "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
                                                                       "premium_credit_strategy_kind"  => existing_latest_eligibility_determination.premium_credit_strategy_kind, 
@@ -344,12 +345,12 @@ class HbxAdmin
     # 15th of the month rule
     def find_enrollment_effective_on_date(hbx_created_datetime)
       offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
-      year = TimeKeeper.datetime_of_record.year
-      month = TimeKeeper.datetime_of_record.month + offset_month
+      year = hbx_created_datetime.year
+      month = hbx_created_datetime.month + offset_month
       day = 1
-      hour = TimeKeeper.datetime_of_record.hour
-      min = TimeKeeper.datetime_of_record.min
-      sec = TimeKeeper.datetime_of_record.sec
+      hour = hbx_created_datetime.hour
+      min = hbx_created_datetime.min
+      sec = hbx_created_datetime.sec
       return DateTime.new(year, month, day, hour, min, sec)
       #return DateTime.new(year, month, day)
     end
