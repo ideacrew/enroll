@@ -9,7 +9,14 @@ class CorrectCuramVlpStatus < MongoidMigrationTask
   def update_person(person)
     begin
       person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
-      person.consumer_role.import!
+      person.consumer_role.update_attributes(:lawful_presence_update_reason => {:update_reason => "user in curam",
+                                                                                :update_comment => "fix data migration",
+                                                                                :v_type => "any"})
+      person.consumer_role.aasm_state = "fully_verified"
+      if person.ssn
+        person.consumer_role.ssn_validation = "valid"
+        person.consumer_role.ssn_update_reason = "user in curam"
+      end
       person.save!
       print "."
     rescue => e

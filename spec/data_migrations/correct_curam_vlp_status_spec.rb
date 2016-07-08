@@ -14,19 +14,37 @@ describe CorrectCuramVlpStatus do
   describe "given a person who has a vlp authority of 'curam', in the 'pending' status" do
     subject { CorrectCuramVlpStatus.new("fix me task", double(:current_scope => nil)) }
     let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
-
     before :each do
       curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
       curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
       curam_user.consumer_role.aasm_state = "verification_outstanding"
       curam_user.save!
       subject.migrate
-    end
-    it "moves the person to 'fully verified'" do
       curam_user.reload
-      expect(curam_user.consumer_role.lawful_presence_determination.vlp_authority).to eq "curam"
-      expect(curam_user.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_successful"
+    end
+    it "moves the person consumer_role to 'fully verified'" do
       expect(curam_user.consumer_role.aasm_state).to eq "fully_verified"
+    end
+
+    it "moves SSN to 'valid' state" do
+      expect(curam_user.consumer_role.ssn_validation).to eq 'valid'
+    end
+
+    it "saves ssn_update_reason as 'user in curam'" do
+      expect(curam_user.consumer_role.ssn_update_reason).to eq 'user in curam'
+    end
+
+    it "keeps vlp authority as curam" do
+      expect(curam_user.consumer_role.lawful_presence_determination.vlp_authority).to eq "curam"
+    end
+
+    it "moves lpd state to 'verification_successful'" do
+      expect(curam_user.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_successful"
+    end
+
+    it "saves 'lawful_presence_update_reason' as Hash with update_reason and update_comment" do
+      expect(curam_user.consumer_role.lawful_presence_update_reason[:update_reason]).to eq "user in curam"
+      expect(curam_user.consumer_role.lawful_presence_update_reason[:update_comment]).to eq "fix data migration"
     end
   end
 
@@ -40,12 +58,18 @@ describe CorrectCuramVlpStatus do
       user.consumer_role.aasm_state = "verification_outstanding"
       user.save!
       subject.migrate
-    end
-    it "does not change the state of the person"do
       user.reload
-      expect(user.consumer_role.lawful_presence_determination.vlp_authority).to eq "ssa"
-      expect(user.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_pending"
+    end
+    it "does not change the consumer state"do
       expect(user.consumer_role.aasm_state).to eq "verification_outstanding"
+    end
+
+    it "does not change lpd status" do
+      expect(user.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_pending"
+    end
+
+    it "does not change vlp authority" do
+      expect(user.consumer_role.lawful_presence_determination.vlp_authority).to eq "ssa"
     end
   end
 end
