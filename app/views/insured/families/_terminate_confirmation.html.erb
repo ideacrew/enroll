@@ -8,6 +8,7 @@
       <%= form_tag(purchase_insured_families_path, method: :get) do %>
         <%= hidden_field_tag 'terminate', 'terminate' %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
+        <%= hidden_field_tag 'hbx_enrollment_id', enrollment.id %>
         <div class="modal-body">
           <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select terminate reason" %>
         </div>

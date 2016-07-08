@@ -20,6 +20,5 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
 
   it "should have the link of terminate" do
     expect(rendered).to have_selector('a', text: 'Terminate Plan')
-    expect(rendered).to have_selector("a[href='#{purchase_insured_families_path(change_plan: 'change_plan', terminate: 'terminate', hbx_enrollment_id: hbx_enrollment.id)}']")
   end
 end

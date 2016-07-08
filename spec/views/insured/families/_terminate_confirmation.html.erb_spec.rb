@@ -20,4 +20,10 @@ RSpec.describe "insured/families/_terminate_confirmation.html.erb" do
     expect(rendered).to have_selector("input[disabled=disabled]", count: 1)
     expect(rendered).to have_selector("input[value='Submit']", count: 1)
   end
+
+  it "should have hidden fields" do
+    expect(rendered).to have_selector("input[name='terminate']")
+    expect(rendered).to have_selector("input[name='change_plan']")
+    expect(rendered).to have_selector("input[name='hbx_enrollment_id']")
+  end
 end
