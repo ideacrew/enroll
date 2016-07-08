@@ -1,7 +1,7 @@
 module Importers
   class ConversionEmployeePolicyAction < ConversionEmployeePolicyCommon
 
-    validate :validate_benefit_group_assignment
+    # validate :validate_benefit_group_assignment
     validate :validate_census_employee
     validate :validate_fein
     validate :validate_plan
@@ -26,6 +26,7 @@ module Importers
       return true if subscriber_ssn.blank?
       found_employee = find_employee
       if found_employee.nil?
+        binding.pry
         errors.add(:subscriber_ssn, "no census employee found")
       end
     end
@@ -68,7 +69,7 @@ module Importers
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
         employer_profile_id: found_employer.id,
-        hired_on: {"$lte" => start_date},
+        # hired_on: {"$lte" => start_date},
         encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
       })
       non_terminated_employees = candidate_employees.reject do |ce|

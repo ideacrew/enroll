@@ -1,7 +1,7 @@
 module Importers
   class ConversionEmployeePolicy < ConversionEmployeePolicyCommon
 
-    validate :validate_benefit_group_assignment
+    # validate :validate_benefit_group_assignment
     validate :validate_census_employee
     validate :validate_fein
     validate :validate_plan
@@ -63,7 +63,7 @@ module Importers
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
         employer_profile_id: found_employer.id,
-        hired_on: {"$lte" => start_date},
+        # hired_on: {"$lte" => start_date},
         encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
       })
       non_terminated_employees = candidate_employees.reject do |ce|
@@ -152,6 +152,13 @@ module Importers
       end
       plan = find_plan
       bga = find_benefit_group_assignment
+
+      if bga.blank?
+        plan_year = employer.plan_years.published_plan_years_by_date(start_date).first
+        employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
+        bga = employee.active_benefit_group_assignment
+      end
+
       person_data = PersonSlug.new(nil, employee.first_name, employee.middle_name,
                                    employee.last_name, employee.name_sfx,
                                    employee.ssn,
@@ -185,6 +192,7 @@ module Importers
         coverage_start: start_date,
         enrollment_kind: "open_enrollment"
       })
+
       en.external_enrollment = true
       en.hbx_enrollment_members.each do |mem|
         mem.eligibility_date = start_date
