@@ -273,7 +273,7 @@ class EmployerProfile
         end
       end
 
-      if plan_year.blank? 
+      if plan_year.blank?
         if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
           billing_report_date = plan_year.start_on
         end
@@ -421,9 +421,9 @@ class EmployerProfile
 
     def organizations_for_force_publish(new_date)
       Organization.where({
-        :'employer_profile.plan_years' => 
+        :'employer_profile.plan_years' =>
         { :$elemMatch => {
-          :start_on => new_date.next_month.beginning_of_month, 
+          :start_on => new_date.next_month.beginning_of_month,
           :aasm_state => 'renewing_draft'
           }}
       })
