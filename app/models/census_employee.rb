@@ -7,7 +7,7 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
   COBRA_STATES = %w(cobra cobra_terminated)
 
@@ -401,6 +401,10 @@ class CensusEmployee < CensusMember
     self.save
   end
 
+  def need_renew_plan_for_cobra?
+    active_benefit_group_assignment.start_on.year + 1 == cobra_begin_date.year
+  end
+
   def build_hbx_enrollment_for_cobra
     household = employee_role.person.primary_family.latest_household
     coverage_household = household.immediate_family_coverage_household
@@ -413,7 +417,13 @@ class CensusEmployee < CensusMember
         coverage_household: coverage_household,
         benefit_group_assignment: hbx.benefit_group_assignment)
       new_hbx.generate_hbx_signature
-      new_hbx.plan = hbx.plan
+      if need_renew_plan_for_cobra?
+        binding.pry
+        new_hbx.plan_id = hbx.plan.renewal_plan_id
+        raise if new_hbx.plan_id.blank?
+      else
+        new_hbx.plan_id = hbx.plan_id
+      end
       new_hbx.is_cobra = true 
       new_hbx.effective_on = cobra_begin_date
       new_hbx.select_coverage

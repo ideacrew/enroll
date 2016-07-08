@@ -649,6 +649,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     it "should success" do
+      census_employee.hired_on = TimeKeeper.date_of_record - 30.days
       census_employee.employment_terminated_on = TimeKeeper.date_of_record - 20.days
       expect(census_employee.valid?).to be_truthy
       expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
@@ -1113,6 +1114,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it "should return aasm_state" do
         expect(census_employee.current_state).to eq 'eligible'.humanize
       end
+    end
+  end
+
+  context "need_renew_plan_for_cobra?" do
+    let(:census_employee) { CensusEmployee.new }
+    let(:benefit_group_assignment) { BenefitGroupAssignment.new(start_on: (TimeKeeper.date_of_record - 1.years)) }
+
+    before :each do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+    end
+
+    it "should return false when start_on of benefit_group_assignment is equal to cobra_begin_date" do
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record - 1.years
+      expect(census_employee.need_renew_plan_for_cobra?).to be_falsey
+    end
+
+    it "should return true" do
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record
+      expect(census_employee.need_renew_plan_for_cobra?).to be_truthy
     end
   end
 end
