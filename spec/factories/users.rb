@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :user do
-    sequence(:email) {|n| "example\##{n}@example.com"}
+    sequence(:email) {|n| "example#{n}@example.com"}
+    sequence(:oim_id) {|n| "example#{n}"}
     gen_pass = User.generate_valid_password
     password gen_pass
     password_confirmation gen_pass

@@ -83,7 +83,7 @@ RSpec.describe ApplicationController do
           expect(subject).to receive(:log) do |msg, severity|
             expect(severity[:severity]).to eq('error')
             expect(msg[:user_id]).to match(user.id)
-            expect(msg[:email]).to match(user.email)
+            expect(msg[:oim_id]).to match(user.oim_id)
           end
           subject.instance_eval{set_current_person}
         end

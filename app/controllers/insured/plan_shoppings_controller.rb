@@ -142,6 +142,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if hbx_enrollment.may_terminate_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
+      hbx_enrollment.update_current(terminate_reason: params[:terminate_reason]) if params[:terminate_reason].present?
       hbx_enrollment.propogate_terminate
 
       redirect_to family_account_path
