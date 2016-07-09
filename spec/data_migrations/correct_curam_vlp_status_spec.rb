@@ -2,6 +2,16 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "correct_curam_vlp_status")
 
 describe CorrectCuramVlpStatus do
+  let(:threshold_date) {
+    Time.mktime(2016, 7, 5, 6, 0, 0)
+  }
+
+  let(:qualifying_ssa_response) {
+    EventResponse.new({
+      :received_at => threshold_date + 1.hour
+    })
+  }
+
   describe "given a task name" do
     let(:given_task_name) { "migrate_my_curam_vlp_status" }
     subject { CorrectCuramVlpStatus.new(given_task_name, double(:current_scope => nil)) }
@@ -13,12 +23,38 @@ describe CorrectCuramVlpStatus do
 
   describe "given a person who has a vlp authority of 'curam', in the 'pending' status" do
     subject { CorrectCuramVlpStatus.new("fix me task", double(:current_scope => nil)) }
-    context "people with SSN" do
+
+    context "people with SSN, and NO qualifying ssa response" do
       let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         curam_user.consumer_role.aasm_state = "verification_outstanding"
+        curam_user.save!
+        subject.migrate
+        curam_user.reload
+      end
+      it "does not change the consumer state"do
+        expect(curam_user.consumer_role.aasm_state).to eq "verification_outstanding"
+      end
+
+      it "does not change lpd status" do
+        expect(curam_user.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_pending"
+      end
+
+      it "does not change vlp authority" do
+        expect(curam_user.consumer_role.lawful_presence_determination.vlp_authority).to eq "curam"
+      end
+
+    end
+
+    context "people with SSN, and a qualifying ssa response" do
+      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
+      before :each do
+        curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
+        curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+        curam_user.consumer_role.aasm_state = "verification_outstanding"
+        curam_user.consumer_role.lawful_presence_determination.ssa_responses << qualifying_ssa_response
         curam_user.save!
         subject.migrate
         curam_user.reload
@@ -49,7 +85,7 @@ describe CorrectCuramVlpStatus do
       end
     end
 
-    context "people with NO SSN" do
+    context "people with NO SSN, and a qualifying ssa response" do
       let(:curam_user) {
         person = FactoryGirl.create(:person, :with_consumer_role)
         person.ssn = nil
@@ -62,6 +98,7 @@ describe CorrectCuramVlpStatus do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         curam_user.consumer_role.aasm_state = "verification_outstanding"
+        curam_user.consumer_role.lawful_presence_determination.ssa_responses << qualifying_ssa_response
         curam_user.save!
         subject.migrate
         curam_user.reload

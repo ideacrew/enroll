@@ -2,8 +2,12 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CorrectCuramVlpStatus < MongoidMigrationTask
   def get_people
-    Person.where('consumer_role' => {'$exists' => true},
-                 'consumer_role.lawful_presence_determination.vlp_authority' => 'curam')
+    Person.where(
+                 'consumer_role.lawful_presence_determination.vlp_authority' => 'curam',
+                 "consumer_role.lawful_presence_determination.ssa_responses.received_at" => {
+                   "$gte" => Time.mktime(2016, 7, 5,6,0,0)
+                 }
+                )
   end
 
   def update_person(person)
