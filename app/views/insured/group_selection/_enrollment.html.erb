@@ -34,6 +34,12 @@
               <label>Effective date: </label>
               <strong><%= hbx_enrollment.effective_on %></strong>
             </div>
+            <% if hbx_enrollment.is_shop? %>
+              <div>
+                <label>Termination date: </label>
+                <strong><%= @family.terminate_date_for_shop_by_enrollment(hbx_enrollment) %></strong>
+              </div>
+            <% end %>
           </div>
           <div class="col-xs-4">
             <div class="family-plan-selection">
@@ -61,9 +67,6 @@
                 <%= link_to 'Terminate Plan', '#', data: {toggle: "modal", target: "#terminate_confirm_#{hbx_enrollment.id}"}, class: 'btn btn-primary btn-md' %>
                 <%= render :partial => "insured/families/terminate_confirmation", :locals => {:enrollment => hbx_enrollment} %>
               <% end %>
-            <% if hbx_enrollment.can_complete_shopping? %>
-              <%= link_to "Change Plan", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan'), class: "btn btn-primary" %>
-            <% end %>
           </div>
         </div>
       </div>
