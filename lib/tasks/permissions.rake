@@ -23,7 +23,7 @@ namespace :permissions do
   end
   task migrate_hbx: :environment do
   	permission = Permission.hbx_staff
-    Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id)}
+    Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff') unless p.hbx_staff_role.subrole.present?}
   end
   task build_test_hbx: :environment do
     User.where(email: /themanda.*dc.gov/).delete_all
@@ -39,10 +39,10 @@ namespace :permissions do
   	p3 = FactoryGirl.create(:person, first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
   	p4 = FactoryGirl.create(:person, first_name: 'tier1', last_name: "amanda#{rand(1000000)}", user: u4)
   	p5 = FactoryGirl.create(:person, first_name: 'tier2', last_name: "amanda#{rand(1000000)}", user: u5)
-    FactoryGirl.create(:hbx_staff_role, person: p1, permission_id: Permission.hbx_staff.id)
-    FactoryGirl.create(:hbx_staff_role, person: p2, permission_id: Permission.hbx_readonly.id)
-    FactoryGirl.create(:hbx_staff_role, person: p3, permission_id: Permission.hbx_csr_supervisor.id)
-    FactoryGirl.create(:hbx_staff_role, person: p4, permission_id: Permission.hbx_csr_tier1.id)
-    FactoryGirl.create(:hbx_staff_role, person: p5, permission_id: Permission.hbx_csr_tier2.id)
+    FactoryGirl.create(:hbx_staff_role, person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff')
+    FactoryGirl.create(:hbx_staff_role, person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only')
+    FactoryGirl.create(:hbx_staff_role, person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor')
+    FactoryGirl.create(:hbx_staff_role, person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1')
+    FactoryGirl.create(:hbx_staff_role, person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2')
   end
 end

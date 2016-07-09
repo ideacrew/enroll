@@ -412,6 +412,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def set_date
+    authorize HbxProfile, :modify_admin_tabs?
     forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)

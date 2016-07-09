@@ -384,18 +384,31 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "POST" do
-    let(:user) { double("user")}
-
+    let(:user) { FactoryGirl.create(:user)}
+    let(:person) { FactoryGirl.create(:person, user: user) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
       sign_in(user)
     end
 
     it "sends timekeeper a date" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      sign_in(user)
       expect(TimeKeeper).to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
+    end
+
+    it "sends timekeeper a date and fails because not updateable" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      sign_in(user)
+      expect(TimeKeeper).not_to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
+      post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
     end
   end
 
