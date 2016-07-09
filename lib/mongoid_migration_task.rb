@@ -1,3 +1,5 @@
+require 'rake'
+
 class MongoidMigrationTask < Rake::Task
   def initialize(task_name, app)
     super(task_name, app)
