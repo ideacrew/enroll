@@ -33,18 +33,6 @@ module Importers
       org.employer_profile
     end
 
-    def map_plan_year
-      employer = find_employer
-      found_carrier = find_carrier
-      plan_year_attrs = Factories::PlanYearFactory.default_dates_for_coverage_starting_on(default_plan_year_start)
-      plan_year_attrs[:fte_count] = enrolled_employee_count
-      plan_year_attrs[:employer_profile] = employer
-      plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
-      # plan_year_attrs[:imported_plan_year] = true
-      plan_year_attrs[:aasm_state] = "active"
-      PlanYear.new(plan_year_attrs)
-    end
-
     def select_most_common_plan(available_plans, most_expensive_plan)
         if !most_common_hios_id.blank?
           mc_hios = most_common_hios_id.strip
@@ -70,35 +58,8 @@ module Importers
           warnings.add(:single_plan_hios_id, "no hios id specified for single plan benefit group, defaulting to most common plan")
         end
       end
+
       select_most_common_plan(available_plans, most_expensive_plan)
-    end
-
-    def map_benefit_group(found_carrier)
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, default_plan_year_start.year)
-      reference_plan = select_reference_plan(available_plans)
-      elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
-      benefit_group_properties = {
-        :title => "Standard",
-        :plan_option_kind => plan_selection,
-        :relationship_benefits => map_relationship_benefits,
-        :reference_plan_id => reference_plan.id,
-        :elected_plan_ids => elected_plan_ids
-      }
-      if !new_coverage_policy.blank?
-         benefit_group_properties[:effective_on_offset] = new_coverage_policy.offset
-         benefit_group_properties[:effective_on_kind] = new_coverage_policy.kind        
-      end
-      BenefitGroup.new(benefit_group_properties)
-    end
-
-    def map_relationship_benefits
-      BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map do |rel|
-        RelationshipBenefit.new({
-          :relationship => rel,
-          :offered => true,
-          :premium_pct => 50.00
-        })
-      end
     end
 
     def find_and_update_plan_year
@@ -107,10 +68,11 @@ module Importers
 
       puts "Processing....#{employer.legal_name}...#{employer.fein}"
 
-      current_coverage_start = Date.strptime(coverage_start, "%m/%d/%y")
+      current_coverage_start = Date.strptime(coverage_start, "%m/%d/%Y")
       
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
       reference_plan = select_reference_plan(available_plans)
+
 
       if reference_plan.blank?
         errors.add(:base, 'Unable to find a Reference plan with given Hios ID')
@@ -143,6 +105,7 @@ module Importers
       end
 
       return false if errors.present?
+
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
         update_reference_plan(plan_year, reference_plan)
         renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
