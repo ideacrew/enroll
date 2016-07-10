@@ -49,7 +49,6 @@ module Importers
       super(opts)
       @warnings = ActiveModel::Errors.new(self)
     end
-    
 
     def broker_npn=(val)
       @broker_npn = Maybe.new(val).strip.extract_value
@@ -90,7 +89,7 @@ module Importers
 
     def broker_exists_if_specified
       return true if broker_npn.blank?
-      unless BrokerRole.by_npn(broker_npn).any?
+      unless BrokerRole.by_npn(broker_npn).present?
         warnings.add(:broker_npn, "does not correspond to an existing Broker")
       end
     end
@@ -236,55 +235,6 @@ module Importers
         end
       end
       return general_agency_accounts
-    end
-
-    def save
-      return false unless valid?
-      new_organization = Organization.new({
-        :fein => fein,
-        :legal_name => legal_name,
-        :dba => dba,
-        :office_locations => map_office_locations,
-        :employer_profile => EmployerProfile.new({
-          :broker_agency_accounts => assign_brokers,
-          :general_agency_accounts => assign_general_agencies,
-          :entity_kind => "c_corporation",
-          :profile_source => "conversion",
-          :registered_on => registered_on
-        })
-      })
-      save_result = new_organization.save
-      if save_result
-        emp = new_organization.employer_profile
-        map_poc(emp)
-      end
-      propagate_errors(new_organization)
-      return save_result
-    end
-
-    def update
-      organization = Organization.where(:fein => fein).first
-      if organization.blank?
-        errors.add(:fein, "employer don't exists with given fein")
-      end
-
-      broker_exists_if_specified
-
-      organization.legal_name = legal_name
-      organization.dba = dba
-      organization.office_locations = map_office_locations
-
-      br = BrokerRole.by_npn(broker_npn).first
-      if br.present? && organization.employer_profile.broker_agency_accounts.where(:writing_agent_id => br.id).blank?
-        organization.employer_profile.broker_agency_accounts = assign_brokers
-      end
-
-      if update_result = organization.save
-        update_poc(organization.employer_profile)
-      end
-
-      propagate_errors(organization)
-      return update_result
     end
 
     def propagate_errors(org)

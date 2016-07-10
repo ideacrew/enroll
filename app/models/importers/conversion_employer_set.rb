@@ -97,10 +97,12 @@ module Importers
     end
 
     def create_model(record_attrs)
-      row_action = record_attrs[:action]
-      row_action ||= "add"
-
-      ::Importers::ConversionEmployer.new(record_attrs.merge({:registered_on => @conversion_date}))
+      row_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
+      if row_action == 'add'
+        ::Importers::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
+      elsif row_action == 'update'
+        ::Importers::ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
+      end
     end
   end
 end
