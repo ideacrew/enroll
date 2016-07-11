@@ -418,7 +418,6 @@ class CensusEmployee < CensusMember
         benefit_group_assignment: hbx.benefit_group_assignment)
       new_hbx.generate_hbx_signature
       if need_renew_plan_for_cobra?
-        binding.pry
         new_hbx.plan_id = hbx.plan.renewal_plan_id
         raise if new_hbx.plan_id.blank?
       else
