@@ -78,7 +78,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:effective_asc).and_return([hbx_enrollment])
+      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
 
@@ -91,7 +91,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:effective_asc).and_return([hbx_enrollment])
+      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
 
@@ -229,7 +229,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
       it "should redirect" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop'))
+        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop', hbx_enrollment_id: old_hbx.id))
       end
 
       it "should get special_enrollment_period_id" do
