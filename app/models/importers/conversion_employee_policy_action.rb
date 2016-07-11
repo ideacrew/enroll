@@ -26,7 +26,6 @@ module Importers
       return true if subscriber_ssn.blank?
       found_employee = find_employee
       if found_employee.nil?
-        binding.pry
         errors.add(:subscriber_ssn, "no census employee found")
       end
     end
@@ -53,9 +52,11 @@ module Importers
       return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
       census_employee = find_employee
       return nil unless census_employee
+
       candidate_bgas = census_employee.benefit_group_assignments.select do |bga|
         bga.start_on <= start_date
       end
+      
       non_terminated_employees = candidate_bgas.reject do |ce|
         (!ce.end_on.blank?) && ce.end_on <= Date.today
       end
@@ -102,7 +103,14 @@ module Importers
       employer = find_employer
       employee = find_employee
       plan = find_plan
+
       benefit_group_assignment = find_benefit_group_assignment
+      if benefit_group_assignment.blank?
+        plan_year = employer.plan_years.published.first
+        employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
+        benefit_group_assignment = employee.active_benefit_group_assignment
+      end
+
       employee_role = find_employee_role
       is_new = true
       if !employee_role.nil?

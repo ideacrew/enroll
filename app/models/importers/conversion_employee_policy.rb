@@ -154,9 +154,10 @@ module Importers
       bga = find_benefit_group_assignment
 
       if bga.blank?
-        plan_year = employer.plan_years.published_plan_years_by_date(start_date).first
-        employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
-        bga = employee.active_benefit_group_assignment
+        if plan_year = employer.plan_years.published.first
+          employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
+          bga = employee.active_benefit_group_assignment
+        end
       end
 
       person_data = PersonSlug.new(nil, employee.first_name, employee.middle_name,
@@ -164,48 +165,56 @@ module Importers
                                    employee.ssn,
                                    employee.dob,
                                    employee.gender)
-      role, family = Factories::EnrollmentFactory.construct_employee_role(nil, employee, person_data)
-      if role.nil? && family.nil?
-         errors.add(:base, "matching conflict for this personal data")
-         return false
-      end
-      unless role.person.save
-        role.person.errors.each do |attr, err|
-          errors.add("employee_role_" + attr.to_s, err)
-        end
-        return false
-      end
-      unless family.save
-        family.errors.each do |attr, err|
-          errors.add("family_" + attr.to_s, err)
-        end
-        return false
-      end
-      cancel_other_enrollments_for_bga(bga)
-      hh = family.active_household
-      ch = hh.immediate_family_coverage_household
-      en = hh.new_hbx_enrollment_from({
-        coverage_household: ch,
-        employee_role: role,
-        benefit_group: bga.benefit_group,
-        benefit_group_assignment: bga,
-        coverage_start: start_date,
-        enrollment_kind: "open_enrollment"
-      })
+      begin
+        role, family = Factories::EnrollmentFactory.construct_employee_role(nil, employee, person_data)
 
-      en.external_enrollment = true
-      en.hbx_enrollment_members.each do |mem|
-        mem.eligibility_date = start_date
-        mem.coverage_start_on = start_date
+        if role.nil? && family.nil?
+          errors.add(:base, "matching conflict for this personal data")
+          return false
+        end
+
+        unless role.person.save
+          role.person.errors.each do |attr, err|
+            errors.add("employee_role_" + attr.to_s, err)
+          end
+          return false
+        end
+
+        unless family.save
+          family.errors.each do |attr, err|
+            errors.add("family_" + attr.to_s, err)
+          end
+          return false
+        end
+        cancel_other_enrollments_for_bga(bga)
+        hh = family.active_household
+        ch = hh.immediate_family_coverage_household
+        en = hh.new_hbx_enrollment_from({
+          coverage_household: ch,
+          employee_role: role,
+          benefit_group: bga.benefit_group,
+          benefit_group_assignment: bga,
+          coverage_start: start_date,
+          enrollment_kind: "open_enrollment"
+          })
+
+        en.external_enrollment = true
+        en.hbx_enrollment_members.each do |mem|
+          mem.eligibility_date = start_date
+          mem.coverage_start_on = start_date
+        end
+        en.save!
+        en.update_attributes!({
+          carrier_profile_id: plan.carrier_profile_id,
+          plan_id: plan.id,
+          aasm_state: "coverage_selected",
+          coverage_kind: 'health'
+          })
+        true
+      rescue Exception => e
+        errors.add(:base, e.to_s)
+        return false
       end
-      en.save!
-      en.update_attributes!({
-        carrier_profile_id: plan.carrier_profile_id,
-        plan_id: plan.id,
-        aasm_state: "coverage_selected",
-        coverage_kind: 'health'
-      })
-      true
     end
 
     def cancel_other_enrollments_for_bga(bga)
