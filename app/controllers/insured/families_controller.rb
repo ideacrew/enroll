@@ -250,9 +250,17 @@ class Insured::FamiliesController < FamiliesController
       @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
     else
       if @person.active_employee_roles.present?
-        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+        if current_user.has_hbx_staff_role?
+          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+        end
       else @person.consumer_role.present?
-        @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        if current_user.has_hbx_staff_role?
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        end
       end
     end
 
