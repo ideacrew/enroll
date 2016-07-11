@@ -63,7 +63,7 @@ module Importers
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
         employer_profile_id: found_employer.id,
-        hired_on: {"$lte" => start_date},
+        # hired_on: {"$lte" => start_date},
         encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
       })
       non_terminated_employees = candidate_employees.reject do |ce|
@@ -170,26 +170,31 @@ module Importers
     end
 
     def save
-      return false unless valid?
-      employer = find_employer
+      begin
+        return false unless valid?
+        employer = find_employer
 
-      person = find_person
-      return false unless person
+        person = find_person
+        return false unless person
 
-      puts '----processing ' + person.full_name
-      family = person.primary_family
-      enrollment = find_current_enrollment(family, employer)
-      return false unless enrollment
+        puts '----processing ' + person.full_name
+        family = person.primary_family
+        enrollment = find_current_enrollment(family, employer)
+        return false unless enrollment
 
-      plan = find_plan
-      if enrollment.plan_id != plan.id
-        enrollment.update_attributes(plan_id: plan.id)
+        plan = find_plan
+        if enrollment.plan_id != plan.id
+          enrollment.update_attributes(plan_id: plan.id)
 
-        if renewing_plan_year = employer.plan_years.renewing.first
-          update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
+          if renewing_plan_year = employer.plan_years.renewing.first
+            update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
+          end
+        else
+          errors.add(:base, "already have coverage with same hios id")
+          return false
         end
-      else
-        errors.add(:base, "already have coverage with same hios id")
+      rescue Exception => e
+        errors.add(:base, e.to_s)
         return false
       end
     end
