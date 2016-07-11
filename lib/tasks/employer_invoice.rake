@@ -29,8 +29,8 @@ namespace :employer_invoice do
        }}
     })
 
-    # generate_invoices(conversion_employers, false)
-    generate_invoices(new_employers, true)
+    generate_invoices(conversion_employers, false)
+    # generate_invoices(new_employers, true)
    
     #Create a tar file 
     puts "creating a tar file now"
