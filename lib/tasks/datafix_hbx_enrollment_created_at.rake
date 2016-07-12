@@ -7,7 +7,7 @@ namespace :datafix do
   	families_with_enrollments_with_created_at_nil.each do |family|
   		family.households.each do |household|
   			household.hbx_enrollments.each do |enrollment|
-  				enrollment.set(:created_at => TimeKeeper.datetime_of_record)
+          enrollment.set(:created_at => enrollment.submitted_at)
   			end
   		end
   	end
