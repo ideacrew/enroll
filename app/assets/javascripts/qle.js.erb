@@ -5,6 +5,43 @@ $(function () {
 		return true;
 	}
 
+  var labels = ["Coverage end date", "Date of move"]
+
+  function check_qle_reason() {
+
+    switch ($('.qle-label').html()){
+      case labels[0]:
+            test = false;
+            break;
+      case labels[1]:
+            dateMove();
+            test = false;
+            break;
+      default: 
+          test = true;
+    }
+    return test;
+  }
+
+
+  function dateMove(){
+    $('#qle-date-chose').hide();
+    $('#qle_reason').show();
+    $("#qle_reason").html("qle_moving_detail");
+    $('.calculator').hide();
+    $('#qle_reason .moving_reasons').removeClass('hidden');
+    $("input:radio[name=reason]:first").click();
+
+    var init_date = new Date($('#qle_date').val());
+    var new_date = new Date(init_date.setDate(init_date.getDate()-61));
+    var prev_date= ((new_date.getMonth() + 1) + '/' + new_date.getDate() + '/' +  new_date.getFullYear());
+
+    var moving_notice = 'I had other health coverage for at least one day between ' + prev_date + " and " + $('#qle_date').val();   
+    $("#date-change").html(moving_notice);
+    $("input:radio[name=reason]:first").val(moving_notice);
+  }
+
+
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
     $('#qle-details .error-info').addClass('hidden');
@@ -16,6 +53,10 @@ $(function () {
   }
 
   function get_qle_date() {
+
+    console.log ("YES I am here");
+
+
     $.ajax({
       type: "GET",
       data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
@@ -90,14 +131,18 @@ $(function () {
   });
 
 	/* QLE Date Validator */
-	$(document).on('click', '#qle_submit', function() {
-		if(check_qle_date()) {
-			$('#qle_date').removeClass('input-error');
-			get_qle_date();
-		} else {
-			$('#qle_date').addClass('input-error');
-		}
-	});
+  $(document).on('click', '#qle_submit', function() {
+    if(check_qle_date()) {
+      $('#qle_date').removeClass('input-error');
+
+
+      if(check_qle_reason())
+        get_qle_date();
+
+    } else {
+      $('#qle_date').addClass('input-error');
+    }
+  });
 
   /* for Family member */
 	$(document).on('click', '#qle_continue_button', function() {
