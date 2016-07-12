@@ -42,7 +42,11 @@
                     <div class="enrollment-effective info">
                       <label>Effective date:
                       </label>
-                      <strong><%= hbx_enrollment.effective_on %></strong>
+                       <% if hbx_enrollment.is_shop? %>
+                        <%= @benefit_group.effective_on_for(@employee_role.census_employee.hired_on) %>
+                       <% else %>
+                        <strong><%= hbx_enrollment.effective_on %></strong>
+                       <% end %>
                     </div>
                   </td>
                    <td>
@@ -58,7 +62,12 @@
                     <div class="enrollment-effective info">
                       <label>Effective date:
                       </label>
-                      <strong><%= hbx_enrollment.effective_on %></strong>
+                       <% if hbx_enrollment.is_shop? %>
+                        <%= @benefit_group.effective_on_for(@employee_role.census_employee.hired_on) %>
+                       <% else %>
+                        <strong><%= hbx_enrollment.effective_on %></strong>
+                       <% end %>
+                    </div>
                     </div>
                   </td>
                   <% end %>
