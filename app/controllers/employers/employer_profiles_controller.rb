@@ -270,7 +270,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     authorize EmployerProfile, :updateable?
   end
 
-
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
