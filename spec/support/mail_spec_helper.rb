@@ -15,5 +15,15 @@ module MailSpecHelper
        'Please visit',
        "to learn more about your benefits and sign up for insurance during open enrollment."]
     end
+
+    def user_mailer_renewal_invitation_subject
+      "Invitation from your Employer to Renew your Health Insurance at #{Settings.site.short_name} "
+    end
+
+    def user_mailer_renewal_invitation_body(person_name)
+      [person_name, "Your employer has renewed their Health Benefits Program through #{Settings.site.short_name}.",
+       'Please visit',
+       "to login and renew during open enrollment."]
+    end
   end
 end

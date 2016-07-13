@@ -24,6 +24,12 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def renewal_invitation_email(email, person_name, invitation)
+    mail({to: email, subject: "Invitation from your Employer to Renew your Health Insurance at #{Settings.site.short_name} "}) do |format|
+      format.html { render "renewal_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
+    end
+  end
+
   def agent_invitation_email(email, person_name, invitation)
     if email.present?
       mail({to: email, subject: "DCHealthLink Support Invitation "}) do |format|

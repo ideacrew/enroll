@@ -809,9 +809,17 @@ private
   end
 
   def send_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_employee!(ce)
+    if is_renewing?
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_renewal_employee!(ce)
+        end
+      end
+    else
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_employee!(ce)
+        end
       end
     end
   end
