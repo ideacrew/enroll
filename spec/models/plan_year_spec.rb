@@ -2130,10 +2130,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         deliveries = ActionMailer::Base.deliveries
         expect(deliveries).not_to be_empty
         expect(deliveries.count).to eq(benefit_group.census_employees.count)
-        expect(deliveries.map(&:subject).uniq.join('')).to eq(user_mailer_invitation_subject)  
+        expect(deliveries.map(&:subject).uniq.join('')).to eq(user_mailer_renewal_invitation_subject)  
         expect(deliveries.flat_map(&:to)).to eq(benefit_group.census_employees.map(&:email_address))
         benefit_group.census_employees.each do |census_employee_recepient|
-          user_mailer_invitation_body(census_employee_recepient.full_name).each do |body_line|
+          user_mailer_renewal_invitation_body(census_employee_recepient.full_name).each do |body_line|
             deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
           end
         end
