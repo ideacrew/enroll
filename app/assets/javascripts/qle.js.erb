@@ -5,42 +5,29 @@ $(function () {
 		return true;
 	}
 
-  var labels = ["Coverage end date", "Date of move"]
-
   function check_qle_reason() {
-
     switch ($('.qle-label').html()){
-      case labels[0]:
-            test = false;
-            break;
-      case labels[1]:
-            dateMove();
-            test = false;
-            break;
+      case "Coverage end date":
+        qle_question("check_insurance_reason.js");
+        test = false;
+        break;
+      case "Date of move":
+        qle_question("check_move_reason.js");
+        test = false;
+        break;
       default: 
-          test = true;
+        test = true;
     }
     return test;
   }
 
-
-  function dateMove(){
-    $('#qle-date-chose').hide();
-    $('#qle_reason').show();
-    $("#qle_reason").html("qle_moving_detail");
-    $('.calculator').hide();
-    $('#qle_reason .moving_reasons').removeClass('hidden');
-    $("input:radio[name=reason]:first").click();
-
-    var init_date = new Date($('#qle_date').val());
-    var new_date = new Date(init_date.setDate(init_date.getDate()-61));
-    var prev_date= ((new_date.getMonth() + 1) + '/' + new_date.getDate() + '/' +  new_date.getFullYear());
-
-    var moving_notice = 'I had other health coverage for at least one day between ' + prev_date + " and " + $('#qle_date').val();   
-    $("#date-change").html(moving_notice);
-    $("input:radio[name=reason]:first").val(moving_notice);
+  function qle_question(url){
+    $.ajax({
+      type: "GET",
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      url: "/insured/families/" + url
+    });
   }
-
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
@@ -53,13 +40,9 @@ $(function () {
   }
 
   function get_qle_date() {
-
-    console.log ("YES I am here");
-
-
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
       url: "/insured/families/check_qle_date.js"
     });
   }
@@ -101,6 +84,8 @@ $(function () {
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
+    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle-date-chose').show();
 
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
@@ -112,6 +97,10 @@ $(function () {
     };
 
     $('#qle-details').removeClass('hidden');
+  });
+
+  $(document).on('change', 'input[type=radio][name=reason]', function() {
+    $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
@@ -141,6 +130,19 @@ $(function () {
 
     } else {
       $('#qle_date').addClass('input-error');
+    }
+  });
+
+  $(document).on('click', '#qle_submit_reason', function() {
+
+    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){ 
+      get_qle_date();
+    } else {
+      $('#qle_reason').hide();
+      var errorNoticeAction = "The choice you submitted does not qualify for a special enrollment period. Please contact DC Health Link's Customer Care Center: 1-855-532-5465.";
+      $("#qle-details .error-text").html(errorNoticeAction);
+      $('#qle-details .error-info').removeClass('hidden');
+
     }
   });
 

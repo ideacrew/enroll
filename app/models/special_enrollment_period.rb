@@ -30,6 +30,9 @@ class SpecialEnrollmentPeriod
   # Date Enrollment Period ends
   field :end_on, type: Date
 
+  # QLE Answer to specific question
+  field :qle_answer, type: String
+
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date

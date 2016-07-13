@@ -137,12 +137,19 @@ class Insured::FamiliesController < FamiliesController
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
+      @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
+  end
+
+  def check_move_reason
+  end
+
+  def check_insurance_reason
   end
 
   def purchase

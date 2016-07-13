@@ -4,6 +4,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
   $('#qle-details .success-info').removeClass('hidden');
   $('#qle-details .error-info').addClass('hidden');
   $('#qle-details .initial-info').addClass('hidden');
+  $('#qle_reason').hide();
 
   <% case %>
   <% when @qle_aptc_block %>
@@ -22,6 +23,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
     $('#qle-details .initial-info').addClass('hidden');
   <% when @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
+    $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>
   var errorNotice = "The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact <%= raw(Settings.contact_center.name) %>: <%= Settings.contact_center.phone_number %>.";
