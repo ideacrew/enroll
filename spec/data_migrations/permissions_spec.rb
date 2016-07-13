@@ -5,6 +5,7 @@ describe DefinePermissions do
   subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier2 hbx_csr_tier1} }
   describe 'create permissions' do
+    let(:given_task_name) {':initial_hbx'}
     before do
       Person.all.delete
       person= FactoryGirl.create(:person)
@@ -19,6 +20,7 @@ describe DefinePermissions do
   end
 
   describe 'build test roles' do
+    let(:given_task_name) {':build_test_roles'}
     before do
       User.all.delete
       Person.all.delete
