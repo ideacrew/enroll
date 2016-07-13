@@ -1,24 +1,9 @@
-$(function () {
-	function check_qle_date() {
-		var date_value = $('#qle_date').val();
-		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
-		return true;
-	}
+var QLE = ( function( window, undefined ) {
 
-  function check_qle_reason() {
-    switch ($('.qle-label').html()){
-      case "Coverage end date":
-        qle_question("check_insurance_reason.js");
-        test = false;
-        break;
-      case "Date of move":
-        qle_question("check_move_reason.js");
-        test = false;
-        break;
-      default: 
-        test = true;
-    }
-    return test;
+  function initialize() {
+    $(document).on('change', 'input[type=radio][name=reason]', function() {
+      $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
+    });
   }
 
   function qle_question(url){
@@ -28,6 +13,36 @@ $(function () {
       url: "/insured/families/" + url
     });
   }
+
+  function check_qle_reason() {
+    switch ($('.qle-label').html()){
+      case "Coverage end date":
+        QLE.qle_question("check_insurance_reason.js");
+        test = false;
+        break;
+      case "Date of move":
+        QLE.qle_question("check_move_reason.js");
+        test = false;
+        break;
+      default: 
+        test = true;
+    }
+    return test;
+  }
+    return {
+      initialize : initialize,
+      check_qle_reason : check_qle_reason,
+      qle_question : qle_question
+    };
+} )( window );
+
+$(function () {
+
+	function check_qle_date() {
+		var date_value = $('#qle_date').val();
+		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
+		return true;
+	}
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
@@ -99,10 +114,6 @@ $(function () {
     $('#qle-details').removeClass('hidden');
   });
 
-  $(document).on('change', 'input[type=radio][name=reason]', function() {
-    $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
-  });
-
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
     init_qle_message();
 		$('#qle-details').addClass('hidden');
@@ -125,7 +136,7 @@ $(function () {
       $('#qle_date').removeClass('input-error');
 
 
-      if(check_qle_reason())
+      if(QLE.check_qle_reason())
         get_qle_date();
 
     } else {
@@ -134,7 +145,6 @@ $(function () {
   });
 
   $(document).on('click', '#qle_submit_reason', function() {
-
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){ 
       get_qle_date();
     } else {
@@ -142,7 +152,6 @@ $(function () {
       var errorNoticeAction = "The choice you submitted does not qualify for a special enrollment period. Please contact DC Health Link's Customer Care Center: 1-855-532-5465.";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
-
     }
   });
 
@@ -150,27 +159,27 @@ $(function () {
 	$(document).on('click', '#qle_continue_button', function() {
 		$('#qle_flow_info .initial-info').hide();
 		$('#qle_flow_info .qle-info').removeClass('hidden');
-	})
-});
+	 })
+  });
 
-$(document).on('page:update', function(){
-  if ($('select#effective_on_kind').length > 0){
-    $('form#qle_form').submit(function(e){
-      if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
-        $('#qle_effective_on_kind_alert').show();
-        e.preventDefault&&e.preventDefault();
-      } else {
-        $('#qle_effective_on_kind_alert').hide();
-      };
-    });
-  };
-});
+  $(document).on('page:update', function(){
+    if ($('select#effective_on_kind').length > 0){
+      $('form#qle_form').submit(function(e){
+        if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
+          $('#qle_effective_on_kind_alert').show();
+          e.preventDefault&&e.preventDefault();
+        } else {
+          $('#qle_effective_on_kind_alert').hide();
+        };
+      });
+    };
+  });
 
-$(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
-  if(this.checked) {
-    $('#outside-open-enrollment').modal('show');
-    $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
-      $("#no_qle_checkbox").attr("checked",false)
-    });
-  }
-});
+  $(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
+    if(this.checked) {
+      $('#outside-open-enrollment').modal('show');
+      $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
+        $("#no_qle_checkbox").attr("checked",false)
+      });
+    }
+  });
