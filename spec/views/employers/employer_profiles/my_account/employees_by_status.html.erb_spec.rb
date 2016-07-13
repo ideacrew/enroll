@@ -74,6 +74,12 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_selector('span', text: 'COBRA')
     end
+
+    it "should displays cobra confirm area" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('tr.cobra_confirm')
+    end
   end
 
   context 'when employee is waived' do

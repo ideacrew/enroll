@@ -1117,6 +1117,52 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "is_under_cobra?" do
+    let(:census_employee) { CensusEmployee.new }
+
+    context 'when existing_cobra is true' do
+      before :each do
+        census_employee.existing_cobra = true
+      end
+
+      it "should return true when aasm_state not equal cobra" do
+        census_employee.aasm_state = 'eligible'
+        expect(census_employee.is_under_cobra?).to be_truthy
+      end
+
+      it "should return true when aasm_state equal cobra" do
+        census_employee.aasm_state = 'cobra'
+        expect(census_employee.is_under_cobra?).to be_truthy
+      end
+    end
+
+    context "when existing_cobra is false" do
+      before :each do
+        census_employee.existing_cobra = false
+      end
+
+      it "should return false when aasm_state not equal cobra" do
+        census_employee.aasm_state = 'eligible'
+        expect(census_employee.is_under_cobra?).to be_falsey
+      end
+
+      it "should return true when aasm_state equal cobra" do
+        census_employee.aasm_state = 'cobra'
+        expect(census_employee.is_under_cobra?).to be_truthy
+      end
+    end
+  end
+
+  context "toggle_existing_cobra" do
+    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record) }
+
+    it "set existing_cobra to true" do
+      census_employee.update(aasm_state: 'cobra_terminated', existing_cobra: true, cobra_begin_date: TimeKeeper.date_of_record + 10.days)
+      census_employee.reinstate_cobra_terminated
+      expect(census_employee.existing_cobra).to be_falsey
+    end
+  end
+
   context "need_renew_plan_for_cobra?" do
     let(:census_employee) { CensusEmployee.new }
     let(:benefit_group_assignment) { BenefitGroupAssignment.new(start_on: (TimeKeeper.date_of_record - 1.years)) }
