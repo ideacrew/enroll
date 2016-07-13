@@ -104,4 +104,10 @@ module Employers::EmployerHelper
     renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
     return benefit_groups, (renewing_benefit_groups || [])
   end
+
+  def display_families_tab(user)
+    if user.present?
+      user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
+    end
+  end
 end
