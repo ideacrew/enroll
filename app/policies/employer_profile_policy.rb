@@ -1,6 +1,6 @@
 class EmployerProfilePolicy < ApplicationPolicy
 
-  def show_premium_statements
+  def show_premium_statements?
     return false unless person=user.person
     return true unless hbx_staff = person.hbx_staff_role
     hbx_staff.permission.list_enrollments

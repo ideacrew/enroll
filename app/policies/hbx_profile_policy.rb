@@ -20,9 +20,9 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.approve_broker
   end
 
-  def approve_general_agency?
+  def approve_ga?
     return true unless role = user.person.hbx_staff_role
-    role.permission.approve_general_agency
+    role.permission.approve_ga
   end
 
   def show?
