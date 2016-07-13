@@ -32,9 +32,9 @@ class CorrectCuramVlpStatus < MongoidMigrationTask
 
   def migrate
     people_to_fix = get_people
-    puts
-    puts "#{people_to_fix.count} records will be fixed."
-    puts
+    # puts
+    # puts "#{people_to_fix.count} records will be fixed."
+    # puts
     people_to_fix.each do |person|
       update_person(person)
     end
