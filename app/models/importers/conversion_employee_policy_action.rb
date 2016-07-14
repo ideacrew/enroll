@@ -102,22 +102,21 @@ module Importers
       return false unless valid?
       employer = find_employer
       employee = find_employee
-      plan = find_plan
+      employee_role = employee.employee_role
+      
+      if find_benefit_group_assignment.blank?
+        plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
-      benefit_group_assignment = find_benefit_group_assignment
-      if benefit_group_assignment.blank?
-        plan_year = employer.plan_years.published.first
-        employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
-        benefit_group_assignment = employee.active_benefit_group_assignment
-      end
-
-      employee_role = find_employee_role
-      is_new = true
-      if !employee_role.nil?
-        if find_enrollments(employee_role, benefit_group_assignment).any?
-          is_new = false
+        if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+          employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
         end
       end
+
+      is_new = true
+      if employee_role.present? && find_enrollments(employee_role).present?
+        is_new = false
+      end
+
       proxy = is_new ? ::Importers::ConversionEmployeePolicy.new(@original_attributes) : ::Importers::ConversionEmployeePolicyUpdate.new(@original_attributes)
       result = proxy.save
       propagate_warnings(proxy)
@@ -137,20 +136,20 @@ module Importers
       end
     end
 
-    def find_employee_role
-      employee = find_employee
-      employee.employee_role
-    end
-
-    def find_enrollments(employee_role, benefit_group_assignment)
+    def find_enrollments(employee_role)
       person = employee_role.person
-      family = person.primary_family
-    
-      family.households.flat_map(&:hbx_enrollments).select do |hbx|
-        (hbx.benefit_group_assignment_id == benefit_group_assignment.id) &&
-          (hbx.employee_role_id == employee_role.id)
-      end
-    end
 
+      family = person.primary_family
+      return [] if family.blank?
+
+      employer = find_employer
+      plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
+      active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+
+      family.active_household.hbx_enrollments.where({
+        :benefit_group_id.in => active_plan_year.benefit_group_ids,
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+        })
+    end
   end
 end

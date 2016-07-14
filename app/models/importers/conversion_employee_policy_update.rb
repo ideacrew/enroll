@@ -119,8 +119,10 @@ module Importers
     end
 
     def find_current_enrollment(family, employer)
-      plan_year = employer.plan_years.published_plan_years_by_date(benefit_begin_date).first || employer.plan_years.published.first
-  
+
+      plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
+      plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+   
       if plan_year.blank?
         errors.add(:base, "plan year missing")
         return false

@@ -116,7 +116,7 @@ module Importers
         return nil if found_employer.nil?
         candidate_employees = CensusEmployee.where({
           employer_profile_id: found_employer.id,
-          hired_on: {"$lte" => start_date},
+          # hired_on: {"$lte" => start_date},
           encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
         })
         non_terminated_employees = candidate_employees.reject do |ce|

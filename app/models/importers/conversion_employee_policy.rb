@@ -154,9 +154,12 @@ module Importers
       bga = find_benefit_group_assignment
 
       if bga.blank?
-        if plan_year = employer.plan_years.published.first
-          employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
-          bga = employee.active_benefit_group_assignment
+        plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
+
+        if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+          employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
+          employee.reload
+          bga = employee.benefit_group_assignments.first
         end
       end
 
