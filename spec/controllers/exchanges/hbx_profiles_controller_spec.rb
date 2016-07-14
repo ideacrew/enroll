@@ -68,6 +68,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(flash[:notice]).to eq 'Successfully submitted the selected employer(s) for binder paid.'
     end
 
+    it "should render json template" do
+      get :binder_index_datatable, {format: :json}
+      expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
+    end
+
   end
 
   describe "new" do

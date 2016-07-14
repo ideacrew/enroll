@@ -299,10 +299,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-    # respond_to do |format|
-    #   format.html { render "employers/employer_profiles/binder_index" }
-    #   format.js {}
-    # end
   end
 
   def verifications_index_datatable

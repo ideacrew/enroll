@@ -54,11 +54,12 @@ class Organization
 
   scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
 
-  scope :with_published_and_renewing_plan_year_statuses, ->{
+  scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
     unscoped.where(
       :"employer_profile.plan_years" => {
         :$elemMatch => {
-          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING
+          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
+          start_on: start_on
         }
       })
   }
@@ -198,7 +199,7 @@ class Organization
 
   def self.retrieve_employers_eligible_for_binder_paid
     date = TimeKeeper.date_of_record.end_of_month + 1.day
-    all_employers_by_plan_year_start_on(date).with_published_and_renewing_plan_year_statuses
+    all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
   def self.valid_carrier_names
