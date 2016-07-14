@@ -1181,4 +1181,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.need_renew_plan_for_cobra?).to be_truthy
     end
   end
+
+  context "can_cobra_employee_role?" do
+    let(:hired_on) { TimeKeeper.date_of_record }
+    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
+    before :each do
+      census_employee.terminate_employee_role!
+    end
+
+    it "can cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on + 10.days
+      expect(census_employee.may_cobra_employee_role?).to be_truthy
+    end
+
+    it "can not cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on - 10.days
+      expect(census_employee.may_cobra_employee_role?).to be_falsey
+    end
+
+    it "can not cobra employee_role without cobra_begin_date" do
+      census_employee.cobra_begin_date = nil
+      expect(census_employee.may_cobra_employee_role?).to be_falsey
+    end
+  end
 end

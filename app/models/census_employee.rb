@@ -483,7 +483,7 @@ class CensusEmployee < CensusMember
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :cobra_employee_role, :after => :record_transition do
+    event :cobra_employee_role, :guard => :can_cobra_employee_role?, :after => :record_transition do
       transitions from: [:employment_terminated, :cobra_terminated], to: :cobra
     end
 
@@ -588,6 +588,10 @@ class CensusEmployee < CensusMember
         errors.add(:employment_terminated_on, "Employee termination must be within the past 60 days")
       end
     end
+  end
+
+  def can_cobra_employee_role?
+    cobra_begin_date.present? && hired_on <= cobra_begin_date
   end
 
   def check_cobra_begin_date
