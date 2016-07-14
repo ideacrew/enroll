@@ -85,6 +85,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def broker_application_confirmation(person)
+    if person.emails.find_by(kind: 'work').address.present?
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application to #{Settings.site.short_name}"}) do |format|
+        format.html { render "broker_application_confirmation", :locals => { :person => person }}
+      end
+    end
+  end
+
   def notice_uploaded_notification(person)
     mail({to: person.user.email, subject: "New Notice Uploaded"}) do |format|
       format.html { render "notice_uploaded", :locals => { :person_name => person.full_name }}
