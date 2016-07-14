@@ -1,5 +1,4 @@
 var QLE = ( function( window, undefined ) {
-
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
       $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
@@ -37,7 +36,6 @@ var QLE = ( function( window, undefined ) {
 } )( window );
 
 $(function () {
-
 	function check_qle_date() {
 		var date_value = $('#qle_date').val();
 		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
@@ -49,7 +47,6 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
-
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
@@ -67,7 +64,6 @@ $(function () {
     var splitedate = cdate.split('/');
     var cur_date = new Date(splitedate[2], splitedate[0]-1, splitedate[1]);
     var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
-
     var post_days = (idays - post_event_sep_in_days);
     var pre_days = (pre_event_sep_in_days + idays);
     if (post_days >= 0){
@@ -81,7 +77,6 @@ $(function () {
       var dateMax = pre_days + 'd';
     }
     var cur_qle_title = $('.qle-details-title').html();
-
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -101,7 +96,6 @@ $(function () {
     $('#qle_id').val($(this).data('id'));
     $('#qle_reason .special_qle_reasons').addClass('hidden');
     $('#qle-date-chose').show();
-
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -135,10 +129,8 @@ $(function () {
     if(check_qle_date()) {
       $('#qle_date').removeClass('input-error');
 
-
       if(QLE.check_qle_reason())
         get_qle_date();
-
     } else {
       $('#qle_date').addClass('input-error');
     }
