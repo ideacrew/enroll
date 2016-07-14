@@ -1,0 +1,8 @@
+<html>
+<body>
+<%= person_name %>,
+<br />
+<div>Your employer has renewed their Health Benefits Program through <%= Settings.site.short_name %>.</div>
+<div>Please visit <%= link_to "#{Settings.site.short_name}", SamlInformation.iam_login_url %> to login and renew during open enrollment.</div>
+</body>
+</html>
