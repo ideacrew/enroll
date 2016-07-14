@@ -22,7 +22,7 @@ class DefinePermissions < MigrationTask
   	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
   	  modify_admin_tabs: false, view_admin_tabs: false)
   	permission = Permission.hbx_staff
-    Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff') unless p.hbx_staff_role.subrole.present?}
+    Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
   def build_test_roles
     User.where(email: /themanda.*dc.gov/).delete_all
