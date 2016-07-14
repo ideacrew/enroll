@@ -128,6 +128,7 @@
   }
 }
 .module {
+<<<<<<< HEAD
   &.change-employee-status  {
     .form-control, h4 {
       display: inline-block;
@@ -138,6 +139,19 @@
     }
     .btn-primary {
       width: 100%;
+    }
+  }
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
     }
   }
   &.home-tab {
