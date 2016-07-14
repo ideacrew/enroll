@@ -101,10 +101,19 @@ $(function () {
 	});
 });
 
-$(document).on('change', '.terminate_confirm select#terminate_reason', function() {
-  if($(this).val() == undefined || $(this).val() == ""){
-    $(this).parents('.terminate_confirm').find('.terminate_reason_submit').attr("disabled",true);
-  }else{
-    $(this).parents('.terminate_confirm').find('.terminate_reason_submit').attr("disabled",false);
+var EmployeeRole = ( function( window, undefined ) {
+  function disableTerminateSubmit(hbx_id) {
+    var target = $('#terminate_confirm_' + hbx_id);
+    var terminate_reason = target.find('select.interaction-choice-control-terminate-reason').val();
+    if(terminate_reason == undefined || terminate_reason == ""){
+      target.find('.terminate_reason_submit').attr("disabled",true);
+    }else{
+      target.find('.terminate_reason_submit').attr("disabled",false);
+    }
   }
-});
+
+  return {
+    disableTerminateSubmit : disableTerminateSubmit,
+  };
+})( window );
+

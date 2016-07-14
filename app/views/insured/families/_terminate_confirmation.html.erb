@@ -10,7 +10,7 @@
         <%= hidden_field_tag 'change_plan', @change_plan %>
         <%= hidden_field_tag 'hbx_enrollment_id', enrollment.id %>
         <div class="modal-body">
-          <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select terminate reason" %>
+          <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), {include_blank: "Please select terminate reason", onchange: "EmployeeRole.disableTerminateSubmit('#{enrollment.id}')"} %>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
