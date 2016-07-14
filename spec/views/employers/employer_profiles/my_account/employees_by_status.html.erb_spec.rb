@@ -53,7 +53,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     before do
       allow(census_employee2).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment2)
       allow(census_employee2).to receive(:may_rehire_employee_role?).and_return true
-      allow(census_employee2).to receive(:may_cobra_employee_role?).and_return true
+      allow(census_employee2).to receive(:can_cobra_employee_role?).and_return true
       allow(census_employee2).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
     end
 

@@ -395,9 +395,9 @@ class CensusEmployee < CensusMember
   end
 
   def update_for_cobra(cobra_date)
-    self.cobra_employee_role!
     self.cobra_begin_date = cobra_date
     self.existing_cobra = true
+    self.cobra_employee_role
     self.save
   end
 
@@ -416,6 +416,12 @@ class CensusEmployee < CensusMember
         benefit_group: hbx.benefit_group,
         coverage_household: coverage_household,
         benefit_group_assignment: hbx.benefit_group_assignment)
+
+      family_member_ids = hbx.hbx_enrollment_members.map(&:applicant_id)
+      new_hbx.hbx_enrollment_members = new_hbx.hbx_enrollment_members.select do |member|
+        family_member_ids.include? member.applicant_id
+      end
+
       new_hbx.generate_hbx_signature
       if need_renew_plan_for_cobra?
         new_hbx.plan_id = hbx.plan.renewal_plan_id
@@ -483,7 +489,7 @@ class CensusEmployee < CensusMember
       transitions from: [:employment_terminated], to: :rehired
     end
 
-    event :cobra_employee_role, :guard => :can_cobra_employee_role?, :after => :record_transition do
+    event :cobra_employee_role, :guard => :have_valid_cobra_begin_date?, :after => :record_transition do
       transitions from: [:employment_terminated, :cobra_terminated], to: :cobra
     end
 
@@ -552,6 +558,10 @@ class CensusEmployee < CensusMember
     existing_cobra || aasm_state == 'cobra'
   end
 
+  def can_cobra_employee_role?
+    ['employment_terminated', 'cobra_terminated'].include?(aasm_state)
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -590,7 +600,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def can_cobra_employee_role?
+  def have_valid_cobra_begin_date?
     cobra_begin_date.present? && hired_on <= cobra_begin_date
   end
 

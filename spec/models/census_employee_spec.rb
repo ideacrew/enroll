@@ -1182,7 +1182,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "can_cobra_employee_role?" do
+  context "have_valid_cobra_begin_date?" do
     let(:hired_on) { TimeKeeper.date_of_record }
     let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
     before :each do
@@ -1202,6 +1202,24 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     it "can not cobra employee_role without cobra_begin_date" do
       census_employee.cobra_begin_date = nil
       expect(census_employee.may_cobra_employee_role?).to be_falsey
+    end
+  end
+
+  context "can_cobra_employee_role?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return false when aasm_state is eligible" do
+      expect(census_employee.can_cobra_employee_role?).to be_falsey
+    end
+
+    it "should return true when aasm_state is employment_terminated" do
+      census_employee.aasm_state = 'employment_terminated'
+      expect(census_employee.can_cobra_employee_role?).to be_truthy
+    end
+
+    it "should return true when aasm_state is cobra_terminated" do
+      census_employee.aasm_state = 'cobra_terminated'
+      expect(census_employee.can_cobra_employee_role?).to be_truthy
     end
   end
 end

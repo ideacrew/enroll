@@ -105,7 +105,6 @@ module Employers::EmployerHelper
     return benefit_groups, (renewing_benefit_groups || [])
   end
 
-
   def cobra_effective_date(census_employee)
     disabled = current_user.has_hbx_staff_role? ? false : true
     content_tag(:div) do 
@@ -115,7 +114,6 @@ module Employers::EmployerHelper
       end
     end.html_safe
   end
-
 
   def cobra_button(census_employee)
     disabled = current_user.has_hbx_staff_role? || census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
