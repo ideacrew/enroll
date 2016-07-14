@@ -246,7 +246,9 @@ class Insured::FamiliesController < FamiliesController
     @qualifying_life_events = []
     if @person.has_multiple_roles?
       if current_user.has_hbx_staff_role?
-        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin + QualifyingLifeEventKind.individual_market_events_admin
+        @multiroles = @person.has_multiple_roles?
+        @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
