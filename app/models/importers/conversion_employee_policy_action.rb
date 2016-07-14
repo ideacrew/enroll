@@ -103,7 +103,7 @@ module Importers
       employer = find_employer
       employee = find_employee
       employee_role = employee.employee_role
-      
+
       if find_benefit_group_assignment.blank?
         plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
@@ -145,6 +145,7 @@ module Importers
       employer = find_employer
       plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
       active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+      return [] if active_plan_year.blank?
 
       family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => active_plan_year.benefit_group_ids,
