@@ -28,21 +28,21 @@ class DefinePermissions < MigrationTask
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all
     a=10000000
-    u1 = FactoryGirl.create(:user, email: 'themanda.staff@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u2 = FactoryGirl.create(:user, email: 'themanda.readonly@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
-    u3 = FactoryGirl.create(:user, email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u4 = FactoryGirl.create(:user, email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
-    u5 = FactoryGirl.create(:user, email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-  
-  	p1 = FactoryGirl.create(:person, first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
-  	p2 = FactoryGirl.create(:person, first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
-  	p3 = FactoryGirl.create(:person, first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
-  	p4 = FactoryGirl.create(:person, first_name: 'tier1', last_name: "amanda#{rand(1000000)}", user: u4)
-  	p5 = FactoryGirl.create(:person, first_name: 'tier2', last_name: "amanda#{rand(1000000)}", user: u5)
-    FactoryGirl.create(:hbx_staff_role, person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff')
-    FactoryGirl.create(:hbx_staff_role, person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only')
-    FactoryGirl.create(:hbx_staff_role, person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor')
-    FactoryGirl.create(:hbx_staff_role, person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1')
-    FactoryGirl.create(:hbx_staff_role, person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2')
+    u1 = User.create( email: 'themanda.staff@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
+    u2 = User.create( email: 'themanda.readonly@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
+    u3 = User.create( email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
+    u4 = User.create( email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
+    u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
+    hbx_profile_id = HbxProfile.all.first.id
+    p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
+    p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
+    p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
+    p4 = Person.create( first_name: 'tier1', last_name: "amanda#{rand(1000000)}", user: u4)
+    p5 = Person.create( first_name: 'tier2', last_name: "amanda#{rand(1000000)}", user: u5)
+    HbxStaffRole.create!( person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!( person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(  person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!( person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
   end
 end
