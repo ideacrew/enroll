@@ -14,9 +14,11 @@ namespace :reports do
                                                                                 :"updated_at" => date_of_termination}})
       field_names  = %w(
                HBX_ID
-               Last_Name
-               First_Name
-               SSN
+               Enrolled_Member_First_Name
+               Enrolled_Member_Last_Name
+               Primary_Member_First_Name
+               Primary_Member_Last_Name
+               Kind
                Plan_Name
                HIOS_ID
                Policy_ID
@@ -34,21 +36,24 @@ namespace :reports do
         families.each do |family|
           # reject if doesn't have consumer role
           next unless family.primary_family_member.person.consumer_role
-          # find hbx_enrollments who's aasm state=coverage_terminated and updated i.e submitted date == previous day
+          # find hbx_enrollments who's aasm state=coverage_terminated and updated date (date termination submitted)== yesterday day
           hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && hbx.updated_at.strftime('%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
-          hbx_enrollments.each do |hbx_enrollment|
-            if hbx_enrollment
+          hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
+          hbx_enrollment_members.each do |hbx_enrollment_member|
+            if hbx_enrollment_member
               csv << [
-                  hbx_enrollment.id,
-                  family.primary_family_member.person.last_name,
+                  hbx_enrollment_member.id,
+                  hbx_enrollment_member.person.first_name,
+                  hbx_enrollment_member.person.last_name,
                   family.primary_family_member.person.first_name,
-                  family.primary_family_member.person.ssn,
-                  hbx_enrollment.plan.name,
-                  hbx_enrollment.plan.hios_id,
-                  hbx_enrollment.hbx_id,
-                  hbx_enrollment.effective_on,
-                  hbx_enrollment.terminated_on,
-                  hbx_enrollment.updated_at
+                  family.primary_family_member.person.last_name,
+                  hbx_enrollment_member.hbx_enrollment.kind,
+                  hbx_enrollment_member.hbx_enrollment.plan.name,
+                  hbx_enrollment_member.hbx_enrollment.plan.hios_id,
+                  hbx_enrollment_member.hbx_enrollment.hbx_id,
+                  hbx_enrollment_member.hbx_enrollment.effective_on,
+                  hbx_enrollment_member.hbx_enrollment.terminated_on,
+                  hbx_enrollment_member.hbx_enrollment.updated_at
               ]
             end
             processed_count += 1
