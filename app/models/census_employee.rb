@@ -7,9 +7,9 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra_eligible cobra_employee_role_linked)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
-  COBRA_STATES = %w(cobra cobra_terminated)
+  COBRA_STATES = %w(cobra_eligible cobra_employee_role_linked cobra cobra_terminated)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
@@ -27,7 +27,6 @@ class CensusEmployee < CensusMember
   # Employee linked to this roster record
   field :employee_role_id, type: BSON::ObjectId
 
-  field :existing_cobra, type: Boolean, default: false
   field :cobra_begin_date, type: Date
 
   embeds_many :census_dependents,
@@ -101,7 +100,7 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
-    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "eligible")
+    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['eligible', 'cobra_eligible']})
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
@@ -109,7 +108,7 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "employee_role_linked")
+   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['employee_role_linked', 'cobra_employee_role_linked']})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
@@ -383,7 +382,7 @@ class CensusEmployee < CensusMember
   end
 
   def current_state
-    if existing_cobra?
+    if existing_cobra
       if COBRA_STATES.include? aasm_state
         aasm_state.humanize
       else
@@ -396,7 +395,6 @@ class CensusEmployee < CensusMember
 
   def update_for_cobra(cobra_date)
     self.cobra_begin_date = cobra_date
-    self.existing_cobra = true
     self.cobra_employee_role
     self.save
   end
@@ -479,7 +477,9 @@ class CensusEmployee < CensusMember
 
   aasm do
     state :eligible, initial: true
+    state :cobra_eligible
     state :employee_role_linked
+    state :cobra_employee_role_linked
     state :employment_terminated
     state :cobra
     state :cobra_terminated
@@ -495,18 +495,20 @@ class CensusEmployee < CensusMember
 
     event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
+      transitions from: :cobra_eligible, to: :cobra_employee_role_linked, guard: :has_benefit_group_assignment?
     end
 
     event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
+      transitions from: :cobra_employee_role_linked, to: :cobra_eligible, after: :clear_employee_role
     end
 
     event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
-      transitions from: :cobra,  to: :cobra_terminated, after: :notify_cobra_terminated
+      transitions from: [:cobra, :cobra_employee_role_linked],  to: :cobra_terminated, after: :notify_cobra_terminated
     end
 
-    event :reinstate_cobra_terminated , :after => [:record_transition , :toggle_existing_cobra] do 
+    event :reinstate_cobra_terminated , :after => [:record_transition] do 
       transitions from: :cobra_terminated,  to: :eligible
     end
 
@@ -554,8 +556,20 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def existing_cobra
+    COBRA_STATES.include? aasm_state
+  end
+
+  def existing_cobra=(cobra)
+    self.aasm_state = 'cobra_eligible' if cobra == 'true'
+  end
+
+  def linked?
+    employee_role_linked? || cobra_employee_role_linked?
+  end
+
   def is_under_cobra?
-    existing_cobra || aasm_state == 'cobra'
+    existing_cobra
   end
 
   def can_cobra_employee_role?
@@ -628,11 +642,6 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def toggle_existing_cobra
-    self.existing_cobra = self.existing_cobra ? false : true
-    self.save
-  end
-
   def check_census_dependents_relationship
     return true if census_dependents.blank?
 
@@ -644,7 +653,7 @@ class CensusEmployee < CensusMember
 
   # SSN and DOB values may be edited only in pre-linked status
   def allow_id_info_changes_only_in_eligible_state
-    if (ssn_changed? || dob_changed?) && aasm_state != "eligible"
+    if (ssn_changed? || dob_changed?) && (aasm_state != "eligible" && aasm_state != 'cobra_eligible')
       message = "An employee's identifying information may change only when in 'eligible' status. "
       errors.add(:base, message)
     end

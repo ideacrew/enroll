@@ -145,7 +145,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
         context "when existing_cobra is true" do
           before do
-            initial_census_employee.existing_cobra = true
+            initial_census_employee.existing_cobra = 'true'
           end
 
           it "should not have errors when hired_on earlier than cobra_begin_date" do
@@ -1097,11 +1097,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "existing_cobra is true" do
       before :each do 
-        census_employee.existing_cobra = true
-      end
-
-      it "should return cobra" do
-        expect(census_employee.current_state).to eq 'Cobra'
+        census_employee.existing_cobra = 'true'
       end
 
       it "should return cobra_terminated" do
@@ -1122,17 +1118,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context 'when existing_cobra is true' do
       before :each do
-        census_employee.existing_cobra = true
+        census_employee.existing_cobra = 'true'
       end
 
-      it "should return true when aasm_state not equal cobra" do
-        census_employee.aasm_state = 'eligible'
+      it "should return true" do
         expect(census_employee.is_under_cobra?).to be_truthy
       end
 
-      it "should return true when aasm_state equal cobra" do
-        census_employee.aasm_state = 'cobra'
-        expect(census_employee.is_under_cobra?).to be_truthy
+      it "aasm_state should be cobra_eligible" do
+        expect(census_employee.aasm_state).to eq 'cobra_eligible'
       end
     end
 
@@ -1153,13 +1147,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "toggle_existing_cobra" do
-    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record) }
+  context "existing_cobra" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
 
-    it "set existing_cobra to true" do
-      census_employee.update(aasm_state: 'cobra_terminated', existing_cobra: true, cobra_begin_date: TimeKeeper.date_of_record + 10.days)
-      census_employee.reinstate_cobra_terminated
-      expect(census_employee.existing_cobra).to be_falsey
+    it "should return true" do
+      CensusEmployee::COBRA_STATES.each do |state|
+        census_employee.aasm_state = state
+        expect(census_employee.existing_cobra).to be_truthy
+      end
+    end
+  end
+
+  context "linked?" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+
+    it "should return true when employee_role_linked" do
+      census_employee.aasm_state = 'employee_role_linked'
+      expect(census_employee.linked?).to be_truthy
+    end
+
+    it "should return true when cobra_employee_role_linked" do
+      census_employee.aasm_state = 'cobra_employee_role_linked'
+      expect(census_employee.linked?).to be_truthy
     end
   end
 
