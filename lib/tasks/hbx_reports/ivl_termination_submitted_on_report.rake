@@ -18,7 +18,7 @@ namespace :reports do
                Enrolled_Member_Last_Name
                Primary_Member_First_Name
                Primary_Member_Last_Name
-               Kind
+               Market_Kind
                Plan_Name
                HIOS_ID
                Policy_ID
@@ -42,7 +42,7 @@ namespace :reports do
           hbx_enrollment_members.each do |hbx_enrollment_member|
             if hbx_enrollment_member
               csv << [
-                  hbx_enrollment_member.id,
+                  hbx_enrollment_member.person.hbx_id,
                   hbx_enrollment_member.person.first_name,
                   hbx_enrollment_member.person.last_name,
                   family.primary_family_member.person.first_name,
