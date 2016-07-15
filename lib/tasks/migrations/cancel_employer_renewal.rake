@@ -103,7 +103,7 @@ namespace :migrations do
       end
 
       if plan_year.blank?
-        puts "#{employer_profile.legal_name} --FAILED!!"
+        puts "#{employer_profile.legal_name} --no renewal plan year found!!"
         prev_canceled += 1
         next
       end
