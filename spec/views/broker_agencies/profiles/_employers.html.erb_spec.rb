@@ -10,18 +10,39 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
     assign :page_alphabets, ['a']
     assign :general_agency_profiles, []
     allow(view).to receive(:controller_name).and_return 'profiles'
+  end
+  describe 'with modify permissions ' do 
+    before :each do
+    allow(view).to receive(:policy_helper).and_return(double("Policy", modify_admin_tabs?: true))
     render template: "broker_agencies/profiles/_employers.html.erb"
-  end
+    end
+    it "should have general agency" do
+      expect(rendered).to match(/General Agencies/)
+    end
 
-  it "should have general agency" do
-    expect(rendered).to match(/General Agencies/)
-  end
+    it "should have button for ga assign" do
+      expect(rendered).to have_selector('#assign_general_agency')
+    end
 
-  it "should have button for ga assign" do
-    expect(rendered).to have_selector('#assign_general_agency')
+    it "should have checkbox for employer_profile" do
+      expect(rendered).to have_selector("input[type='checkbox']")
+    end
   end
+  describe 'without modify permissions ' do 
+    before :each do
+      allow(view).to receive(:policy_helper).and_return(double("Policy", modify_admin_tabs?: false))
+      render template: "broker_agencies/profiles/_employers.html.erb"
+    end
+    it "should have general agency" do
+      expect(rendered).to match(/General Agencies/)
+    end
 
-  it "should have checkbox for employer_profile" do
-    expect(rendered).to have_selector("input[type='checkbox']")
-  end
-end
+    it "should not have button for ga assign" do
+      expect(rendered).not_to have_selector('#assign_general_agency')
+    end
+
+    it "should have checkbox for employer_profile" do
+      expect(rendered).to have_selector("input[type='checkbox']")
+    end
+  end 
+end  
