@@ -345,7 +345,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     it "should render the configuration partial" do
       expect(response).to have_http_status(:success)
-      #binding.pry
       expect(response).to render_template(:partial => 'exchanges/hbx_profiles/_configuration_index')
     end
   end

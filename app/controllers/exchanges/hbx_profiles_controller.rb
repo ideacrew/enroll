@@ -301,10 +301,9 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def verify_dob_change
     @person = Person.find(params[:person_id])
-    @new_dob = params[:new_dob]
-    @has_premium_implication = Person.dob_change_has_premium_implication?(@person, @new_dob)
+    @has_premium_implication = Person.dob_change_has_premium_implication?(@person, params[:new_dob])
     respond_to do |format|
-      format.js { render "edit_enrollment"}
+      format.js { render "edit_enrollment", :new_ssn => params[:new_ssn], :new_dob => params[:new_dob] }
     end
   end
 
@@ -318,8 +317,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       begin
         @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        CensusEmployee.update_census_employee_records(@person, current_user) 
       rescue Exception => e
-        @error_on_save = "SSN must be 9 digits long."
+        @error_on_save = @person.errors.messages
+        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
       end
       @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
     end
