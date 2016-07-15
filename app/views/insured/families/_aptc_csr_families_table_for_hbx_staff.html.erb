@@ -20,6 +20,7 @@ $(document).ready(function(){
         <th>First Name</th>
         <th>DOB</th>
         <th>SSN</th>
+        <th>Family <br />Count</th>
         <th>Active <br />Enrollment(s)?</th>
         <th>Edit <br />APTC/CSR</th>
       </tr>
@@ -30,11 +31,13 @@ $(document).ready(function(){
         <% pp = family.primary_applicant.person %>
 
         <tr id="family_<%= family.id %>">
-          <td><%= pp.hbx_id %></td>
+
+          <td><%#= pp.hbx_id %> <%= link_to pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id) %></td>
           <td><%= pp.last_name%></td>
           <td><%= pp.first_name%></td>
           <td><%= format_date(pp.dob) %></td>
           <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
+          <td><%= family.active_family_members.size %></td>
           <td>
               <% if all_active_enrollment_with_aptc(family).present?%>
                 <span class="glyphicon glyphicon-check">&nbsp;</span>
