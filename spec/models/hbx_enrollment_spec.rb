@@ -554,6 +554,7 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
           expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+          expect(enrollment.created_at).not_to be_nil
         end
       end
     end
@@ -705,6 +706,14 @@ describe HbxProfile, "class methods", type: :model do
     it "when qle is false and is not uder opent enrollment period" do
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return false
       expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error(RuntimeError)
+    end
+
+    it "should have submitted at as current date and time" do
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+
+      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false, submitted_at: nil)
+      enrollment.save
+      expect(enrollment.submitted_at).not_to be_nil
     end
   end
 

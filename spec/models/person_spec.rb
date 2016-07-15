@@ -797,7 +797,7 @@ describe Person do
         @person_aqhp = family1.primary_applicant.person
       end
       it "creates person with status verification_pending" do
-        expect(person.consumer_role.aasm_state).to eq("verifications_pending")
+        expect(person.consumer_role.aasm_state).to eq("unverified")
       end
 
       it "returns people with uverified status" do
@@ -805,7 +805,7 @@ describe Person do
       end
 
       it "doesn't return people with verified status" do
-        person2.consumer_role.aasm_state = "verified"
+        person2.consumer_role.aasm_state = "fully_verified"
         person2.save
         expect(Person.unverified_persons.include? person2).to eq(false)
       end
