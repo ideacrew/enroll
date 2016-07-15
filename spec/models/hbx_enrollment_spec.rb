@@ -1755,6 +1755,10 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   it "should not be visible to the family" do
     expect(family.enrollments_for_display.to_a).to eq([])
   end
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_terminated"
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
 end
 
 describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
