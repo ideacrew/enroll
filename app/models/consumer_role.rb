@@ -33,6 +33,9 @@ class ConsumerRole
       indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
+      non_native_not_lawfully_present_in_us
+      ssn_pass_citizenship_fails_with_SSA
+      non_native_citizen
   )
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
