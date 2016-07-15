@@ -322,7 +322,6 @@ class Exchanges::HbxProfilesController < ApplicationController
         @error_on_save = @person.errors.messages
         @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
       end
-      @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record) if @person.has_consumer_role?
     end
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person } if @error_on_save
