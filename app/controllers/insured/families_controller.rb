@@ -43,8 +43,7 @@ class Insured::FamiliesController < FamiliesController
 
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
-
-    @employee_role = @person.active_employee_roles.first
+    
     @tab = params['tab']
     respond_to do |format|
       format.html
