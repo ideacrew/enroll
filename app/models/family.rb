@@ -310,8 +310,12 @@ class Family
                        else
                          latest_shop_sep.qle_on.end_of_month
                        end
-      if enrollment.present? && enrollment.effective_on >= terminate_date
-        terminate_date = TimeKeeper.date_of_record.end_of_month
+      if enrollment.present?
+        if enrollment.effective_on > latest_shop_sep.qle_on
+          terminate_date = enrollment.effective_on
+        elsif enrollment.effective_on >= terminate_date
+          terminate_date = TimeKeeper.date_of_record.end_of_month
+        end
       end
       terminate_date
     else
