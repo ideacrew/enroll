@@ -23,7 +23,8 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
 
     it "should have employer name" do
       expect(rendered).to have_selector('input')
-      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles.first.employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at 
+                                        #{person.employee_roles.first.employer_profile.legal_name}.")
     end
   end
 
@@ -52,8 +53,10 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
 
     it "should have notices for both employers" do
       expect(rendered).to have_selector('input')
-      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles[0].employer_profile.legal_name}.")
-      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles[1].employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at 
+                                        #{person.employee_roles[0].employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at 
+                                        #{person.employee_roles[1].employer_profile.legal_name}.")
     end
   end
 end
