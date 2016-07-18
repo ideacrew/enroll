@@ -58,6 +58,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
+    @status = params[:status]
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
@@ -93,10 +94,10 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
-      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees')
+      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     else
       flash[:error] = @census_employee.errors.full_messages
-      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees')
+      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     end
     #else
       #flash[:error] = "Please select Benefit Group."
@@ -183,6 +184,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
     @census_employee.census_dependents.build unless @census_employee.census_dependents.present?
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
+    @status = params[:status]
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
@@ -237,7 +239,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def updateable?
     authorize ::EmployerProfile, :updateable?
-  end  
+  end
 
   def benefit_group_id
     params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil
