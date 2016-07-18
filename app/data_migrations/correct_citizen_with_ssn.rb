@@ -21,6 +21,10 @@ class CorrectCitizenStatus < MongoidMigrationTask
     person.consumer_role.lawful_presence_determination.ssa_responses.where('received_at' => {"$gte" => Time.mktime(2016,7,5,8,0,0)}).first
   end
 
+  def get_previous_response(person)
+    person.consumer_role.lawful_presence_determination.ssa_responses.where('received_at' => {"$lt" => Time.mktime(2016,7,5,8,0,0)}).first
+  end
+
   def parse_ssa_response(person)
     response_doc = get_response_doc(person)
     doc = Nokogiri::XML(response_doc.body)
@@ -29,7 +33,21 @@ class CorrectCitizenStatus < MongoidMigrationTask
     if ssn_response && ssn_response == "true"
       citizenship_response && citizenship_response == "true" ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
     else
-      person.consumer_role.ssn_invalid!(args)
+      check_previous_response(person)
+    end
+  end
+
+  def check_previous_response(person)
+    response_doc = get_previous_response(person)
+    if response_doc
+      doc = Nokogiri::XML(response_doc.body)
+      ssn_response = doc.xpath("//ns1:ssn_verified").first.content
+      citizenship_response = doc.xpath("//ns1:citizenship_verified").try(:first) ? doc.xpath("//ns1:citizenship_verified").first.content : nil
+      if ssn_response && ssn_response == "true"
+        citizenship_response && citizenship_response == "true" ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+      else
+        person.consumer_role.ssn_invalid!(args)
+      end
     end
   end
 
