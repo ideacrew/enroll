@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
+  
+  post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -153,8 +155,9 @@ Rails.application.routes.draw do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
         post :match
-        get 'welcome'
         get 'search'
+        get 'privacy'
+        get 'welcome'
       end
     end
 
@@ -390,7 +393,6 @@ Rails.application.routes.draw do
     collection do
       put :change_person_aasm_state
       get :show_docs
-      get :update_individual
       put :update_verification_type
       get :enrollment_verification
       put :enrollment_docs_state

@@ -54,7 +54,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
 
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
@@ -110,9 +110,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-
-
-
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
@@ -153,8 +151,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-
-
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 

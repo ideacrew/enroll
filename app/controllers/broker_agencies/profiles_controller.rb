@@ -42,6 +42,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def edit
     @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+    @id = params[:id]
   end
 
   def update
@@ -102,7 +103,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @q.nil?
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      @staff = @staff.where(last_name: @q)
+      @staff = @staff.where(last_name: /^#{@q}/i)
     end
   end
 
@@ -111,15 +112,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     id = params.permit(:id)[:id]
     page = params.permit([:page])[:page]
     if current_user.has_broker_role?
-      broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
     elsif current_user.has_hbx_staff_role?
-      broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
       redirect_to new_broker_agencies_profile_path
       return
     end
 
-    total_families = broker_agency_profile.families
+    total_families = @broker_agency_profile.families
     @total = total_families.count
     @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
@@ -128,7 +129,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
        @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
     else
       @families = total_families[0..20]
-     end
+    end
 
     @family_count = @families.count
     respond_to do |format|
@@ -143,12 +144,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.by_broker_role(broker_role_id)
     end
-
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i) unless @orgs.blank?
-    @employer_profiles = @organizations.map {|o| o.employer_profile} unless @orgs.blank?
-
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+    @memo = {}
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
