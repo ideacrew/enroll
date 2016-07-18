@@ -9,6 +9,18 @@ class CorrectNonCitizenStatus < CorrectCitizenStatus
                  "encrypted_ssn" => {"$ne" => nil})
   end
 
+  def parse_ssa_response(person)
+    response_doc = get_response_doc(person)
+    doc = Nokogiri::XML(response_doc.body)
+    ssn_response = doc.xpath("//ns1:ssn_verified").first.content
+    citizenship_response = doc.xpath("//ns1:citizenship_verified").try(:first) ? doc.xpath("//ns1:citizenship_verified").first.content : nil
+    if ssn_response && ssn_response == "true"
+      citizenship_response && citizenship_response == "true" ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+    else
+      person.consumer_role.ssn_invalid!(args)
+    end
+  end
+
   def migrate
     people_to_fix = get_people
     people_to_fix.each do |person|
