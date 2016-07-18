@@ -228,6 +228,10 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  def draft_plan_year
+    plan_years.select{ |py| py.aasm_state == "draft" }
+  end
+
   def published_plan_year
     plan_years.published.first
   end
