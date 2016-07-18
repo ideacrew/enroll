@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8' ?>
+%employer_digest_event{:xmlns=>"http://openhbx.org/api/terms/1.0",
+  :'xmlns:xsi'=>"http://www.w3.org/2001/XMLSchema-instance",
+  :'xsi:schemaLocation'=>"http://openhbx.org/api/terms/1.0 organization.xsd http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"}
+  %event_name= "urn:openhbx:events:v1:employer#digest_period_ended"
+  %resource_instance_uri
+    %id= "urn:openhbx:resources:v1:carrier:abbreviation##{abbreviation}"
+  %body
+    %employer_events
+      %coverage_period
+        %begin_datetime= Date.parse(plan_year[:start_date]).strftime("%Y-%m-%d") + "T00:00:00"
+        %end_datetime= Date.parse(plan_year[:end_date]).strftime("%Y-%m-%d") + "T00:00:00"
+      - organizations.each do |organization|
+        %employer_event
+          %event_name= organization[0]
+          %resource_instance_uri
+            - doc = Nokogiri::XML(organization[2])
+            %id="urn:openhbx:resource:organization:id##{doc.at('organization/id/id').text}"
+          %body
+            = organization[2].html_safe

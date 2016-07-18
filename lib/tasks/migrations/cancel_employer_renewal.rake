@@ -8,6 +8,12 @@ namespace :migrations do
     if employer_profile.blank?
       raise 'unable to find employer'
     end
+    
+    employer_profile.census_employees.each do |census_employee|    
+      census_employee.aasm_state = "eligible" if census_employee.aasm_state = "employee_role_linked"    
+      census_employee.save    
+      puts "De-linking #{census_employee}"    
+    end
 
     puts "Processing #{employer_profile.legal_name}"
     organizations = Organization.where(fein: args[:fein])
@@ -22,6 +28,7 @@ namespace :migrations do
         puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
         renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
       end
+      organization.employer_profile.revert_application! if organization.employer_profile.may_revert_application?
     end
   end
 
@@ -40,7 +47,7 @@ namespace :migrations do
     if plan_year = employer_profile.plan_years.where(:start_on => plan_year_start_on).published.first
       enrollments = enrollments_for_plan_year(plan_year)
       if enrollments.any?
-        puts "Canceling employees coverage for employer #{organization.legal_name}"
+        puts "Canceling employees coverage for employer #{employer_profile.legal_name}"
       end
 
       enrollments.each do |hbx_enrollment|

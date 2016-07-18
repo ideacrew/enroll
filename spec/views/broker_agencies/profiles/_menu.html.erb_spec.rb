@@ -17,7 +17,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
     it "should not have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-      view.content_for(:horizontal_menu).should_not include('multi-line')
+      expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
     end
   end
 
@@ -27,7 +27,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
     it "should have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-      view.content_for(:horizontal_menu).should include('multi-line')
+      expect(view.content_for(:horizontal_menu)).to include('multi-line')
     end
   end
 
