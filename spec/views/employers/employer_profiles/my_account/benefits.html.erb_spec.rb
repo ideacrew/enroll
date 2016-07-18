@@ -141,5 +141,17 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       expect(rendered).to match /first of month/i
     end
 
+    context "when draft plan year present "do
+      before do
+        allow(employer_profile).to receive(:draft_plan_year).and_return([plan_year])
+      end
+
+      it "should not display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).not_to have_selector("a", text: "Add Plan Year")
+        expect(rendered).to have_selector("a", text: "Publish Plan Year")
+        expect(rendered).to have_selector("a", text: "Edit Plan Year")
+      end
+    end
   end
 end
