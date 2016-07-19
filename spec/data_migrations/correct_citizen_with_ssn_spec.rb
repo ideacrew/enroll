@@ -25,7 +25,7 @@ end
 
 shared_examples_for "a determination updated using a previous response" do |cr_state, ssn_state, lpd_state, cit_result|
   it "has the verified_at of the previous response" do
-    expect(person.consumer_role.lawful_presence_determination.verified_at).to eq previous_response.received_at
+    expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq previous_response.received_at
   end
 
   it_behaves_like "a determination in the correct states", cr_state, ssn_state, lpd_state, cit_result
