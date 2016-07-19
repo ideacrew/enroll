@@ -8,7 +8,6 @@ Rails.application.routes.draw do
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
-  
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
   namespace :users do

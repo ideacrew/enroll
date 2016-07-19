@@ -113,7 +113,7 @@ module Insured::FamiliesHelper
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
-  
+
   def disable_make_changes_button?(hbx_enrollment)
     if hbx_enrollment.census_employee.blank?
       return false
@@ -149,5 +149,4 @@ module Insured::FamiliesHelper
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
     end
   end
-
 end
