@@ -373,7 +373,7 @@ class ConsumerRole
       transitions from: :ssa_pending, to: :verification_outstanding
     end
 
-    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change] do
+    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
       transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
       transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end

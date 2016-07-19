@@ -63,8 +63,8 @@ class LawfulPresenceDetermination
   private
   def record_approval_information(*args)
     approval_information = args.first
-    self.vlp_verified_at = approval_information.determined_at
-    self.vlp_authority = approval_information.vlp_authority
+    self.update_attributes!(vlp_verified_at: approval_information.determined_at,
+                            vlp_authority: approval_information.vlp_authority)
     if approval_information.citizen_status
       self.citizenship_result = approval_information.citizen_status
     else
@@ -83,9 +83,9 @@ class LawfulPresenceDetermination
 
   def record_denial_information(*args)
     denial_information = args.first
-    self.vlp_verified_at = denial_information.determined_at
-    self.vlp_authority = denial_information.vlp_authority
-    self.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+    self.update_attributes!(vlp_verified_at: denial_information.determined_at,
+                            vlp_authority: denial_information.vlp_authority,
+                            citizenship_result: ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
   end
 
   def record_transition(*args)

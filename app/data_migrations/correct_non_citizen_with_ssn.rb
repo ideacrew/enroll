@@ -13,7 +13,11 @@ class CorrectNonCitizenStatus < CorrectCitizenStatus
     response_doc = get_response_doc(person)
     ssn_response, citizenship_response = parse_payload(response_doc)
     if ssn_response
-      citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc)) : person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
+      if citizenship_response
+        person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
+      else
+        person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
+      end
     else
       person.consumer_role.ssn_invalid!(args(response_doc))
     end
