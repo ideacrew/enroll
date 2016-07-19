@@ -40,9 +40,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
     people = family_members.map(&:person).uniq
 
-    if people.any?{|p| (p.consumer_role.lawful_presence_determination.vlp_authority == 'dhs' && !p.ssn.blank?) }
-      raise 'needs ssa validation!'
-    end
+    
+    # if people.any?{|p| (p.consumer_role.lawful_presence_determination.vlp_authority == 'dhs' && !p.ssn.blank?) }
+    #   raise 'needs ssa validation!'
+    # end
 
     people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
 
@@ -51,22 +52,31 @@ class IvlNotices::ConsumerNotice < IvlNotice
     end
 
     ## Skip families who already uploaded verification documents
+    # people.each do |person|
+    #   if person.consumer_role.vlp_documents.any? { |vlpd| !vlpd.identifier.blank? }
+    #     raise 'documents already uploaded'
+    #   end
+    # end
+
+    outstanding_people = []
     people.each do |person|
-      if person.consumer_role.vlp_documents.any? { |vlpd| !vlpd.identifier.blank? }
-        raise 'documents already uploaded'
+      verification_types = person.consumer_role.outstanding_verification_types
+      if verification_types.detect{|type| !person.consumer_role.has_docs_for_type?(type) }
+        outstanding_people << person
       end
     end
 
-    # people.reject!{|person| person.consumer_role.vlp_documents.any?{|vlpd| !vlpd.identifier.blank? }}
-    # if people.empty?
-    #   raise 'no family member found without uploaded documents'
-    # end
+    # outstanding_people.reject!{|person| person.consumer_role.vlp_documents.any?{|vlpd| !vlpd.identifier.blank? }}
+    
+    if outstanding_people.empty?
+      raise 'no family member found without uploaded documents'
+    end
 
     if enrollments.map(&:special_verification_period).uniq.size > 1
       raise 'found multiple enrollments with different due dates'
     end
 
-    append_unverified_individuals(people)
+    append_unverified_individuals(outstanding_people)
     @notice.enrollments << enrollments.first
 
     # Re-enable this condition after done with initial verification notifications
