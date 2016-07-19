@@ -22,7 +22,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if @recipient.mailing_address
       append_address(@recipient.mailing_address)
     else
-      raise 'mailing address not present'
+      raise 'mailing address not present' 
     end
 
     append_unverified_family_members
@@ -31,8 +31,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
   def append_unverified_family_members
     enrollments = @family.enrollments.individual_market.select{|e| e.currently_active? || e.future_active?}
 
-    # this is for inital backlog notices. no longer needed for reminders 
-    # enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    # Comment this for reminders
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
@@ -40,23 +40,15 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
     people = family_members.map(&:person).uniq
 
-    
+    # Logic to skip people pending SSA validation
     # if people.any?{|p| (p.consumer_role.lawful_presence_determination.vlp_authority == 'dhs' && !p.ssn.blank?) }
     #   raise 'needs ssa validation!'
     # end
 
     people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
-
     if people.empty?
       raise 'no family member found with outstanding verification'
     end
-
-    ## Skip families who already uploaded verification documents
-    # people.each do |person|
-    #   if person.consumer_role.vlp_documents.any? { |vlpd| !vlpd.identifier.blank? }
-    #     raise 'documents already uploaded'
-    #   end
-    # end
 
     outstanding_people = []
     people.each do |person|
@@ -65,8 +57,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
         outstanding_people << person
       end
     end
-
-    # outstanding_people.reject!{|person| person.consumer_role.vlp_documents.any?{|vlpd| !vlpd.identifier.blank? }}
     
     if outstanding_people.empty?
       raise 'no family member found without uploaded documents'
@@ -78,9 +68,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
     append_unverified_individuals(outstanding_people)
     @notice.enrollments << enrollments.first
-
-    # Re-enable this condition after done with initial verification notifications
-    # ((enrollment.submitted_at.present? ? enrollment.submitted_at : enrollment.created_at) + 95.days)
 
     @notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
   end
