@@ -48,6 +48,8 @@ class CorrectCitizenStatus < MongoidMigrationTask
       else
         person.consumer_role.ssn_invalid!(args)
       end
+    else
+      person.consumer_role.ssn_invalid!(args)
     end
   end
 
