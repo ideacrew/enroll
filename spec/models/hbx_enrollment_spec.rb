@@ -1,3 +1,4 @@
+
 require 'rails_helper'
 
 describe HbxEnrollment do
@@ -714,6 +715,56 @@ describe HbxProfile, "class methods", type: :model do
       enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false, submitted_at: nil)
       enrollment.save
       expect(enrollment.submitted_at).not_to be_nil
+    end
+  end
+
+  context "is reporting a qle before the employer plan start_date and having a expired plan year" do
+    let(:coverage_household) { double}
+    let(:coverage_household_members) {double}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let(:benefit_package) { BenefitPackage.new }
+    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 07, 01) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:expired_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: Date.new(TimeKeeper.date_of_record.year, 07, 01)-1.year , end_on: Date.new(TimeKeeper.date_of_record.year, 06, 30) , aasm_state: "expired" }
+    let!(:active_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: plan_year_start_on, aasm_state: "active") }
+    let!(:benefit_group){ BenefitGroup.create(plan_year: active_plan_year) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
+    let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
+    let(:qle_effective_date) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let(:sep) {SpecialEnrollmentPeriod.new(effective_on: Date.new(TimeKeeper.date_of_record.year, 06, 26), qle_on: Date.new(TimeKeeper.date_of_record.year, 06, 26), effective_on_kind: 'date_of_event')}
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123453789') }
+    let(:employee_role) {
+      person.employee_roles.create(
+        employer_profile: employer_profile,
+        census_employee_id: census_employee.id
+        )
+    }
+    let(:benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+      census_employee: census_employee,
+      benefit_group: active_plan_year.benefit_groups.first,
+      start_on: plan_year_start_on
+      })
+    }
+
+    before do 
+      active_plan_year.update_attributes('aasm_state' => 'active')
+      family.primary_applicant.person.employee_roles.create(
+        employer_profile: active_plan_year.employer_profile,
+        census_employee_id: census_employee.id
+      )
+      allow(coverage_household).to receive(:household).and_return household
+      allow(coverage_household).to receive(:coverage_household_members).and_return []
+      allow(household).to receive(:family).and_return family
+      allow(family).to receive(:current_sep).and_return sep
+      allow(employee_role).to receive(:benefit_group).and_return(active_plan_year.benefit_groups.first)
+      allow(family).to receive(:special_enrollment_periods).and_return [sep]
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+    end
+    it "should return a sep with an effective date that equals to sep date" do
+       enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_package: benefit_package, benefit_group_assignment: benefit_group_assignment, qle: true)
+       expect(enrollment.effective_on).to eq sep.qle_on
     end
   end
 

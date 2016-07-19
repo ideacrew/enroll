@@ -250,6 +250,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let(:sep) { SpecialEnrollmentPeriod.new }
     let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop') }
 
+
     context "SHOP QLE and event date are specified" do
       it "should set start_on date to date of event" do
         expect(sep_effective_date.start_on).to eq event_date
@@ -394,6 +395,36 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     it "should return a sep with an effective date that equals to employers plan year start-date when sep_effective_date  < plan_year_start_on" do
        expect(sep.effective_on).to eq published_plan_year.start_on
+    end
+  end
+
+
+  context "is reporting a qle before the employer plan start_date and having a expired plan year" do
+    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 07, 01) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:expired_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: Date.new(TimeKeeper.date_of_record.year, 07, 01)-1.year , end_on: Date.new(TimeKeeper.date_of_record.year, 06, 30) , aasm_state: "expired" }
+    let!(:active_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: plan_year_start_on, aasm_state: "active") }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(TimeKeeper.date_of_record.year, 04, 14)) }
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
+    let(:sep){
+      sep = shop_family.special_enrollment_periods.new
+      sep.effective_on_kind = 'date_of_event'
+      sep.qualifying_life_event_kind= qle_effective_date
+      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 06, 26)
+      sep
+    }
+
+    before do 
+      active_plan_year.update_attributes('aasm_state' => 'active')
+      shop_family.primary_applicant.person.employee_roles.create(
+        employer_profile: active_plan_year.employer_profile,
+        hired_on: census_employee.hired_on,
+        census_employee_id: census_employee.id
+      )
+    end
+
+    it "should return a sep with an effective date that equals to sep date" do
+       expect(sep.effective_on).to eq sep.qle_on
     end
   end
 
