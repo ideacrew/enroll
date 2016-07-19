@@ -203,7 +203,7 @@ describe CorrectCitizenStatus do
         person.reload
       end
 
-      it "moves person to fully verified" do
+      it "moves person to outstanding" do
         expect(person.consumer_role.aasm_state).to eq "verification_outstanding"
       end
 
@@ -215,7 +215,7 @@ describe CorrectCitizenStatus do
         expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq "ssa"
       end
 
-      it "moves lawful_presence_determination to successful" do
+      it "moves lawful_presence_determination to outstanding" do
         expect(person.consumer_role.lawful_presence_determination.aasm_state).to eq "verification_outstanding"
       end
     end
