@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HbxAdmin, :type => :model do
+RSpec.describe Admin::Aptc, :type => :model do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
   # Household
@@ -38,12 +38,12 @@ RSpec.describe HbxAdmin, :type => :model do
                                                  "Jul"=>"612.33", "Aug"=>"666.00", "Sep"=>"666.00", "Oct"=>"666.00", "Nov"=>"666.00", "Dec"=>"666.00"} } 
         
       it "should return a hash that reflects max_aptc change on a montly basis based on the determined_on date of eligibility determinations - without max_aptc param" do
-        expect(HbxAdmin.build_max_aptc_values(family, nil)).to eq expected_hash_without_param_case
+        expect(Admin::Aptc.build_max_aptc_values(family, nil)).to eq expected_hash_without_param_case
       end
 
       # This 'change in param' case is for the AJAX call where the latest max_aptc is not read from the latest ED from the database but read from a user input - transient"
       it "should return a hash that reflects max_aptc change on a montly basis based on the determined_on date of eligibility determinations - with max_aptc param" do
-        expect(HbxAdmin.build_max_aptc_values(family, 666)).to eq expected_hash_with_param_case
+        expect(Admin::Aptc.build_max_aptc_values(family, 666)).to eq expected_hash_with_param_case
       end
     end
 
@@ -54,11 +54,11 @@ RSpec.describe HbxAdmin, :type => :model do
       let(:expected_hash_with_param_case)     { {"Jan"=>87, "Feb"=>87, "Mar"=>87, "Apr"=>87, "May"=>94, "Jun"=>94, "Jul"=>94, "Aug"=>100, "Sep"=>100, "Oct"=>100, "Nov"=>100, "Dec"=>100} } 
         
       it "should return a hash that reflects csr_percent change on a montly basis based on the determined_on date of eligibility determinations - without csr_percent param" do
-        expect(HbxAdmin.build_csr_percentage_values(family, nil)).to eq expected_hash_without_param_case
+        expect(Admin::Aptc.build_csr_percentage_values(family, nil)).to eq expected_hash_without_param_case
       end
 
       it "should return a hash that reflects csr_percent change on a montly basis based on the determined_on date of eligibility determinations - with csr_percent param" do
-        expect(HbxAdmin.build_csr_percentage_values(family, 100)).to eq expected_hash_with_param_case
+        expect(Admin::Aptc.build_csr_percentage_values(family, 100)).to eq expected_hash_with_param_case
       end
     end
 

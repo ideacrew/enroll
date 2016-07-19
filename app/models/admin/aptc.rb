@@ -1,4 +1,5 @@
-class HbxAdmin
+class Admin::Aptc < ApplicationController
+
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
