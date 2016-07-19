@@ -95,17 +95,17 @@ describe CorrectCitizenStatus do
   let(:body_ssn_true_citizenship_false) {
     doc = Nokogiri::XML(body_ssn_true_citizenship_true)
     doc.xpath("//ns1:citizenship_verified").first.content = "false"
-    doc
+    doc.to_xml(:indent => 2)
   }
 
   let(:body_ssn_true_NO_citizenship) {
     doc = Nokogiri::XML(body_ssn_true_citizenship_true)
     doc.xpath("//ns1:citizenship_verified").remove
-    doc
+    doc.to_xml(:indent => 2)
   }
 
   let(:body_no_ssn_verified_element) {
-    xml_string = "<ssa_verification_result xmlns=\"http://openhbx.org/api/terms/1.0\"
+   "<ssa_verification_result xmlns=\"http://openhbx.org/api/terms/1.0\"
               xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\"
               xmlns:ns1=\"http://openhbx.org/api/terms/1.0\"
               xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">
@@ -144,7 +144,6 @@ describe CorrectCitizenStatus do
               <ns1:response_text>Success</ns1:response_text>
               <ns1:ssn_verification_failed>true</ns1:ssn_verification_failed>
               </ssa_verification_result>"
-    Nokogiri::XML(xml_string)
   }
 
   let(:ssa_response_ssn_true_citizenship_true) { EventResponse.new({:received_at => threshold_date + 1.hour, :body => body_ssn_true_citizenship_true}) }
