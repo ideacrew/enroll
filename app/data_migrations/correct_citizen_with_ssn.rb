@@ -18,11 +18,15 @@ class CorrectCitizenStatus < MongoidMigrationTask
   end
 
   def get_response_doc(person)
-    person.consumer_role.lawful_presence_determination.ssa_responses.where('received_at' => {"$gte" => Time.mktime(2016,7,5,8,0,0)}).first
+    person.consumer_role.lawful_presence_determination.ssa_responses.select do |sa|
+      sa.received_at >= Time.mktime(2016,7,5,8,0,0)
+    end.sort_by(&:received_at).last
   end
 
   def get_previous_response(person)
-    person.consumer_role.lawful_presence_determination.ssa_responses.where('received_at' => {"$lt" => Time.mktime(2016,7,5,8,0,0)}).first
+    person.consumer_role.lawful_presence_determination.ssa_responses.select do |sa|
+      sa.received_at < Time.mktime(2016,7,5,8,0,0)
+    end.sort_by(&:received_at).last
   end
 
   def parse_payload(response_doc)
@@ -41,21 +45,29 @@ class CorrectCitizenStatus < MongoidMigrationTask
     response_doc = get_response_doc(person)
     ssn_response, citizenship_response = parse_payload(response_doc)
     if ssn_response
-      citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+      if citizenship_response
+        person.consumer_role.ssn_valid_citizenship_valid!(args) 
+      else
+        if get_previous_response(person)
+          check_previous_response(person)
+        else
+          person.consumer_role.ssn_valid_citizenship_invalid!(args)
+        end
+      end
     else
-      check_previous_response(person, response_doc)
-    end
-  end
-
-  def check_previous_response(person, current_response_doc)
-    response_doc = get_previous_response(person)
-    if response_doc
-      ssn_response, citizenship_response = parse_payload(response_doc)
-      if ssn_response
-        citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+      if get_previous_response(person)
+        check_previous_response(person)
       else
         person.consumer_role.ssn_invalid!(args)
       end
+    end
+  end
+
+  def check_previous_response(person)
+    response_doc = get_previous_response(person)
+    ssn_response, citizenship_response = parse_payload(response_doc)
+    if ssn_response
+      citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
     else
       person.consumer_role.ssn_invalid!(args)
     end
