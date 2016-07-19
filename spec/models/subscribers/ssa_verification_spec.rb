@@ -16,15 +16,14 @@ describe Subscribers::SsaVerification do
     let(:xml_hash3) { {:response_code => "ss", :response_text => "Failed", :ssn_verification_failed => nil,
                       :death_confirmation => nil, :ssn_verified => "true", :citizenship_verified => "false",
                       :incarcerated => "false"} }
-    let(:person) { person = FactoryGirl.build(:person);
-    consumer_role = person.build_consumer_role;
-    consumer_role = FactoryGirl.build(:consumer_role);
-    person.consumer_role = consumer_role;
-    person.consumer_role.aasm_state="ssa_pending";
-    person
-    }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
+
+    before :each do
+      person.consumer_role.aasm_state="ssa_pending"
+      person.save!
+    end
 
     context "ssn_verified and citizenship_verified=true" do
       it "should approve lawful presence" do
