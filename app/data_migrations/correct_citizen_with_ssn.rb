@@ -46,19 +46,19 @@ class CorrectCitizenStatus < MongoidMigrationTask
     ssn_response, citizenship_response = parse_payload(response_doc)
     if ssn_response
       if citizenship_response
-        person.consumer_role.ssn_valid_citizenship_valid!(args) 
+        person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
       else
         if get_previous_response(person)
           check_previous_response(person)
         else
-          person.consumer_role.ssn_valid_citizenship_invalid!(args)
+          person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
         end
       end
     else
       if get_previous_response(person)
         check_previous_response(person)
       else
-        person.consumer_role.ssn_invalid!(args)
+        person.consumer_role.ssn_invalid!(args(response_doc))
       end
     end
   end
@@ -67,14 +67,14 @@ class CorrectCitizenStatus < MongoidMigrationTask
     response_doc = get_previous_response(person)
     ssn_response, citizenship_response = parse_payload(response_doc)
     if ssn_response
-      if citzenship_response
-        person.consumer_role.ssn_valid_citizenship_valid!(args)
+      if citizenship_response
+        person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
         @previously_valid = @previously_valid + 1
       else
-        person.consumer_role.ssn_valid_citizenship_invalid!(args)
+        person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
       end
     else
-      person.consumer_role.ssn_invalid!(args)
+      person.consumer_role.ssn_invalid!(args(response_doc))
     end
   end
 
@@ -86,10 +86,12 @@ class CorrectCitizenStatus < MongoidMigrationTask
       person.reload
       parse_ssa_response(person)
     end
-    $STDERR.puts @previously_valid
+    if @previously_valid > 0
+      $stderr.puts @previously_valid
+    end
   end
 
-  def args
-    OpenStruct.new(:determined_at => Time.mktime(2016,7,5,8,0,0), :vlp_authority => 'ssa')
+  def args(response_doc)
+    OpenStruct.new(:determined_at => response_doc.received_at, :vlp_authority => 'ssa')
   end
 end

@@ -190,7 +190,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
         it_behaves_like "a determination in the correct states", "fully_verified", "valid", "verification_successful", "us_citizen"
 
         it "stores transition information from existing response" do
-          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq threshold_date
+          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_true_citizenship_true.received_at
         end
 
       end
@@ -206,7 +206,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
         it_behaves_like "a determination in the correct states", "verification_outstanding", "valid", "verification_outstanding", "not_lawfully_present_in_us"
 
         it "stores transition information from existing response" do
-          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq threshold_date
+          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_true_citizenship_false.received_at
         end
       end
 
@@ -221,7 +221,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
         it_behaves_like "a determination in the correct states", "verification_outstanding", "valid", "verification_outstanding", "not_lawfully_present_in_us"
 
         it "stores transition information from existing response" do
-          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq threshold_date
+          expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_true_NO_citizenship.received_at
         end
 
       end
