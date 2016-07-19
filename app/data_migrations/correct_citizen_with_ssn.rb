@@ -25,26 +25,34 @@ class CorrectCitizenStatus < MongoidMigrationTask
     person.consumer_role.lawful_presence_determination.ssa_responses.where('received_at' => {"$lt" => Time.mktime(2016,7,5,8,0,0)}).first
   end
 
+  def parse_payload(response_doc)
+    doc = Nokogiri::XML(response_doc.body)
+    ssn_node = doc.at_xpath("//ns1:ssn_verified")
+    return([false, false]) unless ssn_node
+    ssn_valid = (ssn_node.content.downcase.strip == "true")
+    return([false, false]) unless ssn_valid
+    citizenship_node = doc.at_xpath("//ns1:citizenship_verified")
+    return([true, false]) unless citizenship_node
+    citizenship_valid = citizenship_node.content.strip.downcase == "true"
+    [true, citizenship_valid]
+  end
+
   def parse_ssa_response(person)
     response_doc = get_response_doc(person)
-    doc = Nokogiri::XML(response_doc.body)
-    ssn_response = doc.xpath("//ns1:ssn_verified").try(:first) ? doc.xpath("//ns1:ssn_verified").first.content : nil
-    citizenship_response = doc.xpath("//ns1:citizenship_verified").try(:first) ? doc.xpath("//ns1:citizenship_verified").first.content : nil
-    if ssn_response && ssn_response == "true"
-      citizenship_response && citizenship_response == "true" ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+    ssn_response, citizenship_response = parse_payload(response_doc)
+    if ssn_response
+      citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
     else
-      check_previous_response(person)
+      check_previous_response(person, response_doc)
     end
   end
 
-  def check_previous_response(person)
+  def check_previous_response(person, current_response_doc)
     response_doc = get_previous_response(person)
     if response_doc
-      doc = Nokogiri::XML(response_doc.body)
-      ssn_response = doc.xpath("//ns1:ssn_verified").first.content
-      citizenship_response = doc.xpath("//ns1:citizenship_verified").try(:first) ? doc.xpath("//ns1:citizenship_verified").first.content : nil
-      if ssn_response && ssn_response == "true"
-        citizenship_response && citizenship_response == "true" ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
+      ssn_response, citizenship_response = parse_payload(response_doc)
+      if ssn_response
+        citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args) : person.consumer_role.ssn_valid_citizenship_invalid!(args)
       else
         person.consumer_role.ssn_invalid!(args)
       end

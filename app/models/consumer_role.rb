@@ -581,7 +581,9 @@ class ConsumerRole
   end
 
   def fail_ssn(*args)
-    self.ssn_validation = "outstanding"
+    self.update_attributes!(
+      ssn_validation: "outstanding"
+    )
   end
 
   def fail_ssa_for_no_ssn(*args)
