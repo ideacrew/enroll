@@ -577,7 +577,7 @@ class ConsumerRole
   end
 
   def pass_ssn(*args)
-    self.ssn_validation = "valid"
+    self.update_attributes!(ssn_validation: "valid")
   end
 
   def fail_ssn(*args)
@@ -585,8 +585,10 @@ class ConsumerRole
   end
 
   def fail_ssa_for_no_ssn(*args)
-    self.ssn_validation = "outstanding"
-    self.ssn_update_reason = "no_ssn_for_native"
+    self.update_attributes!(
+      ssn_validation: "outstanding",
+      ssn_update_reason: "no_ssn_for_native"
+    )
   end
 
   def pass_lawful_presence(*args)
