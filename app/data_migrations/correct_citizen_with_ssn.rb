@@ -67,18 +67,27 @@ class CorrectCitizenStatus < MongoidMigrationTask
     response_doc = get_previous_response(person)
     ssn_response, citizenship_response = parse_payload(response_doc)
     if ssn_response
-      citizenship_response ? person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc)) : person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
+      if citizenship_response
+        person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
+        @previously_valid = @previously_valid + 1
+      else
+        person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
+      end
     else
       person.consumer_role.ssn_invalid!(args(response_doc))
     end
   end
 
   def migrate
+    @previously_valid = 0
     people_to_fix = get_people
     people_to_fix.each do |person|
       move_to_pending_ssa(person)
       person.reload
       parse_ssa_response(person)
+    end
+    if @previously_valid > 0
+      $stderr.puts @previously_valid
     end
   end
 
