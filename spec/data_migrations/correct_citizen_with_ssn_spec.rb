@@ -46,7 +46,7 @@ shared_examples_for "a citizen migration which falls back to the previous respon
   end
 end
 
-describe CorrectCitizenStatus do
+describe CorrectCitizenStatus, :dbclean => :after_each do
   let(:threshold_date) { Time.mktime(2016,7,5,8,0,0) }
   let(:previous_date) { Time.mktime(2015,7,5,8,0,0) }
   let(:body_ssn_true_citizenship_true) {"<ssa_verification_result xmlns=\"http://openhbx.org/api/terms/1.0\"
