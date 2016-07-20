@@ -420,11 +420,11 @@ class ConsumerRole
     end
   end
 
-  def invoke_verification!(requested_start_date=requested_coverage_start_date)
+  def invoke_verification!(*args)
     if person.ssn || is_native?
       invoke_ssa
     else
-      invoke_dhs(requested_start_date)
+      invoke_dhs
     end
   end
 
@@ -572,8 +572,8 @@ class ConsumerRole
     lawful_presence_determination.start_ssa_process
   end
 
-  def invoke_dhs(requested_start_date=requested_coverage_start_date)
-    lawful_presence_determination.start_vlp_process(requested_start_date)
+  def invoke_dhs
+    lawful_presence_determination.start_vlp_process(requested_coverage_start_date)
   end
 
   def pass_ssn(*args)
