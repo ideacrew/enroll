@@ -14,6 +14,15 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
+  BROKER_CARRIER_APPOINTMENTS = {:aetna_health_inc => nil,
+    :aetna_life_insurance_company => nil,
+     :carefirst_bluechoice_inc => nil,
+     :group_hospitalization_and_medical_services_inc => nil,
+     :kaiser_foundation => nil,
+     :optimum_choice => nil,
+     :united_health_care_insurance => nil,
+     :united_health_care_mid_atlantic => nil}
+
   embedded_in :person
 
   field :aasm_state, type: String
@@ -28,6 +37,9 @@ class BrokerRole
   field :languages_spoken, type: Array, default: ["en"]
   field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
+  field :license, type: Boolean
+  field :training, type: Boolean
+  field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
 
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :favorite_general_agencies, cascade_callbacks: true
@@ -206,7 +218,6 @@ class BrokerRole
     end
   end
 
-
   aasm do
     state :applicant, initial: true
     state :active
@@ -222,7 +233,7 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated] do
+    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
@@ -293,6 +304,11 @@ class BrokerRole
 
   def notify_broker_denial
     UserMailer.broker_denied_notification(self).deliver_now
+  end
+
+  def notify_broker_pending
+    unchecked_carriers = self.carrier_appointments.select { |k,v| k if v != "true"}
+    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present?  || !self.training
   end
 
   def applicant?
