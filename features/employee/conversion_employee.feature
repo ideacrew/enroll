@@ -117,3 +117,12 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Soren White should see coverage summary page with renewing plan year start date as effective date
       Then Soren White should see the receipt page with renewing plan year start date as effective date
       Then Employee should see "my account" page with enrollment
+
+  Scenario: Existing Employee can buy coverage from multiple employers during open enrollment of renewing plan year
+    Given Conversion Employer for Soren White exists with active and renewing plan year
+    Given Multiple Conversion Employers for Soren White exist with active and renewing plan years
+      And Employer for Soren White is under open enrollment
+      And Other Employer for Soren White is under open enrollment
+      And Current hired on date all employments
+      And Soren White matches all employee roles to employers and is logged in
+      And Soren White has New Hire Badges for all employers
