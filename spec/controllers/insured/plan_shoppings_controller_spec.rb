@@ -2,6 +2,36 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
+  describe ".sort_by_standard_plans" do
+
+      context "width standard plan present" do
+
+        let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+        let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+        let(:person) { FactoryGirl.build_stubbed(:person) }
+        let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+        let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+        let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group) }
+
+        before :each do
+          sign_in user
+          allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+          allow(person.primary_family).to receive(:active_household).and_return(household)
+        end
+
+        @controller = Insured::PlanShoppingsController.new
+
+        let(:plan1) { FactoryGirl.build(:plan) }
+        let(:plan2) { FactoryGirl.build(:plan, is_standard_plan: true ) }
+        let(:plans) {[PlanCostDecorator.new(plan1, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id), PlanCostDecorator.new(plan2, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id)]}
+
+        it "should display the standard plan first" do
+          expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
+        end
+      end
+
+  end
+
   describe "not eligible for cost sharing or aptc / normal user" do
 
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
