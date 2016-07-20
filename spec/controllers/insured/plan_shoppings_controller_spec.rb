@@ -3,9 +3,7 @@ require 'rails_helper'
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   describe ".sort_by_standard_plans" do
-
       context "width standard plan present" do
-
         let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
         let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
         let(:person) { FactoryGirl.build_stubbed(:person) }
@@ -29,7 +27,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
         end
       end
-
   end
 
   describe "not eligible for cost sharing or aptc / normal user" do
