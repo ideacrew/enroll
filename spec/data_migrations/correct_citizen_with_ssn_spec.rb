@@ -94,13 +94,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
 
   let(:body_ssn_true_citizenship_false) {
     doc = Nokogiri::XML(body_ssn_true_citizenship_true)
-    doc.xpath("//ns1:citizenship_verified").first.content = "false"
+    doc.xpath("//ns1:citizenship_verified", {:ns1 => "http://openhbx.org/api/terms/1.0"}).first.content = "false"
     doc.to_xml(:indent => 2)
   }
 
   let(:body_ssn_true_NO_citizenship) {
     doc = Nokogiri::XML(body_ssn_true_citizenship_true)
-    doc.xpath("//ns1:citizenship_verified").remove
+    doc.xpath("//ns1:citizenship_verified", {:ns1 => "http://openhbx.org/api/terms/1.0"}).remove
     doc.to_xml(:indent => 2)
   }
 

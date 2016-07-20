@@ -31,11 +31,11 @@ class CorrectCitizenStatus < MongoidMigrationTask
 
   def parse_payload(response_doc)
     doc = Nokogiri::XML(response_doc.body)
-    ssn_node = doc.at_xpath("//ns1:ssn_verified")
+    ssn_node = doc.at_xpath("//ns1:ssn_verified", {:ns1 => "http://openhbx.org/api/terms/1.0"})
     return([false, false]) unless ssn_node
     ssn_valid = (ssn_node.content.downcase.strip == "true")
     return([false, false]) unless ssn_valid
-    citizenship_node = doc.at_xpath("//ns1:citizenship_verified")
+    citizenship_node = doc.at_xpath("//ns1:citizenship_verified", {:ns1 => "http://openhbx.org/api/terms/1.0"})
     return([true, false]) unless citizenship_node
     citizenship_valid = citizenship_node.content.strip.downcase == "true"
     [true, citizenship_valid]
