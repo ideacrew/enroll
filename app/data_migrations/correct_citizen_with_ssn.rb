@@ -82,9 +82,13 @@ class CorrectCitizenStatus < MongoidMigrationTask
     @previously_valid = 0
     people_to_fix = get_people
     people_to_fix.each do |person|
-      move_to_pending_ssa(person)
-      person.reload
-      parse_ssa_response(person)
+      begin
+        move_to_pending_ssa(person)
+        person.reload
+        parse_ssa_response(person)
+      rescue
+        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}"
+      end
     end
     if @previously_valid > 0
       $stderr.puts @previously_valid
