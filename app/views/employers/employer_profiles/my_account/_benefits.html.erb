@@ -58,12 +58,12 @@
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
             <% end %>  
-            <% if policy_helper(EmployerProfile).revert_application? %>
+            <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
-                <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
-                <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
+                  <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
+                  <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
                 <% end %>
-            <% end %>
+            </span>
         <% end %>    
       </div>
     </div>

@@ -37,6 +37,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def create
+    authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
 
@@ -63,6 +64,7 @@ class Employers::BrokerAgencyController < ApplicationController
 
 
   def terminate
+    authorize EmployerProfile, :updateable?
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
       @employer_profile.fire_broker_agency(termination_date)

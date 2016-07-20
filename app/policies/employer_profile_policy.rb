@@ -1,13 +1,13 @@
 class EmployerProfilePolicy < ApplicationPolicy
 
-  def show_premium_statements?
+  def list_enrollments?
     return false unless person=user.person
     return true unless hbx_staff = person.hbx_staff_role
     hbx_staff.permission.list_enrollments
   end
 
   def updateable?                
-      return true unless role = user.person && user.person.hbx_staff_role
+    return true unless role = user.person && user.person.hbx_staff_role
     role.permission.modify_employer
   end
 
