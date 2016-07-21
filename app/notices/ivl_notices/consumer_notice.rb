@@ -58,10 +58,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'no family member found without uploaded documents'
     end
 
-    if enrollments.map(&:special_verification_period).uniq.size > 1
-      raise 'found multiple enrollments with different due dates'
-    end
-
     enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
 
     append_unverified_individuals(outstanding_people)
