@@ -301,7 +301,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def verify_dob_change
     @person = Person.find(params[:person_id])
-    @has_premium_implication = Person.dob_change_has_premium_implication?(@person, params[:new_dob])
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
     respond_to do |format|
       format.js { render "edit_enrollment", :new_ssn => params[:new_ssn], :new_dob => params[:new_dob] }
     end

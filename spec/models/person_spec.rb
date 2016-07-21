@@ -1043,4 +1043,38 @@ describe Person do
     end
   end
 
+  
+  describe "dob_change_implication_on_active_enrollments" do
+    
+    let(:persons_dob) { TimeKeeper.date_of_record - 19.years }
+    let(:person) { FactoryGirl.create(:person, dob: persons_dob) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                              household: primary_family.latest_household,
+                                              aasm_state: 'coverage_selected',
+                                              effective_on: TimeKeeper.date_of_record - 10.days,
+                                              is_active: true
+                                            )}
+    let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
+    let(:new_dob_without_premium_implication) { TimeKeeper.date_of_record - 17.years }
+    
+    let(:premium_implication_hash) { {enrollment.id => true} }
+    let(:empty_hash) { {} } 
+
+    before do
+      allow(person).to receive(:primary_family).and_return(primary_family)
+      allow(primary_family).to receive(:enrollments).and_return([enrollment])
+    end
+
+    it "should return a NON-EMPTY hash with at least one enrollment if DOB change RESULTS in premium change" do
+      expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_with_premium_implication)).to eq premium_implication_hash
+    end
+
+    it "should return an EMPTY hash if DOB change DOES NOT RESULT in premium change" do
+      expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_without_premium_implication)).to eq empty_hash
+    end
+
+  end 
+
+
 end

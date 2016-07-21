@@ -594,4 +594,8 @@ module ApplicationHelper
       return "2. You have 0 non-owner employees on your roster"
     end
   end
+
+  def find_plan_name(hbx_id)
+    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
+  end
 end

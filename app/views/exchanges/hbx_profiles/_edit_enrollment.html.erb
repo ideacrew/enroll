@@ -43,15 +43,25 @@
             </tr>
             <td></td>
             <td>
-                <%= f.submit "Update", :class => "btn btn-primary pull-right"%>
+              <div class= "pull-right">
+                <%= link_to "Reset", edit_dob_ssn_path(id: @person.primary_family.primary_applicant.person.id) , class: "btn btn-info", remote: true %>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary"%>
+              </div>
             </td>
         </tbody>
       </table>
     <% end %>
   </div>
-  <%if @has_premium_implication%> 
-    <div class="alert alert-warning"> <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> There is an active enrollment for this person. Updating the DOB has downstream implications as it could result in the change of premium. </div>
+  <%if @premium_implications.present?%> 
+    <div class="alert alert-warning row"> 
+      <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> 
+      <b>Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment(s):</b>
+      <%@premium_implications.each do |key, val|%>
+        <li><%=find_plan_name(key)%></li>
+      <%end%> 
+    </div>
   <%end%>
 </div>
 
-<%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path, remote: true, class: 'btn btn-default' %>
+<%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>
