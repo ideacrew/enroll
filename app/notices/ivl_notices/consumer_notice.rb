@@ -30,10 +30,12 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    enrollments = @family.enrollments.individual_market.verification_needed
-    # select{|e| e.currently_active? || e.future_active?}
+    enrollments = @family.enrollments.individual_market.where(:aasm_state.in => ["enrolled_contingent", "unverifeid"]).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record})
 
+    # .verification_needed
+    # select{|e| e.currently_active? || e.future_active?}
     # Comment this for reminders
+
     enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
@@ -47,7 +49,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
     #   raise 'needs ssa validation!'
     # end
 
-    people.reject!{|p| p.consumer_role.lawful_presence_determination.aasm_state != 'verification_outstanding'}
+    people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
+    people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
+
     if people.empty?
       raise 'no family member found with outstanding verification'
     end

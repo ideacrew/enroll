@@ -1,4 +1,4 @@
-people_to_check = Person.where("consumer_role.lawful_presence_determination.aasm_state" => "verification_outstanding")
+people_to_check = Person.where("consumer_role.aasm_state" => "verification_outstanding")
 puts "Candidate People: #{people_to_check.count}"
 
 families = Family.where("family_members.person_id" => {"$in" => people_to_check.map(&:_id)})
