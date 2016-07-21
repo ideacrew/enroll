@@ -38,13 +38,21 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
     person = family.primary_applicant.person
 
+    next unless [193384,235379,18941430,19746253,19763682,19771578].include?(person.hbx_id.to_i)
+
+    if person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?
+      puts "already notified!!"
+      next
+    end
+
     if person.consumer_role.blank?
       count += 1
       next
     end
 
     begin
-      event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
+      # event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
