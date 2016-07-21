@@ -1749,7 +1749,7 @@ context '.process_verification_reminders' do
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return(true)
       hbx_enrollment.save
       consumer_role.lawful_presence_determination.update_attributes(:aasm_state => 'verification_outstanding')
-      consumer_role.update_attributes(:aasm_state => 'verifications_outstanding')
+      consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
     end
 
     context 'when first verification due date reached' do 
