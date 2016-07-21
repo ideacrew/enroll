@@ -106,10 +106,7 @@
                 </strong>
                 <span>
                   <% if @employer_profile.broker_agency_profile.organization.office_locations.any? %>
-                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.address_1 %>
-                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.city %>,
-                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.state %>
-                  <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.zip %>
+                    <%= @employer_profile.broker_agency_profile.organization.primary_office_location.address.full_address %>
                   <% else %>
                   <% end %>
                 </span>
