@@ -38,8 +38,6 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
     person = family.primary_applicant.person
 
-    next unless [193384,235379,18941430,19746253,19763682,19771578].include?(person.hbx_id.to_i)
-
     if person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?
       puts "already notified!!"
       next

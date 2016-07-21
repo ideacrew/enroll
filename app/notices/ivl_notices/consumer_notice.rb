@@ -22,6 +22,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if @recipient.mailing_address
       append_address(@recipient.mailing_address)
     else
+      # @notice.primary_address = nil
       raise 'mailing address not present' 
     end
 
@@ -29,7 +30,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    enrollments = @family.enrollments.individual_market.select{|e| e.currently_active? || e.future_active?}
+    enrollments = @family.enrollments.individual_market.verification_needed
+    # select{|e| e.currently_active? || e.future_active?}
 
     # Comment this for reminders
     enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
@@ -57,6 +59,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
         outstanding_people << person
       end
     end
+    outstanding_people.uniq!
     
     if outstanding_people.empty?
       raise 'no family member found without uploaded documents'
@@ -123,7 +126,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
       @recipient.hbx_id,
       @recipient.first_name,
       @recipient.last_name,
-      @notice.primary_address.attributes.values.reject{|x| x.blank?}.compact.join(','),
+      @notice.primary_address.present? ? @notice.primary_address.attributes.values.reject{|x| x.blank?}.compact.join(',') : "",
       @notice.due_date,
       (@notice.enrollments.first.submitted_at || @notice.enrollments.first.created_at),
       @notice.enrollments.first.effective_on,
