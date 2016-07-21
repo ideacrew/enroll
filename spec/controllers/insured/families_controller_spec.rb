@@ -467,6 +467,34 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
+    context "qle event when person has dual roles" do
+      before :each do
+        allow(person).to receive(:user).and_return(user)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        @qle = FactoryGirl.create(:qualifying_life_event_kind)
+        @family = FactoryGirl.build(:family, :with_primary_family_member)
+        allow(person).to receive(:primary_family).and_return(@family)
+      end
+
+      it "future_qualified_date return true/false when qle market kind is shop" do
+        date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+        expect(response).to have_http_status(:success)
+        expect(assigns(:future_qualified_date)).to eq(false)
+      end
+
+      it "future_qualified_date should return nil when qle market kind is indiviual" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+        date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+        expect(response).to have_http_status(:success)
+        expect(assigns(:qualified_date)).to eq true
+        expect(assigns(:future_qualified_date)).to eq(nil)
+      end
+    end
+
     context "GET check_qle_date" do
       let(:user) { FactoryGirl.create(:user) }
       let(:person) { FactoryGirl.build(:person) }
