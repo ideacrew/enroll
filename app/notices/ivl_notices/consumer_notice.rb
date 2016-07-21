@@ -9,20 +9,14 @@ class IvlNotices::ConsumerNotice < IvlNotice
     @secure_message_recipient = consumer_role.person
     @notice = PdfTemplates::ConditionalEligibilityNotice.new
     @market_kind = 'individual'
-
-    # @to = @recipient.home_email.address
-    # @email_notice = args[:email_notice] || true
-    # @paper_notice = args[:paper_notice] || true
   end
 
   def build
     @family = @recipient.primary_family    
     @notice.primary_fullname = @recipient.full_name.titleize
-    # @notice.primary_identifier = @recipient.hbx_id
     if @recipient.mailing_address
       append_address(@recipient.mailing_address)
     else
-      # @notice.primary_address = nil
       raise 'mailing address not present' 
     end
 
@@ -30,25 +24,20 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    enrollments = @family.enrollments.individual_market.where(:aasm_state.in => ["enrolled_contingent", "unverifeid"]).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record})
 
-    # .verification_needed
-    # select{|e| e.currently_active? || e.future_active?}
-    # Comment this for reminders
-
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    enrollments = @family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+      (!hbx_en.is_shop?) && ["enrolled_contingent", "unverified"].include?(hbx_en.aasm_state) &&
+        (
+          hbx_en.terminated_on.blank? ||
+          hbx_en.terminated_on >= Timekeeper.date_of_record
+        )
+    end
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
 
     people = family_members.map(&:person).uniq
-
-    # Logic to skip people pending SSA validation
-    # if people.any?{|p| (p.consumer_role.lawful_presence_determination.vlp_authority == 'dhs' && !p.ssn.blank?) }
-    #   raise 'needs ssa validation!'
-    # end
-
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
     people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
 
@@ -73,20 +62,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'found multiple enrollments with different due dates'
     end
 
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+
     append_unverified_individuals(outstanding_people)
     @notice.enrollments << enrollments.first
-
     @notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
-  end
-
-  def verification_type_outstanding?(person, verification_type)
-    verification_pending = false
-    if person.verification_types.include?(verification_type)
-      if person.consumer_role.is_type_outstanding?(verification_type)
-        verification_pending = true
-      end
-    end
-    verification_pending
   end
 
   def ssn_outstanding?(person)

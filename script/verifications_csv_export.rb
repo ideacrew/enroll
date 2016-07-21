@@ -1,8 +1,17 @@
-people_to_check = Person.where("consumer_role.aasm_state" => "verification_outstanding")
-puts "Candidate People: #{people_to_check.count}"
-
-families = Family.where("family_members.person_id" => {"$in" => people_to_check.map(&:_id)})
-puts "Candidate Families: #{families.count}"
+families = Family.where({
+  "households.hbx_enrollments" => {
+   "$elemMatch" => {
+    "aasm_state" => {
+      "$in" => ["enrolled_contingent", "unverified"]
+      },
+      "kind" => { "$ne" => "employer_sponsored" },
+      "$or" => [
+        {:terminated_on => nil },
+        {:terminated_on.gt => TimeKeeper.date_of_record}
+      ]
+    }  
+  }
+})
 
 mailing_address_missing = []
 coverage_not_found = []
