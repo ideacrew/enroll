@@ -19,7 +19,7 @@ class EmployerProfile
   PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
 
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
-  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled)
+  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
 
   field :entity_kind, type: String
