@@ -20,7 +20,7 @@ describe Subscribers::SsaVerification do
     consumer_role = person.build_consumer_role;
     consumer_role = FactoryGirl.build(:consumer_role);
     person.consumer_role = consumer_role;
-    person.consumer_role.aasm_state=:verifications_pending;
+    person.consumer_role.aasm_state="ssa_pending";
     person
     }
 
@@ -44,7 +44,7 @@ describe Subscribers::SsaVerification do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash3)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('ssa')
 #        expect(person.consumer_role.lawful_presence_determination.citizen_status).to eq(::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
       end
@@ -55,7 +55,7 @@ describe Subscribers::SsaVerification do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('ssa')
 #        expect(person.consumer_role.lawful_presence_determination.citizen_status).to eq(::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
         expect(person.consumer_role.lawful_presence_determination.ssa_responses.count).to eq(1)

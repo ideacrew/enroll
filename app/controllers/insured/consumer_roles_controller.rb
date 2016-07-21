@@ -12,8 +12,15 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
+    @val = params[:aqhp] || params[:uqhp]
+    @key = params.key(@val)
+    @search_path = {@key => @val}
+    if @person.try(:consumer_role?)
+      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
+      redirect_to bookmark_url || family_account_path 
+    end
   end
+
 
   def search
     @no_previous_button = true
