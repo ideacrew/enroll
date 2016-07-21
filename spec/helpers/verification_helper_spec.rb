@@ -146,7 +146,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
-        member.person.consumer_role.aasm_state="verifications_outstanding"
+        member.person.consumer_role.aasm_state="verification_outstanding"
         member.save
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
