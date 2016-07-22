@@ -145,7 +145,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def purchase
+    if params[:hbx_enrollment_id].present?
+      @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    else
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+    end
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
@@ -172,6 +176,8 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
+      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
       redirect_to :back

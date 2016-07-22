@@ -70,6 +70,7 @@ class HbxEnrollment
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
+  field :terminate_reason, type: String
 
   field :plan_id, type: BSON::ObjectId
   field :carrier_profile_id, type: BSON::ObjectId
@@ -126,6 +127,9 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
+  scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :effective_asc,      -> { order(effective_on: :asc) }
+  scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled"] )}
   scope :changing,            ->{ where(changing: true) }
@@ -1148,6 +1152,11 @@ class HbxEnrollment
     !(shopping_plan_year.start_on == effective_on)
   end
 
+  def update_coverage_kind_by_plan
+    if plan.present? && coverage_kind != plan.coverage_kind
+      self.update(coverage_kind: plan.coverage_kind)
+    end
+  end
 
  def set_submitted_at
    if submitted_at.blank?
@@ -1167,6 +1176,7 @@ class HbxEnrollment
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else
+      self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")
       false
     end
   end

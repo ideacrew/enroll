@@ -62,6 +62,27 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         expect(flash[:error]).to include("You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance")
       end
     end
+
+    context "hbx_enrollment can not select_coverage" do
+      let(:errors) { double }
+      before :each do
+        request.env["HTTP_REFERER"] = "/home"
+        allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record - 10.days)
+        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return false
+        allow(hbx_enrollment).to receive(:errors).and_return(errors)
+        allow(errors).to receive(:full_messages).and_return("You can not keep an existing plan which belongs to previous plan year")
+      end
+
+      it "should redirect" do
+        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should get flash" do
+        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        expect(flash[:error]).to include("You can not keep an existing plan which belongs to previous plan year")
+      end
+    end
   end
 
   context "GET receipt" do
@@ -203,13 +224,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "POST terminate" do
+    let(:enrollment) { HbxEnrollment.new }
     before do
-      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      #allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
-      allow(hbx_enrollment).to receive(:update_current).and_return(true)
-      allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
-      sign_in
+      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
+      allow(enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(enrollment).to receive(:terminate_coverage!).and_return(true)
+      #allow(hbx_enrollment).to receive(:update_current).and_return(true)
+      #allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
+      allow(person).to receive(:primary_family).and_return(Family.new)
+      sign_in user
     end
 
     it "returns http success" do
@@ -219,7 +242,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
+      allow(enrollment).to receive(:may_terminate_coverage?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end
