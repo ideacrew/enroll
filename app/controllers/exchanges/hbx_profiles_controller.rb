@@ -75,17 +75,18 @@ class Exchanges::HbxProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
     cursor = dt_query.skip.to_i
 
-    employer_invoices = Organization.all_employer_profiles.invoice_view_all
+    employers = Organization.all_employer_profiles.invoice_view_all
+    total_employer_count = employers.length
 
     if invoice_state.downcase == "r"
-      employers = employer_invoices.employer_profile_renewing_starting_on(date_filter).offset(cursor).limit(page_size)
+      employers = Organization.employer_profile_renewing_starting_on(date_filter).offset(cursor).limit(page_size)
       is_search = true
     elsif invoice_state.downcase == "i"
-      employers = employer_invoices.employer_profile_initial_starting_on(date_filter).offset(cursor).limit(page_size)
+      employers = Organization.employer_profile_initial_starting_on(date_filter).offset(cursor).limit(page_size)
       is_search = true
     else
       # datatable records with no filter should default to scope "invoice_view_all"
-      employers = employer_invoices.offset(cursor).limit(page_size)
+      employers = employers.offset(cursor).limit(page_size)
       is_search = false
     end
 
@@ -119,7 +120,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     }
 
     #records_filtered is for datatable required so it knows how many records were filtered
-    total_employer_count = employer_invoices.length
+
     @records_filtered = is_search ? employers.length : total_employer_count
     @total_records = total_employer_count
 
