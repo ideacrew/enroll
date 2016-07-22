@@ -1166,8 +1166,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.linked?).to be_truthy
     end
 
-    it "should return true when cobra_employee_role_linked" do
-      census_employee.aasm_state = 'cobra_employee_role_linked'
+    it "should return true when cobra" do
+      census_employee.aasm_state = 'cobra'
       expect(census_employee.linked?).to be_truthy
     end
   end
@@ -1191,7 +1191,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "have_valid_cobra_begin_date?" do
+  context "have_valid_date_for_cobra?" do
     let(:hired_on) { TimeKeeper.date_of_record }
     let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
     before :each do
@@ -1200,7 +1200,33 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     it "can cobra employee_role" do
       census_employee.cobra_begin_date = hired_on + 10.days
+      census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record
       expect(census_employee.may_cobra_employee_role?).to be_truthy
+    end
+
+    it "can not cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on + 10.days
+      census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months - 5.days
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record
+      expect(census_employee.may_cobra_employee_role?).to be_falsey
+    end
+
+    context "current date is less then 6 months after coverage_terminated_on" do
+      before :each do
+        census_employee.cobra_begin_date = hired_on + 10.days
+        census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+      end
+
+      it "when cobra_begin_date is early than coverage_terminated_on" do
+        census_employee.cobra_begin_date = census_employee.coverage_terminated_on - 5.days
+        expect(census_employee.may_cobra_employee_role?).to be_falsey
+      end
+
+      it "when cobra_begin_date is later than 6 months after coverage_terminated_on" do
+        census_employee.cobra_begin_date = census_employee.coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+        expect(census_employee.may_cobra_employee_role?).to be_falsey
+      end
     end
 
     it "can not cobra employee_role" do
@@ -1228,7 +1254,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     it "should return true when aasm_state is cobra_terminated" do
       census_employee.aasm_state = 'cobra_terminated'
-      expect(census_employee.can_cobra_employee_role?).to be_truthy
+      expect(census_employee.can_cobra_employee_role?).to be_falsey
+    end
+  end
+
+  context "linked?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return true when aasm_state is employee_role_linked" do
+      census_employee.aasm_state = 'employee_role_linked'
+      expect(census_employee.linked?).to be_truthy
+    end
+
+    it "should return true when aasm_state is cobra" do
+      census_employee.aasm_state = 'cobra'
+      expect(census_employee.linked?).to be_truthy
+    end
+
+    it "should return false" do
+      expect(census_employee.linked?).to be_falsey
     end
   end
 end

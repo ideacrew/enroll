@@ -168,6 +168,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
@@ -215,6 +216,20 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
+      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+    end
+
+    it "for cobra with invalid date" do
+      user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
+      sign_in user
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(employee_role).to receive(:is_under_cobra?).and_return(true)
+      allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
+      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match /You may not enroll for cobra after/
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
 

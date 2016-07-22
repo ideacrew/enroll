@@ -68,7 +68,7 @@
           <% else %>
             <td class="table-functions"></td>
           <% end %>
-          <% if census_employee.can_cobra_employee_role? %>
+          <% if census_employee.can_cobra_employee_role? || census_employee.may_reinstate_cobra_terminated? %>
             <td class="table-functions">
              <%= cobra_button(census_employee) %>
             </td>
@@ -93,7 +93,7 @@
             </td>
           </tr>
         <% end %>
-        <% if census_employee.can_cobra_employee_role? %>
+        <% if census_employee.may_reinstate_cobra_terminated? %>
          <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
             <td class="confirm-terminate-wrapper" colspan="3">
               <span>Employment Termination Date: </span>

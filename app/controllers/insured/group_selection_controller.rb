@@ -71,7 +71,12 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    hbx_enrollment.is_cobra = true if @employee_role.present? && @employee_role.is_under_cobra?
+    if @employee_role.present? && @employee_role.is_under_cobra?
+      hbx_enrollment.is_cobra = true
+      if @employee_role.census_employee.coverage_terminated_on.present? && !@employee_role.census_employee.have_valid_date_for_cobra?
+        raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+      end
+    end
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away

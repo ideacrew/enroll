@@ -18,7 +18,7 @@ class CensusEmployeePolicy < ApplicationPolicy
     if @user.has_role? :hbx_staff or
        @user.has_role? :broker_agency_staff or
        @user.has_role? :broker
-      @record.employee_role_linked? || @record.cobra_employee_role_linked?
+      @record.linked?
     else
       false
     end

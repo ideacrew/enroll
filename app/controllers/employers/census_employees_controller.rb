@@ -181,9 +181,12 @@ class Employers::CensusEmployeesController < ApplicationController
     end
 
     if @cobra_date.present? && @census_employee.can_cobra_employee_role?
-      @census_employee.update_for_cobra(@cobra_date)
-      @census_employee.build_hbx_enrollment_for_cobra
-      flash[:notice] = "Successfully update Census Employee."
+      if @census_employee.update_for_cobra(@cobra_date)
+        @census_employee.build_hbx_enrollment_for_cobra
+        flash[:notice] = "Successfully update Census Employee."
+      else
+        flash[:error] = "Please check cobra date."
+      end
     else
       flash[:error] = "Please enter cobra date."
     end

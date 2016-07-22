@@ -81,6 +81,9 @@ aca:
       maximum_length:
         months: 2
 
+    cobra_enrollment_period:
+      months: 6
+
 
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
