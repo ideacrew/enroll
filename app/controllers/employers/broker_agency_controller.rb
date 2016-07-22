@@ -117,8 +117,8 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def send_broker_assigned_msg(employer_profile, broker_agency_profile)
-    broker_subject = "#{employer_profile.staff_roles.first.try(:full_name)} has selected you as the broker on DC Health Link"
-    broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.organization.office_locations.first.phone.to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
+    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on DC Health Link"
+    broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone).to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
     employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on DC Health Link."
     employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
     secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
