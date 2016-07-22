@@ -137,7 +137,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         :remaining => eligible_to_enroll_count - enrolled.to_i,
         :eligible => eligible_to_enroll_count,
         #:enrollment_ratio => (plan_year.try(:enrollment_ratio).to_f * 100).to_i
-        :enrollment_ratio => (enrolled / eligible_to_enroll_count * 100).to_i unless eligible_to_enroll_count == 0 then 0
+        :enrollment_ratio => ((enrolled / eligible_to_enroll_count * 100).to_i rescue 0)
       }
     }
 
