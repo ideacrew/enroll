@@ -353,7 +353,6 @@ class HbxEnrollment
   end
 
   def cancel_previous(year)
-
     #Perform cancel/terms of previous enrollments for the same plan year
     self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |p|
 
@@ -377,15 +376,45 @@ class HbxEnrollment
     end
   end
 
-  def propogate_selection
+  def update_existing_shop_coverage
+    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
-    cancel_previous(self.plan.active_year)
+    terminate_proc = lambda do |enrollment|
+      if enrollment.may_terminate_coverage?
+        enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+        enrollment.terminate_coverage!
+      end
+    end
+
+    shop_enrollments.each do |enrollment|
+      if enrollment.currently_active? && enrollment.may_terminate_coverage?
+        terminate_proc.call(enrollment)
+      elsif enrollment.future_active?
+        if enrollment.effective_on >= self.effective_on
+          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+        else
+          terminate_proc.call(enrollment)
+        end
+      end
+    end
+
+    # TODO: gereate or update passive renewal
+  end
+
+  def propogate_selection
+    if self.kind == "employer_sponsored"
+      update_existing_shop_coverage
+    else
+      cancel_previous(self.plan.active_year)
+    end
 
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
+    
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
         hem.person.consumer_role.invoke_verification!(effective_on)
