@@ -5,12 +5,11 @@
     </div>
     <div class="col-xs-4">
 
-      <% if policy_helper(EmployerProfile).updateable? %>
+      <%= pundit_span EmployerProfile,:updateable? %>
         <% if @plan_years.present? && @employer_profile.published_plan_year.blank? %>
           <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
         <% end %>
-
-      <% end %>
+      </span>
     </div>
     <% unless @employer_profile.plan_years.blank? || @employer_profile.published_plan_year.present? %>
     <% if @employer_profile.renewing_plan_year.blank? || @employer_profile.active_plan_year.blank? %>
@@ -51,7 +50,7 @@
     </div>
     <div class="col-xs-6 above">
       <div class="row">
-        <% if policy_helper(EmployerProfile).updateable? %>
+        <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
                 <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
@@ -64,7 +63,7 @@
                   <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
                 <% end %>
             </span>
-        <% end %>    
+        </span>
       </div>
     </div>
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
@@ -449,12 +448,12 @@
         </div>
         <br class="clear"/>
       </div>
-        <% if policy_helper(EmployerProfile).updateable? %>
+        <%= pundit_span EmployerProfile, :updateable? %>
             <div class="below clear">
               <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-default' if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
               <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
             </div>
-        <% end %>    
+        </span>
       <% end %>
     </div>
     <br/>

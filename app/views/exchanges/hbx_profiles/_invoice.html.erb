@@ -37,7 +37,7 @@
 </div>
 
 <div class="pull-right">
-      <%= submit_tag "Generate Invoices", class: "btn btn-primary" %>
+      <%= submit_tag "Generate Invoices", class: "btn btn-primary" + pundit_class(HbxProfile, :modify_admin_tabs?) %>
       <% end %>
 </div>
 

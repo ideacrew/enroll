@@ -62,7 +62,7 @@
         <br/>
         <div class="row top-row no-border">
           <div class="col-xs-12 text-center broker_approve_deny_btn">
-            <% if policy_helper(HbxProfile).approve_ga? %>
+            <%= pundit_span HbxProfile, :approve_ga? %>
                 <% if current_user.has_hbx_staff_role? %>
                   <% if @staff.may_approve? %>
                     <%= submit_tag 'Approve', name: 'approve', class: "btn btn-primary  interaction-click-control-general-agency-approve" %>
@@ -72,7 +72,7 @@
                     <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-general-agency-decertify" %>
                   <% end %>
                 <% end %>
-            <% end %>  
+            </span>  
           </div>
         </div>
       </div>

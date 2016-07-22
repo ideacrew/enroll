@@ -115,9 +115,9 @@
             <% end %>
             <br/>
             <div class="form-inputs">
-              <% if policy_helper(EmployerProfile).updateable? %>
-              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
-              <% end %>
+              <%= pundit_span(EmployerProfile,:updateable?) %>
+                 <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
+              </span>
               <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default' %>
             </div>
             <div class="top-row no-border">
