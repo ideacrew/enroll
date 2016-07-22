@@ -131,8 +131,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
         :invoice_id => ('<input type="checkbox" name="employerId[]" value="' + er.id.to_s + '">'),
         :fein => er.fein,
+        :legal_name => (view_context.link_to er.legal_name, employers_employer_profile_path(er.employer_profile)+"?tab=home"),
+        :is_conversion => view_context.boolean_to_glyph(er.employer_profile.is_conversion?),
         :state => er.employer_profile.aasm_state.humanize,
         :plan_year => plan_year.try(:effective_date).to_s,
+        :is_current_month_invoice_generated => view_context.boolean_to_glyph(er.current_month_invoice.present?),
         :enrolled => enrolled.to_s + "/" + waived.to_s,
         :remaining => eligible_to_enroll_count - enrolled.to_i,
         :eligible => eligible_to_enroll_count,
