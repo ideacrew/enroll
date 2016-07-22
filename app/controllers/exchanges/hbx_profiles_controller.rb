@@ -10,7 +10,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
-  
+
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
@@ -75,15 +75,17 @@ class Exchanges::HbxProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
     cursor = dt_query.skip.to_i
 
+    employer_invoices = Organization.all_employer_profiles.invoice_view_all
+
     if invoice_state.downcase == "r"
-      employers = Organization.employer_profile_renewing_starting_on(date_filter).offset(cursor).limit(page_size)
+      employers = employer_invoices.employer_profile_renewing_starting_on(date_filter).offset(cursor).limit(page_size)
       is_search = true
     elsif invoice_state.downcase == "i"
-      employers = Organization.employer_profile_initial_starting_on(date_filter).offset(cursor).limit(page_size)
+      employers = employer_invoices.employer_profile_initial_starting_on(date_filter).offset(cursor).limit(page_size)
       is_search = true
     else
       # datatable records with no filter should default to scope "invoice_view_all"
-      employers = Organization.invoice_view_all.offset(cursor).limit(page_size)
+      employers = employer_invoices.offset(cursor).limit(page_size)
       is_search = false
     end
 
@@ -117,7 +119,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     }
 
     #records_filtered is for datatable required so it knows how many records were filtered
-    total_employer_count = Organization.all_employer_profiles.length
+    total_employer_count = employer_invoices.length
     @records_filtered = is_search ? employers.length : total_employer_count
     @total_records = total_employer_count
 
