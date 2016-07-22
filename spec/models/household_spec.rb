@@ -16,6 +16,10 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     expect(subject.enrolled_hbx_enrollments).to eq []
   end
 
+  it "ImmediateFamily should have domestic partner" do
+    expect(Household::ImmediateFamily.include?('domestic_partner')).to eq true
+  end
+
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:person) { double(primary_family: family)}
@@ -163,6 +167,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
+
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
   #   let(:hbx_enrollments) { [mock_hbx_enrollment] }
@@ -175,4 +180,26 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   #     expect(subject.enrolled_hbx_enrollments).to eq hbx_enrollments
   #   end
   # end
+end
+
+
+describe Household, "for dependent with domestic partner relationship", type: :model, dbclean: :after_each do
+  let(:family) { FactoryGirl.build(:family) }
+  let(:family_member)  { FactoryGirl.create(:person)}
+  let(:person) do
+    p = FactoryGirl.build(:person)
+    p.person_relationships.build(relative: family_member, kind: "domestic_partner")
+    p.save
+    p
+  end
+  before(:each) do
+    f_id = family.id
+    family.add_family_member(person, is_primary_applicant: true)
+    family.relate_new_member(family_member, "domestic_partner")
+    family.save!
+  end
+  it "should have the extended family member in the extended coverage household" do
+     immediate_coverage_members = family.active_household.immediate_family_coverage_household.coverage_household_members
+     expect(immediate_coverage_members.length).to eq 2
+  end
 end
