@@ -664,8 +664,8 @@ Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
   click_button "Continue"
-  
 end
+
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
   expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy

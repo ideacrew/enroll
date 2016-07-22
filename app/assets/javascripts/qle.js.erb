@@ -23,7 +23,7 @@ var QLE = ( function( window, undefined ) {
         QLE.qle_question("check_move_reason.js");
         test = false;
         break;
-      default: 
+      default:
         test = true;
     }
     return test;
@@ -123,7 +123,7 @@ $(function () {
       return false;
     }
   });
-  
+
 	/* QLE Date Validator */
   $(document).on('click', '#qle_submit', function() {
     if(check_qle_date()) {
@@ -138,7 +138,7 @@ $(function () {
   });
 
   $(document).on('click', '#qle_submit_reason', function() {
-    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){ 
+    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){
       get_qle_date();
     } else {
       $('#qle_reason').hide();

@@ -89,7 +89,7 @@ end
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
   expect(page).to have_content('Enrollment Submitted')
   step "#{named_person} should get plan year start date as coverage effective date"
-  
+
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
   else
@@ -117,7 +117,7 @@ Then(/Employee should see confirmation and clicks continue/) do
 end
 
 Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "Household Info: Family Members" 
+  expect(page).to have_content "Household Info: Family Members"
   within '#dependent_buttons' do
     click_link "Continue"
   end
