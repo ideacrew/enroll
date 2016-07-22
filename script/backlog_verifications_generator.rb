@@ -5,20 +5,23 @@ def create_directory(path)
   Dir.mkdir path
 end
 
-families = Family.where({
-  "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => {
-      "$in" => ["enrolled_contingent", "unverified"]
-      },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
-    }  
-  }
-})
+# families = Family.where({
+#   "households.hbx_enrollments" => {
+#    "$elemMatch" => {
+#     # "aasm_state" => {
+#     #   "$in" => ["enrolled_contingent", "unverified"]
+#     #   },
+#       "kind" => { "$ne" => "employer_sponsored" },
+#       "$or" => [
+#         {:terminated_on => nil },
+#         {:terminated_on.gt => TimeKeeper.date_of_record}
+#       ]
+#     }  
+#   }
+# })
+
+families = [19754644,127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+
 
 mailing_address_missing = []
 coverage_not_found = []

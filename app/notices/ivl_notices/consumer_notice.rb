@@ -17,6 +17,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if @recipient.mailing_address
       append_address(@recipient.mailing_address)
     else
+      # @notice.primary_address = nil
       raise 'mailing address not present' 
     end
 
@@ -25,12 +26,14 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_family_members
     enrollments = @family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && ["enrolled_contingent", "unverified"].include?(hbx_en.aasm_state) &&
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
-          hbx_en.terminated_on >= Timekeeper.date_of_record
+          hbx_en.terminated_on >= TimeKeeper.date_of_record
         )
     end
+
+    # && ["enrolled_contingent", "unverified"].include?(hbx_en.aasm_state)
 
     enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
 
@@ -52,8 +55,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      verification_types = person.consumer_role.outstanding_verification_types
-      if verification_types.detect{|type| !person.consumer_role.has_docs_for_type?(type) }
+      # verification_types = person.consumer_role.outstanding_verification_types
+      # if verification_types.detect{|type| !person.consumer_role.has_docs_for_type?(type) }
+      if person.consumer_role.outstanding_verification_types.present?
         outstanding_people << person
       end
     end
@@ -71,11 +75,13 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def ssn_outstanding?(person)
-    person.consumer_role.ssn_validation == 'outstanding'
+    # person.consumer_role.ssn_validation == 'outstanding'
+    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.lawful_presence_determination.aasm_state == 'verification_outstanding'
+    # person.consumer_role.lawful_presence_determination.aasm_state == 'verification_outstanding'
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
   def append_unverified_individuals(people)
