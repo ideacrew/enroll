@@ -32,8 +32,8 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   csv << [
     'Family Id',
     'Family ECase ID',
-    'Primary Firstname', 
-    'Primary Lastname'
+    'Person name', 
+    'Hbx ID'
   ]
 
   count   = 0
@@ -62,13 +62,14 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
       notice_trigger = event_kind.notice_triggers.first 
 
+
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
         template: notice_trigger.notice_template, 
         subject: event_kind.title, 
         mpi_indicator: notice_trigger.mpi_indicator
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
-      csv << [family.id, family.e_case_id, person.full_name]
+      csv << [family.id, family.e_case_id, person.full_name, p.hbx_id]
 
       puts 'processed--' + person.full_name
 

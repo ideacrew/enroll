@@ -24,13 +24,18 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-
     enrollments = @family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && ["enrolled_contingent", "unverified"].include?(hbx_en.aasm_state) &&
         (
           hbx_en.terminated_on.blank? ||
           hbx_en.terminated_on >= Timekeeper.date_of_record
         )
+    end
+
+    enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
+
+    if enrollments.empty?
+      raise 'enrollments not found!'
     end
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
@@ -52,8 +57,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
         outstanding_people << person
       end
     end
+
     outstanding_people.uniq!
-    
     if outstanding_people.empty?
       raise 'no family member found without uploaded documents'
     end
