@@ -26,7 +26,7 @@
           </ul>
         </div>
       <% end %>
-      <div class="module employer-staff-table">
+      <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?)%>">
         <h4>
           Point of Contact - Employer Staff
         </h4>
