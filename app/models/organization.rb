@@ -105,15 +105,6 @@ class Organization
   scope :approved_broker_agencies,            ->{ where("broker_agency_profile.aasm_state" => 'is_approved') }
   scope :broker_agencies_by_market_kind,      ->( market_kind ) { any_in("broker_agency_profile.market_kind" => market_kind) }
   scope :all_employers_by_plan_year_start_on, ->( start_on ){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
-  scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
-    unscoped.where(
-      :"employer_profile.plan_years" => {
-        :$elemMatch => {
-          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
-          start_on: start_on
-        }
-      })
-  }
   scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
   scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
   scope :has_broker_agency_profile,           ->{ exists(broker_agency_profile: true) }
@@ -125,7 +116,15 @@ class Organization
   scope :invoice_view_all,                    ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
   scope :invoice_view_renewing,               ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING) }
   scope :invoice_view_initial,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_INITIAL) }
-  #scope :invoice_starting,                   ->{ unscoped.where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+  scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
+    unscoped.where(
+      :"employer_profile.plan_years" => {
+        :$elemMatch => {
+          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
+          start_on: start_on
+        }
+      })
+  }
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
