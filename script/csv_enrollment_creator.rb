@@ -163,6 +163,27 @@ CSV.foreach(filename, headers: :true) do |row|
 	subscriber.hbx_id = data_row["HBX ID"]
 	subscriber.save
 
+	## Add contact info
+	unless data_row["Address Kind"].blank?
+		subscriber.addresses.build(:kind => data_row["Address Kind"], 
+								   :address_1 => data_row["Address 1"],
+								   :address_2 => data_row["Address 2"],
+								   :city => data_row["City"], 
+								   :state => data_row["State"], 
+								   :zip => data_row["Zip"].to_s)
+		subscriber.save
+	end
+	unless data_row["Phone Type"].blank?
+		subscriber.phones.build(:kind => data_row["Phone Type"],
+								:full_phone_number => data_row["Phone Number"].to_s.gsub("(","").gsub(")","").gsub("-",""))
+		subscriber.save
+	end
+	unless data_row["Email Kind"].blank?
+		subscriber.emails.build(:kind => data_row["Email Kind"],
+								:address => data_row["Email Address"])
+		subscriber.save
+	end
+
 	6.times do |i|
 		if data_row["HBX ID (Dep #{i+1})"] != nil
 			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
