@@ -83,7 +83,7 @@ Then(/Individual should see a form to enter personal information$/) do
 end
 
 When(/Individual clicks on Save and Exit/) do
-  find(:xpath, '//*[@id="new_person_wrapper"]/div/div[2]/ul[2]/li[2]/a').trigger('click') #overlapping li element wat?
+  find('li a', text: 'SAVE & EXIT').trigger('click')
 end
 
 Then (/Individual resumes enrollment/) do
@@ -269,7 +269,7 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
-  find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  find('.container .row div div.btn', text: 'Help').click
   sleep 1
   click_link "Help from a Customer Service Representative"
   sleep 1
