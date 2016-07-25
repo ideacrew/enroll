@@ -49,8 +49,8 @@ context "without default_general_agency_profile, not updateable" do
       expect(rendered).to have_selector('h3', text: 'General Agencies')
     end
 
-    it "should NOT have button of clear default ga" do
-      expect(rendered).not_to have_selector('a', text: 'Clear Default GA')
+    it "should NOT have click able button of clear default ga" do
+      expect(rendered).to have_selector('.blocking', text: 'Clear Default GA')
     end
 
     it "should have general_agency_profile" do
@@ -59,7 +59,7 @@ context "without default_general_agency_profile, not updateable" do
     end
 
     it "should NOT have link of set default ga" do
-      expect(rendered).not_to have_selector('a', text: 'Select Default GA')
+      expect(rendered).to have_selector('.blocking', text: 'Select Default GA')
     end
 
     it "should have hint msg for select default GA" do

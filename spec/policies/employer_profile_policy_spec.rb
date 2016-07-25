@@ -11,35 +11,35 @@ describe EmployerProfilePolicy do
   context 'hbx_staff_role subroles' do
     it 'hbx_staff' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_staff))
-      expect(policy.show_premium_statements?).to be true
+      expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be true
     end
 
     it 'hbx_read_only' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_read_only))
-      expect(policy.show_premium_statements?).to be true
+      expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be false
       expect(policy.revert_application?).to be false
     end
 
     it 'hbx_csr_supervisor' do
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_csr_supervisor))
-      expect(policy.show_premium_statements?).to be true
+      expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be true
     end
 
     it 'hbx_csr_tier2' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_csr_tier2))
-      expect(policy.show_premium_statements?).to be false
+      expect(policy.list_enrollments?).to be false
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be false
     end
 
     it 'csr_tier1' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_csr_tier1))
-      expect(policy.show_premium_statements?).to be false
+      expect(policy.list_enrollments?).to be false
       expect(policy.updateable?).to be false
       expect(policy.revert_application?).to be false
     end

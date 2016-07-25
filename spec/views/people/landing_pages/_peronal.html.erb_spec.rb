@@ -15,6 +15,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     it "should show save button" do
       render :template => "people/landing_pages/_personal.html.erb"
       expect(rendered).to have_selector('button', text: 'Save')
+      expect(rendered).not_to have_selector('.blocking', text: 'Save')
     end
 
     context "with consumer_role" do
@@ -68,7 +69,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
 
     it "should not show save button" do
       render :template => "people/landing_pages/_personal.html.erb"
-      expect(rendered).not_to have_selector('button', text: 'Save')
+      expect(rendered).to have_selector('.blocking', text: 'Save' )
     end
   end
 end

@@ -13,8 +13,8 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
   end
   describe 'with modify permissions ' do 
     before :each do
-    allow(view).to receive(:policy_helper).and_return(double("Policy", modify_admin_tabs?: true))
-    render template: "broker_agencies/profiles/_employers.html.erb"
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", list_enrollments?: true, updateable?: true))
+      render template: "broker_agencies/profiles/_employers.html.erb"
     end
     it "should have general agency" do
       expect(rendered).to match(/General Agencies/)
@@ -24,21 +24,24 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       expect(rendered).to have_selector('#assign_general_agency')
     end
 
+    it "should not have a blocked button for ga assign" do
+      expect(rendered).not_to have_selector('.blocking #assign_general_agency')
+    end
     it "should have checkbox for employer_profile" do
       expect(rendered).to have_selector("input[type='checkbox']")
     end
   end
   describe 'without modify permissions ' do 
     before :each do
-      allow(view).to receive(:policy_helper).and_return(double("Policy", modify_admin_tabs?: false))
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", list_enrollments?: false, updateable?: false))
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     it "should have general agency" do
       expect(rendered).to match(/General Agencies/)
     end
 
-    it "should not have button for ga assign" do
-      expect(rendered).not_to have_selector('#assign_general_agency')
+    it "should  have a blocked button for ga assign" do
+      expect(rendered).to have_selector('.blocking #assign_general_agency')
     end
 
     it "should have checkbox for employer_profile" do

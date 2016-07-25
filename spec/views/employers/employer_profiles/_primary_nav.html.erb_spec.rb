@@ -12,6 +12,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER" do
     current_user.person.broker_role.npn = rand(100000)
     current_user.person.broker_role.broker_agency_profile_id = 99
     current_user.person.broker_role.save!
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
   it "should display the standard tabs for Employer [broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
@@ -45,6 +46,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
 
     @employer_profile = employer_profile
     sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
   it "should display the standard tabs for Employer [broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
@@ -73,6 +75,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS EMPLOYER" do
   before :each do
     @employer_profile = employer_profile
     sign_in current_user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
   it "should display the standard tabs for Employer[broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)

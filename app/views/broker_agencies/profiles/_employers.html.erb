@@ -60,7 +60,7 @@
                   <td class='general_agency'>
                     <%= er.hashed_active_general_agency_legal_name(@general_agency_profiles) %>
                       &nbsp;
-                    <%= pundit_span HbxProfile, :modify_admin_tabs? %>
+                    <%= pundit_span EmployerProfile, :updateable? %>
                       <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? && controller_name == 'profiles' %>
                     </span>
                   </td>
@@ -77,7 +77,7 @@
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
           <%= hidden_field_tag :from_assign, false %>
-          <%= pundit_span HbxProfile, :modify_admin_tabs? %>
+          <%= pundit_span EmployerProfile, :updateable?  %>
             <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
             <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
           </span>
