@@ -49,13 +49,16 @@ def format_date(date)
 end
 
 def find_census_employee(subscriber_params)
-	census_employee = CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(subscriber_params["ssn"])).first
-	if census_employee == nil
+	matched_employees = CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(subscriber_params["ssn"]))
+	census_employee = matched_employees.non_terminated.first || matched_employees.first
+
+	if census_employee.blank?
 		census_employee = CensusEmployee.where(first_name: subscriber_params["first_name"], 
 											   middle_name: subscriber_params["middle_name"],
 											   last_name: subscriber_params["last_name"],
 											   dob: subscriber_params["dob"]).first
 	end
+
 	return census_employee
 end
 
@@ -100,9 +103,10 @@ end
 CSV.foreach(filename, headers: :true) do |row|
 	
 	# begin
-		data_row = row.to_hash
-		subscriber = Person.where(hbx_id: data_row['HBX ID']).first
-		subscriber_params = {"name_pfx" => data_row["Name Prefix"],
+	data_row = row.to_hash
+		
+	# subscriber = Person.where(hbx_id: data_row['HBX ID']).first
+	subscriber_params = {"name_pfx" => data_row["Name Prefix"],
 									 "first_name" => data_row["First Name"],
 									 "middle_name" => data_row["Middle Name"],
 									 "last_name" => data_row["Last Name"],
@@ -113,97 +117,92 @@ CSV.foreach(filename, headers: :true) do |row|
 									 "no_ssn" => 0
 									}
 
-		person_details = create_person_details(subscriber_params)
-		organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
-		census_employee = find_census_employee(subscriber_params)
-    census_dependents = []
-		6.times do |i|
-			if data_row["HBX ID (Dep #{i+1})"].present?
-				census_dependents << CensusDependent.new({
-					first_name: data_row["First Name (Dep #{i+1})"],
-					middle_name: data_row["Middle Name (Dep #{i+1})"],
-					last_name: data_row["Last Name (Dep #{i+1})"],
-					dob: format_date(data_row["DOB (Dep #{i+1})"]),
-					employee_relationship: data_row["Relationship (Dep #{i+1})"].strip == 'child' ? 'child_under_26' : data_row["Relationship (Dep #{i+1})"].strip,
-					gender:  data_row["Gender (Dep #{i+1})"],
-					ssn: data_row["SSN (Dep #{i+1})"].to_s.strip.gsub("-","")
-					})
-			end
+	person_details = create_person_details(subscriber_params)
+	organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
+
+	census_employee = find_census_employee(subscriber_params)
+	census_dependents = []
+	6.times do |i|
+		if data_row["HBX ID (Dep #{i+1})"].present?
+			census_dependents << CensusDependent.new({
+				first_name: data_row["First Name (Dep #{i+1})"],
+				middle_name: data_row["Middle Name (Dep #{i+1})"],
+				last_name: data_row["Last Name (Dep #{i+1})"],
+				dob: format_date(data_row["DOB (Dep #{i+1})"]),
+				employee_relationship: data_row["Relationship (Dep #{i+1})"].strip == 'child' ? 'child_under_26' : data_row["Relationship (Dep #{i+1})"].strip,
+				gender:  data_row["Gender (Dep #{i+1})"],
+				ssn: data_row["SSN (Dep #{i+1})"].to_s.strip.gsub("-","")
+				})
 		end
+	end  
+	puts "processing #{census_employee.full_name}"
 
-    
-    puts "processing #{census_employee.full_name}"
+	if census_employee.census_dependents.blank? && census_dependents.present?
+		census_employee.census_dependents = census_dependents
+		census_employee.save!
+	end
 
-		if census_employee.census_dependents.blank? && census_dependents.present?
-			census_employee.census_dependents = census_dependents
-			census_employee.save!
+	benefit_begin_date = format_date(data_row["Benefit Begin Date"])
+	plan_year = organization.employer_profile.plan_years.published_plan_years_by_date(benefit_begin_date).first
+	plan_year = organization.employer_profile.plan_years.detect{|py| (py.start_on..py.end_on).cover?(benefit_begin_date)} if plan_year.blank?
+
+	correct_benefit_group = plan_year.benefit_groups.detect{|bg| data_row["Benefit Package/Benefit Group"].strip.downcase == bg.title.downcase.strip }
+	benefit_group_assignment = select_benefit_group_assignment(data_row["Benefit Package/Benefit Group"], census_employee)
+
+	if benefit_group_assignment.blank?
+		benefit_group_assignment = census_employee.benefit_group_assignments.new(benefit_group: correct_benefit_group, start_on: benefit_begin_date)
+		benefit_group_assignment.save!
+		benefit_group_assignment.make_active
+	end
+	
+	employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
+	employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
+	employee_role.save!
+
+	subscriber = employee_role.person
+	subscriber.hbx_id = data_row["HBX ID"]
+	subscriber.save
+
+	6.times do |i|
+		if data_row["HBX ID (Dep #{i+1})"] != nil
+			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
+				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
+			dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
+			dependent.save
 		end
+	end
 
+	start_date = format_date(data_row["Benefit Begin Date"])
+	plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: data_row["Plan Year"].strip).first
 
-				  benefit_begin_date = format_date(data_row["Benefit Begin Date"])
-				  plan_year = organization.employer_profile.plan_years.published_plan_years_by_date(benefit_begin_date).first
-				  plan_year = organization.employer_profile.plan_years.detect{|py| (py.start_on..py.end_on).cover?(benefit_begin_date)} if plan_year.blank?
+	if plan.blank?
+		raise "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
+	end
 
-	        correct_benefit_group = plan_year.benefit_groups.detect{|bg| data_row["Benefit Package/Benefit Group"].strip.downcase == bg.title.downcase.strip }
-					benefit_group_assignment = select_benefit_group_assignment(data_row["Benefit Package/Benefit Group"], census_employee)
+	family = subscriber.primary_family
+	hh = family.active_household
+	ch = hh.immediate_family_coverage_household
+	en = hh.new_hbx_enrollment_from({
+		coverage_household: ch,
+		employee_role: employee_role,
+		benefit_group: benefit_group_assignment.benefit_group,
+		benefit_group_assignment: benefit_group_assignment
+		})
+	en.effective_on = start_date
+	en.external_enrollment = true
+	en.hbx_enrollment_members.each do |mem|
+		mem.eligibility_date = start_date
+		mem.coverage_start_on = start_date
+	end
 
-					if benefit_group_assignment.blank?
-						benefit_group_assignment = census_employee.benefit_group_assignments.new(benefit_group: correct_benefit_group, start_on: benefit_begin_date)
-						benefit_group_assignment.save!
-						benefit_group_assignment.make_active
-					end
+	en.carrier_profile_id = plan.carrier_profile_id
+	en.plan_id = plan.id
+	en.aasm_state =  "coverage_selected"
+	en.coverage_kind = 'health'
 
-					employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
-					employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
-					employee_role.save!
+	en.save!
 
-					subscriber = employee_role.person
-					##  Give the subscriber the correct HBX ID.
-					subscriber.hbx_id = data_row["HBX ID"]
-					subscriber.save
-
-					6.times do |i|
-						if data_row["HBX ID (Dep #{i+1})"] != nil
-							dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
-								data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
-							dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
-							dependent.save
-						end
-					end
-
-
-    start_date = format_date(data_row["Benefit Begin Date"])
-		plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: data_row["Plan Year"].strip).first
-
-		if plan.blank?
-			raise "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
-		end
-
-
-    family = subscriber.primary_family
-		hh = family.active_household
-		ch = hh.immediate_family_coverage_household
-		en = hh.new_hbx_enrollment_from({
-			coverage_household: ch,
-			employee_role: employee_role,
-			benefit_group: benefit_group_assignment.benefit_group,
-			benefit_group_assignment: benefit_group_assignment
-			})
-		en.effective_on = start_date
-		en.external_enrollment = true
-		en.hbx_enrollment_members.each do |mem|
-			mem.eligibility_date = start_date
-			mem.coverage_start_on = start_date
-		end
-
-		en.carrier_profile_id = plan.carrier_profile_id
-	  en.plan_id = plan.id
-		en.aasm_state =  "coverage_selected"
-		en.coverage_kind = 'health'
-
-	  en.save!
-
-		true
+	true
 	# rescue Exception=>e
 	# 	puts e.inspect
 	# 	binding.pry
