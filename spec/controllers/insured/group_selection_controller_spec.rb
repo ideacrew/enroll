@@ -39,6 +39,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
   context "GET new" do
     let(:census_employee) {FactoryGirl.build(:census_employee)}
+    let(:hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member) }
+    let(:family_member) { FamilyMember.new }
+    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     it "return http success" do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
@@ -85,6 +88,24 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop'
       expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
+    end
+
+    it "should get coverage_family_members_for_cobra when has active hbx_enrollments and in open enrollment" do
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
+      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member])
+      allow(hbx_enrollment_member).to receive(:family_member).and_return(family_member)
+      allow(employee_role).to receive(:is_under_cobra?).and_return true
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id, market_kind: 'shop'
+      expect(assigns(:coverage_family_members_for_cobra)).to eq [family_member]
     end
 
     it "should get hbx_enrollment when has enrolled hbx_enrollments and in shop qle flow but user has both employee_role and consumer_role" do

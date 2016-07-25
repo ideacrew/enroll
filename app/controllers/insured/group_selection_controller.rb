@@ -41,6 +41,8 @@ class Insured::GroupSelectionController < ApplicationController
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+
+    generate_coverage_family_members_for_cobra
   end
 
   def create
@@ -180,6 +182,15 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+  def generate_coverage_family_members_for_cobra
+    if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_under_cobra?
+      hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      if hbx_enrollment.present?
+        @coverage_family_members_for_cobra = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
+      end
+    end
+  end
+
 
   # def is_under_open_enrollment
   #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?
