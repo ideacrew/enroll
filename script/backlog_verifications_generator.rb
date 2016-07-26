@@ -5,22 +5,24 @@ def create_directory(path)
   Dir.mkdir path
 end
 
-# families = Family.where({
-#   "households.hbx_enrollments" => {
-#    "$elemMatch" => {
-#     # "aasm_state" => {
-#     #   "$in" => ["enrolled_contingent", "unverified"]
-#     #   },
-#       "kind" => { "$ne" => "employer_sponsored" },
-#       "$or" => [
-#         {:terminated_on => nil },
-#         {:terminated_on.gt => TimeKeeper.date_of_record}
-#       ]
-#     }  
-#   }
-# })
+families = Family.where({
+  "households.hbx_enrollments" => {
+   "$elemMatch" => {
+    # "aasm_state" => {
+    #   "$in" => ["enrolled_contingent", "unverified"]
+    #   },
+      "kind" => { "$ne" => "employer_sponsored" },
+      "$or" => [
+        {:terminated_on => nil },
+        {:terminated_on.gt => TimeKeeper.date_of_record}
+      ]
+    }  
+  }
+})
 
-families = [19754644,127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+# families = [127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+
+# families = [18941625].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
 
 
 mailing_address_missing = []
@@ -48,21 +50,29 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     # next unless family.id.to_s == "5619ca5554726532e58b2201"
     next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
 
-    person = family.primary_applicant.person
 
-    if person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?
-      puts "already notified!!"
-      next
-    end
+    begin
+      person = family.primary_applicant.person
+
+    # if person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?
+    #   puts "already notified!!"
+    #   next
+    # end
 
     if person.consumer_role.blank?
       count += 1
       next
     end
 
-    begin
-      # event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+    next if person.inbox.blank?
+    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+      next if secure_message.created_at > 15.days.ago
+    end
+
+      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+      # event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+
       notice_trigger = event_kind.notice_triggers.first 
 
 
@@ -72,7 +82,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         mpi_indicator: notice_trigger.mpi_indicator
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
-      csv << [family.id, family.e_case_id, person.full_name, p.hbx_id]
+      csv << [family.id, family.e_case_id, person.full_name, person.hbx_id]
 
       puts 'processed--' + person.full_name
 
@@ -85,7 +95,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       when 'active coverage not found!'
         coverage_not_found << person.full_name
       else 
-        others << person.full_name 
+        puts "#{family.e_case_id}----#{e.to_s}"
       end
     end
 
