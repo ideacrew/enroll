@@ -102,6 +102,8 @@ module Importers
         ::Importers::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
       elsif row_action == 'update'
         ::Importers::ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
+      else
+        ::Importers::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
       end
     end
   end
