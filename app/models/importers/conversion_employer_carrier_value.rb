@@ -3,7 +3,9 @@ module Importers::ConversionEmployerCarrierValue
     "aetna" => "AHI",
     "carefirst bluecross blueshield" => "GHMSI",
     "kaiser permanente" => "KFMASI",
-    "united healthcare" => "UHIC"
+    "united healthcare" => "UHIC",
+    "united health care" => "UHIC",
+    "unitedhealthcare" => "UHIC"
   }
 
   def self.included(base) 
