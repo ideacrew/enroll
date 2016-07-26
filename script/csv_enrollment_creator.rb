@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "Redmine-7481_enrollments.csv"
+filename = "Redmine-6879_enrollments.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
