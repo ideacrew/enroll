@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "redmine_6922_7580.csv"
+filename = "Redmine-7481_enrollments.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -154,14 +154,26 @@ CSV.foreach(filename, headers: :true) do |row|
 		benefit_group_assignment.save!
 		benefit_group_assignment.make_active
 	end
-	
-	employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
-	employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
-	employee_role.save!
 
-	subscriber = employee_role.person
-	subscriber.hbx_id = data_row["HBX ID"]
-	subscriber.save
+
+	subscriber = Person.where(hbx_id: data_row['HBX ID']).first
+	employee_role = subscriber.employee_roles.where(:employer_profile_id => organization.employer_profile.id).first if subscriber
+		
+    if  employee_role.blank?
+      if subscriber.present?
+      	census_employee = organization.employer_profile.census_employees.where(:first_name => /#{data_row["First Name"]}/i, :last_name => /#{data_row["Last Name"]}/i).first
+      	employee_role = Factories::EnrollmentFactory.build_employee_role(subscriber, false, census_employee.employer_profile, census_employee, census_employee.hired_on)
+      else
+	    employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
+	  end
+
+	  employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
+	  employee_role.save!
+
+	  subscriber = employee_role.person
+	  subscriber.hbx_id = data_row["HBX ID"]
+	  subscriber.save
+    end
 
 	## Add contact info
 	unless data_row["Address Kind"].blank?
