@@ -220,10 +220,7 @@ CSV.foreach(filename, headers: :true) do |row|
 	en.plan_id = plan.id
 	en.aasm_state =  "coverage_selected"
 	en.coverage_kind = 'health'
-<<<<<<< HEAD
 	en.hbx_id = data_row["Enrollment Group ID"]
-=======
->>>>>>> 84b42d55ed6bdf6dff4f5c27223b055eb8e1dbab
 
 	en.save!
 
