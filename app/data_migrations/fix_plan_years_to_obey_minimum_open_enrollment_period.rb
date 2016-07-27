@@ -7,7 +7,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class FixPlanYearsToObeyMinimumOpenEnrollmentPeriod < MongoidMigrationTask
   
   def migrate
-     file = File.open("open_enrollment_date_fix_output.txt", "w")
+     file = File.open("fix_plan_year_output.txt", "w")
      organization = Organization.where(fein: ENV['fein']).first
      if organization.blank?
       puts "Please run the task with a valid FEIN as a parameter. Organization not found!"
