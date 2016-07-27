@@ -2,14 +2,12 @@ namespace :employer_invoice do
   desc "Generates Invoices for Initial and Conversion Employers"
   task generate: :environment do
 
-    DO_NOT_INVOICE_LIST = [464303739, 521322260, 521185005, 521021282, 510400233,
-      521961415, 530196563, 270360045, 522094677, 231520302, 272141277, 931169142,
-      522062304, 550864322, 621469595, 521795954, 522324745, 273300538, 264064164,
-      28, 363697513, 200714211, 200850720, 451221231, 202853236, 201743104, 131954338,
-      521996156, 520746264, 260839561, 204098898, 521818188, 42751357, 521811081,
-      521782065, 237400898, 830353971, 742994661, 522312249, 521498887, 261332221,
-      521016137, 452400752, 521103582, 360753125, 710863908, 521309304, 522022029,
-      522197080 ,521826332]
+    DO_NOT_INVOICE_LIST = ["520743373", "530026395", "550825492", "453987501", "530164970", "237256856",
+     "611595539", "591640708", "521442741", "521766561", "522167254", "521826441", "530176859", "521991811",
+     "522153746", "521967581", "147381250", "520968193", "521143054", "521943790", "520954741", "462199955",
+     "205862174", "521343924", "521465311", "521816954", "020614142", "521132764", "521246872", "307607552",
+     "522357359", "520978073", "356007147", "522315929", "521989454", "942437024", "133535334", "462612890",
+     "541873351", "521145355", "530071995", "521449994"]
 
     @folder_name="DCEXCHANGE_#{TimeKeeper.date_of_record.strftime("%Y%m%d")}"
     
@@ -17,7 +15,7 @@ namespace :employer_invoice do
     :'employer_profile.profile_source' => 'conversion',
     :'employer_profile.plan_years' => { 
       :$elemMatch => {
-          :"start_on" => { "$eq" => DateTime.parse("2016-07-01" ) } ,
+          :"start_on" => { "$eq" => DateTime.parse("2016-08-01" ) } ,
           :"aasm_state".in =>  PlanYear::RENEWING_PUBLISHED_STATE 
         }
       }
@@ -26,13 +24,13 @@ namespace :employer_invoice do
     new_employers = Organization.where({
       :'employer_profile.plan_years' => { 
        :$elemMatch => {
-         :start_on =>  { "$eq" => DateTime.parse("2016-07-01" ) },
+         :start_on =>  { "$eq" => DateTime.parse("2016-08-01" ) },
          :"aasm_state".in => PlanYear::PUBLISHED
        }}
     })
 
     generate_invoices(conversion_employers, false)
-    generate_invoices(new_employers, true)
+    # generate_invoices(new_employers, true)
    
     #Create a tar file 
     puts "creating a tar file now"
