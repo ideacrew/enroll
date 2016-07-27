@@ -45,7 +45,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:user) { double("user")}
     let(:person) { double("person")}
     let(:hbx_profile) { double("HbxProfile") }
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryGirl.create(:permission))}
     let(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state: "enrolling") }
 
     before(:each) do

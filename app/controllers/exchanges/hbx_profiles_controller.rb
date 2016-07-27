@@ -1,6 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
-
+  before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
@@ -424,6 +424,14 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
+
+   def modify_admin_tabs?
+     authorize HbxProfile, :modify_admin_tabs?
+   end
+
+   def view_admin_tabs?
+     authorize HbxProfile, :view_admin_tabs?
+   end
 
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
