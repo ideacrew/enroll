@@ -1,0 +1,10 @@
+<div class='row'>
+	<ul class="col-md-offset-1">	
+		<li>Minimum of 8 characters</li>
+		<li>Must have at least 4 alphabetical characters</li>
+		<li>Must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space</li>
+		<li>Cannot contain username</li>
+		<li>Cannot repeat any character more than <%=User::MAX_SAME_CHAR_LIMIT%> times</li>
+		<li>Must not repeat consecutive characters more than once</li>
+	</ul>
+</div>
