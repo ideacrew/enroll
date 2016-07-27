@@ -147,9 +147,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_move_reason
+    calculate_dates
   end
 
   def check_insurance_reason
+    calculate_dates
   end
 
   def purchase
@@ -336,4 +338,13 @@ class Insured::FamiliesController < FamiliesController
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
   end
+
+  def calculate_dates
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+  end
+
 end

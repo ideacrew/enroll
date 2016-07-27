@@ -6,11 +6,11 @@ var QLE = ( function( window, undefined ) {
   }
 
   function qle_question(url){
-    $.ajax({
-      type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
-      url: "/insured/families/" + url
-    });
+      $.ajax({
+        type: "GET",
+        data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+        url: "/insured/families/" + url
+      });
   }
 
   function check_qle_reason() {
