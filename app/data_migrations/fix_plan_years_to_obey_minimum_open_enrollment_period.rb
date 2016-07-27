@@ -10,7 +10,7 @@ class FixPlanYearsToObeyMinimumOpenEnrollmentPeriod < MongoidMigrationTask
      file = File.open("fix_plan_year_output.txt", "w")
      organization = Organization.where(fein: ENV['fein']).first
      if organization.blank?
-      puts "Please run the task with a valid FEIN as a parameter. Organization not found!"
+      file.write("Please run the task with a valid FEIN as a parameter. Organization not found!\n")
       return
      end 
 
@@ -30,7 +30,7 @@ class FixPlanYearsToObeyMinimumOpenEnrollmentPeriod < MongoidMigrationTask
         end
      end
      file.write("#{py_update_count} PlanYear(s) Updated (Organization : #{organization.legal_name}, FEIN: #{organization.fein})\n")
-     file.close unless file.nil? 
+     file.close unless file.nil?
   end
 
 end
