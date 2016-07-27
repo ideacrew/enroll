@@ -95,9 +95,9 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
-  def is_under_cobra?
+  def is_cobra_status?
     if census_employee.present?
-      census_employee.is_under_cobra?
+      census_employee.is_cobra_status?
     else
       false
     end

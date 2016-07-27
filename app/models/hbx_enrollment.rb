@@ -9,7 +9,7 @@ class HbxEnrollment
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers
-  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
+  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored employer_sponsored_cobra streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
     "I have coverage through spouse’s employer health plan",
@@ -107,7 +107,7 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
-  field :is_cobra, type: Boolean, default: false
+  #field :is_cobra, type: Boolean, default: false
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -136,8 +136,8 @@ class HbxEnrollment
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
-  scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
-  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
+  scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:aasm_state => "enrolled_contingent").or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
@@ -286,14 +286,6 @@ class HbxEnrollment
     end
   end
 
-  def market_name
-    if is_shop?
-      is_under_cobra? ? 'Employer Sponsored COBRA/Continuation' : 'Employer Sponsored'
-    else
-      'Individual'
-    end
-  end
-
   def census_employee
     if employee_role.present?
       employee_role.census_employee
@@ -304,8 +296,16 @@ class HbxEnrollment
     end
   end
 
-  def is_under_cobra?
-    is_cobra
+  def market_name
+    if is_shop?
+      'Employer Sponsored'
+    else
+      'Individual'
+    end
+  end
+
+  def is_cobra_status?
+    kind == 'employer_sponsored_cobra'
   end
 
   def benefit_sponsored?
@@ -382,13 +382,13 @@ class HbxEnrollment
 
       p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
+      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && !p.is_shop? && TimeKeeper.date_of_record < p.effective_on) || (p.is_shop? && TimeKeeper.date_of_record < p.effective_on)
 
         if p.may_cancel_coverage?
           p.cancel_coverage!
           p.update_current(terminated_on: p.effective_on)
         end
-      elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
+      elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && !p.is_shop? && TimeKeeper.date_of_record >= p.effective_on) || (p.is_shop? && TimeKeeper.date_of_record >= p.effective_on)
         if p.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
@@ -427,7 +427,7 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    if self.kind == "employer_sponsored"
+    if is_shop?
       update_existing_shop_coverage
     else
       cancel_previous(self.plan.active_year)
@@ -462,7 +462,7 @@ class HbxEnrollment
   end
 
   def is_shop?
-    kind == "employer_sponsored"
+    kind == "employer_sponsored" || kind == 'employer_sponsored_cobra'
   end
 
   def is_shop_sep?
@@ -1091,7 +1091,7 @@ class HbxEnrollment
 
   def can_select_coverage?
     return true unless is_shop?
-    return true if is_under_cobra?
+    return true if is_cobra_status?
 
     if employee_role.can_enroll_as_new_hire?
       coverage_effective_date = employee_role.coverage_effective_on

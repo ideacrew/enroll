@@ -18,10 +18,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       hbx_enrollment_members: members,
       effective_on: TimeKeeper.date_of_record.beginning_of_month,
       plan: new_plan,
-      is_under_cobra?: false,
+      is_cobra_status?: false,
       coverage_kind: 'health',
+      is_shop?: true,
       benefit_package_name: 'benefit_package',
-      market_name: 'market_name',
       employee_role: double("EmployeeRole")
     )
   end
@@ -93,7 +93,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
 
   it "should have market" do
     expect(rendered).to match('Market')
-    expect(rendered).to match('market_name')
+    expect(rendered).to match('Employer Sponsored')
   end
 
   it "should have benefit_package" do

@@ -543,13 +543,13 @@ describe EmployeeRole, dbclean: :after_each do
     end
   end
 
-  context "is_under_cobra?" do
+  context "is_cobra_status?" do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
     let(:census_employee) { FactoryGirl.build(:census_employee) }
 
     it "should return false when without census_employee" do
       allow(employee_role).to receive(:census_employee).and_return nil
-      expect(employee_role.is_under_cobra?).to be_falsey
+      expect(employee_role.is_cobra_status?).to be_falsey
     end
 
     context "with census_employee" do
@@ -558,7 +558,7 @@ describe EmployeeRole, dbclean: :after_each do
       end
 
       it "should return cobra state of census_employee" do
-        expect(employee_role.is_under_cobra?).to eq census_employee.is_under_cobra?
+        expect(employee_role.is_cobra_status?).to eq census_employee.is_cobra_status?
       end
     end
   end

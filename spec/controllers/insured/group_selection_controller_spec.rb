@@ -99,7 +99,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member])
       allow(hbx_enrollment_member).to receive(:family_member).and_return(family_member)
-      allow(employee_role).to receive(:is_under_cobra?).and_return true
+      allow(employee_role).to receive(:is_cobra_status?).and_return true
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
 
@@ -274,7 +274,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       sign_in user
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(employee_role).to receive(:is_under_cobra?).and_return(true)
+      allow(employee_role).to receive(:is_cobra_status?).and_return(true)
       allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids

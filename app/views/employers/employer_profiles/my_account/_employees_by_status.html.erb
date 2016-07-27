@@ -54,7 +54,7 @@
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <td><%= renewal_enrollment_state(census_employee) %></td>
           <% end %>
-          <% if census_employee.may_rehire_employee_role? %>
+          <% if census_employee.aasm_state == 'employment_terminated' %>
             <td class="table-functions">
               <a class="show_confirm btn btn-primary" id="show_confirm_<%= census_employee.id %>">
                 <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').nextAll('.rehire_<%= census_employee.id %>').toggle();">Rehire</span>
@@ -68,7 +68,7 @@
           <% else %>
             <td class="table-functions"></td>
           <% end %>
-          <% if census_employee.can_cobra_employee_role? || census_employee.may_reinstate_cobra_terminated? %>
+          <% if census_employee.can_elect_cobra? || census_employee.may_reinstate_eligibility? %>
             <td class="table-functions">
              <%= cobra_button(census_employee) %>
             </td>
@@ -77,7 +77,7 @@
           <% end %>
         </tr>
 
-        <% if census_employee.can_cobra_employee_role? %>
+        <% if census_employee.can_elect_cobra? %>
           <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td class="confirm-terminate-wrapper" colspan="3">
               <span>Employment Termination Date: </span>
@@ -93,7 +93,7 @@
             </td>
           </tr>
         <% end %>
-        <% if census_employee.may_reinstate_cobra_terminated? %>
+        <% if census_employee.may_reinstate_eligibility? %>
          <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
             <td class="confirm-terminate-wrapper" colspan="3">
               <span>Employment Termination Date: </span>
@@ -109,12 +109,12 @@
             </td>
           </tr>
           <%end%>
-        <% if census_employee.may_rehire_employee_role? %>
+        <% if census_employee.aasm_state == 'employment_terminated' %>
         <tr class="unbrd  rehire_<%= census_employee.id %> dn">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
             <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
             <span class="confirm-terminate" style="display:inline;">
-              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
+              <input class="text-center date-picker" data-date-min="<%= rehire_date_min(census_employee) %>d" placeholder="e.g. 5/1/2015" type="text">
               <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
                 <strong>&nbsp;Submit</strong>
               </a>

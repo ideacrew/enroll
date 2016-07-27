@@ -304,13 +304,13 @@ RSpec.describe Employers::CensusEmployeesController do
 
     context 'Get cobra_reinstate' do
       it "should get notice" do
-        allow(census_employee).to receive(:reinstate_cobra_terminated!).and_return true
+        allow(census_employee).to receive(:reinstate_eligibility!).and_return true
         xhr :get, :cobra_reinstate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
         expect(flash[:notice]).to eq 'Successfully update Census Employee.'
       end
 
       it "should get error" do
-        allow(census_employee).to receive(:reinstate_cobra_terminated!).and_return false
+        allow(census_employee).to receive(:reinstate_eligibility!).and_return false
         xhr :get, :cobra_reinstate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
         expect(flash[:error]).to eq "Unable to update Census Employee."
       end

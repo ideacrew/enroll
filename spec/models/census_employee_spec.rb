@@ -1113,7 +1113,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_under_cobra?" do
+  context "is_cobra_status?" do
     let(:census_employee) { CensusEmployee.new }
 
     context 'when existing_cobra is true' do
@@ -1122,7 +1122,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return true" do
-        expect(census_employee.is_under_cobra?).to be_truthy
+        expect(census_employee.is_cobra_status?).to be_truthy
       end
 
       it "aasm_state should be cobra_eligible" do
@@ -1137,12 +1137,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should return false when aasm_state not equal cobra" do
         census_employee.aasm_state = 'eligible'
-        expect(census_employee.is_under_cobra?).to be_falsey
+        expect(census_employee.is_cobra_status?).to be_falsey
       end
 
-      it "should return true when aasm_state equal cobra" do
-        census_employee.aasm_state = 'cobra'
-        expect(census_employee.is_under_cobra?).to be_truthy
+      it "should return true when aasm_state equal cobra_linked" do
+        census_employee.aasm_state = 'cobra_linked'
+        expect(census_employee.is_cobra_status?).to be_truthy
       end
     end
   end
@@ -1166,8 +1166,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.linked?).to be_truthy
     end
 
-    it "should return true when cobra" do
-      census_employee.aasm_state = 'cobra'
+    it "should return true when cobra_linked" do
+      census_employee.aasm_state = 'cobra_linked'
       expect(census_employee.linked?).to be_truthy
     end
   end
@@ -1202,14 +1202,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       census_employee.cobra_begin_date = hired_on + 10.days
       census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
       census_employee.cobra_begin_date = TimeKeeper.date_of_record
-      expect(census_employee.may_cobra_employee_role?).to be_truthy
+      expect(census_employee.may_elect_cobra?).to be_truthy
     end
 
     it "can not cobra employee_role" do
       census_employee.cobra_begin_date = hired_on + 10.days
       census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months - 5.days
       census_employee.cobra_begin_date = TimeKeeper.date_of_record
-      expect(census_employee.may_cobra_employee_role?).to be_falsey
+      expect(census_employee.may_elect_cobra?).to be_falsey
     end
 
     context "current date is less then 6 months after coverage_terminated_on" do
@@ -1220,41 +1220,41 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "when cobra_begin_date is early than coverage_terminated_on" do
         census_employee.cobra_begin_date = census_employee.coverage_terminated_on - 5.days
-        expect(census_employee.may_cobra_employee_role?).to be_falsey
+        expect(census_employee.may_elect_cobra?).to be_falsey
       end
 
       it "when cobra_begin_date is later than 6 months after coverage_terminated_on" do
         census_employee.cobra_begin_date = census_employee.coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
-        expect(census_employee.may_cobra_employee_role?).to be_falsey
+        expect(census_employee.may_elect_cobra?).to be_falsey
       end
     end
 
     it "can not cobra employee_role" do
       census_employee.cobra_begin_date = hired_on - 10.days
-      expect(census_employee.may_cobra_employee_role?).to be_falsey
+      expect(census_employee.may_elect_cobra?).to be_falsey
     end
 
     it "can not cobra employee_role without cobra_begin_date" do
       census_employee.cobra_begin_date = nil
-      expect(census_employee.may_cobra_employee_role?).to be_falsey
+      expect(census_employee.may_elect_cobra?).to be_falsey
     end
   end
 
-  context "can_cobra_employee_role?" do
+  context "can_elect_cobra?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
 
     it "should return false when aasm_state is eligible" do
-      expect(census_employee.can_cobra_employee_role?).to be_falsey
+      expect(census_employee.can_elect_cobra?).to be_falsey
     end
 
     it "should return true when aasm_state is employment_terminated" do
       census_employee.aasm_state = 'employment_terminated'
-      expect(census_employee.can_cobra_employee_role?).to be_truthy
+      expect(census_employee.can_elect_cobra?).to be_truthy
     end
 
     it "should return true when aasm_state is cobra_terminated" do
       census_employee.aasm_state = 'cobra_terminated'
-      expect(census_employee.can_cobra_employee_role?).to be_falsey
+      expect(census_employee.can_elect_cobra?).to be_falsey
     end
   end
 
@@ -1266,8 +1266,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.linked?).to be_truthy
     end
 
-    it "should return true when aasm_state is cobra" do
-      census_employee.aasm_state = 'cobra'
+    it "should return true when aasm_state is cobra_linked" do
+      census_employee.aasm_state = 'cobra_linked'
       expect(census_employee.linked?).to be_truthy
     end
 

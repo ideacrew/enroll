@@ -7,9 +7,9 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra_eligible cobra)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra_eligible cobra_linked)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
-  COBRA_STATES = %w(cobra_eligible cobra cobra_terminated)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
@@ -70,7 +70,7 @@ class CensusEmployee < CensusMember
   scope :without_cobra, -> { not_in(aasm_state: COBRA_STATES) }
   scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
-  scope :by_cobra,    ->{ where(aasm_state: "cobra") }
+  scope :by_cobra,    ->{ where(aasm_state: "cobra_linked") }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -109,7 +109,7 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['employee_role_linked', 'cobra']})
+   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['employee_role_linked', 'cobra_linked']})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
@@ -396,7 +396,7 @@ class CensusEmployee < CensusMember
 
   def update_for_cobra(cobra_date)
     self.cobra_begin_date = cobra_date
-    self.cobra_employee_role
+    self.elect_cobra
     self.save
   rescue => e
     false
@@ -409,7 +409,7 @@ class CensusEmployee < CensusMember
   def build_hbx_enrollment_for_cobra
     household = employee_role.person.primary_family.latest_household
     coverage_household = household.immediate_family_coverage_household
-    enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| hbx.may_terminate_coverage? && !hbx.is_cobra }
+    enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| hbx.may_terminate_coverage? && !hbx.is_cobra_status? }
 
     enrollments.each do |hbx|
       new_hbx = household.new_hbx_enrollment_from(
@@ -430,7 +430,7 @@ class CensusEmployee < CensusMember
       else
         new_hbx.plan_id = hbx.plan_id
       end
-      new_hbx.is_cobra = true 
+      new_hbx.kind = 'employer_sponsored_cobra'
       new_hbx.effective_on = coverage_terminated_on.end_of_month + 1.days 
       new_hbx.select_coverage
       new_hbx.save
@@ -482,36 +482,40 @@ class CensusEmployee < CensusMember
     state :eligible, initial: true
     state :cobra_eligible
     state :employee_role_linked
+    state :cobra_linked
     state :employment_terminated
-    state :cobra
     state :cobra_terminated
     state :rehired
 
     event :rehire_employee_role, :after => :record_transition do
-      transitions from: [:employment_terminated], to: :rehired
+      transitions from: [:employment_terminated, :cobra_eligible, :cobra_linked, :cobra_terminated], to: :rehired
     end
 
-    event :cobra_employee_role, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
-      transitions from: [:employment_terminated], to: :cobra
+    event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
+      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
+      transitions from: :employment_terminated,  to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
-      transitions from: :cobra_eligible, to: :cobra, guard: :has_benefit_group_assignment?
+      transitions from: :cobra_eligible, to: :cobra_linked, guard: :has_benefit_group_assignment?
     end
 
     event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
-      transitions from: :cobra, to: :cobra_eligible, after: :clear_employee_role
+      transitions from: :cobra_linked, to: :cobra_eligible, after: :clear_employee_role
     end
 
     event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
-      transitions from: [:cobra_eligible, :cobra],  to: :cobra_terminated, after: :notify_cobra_terminated
+      transitions from: [:cobra_eligible, :cobra_linked],  to: :cobra_terminated, after: :notify_cobra_terminated
     end
 
-    event :reinstate_cobra_terminated , :after => [:record_transition] do 
-      transitions from: :cobra_terminated,  to: :eligible
+    event :reinstate_eligibility, :after => [:record_transition] do 
+      transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
+      transitions from: :employment_terminated,  to: :eligible 
+      transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
+      transitions from: :cobra_terminated,  to: :cobra_eligible
     end
 
   end
@@ -574,14 +578,14 @@ class CensusEmployee < CensusMember
   end
 
   def linked?
-    employee_role_linked? || cobra?
+    employee_role_linked? || cobra_linked?
   end
 
-  def is_under_cobra?
+  def is_cobra_status?
     existing_cobra
   end
 
-  def can_cobra_employee_role?
+  def can_elect_cobra?
     ['employment_terminated'].include?(aasm_state)
   end
 
@@ -590,6 +594,10 @@ class CensusEmployee < CensusMember
       coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
       coverage_terminated_on <= cobra_begin_date &&
       cobra_begin_date <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months)
+  end
+
+  def has_employee_role_linked?
+    employee_role.present?
   end
 
   private

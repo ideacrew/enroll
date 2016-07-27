@@ -1760,19 +1760,19 @@ end
 context "for cobra", :dbclean => :after_each do
   let(:enrollment) { HbxEnrollment.new }
 
-  context "is_under_cobra?" do
+  context "is_cobra_status?" do
     it "should return false" do
-      expect(enrollment.is_under_cobra?).to be_falsey
+      expect(enrollment.is_cobra_status?).to be_falsey
     end
 
     it "should return true" do
-      enrollment.is_cobra = true
-      expect(enrollment.is_under_cobra?).to be_truthy
+      enrollment.kind = 'employer_sponsored_cobra' 
+      expect(enrollment.is_cobra_status?).to be_truthy
     end
   end
 
   it "can_select_coverage?" do
-    enrollment.is_cobra = true
+    enrollment.kind = 'employer_sponsored_cobra' 
     expect(enrollment.can_select_coverage?).to be_truthy
   end
 
@@ -1783,26 +1783,6 @@ context "for cobra", :dbclean => :after_each do
       enrollment.kind = 'employer_sponsored'
       enrollment.benefit_group = benefit_group
       expect(enrollment.benefit_package_name).to eq benefit_group.title
-    end
-  end
-
-  context "market_name" do
-    context "for shop" do
-      it "under cobra" do
-        enrollment.kind = 'employer_sponsored'
-        enrollment.is_cobra = true
-        expect(enrollment.market_name).to eq 'Employer Sponsored COBRA/Continuation'
-      end
-
-      it "not under cobra" do
-        enrollment.kind = 'employer_sponsored'
-        enrollment.is_cobra = false
-        expect(enrollment.market_name).to eq 'Employer Sponsored'
-      end
-    end
-
-    it "for individual" do
-      expect(enrollment.market_name).to eq 'Individual'
     end
   end
 end
@@ -1965,6 +1945,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
         expect(passive_renewal.coverage_terminated?).to be_truthy
         expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
       end
+    end
+  end
+
+  context "market_name" do
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      expect(enrollment.market_name).to eq 'Employer Sponsored'
+    end
+
+    it "for individual" do
+      enrollment.kind = 'individual'
+      expect(enrollment.market_name).to eq 'Individual'
     end
   end
 end

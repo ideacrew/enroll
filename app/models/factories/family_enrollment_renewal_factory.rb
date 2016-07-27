@@ -167,7 +167,7 @@ module Factories
 
       renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-      renewal_enrollment.is_cobra = active_enrollment.is_cobra
+      renewal_enrollment.kind = active_enrollment.kind if active_enrollment.is_cobra_status?
       # Set the HbxEnrollment to proper state
 
       # Renew waiver status

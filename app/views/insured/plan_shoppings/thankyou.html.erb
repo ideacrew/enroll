@@ -23,7 +23,7 @@
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Benefit: <%= @enrollment.coverage_kind %><br>
             Metal level : <%= display_dental_metal_level @plan %><br>
-            Market: <%= @enrollment.market_name %>
+            Market: <%= show_market_name_by_enrollment @enrollment %>
              
           </p>
 
@@ -36,7 +36,7 @@
             <%= render "insured/plan_shoppings/individual_agreement" %>
           <% end %>
 
-          <% if @enrollment.is_under_cobra? %>
+          <% if @enrollment.is_cobra_status? %>
             <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.</p>
           <% end %>
         </div>

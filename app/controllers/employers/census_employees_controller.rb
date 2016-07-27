@@ -180,7 +180,7 @@ class Employers::CensusEmployeesController < ApplicationController
       @cobra_date = ""
     end
 
-    if @cobra_date.present? && @census_employee.can_cobra_employee_role?
+    if @cobra_date.present? && @census_employee.can_elect_cobra?
       if @census_employee.update_for_cobra(@cobra_date)
         @census_employee.build_hbx_enrollment_for_cobra
         flash[:notice] = "Successfully update Census Employee."
@@ -193,7 +193,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def cobra_reinstate
-    if @census_employee.reinstate_cobra_terminated!
+    if @census_employee.reinstate_eligibility!
       flash[:notice] = "Successfully update Census Employee."
     else
       flash[:error] = "Unable to update Census Employee."

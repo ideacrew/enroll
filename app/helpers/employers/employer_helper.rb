@@ -129,4 +129,16 @@ module Employers::EmployerHelper
         :onclick => "$(this).closest('tr').nextAll('#{toggle_class}#{census_employee.id}').toggle()")
     end
   end
+
+  def rehire_date_min(census_employee)
+    return 0 if census_employee.blank?
+
+    if census_employee.employment_terminated?
+      (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1
+    elsif census_employee.cobra_eligible? || census_employee.cobra_linked? || census_employee.cobra_terminated?
+      (census_employee.cobra_begin_date - TimeKeeper.date_of_record).to_i + 1
+    else
+      0
+    end
+  end
 end

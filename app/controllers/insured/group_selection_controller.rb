@@ -76,8 +76,8 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    if @employee_role.present? && @employee_role.is_under_cobra?
-      hbx_enrollment.is_cobra = true
+    if @employee_role.present? && @employee_role.is_cobra_status?
+      hbx_enrollment.kind = 'employer_sponsored_cobra'
       if @employee_role.census_employee.coverage_terminated_on.present? && !@employee_role.census_employee.have_valid_date_for_cobra?
         raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
       end
@@ -183,7 +183,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
   def generate_coverage_family_members_for_cobra
-    if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_under_cobra?
+    if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
       if hbx_enrollment.present?
         @coverage_family_members_for_cobra = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
