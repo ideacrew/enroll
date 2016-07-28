@@ -303,7 +303,7 @@ class HbxEnrollment
       elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
         if p.may_terminate_coverage?
           term_date = self.effective_on - 1.day
-          term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days and p.kind == "individual") > term_date
+          term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
 
           p.terminate_coverage
           p.update_current(terminated_on: term_date)
