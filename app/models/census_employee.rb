@@ -402,42 +402,16 @@ class CensusEmployee < CensusMember
     false
   end
 
-  def need_renew_plan_for_cobra?
-    active_benefit_group_assignment.start_on.year + 1 == cobra_begin_date.year
-  end
-
   def build_hbx_enrollment_for_cobra
-    household = employee_role.person.primary_family.latest_household
-    coverage_household = household.immediate_family_coverage_household
+    family = employee_role.person.primary_family
     enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| hbx.may_terminate_coverage? && !hbx.is_cobra_status? }
 
     enrollments.each do |hbx|
-      new_hbx = household.new_hbx_enrollment_from(
-        employee_role: employee_role,
-        benefit_group: hbx.benefit_group,
-        coverage_household: coverage_household,
-        benefit_group_assignment: hbx.benefit_group_assignment)
-
-      family_member_ids = hbx.hbx_enrollment_members.map(&:applicant_id)
-      new_hbx.hbx_enrollment_members = new_hbx.hbx_enrollment_members.select do |member|
-        family_member_ids.include? member.applicant_id
-      end
-
-      new_hbx.generate_hbx_signature
-      if need_renew_plan_for_cobra?
-        new_hbx.plan_id = hbx.plan.renewal_plan_id
-        raise if new_hbx.plan_id.blank?
-      else
-        new_hbx.plan_id = hbx.plan_id
-      end
-      new_hbx.kind = 'employer_sponsored_cobra'
-      new_hbx.effective_on = coverage_terminated_on.end_of_month + 1.days 
-      new_hbx.select_coverage
-      new_hbx.save
-      new_hbx.benefit_group_assignment.update(hbx_enrollment_id: new_hbx.id) if new_hbx.benefit_group_assignment.present?
-      term_date = TimeKeeper.date_of_record
-      hbx.terminate_benefit(term_date)
-      hbx.propogate_terminate(term_date)
+      enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
+      enrollment_cobra_factory.family = family
+      enrollment_cobra_factory.census_employee = self
+      enrollment_cobra_factory.enrollment = hbx
+      enrollment_cobra_factory.clone_for_cobra
     end
   rescue => e
     logger.error(e)
@@ -492,7 +466,7 @@ class CensusEmployee < CensusMember
     end
 
     event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
-      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
+      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
       transitions from: :employment_terminated,  to: :cobra_eligible
     end
 

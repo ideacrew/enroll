@@ -122,7 +122,7 @@ module Employers::EmployerHelper
     if census_employee.cobra_terminated? 
       button_text = 'COBRA REINSTATE' 
       toggle_class = ".cobra_reinstate_"
-      disabled = current_user.has_hbx_staff_role?
+      disabled = !current_user.has_hbx_staff_role?
     end
     content_tag(:a, :class => "show_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
       content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg", 
