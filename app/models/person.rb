@@ -595,7 +595,7 @@ class Person
         next if new_age == current_age # No Change in age -> No Premium Implication
 
         # No Implication when the change is all within the 0-20 age range or all within the 61+ age range
-        if ( current_age.between?(0,20) && new_age.between?(0,20) ) || ( current_age > 61 && new_age > 61 )
+        if ( current_age.between?(0,20) && new_age.between?(0,20) ) || ( current_age >= 61 && new_age >= 61 )
           #premium_impication_for_enrollment[hbx.id] = false
         else
           premium_impication_for_enrollment[hbx.id] = true

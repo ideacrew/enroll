@@ -1073,7 +1073,26 @@ describe Person do
     it "should return an EMPTY hash if DOB change DOES NOT RESULT in premium change" do
       expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_without_premium_implication)).to eq empty_hash
     end
+    
+    context 'edge case when DOB change makes person 61' do
+      
+      let(:age_older_than_sixty_one) { TimeKeeper.date_of_record - 75.years }
+      let(:person_older_than_sixty_one) { FactoryGirl.create(:person, dob: age_older_than_sixty_one) }
+      let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
+      let(:enrollment)   { FactoryGirl.create( :hbx_enrollment, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
+      let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
+  
+      before do
+        allow(person_older_than_sixty_one).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([enrollment])
+      end
 
+      it "should return an EMPTY hash if a person more than 61 year old changes their DOB so that they are 61 on the day the coverage starts" do
+        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash 
+      end
+
+    end
   end 
 
 
