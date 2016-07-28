@@ -34,8 +34,8 @@
     <%= render 'layouts/header' %>
 
     <div class="content <%= controller_name %> content-bottom">
+      <%= render_flash %>
       <div class="container">
-        <%= render_flash %>
         <%= yield :horizontal_status %>
 
       </div>

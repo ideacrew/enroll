@@ -16,6 +16,9 @@ describe LawfulPresenceDetermination do
   end
 
   describe "being given an ssa response which fails" do
+    before :each do
+      consumer_role.coverage_purchased!("args")
+    end
     it "should have the ssa response document" do
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
       consumer_role.person.save!
@@ -29,7 +32,7 @@ describe LawfulPresenceDetermination do
       args.determined_at = TimeKeeper.datetime_of_record - 1.month
       args.vlp_authority = "dhs"
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: payload})
-      consumer_role.deny_lawful_presence!(args)
+      consumer_role.ssn_invalid!(args)
       consumer_role.person.save!
       found_person = Person.find(person_id)
       lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
@@ -38,6 +41,9 @@ describe LawfulPresenceDetermination do
   end
 
   describe "being given an vlp response which fails" do
+    before :each do
+      consumer_role.coverage_purchased!("args")
+    end
     it "should have the vlp response document" do
       consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: Time.now, body: payload})
       consumer_role.person.save!
@@ -51,7 +57,7 @@ describe LawfulPresenceDetermination do
       args.determined_at = TimeKeeper.datetime_of_record - 1.month
       args.vlp_authority = "dhs"
       consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: args.determined_at, body: payload})
-      consumer_role.deny_lawful_presence!(args)
+      consumer_role.ssn_invalid!(args)
       consumer_role.person.save!
       found_person = Person.find(person_id)
       lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
@@ -68,7 +74,7 @@ describe LawfulPresenceDetermination do
 
     it "should invoke the ssa workflow event when asked to begin the lawful presence process" do
       expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
-      subject.start_determination_process(requested_start_date)
+      subject.start_ssa_process
     end
   end
 
@@ -76,7 +82,7 @@ describe LawfulPresenceDetermination do
     subject { LawfulPresenceDetermination.new(citizen_status: "naturalized_citizen", :consumer_role => ConsumerRole.new(:person => person)) }
     it "should invoke the vlp workflow event when asked to begin the lawful presence process" do
       expect(subject).to receive(:notify).with(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => person, :coverage_start_date => requested_start_date})
-      subject.start_determination_process(requested_start_date)
+      subject.start_vlp_process(requested_start_date)
     end
   end
 

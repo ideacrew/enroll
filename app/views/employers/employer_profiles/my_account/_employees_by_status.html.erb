@@ -70,7 +70,6 @@
           </td>
         </tr>
         <% if census_employee.employment_terminated? %>
-
         <tr class="unbrd  rehire_<%= census_employee.id %> dn">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
             <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
@@ -87,14 +86,10 @@
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
                 <div class="confirm-terminate">
-
-
                   <h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong>
                     <br/>
                     <span class="lg fourteen">(termination date must be within the past 60 days)</span>
                   </h5>
-
-
                   <div class="pull-right" style="margin-top: 2px;>
                   <!--<h5>Enter termination date to remove this employee:</h5>-->
                   <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
@@ -106,10 +101,7 @@
                 </div>
               </td>
             </tr>
-
-
             <% end %>
-
           <% end %>
           <% end %>
        </tbody>

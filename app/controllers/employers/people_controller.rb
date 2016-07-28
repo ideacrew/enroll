@@ -64,7 +64,7 @@ class Employers::PeopleController < ApplicationController
     make_new_person_params @person
 
     @employer_profile = @person.employer_contact.present? ? @person.employer_contact : @person.build_employer_contact
-    @person.updated_by = current_user.email if current_user.present?
+    @person.updated_by = current_user.oim_id if current_user.present?
 
     respond_to do |format|
       if @person.update_attributes(params[:person])

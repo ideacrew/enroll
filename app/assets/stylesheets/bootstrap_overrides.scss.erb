@@ -1,3 +1,5 @@
+@import "variables";
+
 .navbar {
   margin-bottom: 0;
   background-color: $primary-button-text;
@@ -28,6 +30,7 @@
         color: $primary-black;
         &:hover {
           background-color: $background-hover;
+          text-decoration: none;
         }
       }
     }
@@ -420,4 +423,9 @@ fieldset[disabled] .form-control {
 }
 textarea.form-control {
   height: auto;
+}
+
+b,
+strong {
+  font-weight: $primary-bold;
 }

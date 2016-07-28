@@ -121,7 +121,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("show")
     end
-    
+
     it "should get default status" do
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:status)).to eq "active"
@@ -190,6 +190,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:policy) {double("policy")}
 
     context "it should return published plan year " do
+      let(:broker_agency_account) { FactoryGirl.build_stubbed(:broker_agency_account) }
+
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:authorize_show).and_return(true)
@@ -198,7 +200,8 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
-  
+        allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
+        allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         sign_in(user)
       end
 
@@ -212,6 +215,7 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(assigns(:premium_amt_total)).to eq hbx_enrollment.total_premium
         expect(assigns(:employee_cost_total)).to eq hbx_enrollment.total_employee_cost
       end
+
 
       it "should get announcement" do
         FactoryGirl.create(:announcement, content: "msg for Employer", audiences: ['Employer'])
@@ -587,4 +591,16 @@ RSpec.describe Employers::EmployerProfilesController do
   #    expect(response).to be_redirect
   #  end
   #end
+
+  describe "GET export_census_employees" do
+    let(:user) { FactoryGirl.create(:user) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+   it "should export cvs" do
+     sign_in(user)
+     get :export_census_employees, employer_profile_id: employer_profile, format: :csv
+     expect(response).to have_http_status(:success)
+   end
+
+  end
 end

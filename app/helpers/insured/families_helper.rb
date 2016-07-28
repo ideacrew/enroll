@@ -32,12 +32,24 @@ module Insured::FamiliesHelper
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
+  def shift_waived_time(policy)
+    (policy.submitted_at || policy.created_at).in_time_zone('Eastern Time (US & Canada)')
+  end
+
   def format_policy_purchase_date(policy)
     format_date(shift_purchase_time(policy))
   end
 
   def format_policy_purchase_time(policy)
     shift_purchase_time(policy).strftime("%-I:%M%p")
+  end
+
+  def format_policy_waived_date(policy)
+    format_date(shift_waived_time(policy))
+  end
+
+  def format_policy_waived_time(policy)
+    shift_waived_time(policy).strftime("%-I:%M%p")
   end
 
   def render_plan_type_details(plan)
@@ -105,9 +117,12 @@ module Insured::FamiliesHelper
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
-  def display_aasm_state?(aasm_state)
-    if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
-     true
-    end  
-  end  
+  def display_aasm_state?(enrollment)
+    if enrollment.is_shop?
+      true
+    else
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
+    end
+  end
+      
 end

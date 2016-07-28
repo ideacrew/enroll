@@ -10,6 +10,9 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
+  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled)
+  INVOICE_VIEW_INITIAL = %w(published enrolling enrolled active suspended)
+
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
 
   # Plan Year time period
@@ -44,6 +47,7 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
@@ -77,19 +81,32 @@ class PlanYear
     id_list = benefit_groups.collect(&:_id).uniq
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
-      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
-    }).limit(100) # limit census employees to 100 due to performance reasons
+      :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+      }).limit(100)
 
     families.inject([]) do |enrollments, family|
-
       valid_enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
-        :"effective_on".lte => date.end_of_month,
-        :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES)
+        :effective_on.lte => date.end_of_month,
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
       }).order_by(:'submitted_at'.desc)
 
-      enrollments << valid_enrollments.where({:coverage_kind => 'health'}).first
-      enrollments << valid_enrollments.where({:coverage_kind => 'dental'}).first
+      health_enrollments = valid_enrollments.where({:coverage_kind => 'health'})
+      dental_enrollments = valid_enrollments.where({:coverage_kind => 'dental'})
+
+      coverage_filter = lambda do |enrollments, date|
+        enrollments = enrollments.select{|e| e.terminated_on.blank? || e.terminated_on >= date}
+        
+        if enrollments.size > 1
+          enrollment = enrollments.detect{|e| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(e.aasm_state.to_s)}
+          enrollment || enrollments.detect{|e| HbxEnrollment::RENEWAL_STATUSES.include?(e.aasm_state.to_s)}
+        else
+          enrollments.first
+        end
+      end
+
+      enrollments << coverage_filter.call(health_enrollments, date)
+      enrollments << coverage_filter.call(dental_enrollments, date)
     end.compact
   end
 
@@ -213,7 +230,8 @@ class PlanYear
   end
 
   def is_publish_date_valid?
-    TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
   end
 
   # Check plan year for violations of model integrity relative to publishing
@@ -240,7 +258,7 @@ class PlanYear
       errors.merge!({publish: "You may only have one published plan year at a time"})
     end
 
-    if !is_publish_date_valid?
+    if !is_publish_date_valid? 
       errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
@@ -320,7 +338,7 @@ class PlanYear
 
   # Any employee who selected or waived coverage
   def enrolled
-    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage? }
+    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
   def total_enrolled_count
@@ -603,6 +621,14 @@ class PlanYear
     # Plan as submitted failed eligibility check
     event :force_publish, :after => :record_transition do
       transitions from: :publish_pending, to: :published_invalid
+
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :publish_pending
+
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Employer requests review of invalid application determination
@@ -622,7 +648,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: :enrolled, to: :canceled
+      transitions from: [:enrolled, :active], to: :canceled
     end
 
     # Coverage disabled due to non-payment
@@ -658,7 +684,7 @@ class PlanYear
       transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
     end
 
-    event :cancel_renewal, :after => :record_transition do 
+    event :cancel_renewal, :after => :record_transition do
       transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
   end
@@ -855,6 +881,8 @@ private
         "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
+    return if active?
+
     if is_renewing?
       if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
        errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
@@ -864,7 +892,6 @@ private
        errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
       end
     end
-
 
   end
 end

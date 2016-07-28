@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :update_individual, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
 
   def download
@@ -10,11 +10,22 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
-  def update_individual
-      @person.consumer_role.authorize_residency! verification_attr
-      @person.consumer_role.authorize_lawful_presence! verification_attr
-    respond_to do |format|
-      format.html { redirect_to :back }
+  def authorized_download
+    begin
+      model = params[:model].camelize
+      model_id = params[:model_id]
+      relation = params[:relation]
+      relation_id = params[:relation_id]
+      model_object = Object.const_get(model).find(model_id)
+      documents = model_object.send(relation.to_sym)
+      if authorized_to_download?(model_object, documents, relation_id)
+        uri = documents.find(relation_id).identifier
+        send_data Aws::S3Storage.find(uri), get_options(params)
+      else
+       raise "Sorry! You are not authorized to download this document."
+      end
+    rescue => e
+      redirect_to(:back, :flash => {error: e.message})
     end
   end
 
@@ -24,21 +35,17 @@ class DocumentsController < ApplicationController
       @person.consumer_role.update_attributes(:ssn_validation => "valid",
                                               :ssn_update_reason => params[:verification_reason])
     else
-     @person.consumer_role.lawful_presence_determination.authorize! verification_attr
-     @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
+      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
+      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
                                              {:v_type => v_type,
                                               :update_reason => params[:verification_reason]
                                              } )
     end
+    @person.consumer_role.verify_ivl_by_admin if all_types_verified?(@person)
     respond_to do |format|
       format.html {
-        if all_types_verified?(@person)
-          flash[:notice] = "Individual verification status was completely approved."
-          redirect_to update_individual_documents_path(:person_id => @person)
-        else
-          flash[:notice] = "Verification type successfully approved."
-          redirect_to :back
-        end
+        flash[:notice] = "Verification successfully approved."
+        redirect_to :back
       }
     end
   end
@@ -142,11 +149,16 @@ class DocumentsController < ApplicationController
     person.verification_types.all?{ |type| is_type_verified?(person, type) }
   end
 
+  def authorized_to_download?(owner, documents, document_id)
+    return true
+    owner.user.has_hbx_staff_role? || documents.find(document_id).present?
+  end
+
   def is_type_verified?(person, type)
     if type == 'Social Security Number'
       person.consumer_role.ssn_verified?
     elsif type == 'Citizenship' || type == 'Immigration status'
-      person.consumer_role.citizenship_verified?
+      person.consumer_role.lawful_presence_verified?
     end
   end
 
@@ -160,9 +172,9 @@ class DocumentsController < ApplicationController
   end
 
   def verification_attr
-    OpenStruct.new({
-       :verified_at => Time.now,
-       :authority => "hbx"
+    OpenStruct.new({:determined_at => Time.now,
+                    :authority => "hbx"
                    })
   end
+
 end

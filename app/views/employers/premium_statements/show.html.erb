@@ -5,47 +5,50 @@
   <div class="row no-buffer">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
     <% if plan_year.present? && billing_date.present? %>
-      <h1>Enrollment Report <%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></h1>
-      <span class="text-danger">This is not an invoice.</span>
+
+      <div class="col-xs-8 col-xs-offset-4">
+        <div class="row">
+          <div class="col-xs-8">
+           <button class="btn btn-lg btn-warning hidden" id="loader">
+            <span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+          </button>
+            <span style="float: right; margin-top: 10px;">Select the Coverage Period</span>
+          </div>
+          <div class="col-xs-4">
+            <%= billing_period_dropdown %>
+          </div>
+        </div>
+      </div>
+
+      <%= form_tag employers_premium_statement_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
+        <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
+      <% end %>
+
     <% end %>
   </div>
-  <div class="premium-reports-table">
-  <div class="row no-buffer table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Employee Profile</th>
-          <th>Benefit Package</th>
-          <th>Insurance Coverage</th>
-          <th>Cost</th>
 
-          <!-- <th>Employee</th>
-          <th>SSN</th>
-          <th>DOB</th>
-          <th>Hired</th>
-          <th>Benefit Group</th>
-          <th>Type</th>
-          <th>Plan Name</th>
-          <th>Issuer</th>
-          <th>Covered Ct</th>
-          <th>Employer Contribution</th>
-          <th>Employee Premium</th>
-          <th>Total Premium</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <% if @hbx_enrollments.present? %>
-          <% @hbx_enrollments.each do |hbx_enrollment| %>
-            <%= render "employee_line_item", census_employee: hbx_enrollment.census_employee, enrollment: hbx_enrollment %>
-          <% end %>
-        <% else %>
-          <tr> <td colspan="12" style="text-align: left;">No employees enrolled.</td></tr>
-        <% end %>
-      </tbody>
-    </table>
+  <div class="premium-reports-table">
+    <%= render 'show' %>
   </div>
-</div><br>
+<br>
 <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
   <a class='btn btn-default' data-toggle='modal' data-target='#downloadCsv'>Download</a>
 </div>
-<%= render "download_csv_modal" %>
+
+<script>
+$(function() {
+  $('#billing_date_form').bind({
+    'ajax:before': function () {
+      $('#loader').removeClass('hidden');
+    },
+    'ajax:complete': function () {
+      $('#loader').addClass('hidden');
+    }
+  });
+
+  $('#enrollment_report_dropdown').on('change', function(){
+    $('#billing_date').val($('option:selected', this).val());
+    $("#billing_date_form").submit();
+  });
+});
+</script>
