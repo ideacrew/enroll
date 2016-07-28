@@ -29,7 +29,10 @@ class CorrectEnrollmentStatus < MongoidMigrationTask
     families = get_families
     families.each do |family|
       enrollments = get_enrollments(family)
-      enrollments.each{|enrollment| fix_enrollment(enrollment)}
+      enrollments.each do |enrollment|
+        fix_enrollment(enrollment)
+        enrollment.save!
+      end
     end
   end
 end
