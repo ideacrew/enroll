@@ -27,6 +27,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
 
@@ -233,6 +234,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
@@ -288,6 +290,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
     end
@@ -504,6 +507,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     before :each do
       allow(person).to receive(:has_active_employee_role?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       assign :person, person
       assign :employee_role, employee_role
@@ -539,6 +543,12 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "shouldn't see marketplace options" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('h3', text: 'Marketplace')
+    end
+    
+    it "should not see employer-sponsored coverage radio option" do
+      allow(person).to receive(:has_employer_benefits?).and_return(false)
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_selector('#market_kind_shop')
     end
 
     context "consumer with both roles but employee isn't offering dental" do
