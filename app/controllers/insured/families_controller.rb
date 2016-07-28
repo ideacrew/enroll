@@ -12,7 +12,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-
+    
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -45,7 +45,8 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab']
+    @tab = params['tab'] 
+    @family_members = @family.active_family_members
     respond_to do |format|
       format.html
     end
@@ -139,13 +140,17 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    if @person.has_active_employee_role?
+    if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
   end
 
   def purchase
+    if params[:hbx_enrollment_id].present?
+      @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    else
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+    end
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
@@ -172,6 +177,8 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
+      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
       redirect_to :back

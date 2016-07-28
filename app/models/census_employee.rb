@@ -223,6 +223,12 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def active_benefit_group
+    if active_benefit_group_assignment.present?
+      active_benefit_group_assignment.benefit_group
+    end
+  end
+
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end

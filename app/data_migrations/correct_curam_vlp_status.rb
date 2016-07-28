@@ -22,11 +22,8 @@ class CorrectCuramVlpStatus < MongoidMigrationTask
         person.consumer_role.ssn_update_reason = "user in curam"
       end
       person.save!
-      print "."
     rescue => e
-      puts
       puts "Error for Person id: #{person.id}. Error: #{e.message}"
-      puts
     end
   end
 
