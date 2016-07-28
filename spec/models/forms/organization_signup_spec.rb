@@ -46,3 +46,61 @@ describe Forms::OrganizationSignup, "office location kind validtion" do
     end
   end
 end
+
+describe Forms::OrganizationSignup, "fein validation" do
+  let(:organization) { FactoryGirl.create(:organization, broker_agency_profile: 
+                                                            FactoryGirl.create(:broker_agency_profile)) }
+  let(:organization_not_broker) { FactoryGirl.create(:organization) }
+  let(:office_location_1) { OfficeLocation.new(organization: organization, 
+                                                                          :address => FactoryGirl.build(:address, :kind => "primary"), phone: FactoryGirl.build(:phone)) }
+  subject { Forms::OrganizationSignup.new( :office_locations => [office_location_1]) }
+
+  context "no fein" do
+    it "should not be valid" do
+      subject = Forms::OrganizationSignup.new(legal_name: "asdf", 
+                                              dba: "cas", 
+                                              dob: "2015-1-1", 
+                                              first_name: "aaa", 
+                                              last_name: "bbb", 
+                                              entity_kind: "c_corporation", 
+                                              office_locations: [office_location_1]
+                                              ) 
+      expect(subject.valid?).to be_falsey
+      expect(subject).to have_errors_on(:fein)
+      expect(subject).not_to have_errors_on(:base)
+    end
+  end
+
+  context "fein of organization that exists with broker agency profile" do
+    it "should not be valid" do
+      subject = Forms::OrganizationSignup.new(legal_name: "asdf", 
+                                              dba: "cas", 
+                                              dob: "2015-1-1", 
+                                              fein: organization.fein,
+                                              first_name: "aaa", 
+                                              last_name: "bbb", 
+                                              entity_kind: "c_corporation", 
+                                              office_locations: [office_location_1]
+                                              ) 
+      expect(subject.valid?).to be_falsey
+      expect(subject).to have_errors_on(:base)
+      expect(subject.errors[:base]).to eq(["organization has already been created."])
+    end
+  end
+
+  context "fein of organization that exists without broker agency profile" do
+    it "should be valid" do
+      subject = Forms::OrganizationSignup.new(legal_name: "asdf", 
+                                              dba: "cas", 
+                                              dob: "2015-1-1", 
+                                              fein: organization_not_broker.fein,
+                                              first_name: "aaa", 
+                                              last_name: "bbb", 
+                                              entity_kind: "c_corporation", 
+                                              office_locations: [office_location_1]
+                                              ) 
+      expect(subject).to be_valid
+      expect(subject).not_to have_errors_on(:base)
+    end
+  end
+end
