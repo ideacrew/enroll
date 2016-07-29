@@ -168,6 +168,17 @@ module Factories
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
     end
+    
+    def self.migrate_census_employee_contact_to_person(census_employee, person)
+      if census_employee
+        if census_employee.address
+          person.addresses.create!(census_employee.address.attributes) if person.addresses.blank?
+        end
+        if census_employee.email
+          person.emails.create!(census_employee.email.attributes) if person.emails.blank?
+        end
+      end
+    end
 
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
@@ -176,9 +187,11 @@ module Factories
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         census_employee.save
+        migrate_census_employee_contact_to_person(census_employee, person)
       elsif person_new
         person.delete
       end
+      
       return role, family
     end
 
@@ -249,8 +262,10 @@ module Factories
         user.roles << role_type unless user.roles.include?(role_type)
         user.save
         unless person.emails.count > 0
-          person.emails.build(kind: "home", address: user.email)
-          person.save
+          if user.email.present?
+            person.emails.build(kind: "home", address: user.email)
+            person.save
+          end
         end
       end
       return person, is_new

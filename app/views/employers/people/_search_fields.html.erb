@@ -1,7 +1,7 @@
 <h3>Personal Information</h3>
 
 <div class="row no-buffer">
-  <div id="personal_info" class="focus_effect personal-info-row">
+  <div id="personal_info" class="focus_effect personal-info-row module">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
       <%= hidden_field "people","id" %>
 
@@ -16,7 +16,10 @@
           <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :prompt => 'SUFFIX', class: "floatlabel form-control" %>
+          <div class="selectric-labeled">
+            <span><strong>Suffix</strong></span>
+            <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
+          </div>
         </div>
       </div>
 

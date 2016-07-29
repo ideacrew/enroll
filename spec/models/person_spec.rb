@@ -212,6 +212,7 @@ describe Person do
           expect(@person.is_active?).to eq false
         end
 
+=begin
         context "dob more than 110 years ago" do
           let(:dob){ 200.years.ago }
 
@@ -221,6 +222,7 @@ describe Person do
           end
 
         end
+=end
       end
 
       context "with invalid date values" do
@@ -797,7 +799,7 @@ describe Person do
         @person_aqhp = family1.primary_applicant.person
       end
       it "creates person with status verification_pending" do
-        expect(person.consumer_role.aasm_state).to eq("verifications_pending")
+        expect(person.consumer_role.aasm_state).to eq("unverified")
       end
 
       it "returns people with uverified status" do
@@ -805,7 +807,7 @@ describe Person do
       end
 
       it "doesn't return people with verified status" do
-        person2.consumer_role.aasm_state = "verified"
+        person2.consumer_role.aasm_state = "fully_verified"
         person2.save
         expect(Person.unverified_persons.include? person2).to eq(false)
       end
@@ -947,7 +949,7 @@ describe Person do
   describe ".deactivate_employer_staff_role" do
     let(:person) {FactoryGirl.create(:person)}
     let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, person: person)}
-
+    let(:employer_staff_roles) { FactoryGirl.create_list(:employer_staff_role, 3, person: person) } 
     context 'does not find the person' do
       before {@status, @result = Person.deactivate_employer_staff_role(1, employer_staff_role.employer_profile_id)}
       it 'returns false' do
@@ -970,6 +972,26 @@ describe Person do
 
       it 'sets is_active to false' do
         expect(employer_staff_role.reload.is_active?).to eq false
+      end
+    end
+
+    context 'finds the person and inactivates all roles' do
+      before {@status, @result = Person.deactivate_employer_staff_role(person.id, employer_staff_role.employer_profile_id)}
+      it 'returns true' do
+        expect(@status).to be true
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+
+      it 'has more than one employer_staff_role' do
+        employer_staff_roles 
+        expect(person.employer_staff_roles.count).to eq (employer_staff_roles << employer_staff_role).count
+      end
+
+      it 'sets is_active to false for each role' do
+        expect(person.employer_staff_roles.each { |role| role.reload.is_active? == false })
       end
     end
   end

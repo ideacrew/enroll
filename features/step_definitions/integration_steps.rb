@@ -145,7 +145,7 @@ end
 
 def fill_user_registration_form(credentials)
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  @browser.text_field(name: "user[email]").set(credentials[:email])
+  @browser.text_field(name: "user[login]").set(credentials[:email])
   @browser.text_field(name: "user[password]").set(credentials[:password])
   @browser.text_field(name: "user[password_confirmation]").set(credentials[:password])
 end
@@ -254,11 +254,11 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   portal_uri = find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
-  fill_in "user[email]", :with => person[:email]
-  find('#user_email').set(person[:email])
+  fill_in "user[login]", :with => person[:email]
+  find('#user_login').set(person[:email])
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => person[:email] unless find(:xpath, '//*[@id="user_email"]').value == person[:email]
+  fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
   visit portal_uri
 end
@@ -338,7 +338,11 @@ Then(/^.+ should see the employee search page$/) do
 end
 
 Given(/^(.*) visits the employee portal$/) do |named_person|
-  visit "/insured/employee/search"
+  visit "/insured/employee/privacy"
+end
+
+Then(/^.+ should see the employee privacy text$/) do
+  click_link "CONTINUE"
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
@@ -459,7 +463,7 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
 end
 
 When(/^.+ clicks? confirm member$/) do
-  click_button 'Confirm Member'
+  all(:css, ".mz").last.click
   expect(page).to have_link('Add Member')
 end
 

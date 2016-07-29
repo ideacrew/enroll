@@ -35,7 +35,7 @@ def generate_approved_broker (broker, wk_addr, wk_phone, wk_email, email)
   broker.save!
   broker.approve!
   broker.broker_agency_accept!
-  broker.person.user = User.create!(email: email, 'password'=>'aA1!aA1!aA1!', roles: ['broker'])
+  broker.person.user = User.create!(email: email, oim_id: email, 'password'=>'aA1!aA1!aA1!', roles: ['broker'])
   broker.person.save!
 end
 

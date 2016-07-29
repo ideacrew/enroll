@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form,:download_invoice]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -101,6 +101,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'inbox'
 
       else
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
         @current_plan_year = @employer_profile.show_plan_year
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
@@ -160,8 +161,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
         if pending
-          flash[:notice] = 'Your Employer Staff application is pending'
-          render action: 'new'
+          # flash[:notice] = 'Your Employer Staff application is pending'
+          render action: 'show_pending'
         else
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
@@ -169,6 +170,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     else
       render action: "new"
     end
+  end
+
+  def show_pending
   end
 
   def update
@@ -218,6 +222,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def consumer_override
     session[:person_id] = params['person_id']
     redirect_to family_account_path
+  end
+
+  def export_census_employees
+    respond_to do |format|
+      format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+    end
   end
 
   def bulk_employee_upload_form

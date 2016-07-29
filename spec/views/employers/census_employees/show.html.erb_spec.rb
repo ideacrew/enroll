@@ -100,7 +100,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(benefit_group_assignment).to receive(:coverage_selected?).and_return(true)
     allow(census_employee).to receive(:employee_role).and_return(double(hired_on: Date.new, effective_on: Date.new))
     render template: "employers/census_employees/show.html.erb"
-    expect(rendered).to match /Eligible for Coverage/i
   end
 
   context 'with a previous coverage waiver' do

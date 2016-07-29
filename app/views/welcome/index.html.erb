@@ -14,12 +14,12 @@
   <br/>
   <% if user_signed_in? %>
     <strong>
-      Welcome <%= current_user.email %> <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
+      Welcome <%= current_user.oim_id %> <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
     </strong>
     <br/>
     <br/>
   <% end %>
-  <%= link_to "Employee Portal", search_insured_employee_index_path, class: "btn btn-default" %>
+  <%= link_to "Employee Portal", privacy_insured_employee_index_path, class: "btn btn-default" %>
   <%= link_to "Consumer/Family Portal", privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
   <%= link_to "Assisted Consumer/Family Portal", privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
   <%= link_to "Returning User", family_account_path, class: "btn btn-default" %>

@@ -33,6 +33,9 @@ class ConsumerRole
       indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
+      non_native_not_lawfully_present_in_us
+      ssn_pass_citizenship_fails_with_SSA
+      non_native_citizen
   )
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
@@ -44,7 +47,7 @@ class ConsumerRole
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
-  field :aasm_state, type: String, default: "verifications_pending"
+  field :aasm_state
 
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
@@ -121,14 +124,8 @@ class ConsumerRole
   before_validation :ensure_ssn_validation_status
 
   def ensure_ssn_validation_status
-    if self.person
-      if self.person.ssn.blank?
-        ssn_validation = "na"
-      else
-        if ssn_validation == "na"
-          ssn_validation = "pending"
-        end
-      end
+    if self.person && self.person.ssn.blank?
+      self.ssn_validation = "na"
     end
   end
 
@@ -187,6 +184,10 @@ class ConsumerRole
 
   def ssn_outstanding?
     self.ssn_validation == "outstanding"
+  end
+
+  def lawful_presence_verified?
+    self.lawful_presence_determination.verification_successful?
   end
 
   def is_hbx_enrollment_eligible?
@@ -344,76 +345,94 @@ class ConsumerRole
 
   ## TODO: Move RIDP to user model
   aasm do
-    state :verifications_pending, initial: true
-    state :verifications_outstanding
+    state :unverified, initial: true
+    state :ssa_pending
+    state :dhs_pending
+    state :verification_outstanding
     state :fully_verified
+    state :verification_period_ended
 
     before_all_events :ensure_ssn_validation_status
 
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verifications_pending, to: :fully_verified
-      transitions from: :verifications_outstanding, to: :fully_verified
+      transitions from: :unverified, to: :fully_verified
+      transitions from: :ssa_pending, to: :fully_verified
+      transitions from: :dhs_pending, to: :fully_verified
+      transitions from: :verification_outstanding, to: :fully_verified
+      transitions from: :verification_period_ended, to: :fully_verified
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied, :notify_of_eligibility_change] do
-      transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
-      transitions from: :verifications_pending, to: :verifications_outstanding
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    event :coverage_purchased do
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn, :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
     end
 
-    event :authorize_lawful_presence, :after => [:record_transition, :mark_lp_authorized, :notify_of_eligibility_change] do
-      transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
-      transitions from: :verifications_pending, to: :fully_verified, guard: :residency_verified?
-      transitions from: :verifications_pending, to: :verifications_outstanding
-      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
-      transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
+    event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+      transitions from: :ssa_pending, to: :verification_outstanding
+    end
+
+    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
+      transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
+      transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
+    end
+
+    event :ssn_valid_citizenship_valid, :after => [:pass_ssn, :pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :fully_verified, :guard => [:call_ssa?]
+      transitions from: :ssa_pending, to: :fully_verified
+      transitions from: :verification_outstanding, to: :fully_verified
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :authorize_residency, :after => [:record_transition, :mark_residency_authorized, :notify_of_eligibility_change] do
-      transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
-      transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_authorized?
-      transitions from: :verifications_pending, to: :verifications_outstanding
-      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
-      transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
-      transitions from: :fully_verified, to: :fully_verified
+    event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+      transitions from: :dhs_pending, to: :verification_outstanding
     end
 
-    event :deny_residency, :after => [:record_transition, :mark_residency_denied, :notify_of_eligibility_change] do
-      transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
-      transitions from: :verifications_pending, to: :verifications_outstanding
-      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
-      transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+    event :pass_dhs, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
+      transitions from: :dhs_pending, to: :fully_verified
+      transitions from: :verification_outstanding, to: :fully_verified
     end
 
-    event :verifications_backlog, :after => [:record_transition] do
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :unverified
+      transitions from: :ssa_pending, to: :unverified
+      transitions from: :dhs_pending, to: :unverified
+      transitions from: :verification_outstanding, to: :unverified
+      transitions from: :fully_verified, to: :unverified
+      transitions from: :verification_period_ended, to: :unverified
     end
 
-    event :first_verifications_reminder, :after => [:record_transition] do
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
-    end
-
-    event :second_verifications_reminder, :after => [:record_transition] do
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
-    end
-
-    event :third_verifications_reminder, :after => [:record_transition] do
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
-    end
-
-    event :fourth_verifications_reminder, :after => [:record_transition] do
-      transitions from: :verifications_outstanding, to: :verifications_outstanding
+    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :verification_outstanding, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :ssa_pending, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :ssa_pending, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :dhs_pending, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :dhs_pending, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :fully_verified, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :fully_verified, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :verification_period_ended, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :verification_period_ended, to: :ssa_pending, :guard => [:call_ssa?]
     end
   end
 
-  def start_individual_market_eligibility!(requested_start_date)
-    if lawful_presence_pending?
-      lawful_presence_determination.start_determination_process(requested_start_date)
+  def invoke_verification!(*args)
+    if person.ssn || is_native?
+      invoke_ssa
+    else
+      invoke_dhs
     end
-    if residency_pending?
-      start_residency_verification_process
+  end
+
+  def verify_ivl_by_admin(*args)
+    if person.ssn || is_native?
+      self.ssn_valid_citizenship_valid! verification_attr
+    else
+      self.pass_dhs! verification_attr
     end
   end
 
@@ -482,8 +501,28 @@ class ConsumerRole
     !is_native?
   end
 
+  def no_ssn?
+    person.ssn.nil?
+  end
+
+  def ssn_applied?
+    !no_ssn?
+  end
+
+  def call_ssa?
+    is_native? || ssn_applied?
+  end
+
+  def call_dhs?
+    no_ssn? && is_non_native?
+  end
+
+  def native_no_ssn?
+    is_native? && no_ssn?
+  end
+
   private
-  def notify_of_eligibility_change
+  def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
   end
 
@@ -529,20 +568,50 @@ class ConsumerRole
     citizen_status == "indian_tribe_member"
   end
 
-  def mark_lp_authorized(*args)
-    if aasm.current_event == :authorize_lawful_presence!
-      lawful_presence_determination.authorize!(*args)
-    else
-      lawful_presence_determination.authorize(*args)
-    end
+  def invoke_ssa
+    lawful_presence_determination.start_ssa_process
   end
 
-  def mark_lp_denied(*args)
-    if aasm.current_event == :deny_lawful_presence!
-      lawful_presence_determination.deny!(*args)
-    else
-      lawful_presence_determination.deny(*args)
-    end
+  def invoke_dhs
+    lawful_presence_determination.start_vlp_process(requested_coverage_start_date)
+  end
+
+  def pass_ssn(*args)
+    self.update_attributes!(ssn_validation: "valid")
+  end
+
+  def fail_ssn(*args)
+    self.update_attributes!(
+      ssn_validation: "outstanding"
+    )
+  end
+
+  def fail_ssa_for_no_ssn(*args)
+    self.update_attributes!(
+      ssn_validation: "outstanding",
+      ssn_update_reason: "no_ssn_for_native"
+    )
+  end
+
+  def pass_lawful_presence(*args)
+    lawful_presence_determination.authorize!(*args)
+  end
+
+  def record_partial_pass(*args)
+    lawful_presence_determination.citizen_status = "non_native_not_lawfully_present_in_us"
+    lawful_presence_determination.citizenship_result = "ssn_pass_citizenship_fails_with_SSA"
+  end
+
+  def fail_lawful_presence(*args)
+    lawful_presence_determination.deny!(*args)
+  end
+
+  def revert_ssn
+    self.ssn_validation = "pending"
+  end
+
+  def revert_lawful_presence(*args)
+    self.lawful_presence_determination.revert!(*args)
   end
 
   def record_transition(*args)
@@ -552,4 +621,9 @@ class ConsumerRole
     )
   end
 
+  def verification_attr
+    OpenStruct.new({:determined_at => Time.now,
+                    :vlp_authority => "hbx"
+                   })
+  end
 end

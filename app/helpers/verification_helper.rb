@@ -23,7 +23,7 @@ module VerificationHelper
          "outstanding"
        end
      elsif type == 'Citizenship' || type == 'Immigration status'
-       if member.consumer_role.lawful_presence_authorized?
+       if member.consumer_role.lawful_presence_verified?
          "verified"
        elsif member.consumer_role.has_docs_for_type?(type)
          "in review"
@@ -49,7 +49,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verifications_outstanding"}
+    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
