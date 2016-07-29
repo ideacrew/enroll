@@ -24,9 +24,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def renewal_invitation_email(email, person_name, invitation)
+  def renewal_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
-      format.html { render "renewal_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
+      format.html { render "renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
     end
   end
 
