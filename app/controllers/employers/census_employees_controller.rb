@@ -179,6 +179,9 @@ class Employers::CensusEmployeesController < ApplicationController
       @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
       @benefit_group = @benefit_group_assignment.benefit_group
     end
+
+    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
+    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state }
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
@@ -293,5 +296,6 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build
     @census_employee
   end
+  private
 
 end

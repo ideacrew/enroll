@@ -54,9 +54,10 @@
       <div class="text-right col-xs-6">
         <div class="row">
           <span><strong>Added to Roster:</strong>
-            <%= format_date @census_employee.created_at %></span>&nbsp;
+            <%= format_date @census_employee.created_at %></span>&nbsp;&nbsp;
           <h5 class="label label-success census-employee-aasm <%= @census_employee.aasm_state %>">
             <%= @census_employee.aasm_state.titleize %>
+            <i class="fa fa-pencil" aria-hidden="true" title="Edit" data-toggle="tooltip"></i>
           </h5>
         </div>
       </div>
@@ -161,6 +162,10 @@
       <% end %>
     </div>
   </div>
+  <h3>
+    Past Enrollments
+  </h3>
+  <%= render partial: 'shared/past_enrollments', locals: { hbx_enrollments: @past_enrollments } %>
   <br/>
   <br/>
   <div class="vertically-aligned-row">
@@ -179,6 +184,7 @@
 
 <script>
   $(document).on('ready page:load', function () {
-    Enroll.preventUnload();
+    FormHelpers.preventUnload();
+    FormHelpers.applyAsterisks();
   });
 </script>
