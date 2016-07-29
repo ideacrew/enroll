@@ -12,6 +12,19 @@
         padding:0
       }
 
+
+
+      @font-face {
+        font-family: 'Custom Font';
+        font-style: normal;
+        font-weight: 300;
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+
+/*        src: url("<%= Rails.root.join('app', 'assets', 'fonts', 'Crimson-Roman.ttf') %>") format('truetype')
+*/
+/*        src: url('file:///Users/raghuram/.rvm/rubies/ruby-2.1.6/lib/ruby/gems/2.1.0/gems/prawn-0.11.1/data/fonts/gkai00mp.ttf') format('truetype')
+*/}
+
       body {
 /*        width:100%!important;
 */        -webkit-text-size-adjust:100%;
@@ -21,7 +34,7 @@
         mso-line-height-rule:exactly
         font-size:12px;
   color:rgb(0,0,0);
-  font-family: "Times New Roman", Times, serif;
+  font-family: "Custom Font", Times, serif;
         padding-left: 15px;
         padding-right: 15px;
       }
@@ -29,7 +42,7 @@
 table td {
   border-collapse:collapse;
   font-size:12px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: "Custom Font", Times, serif;
   border-color: #000;
 }
 
