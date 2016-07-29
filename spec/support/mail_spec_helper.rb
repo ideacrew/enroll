@@ -21,8 +21,8 @@ module MailSpecHelper
     end
 
     def user_mailer_renewal_invitation_body(census_employee)
-      ["Dear #{census_employee.full_name}", "Congratulations!#{census_employee.employer_profile.legal_name}, has chosen to renew the offer of health insurance coverage to its employees
-  through DC Health Link and will contribute to the monthly premium to make the cost of coverage more affordable.",
+      ["Dear #{census_employee.full_name}","Congratulations! #{census_employee.employer_profile.legal_name}, has chosen to renew the offer of health insurance coverage
+  to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable.",
        "You Are Able to Change Your Plan Selection during Open Enrollment"]
     end
   end
