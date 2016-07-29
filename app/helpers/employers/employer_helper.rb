@@ -124,7 +124,7 @@ module Employers::EmployerHelper
       toggle_class = ".cobra_reinstate_"
       disabled = !current_user.has_hbx_staff_role?
     end
-    content_tag(:a, :class => "show_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
+    content_tag(:a, :class => "show_confirm show_cobra_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
       content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg", 
         :onclick => "$(this).closest('tr').nextAll('#{toggle_class}#{census_employee.id}').toggle()")
     end

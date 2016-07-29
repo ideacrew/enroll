@@ -4,7 +4,7 @@
       <h4 class="bg-title">
         <%= hbx_enrollment.coverage_kind %>
         Coverage
-        <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
+        <span class="separator"><%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
       </h4>
       <hr>
     </div>
