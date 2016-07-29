@@ -27,7 +27,7 @@ module VlpDoc
     if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
       if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
         params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
-      elsif params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
+      elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
         params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
       end
 
