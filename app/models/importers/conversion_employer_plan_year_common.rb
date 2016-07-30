@@ -6,10 +6,12 @@ module Importers
     include ActiveModel::Model
 
     HIRE_COVERAGE_POLICIES = {
+      "date of hire" => NewHireCoveragePolicy.new("date_of_hire", 0),
       "date of hire equal to effective date" => NewHireCoveragePolicy.new("date_of_hire", 0),
       "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
       "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
-      "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
+      "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
+      "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0)
     }
 
     attr_reader :fein, :plan_selection, :carrier
@@ -17,6 +19,7 @@ module Importers
     attr_accessor :action,
       :enrolled_employee_count,
       :new_coverage_policy,
+      :new_coverage_policy_value,
       :default_plan_year_start,
       :most_common_hios_id,
       :single_plan_hios_id,
@@ -35,11 +38,12 @@ module Importers
     include ValueParsers::OptimisticSsnParser.on(:fein)
 
     def new_coverage_policy=(val)
+      @new_coverage_policy = val
       if val.blank?
-        @new_coverage_policy = nil
+        @new_coverage_policy_value = nil
         return val
       end
-      @new_coverage_policy = HIRE_COVERAGE_POLICIES[val.strip.downcase]
+      @new_coverage_policy_value = HIRE_COVERAGE_POLICIES[val.strip.downcase]
     end
 
     def plan_selection=(val)

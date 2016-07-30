@@ -39,7 +39,7 @@ module Importers
 
     def validate_new_coverage_policy
       return true if new_coverage_policy.blank?
-      if new_coverage_policy.blank?
+      if new_coverage_policy_value.blank?
         warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(",")}), defaulting to first of month following date of hire")
       end
     end
@@ -101,9 +101,9 @@ module Importers
         :reference_plan_id => reference_plan.id,
         :elected_plan_ids => elected_plan_ids
       }
-      if !new_coverage_policy.blank?
-         benefit_group_properties[:effective_on_offset] = new_coverage_policy.offset
-         benefit_group_properties[:effective_on_kind] = new_coverage_policy.kind        
+      if !new_coverage_policy_value.blank?
+         benefit_group_properties[:effective_on_offset] = new_coverage_policy_value.offset
+         benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
       end
       BenefitGroup.new(benefit_group_properties)
     end
