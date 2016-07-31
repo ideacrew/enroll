@@ -32,7 +32,7 @@ module Importers
     def validate_is_conversion_employer
       found_employer = find_employer
       return true unless found_employer
-      if found_employer.plan_years.any?
+      if plan_years_are_active?(found_employer.plan_years) 
         errors.add(:fein, "already has active plan years")
       end
     end
