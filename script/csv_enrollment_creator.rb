@@ -76,7 +76,7 @@ end
 def find_dependent(ssn,dob,first_name,middle_name,last_name)
 	person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).first
 	if person == nil
-		person = Person.where(first_name: first_name.strip, middle_name: middle_name.strip, last_name: last_name.strip, dob: format_date(dob))
+		person = Person.where(first_name: first_name.to_s.strip, middle_name: middle_name.to_s.strip, last_name: last_name.to_s.strip, dob: format_date(dob)).first
 	else
 		return person
 	end
