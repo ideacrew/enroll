@@ -13,7 +13,7 @@ class Envelope < PdfReport
   def fill_envelope(notice, mpi_indicator = nil)
     x_pos = mm2pt(21.83) - @margin[0]
 
-    if notice.employer_name.present?
+    if notice.respond_to?(:employer_name) && notice.employer_name.present?
       y_pos = 790.86 - mm2pt(57.15) - 45
     else
       y_pos = 790.86 - mm2pt(57.15) - 65
@@ -34,7 +34,7 @@ class Envelope < PdfReport
 
   def fill_recipient_contact(notice)
     text notice.primary_fullname
-    text notice.employer_name if notice.employer_name.present?
+    text notice.employer_name if notice.respond_to?(:employer_name) && notice.employer_name.present?
     text notice.primary_address.street_1
     text notice.primary_address.street_2 unless notice.primary_address.street_2.blank?
     text "#{notice.primary_address.city}, #{notice.primary_address.state} #{notice.primary_address.zip}"      

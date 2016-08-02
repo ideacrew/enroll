@@ -13,11 +13,40 @@
       }
 
 
-      @font-face {
+/*      @font-face {
         font-family: 'NimbusTimesRoman';
         font-style: normal;
-        font-weight: 300;
-        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+        font-weight: 400;
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype'),
+             url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-RegIta.otf') %>") format('opentype'),
+             url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Med.otf') %>") format('opentype'),
+             url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-MedIta.otf') %>") format('opentype')
+      }*/
+
+
+      @font-face {
+        font-family: "NimbusTimesRomanRegular";
+        font-style: normal;
+        font-weight: 400;
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype');
+      }
+      @font-face {
+        font-family: "NimbusTimesRomanBold";
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Med.otf') %>") format('opentype');
+        font-weight: bold;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "NimbusTimesRomanBoldItalic";
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-RegIta.otf') %>") format('opentype');
+        font-style: italic, oblique;
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: "NimbusTimesRomanBoldItalic";
+        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-MedIta.otf') %>") format('opentype');
+        font-weight: bold;
+        font-style: italic, oblique;
       }
 
       body {
@@ -28,7 +57,7 @@
         mso-line-height-rule:exactly
         font-size:12px;
         color:rgb(0,0,0);
-        font-family: "NimbusTimesRoman", Times, serif;
+        font-family: "NimbusTimesRomanRegular", Times, serif;
         padding-left: 15px;
         padding-right: 15px;
       }
@@ -36,7 +65,7 @@
       table td {
         border-collapse:collapse;
         font-size:12px;
-        font-family: "NimbusTimesRoman", Times, serif;
+        font-family: "NimbusTimesRomanRegular", Times, serif;
         border-color: #000;
       }
 
@@ -47,6 +76,14 @@
 
       table {
         border-collapse: collapse;
+      }
+      
+      h1, h2, h3, h4, strong {
+        font-family: "NimbusTimesRomanBold", Times, serif;
+      }
+
+      .bold-italic {
+        font-family: "NimbusTimesRomanBoldItalic";
       }
 
       h3, h4 {
