@@ -103,6 +103,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
+        allow(family).to receive(:active_family_members).and_return(family_members)
         sign_in user
         get :home
       end
@@ -142,6 +143,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
+        allow(family).to receive(:active_family_members).and_return(family_members)
         sign_in user
         get :home
       end
@@ -212,6 +214,7 @@ RSpec.describe Insured::FamiliesController do
         let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          allow(family).to receive(:active_family_members).and_return(family_members)
           get :home
         end
         it "should be a success" do
@@ -238,6 +241,7 @@ RSpec.describe Insured::FamiliesController do
         let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
+          allow(family).to receive(:active_family_members).and_return(family_members)
           get :home
         end
         it "should be a success" do
@@ -467,6 +471,34 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
+    context "qle event when person has dual roles" do
+      before :each do
+        allow(person).to receive(:user).and_return(user)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        @qle = FactoryGirl.create(:qualifying_life_event_kind)
+        @family = FactoryGirl.build(:family, :with_primary_family_member)
+        allow(person).to receive(:primary_family).and_return(@family)
+      end
+
+      it "future_qualified_date return true/false when qle market kind is shop" do
+        date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+        expect(response).to have_http_status(:success)
+        expect(assigns(:future_qualified_date)).to eq(false)
+      end
+
+      it "future_qualified_date should return nil when qle market kind is indiviual" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+        date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+        expect(response).to have_http_status(:success)
+        expect(assigns(:qualified_date)).to eq true
+        expect(assigns(:future_qualified_date)).to eq(nil)
+      end
+    end
+
     context "GET check_qle_date" do
       let(:user) { FactoryGirl.create(:user) }
       let(:person) { FactoryGirl.build(:person) }
@@ -524,9 +556,9 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "delete delete_consumer_broker" do 
+    context "delete delete_consumer_broker" do
       let(:family) {FactoryGirl.build(:family)}
-      before :each do 
+      before :each do
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
@@ -534,7 +566,7 @@ RSpec.describe Insured::FamiliesController do
         delete :delete_consumer_broker , :id => family.id
       end
 
-      it "should delete consumer broker" do 
+      it "should delete consumer broker" do
         expect(response).to have_http_status(:redirect)
         expect(family.current_broker_agency).to be nil
       end
@@ -570,7 +602,7 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "GET upload_notice" do
+  describe "GET upload_notice", dbclean: :after_each do
 
     let(:person2) { FactoryGirl.create(:person) }
     let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }
@@ -625,6 +657,29 @@ RSpec.describe Insured::FamiliesController do
       it "adds a message to person inbox" do
         expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
+    end
+  end
+end
+
+RSpec.describe Insured::FamiliesController do
+  describe "GET purchase" do
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    before :each do
+      allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+      allow(person).to receive(:primary_family).and_return(family)
+      sign_in(user)
+      get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
+    end
+
+    it "should get hbx_enrollment" do
+      expect(assigns(:enrollment)).to eq hbx_enrollment
+    end
+
+    it "should get terminate" do
+      expect(assigns(:terminate)).to eq 'terminate'
     end
   end
 end

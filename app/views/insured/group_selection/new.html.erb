@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -103,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.benefit_group.is_offering_dental? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
@@ -139,8 +139,7 @@
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg' %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary ' if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
@@ -203,7 +202,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if !@employee_role.benefit_group.is_offering_dental? %>
+    <% if !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -227,7 +226,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();

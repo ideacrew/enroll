@@ -277,7 +277,7 @@ context "Verification process and notices" do
       it "changes state to outstanding for native consumer with NO ssn without calling hub" do
         person.ssn=nil
         expect(consumer).to transition_from(:unverified).to(:verification_outstanding).on_event(:coverage_purchased)
-        expect(consumer.ssn_validation).to eq("outstanding")
+        expect(consumer.ssn_validation).to eq("na")
         expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
       end
     end
@@ -299,7 +299,7 @@ context "Verification process and notices" do
         expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
-        expect(consumer.lawful_presence_determination.citizenship_result).to eq("ssn_pass_citizenship_fails_with_SSA")
+        expect(consumer.lawful_presence_determination.citizenship_result).to eq("not_lawfully_present_in_us")
       end
     end
 

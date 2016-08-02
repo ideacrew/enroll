@@ -49,7 +49,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verifications_outstanding"}
+    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)

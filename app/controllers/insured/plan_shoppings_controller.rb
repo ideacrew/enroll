@@ -7,7 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout]
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
@@ -22,6 +22,9 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if !plan_selection.may_select_coverage?
+      if plan_selection.hbx_enrollment.errors.present?
+        flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
+      end
       redirect_to :back
       return
     end
@@ -138,8 +141,9 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
     if hbx_enrollment.may_terminate_coverage?
-      hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
-      hbx_enrollment.propogate_terminate
+      hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
+      hbx_enrollment.terminated_on = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+      hbx_enrollment.terminate_coverage!
 
       redirect_to family_account_path
     else
