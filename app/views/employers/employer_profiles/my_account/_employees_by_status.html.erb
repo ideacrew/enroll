@@ -59,10 +59,8 @@
               <td><%= renewal_enrollment_state(census_employee) %></td>
           <% end %>
           <td class="table-functions">
-             <%= pundit_span EmployerProfile, :updateable? %>
-
               <% if census_employee.employment_terminated? %>
-                  <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id}">
+                  <a class="show_confirm btn btn-green-2 <%= pundit_class EmployerProfile, :updateable? %>" id="show_confirm_#{census_employee.id}">
                     <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').next().show();">Rehire</span>
                   </a>
               <% else %>
@@ -70,7 +68,6 @@
                     edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
                   <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
               <% end %>
-            </span>
           </td>
         </tr>
         <% if census_employee.employment_terminated? %>
