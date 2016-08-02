@@ -5,7 +5,7 @@ module Insured
     end
 
     def can_shop_shop?(person)
-      person.try(:has_active_employee_role?)
+      person.present? && person.has_employer_benefits?
     end
 
     def can_shop_both_markets?(person)
