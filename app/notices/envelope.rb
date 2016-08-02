@@ -34,9 +34,15 @@ class Envelope < PdfReport
 
   def fill_recipient_contact(notice)
     text notice.primary_fullname
-    text notice.employer_name if notice.respond_to?(:employer_name) && notice.employer_name.present?
-    text notice.primary_address.street_1
-    text notice.primary_address.street_2 unless notice.primary_address.street_2.blank?
+    if notice.respond_to?(:employer_name) && notice.employer_name.present?
+      text notice.employer_name
+      address = notice.primary_address.street_1.strip
+      address += "," + notice.primary_address.street_2.strip unless notice.primary_address.street_2.blank?
+      text address
+    else
+      text notice.primary_address.street_1
+      text notice.primary_address.street_2 unless notice.primary_address.street_2.blank?
+    end
     text "#{notice.primary_address.city}, #{notice.primary_address.state} #{notice.primary_address.zip}"      
   end
 end
