@@ -33,8 +33,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
         )
     end
 
-    # && ["enrolled_contingent", "unverified"].include?(hbx_en.aasm_state)
-
     enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
 
     if enrollments.empty?
@@ -55,8 +53,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      # verification_types = person.consumer_role.outstanding_verification_types
-      # if verification_types.detect{|type| !person.consumer_role.has_docs_for_type?(type) }
       if person.consumer_role.outstanding_verification_types.present?
         outstanding_people << person
       end
@@ -75,12 +71,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def ssn_outstanding?(person)
-    # person.consumer_role.ssn_validation == 'outstanding'
     person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    # person.consumer_role.lawful_presence_determination.aasm_state == 'verification_outstanding'
     person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
