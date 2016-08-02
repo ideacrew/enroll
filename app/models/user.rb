@@ -315,7 +315,8 @@ class User
   # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
   #   ID in a has_one association
   def self.orphans
-    all.select(){|u| u.person.blank?}.sort{|a,b| a.email <=> b.email }
+    user_ids=Person.where(:user_id=>{"$ne"=>nil}).pluck(:user_id)
+    User.where("_id"=>{"$nin"=>user_ids}).entries
   end
 
   def self.send_reset_password_instructions(attributes={})
