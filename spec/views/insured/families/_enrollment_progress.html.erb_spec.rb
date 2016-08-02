@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment_progress.html.erb" do
+
   let(:hbx_enrollment) {double(aasm_state: 'coverage_selected', kind: "employer_sponsored")}
 
   before :each do

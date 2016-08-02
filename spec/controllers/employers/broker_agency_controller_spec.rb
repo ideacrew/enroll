@@ -117,7 +117,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should terminate broker and redirect to my_account with broker tab actived" do
         get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
-
         expect(flash[:notice]).to eq("Broker terminated successfully.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
       end
@@ -144,6 +143,17 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+    end
+
+    context "send_broker_assigned_msg" do
+
+      before do
+        @controller.send(:send_broker_assigned_msg, @employer_profile, @org2.broker_agency_profile)
+      end
+
+      it "adds a message to person inbox" do
+        expect(@employer_profile.inbox.messages.count).to eq (2)
+      end
     end
   end
 end

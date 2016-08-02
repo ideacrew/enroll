@@ -33,6 +33,9 @@ class ConsumerRole
       indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
+      non_native_not_lawfully_present_in_us
+      ssn_pass_citizenship_fails_with_SSA
+      non_native_citizen
   )
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
@@ -370,7 +373,7 @@ class ConsumerRole
       transitions from: :ssa_pending, to: :verification_outstanding
     end
 
-    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change] do
+    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
       transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
       transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end
@@ -417,11 +420,11 @@ class ConsumerRole
     end
   end
 
-  def invoke_verification!(requested_start_date=requested_coverage_start_date)
+  def invoke_verification!(*args)
     if person.ssn || is_native?
       invoke_ssa
     else
-      invoke_dhs(requested_start_date)
+      invoke_dhs
     end
   end
 
@@ -569,21 +572,25 @@ class ConsumerRole
     lawful_presence_determination.start_ssa_process
   end
 
-  def invoke_dhs(requested_start_date=requested_coverage_start_date)
-    lawful_presence_determination.start_vlp_process(requested_start_date)
+  def invoke_dhs
+    lawful_presence_determination.start_vlp_process(requested_coverage_start_date)
   end
 
   def pass_ssn(*args)
-    self.ssn_validation = "valid"
+    self.update_attributes!(ssn_validation: "valid")
   end
 
   def fail_ssn(*args)
-    self.ssn_validation = "outstanding"
+    self.update_attributes!(
+      ssn_validation: "outstanding"
+    )
   end
 
   def fail_ssa_for_no_ssn(*args)
-    self.ssn_validation = "outstanding"
-    self.ssn_update_reason = "no_ssn_for_native"
+    self.update_attributes!(
+      ssn_validation: "outstanding",
+      ssn_update_reason: "no_ssn_for_native"
+    )
   end
 
   def pass_lawful_presence(*args)
