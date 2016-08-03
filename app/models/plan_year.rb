@@ -554,7 +554,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling                                      # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage,
                                                           #   but effective date is in future
     state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
@@ -563,7 +563,7 @@ class PlanYear
 
     state :renewing_draft
     state :renewing_published
-    state :renewing_enrolling, :after_enter => :trigger_passive_renewals
+    state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled
     state :renewing_publish_pending
     state :renewing_canceled
@@ -712,7 +712,6 @@ class PlanYear
   def accept_application
     adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
-    send_employee_invites if transition_success && !is_renewing?
   end
 
   def decline_application
@@ -810,9 +809,17 @@ private
   end
 
   def send_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.each do |ce|
-        Invitation.invite_employee!(ce)
+    if is_renewing?
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_renewal_employee!(ce)
+        end
+      end
+    else
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_employee!(ce)
+        end
       end
     end
   end
