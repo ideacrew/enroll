@@ -80,6 +80,7 @@ def find_dependent(ssn,dob,first_name,middle_name,last_name)
 	else
 		return person
 	end
+
 	if person == nil
 		return ArgumentError.new("dependent does not exist for provided person details")
 	else
@@ -196,10 +197,24 @@ CSV.foreach(filename, headers: :true) do |row|
 		subscriber.save
 	end
 
+	family = subscriber.primary_family
+	hh = family.active_household
+	ch = hh.immediate_family_coverage_household
+
 	6.times do |i|
 		if data_row["HBX ID (Dep #{i+1})"] != nil
 			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
 				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
+            if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
+            	dependent = Forms::FamilyMember.new(:family_id => family._id)
+              dependent.build(:first_name => data_row["First Name (Dep #{i+1})"],
+              				  :middle_name => data_row["Middle Name (Dep #{i+1})"],
+              				  :last_name => data_row["Last Name (Dep #{i+1})"],
+              				  :ssn => data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""),
+              				  :dob => data_row["DOB (Dep #{i+1})"])
+              binding.pry
+              Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
+            end
 			dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
 			dependent.save
 		end
@@ -212,9 +227,6 @@ CSV.foreach(filename, headers: :true) do |row|
 		raise "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
 	end
 
-	family = subscriber.primary_family
-	hh = family.active_household
-	ch = hh.immediate_family_coverage_household
 	en = hh.new_hbx_enrollment_from({
 		coverage_household: ch,
 		employee_role: employee_role,
