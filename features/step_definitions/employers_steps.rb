@@ -213,6 +213,7 @@ When(/^.+ clicks on terminate button for a census family$/) do
 end
 
 When(/^.+ clicks on terminate button for a census family for invalid case$/) do
+ wait_for_ajax
  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[7]/i').click
  find(".date-picker").set(TimeKeeper.date_of_record - 75.days)
  # fill_in ".date-picker", :with => TimeKeeper.date_of_record - 75.days
