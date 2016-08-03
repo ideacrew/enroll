@@ -22,7 +22,7 @@
 
 <% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i><span style='font-size:13px'>Documents Showing Social Security Number</span></i></strong><br>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<div style='padding-bottom: 5px;'><strong>Documents Showing Social Security Number</strong></div>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
@@ -41,7 +41,7 @@
 
 <% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i><span style='font-size:13px'>Documents of Citizenship or Immigration Status</span></i></strong><br>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<div style='padding-bottom: 5px;'><strong>Documents of Citizenship or Immigration Status</strong></div>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
@@ -339,7 +339,7 @@
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free<br>at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 
