@@ -362,7 +362,7 @@ class HbxEnrollment
 
       p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
+      if (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
 
         if p.may_cancel_coverage?
           p.cancel_coverage!
