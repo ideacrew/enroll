@@ -206,13 +206,21 @@ CSV.foreach(filename, headers: :true) do |row|
 			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
 				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
             if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
+            	begin
             	dependent = Forms::FamilyMember.new(:family_id => family._id)
-              dependent.build(:first_name => data_row["First Name (Dep #{i+1})"],
-              				  :middle_name => data_row["Middle Name (Dep #{i+1})"],
-              				  :last_name => data_row["Last Name (Dep #{i+1})"],
-              				  :ssn => data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""),
-              				  :dob => data_row["DOB (Dep #{i+1})"])
-              binding.pry
+            	dependent.first_name = data_row["First Name (Dep #{i+1})"]
+            	dependent.middle_name = data_row["Middle Name (Dep #{i+1})"]
+            	dependent.last_name = data_row["Last Name (Dep #{i+1})"]
+            	dependent.ssn = data_row["SSN (Dep #{i+1})"].to_s.gsub("-","")
+            	dependent.dob = format_date(data_row["DOB (Dep #{i+1})"]).strftime("%Y-%m-%d")
+            	# This employee_relationship code needs to be sorted since the form doesn't have this field. 
+            	# dependent.employee_relationship = census_employee.census_dependents.where(first_name: dependent.first_name,
+            	# 																		  middle_name: dependent.middle_name,
+            	# 																		  last_name: dependent.last_name,
+            	# 																		  dob: dependent.dob).first.employee_relationship
+            	rescue Exception=>e
+            		puts e.inspect
+            	end
               Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
             end
 			dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
