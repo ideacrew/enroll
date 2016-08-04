@@ -542,7 +542,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
               context "and existing employee instance is terminated" do
                 before do
-                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record)
+                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record-1.day)
                   saved_census_employee.save
                 end
 

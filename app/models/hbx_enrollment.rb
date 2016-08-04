@@ -188,7 +188,6 @@ class HbxEnrollment
 
 
   def record_transition
-    puts "recording transition"
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state
@@ -209,7 +208,6 @@ class HbxEnrollment
         end
 
         enrollments_for_termination.each do |hbx_enrollment|
-          puts "terminating enrollment " + hbx_enrollment.id.to_s
           hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
         end
 

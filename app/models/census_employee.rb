@@ -283,16 +283,17 @@ class CensusEmployee < CensusMember
 
       if may_terminate_employee_role?
 
-        if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
-          active_benefit_group_assignment.terminate_coverage!
-        end
+        unless employee_termination_pending?
 
-        if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
-          renewal_benefit_group_assignment.terminate_coverage!
-        end
+          self.employment_terminated_on = employment_terminated_on
+          self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-        self.employment_terminated_on = employment_terminated_on
-        self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.coverage_terminated_on) }
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.employment_terminated_on) }
+        end
 
         terminate_employee_role!
       else
@@ -302,7 +303,6 @@ class CensusEmployee < CensusMember
       end
     else
 
-      # TODO -> Check if it's within 60 days
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
@@ -388,6 +388,14 @@ class CensusEmployee < CensusMember
   end
 
   class << self
+
+    def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on.lt => as_of_date)
+      census_employees_for_termination.each do |census_employee|
+        census_employee.terminate_employment(census_employee.employment_terminated_on)
+      end
+    end
+
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
@@ -446,7 +454,7 @@ class CensusEmployee < CensusMember
     end
 
     event :terminate_employee_role, :after => :record_transition do
-      transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
+      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
     end
   end
 
