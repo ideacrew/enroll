@@ -66,7 +66,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
 
     append_unverified_individuals(outstanding_people)
-    @notice.enrollments << enrollments.first
+    @notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
     @notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
   end
 
@@ -118,7 +118,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
       @notice.ssa_unverified.map{|individual| individual.full_name }.join(','),
       @notice.dhs_unverified.map{|individual| individual.full_name }.join(','),
       @secure_message_recipient.consumer_role.contact_method,
-      @secure_message_recipient.home_email.try(:address) || @secure_message_recipient.user.try(:email)
+      @secure_message_recipient.home_email.try(:address) || @secure_message_recipient.user.try(:email),
+      @notice.enrollments.first.aasm_state.to_s
     ]
   end
 end 

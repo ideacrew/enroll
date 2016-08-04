@@ -13,31 +13,10 @@
       }
 
       @font-face {
-        font-family: "NimbusTimesRomanRegular";
+        font-family: "NimbusTimesRoman";
         font-style: normal;
-        font-weight: 400;
-        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype');
-      }
-
-      @font-face {
-        font-family: "NimbusTimesRomanBold";
-        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Med.otf') %>") format('opentype');
-        font-weight: bold;
-        font-style: normal;
-      }
-
-      @font-face {
-        font-family: "NimbusTimesRomanBoldItalic";
-        font-style: italic;
-        font-weight: bold;
-        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-MedIta.otf') %>") format('opentype');
-      }
-    
-      @font-face {
-        font-family: "NimbusTimesRomanItalic";
-        src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-RegIta.otf') %>") format('opentype');
-        font-style: italic, oblique;
-        font-weight: 400;
+        font-weight: normal;
+        src: url("<%= asset_data_base64('nimbus-roman-no9/NimbusRomNo9L-Reg.otf') %>") format('opentype'); 
       }
 
 
@@ -49,7 +28,7 @@
         mso-line-height-rule:exactly
         font-size:12px;
         color:rgb(0,0,0);
-        font-family: "NimbusTimesRomanRegular", Times, serif;
+        font-family: "NimbusTimesRoman", Times, serif;
         padding-left: 15px;
         padding-right: 15px;
       }
@@ -57,7 +36,7 @@
       table td {
         border-collapse:collapse;
         font-size:12px;
-        font-family: "NimbusTimesRomanRegular", Times, serif;
+        font-family: "NimbusTimesRoman", Times, serif;
         border-color: #000;
       }
 
@@ -68,10 +47,6 @@
 
       table {
         border-collapse: collapse;
-      }
-      
-      h1, h2, h3, h4, strong {
-        font-family: "NimbusTimesRomanBold", Times, serif;
       }
 
       h3, h4 {

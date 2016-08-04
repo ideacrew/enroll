@@ -22,7 +22,7 @@
 
 <% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<div style='padding-bottom: 5px;'><strong>Documents Showing Social Security Number</strong></div>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents Showing Social Security Number</strong></i></div>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
@@ -41,7 +41,7 @@
 
 <% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<div style='padding-bottom: 5px;'><strong>Documents of Citizenship or Immigration Status</strong></div>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents of Citizenship or Immigration Status</strong></i></div>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 

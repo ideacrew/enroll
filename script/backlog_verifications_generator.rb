@@ -20,10 +20,8 @@ families = Family.where({
   }
 })
 
-# families = [127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
-
-# families = [18941625].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
-
+# 19744754, 19745447
+# families = [18941570].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
 
 mailing_address_missing = []
 coverage_not_found = []
@@ -67,7 +65,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     next if person.inbox.blank?
     next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
     if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 15.days.ago
+      next if secure_message.created_at > 35.days.ago
     end
 
       event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
