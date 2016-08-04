@@ -101,7 +101,7 @@
         </div>
       </div>
     <% else %>
-    <div class="row">
+    <div class="row <%= pundit_class(EmployerProfile, :updateable?) %>">
       <h4 class="starter">
         You haven't added any employees to your roster. Select 'Add New Employee' to begin, or select 'Upload Employee Roster' if you’d like to download the roster template and/or upload it now or later.
         <br/><br/>
