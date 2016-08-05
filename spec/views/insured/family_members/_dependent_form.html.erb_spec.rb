@@ -52,7 +52,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: 'RELATION *')
+      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
     end
   end
 
@@ -84,7 +84,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: 'RELATION *')
+      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
     end
 
     it "should have address info area" do

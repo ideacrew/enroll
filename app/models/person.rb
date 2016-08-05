@@ -468,6 +468,10 @@ class Person
     active_employee_roles.any?
   end
 
+  def has_employer_benefits?
+    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
+  end
+
   def active_employee_roles
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end

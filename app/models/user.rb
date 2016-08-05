@@ -300,6 +300,10 @@ class User
     end
   end
 
+  def is_active_broker?(employer_profile)
+    person == employer_profile.active_broker if employer_profile.active_broker
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token

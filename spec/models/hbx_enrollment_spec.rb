@@ -1742,7 +1742,7 @@ context "A cancelled external enrollment", :dbclean => :after_each do
                       )
   end
 
-  before :each do
+  before do
     enrollment.aasm_state = "coverage_canceled"
     enrollment.terminated_on = enrollment.effective_on
     enrollment.external_enrollment = true
@@ -1754,6 +1754,48 @@ context "A cancelled external enrollment", :dbclean => :after_each do
 
   it "should not be visible to the family" do
     expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_terminated"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_selected"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_canceled"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_canceled"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_selected"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).not_to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_terminated"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).not_to eq([])
   end
 end
 
