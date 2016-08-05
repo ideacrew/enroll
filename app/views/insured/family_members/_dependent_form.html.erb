@@ -1,6 +1,6 @@
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
 
-  <div id="add_info_<%= dependent.id %>">
+  <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable?%>">
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
     <% if dependent.errors.any? %>
     <div class="alert alert-error">
