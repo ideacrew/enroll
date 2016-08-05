@@ -223,6 +223,10 @@ GEM
     htmlentities (4.3.4)
     i18n (0.7.0)
     ice_nine (0.11.2)
+    interactor (3.1.0)
+    interactor-rails (2.0.2)
+      interactor (~> 3.0)
+      rails (>= 3, < 5.1)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
@@ -548,6 +552,8 @@ DEPENDENCIES
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
+  interactor (= 3.1.0)
+  interactor-rails (= 2.0.2)
   jbuilder (~> 2.0)
   jquery-datatables-rails (= 3.4.0)
   jquery-rails (= 4.0.5)

@@ -201,7 +201,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
+  
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
@@ -466,6 +466,10 @@ class Person
 
   def has_active_employee_role?
     active_employee_roles.any?
+  end
+
+  def has_employer_benefits?
+    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
   end
 
   def active_employee_roles
