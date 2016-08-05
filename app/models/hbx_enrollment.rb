@@ -234,7 +234,7 @@ class HbxEnrollment
     end
 
     def advance_day(new_date)
-      process_verification_reminders(new_date - 1.day)
+      # process_verification_reminders(new_date - 1.day)
 
       #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
