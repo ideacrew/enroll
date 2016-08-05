@@ -6,7 +6,7 @@ phone    = Phone.new(kind: "main", area_code: "855", number: "532-5465")
 # email    = Email.new(kind: "work", address: "admin@dc.gov")
 office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 geographic_rating_area = GeographicRatingArea.new(
-    rating_area_code: "R-DC001", 
+    rating_area_code: "R-DC001",
     us_counties: UsCounty.where(county_fips_code: "11001").to_a
   )
 
@@ -36,7 +36,7 @@ hbx_profile.benefit_sponsorship = benefit_sponsorship
 hbx_profile.save!
 
 def create_staff member
-   user = User.create!(email: member[:email], password: "password", password_confirmation: "password", roles: [member[:role]])
+   user = User.create!(email: member[:email], oim_id: member[:email], password: "password", password_confirmation: "password", roles: [member[:role]])
    person = Person.new(first_name: member[:first_name], last_name: member[:last_name], user: user)
    person.save!
    if member[:role] == 'assister'

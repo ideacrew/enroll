@@ -37,25 +37,6 @@ class Organization
   # User or Person ID who created/updated
   field :updated_by, type: BSON::ObjectId
 
-  default_scope -> {order("legal_name ASC")}
-
-  scope :employer_by_hbx_id, ->(employer_id) {
-    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
-  }
-
-  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
-  #scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
-  #scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})}
-  scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
-  scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
-
-  scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
-  scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
-
-  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
-
-  scope :by_general_agency_profile, -> (general_agency_profile_id) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
-
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
@@ -63,6 +44,7 @@ class Organization
   embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
@@ -116,29 +98,44 @@ class Organization
          { name: "active_broker_accounts_writing_agent" })
   before_save :generate_hbx_id
 
-
-  default_scope -> {order("legal_name ASC")}
-
-  scope :employer_by_hbx_id, ->(employer_id) {
-    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
+  default_scope                               ->{ order("legal_name ASC") }
+  scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
+  scope :by_broker_agency_profile,            ->( broker_agency_profile_id ) { where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
+  scope :by_broker_role,                      ->( broker_role_id ){ where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } }) }
+  scope :approved_broker_agencies,            ->{ where("broker_agency_profile.aasm_state" => 'is_approved') }
+  scope :broker_agencies_by_market_kind,      ->( market_kind ) { any_in("broker_agency_profile.market_kind" => market_kind) }
+  scope :all_employers_by_plan_year_start_on, ->( start_on ){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
+  scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
+  scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
+  scope :has_broker_agency_profile,           ->{ exists(broker_agency_profile: true) }
+  scope :has_general_agency_profile,          ->{ exists(general_agency_profile: true) }
+  scope :all_employers_renewing,              ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
+  scope :all_employers_renewing_published,    ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
+  scope :all_employers_non_renewing,          ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
+  scope :all_employers_enrolled,              ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
+  scope :invoice_view_all,                    ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+  scope :invoice_view_renewing,               ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING) }
+  scope :invoice_view_initial,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_INITIAL) }
+  scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
+    unscoped.where(
+      :"employer_profile.plan_years" => {
+        :$elemMatch => {
+          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
+          start_on: start_on
+        }
+      })
   }
-
-  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
-  scope :has_general_agency_profile, ->{ exists(general_agency_profile: true) }
-  scope :by_broker_agency_profile, -> (broker_agency_profile_id) {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
-  scope :by_broker_role, -> (broker_role_id)                     {where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } })}
-
-  scope :approved_broker_agencies,  -> { where("broker_agency_profile.aasm_state" => 'is_approved') }
-  scope :broker_agencies_by_market_kind, -> (market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
-
-
-  scope :all_employers_by_plan_year_start_on,   ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on) }
-  scope :all_employers_renewing,                ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
-  scope :all_employers_enrolled,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
-
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+  end
+
+  def invoices
+    documents.select{ |document| document.subject == 'invoice' }
+  end
+
+  def current_month_invoice
+    documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
   end
 
   # Strip non-numeric characters
@@ -162,9 +159,15 @@ class Organization
     search_rex = Regexp.compile(Regexp.escape(s_rex), true)
     {
       "$or" => ([
-        {"legal_name" => search_rex}
+        {"legal_name" => search_rex},
+        {"fein" => search_rex},
       ])
     }
+  end
+
+  def self.retrieve_employers_eligible_for_binder_paid
+    date = TimeKeeper.date_of_record.end_of_month + 1.day
+    all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
   def self.valid_carrier_names
@@ -201,6 +204,47 @@ class Organization
 
   def self.valid_carrier_names_for_options
     Organization.valid_carrier_names.invert.to_a
+  end
+
+  def self.upload_invoice(file_path)
+    invoice_date = invoice_date(file_path) rescue nil
+    org = by_invoice_filename(file_path) rescue nil
+    if invoice_date && org && !invoice_exist?(invoice_date,org)
+      doc_uri = Aws::S3Storage.save(file_path, "invoices")
+      if doc_uri
+        document = Document.new
+        document.identifier = doc_uri
+        document.date = invoice_date
+        document.format = 'application/pdf'
+        document.subject = 'invoice'
+        document.title = File.basename(file_path)
+        org.documents << document
+        logger.debug "associated file #{file_path} with the Organization"
+        return document
+      end
+    else
+      logger.warn("Unable to associate invoice #{file_path}")
+    end
+  end
+
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Returns Organization
+  def self.by_invoice_filename(file_path)
+    hbx_id= File.basename(file_path).split("_")[0]
+    Organization.where(hbx_id: hbx_id).first
+  end
+
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Returns Date
+  def self.invoice_date(file_path)
+    date_string= File.basename(file_path).split("_")[1]
+    Date.strptime(date_string, "%m%d%Y")
+  end
+
+  def self.invoice_exist?(invoice_date,org)
+    docs =org.documents.where("date" => invoice_date)
+    matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
+    return true if matching_documents.count > 0
   end
 
   def office_location_kinds

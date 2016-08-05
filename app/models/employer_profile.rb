@@ -8,6 +8,7 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include StateTransitionPublisher
 
   embedded_in :organization
 
@@ -26,6 +27,7 @@ class EmployerProfile
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -49,6 +51,7 @@ class EmployerProfile
   embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
@@ -72,6 +75,10 @@ class EmployerProfile
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
   alias_method :is_active?, :is_active
+
+  # def self.all_with_next_month_effective_date
+    # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+  # end
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -154,7 +161,19 @@ class EmployerProfile
     end
   end
 
+  def memoize_active_broker active_broker_memo
+    return unless account = active_broker_agency_account
+    if memo = active_broker_memo[account.broker_agency_profile_id] then return memo end
+    active_broker_memo[account.broker_agency_profile.id] = active_broker
+  end
+
   # for General Agency
+  def hashed_active_general_agency_legal_name gaps
+    return  unless account = active_general_agency_account
+    gap = gaps.detect{|gap| gap.id == account.general_agency_profile_id}
+    gap && gap.legal_name
+  end
+
   def active_general_agency_legal_name
     if active_general_agency_account
       active_general_agency_account.legal_name
@@ -171,7 +190,8 @@ class EmployerProfile
   end
 
   def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
-    # commented out the start_on and terminate_on 
+
+    # commented out the start_on and terminate_on
     # which is same as broker calculation, However it will cause problem
     # start_on later than end_on
     #
@@ -213,6 +233,10 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  def draft_plan_year
+    plan_years.select{ |py| py.aasm_state == "draft" }
+  end
+
   def published_plan_year
     plan_years.published.first
   end
@@ -241,38 +265,40 @@ class EmployerProfile
     end
   end
 
-  def billing_plan_year
-    billing_report_date = TimeKeeper.date_of_record.next_month
+  def billing_plan_year(billing_date = nil)
+    billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
     plan_year = find_plan_year_by_effective_date(billing_report_date)
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
-        billing_report_date = plan_year.start_on
+    if billing_date.blank?
+      if plan_year.blank?
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+          billing_report_date = plan_year.start_on
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
-        billing_report_date = TimeKeeper.date_of_record
+      if plan_year.blank?
+        if plan_year = find_plan_year_by_effective_date(TimeKeeper.date_of_record)
+          billing_report_date = TimeKeeper.date_of_record
+        end
       end
-    end
 
-    if plan_year.blank?
-      if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
-        billing_report_date = plan_year.start_on
+      if plan_year.blank?
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+          billing_report_date = plan_year.start_on
+        end
       end
     end
 
     return plan_year, billing_report_date
   end
 
-  def enrollments_for_billing
-    plan_year, billing_report_date = billing_plan_year
+  def enrollments_for_billing(billing_date = nil)
+    plan_year, billing_report_date = billing_plan_year(billing_date)
     hbx_enrollments = []
 
     if plan_year.present?
       hbx_enrollments = plan_year.hbx_enrollments_by_month(billing_report_date).compact
-      hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
+      # hbx_enrollments.reject!{|enrollment| !enrollment.census_employee.is_active?}
     end
 
     hbx_enrollments
@@ -290,6 +316,10 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
+  def can_transmit_xml?
+    !self.renewing_plan_year.present? && !self.binder_paid?
+  end
+
   def renewing_plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
   end
@@ -300,6 +330,7 @@ class EmployerProfile
 
   ## Class methods
   class << self
+
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.employer_profile }
     end
@@ -402,6 +433,16 @@ class EmployerProfile
       })
     end
 
+    def organizations_for_force_publish(new_date)
+      Organization.where({
+        :'employer_profile.plan_years' =>
+        { :$elemMatch => {
+          :start_on => new_date.next_month.beginning_of_month,
+          :aasm_state => 'renewing_draft'
+          }}
+      })
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
@@ -435,6 +476,13 @@ class EmployerProfile
         organizations_for_plan_year_end(new_date).each do |organization|
           employer_enroll_factory.employer_profile = organization.employer_profile
           employer_enroll_factory.end
+        end
+
+        if new_date.day == 11
+          organizations_for_force_publish(new_date).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            plan_year.force_publish!
+          end
         end
       end
 
@@ -637,12 +685,41 @@ class EmployerProfile
   #   registered? or published_plan_year.enrolling?
   # end
 
+  def self.update_status_to_binder_paid(employer_profile_ids)
+    employer_profile_ids.each do |id|
+      empr = self.find(id)
+      empr.update_attribute(:aasm_state, "binder_paid")
+    end
+  end
+
+  def is_new_employer?
+    !renewing_plan_year.present? #&& TimeKeeper.date_of_record > 10
+  end
+
+  def is_renewing_employer?
+     renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
+  end
+
+  def has_next_month_plan_year?
+    show_plan_year.present? && (show_plan_year.start_on == (TimeKeeper.date_of_record.next_month).beginning_of_month)
+  end
+
   def is_eligible_to_enroll?
     published_plan_year.enrolling?
   end
 
   def notify_binder_paid
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
+  end
+
+  def self.by_hbx_id(an_hbx_id)
+    org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
+    return nil unless org.any?
+    org.first.employer_profile
+  end
+
+  def is_conversion?
+    self.profile_source == "conversion"
   end
 
 private

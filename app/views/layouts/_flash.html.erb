@@ -1,6 +1,10 @@
-<div class="row">
-	<div class="alert alert-<%= type %>">
-		<a href="#" data-dismiss="alert" class="close">×</a>
-		<%= raw message %>
-	</div>
+<div class="row flash module">
+  <div class="alert alert-<%= type %>">
+    <div class="row">
+      <div class="col-xs-12">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        <%= raw message %>
+      </div>
+    </div>
+  </div>
 </div>

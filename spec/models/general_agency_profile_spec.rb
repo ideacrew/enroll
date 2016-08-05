@@ -88,6 +88,38 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
         end
       end
     end
+
+    describe "all_by_broker_role" do
+      let(:broker_role) { FactoryGirl.build :broker_role }
+      let(:general_agency_profile_approved) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_approved"}
+      let(:general_agency_profile_applicant1) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_applicant"}
+      let(:general_agency_profile_applicant2) { FactoryGirl.build :general_agency_profile , :aasm_state => "is_applicant"}
+      context "with approved general_agency_profiles" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_approved,general_agency_profile_applicant1])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq [general_agency_profile_approved]
+        end
+      end
+      context "with favorite general_agency_profile for broker_role" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_approved,general_agency_profile_applicant1])
+          allow(broker_role).to receive(:favorite_general_agencies).and_return([general_agency_profile_approved])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq [general_agency_profile_approved]
+        end
+      end
+      context "without approved general_agency_profiles" do
+        before do
+          allow(GeneralAgencyProfile).to receive(:all).and_return([general_agency_profile_applicant1,general_agency_profile_applicant2])
+        end
+        it "should only gett approved general agency profiles" do
+          expect(GeneralAgencyProfile.all_by_broker_role(broker_role,:approved_only => true)).to eq []
+        end
+      end
+    end
   end
 
   describe "instance method", dbclean: :after_each do
@@ -132,6 +164,54 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
       it "current_staff_state" do
         expect(general_agency_profile.current_staff_state).to eq general_agency_staff_role.current_state
+      end
+    end
+  end
+
+  describe "class method" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+    context "all_by_broker_role" do
+      before :each do
+        10.times { FactoryGirl.create(:general_agency_profile) }
+        broker_role.favorite_general_agencies.create(general_agency_profile_id: general_agency_profile.id)
+      end
+
+      it "should return general_agency_profile that sort by favorite_general_agencies" do
+        sorted_general_agency_profiles = GeneralAgencyProfile.all.sort {|ga| [general_agency_profile.id].include?(ga.id) ? 0:1 }
+        expect(GeneralAgencyProfile.all_by_broker_role(broker_role)).to eq sorted_general_agency_profiles
+      end
+    end
+
+    context "filter_by" do
+      let(:ga1) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_applicant') }
+      let(:ga2) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_approved') }
+      let(:ga3) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_suspended') }
+      before :each do
+        ga1
+        ga2
+        ga3
+      end
+
+      it "should get all general_agency_profile" do
+        expect(GeneralAgencyProfile.filter_by('all')).to eq GeneralAgencyProfile.all
+      end
+
+      it "should get applicant ga without params" do
+        expect(GeneralAgencyProfile.filter_by()).to eq [ga1]
+      end
+
+      it "should get approved ga" do
+        expect(GeneralAgencyProfile.filter_by('is_approved')).to eq [ga2]
+      end
+
+      it "should get suspend ga "do
+        expect(GeneralAgencyProfile.filter_by('is_suspended')).to eq [ga3]
+      end
+
+      it "should get blank" do
+        expect(GeneralAgencyProfile.filter_by('other')).to eq []
       end
     end
   end

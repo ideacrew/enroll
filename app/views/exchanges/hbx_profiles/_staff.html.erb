@@ -1,24 +1,17 @@
-<div id= 'message_form'></div>
-<div class="top-pd" id="inbox_provider_form">
+<div id='message_form'></div>
+<div class="top-pd row" id="inbox_provider_form">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <h3 class="title-inline">CSR, CAC and Assisters</h3>
-
     <div class="form-inline button-group-wrapper">
       <div class="col-xs-12 search-wp">
         <%= render 'shared/search', url: staff_index_exchanges_hbx_profiles_path, q: @q, placeholder: 'Last Name', remote: true %>
       </div>
-<!--       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
-        <%#= link_to 'New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button new_employer_profile new_employer_profile_btn" %>
-      </div> -->
     </div>
   </div>
-
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="table-responsive">
       <table class="table table-wrapper" style="opacity: 1;">
-
         <%= render 'staff_table'%>
-
       </table>
       <%= render 'shared/alph_paginate_remote', url: staff_index_exchanges_hbx_profiles_path, alphs: @page_alphabets %>
     </div>

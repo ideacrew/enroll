@@ -21,7 +21,7 @@
           </td>
           <td>
             <p><%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
-               <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %></p>
+               <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %></p>
           </td>
         </tr>
         <% if @person.primary_family.current_broker_agency.writing_agent.phone.present? %>

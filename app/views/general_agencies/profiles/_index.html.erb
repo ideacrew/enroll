@@ -1,21 +1,21 @@
-<div class="container" id="inbox_provider_form">
+<div class="" id="inbox_provider_form">
   <div class="row">
     <div class="col-md-12">
       <h3 class="title-inline">General Agencies</h3>
       <div class="form-inline button-group-wrapper">
         <div class="btn-group" role="group" aria-label="">
           <div class="btn-group" data-toggle="buttons" name="general_agencies_tab">
-            <label class="btn btn-default <%= 'active' if @status == 'applicant' %>">
-              <input type="radio" name="options" autocomplete="off" value="applicant" <%= 'checked' if @status == 'applicant' %>> Applicant
+            <label class="btn btn-default <%= 'active' if @status == 'is_applicant' %>">
+              <input type="radio" name="options" autocomplete="off" value="is_applicant" <%= 'checked' if @status == 'is_applicant' %>> Applicant
             </label>
-            <label class="btn btn-default <%= 'active' if @status == 'certified' %>">
-              <input type="radio" name="options" autocomplete="off" value="certified" <%= 'checked' if @status == 'certified' %>> Certified
+            <label class="btn btn-default <%= 'active' if @status == 'is_approved' %>">
+              <input type="radio" name="options" autocomplete="off" value="is_approved" <%= 'checked' if @status == 'is_approved' %>> Certified
             </label>
-            <label class="btn btn-default <%= 'active' if @status == 'decertified' %>">
-              <input type="radio" name="options" autocomplete="off" value="decertified" <%= 'checked' if @status == 'decertified' %>> Decertified
+            <label class="btn btn-default <%= 'active' if @status == 'is_rejected' %>">
+              <input type="radio" name="options" autocomplete="off" value="is_rejected" <%= 'checked' if @status == 'is_rejected' %>> Decertified
             </label>
-            <label class="btn btn-default <%= 'active' if @status == 'denied' %>">
-              <input type="radio" name="options" autocomplete="off" value="denied" <%= 'checked' if @status == 'denied' %>> Pending
+            <label class="btn btn-default <%= 'active' if @status == 'is_suspended' %>">
+              <input type="radio" name="options" autocomplete="off" value="is_suspended" <%= 'checked' if @status == 'is_suspended' %>> Pending
             </label>
             <label class="btn btn-default <%= 'active' if @status == 'all' %>">
               <input type="radio" name="options" autocomplete="off" value="all" <%= 'checked' if @status == 'all' %>> All
@@ -46,7 +46,7 @@
             <td><%= general_agency_profile.fein %></td>
             <td><%= general_agency_profile.entity_kind.titleize %></td>
             <td><%= general_agency_profile.market_kind.titleize %></td>
-            <td><%= general_agency_profile.current_staff_state %></td>
+            <td><%= general_agency_profile.current_state %></td>
             <td><%#= link_to 'Send Secure Message'.html_safe,
             new_broker_agencies_inbox_path(id: general_agency_profile.id, profile_id: @profile._id), class: "btn btn-default", remote: true %></td>
           </tbody>

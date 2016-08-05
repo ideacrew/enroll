@@ -1,7 +1,8 @@
 Given /(\w+) is a person$/ do |name|
   person = FactoryGirl.create(:person, first_name: name)
   @pswd = 'aA1!aA1!aA1!'
-  user = User.create(email: Forgery('email').address, password: @pswd, password_confirmation: @pswd, person: person)
+  email = Forgery('email').address
+  user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
@@ -14,11 +15,11 @@ end
 
 Then  /(\w+) signs in to portal/ do |name|
   person = Person.where(first_name: name).first
-  fill_in "user[email]", :with => person.user.email
-  find('#user_email').set(person.user.email)
+  fill_in "user[login]", :with => person.user.email
+  find('#user_login').set(person.user.email)
   fill_in "user[password]", :with => @pswd
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => person.user.email unless find(:xpath, '//*[@id="user_email"]').value == person.user.email
+  fill_in "user[login]", :with => person.user.email unless find(:xpath, '//*[@id="user_login"]').value == person.user.email
   find('.interaction-click-control-sign-in').click
 end
 
@@ -82,6 +83,11 @@ Then(/(\w+) is the staff person for an existing employer$/) do |name|
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)
 end
 
+Then(/(\w+) is applicant staff person for an existing employer$/) do |name|
+  person = Person.where(first_name: name).first
+  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id, aasm_state: 'is_applicant')
+end
+
 When(/(\w+) accesses the Employer Portal/) do |name|
   person = Person.where(first_name: name).first
   visit '/'
@@ -99,9 +105,7 @@ end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
-
   click_link 'Add Employer Staff Role'
-
   fill_in 'first_name', with: person.first_name
   fill_in 'last_name', with: person.last_name
   fill_in  'dob', with: person.dob
@@ -146,9 +150,8 @@ Then /(\w+) enters data for Turner Agency, Inc/ do |name|
 end
 
 Then /(\w+) is notified about Employer Staff Role (.*)/ do |name, alert|
-   find('.interaction-click-control-confirm').click
-   expect(find('.alert-notice').text).to match /#{alert}/
-   expect(find('h2').text).to match /Thank you for logging into your DC/
+   expect(page).to have_content("Thank you for submitting your request to access the employer account. Your application for access is pending.")
+   expect(page).to have_css("a", :text => /back/i)
    screenshot('pending_person_stays_on_new_page')
  end
 
@@ -162,7 +165,6 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   find(tab_class).click
 end
 Given /Admin selects Hannahs company/ do
-
   company = find('a', text: 'Turner Agency, Inc')
   company.click
 end
@@ -199,7 +201,7 @@ Then /(\w+) becomes an Employer/ do |name|
   find('a', text: "I'm an Employer")
 end
 
-Then /there is a linked POC/ do 
+Then /there is a linked POC/ do
   find('td', text: /Linked/)
 end
 

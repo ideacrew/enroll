@@ -185,8 +185,8 @@ class Invitation
     UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
-  def send_renewal_invitation!(invitee_name)
-    UserMailer.renewal_invitation_email(invitation_email, invitee_name, self).deliver_now
+  def send_renewal_invitation!(census_employee)
+    UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
   end
 
   def send_agent_invitation!(invitee_name)
@@ -218,7 +218,7 @@ class Invitation
         :source_id => census_employee.id,
         :invitation_email => census_employee.email_address
       )
-      invitation.send_renewal_invitation!(census_employee.full_name)
+      invitation.send_renewal_invitation!(census_employee)
       invitation
     end
   end

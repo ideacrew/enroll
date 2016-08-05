@@ -1,8 +1,4 @@
-$primary-blue: #007bc4;
-$primay-active-button-text-color: #ffffff;
-$primary-bold: 600;
-$primary-green: #69A30D;
-
+@import "variables";
 .module {
   &.home-tab {
     .plan-details {
@@ -143,5 +139,66 @@ $primary-green: #69A30D;
     .description {
       border-bottom: none;
     }
+  }
+  &.employer-broker-widget {
+    .panel-heading {
+      .panel-title {
+        color: $primary-blue;
+      }
+    }
+    .panel-body {
+      display: table;
+      width: 100%;
+      > * {
+        display: table-cell;
+        vertical-align: middle;
+        &.text-center {
+          width: 25%;
+        }
+        &.text-left {
+          padding-left: 7.5%;
+          .broker-information {
+            word-break: break-all;
+          }
+        }
+      }
+    }
+  }
+  &.open-enrollment-ends-on {
+    .panel-body {
+      display: table;
+      width: 100%;
+      > * {
+        display: table-cell;
+        vertical-align: middle;
+        &.text-center {
+          width: 25%;
+          figure span {
+            display: inline-block;
+          }
+          h2, span {
+            color: $primary-green;
+            line-height: 1.1;
+          }
+          h2 {
+            strong {
+              margin-top: 27.5%;
+              display: inline-block;
+            }
+          }
+        }
+        &.text-left {
+          padding-left: 7.5%;
+          h3 {
+            line-height: 1.1;
+            margin-bottom: 2.5%;
+            color: $primary-green;
+          }
+        }
+      }
+    }
+  }
+  .employer-right-column {
+    padding-right: 0;
   }
 }

@@ -805,7 +805,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     it "should return false without benefit_group_assignment" do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
-      expect(census_employee.has_active_health_coverage?).to be_falsey
+      expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
     end
 
     context "with active benefit_group_assignment" do
@@ -815,12 +815,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should return false without hbx_enrollment" do
         allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
-        expect(census_employee.has_active_health_coverage?).to be_falsey
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
         allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
-        expect(census_employee.has_active_health_coverage?).to be_truthy
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
       end
     end
   end

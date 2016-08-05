@@ -141,7 +141,7 @@ When(/^.+ registers with valid information for ga flow$/) do
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com")
+  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 
@@ -167,9 +167,10 @@ end
 
 When(/^.+ assign employer to general agency$/) do
   find("input#employer_ids_").click
-  find(:xpath, "//p[@class='label']").click
+  find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click
+  sleep(1)
 end
 
 Then(/^.+ should see assign successful message$/) do
@@ -188,10 +189,10 @@ When(/^General Agency staff logs on the General Agency Portal$/) do
   find("a.interaction-click-control-general-agency-portal").click
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: "jack.martin@example.com"
-  find('#user_email').set("jack.martin@example.com")
+  fill_in "user[login]", with: "jack.martin@example.com"
+  find('#user_login').set("jack.martin@example.com")
   fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[email]", :with => "jack.martin@example.com" unless find(:xpath, '//*[@id="user_email"]').value == "jack.martin@example.com"
+  fill_in "user[login]", :with => "jack.martin@example.com" unless find(:xpath, '//*[@id="user_login"]').value == "jack.martin@example.com"
   find('.interaction-click-control-sign-in').click
 end
 
