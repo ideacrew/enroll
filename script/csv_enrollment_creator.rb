@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "Redmine-6879_enrollments.csv"
+filename = "Redmine-6299-7481-7696-6922-8336-single_member.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -163,10 +163,12 @@ CSV.foreach(filename, headers: :true) do |row|
     if  employee_role.blank?
       if subscriber.present?
       	census_employee = organization.employer_profile.census_employees.where(:first_name => /#{data_row["First Name"]}/i, :last_name => /#{data_row["Last Name"]}/i).first
-      	employee_role = Factories::EnrollmentFactory.build_employee_role(subscriber, false, census_employee.employer_profile, census_employee, census_employee.hired_on)
+      	employee_role = Factories::EnrollmentFactory.build_employee_role(subscriber, false, census_employee.employer_profile, census_employee, census_employee.hired_on).first
       else
 	    employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
 	  end
+
+
 
 	  employee_role.benefit_group_id = benefit_group_assignment.benefit_group_id
 	  employee_role.save!
