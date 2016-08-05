@@ -413,6 +413,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
 
     context 'when its initial enrollment' do
@@ -559,6 +560,7 @@ RSpec.describe Insured::FamiliesController do
     context "delete delete_consumer_broker" do
       let(:family) {FactoryGirl.build(:family)}
       before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
@@ -575,6 +577,7 @@ RSpec.describe Insured::FamiliesController do
     context "post unblock" do
       let(:family) { FactoryGirl.build(:family) }
       before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(Family).to receive(:find).and_return family
       end
 
