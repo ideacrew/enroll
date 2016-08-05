@@ -33,6 +33,11 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context 'oim_id validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:oim_id).case_insensitive }
+    end
+
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
       it 'is too long' do
