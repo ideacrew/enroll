@@ -121,7 +121,7 @@ module Forms
     end
 
     def has_broker_agency
-      self.errors.add(:base, "organization has already been created.")
+      self.errors.add(:base, "fein is already in use.")
     end
 
     def office_locations_attributes
