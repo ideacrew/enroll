@@ -543,3 +543,59 @@ describe EmployeeRole, dbclean: :after_each do
     end
   end
 end
+
+describe EmployeeRole, dbclean: :after_each do
+
+  context 'is_dental_offered?' do
+
+    let!(:employer_profile) { 
+      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+      FactoryGirl.create :employer_profile, organization: org
+    }
+
+    let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:end_on) { start_on + 1.year - 1.day }
+    let(:open_enrollment_start_on) { start_on - 1.month }
+    let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
+
+    let!(:plan) {
+      FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+    }
+
+    let!(:current_plan_year) {
+      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
+    }
+
+    let!(:current_benefit_group){
+      FactoryGirl.create :benefit_group, plan_year: current_plan_year, reference_plan_id: plan.id
+    }
+
+    let!(:family) {
+      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+      ce = FactoryGirl.create :census_employee, employer_profile: employer_profile
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+      ce.update_attributes({employee_role: employee_role})
+      Family.find_or_build_from_employee_role(employee_role)
+    }
+
+    let(:employee_role) { family.primary_applicant.person.employee_roles.first }
+
+    context "EE for New ER who's offering Dental trying to purchase coverage during open enrollment" do
+
+      before do 
+        allow(current_benefit_group).to receive(:is_offering_dental?).and_return(true)
+      end
+
+      context 'When benefit package assigned' do
+
+        it 'should retrun true' do
+          employee_role.census_employee.add_benefit_group_assignment current_benefit_group, current_benefit_group.start_on
+          employee_role.census_employee.save!
+
+          expect(employee_role.is_dental_offered?).to be_truthy
+        end
+      end
+    end
+  end
+end
