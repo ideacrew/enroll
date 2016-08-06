@@ -116,7 +116,15 @@ class Organization
   scope :invoice_view_all,                    ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING + PlanYear::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
   scope :invoice_view_renewing,               ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_RENEWING) }
   scope :invoice_view_initial,                ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".nin => PlanYear::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => PlanYear::INVOICE_VIEW_INITIAL) }
-  #scope :invoice_starting,                   ->{ unscoped.where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+  scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
+    unscoped.where(
+      :"employer_profile.plan_years" => {
+        :$elemMatch => {
+          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
+          start_on: start_on
+        }
+      })
+  }
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
@@ -155,6 +163,11 @@ class Organization
         {"fein" => search_rex},
       ])
     }
+  end
+
+  def self.retrieve_employers_eligible_for_binder_paid
+    date = TimeKeeper.date_of_record.end_of_month + 1.day
+    all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
   def self.valid_carrier_names

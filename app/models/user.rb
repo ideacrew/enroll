@@ -15,7 +15,7 @@ class User
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
   validates_presence_of :oim_id
-  validates_uniqueness_of :oim_id
+  validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
   validate :oim_id_rules
   validates_presence_of     :password, if: :password_required?
@@ -298,6 +298,10 @@ class User
         "Customer Service Representative (CSR)"
       end
     end
+  end
+
+  def is_active_broker?(employer_profile)
+    person == employer_profile.active_broker if employer_profile.active_broker
   end
 
   def ensure_authentication_token
