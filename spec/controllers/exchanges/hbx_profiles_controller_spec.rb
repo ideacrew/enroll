@@ -112,6 +112,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+    let(:search_params){{"value"=>""}}
 
     before :each do
       allow(user).to receive(:person).and_return(person)
@@ -128,7 +129,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "renders employer_invoice datatable payload" do
-      xhr :post, :employer_invoice_datatable
+      xhr :post, :employer_invoice_datatable, :search => search_params
       expect(response).to have_http_status(:success)
     end
 
