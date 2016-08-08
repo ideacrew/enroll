@@ -13,7 +13,14 @@
 	          <%= f.label :username %>
 
 <!-- Modal -->
-	          <%= f.text_field :email, class: "form-control", required: true %>
+	          <%= f.text_field :oim_id, class: "form-control", required: true %>
+	        </div>
+
+	        <div class="form-group">
+	          <%= f.label :email %>
+	          	<em> (Optional)</em>
+	          	<br/>
+			 	<%= f.text_field :email, class: "form-control" %> 
 	        </div>
 
 	        <div class="form-group">
