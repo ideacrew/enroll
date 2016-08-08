@@ -34,11 +34,11 @@
     <% if @hbx_enrollments.present? %>
     <div class="row">
       <div class="col-xs-6">
-        <% health_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'} %>
+        <% health_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health' && !enrollment.external_enrollment } %>
         <%= render 'enrollment_details', enrollment: health_coverage if health_coverage %>
       </div>
       <div class="col-xs-6">
-        <% dental_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental'} %>
+        <% dental_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental' && !enrollment.external_enrollment } %>
         <%= render 'enrollment_details', enrollment: dental_coverage if dental_coverage %>
       </div>
     </div>
