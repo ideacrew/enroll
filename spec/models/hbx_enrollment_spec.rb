@@ -793,9 +793,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:hbx_enrollment2){ HbxEnrollment.new(benefit_group: benefit_group, kind: "indiviual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: TimeKeeper.date_of_record) }
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
-      binding.pry
       hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 10.days
-      hbx_enrollment1 = family1.enrollments.where(:aasm_state => 'coverage_selected').first
 
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_canceled?).to be_truthy
@@ -804,7 +802,6 @@ describe HbxProfile, "class methods", type: :model do
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
       hbx_enrollment1.effective_on = TimeKeeper.date_of_record - 10.days
-      hbx_enrollment1 = family1.enrollments.where(:aasm_state => 'coverage_selected').first
 
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_terminated?).to be_truthy
