@@ -103,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">

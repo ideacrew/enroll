@@ -23,6 +23,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:hbx_enrollment, hbx_enrollment)
       sign_in current_user
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(employee_role).to receive(:is_dental_offered?).and_return(true)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
@@ -518,6 +519,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(employee_role).to receive(:is_dental_offered?).and_return(true)
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
@@ -568,12 +570,16 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group_no_dental) }
 
       it "dental option should have a class of dn" do
+        allow(employee_role).to receive(:is_dental_offered?).and_return(false)
+
         assign(:market_kind, 'shop');
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('.n-radio-row.dn')
       end
 
       it "dental option should be visible" do
+        allow(employee_role).to receive(:is_dental_offered?).and_return(true)
+
         allow(employee_role).to receive_message_chain('census_employee.active_benefit_group').and_return(benefit_group)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to_not have_selector('.n-radio-row.dn')
