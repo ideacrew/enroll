@@ -22,7 +22,7 @@ module Importers
 
     def validate_new_coverage_policy
       return true if new_coverage_policy.blank?
-      if new_coverage_policy.blank?
+      if new_coverage_policy_value.blank?
         warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(",")}), defaulting to first of month following date of hire")
       end
     end
