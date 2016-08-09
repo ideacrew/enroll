@@ -25,7 +25,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment benefit_group
 
-
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
 end
