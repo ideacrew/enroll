@@ -2,7 +2,7 @@ class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
   before_action :find_employer
   before_action :find_borker_agency, :except => [:index, :active_broker]
-
+  before_action :updateable?, only: [:create, :terminate]
 
   def index
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
@@ -37,6 +37,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def create
+    authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
 
@@ -63,6 +64,7 @@ class Employers::BrokerAgencyController < ApplicationController
 
 
   def terminate
+    authorize EmployerProfile, :updateable?
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
       @employer_profile.fire_broker_agency(termination_date)
@@ -91,6 +93,10 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   private
+
+  def updateable?
+    authorize @employer_profile, :updateable?
+  end
   def send_broker_successfully_associated_email broker_role_id
     id =BSON::ObjectId.from_string(broker_role_id)
     @broker_person = Person.where(:'broker_role._id' => id).first

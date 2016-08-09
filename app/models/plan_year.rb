@@ -10,9 +10,6 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled)
-  INVOICE_VIEW_INITIAL = %w(published enrolling enrolled active suspended)
-
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
 
   # Plan Year time period
