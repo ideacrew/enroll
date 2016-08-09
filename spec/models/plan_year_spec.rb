@@ -2128,7 +2128,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:calender_year) { TimeKeeper.date_of_record.year }
     let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
     let(:plan_year_end_on) { Date.new(calender_year + 1, 5, 31) }
-    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
+    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 3) }
     let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,

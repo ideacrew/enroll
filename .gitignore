@@ -38,6 +38,7 @@ db/seedfiles/cms/**/*.zip
 
 # Ignore Saml Yaml
 config/saml.yml
+config/symmetric-encryption.yml
 
 # Ignore the gem folder
 /gems
