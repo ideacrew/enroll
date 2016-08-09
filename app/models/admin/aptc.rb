@@ -251,6 +251,7 @@ class Admin::Aptc < ApplicationController
       return current_aptc_applied_hash  
     end
 
+    # Redetermine Eligibility on Max APTC / CSR Update.
     def redetermine_eligibility_with_updated_values(family, params, hbxs)
       eligibility_redetermination_result = false
       max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
@@ -264,7 +265,6 @@ class Admin::Aptc < ApplicationController
 
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         eligibility_redetermination_result = true
-        # TODO: Maybe dont follow the 15th day rule here ??
         eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
         latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
@@ -281,6 +281,7 @@ class Admin::Aptc < ApplicationController
       eligibility_redetermination_result
     end
 
+    # Create new Enrollments when Applied APTC for an Enrollment is Updated.
     def update_aptc_applied_for_enrollments(params)
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
