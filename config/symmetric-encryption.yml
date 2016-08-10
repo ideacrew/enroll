@@ -13,3 +13,4 @@ development:   &development_defaults
 
 test:
   <<: *development_defaults
+
