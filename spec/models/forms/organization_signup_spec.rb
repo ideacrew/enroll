@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Forms::OrganizationSignup, "office location kind validtion" do
+describe Forms::OrganizationSignup, "office location kind validtion", :dbclean => :after_each do
   context "give more than one office location of the primary type" do
     let(:office_location_1) { OfficeLocation.new( :address => Address.new(:kind => "primary") ) }
     let(:office_location_2) { OfficeLocation.new( :address => Address.new(:kind => "primary") ) }
@@ -54,6 +54,10 @@ describe Forms::OrganizationSignup, "fein validation" do
   let(:office_location_1) { OfficeLocation.new(organization: organization,
                                                                           :address => FactoryGirl.build(:address, :kind => "primary"), phone: FactoryGirl.build(:phone)) }
   subject { Forms::OrganizationSignup.new( :office_locations => [office_location_1]) }
+
+  before :each do
+    DatabaseCleaner.clean
+  end
 
   context "no fein" do
     it "should not be valid" do
