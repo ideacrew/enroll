@@ -141,4 +141,10 @@ module Employers::EmployerHelper
       0
     end
   end
+
+  def display_families_tab(user)
+    if user.present?
+      user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
+    end
+  end
 end

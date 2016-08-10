@@ -1,7 +1,7 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
   before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
-
+  before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
   def new
@@ -295,6 +295,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def revert
+    authorize EmployerProfile, :revert_application?
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     if @employer_profile.plan_years.renewing.include?(@plan_year) && @plan_year.may_revert_renewal?
       @plan_year.revert_renewal
@@ -399,6 +400,11 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   private
+
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end  
+
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan

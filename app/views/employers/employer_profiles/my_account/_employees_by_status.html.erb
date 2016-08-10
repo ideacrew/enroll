@@ -56,7 +56,7 @@
           <% end %>
           <% if census_employee.aasm_state == 'employment_terminated' %>
             <td class="table-functions">
-              <a class="show_confirm btn btn-primary" id="show_confirm_<%= census_employee.id %>">
+              <a class="show_confirm btn btn-green-2 <%= pundit_class EmployerProfile, :updateable? %>" id="show_confirm_<%= census_employee.id %>">
                 <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').nextAll('.rehire_<%= census_employee.id %>').toggle();">Rehire</span>
               </a>
             </td>
@@ -125,7 +125,7 @@
           <% elsif census_employee.may_terminate_employee_role? %>
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
-                <div class="confirm-terminate">
+                <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">
                   <h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong>
                     <br/>
                     <span class="lg fourteen">(termination date must be within the past 60 days)</span>

@@ -60,7 +60,7 @@ module ApplicationHelper
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
-      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
+      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
 
@@ -95,6 +95,14 @@ module ApplicationHelper
 
   def format_datetime(date_value)
     date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
+  end
+
+  def group_xml_transmitted_message(employer)
+    employer.xml_transmitted_timestamp.present? ? "The group xml for employer #{employer.legal_name} was transmitted on #{format_time_display(employer.xml_transmitted_timestamp)}. Are you sure you want to transmit again?" : "Are you sure you want to transmit the group xml for employer #{employer.legal_name}?"
+  end
+
+  def format_time_display(timestamp)
+    timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
   # Builds a Dropdown button
@@ -146,7 +154,7 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph
   def boolean_to_glyph(test)
-    test ? content_tag(:span, "", class: "fui-checkbox-checked") : content_tag(:span, "", class: "fui-checkbox-unchecked")
+    test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -546,6 +554,11 @@ module ApplicationHelper
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
+  def make_binder_checkbox_disabled(employer)
+    eligibility_criteria(employer)
+    (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
+  end
+
   def favorite_class(broker_role, general_agency_profile)
     return "" if broker_role.blank?
 
@@ -561,37 +574,31 @@ module ApplicationHelper
     broker_agency_profile.default_general_agency_profile == general_agency_profile
   end
 
-  def eligiblity_participation_rule(count)
-    case count
-    when 0
-      return "2/3 Rule Met? : Yes"
-    else
-      return "2. You have 0 non-owner employees on your roster"
-    end
-  end
-
   def eligibility_criteria(employer)
-    participation_rule_text = participation_rule(employer)
-    non_owner_participation_rule_text = non_owner_participation_rule(employer)
-    text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
-    ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+    if employer.show_plan_year.present?
+      participation_rule_text = participation_rule(employer)
+      non_owner_participation_rule_text = non_owner_participation_rule(employer)
+      text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
+      ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+    end
   end
 
   def participation_rule(employer)
     @participation_count = employer.show_plan_year.additional_required_participants_count
     if @participation_count == 0
-      return "1. 2/3 Rule Met? : Yes"
+      "1. 2/3 Rule Met? : Yes"
     else
-      return "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
+      "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
     end
   end
 
   def non_owner_participation_rule(employer)
     @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
     if @non_owner_participation_rule == true
-      return "2. Non-Owner exists on the roster for the employer"
+      "2. Non-Owner exists on the roster for the employer"
     else
-      return "2. You have 0 non-owner employees on your roster"
+      "2. You have 0 non-owner employees on your roster"
     end
   end
+
 end

@@ -16,7 +16,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       render :new and return
     end
 
-    headless = User.where(email: resource.email).first
+    headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
 
     if headless.present? && !headless.person.present?
       headless.destroy
@@ -26,7 +26,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
     resource.email = nil unless resource.email =~ Devise.email_regexp
 
-    headless = User.where(oim_id: resource.oim_id).first
+    headless = User.where(oim_id: /^#{Regexp.quote(resource.oim_id)}$/i).first
 
     if headless.present? && !headless.person.present?
       headless.destroy

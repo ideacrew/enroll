@@ -171,7 +171,11 @@ end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|
   person = Person.where(first_name: name).first
-  FactoryGirl.create(:hbx_staff_role, person: person)
+  role = FactoryGirl.create(:hbx_staff_role, person: person)
+  Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true)
+  role.update_attributes(permission_id: Permission.hbx_staff.id)
 end
 
 Given /a FEIN for an existing company/ do

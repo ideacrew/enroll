@@ -13,6 +13,7 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
   context "shows families" do
 
     before :each do
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: false))
       sign_in(current_user)
     end
 
