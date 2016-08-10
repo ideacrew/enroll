@@ -459,6 +459,11 @@ class Person
   def mobile_phone
     phones.detect { |phone| phone.kind == "mobile" }
   end
+  
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
 
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?

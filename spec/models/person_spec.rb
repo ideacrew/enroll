@@ -587,8 +587,15 @@ describe Person do
     it "sets person's home email" do
       person = Person.new
       person.emails.build({kind: 'home', address: 'sam@example.com'})
-
       expect(person.emails.first.address).to eq 'sam@example.com'
+    end
+  end
+  
+  describe '#work_email_or_best' do
+    it "expects to get a work email address or home address" do
+      person = Person.new
+      person.emails.build({kind: 'work', address: 'work1@example.com'})
+      expect(person.work_email_or_best).to eq 'work1@example.com'
     end
   end
 
