@@ -1076,4 +1076,22 @@ describe Person do
       expect(person.agent?).to be_truthy
     end
   end
+
+  describe "given a consumer role" do
+    let(:consumer_role) { ConsumerRole.new }
+    let(:subject) { Person.new(:consumer_role => consumer_role) }
+
+    it "delegates #ivl_coverage_selected to consumer role" do
+      expect(consumer_role).to receive(:ivl_coverage_selected)
+      subject.ivl_coverage_selected
+    end
+  end
+
+  describe "without a consumer role" do
+    let(:subject) { Person.new }
+
+    it "delegates #ivl_coverage_selected to nowhere" do
+      expect { subject.ivl_coverage_selected }.not_to raise_error
+    end
+  end
 end

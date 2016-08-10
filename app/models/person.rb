@@ -257,6 +257,8 @@ class Person
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
 
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+
   # before_save :notify_change
   # def notify_change
   #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
