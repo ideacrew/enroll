@@ -17,6 +17,15 @@ RSpec.describe User, :type => :model do
 
   describe 'user' do
 
+    context "when all params are valid" do
+      let(:params){valid_params}
+      it "should not have errors on create" do
+        record = User.create(**params)
+        expect(record).to be_truthy
+        expect(record.errors.messages.size).to eq 0
+      end
+    end
+
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
@@ -51,6 +60,21 @@ RSpec.describe User, :type => :model do
       it 'is empty' do
         expect(User.create(**params).errors[:oim_id].any?).to be_truthy
         expect(User.create(**params).errors[:oim_id]).to eq ["can't be blank"]
+      end
+    end
+
+    context 'when email doest match' do
+      let(:params){valid_params.deep_merge!({email: "test@test"})}
+      it 'does not match' do
+        expect(User.create(**params).errors[:email].any?).to be_truthy
+        expect(User.create(**params).errors[:email]).to eq ["is invalid"]
+      end
+    end
+
+    context 'when email blank' do
+      let(:params){valid_params.deep_merge!({email: ""})}
+      it 'is valid' do
+        expect(User.create(**params).errors[:email].any?).to be_falsy
       end
     end
 
@@ -139,16 +163,6 @@ RSpec.describe User, :type => :model do
         expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end
-
-    context "when all params are valid" do
-      let(:params){valid_params}
-      it "should not have errors on create" do
-        record = User.create(**params)
-        expect(record).to be_truthy
-        expect(record.errors.messages.size).to eq 0
-      end
-    end
-
     context "roles" do
       let(:params){valid_params.deep_merge({roles: ["employee", "broker", "hbx_staff"]})}
       it "should return proper roles" do
