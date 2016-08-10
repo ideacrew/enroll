@@ -256,7 +256,38 @@ describe Person do
           end
         end
       end
+      
+      context "has_employer_benefits?" do
+        let(:person) {FactoryGirl.build(:person)}
+        let(:benefit_group) { FactoryGirl.build(:benefit_group)}
+        let(:employee_roles) {double(active: true)}
+        let(:census_employee) { double }
 
+        before do
+          allow(employee_roles).to receive(:census_employee).and_return(census_employee)
+          allow(census_employee).to receive(:is_active?).and_return(true)
+          allow(employee_roles).to receive(:benefit_group).and_return(benefit_group)
+        end
+
+        it "should return true" do
+          allow(person).to receive(:employee_roles).and_return([employee_roles])
+          allow(employee_roles).to receive(:benefit_group).and_return(benefit_group)
+          expect(person.has_employer_benefits?).to eq true
+        end
+
+        it "should return false" do
+          allow(person).to receive(:employee_roles).and_return([])
+          expect(person.has_employer_benefits?).to eq false
+        end
+
+        it "should return true" do
+          allow(person).to receive(:employee_roles).and_return([employee_roles])
+          allow(employee_roles).to receive(:benefit_group).and_return(nil)
+          expect(person.has_employer_benefits?).to eq false
+        end
+
+      end
+      
       context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
@@ -556,8 +587,15 @@ describe Person do
     it "sets person's home email" do
       person = Person.new
       person.emails.build({kind: 'home', address: 'sam@example.com'})
-
       expect(person.emails.first.address).to eq 'sam@example.com'
+    end
+  end
+  
+  describe '#work_email_or_best' do
+    it "expects to get a work email address or home address" do
+      person = Person.new
+      person.emails.build({kind: 'work', address: 'work1@example.com'})
+      expect(person.work_email_or_best).to eq 'work1@example.com'
     end
   end
 

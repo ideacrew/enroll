@@ -201,7 +201,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
+  
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
@@ -459,6 +459,11 @@ class Person
   def mobile_phone
     phones.detect { |phone| phone.kind == "mobile" }
   end
+  
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
 
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
@@ -466,6 +471,10 @@ class Person
 
   def has_active_employee_role?
     active_employee_roles.any?
+  end
+
+  def has_employer_benefits?
+    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
   end
 
   def active_employee_roles

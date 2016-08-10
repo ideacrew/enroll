@@ -1,11 +1,6 @@
 module BinderTransitionWorld
   include ApplicationHelper
 
-  def hbx_admin(*traits)
-    attributes = traits.extract_options!
-    @hbx_admin ||= FactoryGirl.create :user, *traits, attributes
-  end
-
   def employer(*traits)
     attributes = traits.extract_options!
     @employer ||= FactoryGirl.create :employer, *traits, attributes

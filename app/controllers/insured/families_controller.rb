@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
@@ -12,7 +12,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-
+    
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -45,7 +45,8 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab']
+    @tab = params['tab'] 
+    @family_members = @family.active_family_members
     respond_to do |format|
       format.html
     end
@@ -139,7 +140,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    if @person.has_active_employee_role?
+    if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
   end
@@ -235,6 +236,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def updateable?
+    authorize Family, :updateable?
+  end
 
   def check_employee_role
     @employee_role = @person.active_employee_roles.first

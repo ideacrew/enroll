@@ -6,8 +6,9 @@
   - if !employer.dba.blank?
     %dba= employer.dba.strip
   %fein= employer.fein.strip
-  %office_locations
-    = render :partial => "events/organizations/office_location", :collection => employer.organization.office_locations
+  - if employer.organization.office_locations.any?
+    %office_locations
+      = render :partial => "events/organizations/office_location", :collection => employer.organization.office_locations
   - pocs = (employer.owners.to_a + employer.staff_roles.to_a).uniq
   - if pocs.any?
     %contacts
@@ -19,10 +20,11 @@
       %sic_code= employer.sic_code
     %brokers
       = render :partial => "events/employers/broker_agency_account", :collection => employer.broker_agency_accounts, :locals => { :employer_profile => employer }
-    %plan_years
-      = render :partial => "events/employers/plan_year", :collection => employer.plan_years.select(&:eligible_for_export?)
+    - displayed_plan_years = employer.plan_years.select(&:eligible_for_export?)
+    - if displayed_plan_years.any?
+      %plan_years
+        = render :partial => "events/employers/plan_year", :collection => displayed_plan_years
     - if employer.is_coversion_employer?
       %shop_transfer
         %hbx_active_on= employer.created_at.strftime("%Y-%m-%d")
-    %employer_census_families
   = render :partial => "events/shared/versioned_resource", :object => employer
