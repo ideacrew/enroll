@@ -295,25 +295,41 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employment!(employment_terminated_on)
-    if may_terminate_employee_role?
 
-      if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
-        active_benefit_group_assignment.terminate_coverage!
-      end
+    if employment_terminated_on < TimeKeeper.date_of_record
 
-      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
-        renewal_benefit_group_assignment.terminate_coverage!
+      if may_terminate_employee_role?
+
+        unless employee_termination_pending?
+
+          self.employment_terminated_on = employment_terminated_on
+          self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.coverage_terminated_on) }
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.employment_terminated_on) }
+        end
+
+        terminate_employee_role!
+      else
+        message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
+        Rails.logger.error { message }
+        raise CensusEmployeeError, message
       end
+    else
 
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-      terminate_employee_role!
-    else
-      message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
-      Rails.logger.error { message }
-      raise CensusEmployeeError, message
-    end
+      if may_schedule_employee_termination? || employee_termination_pending?
+          schedule_employee_termination!
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.coverage_terminated_on) }
+      end
+  end
 
     self
   end
@@ -424,6 +440,14 @@ class CensusEmployee < CensusMember
   end
 
   class << self
+
+    def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on.lt => as_of_date)
+      census_employees_for_termination.each do |census_employee|
+        census_employee.terminate_employment(census_employee.employment_terminated_on)
+      end
+    end
+
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
@@ -463,6 +487,7 @@ class CensusEmployee < CensusMember
     state :cobra_eligible
     state :employee_role_linked
     state :cobra_linked
+    state :employee_termination_pending
     state :employment_terminated
     state :cobra_terminated
     state :rehired
@@ -486,6 +511,10 @@ class CensusEmployee < CensusMember
       transitions from: :cobra_linked, to: :cobra_eligible, after: :clear_employee_role
     end
 
+    event :schedule_employee_termination, :after => :record_transition do
+      transitions from: [:employee_termination_pending, :eligible, :employee_role_linked], to: :employee_termination_pending
+    end
+
     event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
       transitions from: [:cobra_eligible, :cobra_linked],  to: :cobra_terminated, after: :notify_cobra_terminated
@@ -496,6 +525,7 @@ class CensusEmployee < CensusMember
       transitions from: :employment_terminated,  to: :eligible 
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated,  to: :cobra_eligible
+      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
     end
 
   end
