@@ -21,8 +21,8 @@ before_filter :configure_sign_up_params, only: [:create]
     if headless.present? && !headless.person.present?
       headless.destroy
     end
-
-    resource.email = nil unless resource.email =~ Devise.email_regexp
+    # binding.pry
+    # resource.email = nil unless resource.email =~ Devise.email_regexp
 
     headless = User.where(oim_id: /^#{Regexp.quote(resource.oim_id)}$/i).first
 
