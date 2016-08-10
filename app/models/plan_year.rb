@@ -831,6 +831,7 @@ private
   end
 
   def open_enrollment_date_checks
+    return if canceled? || expired? || renewing_canceled?
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
 
