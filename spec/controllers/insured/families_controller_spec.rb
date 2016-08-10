@@ -413,6 +413,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
 
     context 'when its initial enrollment' do
@@ -556,9 +557,10 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "delete delete_consumer_broker" do 
+    context "delete delete_consumer_broker" do
       let(:family) {FactoryGirl.build(:family)}
-      before :each do 
+      before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
@@ -566,7 +568,7 @@ RSpec.describe Insured::FamiliesController do
         delete :delete_consumer_broker , :id => family.id
       end
 
-      it "should delete consumer broker" do 
+      it "should delete consumer broker" do
         expect(response).to have_http_status(:redirect)
         expect(family.current_broker_agency).to be nil
       end
@@ -575,6 +577,7 @@ RSpec.describe Insured::FamiliesController do
     context "post unblock" do
       let(:family) { FactoryGirl.build(:family) }
       before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(Family).to receive(:find).and_return family
       end
 
@@ -602,7 +605,7 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "GET upload_notice" do
+  describe "GET upload_notice", dbclean: :after_each do
 
     let(:person2) { FactoryGirl.create(:person) }
     let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }

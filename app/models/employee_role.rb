@@ -111,6 +111,14 @@ class EmployeeRole
     hired_on + 60.days >= TimeKeeper.date_of_record
   end
 
+  def is_dental_offered?
+    plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on)
+
+    benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
+    benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}
+    benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
+  end
+
   class << self
     def klass
       self.to_s.underscore
