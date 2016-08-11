@@ -173,8 +173,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @benefit_group_assignment = @census_employee.active_benefit_group_assignment
-    @renewal_benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
   end
 
   def delink
