@@ -103,6 +103,14 @@ class EmployeeRole
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end
 
+  def hired_on
+    census_employee.hired_on
+  end
+
+  def terminated_on
+    census_employee.employment_terminated_on
+  end
+
   def is_active?
     census_employee && census_employee.is_active?
   end
