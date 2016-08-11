@@ -8,11 +8,10 @@ namespace :reports do
     desc "List of census employee's terminated their hbx_enrollment yesterday "
     task :termination_submitted_on => :environment do
 
-      start_date = Date.yesterday.beginning_of_day
-      end_date = Date.yesterday.end_of_day
+      date_of_termination=Date.yesterday.beginning_of_day..Date.yesterday.end_of_day
       # find families who terminated their hbx_enrollments
       families = Family.where(:"households.hbx_enrollments" =>{ :$elemMatch => {:"aasm_state" => "coverage_terminated",
-                                                                                :"updated_at" => date_of_termination}})
+                                                                                :"termination_submitted_on" => date_of_termination}})
       field_names  = %w(
                Enrolled_Member_HBX_ID
                Enrolled_Member_First_Name
@@ -39,8 +38,8 @@ namespace :reports do
 
         families.each do |family|
           if family.primary_family_member.person.active_employee_roles.present?
-          # find hbx_enrollments who's aasm state=coverage_terminated and updated date (date termination submitted)== yesterday day
-            hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && hbx.kind == "employer_sponsored" && hbx.updated_at.strftime('%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
+          # find hbx_enrollments who's aasm state=coverage_terminated and termination_submitted_on == yesterday day
+            hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && hbx.kind == "employer_sponsored" && hbx.termination_submitted_on.strftime('%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
             hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
             hbx_enrollment_members.each do |hbx_enrollment_member|
               if hbx_enrollment_member
@@ -59,7 +58,7 @@ namespace :reports do
                     hbx_enrollment_member.hbx_enrollment.hbx_id,
                     hbx_enrollment_member.hbx_enrollment.effective_on,
                     hbx_enrollment_member.hbx_enrollment.terminated_on,
-                    hbx_enrollment_member.hbx_enrollment.updated_at
+                    hbx_enrollment_member.hbx_enrollment.termination_submitted_on
                 ]
               end
               processed_count += 1
