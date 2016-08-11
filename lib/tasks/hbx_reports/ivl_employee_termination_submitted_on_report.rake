@@ -16,15 +16,18 @@ namespace :reports do
       families = Family.where(:"households.hbx_enrollments" =>{ :$elemMatch => {:"aasm_state" => "coverage_terminated",
                                                                             :"updated_at" => termination_submitted_on}})
       field_names  = %w(
-               HBX_ID
+               Enrolled_Member_HBX_ID
                Enrolled_Member_First_Name
                Enrolled_Member_Last_Name
                Employer_Legal_Name
-               Fein
+               Employer_Fein
+               Primary_Member_HBX_ID
                Primary_Member_First_Name
                Primary_Member_Last_Name
                Market_Kind
+               Carrier_Legal_Name
                Plan_Name
+               Coverage_Type
                HIOS_ID
                Policy_ID
                Effective_Start_Date
@@ -49,10 +52,13 @@ namespace :reports do
                   hbx_enrollment_member.person.last_name,
                   family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:legal_name),
                   family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:fein),
+                  family.primary_family_member.person.hbx_id,
                   family.primary_family_member.person.first_name,
                   family.primary_family_member.person.last_name,
                   hbx_enrollment_member.hbx_enrollment.kind,
+                  hbx_enrollment_member.hbx_enrollment.plan.carrier_profile.legal_name,
                   hbx_enrollment_member.hbx_enrollment.plan.name,
+                  hbx_enrollment_member.hbx_enrollment.coverage_kind,
                   hbx_enrollment_member.hbx_enrollment.plan.hios_id,
                   hbx_enrollment_member.hbx_enrollment.hbx_id,
                   hbx_enrollment_member.hbx_enrollment.effective_on,
