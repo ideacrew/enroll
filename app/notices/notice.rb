@@ -30,7 +30,7 @@ class Notice
     options = {
       margin:  {
         top: 15,
-        bottom: 30,
+        bottom: 28,
         left: 22,
         right: 22 
       },
