@@ -100,7 +100,6 @@ class HbxEnrollment
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
-  field :termination_submitted_on, type: DateTime
 
 
   # An external enrollment is one which we keep for recording purposes,
