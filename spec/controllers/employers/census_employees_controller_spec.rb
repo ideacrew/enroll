@@ -272,11 +272,12 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:hired_on) { TimeKeeper.date_of_record }
     let(:cobra_date) { hired_on + 10.days }
     before do
-      sign_in
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       census_employee.update(aasm_state: 'employment_terminated', hired_on: hired_on, employment_terminated_on: (hired_on + 2.days))
       allow(census_employee).to receive(:build_hbx_enrollment_for_cobra).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
     end
 
     context 'Get cobra' do

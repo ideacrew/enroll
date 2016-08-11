@@ -9,7 +9,8 @@ class CensusEmployee < CensusMember
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked cobra_eligible cobra_linked)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
-  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
+  PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
@@ -71,6 +72,7 @@ class CensusEmployee < CensusMember
   scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
   scope :by_cobra,    ->{ where(aasm_state: "cobra_linked") }
+  scope :pending,  ->{ any_in(aasm_state: PENDING_STATES) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -441,8 +443,13 @@ class CensusEmployee < CensusMember
 
   class << self
 
+    def advance_day(new_date)
+      terminate_scheduled_census_employees(new_date)
+      HbxEnrollment.terminate_scheduled_enrollments(new_date)
+    end
+
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on.lt => as_of_date)
+      census_employees_for_termination = CensusEmployee.pending.where(:employment_terminated_on.lt => as_of_date)
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employment(census_employee.employment_terminated_on)
       end
@@ -488,6 +495,7 @@ class CensusEmployee < CensusMember
     state :employee_role_linked
     state :cobra_linked
     state :employee_termination_pending
+    state :cobra_termination_pending
     state :employment_terminated
     state :cobra_terminated
     state :rehired
@@ -513,11 +521,12 @@ class CensusEmployee < CensusMember
 
     event :schedule_employee_termination, :after => :record_transition do
       transitions from: [:employee_termination_pending, :eligible, :employee_role_linked], to: :employee_termination_pending
+      transitions from: [:cobra_termination_pending, :cobra_eligible, :cobra_linked],  to: :cobra_termination_pending
     end
 
     event :terminate_employee_role, :after => :record_transition do
-      transitions from: [:eligible, :employee_role_linked], to: :employment_terminated, after: :notify_terminated
-      transitions from: [:cobra_eligible, :cobra_linked],  to: :cobra_terminated, after: :notify_cobra_terminated
+      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
+      transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
 
     event :reinstate_eligibility, :after => [:record_transition] do 
@@ -525,7 +534,6 @@ class CensusEmployee < CensusMember
       transitions from: :employment_terminated,  to: :eligible 
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated,  to: :cobra_eligible
-      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
     end
 
   end
