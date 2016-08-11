@@ -11,7 +11,7 @@ RSpec.describe Users::RegistrationsController do
 
       before(:each) do
         @request.env["devise.mapping"] = Devise.mappings[:user]
-        allow(CuramUser).to receive(:match_email).with(email).and_return([curam_user])
+        allow(CuramUser).to receive(:match_unique_login).with(email).and_return([curam_user])
       end
 
       it "should redirect to saml recovery page if user matches" do
@@ -26,7 +26,7 @@ RSpec.describe Users::RegistrationsController do
 
       before(:each) do
         @request.env["devise.mapping"] = Devise.mappings[:user]
-        allow(CuramUser).to receive(:match_email).with("test@example.com").and_return([])
+        allow(CuramUser).to receive(:match_unique_login).with("test@example.com").and_return([])
       end
 
       it "should not redirect to saml recovery page if user matches" do
@@ -38,7 +38,7 @@ RSpec.describe Users::RegistrationsController do
 
     context "account without person" do
       let(:email) { "devise@test.com" }
-      let!(:user) { FactoryGirl.create(:user, email: email) }
+      let!(:user) { FactoryGirl.create(:user, email: email, oim_id: email) }
 
       before do
         @request.env["devise.mapping"] = Devise.mappings[:user]
@@ -52,7 +52,7 @@ RSpec.describe Users::RegistrationsController do
 
     context "account with person" do
       let(:email) { "devisepersoned@test.com"}
-      let(:user) { FactoryGirl.create(:user, email: email, person: person) }
+      let(:user) { FactoryGirl.create(:user, email: email, person: person, oim_id: email) }
       let(:person) { FactoryGirl.create(:person) }
 
       before do

@@ -1,24 +1,24 @@
 function applyListenersFor(target) {
   // target is person or dependent
-  $("input[name='"+target+"[us_citizen]']").change(function(){
+  $("input[name='" + target + "[us_citizen]']").change(function() {
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html("");
-    $("input[name='"+target+"[naturalized_citizen]']").attr('checked', false);
-    $("input[name='"+target+"[eligible_immigration_status]']").attr('checked', false);
-    if($(this).val() == 'true') {
+    $("input[name='" + target + "[naturalized_citizen]']").attr('checked', false);
+    $("input[name='" + target + "[eligible_immigration_status]']").attr('checked', false);
+    if ($(this).val() == 'true') {
       $('#naturalized_citizen_container').show();
       $('#immigration_status_container').hide();
-      $("#"+target+"_naturalized_citizen_true").attr('required');
-      $("#"+target+"_naturalized_citizen_false").attr('required');
-    }else{
+      $("#" + target + "_naturalized_citizen_true").attr('required');
+      $("#" + target + "_naturalized_citizen_false").attr('required');
+    } else {
       $('#naturalized_citizen_container').hide();
       $('#immigration_status_container').show();
-      $("#"+target+"_naturalized_citizen_true").removeAttr('required');
-      $("#"+target+"_naturalized_citizen_false").removeAttr('required');
+      $("#" + target + "_naturalized_citizen_true").removeAttr('required');
+      $("#" + target + "_naturalized_citizen_false").removeAttr('required');
     }
   });
 
-  $("input[name='"+target+"[naturalized_citizen]']").change(function () {
+  $("input[name='" + target + "[naturalized_citizen]']").change(function() {
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').show();
@@ -31,7 +31,7 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input[name='"+target+"[eligible_immigration_status]']").change(function () {
+  $("input[name='" + target + "[eligible_immigration_status]']").change(function() {
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').hide();
@@ -44,7 +44,7 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input[name='"+target+"[indian_tribe_member]']").change(function() {
+  $("input[name='" + target + "[indian_tribe_member]']").change(function() {
     if ($(this).val() == 'true') {
       $('#tribal_container').show();
     } else {
@@ -55,7 +55,7 @@ function applyListenersFor(target) {
 }
 
 function showOnly(selected) {
-  if (selected == '' || selected == undefined){
+  if (selected == '' || selected == undefined) {
     return false;
   }
   var vlp_doc_map = {
@@ -99,22 +99,24 @@ function applyListeners() {
     applyListenersFor("dependent");
   }
 
-  $("#naturalization_doc_type").change(function () {
+  $("#naturalization_doc_type").change(function() {
     showOnly($(this).val());
   });
 
-  $("#immigration_doc_type").change(function () {
+  $("#immigration_doc_type").change(function() {
     showOnly($(this).val());
   });
 }
 
 function validationForIndianTribeMember() {
-  if ($('#indian_tribe_area').length == 0){
+  if ($('#indian_tribe_area').length == 0) {
     return false;
   };
-  $('.close').click(function(){$('#tribal_id_alert').hide()});
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e){
-    if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')){
+  $('.close').click(function() {
+    $('#tribal_id_alert').hide()
+  });
+  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+    if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
       alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
       e.preventDefault && e.preventDefault();
       return false;
@@ -122,7 +124,7 @@ function validationForIndianTribeMember() {
 
     // for tribal_id
     var tribal_val = $('#tribal_id').val();
-    if($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')){
+    if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')) {
       $('#tribal_id_alert').show();
       e.preventDefault && e.preventDefault();
       return false;
@@ -130,12 +132,147 @@ function validationForIndianTribeMember() {
   });
 }
 
-$(document).ready(function(){
-  applyListeners();
-  validationForIndianTribeMember();
-  if (window.location.href.indexOf("insured") > -1 && window.location.href.indexOf("consumer_role") > -1 && window.location.href.indexOf("edit") > -1) {
-    $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e){
-      
+var PersonValidations = (function(window, undefined) {
+
+  function manageRequiredValidations(this_obj) {
+    hidden_requireds = $('[required]').not(":visible");
+    $('[required]').not(":visible").removeProp('required');
+    this_obj.closest('div').find('button[type="submit"]').trigger('click');
+  }
+
+  function restoreRequiredAttributes(e) {
+    e.preventDefault && e.preventDefault();
+    hidden_requireds.each(function(index) {
+      $(this).prop('required', true);
     });
   }
+
+  function validationForUsCitizenOrUsNational(e) {
+    if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Are you a US Citizen or US National?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
+  function validationForIncarcerated(e) {
+    if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Are you currently incarcerated?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
+  function validationForNaturalizedCitizen(e) {
+    if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Are you a naturalized citizen?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
+  function validationForVlpDocuments(e) {
+    if ($('#vlp_documents_container').is(':visible')) {
+      $('.vlp_doc_area input.doc_fields').each(function() {
+        if ($(this).attr('placeholder') == 'Citizenship Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+          } else {
+
+          }
+        }
+        if ($(this).attr('placeholder') == 'Alien Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+          } else {}
+        }
+        if ($(this).attr('placeholder') == 'Card Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+          } else {}
+        }
+        if ($(this).attr('placeholder') == 'Naturalization Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+          } else {}
+        }
+        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
+
+        } else {
+          if ($(this).attr('placeholder') == 'Passport Number') {
+            if ($(this).val().length < 1) {
+              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+              PersonValidations.restoreRequiredAttributes(e);
+
+            } else {}
+          }
+        }
+        if ($(this).attr('placeholder') == 'I-766 Expiration Date') {
+          if ($(this).val().length != 10) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {}
+        }
+        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
+          if ($(this).val().length != 10) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {}
+        }
+        if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
+
+        } else {
+          if ($(this).attr('placeholder') == 'I 94 Number') {
+            if ($(this).val().length < 1) {
+              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+              PersonValidations.restoreRequiredAttributes(e);
+
+            } else {}
+          }
+        }
+
+        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
+          if ($(this).attr('placeholder') == 'SEVIS ID') {
+            if ($(this).val().length < 1) {
+              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+              PersonValidations.restoreRequiredAttributes(e);
+
+            } else {}
+          }
+        } else {
+
+        }
+
+
+      });
+    }
+  }
+
+  // explicitly return public methods when this object is instantiated
+  return {
+    manageRequiredValidations: manageRequiredValidations,
+    validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
+    validationForNaturalizedCitizen: validationForNaturalizedCitizen,
+    validationForVlpDocuments: validationForVlpDocuments,
+    validationForIncarcerated: validationForIncarcerated,
+    restoreRequiredAttributes: restoreRequiredAttributes
+
+  };
+
+})(window);
+
+$(document).ready(function() {
+  applyListeners();
+  validationForIndianTribeMember();
+
+  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+    PersonValidations.validationForUsCitizenOrUsNational(e);
+    PersonValidations.validationForNaturalizedCitizen(e);
+    PersonValidations.validationForIncarcerated(e);
+    PersonValidations.validationForVlpDocuments(e);
+  });
+
 });

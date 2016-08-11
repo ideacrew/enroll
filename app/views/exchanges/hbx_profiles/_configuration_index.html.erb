@@ -1,13 +1,11 @@
-<div class="container bottom-pd">
-  <div class="row">
-    <h3 class="title-inline">Configuration</h3>
-  </div>
 
-  <div class="row input-no-pd">
+<div class="bottom-pd">
+    <h3>Configuration</h3>
+  <div class="input-no-pd">
     <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default'} %>
-    
+
     <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
-      <table class="table table-border">
+      <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
         <tbody>
         <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
         </td>

@@ -1,10 +1,4 @@
-$primary-blue: #007bc4;
-$primary-green: #69A30D;
-$primary-black: #333333;
-$primay-active-button-text-color: #ffffff;
-$primary-bold: 600;
-$primary-white: #fff;
-$grayed-out: #b7b7b7;
+@import "variables";
 .module {
   &.inbox {
     .inboxes {
@@ -22,6 +16,9 @@ $grayed-out: #b7b7b7;
         cursor: pointer;
       }
     }
+  }
+  &.registration-rules {
+    font-size: 11px;
   }
   &.footer {
     font-size: 14px;
@@ -73,7 +70,7 @@ $grayed-out: #b7b7b7;
           }
         }
         .fa {
-          color: $grayed-out;
+          color: $primary-gray;
         }
       }
     }
@@ -108,7 +105,7 @@ $grayed-out: #b7b7b7;
         }
       }
       .fa {
-        color: $grayed-out;
+        color: $primary-gray;
       }
       .fa-stack {
         position: relative;

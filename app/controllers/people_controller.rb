@@ -33,8 +33,8 @@ class PeopleController < ApplicationController
     @family = Family.find(params[:id])
     @employee_role = EmployeeRole.find(params[:id])
 
-    @family.updated_by = current_user.email unless current_user.nil?
-    @employee_role.updated_by = current_user.email unless current_user.nil?
+    @family.updated_by = current_user.oim_id unless current_user.nil?
+    @employee_role.updated_by = current_user.oim_id unless current_user.nil?
 
     # May need person init code here
     if (@family.update_attributes(@family) && @employee_role.update_attributes(@employee_role))
@@ -192,7 +192,7 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = find_person(params[:id])
     clean_duplicate_addresses
-    @person.updated_by = current_user.email unless current_user.nil?
+    @person.updated_by = current_user.oim_id unless current_user.nil?
 
     if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
@@ -201,6 +201,7 @@ class PeopleController < ApplicationController
 
       redirect_path = family_account_path
     end
+
 
     respond_to do |format|
       if @person.update_attributes(person_params)
@@ -352,7 +353,9 @@ private
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
       { :phones_attributes => [:kind, :full_phone_number, :id] },
       { :emails_attributes => [:kind, :address, :id] },
-      :consumer_role_attributes,
+      { :consumer_role_attributes => [:contact_method, :language_preference, :id]},
+      { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
+
       :first_name,
       :middle_name,
       :last_name,
@@ -370,7 +373,7 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :no_dc_address_reason, 
       :id
     ]
   end

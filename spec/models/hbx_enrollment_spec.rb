@@ -554,6 +554,7 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
           expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+          expect(enrollment.created_at).not_to be_nil
         end
       end
     end
@@ -705,6 +706,14 @@ describe HbxProfile, "class methods", type: :model do
     it "when qle is false and is not uder opent enrollment period" do
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return false
       expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error(RuntimeError)
+    end
+
+    it "should have submitted at as current date and time" do
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+
+      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false, submitted_at: nil)
+      enrollment.save
+      expect(enrollment.submitted_at).not_to be_nil
     end
   end
 
@@ -1060,6 +1069,12 @@ describe HbxEnrollment, dbclean: :after_each do
       it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
       end
+
+      it "should get a error msg" do
+        shop_enrollment.can_select_coverage?
+        expect(shop_enrollment.errors.any?).to be_truthy
+        expect(shop_enrollment.errors.full_messages.to_s).to match /You can not keep an existing plan which belongs to previous plan year/
+      end
     end
 
     context 'when roster create present' do
@@ -1083,6 +1098,12 @@ describe HbxEnrollment, dbclean: :after_each do
 
       it "should not allow" do
         expect(shop_enrollment.can_select_coverage?).to be_falsey
+      end
+
+      it "should get a error msg" do
+        shop_enrollment.can_select_coverage?
+        expect(shop_enrollment.errors.any?).to be_truthy
+        expect(shop_enrollment.errors.full_messages.to_s).to match /You can not keep an existing plan which belongs to previous plan year/
       end
     end
 
@@ -1686,6 +1707,28 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
       expect(rs).to be_empty
     end
   end
+
+  context "update_coverage_kind_by_plan" do
+    let(:plan) { FactoryGirl.create(:plan, coverage_kind: 'health') }
+    attr_reader :enrollment, :household, :coverage_household
+    before :all do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      @enrollment = household.create_hbx_enrollment_from(
+        employee_role: mikes_employee_role,
+        coverage_household: coverage_household,
+        benefit_group: mikes_benefit_group,
+        benefit_group_assignment: @mikes_benefit_group_assignments
+      )
+    end
+
+    it "should update coverage_kind by plan" do
+      enrollment.plan = plan
+      enrollment.coverage_kind = 'dental'
+      enrollment.update_coverage_kind_by_plan
+      expect(enrollment.coverage_kind).to eq enrollment.plan.coverage_kind
+    end
+  end
 end
 
 context "A cancelled external enrollment", :dbclean => :after_each do
@@ -1699,7 +1742,7 @@ context "A cancelled external enrollment", :dbclean => :after_each do
                       )
   end
 
-  before :each do
+  before do
     enrollment.aasm_state = "coverage_canceled"
     enrollment.terminated_on = enrollment.effective_on
     enrollment.external_enrollment = true
@@ -1711,5 +1754,209 @@ context "A cancelled external enrollment", :dbclean => :after_each do
 
   it "should not be visible to the family" do
     expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_terminated"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_selected"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_canceled"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_canceled"
+    enrollment.external_enrollment = true
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_selected"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).not_to eq([])
+  end
+
+  it "should not be visible to the family" do
+    enrollment.aasm_state = "coverage_terminated"
+    enrollment.external_enrollment = false
+    enrollment.save!
+    expect(family.enrollments_for_display.to_a).not_to eq([])
+  end
+end
+
+describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
+
+  let!(:employer_profile) { 
+    org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    FactoryGirl.create :employer_profile, organization: org
+  }
+
+  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
+  let(:end_on) { start_on + 1.year - 1.day }
+  let(:open_enrollment_start_on) { start_on - 1.month }
+  let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
+
+  let!(:renewal_plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01")
+  }
+
+  let!(:plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
+  }
+
+  let!(:current_plan_year) {
+    FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
+  }
+
+  let!(:current_benefit_group){
+    FactoryGirl.create :benefit_group, plan_year: current_plan_year, reference_plan_id: plan.id
+  }
+
+  let!(:census_employees){
+    FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment current_benefit_group, current_benefit_group.start_on
+  }
+
+  let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+  let!(:family) {
+    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
+  }
+
+  let(:person) { family.primary_applicant.person }
+
+  let!(:enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+      household: family.active_household,
+      coverage_kind: "health",
+      effective_on: current_benefit_group.start_on,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: current_benefit_group.start_on - 20.days,
+      benefit_group_id: current_benefit_group.id,
+      employee_role_id: person.active_employee_roles.first.id,
+      benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+      plan_id: plan.id
+      )
+  }
+
+  context 'When family has active coverage and makes changes for their coverage' do
+
+    let(:new_enrolllment) {
+      FactoryGirl.create(:hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+        enrollment_kind: "open_enrollment",
+        kind: "employer_sponsored",
+        submitted_at: TimeKeeper.date_of_record,
+        benefit_group_id: current_benefit_group.id,
+        employee_role_id: person.active_employee_roles.first.id,
+        benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+        plan_id: plan.id,
+        aasm_state: 'shopping'
+        )
+    }
+
+    it 'should terminate their existing coverage' do
+      expect(enrollment.coverage_selected?).to be_truthy
+      expect(enrollment.terminated_on).to be_nil
+      new_enrolllment.select_coverage!
+      expect(enrollment.coverage_terminated?).to be_truthy
+      expect(enrollment.terminated_on).to eq(new_enrolllment.effective_on - 1.day)
+    end
+  end
+
+
+  context 'When family has passive renewal and selected a coverage' do
+
+    let!(:renewing_plan_year) {
+      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
+    }
+
+    let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }
+    let!(:renewal_benefit_group_assignment) { ce.add_renew_benefit_group_assignment renewal_benefit_group }
+
+    let!(:generate_passive_renewal) {
+      factory = Factories::FamilyEnrollmentRenewalFactory.new
+      factory.family = family
+      factory.census_employee = ce
+      factory.employer = employer_profile
+      factory.renewing_plan_year = employer_profile.renewing_plan_year
+      factory.renew
+    }
+
+    let!(:new_plan) {
+      FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year + 1, hios_id: "11111111122301-01", csr_variant_id: "01")
+    }
+
+    let(:new_enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: renewing_plan_year.start_on,
+        enrollment_kind: "open_enrollment",
+        kind: "employer_sponsored",
+        submitted_at: TimeKeeper.date_of_record,
+        benefit_group_id: renewal_benefit_group.id,
+        employee_role_id: person.active_employee_roles.first.id,
+        benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
+        plan_id: new_plan.id,
+        aasm_state: 'shopping'
+        )
+    }
+
+    context 'with same effective date as passive renewal' do 
+      it 'should cancel their passive renewal' do 
+        passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+        expect(passive_renewal).not_to be_nil
+
+        new_enrollment.select_coverage!
+        passive_renewal.reload 
+        new_enrollment.reload
+
+        expect(passive_renewal.coverage_canceled?).to be_truthy
+        expect(new_enrollment.coverage_selected?).to be_truthy
+      end
+    end
+
+    context 'with effective date later to the passive renewal' do
+
+      before do
+        new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month) 
+      end
+
+      it 'should terminate the passive renewal' do 
+        passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+        expect(passive_renewal).not_to be_nil
+
+        new_enrollment.select_coverage!
+        passive_renewal.reload 
+        new_enrollment.reload
+
+        expect(new_enrollment.coverage_selected?).to be_truthy
+        expect(passive_renewal.coverage_terminated?).to be_truthy
+        expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+      end
+    end
   end
 end

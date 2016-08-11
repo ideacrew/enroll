@@ -7,6 +7,7 @@ namespace :migrations do
 
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
+      raise 'more than 1 employer found with given fein'
     end
 
     puts "Processing #{organizations.first.legal_name}"
@@ -29,7 +30,8 @@ namespace :migrations do
       end
 
       # Terminate current active plan years
-      organization.employer_profile.plan_years.published.where(:"end_on".gt => TimeKeeper.date_of_record).each do |plan_year|
+      organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
+
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
           puts "Terminating employees coverage for employer #{organization.legal_name}"
@@ -39,7 +41,7 @@ namespace :migrations do
           if hbx_enrollment.may_terminate_coverage?
             hbx_enrollment.update_attributes(:terminated_on => termination_date)
             hbx_enrollment.terminate_coverage!
-            hbx_enrollment.propogate_terminate(termination_date)
+            # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
 
@@ -62,23 +64,23 @@ namespace :migrations do
   end
 
 
-  task :clean_terminated_employers => :environment do
-    employers = {
-      "460820787" => "10/31/2015",
-      "521954919" => "9/30/2015",
-      "711024079" => "6/30/2015",
-      "453460933" => "9/30/2015",
-      "042730954" => "12/31/2015",
-      "522227063" => "1/31/2016",
-      "465220487" => "1/31/2016",
-      "201146765" => "12/31/2015",
-      "454161124" => "1/31/2016",
-      "461825831" => "1/31/2016",
-      "471408297" => "1/31/2016",
-      "743162814" => "12/31/2015"
-    }
+  task :clean_terminated_employers, [:fein, :termination_date] => :environment do |fein, termination_date|
+    # employers = {
+    #   "460820787" => "10/31/2015",
+    #   "521954919" => "9/30/2015",
+    #   "711024079" => "6/30/2015",
+    #   "453460933" => "9/30/2015",
+    #   "042730954" => "12/31/2015",
+    #   "522227063" => "1/31/2016",
+    #   "465220487" => "1/31/2016",
+    #   "201146765" => "12/31/2015",
+    #   "454161124" => "1/31/2016",
+    #   "461825831" => "1/31/2016",
+    #   "471408297" => "1/31/2016",
+    #   "743162814" => "12/31/2015"
+    # }
 
-    employers.each do |fein, termination_date|
+    # employers.each do |fein, termination_date|
       organizations = Organization.where(fein: fein)
 
       if organizations.size > 1
@@ -90,14 +92,18 @@ namespace :migrations do
 
       organizations.each do |organization|
         renewing_plan_year = organization.employer_profile.plan_years.renewing.first
-        if renewing_plan_year.present?
-          puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
-          renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+         if renewing_plan_year.present?
+           enrollments = enrollments_for_plan_year(renewing_plan_year)
+           enrollments.each do |enrollment|
+             enrollment.cancel_coverage!
+           end
+
+           puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
+           renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+          end
         end
       end
     end
-  end
-end
 
 
 def enrollments_for_plan_year(plan_year)

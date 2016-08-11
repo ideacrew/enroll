@@ -202,11 +202,11 @@ When /^the employer login in$/ do
   click_link 'Employer Portal'
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: "employer1@dc.gov"
-  find('#user_email').set("employer1@dc.gov")
+  fill_in "user[login]", with: "employer1@dc.gov"
+  find('#user_login').set("employer1@dc.gov")
   find('#user_password').set("1qaz@WSX")
   fill_in "user[password]", with: "1qaz@WSX"
-  fill_in "user[email]", :with => "employer1@dc.gov" unless find(:xpath, '//*[@id="user_email"]').value == "employer1@dc.gov"
+  fill_in "user[login]", :with => "employer1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "employer1@dc.gov"
   find('.interaction-click-control-sign-in').click
 end
 
@@ -233,10 +233,10 @@ When /^the broker login in$/ do
   click_link 'Broker Agency Portal'
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: "broker1@dc.gov"
-  find('#user_email').set("broker1@dc.gov")
+  fill_in "user[login]", with: "broker1@dc.gov"
+  find('#user_login').set("broker1@dc.gov")
   fill_in "user[password]", with: "1qaz@WSX"
-  fill_in "user[email]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_email"]').value == "broker1@dc.gov"
+  fill_in "user[login]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "broker1@dc.gov"
   find('.interaction-click-control-sign-in').click
 end
 
@@ -316,10 +316,10 @@ When /^the ga login in$/ do
   click_link 'General Agency Portal'
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: email_address
-  find('#user_email').set(email_address)
+  fill_in "user[login]", with: email_address
+  find('#user_login').set(email_address)
   fill_in "user[password]", with: "1qaz@WSX"
-  fill_in "user[email]", :with => email_address unless find(:xpath, '//*[@id="user_email"]').value == email_address
+  fill_in "user[login]", :with => email_address unless find(:xpath, '//*[@id="user_login"]').value == email_address
   find('.interaction-click-control-sign-in').click
 end
 
@@ -395,10 +395,10 @@ When /^the ga2 login in$/ do
   click_link 'General Agency Portal'
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[email]", with: email_address
-  find('#user_email').set(email_address)
+  fill_in "user[login]", with: email_address
+  find('#user_login').set(email_address)
   fill_in "user[password]", with: "1qaz@WSX"
-  fill_in "user[email]", :with => email_address unless find(:xpath, '//*[@id="user_email"]').value == email_address
+  fill_in "user[login]", :with => email_address unless find(:xpath, '//*[@id="user_login"]').value == email_address
   find('.interaction-click-control-sign-in').click
 end
 
