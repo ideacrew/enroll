@@ -104,11 +104,7 @@ class EmployeeRole
   end
 
   def hired_on
-    census_employee.hired_on
-  end
-
-  def terminated_on
-    census_employee.employment_terminated_on
+    census_employee.try(:hired_on) || (read_attribute(:hired_on).present? ? Date.parse(read_attribute(:hired_on).strftime('%Y/%m/%d')) : nil)
   end
 
   def is_active?
