@@ -14,7 +14,7 @@ describe UpdateBenefitGroup do
   describe "updating active benefit group", :dbclean => :after_each do
     context "changing field in benefit group assignment", :dbclean => :after_each do
       before :each do
-       DatabaseCleaner.clean
+        DatabaseCleaner.clean
       end
       let(:organization) { FactoryGirl.create(:organization, employer_profile: employer_profile, fein: "123456789")}
       let(:employer_profile) { FactoryGirl.create(:employer_profile)}
@@ -23,7 +23,7 @@ describe UpdateBenefitGroup do
       let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile )}
       let(:benefit_group)     { FactoryGirl.create(:benefit_group)}
       let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
-      
+
       before do
         allow(organization).to receive(:employer_profile).and_return employer_profile
         allow(employer_profile).to receive(:plan_years).and_return [active_plan_year]
@@ -32,6 +32,7 @@ describe UpdateBenefitGroup do
         allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
         allow(benefit_group).to receive(:plan_year).and_return renewal_plan_year
       end
+
       it "should change the is_active state of the benefit group assignment" do
         benefit_group_assignment.is_active = false
         benefit_group_assignment.save
