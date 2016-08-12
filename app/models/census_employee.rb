@@ -6,7 +6,7 @@ class CensusEmployee < CensusMember
   include Autocomplete
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
 
   field :is_business_owner, type: Boolean, default: false
@@ -289,7 +289,7 @@ class CensusEmployee < CensusMember
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.coverage_terminated_on) }
+          census_employee_hbx_enrollment.map { |e| self.coverage_terminated_on < e.effective_on ? e.schedule_coverage_termination!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.employment_terminated_on) }
@@ -301,16 +301,15 @@ class CensusEmployee < CensusMember
         Rails.logger.error { message }
         raise CensusEmployeeError, message
       end
-    else
+    else # Schedule Future Terminations as employment_terminated_on is in the future
 
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
       if may_schedule_employee_termination? || employee_termination_pending?
           schedule_employee_termination!
-
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| e.schedule_coverage_termination!(self.coverage_terminated_on) }
+          census_employee_hbx_enrollment.map { |e| self.coverage_terminated_on < e.effective_on ? e.schedule_coverage_termination!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
       end
   end
 
