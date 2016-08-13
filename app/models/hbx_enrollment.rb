@@ -550,8 +550,11 @@ class HbxEnrollment
 
   def set_coverage_termination_date(coverage_terminated_on)
     self.terminated_on = coverage_terminated_on
-
-    self.cancel_coverage! if self.terminated_on < self.effective_on # cancel immediatel if request is before scheduled coverage effective date
+    puts "*******"
+    puts "termin: " + self.terminated_on.to_s
+    puts "effect: " + self.effective_on.to_s
+    ret = self.cancel_coverage! if self.terminated_on < self.effective_on # cancel immediatel if request is before scheduled coverage effective date
+    puts ret.to_s
   end
 
   def select_applicable_broker_account(broker_accounts)
