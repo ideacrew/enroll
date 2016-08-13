@@ -550,11 +550,11 @@ class HbxEnrollment
 
   def set_coverage_termination_date(coverage_terminated_on)
     self.terminated_on = coverage_terminated_on
-    puts "*******"
-    puts "termin: " + self.terminated_on.to_s
-    puts "effect: " + self.effective_on.to_s
+    #puts "*******"
+    #puts "termin: " + self.terminated_on.to_s
+    #puts "effect: " + self.effective_on.to_s
     ret = self.cancel_coverage! if self.terminated_on < self.effective_on # cancel immediatel if request is before scheduled coverage effective date
-    puts ret.to_s
+    #puts ret.to_s
   end
 
   def select_applicable_broker_account(broker_accounts)
@@ -1030,7 +1030,7 @@ class HbxEnrollment
     #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     # end
     event :schedule_coverage_termination, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date, :guard => :should_cancel?
     end
 
     event :cancel_coverage, :after => :record_transition do
@@ -1090,6 +1090,17 @@ class HbxEnrollment
 
     event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
+    end
+  end
+
+  def should_cancel?(coverage_terminated_on)
+
+    if coverage_terminated_on < self.effective_on # cancel immediatel if request is before scheduled coverage effective date
+      self.terminated_on = coverage_terminated_on
+      self.cancel_coverage!
+      return false
+    else
+      return true
     end
   end
 
