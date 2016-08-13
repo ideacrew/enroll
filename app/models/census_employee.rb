@@ -310,6 +310,11 @@ class CensusEmployee < CensusMember
           schedule_employee_termination!
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.coverage_terminated_on < e.effective_on ? e.schedule_coverage_termination!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment.map { |e| self.coverage_terminated_on < e.effective_on ? e.schedule_coverage_termination!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
+      end
+
       end
   end
 
