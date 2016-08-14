@@ -130,7 +130,7 @@ module Importers
 
       enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
         })
 
       if enrollments.empty?
@@ -144,6 +144,93 @@ module Importers
       end
 
       enrollments[0]
+    end
+
+    def update_covered_dependents(family, enrollment)
+      update_msgs = []
+
+      census_dependents = map_dependents
+      dependents = census_dependents.inject([]) do |dependents, dependent|
+        dependents << Factories::EnrollmentFactory.initialize_dependent(enrollment.family, enrollment.subscriber.person, dependent)
+      end
+
+      dependent_ids = dependents.map(&:id)
+      updated_enrollment_members = enrollment.hbx_enrollment_members.inject([]) do |enrollment_members, enrollment_member|
+        if enrollment_member.is_subscriber? || dependent_ids.include?(enrollment_member.family_member.person_id)
+          enrollment_members << enrollment_member
+        else
+          update_msgs << "Droped #{enrollment_member.family_member.person.full_name} from the enrollment"
+          enrollment_members
+        end
+      end
+
+      hh = family.active_household
+      ch = hh.immediate_family_coverage_household
+      dependents.each do |dependent|
+        family_member = family.find_family_member_by_person(dependent)
+        enrollment_member = updated_enrollment_members.detect{|enrollment_member| enrollment_member.applicant_id == family_member.id}
+        if enrollment_member.blank?
+          coverage_member = ch.coverage_household_members.detect{|cm| cm.family_member == family_member }
+          if coverage_member.present?
+            enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+            enrollment_member.eligibility_date = enrollment.effective_on
+            enrollment_member.coverage_start_on = enrollment.effective_on
+            updated_enrollment_members << enrollment_member
+            update_msgs << "Added #{family_member.person.full_name} to the enrollment"
+          else
+            errors.add(:base, "Immediate coverage household member missing for #{family_member.person.full_name}")
+          end
+        end
+      end
+
+      enrollment.hbx_enrollment_members = updated_enrollment_members
+
+      if enrollment.save
+        warnings.add(:base, update_msgs.join(',')) if update_msgs.any?
+        return true
+      else
+        enrollment.errors.each do |attr, err|
+          errors.add("family_" + attr.to_s, err)
+        end
+        return false
+      end
+    end
+
+    def map_dependent(dep_idx)
+      last_name = self.send("dep_#{dep_idx}_name_last".to_sym)
+      first_name = self.send("dep_#{dep_idx}_name_first".to_sym)
+      middle_name = self.send("dep_#{dep_idx}_name_middle".to_sym)
+      relationship = self.send("dep_#{dep_idx}_relationship".to_sym)
+      dob = self.send("dep_#{dep_idx}_dob".to_sym)
+      ssn = self.send("dep_#{dep_idx}_ssn".to_sym)
+      gender = self.send("dep_#{dep_idx}_gender".to_sym)
+      if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
+        return nil
+      end
+      attr_hash = {
+        first_name: first_name,
+        last_name: last_name,
+        dob: dob,
+        employee_relationship: relationship,
+        gender: gender
+      }
+      unless middle_name.blank?
+        attr_hash[:middle_name] = middle_name
+      end
+      unless ssn.blank?
+        if ssn == subscriber_ssn
+          warnings.add("dependent_#{dep_idx}_ssn", "ssn same as subscriber, blanking for import")
+        else
+          attr_hash[:ssn] = ssn
+        end
+      end
+      CensusDependent.new(attr_hash)
+    end
+
+    def map_dependents
+      (1..8).to_a.map do |idx|
+        map_dependent(idx)
+      end.compact
     end
 
     def update_plan_for_passive_renewal(family, renewing_plan_year, renewal_plan)
@@ -184,6 +271,10 @@ module Importers
         enrollment = find_current_enrollment(family, employer)
         return false unless enrollment
 
+        unless update_covered_dependents(family, enrollment)
+          return false
+        end
+
         plan = find_plan
         if enrollment.plan_id != plan.id
           enrollment.update_attributes(plan_id: plan.id)
@@ -195,6 +286,7 @@ module Importers
           errors.add(:base, "already have coverage with same hios id")
           return false
         end
+
       rescue Exception => e
         errors.add(:base, e.to_s)
         return false
