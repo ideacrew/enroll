@@ -340,6 +340,15 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
+  def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
+    self.terminated_on ||= term_date
+    if benefit_group_assignment
+      benefit_group_assignment.end_benefit(terminated_on)
+      benefit_group_assignment.save
+    end
+
+  end
+
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
     self.terminated_on ||= term_date
     if benefit_group_assignment
@@ -550,7 +559,7 @@ class HbxEnrollment
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
 
-  def set_coverage_termination_date(coverage_terminated_on)
+  def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)
     self.terminated_on = coverage_terminated_on
   end
 
@@ -1027,11 +1036,11 @@ class HbxEnrollment
     #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     # end
     event :schedule_coverage_termination, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date, :guard => :should_cancel?
+      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled, after: :set_coverage_termination_date
       transitions from: :renewing_waived, to: :inactive
     end
 
@@ -1090,16 +1099,6 @@ class HbxEnrollment
     end
   end
 
-  def should_cancel?(coverage_terminated_on)
-
-    if coverage_terminated_on < self.effective_on # cancel immediatel if request is before scheduled coverage effective date
-      self.terminated_on = coverage_terminated_on
-      self.cancel_coverage!
-      return false
-    else
-      return true
-    end
-  end
 
   def can_be_expired?
     if benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record
