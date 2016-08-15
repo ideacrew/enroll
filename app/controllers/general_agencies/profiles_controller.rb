@@ -64,7 +64,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
     elsif @q
-      @families = total_families.select {|v| v.primary_applicant.person.last_name =~ /^#{@q}/i}
+      @families = total_families.select {|v| v.primary_applicant.person.full_name =~ /#{@q}/i}
     else
       @families = total_families[0..20]
     end
