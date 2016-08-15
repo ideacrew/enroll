@@ -30,6 +30,7 @@ module Forms
     class TooManyMatchingPeople < StandardError; end
 
     def initialize(attrs = {})
+      self.fein = Organization.generate_fein
       @office_locations ||= []
       assign_wrapper_attributes(attrs)
       ensure_office_locations
