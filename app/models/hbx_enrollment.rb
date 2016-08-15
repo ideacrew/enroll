@@ -396,7 +396,7 @@ class HbxEnrollment
 
         if hbx_enrollment.may_cancel_coverage?
           hbx_enrollment.cancel_coverage!
-          hbx_enrollment.update_current(terminated_on: p.effective_on)
+          hbx_enrollment.update_current(terminated_on: hbx_enrollment.effective_on)
         end
       elsif (hbx_enrollment.enrollment_signature == self.enrollment_signature && hbx_enrollment.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && hbx_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= hbx_enrollment.effective_on) || (hbx_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= hbx_enrollment.effective_on)
         if hbx_enrollment.may_terminate_coverage?
