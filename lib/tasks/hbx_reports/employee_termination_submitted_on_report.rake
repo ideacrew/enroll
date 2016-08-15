@@ -65,7 +65,7 @@ namespace :reports do
             end
           end
         end
-        puts "For date #{start_date}, total census employee's terminated their hbx_enrollment count #{processed_count} and census employee's information output file: #{file_name}"
+        puts "For date #{date_of_termination}, total census employee's terminated their hbx_enrollment count #{processed_count} and census employee's information output file: #{file_name}"
       end
     end
   end
