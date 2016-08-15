@@ -2251,6 +2251,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "migration_expired"
       end
 
+      it "should not change its aasm state" do
+        workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
+        workflow_plan_year_with_benefit_group.save
+        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
+      end
+
       it "should not trigger a state transitioin" do
         workflow_plan_year_with_benefit_group.employer_profile.registered_on = TimeKeeper.date_of_record + 45.days
         workflow_plan_year_with_benefit_group.save
