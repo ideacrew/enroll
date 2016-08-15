@@ -10,7 +10,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -863,6 +863,11 @@ private
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
+    
+
+    if open_enrollment_start_on < (start_on - 2.months)
+      errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
+    end    
 
     if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")

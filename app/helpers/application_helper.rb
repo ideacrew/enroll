@@ -60,7 +60,7 @@ module ApplicationHelper
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
-      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
+      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
 

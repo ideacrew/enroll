@@ -101,6 +101,7 @@ class HbxEnrollment
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
+  field :termination_submitted_on, type: DateTime
 
 
   # An external enrollment is one which we keep for recording purposes,
@@ -448,18 +449,8 @@ class HbxEnrollment
       benefit_group_assignment.save
     end
 
-    if consumer_role.present?
-      hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.invoke_verification!(effective_on)
-      end
-      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-      self.published_to_bus_at = Time.now
-    else
-      if is_shop_sep?
-        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-        self.published_to_bus_at = Time.now
-      end
-    end
+    callback_context = { :hbx_enrollment => self }
+    HandleCoverageSelected.call(callback_context)
   end
 
   def should_transmit_update?
