@@ -8,8 +8,9 @@ namespace :report do
     desc "List of users with no email address in user account"
     task :with_no_email_address => :environment do
 
-      users = User.where(:"oim_id".exists=>true, email:nil)
+      users = User.where(:"oim_id".exists=>true, :"email".exists=>false)
       field_names  = %w(
+               username
                user_first_name
                user_last_name
                person_hbx_id
@@ -26,6 +27,7 @@ namespace :report do
         users.each do |user|
           if user.person.present?
             csv << [
+                user.oim_id,
                 user.person.first_name,
                 user.person.last_name,
                 user.person.hbx_id,
