@@ -8,7 +8,7 @@ namespace :report do
     desc "List of users with no email address in user account"
     task :with_no_email_address => :environment do
 
-      persons = User.where(:"oim_id".exists=>true, :"email".exists=>false).map(&:person)
+      persons = User.where(:"oim_id".exists=>true, :"email".exists=>false).map(&:person).compact
       field_names  = %w(
                username
                user_first_name
