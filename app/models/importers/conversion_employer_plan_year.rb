@@ -53,7 +53,7 @@ module Importers
     def map_plan_year
       employer = find_employer
       found_carrier = find_carrier
-      plan_year_attrs = Factories::PlanYearFactory.default_dates_for_coverage_starting_on(default_plan_year_start)
+      plan_year_attrs = Factories::PlanYearFactory.default_dates_for_coverage_starting_on(Date.strptime(coverage_start, "%m/%d/%Y") || default_plan_year_start)
       plan_year_attrs[:fte_count] = enrolled_employee_count
       plan_year_attrs[:employer_profile] = employer
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
@@ -91,7 +91,7 @@ module Importers
     end
 
     def map_benefit_group(found_carrier)
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, default_plan_year_start.year)
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (Date.strptime(coverage_start, "%m/%d/%Y") || default_plan_year_start).year)
       reference_plan = select_reference_plan(available_plans)
       elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
       benefit_group_properties = {

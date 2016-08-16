@@ -136,7 +136,7 @@ module Importers
       unless poc_user.nil? 
         poc_person.unset(:user_id)
         if emp_user.nil?
-          employee_person.set(:user_id, poc_user.id)
+          employee_person.set(:user_id => poc_user.id)
         else
           poc_user.destroy!
         end 

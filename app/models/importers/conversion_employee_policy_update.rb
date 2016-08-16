@@ -130,20 +130,181 @@ module Importers
 
       enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
-        })
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
+        }).by_coverage_kind('health').order(created_at: :desc).to_a
 
       if enrollments.empty?
         errors.add(:base, "enrollment missing!")
         return false
       end
+  
+      enrollment = enrollments.shift
 
-      if enrollments.size > 1
-        errors.add(:base, "more than 1 enrollment found for given benefit groups")
+      # if enrollments.size > 1
+      #   errors.add(:base, "more than 1 enrollment found for given benefit groups")
+      #   return false
+      # end
+
+      enrollments.each do |enrollment|
+        enrollment.cancel_coverage!
+      end
+
+      enrollment.expire_coverage! if enrollment.may_expire_coverage?
+      enrollment
+    end
+
+    def update_coverage_dependents(family, enrollment, employer, plan)
+      census_dependents = map_dependents
+      dependents = census_dependents.inject([]) do |dependents, dependent|
+        dependents << Factories::EnrollmentFactory.initialize_dependent(enrollment.family, enrollment.subscriber.person, dependent)
+      end.compact
+
+      family.save!
+      family.reload
+
+      if enrollment.plan_id != plan.id
+        enrollment.update_attributes(plan_id: plan.id)
+      end
+
+      enrollment.reload
+
+      if update_enrollment_members(family, enrollment, dependents)         
+        if passive_renewal = get_passively_renewed_coverage(employer, family)
+          return passive_renewal if passive_renewal.is_a?(Boolean)
+          update_enrollment_members(family, passive_renewal, dependents, true)
+
+          renewal_plan = enrollment.plan.renewal_plan
+          if passive_renewal.plan_id != renewal_plan.try(:id)
+            passive_renewal.update_attributes(plan_id: renewal_plan.id)
+          end
+          
+          return true
+        else
+          return false
+        end
+      else
+        return false
+      end
+    end
+
+    def get_passively_renewed_coverage(employer, family)
+      renewed_plan_year = employer.renewing_published_plan_year
+      if expired_plan_year = employer.plan_years.where(:aasm_state => 'expired').first
+        renewed_plan_year = employer.plan_years.where({
+          :start_on => (expired_plan_year.start_on + 1.year), 
+          :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED}).first
+      end
+    
+      if renewed_plan_year.blank?
+        errors.add(:base, "renewed/renewing plan year missing")
         return false
       end
 
-      enrollments[0]
+      enrollments = family.active_household.hbx_enrollments.where({
+        :benefit_group_id.in => renewed_plan_year.benefit_group_ids,
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
+        }).by_coverage_kind('health')
+
+      if enrollments.empty?
+        errors.add(:base, "renewal enrollment missing!")
+        return false
+      end
+
+      manual_selection = enrollments.detect{|e| e.workflow_state_transitions.where(:to_state => 'auto_renewing').none?}
+      if manual_selection.present?
+        warnings.add(:base, "employee already made plan selection")
+        return true
+      end
+
+      if enrollments.size > 1
+        errors.add(:base, "more than 1 passive renewal found for given benefit groups")
+        return false
+      end
+
+      enrollments.first
+    end
+
+    def update_enrollment_members(family, enrollment, dependents, passive=false)
+      update_msgs = []
+
+      dependent_ids = dependents.map(&:id)
+      updated_enrollment_members = enrollment.hbx_enrollment_members.inject([]) do |enrollment_members, enrollment_member|
+        if enrollment_member.is_subscriber? || (enrollment_member.family_member.present? && dependent_ids.include?(enrollment_member.family_member.person_id))
+          enrollment_members << enrollment_member
+        else
+          update_msgs << "Dropped #{enrollment_member.try(:family_member).try(:person).try(:full_name)} from the #{'renewed' if passive} enrollment"
+          enrollment_members
+        end
+      end
+
+      hh = family.active_household
+      ch = hh.immediate_family_coverage_household
+      dependents.each do |dependent|
+        family_member = family.find_family_member_by_person(dependent)
+        enrollment_member = updated_enrollment_members.detect{|enrollment_member| enrollment_member.applicant_id == family_member.id}
+        if enrollment_member.blank?
+          coverage_member = ch.coverage_household_members.detect{|cm| cm.family_member == family_member }
+          if coverage_member.present?        
+            updated_enrollment_members << HbxEnrollmentMember.new({
+              applicant_id: family_member.id,
+              eligibility_date: enrollment.effective_on,
+              coverage_start_on: enrollment.effective_on
+              })
+            update_msgs << "Added #{family_member.person.full_name} to the #{'renewed' if passive} enrollment"
+          else
+            errors.add(:base, "Immediate coverage household member missing for #{family_member.person.full_name}")
+          end
+        end
+      end
+
+      enrollment.hbx_enrollment_members = updated_enrollment_members
+
+      if enrollment.save
+        warnings.add(:base, update_msgs.join(',')) if update_msgs.any?
+        return true
+      else
+        enrollment.errors.each do |attr, err|
+          errors.add("family_" + attr.to_s, err)
+        end
+        return false
+      end
+    end
+
+    def map_dependent(dep_idx)
+      last_name = self.send("dep_#{dep_idx}_name_last".to_sym)
+      first_name = self.send("dep_#{dep_idx}_name_first".to_sym)
+      middle_name = self.send("dep_#{dep_idx}_name_middle".to_sym)
+      relationship = self.send("dep_#{dep_idx}_relationship".to_sym)
+      dob = self.send("dep_#{dep_idx}_dob".to_sym)
+      ssn = self.send("dep_#{dep_idx}_ssn".to_sym)
+      gender = self.send("dep_#{dep_idx}_gender".to_sym)
+      if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
+        return nil
+      end
+      attr_hash = {
+        first_name: first_name,
+        last_name: last_name,
+        dob: dob,
+        employee_relationship: relationship,
+        gender: gender
+      }
+      unless middle_name.blank?
+        attr_hash[:middle_name] = middle_name
+      end
+      unless ssn.blank?
+        if ssn == subscriber_ssn
+          warnings.add("dependent_#{dep_idx}_ssn", "ssn same as subscriber, blanking for import")
+        else
+          attr_hash[:ssn] = ssn
+        end
+      end
+      CensusDependent.new(attr_hash)
+    end
+
+    def map_dependents
+      (1..8).to_a.map do |idx|
+        map_dependent(idx)
+      end.compact
     end
 
     def update_plan_for_passive_renewal(family, renewing_plan_year, renewal_plan)
@@ -182,15 +343,18 @@ module Importers
         puts '----processing ' + person.full_name
         family = person.primary_family
         enrollment = find_current_enrollment(family, employer)
+
         return false unless enrollment
 
         plan = find_plan
+        return false unless update_coverage_dependents(family, enrollment, employer, plan)
+
         if enrollment.plan_id != plan.id
           enrollment.update_attributes(plan_id: plan.id)
-
           if renewing_plan_year = employer.plan_years.renewing.first
             update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
           end
+          return true
         else
           errors.add(:base, "already have coverage with same hios id")
           return false

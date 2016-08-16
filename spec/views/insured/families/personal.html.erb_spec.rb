@@ -5,7 +5,7 @@ RSpec.describe "insured/families/personal.html.erb" do
   stub_template "insured/families/_navigation.html.erb" => ''
   stub_template "insured/families/_profile_submenu.html.erb" => ''
   assign(:person, person)
-
+  allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
   render file: "insured/families/personal.html.erb"
   end
 

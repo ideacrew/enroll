@@ -149,7 +149,7 @@ module Importers
 
       family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => active_plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
         })
     end
   end

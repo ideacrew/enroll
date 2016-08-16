@@ -57,6 +57,7 @@ module Importers
         city = subscriber_city
         state = subscriber_state
         zip = subscriber_zip
+
         attr_hash = {
           first_name: first_name,
           last_name: last_name,
@@ -94,7 +95,10 @@ module Importers
             }
           })
         end
-        result = found_employee.update_attributes(attr_hash)
+
+        found_employee.attributes = attr_hash
+        found_employee.census_dependents = map_dependents
+        result = found_employee.save
         [result, found_employee]
       end
 

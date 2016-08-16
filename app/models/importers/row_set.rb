@@ -44,7 +44,9 @@ module Importers
           import_details = ["imported", ""]
         end
       else
-        import_details = ["import failed", JSON.dump(record.errors.to_hash)] 
+        import_details  = []
+        import_details << ["import failed", JSON.dump(record.errors.to_hash)]
+        import_details << ["warnings", JSON.dump(record.warnings.to_hash)] if record.warnings.any?
       end
       @out_csv << (row.map(&:to_s) + import_details)
     end
