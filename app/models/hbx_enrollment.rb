@@ -388,27 +388,25 @@ class HbxEnrollment
 
   def cancel_previous(year)
     #Perform cancel/terms of previous enrollments for the same plan year
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |hbx_enrollment|
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |previous_enrollment|
 
-      hbx_enrollment.update_attributes(enrollment_signature: hbx_enrollment.generate_hbx_signature) if !hbx_enrollment.enrollment_signature.present?
+      previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
 
-      if (hbx_enrollment.enrollment_signature == self.enrollment_signature && hbx_enrollment.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && hbx_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < hbx_enrollment.effective_on) || (hbx_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < hbx_enrollment.effective_on)
+      if (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on)
 
-        if hbx_enrollment.may_cancel_coverage?
-          hbx_enrollment.cancel_coverage!
-          hbx_enrollment.update_current(terminated_on: hbx_enrollment.effective_on)
+        if previous_enrollment.may_cancel_coverage?
+          previous_enrollment.cancel_coverage!(previous_enrollment.effective_on)
         end
-      elsif (hbx_enrollment.enrollment_signature == self.enrollment_signature && hbx_enrollment.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && hbx_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= hbx_enrollment.effective_on) || (hbx_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= hbx_enrollment.effective_on)
-        if hbx_enrollment.may_terminate_coverage?
+      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
+        if previous_enrollment.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
-
-          hbx_enrollment.terminate_coverage
-          hbx_enrollment.update_current(terminated_on: term_date)
+          previous_enrollment.terminate_coverage!(term_date)
         end
       end
     end
   end
+
 
   def update_existing_shop_coverage
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
