@@ -53,7 +53,8 @@ module Importers
         "child" => "child_under_26",
         "child under 26" => "child_under_26",
         "child over 26" => "child_26_and_over",
-        "disabled child under 26" => "disabled_child_26_and_over"
+        "disabled child under 26" => "disabled_child_26_and_over",
+        "disabled child over 26" => "disabled_child_26_and_over"
       }
 
     include ValueParsers::OptimisticSsnParser.on(:subscriber_ssn, :fein)

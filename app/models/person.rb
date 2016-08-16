@@ -399,6 +399,7 @@ class Person
   end
 
   def ensure_relationship_with(person, relationship)
+    return if person.blank?
     existing_relationship = self.person_relationships.detect do |rel|
       rel.relative_id.to_s == person.id.to_s
     end
