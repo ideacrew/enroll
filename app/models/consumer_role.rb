@@ -123,6 +123,12 @@ class ConsumerRole
 
   before_validation :ensure_ssn_validation_status
 
+  def ivl_coverage_selected
+    if unverified?
+      coverage_purchased!
+    end
+  end
+
   def ensure_ssn_validation_status
     if self.person && self.person.ssn.blank?
       self.ssn_validation = "na"
