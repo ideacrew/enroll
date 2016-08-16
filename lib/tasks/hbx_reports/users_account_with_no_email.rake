@@ -8,11 +8,12 @@ namespace :report do
     desc "List of users with no email address in user account"
     task :with_no_email_address => :environment do
 
-      users = User.where(:"oim_id".exists=>true, :"email".exists=>false)
+      persons = User.where(:"oim_id".exists=>true, :"email".exists=>false).map(&:person)
       field_names  = %w(
                username
                user_first_name
                user_last_name
+               user_roles
                person_hbx_id
                person_home_email
                person_work_email
@@ -24,20 +25,21 @@ namespace :report do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        users.each do |user|
-          if user.person.present?
+        persons.each do |person|
+          if person.emails.present?
             csv << [
-                user.oim_id,
-                user.person.first_name,
-                user.person.last_name,
-                user.person.hbx_id,
-                user.person.try(:emails).where(kind: "home").try(:first).try(:address),
-                user.person.try(:emails).where(kind: "work").try(:first).try(:address)
+                person.user.oim_id,
+                person.first_name,
+                person.last_name,
+                person.user.roles,
+                person.hbx_id,
+                person.try(:emails).where(kind: "home").try(:first).try(:address),
+                person.try(:emails).where(kind: "work").try(:first).try(:address)
             ]
             processed_count += 1
           end
         end
-        puts "Total users with no email address in user account count #{processed_count} and users account output file: #{file_name}"
+        puts "Total users with no email address in user account and with email in person record count #{processed_count} and users account output file: #{file_name}"
       end
     end
   end
