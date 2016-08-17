@@ -41,6 +41,7 @@ def create_person_details(subscriber_params)
 end
 
 def find_dependent(ssn,dob,first_name,middle_name,last_name)
+	dob = format_date(dob)
 	person = Person.match_by_id_info(:ssn=> ssn, :dob => dob, :first_name => first_name, :last_name => last_name).first
 	if person == nil
 		return ArgumentError.new("dependent does not exist for provided person details")
@@ -158,9 +159,9 @@ CSV.foreach(filename, headers: :true) do |row|
 
 	benefit_package = select_benefit_package(data_row["Benefit Package/Benefit Group"],benefit_coverage_period)
 	en = hh.new_hbx_enrollment_from({
-			coverage_household: ch
-			consumer_role: consumer_role
-			benefit_package: benefit_package
+			coverage_household: ch,
+			consumer_role: consumer_role,
+			benefit_package: benefit_package,
 			submitted_at: data_row["Date Plan Selected"].to_time
 		})
 	en.effective_on = start_date
