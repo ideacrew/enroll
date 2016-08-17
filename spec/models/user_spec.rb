@@ -78,6 +78,11 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context 'email validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:email).case_insensitive }
+    end
+
     context 'when password' do
       let(:params){valid_params.deep_merge!({password: "",})}
       it 'is empty' do
