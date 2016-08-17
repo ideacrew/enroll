@@ -40,7 +40,7 @@
 	         	</div>
 	         	<div class='init_event_date'>
 	         	  <div class="col-md-3 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-			     			<%= text_field_tag :event_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "-60d", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
+			     			<%= text_field_tag :event_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
 			 				</div>
 			 			</div>
 	         	<div class='admin_effective_on_kind_options'>
@@ -54,7 +54,7 @@
 		          </div>
 	          </div>
 			 		</div>
-			 		<div class='row row-form-wrapper no-buffer'>
+			 		<div class='row row-form-wrapper no-buffer sep_dates_filter'>
 			 			<div class = "start_end_date">
 			 				<div class = "start_btn">
 						 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd start_input">
@@ -69,24 +69,24 @@
 						</div>
 						<div class='init_effective_date'>
 							<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "disabled-input floatlabel required date-picker form-control", required: true, placeholder: "NEXT POSSIBLE EFFECTIVE DATE"%>
+						    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control disabled-input", required: true, placeholder: "NEXT POSSIBLE EFFECTIVE DATE", value: Date.current %>
 							</div>
 						</div>
 					</div>
-					<div class='row row-form-wrapper no-buffer'>
+					<div class='row row-form-wrapper no-buffer optional_date'>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option1_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
+						    <%= text_field_tag :option1_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option2_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
+						    <%= text_field_tag :option2_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option3_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
+						    <%= text_field_tag :option3_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
 						</div>
 					</div>
 					<div class='row row-form-wrapper no-buffer'>
 						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-			    			<%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body", rows: 2, placeholder: "Enter Comments Here" %>
+			    			<%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body", rows: 5, placeholder: "Enter Comments Here" %>
 						</div>
 					</div>
 					<div class="col-md-8 col-md-offset-5 col-sm-6 col-xs-12 form-group form-group-lg no-pd" style="margin-top:10px;">
