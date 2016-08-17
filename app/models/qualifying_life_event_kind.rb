@@ -186,6 +186,12 @@ class QualifyingLifeEventKind
     def individual_market_events_admin
       where(:market_kind => "individual").active.to_a
     end
+
+    def date_hint
+      start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
+      end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
+        "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+    end
   end
 
 end

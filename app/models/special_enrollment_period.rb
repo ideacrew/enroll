@@ -13,6 +13,9 @@ class SpecialEnrollmentPeriod
   # Date Qualifying Life Event occurred
   field :qle_on, type: Date
 
+  # Comments made by admin
+  field :admin_comment, type: String
+
   # Date coverage starts
   field :effective_on_kind, type: String
 
@@ -32,6 +35,32 @@ class SpecialEnrollmentPeriod
 
   # QLE Answer to specific question
   field :qle_answer, type: String
+
+  # Next Possible Event Date
+  field :next_poss_effective_date, type: Date
+
+  # Date Option 1
+  field :option1_date, type: Date
+
+  # Date Option 2
+  field :option2_date, type: Date
+
+  # Date Option 3
+  field :option3_date, type: Date
+
+  # Date Options Array
+  field :optional_effective_on, type: Array, default: []
+
+  # CSL#
+  field :csl_num, type: String
+
+  # MARKET KIND
+  field :market_kind, type:String
+
+  validates :csl_num,
+    length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
+    allow_blank: true,
+    numericality: true
 
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
