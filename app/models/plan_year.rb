@@ -294,7 +294,7 @@ class PlanYear
   # All active employees present on the roster with benefit groups belonging to this plan year
   def eligible_to_enroll
     return @eligible if defined? @eligible
-    @eligible ||= find_census_employees.active.without_cobra
+    @eligible ||= find_census_employees.active
   end
 
   def waived
