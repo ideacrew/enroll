@@ -23,6 +23,11 @@ module Forms
 
     class OrganizationAlreadyMatched < StandardError; end
 
+    def initialize(attrs = {})
+      self.fein = Organization.generate_fein
+      super(attrs)
+    end
+
     def self.model_name
       ::BrokerAgencyProfile.model_name
     end
