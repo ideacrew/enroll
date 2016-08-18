@@ -4,7 +4,7 @@ module HbxAdminHelper
     Person.find(person_id).full_name
   end
 
-  def ehb_percent_for_enrrollment(hbx_id)
+  def ehb_percent_for_enrollment(hbx_id)
   	ehb = HbxEnrollment.find(hbx_id).plan.ehb
   	enb_percent = (ehb*100).round(2)
   end
