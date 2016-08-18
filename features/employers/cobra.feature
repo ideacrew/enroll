@@ -66,6 +66,7 @@ Feature: COBRA basic
     When Jack Doe visit the Employer portal
     And Jack Doe login in for employer
     Then Jack Doe should see employer profile page
+    When Set Date two months later
     When Employer clicks on the Employees tab
     And Employer should see the status of Cobra Linked
     And Employer should see the status of Employee Role Linked
@@ -83,4 +84,5 @@ Feature: COBRA basic
     And Jack Employee login in for employee
     Then Jack Employee should see my account page
     Then Jack Employee should see cobra enrollment on my account page
+    Then Set Date back to two months ago
     Then Employee logs out

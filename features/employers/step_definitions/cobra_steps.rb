@@ -186,11 +186,21 @@ Then(/^(.*) should see employer profile page$/) do |named_person|
   expect(page).to have_content(person[:legal_name])
 end
 
+When(/Set Date two months later/) do
+  TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 2.months)
+end
+
+Then(/Set Date back to two months ago/) do
+  TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record - 2.months)
+end
+
 When(/^.+ terminate one employee$/) do
   find('tr.even i.fa-trash-o').click
   sleep(1)
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
+  find('.employees-section').click
   click_link 'Terminate Employee'
+  wait_for_ajax(5)
 end
 
 Then(/^.+ should see terminate successful msg$/) do
@@ -223,7 +233,7 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Canceled')
+  expect(page).to have_content('Terminated')
   expect(page).to have_content('Coverage Selected')
 end
 

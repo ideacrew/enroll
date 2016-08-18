@@ -662,7 +662,7 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
-    return if !employment_terminated? && !employee_termination_pending? && !cobra_terminated? && !cobra_termination_pending?
+    return false if is_cobra_status?
 
     if employment_terminated_on && employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before hiring date")
