@@ -42,31 +42,33 @@ namespace :reports do
         csv << field_names
 
         families.each do |family|
-          hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && termination_submitted_on.cover?(hbx.updated_at)}
-          hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
-          hbx_enrollment_members.each do |hbx_enrollment_member|
-            if hbx_enrollment_member
-              csv << [
-                  hbx_enrollment_member.person.hbx_id,
-                  hbx_enrollment_member.person.first_name,
-                  hbx_enrollment_member.person.last_name,
-                  family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:legal_name),
-                  family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:fein),
-                  family.primary_family_member.person.hbx_id,
-                  family.primary_family_member.person.first_name,
-                  family.primary_family_member.person.last_name,
-                  hbx_enrollment_member.hbx_enrollment.kind,
-                  hbx_enrollment_member.hbx_enrollment.plan.carrier_profile.legal_name,
-                  hbx_enrollment_member.hbx_enrollment.plan.name,
-                  hbx_enrollment_member.hbx_enrollment.coverage_kind,
-                  hbx_enrollment_member.hbx_enrollment.plan.hios_id,
-                  hbx_enrollment_member.hbx_enrollment.hbx_id,
-                  hbx_enrollment_member.hbx_enrollment.effective_on,
-                  hbx_enrollment_member.hbx_enrollment.terminated_on,
-                  hbx_enrollment_member.hbx_enrollment.updated_at
-              ]
+          if family.primary_family_member.person.has_active_consumer_role? || family.primary_family_member.person.has_active_employee_role?
+            hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && termination_submitted_on.cover?(hbx.updated_at) && hbx.terminated_on.strftime('%Y-%m-%d') > hbx.updated_at.strftime('%Y-%m-%d')}
+            hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
+            hbx_enrollment_members.each do |hbx_enrollment_member|
+              if hbx_enrollment_member
+                csv << [
+                    hbx_enrollment_member.person.hbx_id,
+                    hbx_enrollment_member.person.first_name,
+                    hbx_enrollment_member.person.last_name,
+                    family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:legal_name),
+                    family.primary_family_member.person.try(:active_employee_roles).try(:first).try(:employer_profile).try(:fein),
+                    family.primary_family_member.person.hbx_id,
+                    family.primary_family_member.person.first_name,
+                    family.primary_family_member.person.last_name,
+                    hbx_enrollment_member.hbx_enrollment.kind,
+                    hbx_enrollment_member.hbx_enrollment.plan.carrier_profile.legal_name,
+                    hbx_enrollment_member.hbx_enrollment.plan.name,
+                    hbx_enrollment_member.hbx_enrollment.coverage_kind,
+                    hbx_enrollment_member.hbx_enrollment.plan.hios_id,
+                    hbx_enrollment_member.hbx_enrollment.hbx_id,
+                    hbx_enrollment_member.hbx_enrollment.effective_on,
+                    hbx_enrollment_member.hbx_enrollment.terminated_on,
+                    hbx_enrollment_member.hbx_enrollment.updated_at
+                ]
+              end
+              processed_count += 1
             end
-            processed_count += 1
           end
         end
         puts "For date range  #{termination_submitted_on}, total ivl and census employee's terminated their hbx_enrollment count #{processed_count} and information output file: #{file_name}"
