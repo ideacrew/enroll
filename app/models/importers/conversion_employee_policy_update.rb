@@ -196,8 +196,8 @@ module Importers
       end
     
       if renewed_plan_year.blank?
-        errors.add(:base, "renewed/renewing plan year missing")
-        return false
+        warnings.add(:base, "renewed/renewing plan year missing")
+        return true
       end
 
       enrollments = family.active_household.hbx_enrollments.where({
@@ -206,8 +206,8 @@ module Importers
         }).by_coverage_kind('health')
 
       if enrollments.empty?
-        errors.add(:base, "renewal enrollment missing!")
-        return false
+        warnings.add(:base, "renewal enrollment missing!")
+        return true
       end
 
       manual_selection = enrollments.detect{|e| e.workflow_state_transitions.where(:to_state => 'auto_renewing').none?}
