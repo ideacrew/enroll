@@ -111,7 +111,7 @@ class CensusEmployee < CensusMember
   end
 
   def assign_default_benefit_package
-    self.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING + ['renewing_draft']).order_by(:start_on.asc).each do |py|
+    self.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING + ['draft']).order_by(:start_on.asc).each do |py|
       if self.benefit_group_assignments.detect{|bg_assign| py.benefit_groups.map(&:id).include?(bg_assign.benefit_group_id) }.blank?
         find_or_build_benefit_group_assignment(py.benefit_groups.first)
       end
