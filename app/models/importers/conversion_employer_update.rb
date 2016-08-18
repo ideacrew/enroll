@@ -42,7 +42,9 @@ module Importers
         puts "FAILED.....#{e.to_s}"
       end
 
-      propagate_errors(organization)
+      if organization
+        propagate_errors(organization)
+      end
       return update_result
     end
   end
