@@ -15,11 +15,11 @@
       
       <%= render 'household_level_info.html.erb'%>
 
-      <div align="right">
-        View Terminated / Cancelled APTC Enrollments <br />
-         -<%=@cancelled_and_terminated_hbxs.first.plan.name%>
-      </div> <br />
-      
+      <% if all_canceled_and_terminated_enrollments_with_aptc(@family).present? %>
+        <div align="right">
+           <a data-toggle="modal" href="##terminated-hbx-modal" class="button">View Terminated / Cancelled APTC Enrollments</a>
+        </div> <br />
+      <% end %>
       
       <div id = "enrollmentsDiv">
         <%count =0%>
@@ -43,3 +43,5 @@
   </div>
 
 </div>
+
+<%= render 'terminated_cancelled_aptc_enrollments'%>
