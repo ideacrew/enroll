@@ -43,6 +43,7 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        post :update_setting
         get :staff_index
         get :assister_index
         get :request_help

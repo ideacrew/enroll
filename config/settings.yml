@@ -24,9 +24,7 @@ aca:
   state_abbreviation: "DC"
 #
   individual_market:
-    # IndividualEnrollmentDueDayOfMonth = 15
-    # Temporary change for Dec 2015 extension
-    monthly_enrollment_due_on: 18
+    monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
 #

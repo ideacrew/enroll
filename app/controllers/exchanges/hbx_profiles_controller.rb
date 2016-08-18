@@ -449,6 +449,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+
   # Enrollments for APTC / CSR
   def aptc_csr_family_index
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
@@ -469,6 +470,18 @@ class Exchanges::HbxProfilesController < ApplicationController
       #format.html { render "insured/families/aptc_csr_listing" }
       format.js {}
     end
+
+  def update_setting
+    authorize HbxProfile, :modify_admin_tabs?
+    setting_record = Setting.where(name: setting_params[:name]).last
+
+    begin
+      setting_record.update(value: setting_params[:value]) if setting_record.present?
+    rescue Exception=>e
+      flash[:error] = "Failed to update setting, " + e.message
+    end
+    redirect_to exchanges_hbx_profiles_root_path
+
   end
 
 private
@@ -480,6 +493,10 @@ private
    def view_admin_tabs?
      authorize HbxProfile, :view_admin_tabs?
    end
+
+  def setting_params
+    params.require(:setting).permit(:name, :value)
+  end
 
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
