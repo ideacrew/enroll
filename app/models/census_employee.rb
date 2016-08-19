@@ -39,6 +39,7 @@ class CensusEmployee < CensusMember
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
   validate :no_duplicate_census_dependent_ssns
+  validate :check_hired_on_later_than_dob
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   index({aasm_state: 1})
@@ -548,6 +549,12 @@ class CensusEmployee < CensusMember
     if (ssn_changed? || dob_changed?) && aasm_state != "eligible"
       message = "An employee's identifying information may change only when in 'eligible' status. "
       errors.add(:base, message)
+    end
+  end
+
+  def check_hired_on_later_than_dob
+    if hired_on && dob && hired_on <= dob
+      errors.add(:hired_on, "can't be later than date of birth.")
     end
   end
 
