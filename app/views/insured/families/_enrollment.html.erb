@@ -17,11 +17,7 @@
       </span>
     </div>
     <% else %>
-    <div class="text-right">
-      <span class="label label-success">
-        <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
-      </span>
-    </div>
+      <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
     <% end %>
   </div>
 

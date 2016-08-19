@@ -26,6 +26,11 @@
       }
     }
   }
+  &.past-enrollments {
+    th, td {
+      vertical-align: middle;
+    }
+  }
   &.hbx-enrollment-panel {
     .panel-heading {
       background-color: transparent;
@@ -56,6 +61,9 @@
         table-layout: fixed;
         vertical-align: top;
       }
+      .table {
+        margin-bottom: 0;
+      }
     }
     .panel-footer {
       padding-top: 0;
@@ -64,6 +72,16 @@
       > .vertically-aligned-row {
         table-layout: fixed;
       }
+      a {
+        padding: 3%;
+        &:hover {
+          text-decoration: none;
+          color: $primary-blue;
+          background-color: $primary-light-gray;
+          border-radius: $primary-border-radius;
+        }
+      }
+
     }
   }
   &.inbox {
