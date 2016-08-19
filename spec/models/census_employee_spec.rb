@@ -609,9 +609,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-
-
-
   context "validation for census_dependents_relationship" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:spouse1) { FactoryGirl.build(:census_dependent, employee_relationship: "spouse") }
@@ -987,7 +984,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context '.find_or_build_benefit_group_assignment' do
-
+    
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
@@ -1012,6 +1009,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:employer_profile) { plan_year.employer_profile }
     let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, :premiums_for_2015, plan_year: plan_year, title: "white collar benefit group") }
     let!(:census_employee) { CensusEmployee.create(**valid_params) }
+
+    before do
+      census_employee.benefit_group_assignments.each{|bg| bg.delete} 
+    end
 
     context 'when benefit group assignment with benefit group already exists' do
       let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }

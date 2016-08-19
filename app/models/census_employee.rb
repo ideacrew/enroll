@@ -119,6 +119,7 @@ class CensusEmployee < CensusMember
   end
 
   def find_or_build_benefit_group_assignment(benefit_group)
+    return unless benefit_group
     return if self.benefit_group_assignments.where(:benefit_group_id => benefit_group.id).present?
 
     active = false 
