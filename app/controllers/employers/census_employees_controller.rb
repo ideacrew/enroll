@@ -87,6 +87,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
       flash[:notice] = "Census Employee is successfully updated."
       if benefit_group_id.present?
+        @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully updated."
       else
         flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
