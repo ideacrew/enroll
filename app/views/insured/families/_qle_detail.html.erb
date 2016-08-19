@@ -34,24 +34,6 @@
               </div>
             </div>
           </div>
-
-<<<<<<< HEAD
-            <div id="qle_message">
-              <div class="success-info hidden">
-                <%= hidden_field_tag 'change_plan' %>
-                <%= hidden_field_tag 'qle_id' %>
-                <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
-
-                <p class="success-text">
-                  <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
-                </p>
-                <div class="effective_on_kinds">
-                </div>
-
-                <div class="center <%=pundit_class Family,:updateable?%>">
-                  <%= submit_tag 'Continue', class: 'btn btn-primary' %>
-                </div>
-=======
           <div id="qle_message">
             <div class="success-info hidden">
               <%= hidden_field_tag 'change_plan' %>
@@ -59,7 +41,6 @@
               <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
               <div class="alert alert-success no-buffer" role="alert">
                 <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
->>>>>>> c8bb180... refs #7917 finish census employee show/edit, enrollment tiles, and related tweaks
               </div>
               <div class="effective_on_kinds"></div>
               <div class="text-center">
