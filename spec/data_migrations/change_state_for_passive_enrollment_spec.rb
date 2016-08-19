@@ -54,5 +54,17 @@ describe ChangeStateForPassiveEnrollment do
       enrollment.reload
       expect(enrollment.aasm_state).to eq "coverage_enrolled"
     end
+
+    it "should not change the passive enrollment aasm state" do
+      employer_profile = organization.first.employer_profile
+      census_employee = employer_profile.census_employees.first
+      renewing_plan_year = organization.first.employer_profile.plan_years.last
+      enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.last
+      enrollment.update_attribute(:coverage_kind, "dental")
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    end
   end
 end

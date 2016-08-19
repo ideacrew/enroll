@@ -2,8 +2,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeStateForPassiveEnrollment < MongoidMigrationTask
   def migrate
-    begin
-      Person.all.each do |person|
+    Person.all.each do |person|
+      begin
         enrollments = person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
         plan_year = person.try(:employee_roles).first.try(:employer_profile).try(:plan_years)
         if plan_year.present?
@@ -29,8 +29,8 @@ class ChangeStateForPassiveEnrollment < MongoidMigrationTask
             end
           end
         end
+      rescue
       end
-    rescue
     end
   end
 end
