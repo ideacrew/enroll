@@ -37,6 +37,11 @@ module Importers
 
     include ValueParsers::OptimisticSsnParser.on(:fein)
 
+    def calculated_coverage_start
+      return @calculated_coverage_start if @calculated_coverage_start
+      default_plan_year_start
+    end
+
     def new_coverage_policy=(val)
       @new_coverage_policy = val
       if val.blank?

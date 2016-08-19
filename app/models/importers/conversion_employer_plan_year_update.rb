@@ -68,7 +68,7 @@ module Importers
 
       puts "Processing....#{employer.legal_name}...#{employer.fein}"
 
-      current_coverage_start = Date.strptime(coverage_start, "%m/%d/%Y")
+      current_coverage_start = calculated_coverage_start
       
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
       reference_plan = select_reference_plan(available_plans)
