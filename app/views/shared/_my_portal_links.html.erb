@@ -23,7 +23,7 @@
           <% employer_staff.each do |employer_staff_role|  %>
             <% id = employer_staff_role.employer_profile_id %>
             <% employer = EmployerProfile.find(id) %>
-            <li><%= link_to employer.legal_name, employers_employer_profile_path(employer), class: 'header-text' %></li>
+            <li><%= link_to employer.legal_name, employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
           <% end %>
           <% if broker %>
           <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' %></li>
