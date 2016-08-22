@@ -16,7 +16,7 @@ RSpec.describe "_waived_coverage_widget.html.erb" do
     end
 
     it "should display coverage waived widget" do
-      expect(rendered).to match (hbx_enrollment.aasm_state.gsub!(/_/, ' ')).split(/ |\_/).map(&:capitalize).join(" ")
+      expect(rendered).to match (/waived/i)
     end
 
     it "should display coverage waived time stamp" do

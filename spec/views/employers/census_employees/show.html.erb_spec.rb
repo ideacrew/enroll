@@ -43,6 +43,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     assign(:hbx_enrollments, [hbx_enrollment])
     assign(:benefit_group, benefit_group)
     assign(:plan, plan)
+    assign(:status, "terminated")
     assign(:active_benefit_group_assignment, benefit_group_assignment)
     allow(hbx_enrollment_member).to receive(:person).and_return(person)
     allow(hbx_enrollment_member).to receive(:primary_relationship).and_return("self")
