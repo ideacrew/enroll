@@ -277,17 +277,18 @@ describe User do
 
   describe "orphans" do
     context "when users have person associated" do
-      before do 
-        user = FactoryGirl.create :user 
+      before do
+        user = FactoryGirl.create :user
         user.person = FactoryGirl.create :person
       end
       it "should return no orphans" do
         expect(User.orphans).to eq []
       end
     end
-    context "when some users does NOT have person associated" do
-      before do 
-        user_with_person = FactoryGirl.create :user 
+
+    context "when some users does NOT have person associated", dbclean: :after_each do
+      before do
+        user_with_person = FactoryGirl.create :user
         user_with_person.person = FactoryGirl.create :person
         @user1_without_person = FactoryGirl.create :user , :email => "aaa@aaa.com"
         @user2_without_person = FactoryGirl.create :user , :email => "zzz@zzz.com"
