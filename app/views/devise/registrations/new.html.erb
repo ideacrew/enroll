@@ -13,7 +13,7 @@
         <%= f.label :email_or_username %>
 
 <!-- Modal -->
-        <%= f.text_field :oim_id, class: "form-control", required: true , onfocusout: "Registration.toggleEmail(this)",
+        <%= f.text_field :oim_id, class: "form-control", required: true , onblur: "Registration.toggleEmail(this)",
         :data => { :toggle=>"popover" ,:content=>"You can create a username or use your email address as your login.Using your email address will make it easier to recover your password if you ever forget it.",
           :placement => 'right', :trigger => 'focus' }
         %>
