@@ -252,7 +252,6 @@ CSV.foreach(filename, headers: :true) do |row|
 		benefit_group_assignment: benefit_group_assignment
 		})
 	en.effective_on = start_date
-	en.external_enrollment = true
 	en.hbx_enrollment_members.each do |mem|
 		mem.eligibility_date = start_date
 		mem.coverage_start_on = start_date
