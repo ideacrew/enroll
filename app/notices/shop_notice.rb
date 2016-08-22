@@ -1,9 +1,8 @@
 class ShopNotice < Notice
 
-  @@required_params= [:subject,:template,:employer_profile,:mpi_indicator]
+  Required= Notice::Required + []
 
   def initialize(params = {})
-    validate_params(params)
     super(params)
   end
 
@@ -14,7 +13,7 @@ class ShopNotice < Notice
   end
 
   def append_hbe
-    @notice.hbe = PdfTemplates::Hbe.new({
+    notice.hbe = PdfTemplates::Hbe.new({
       url: "www.dhs.dc.gov",
       phone: "(855) 532-5465",
       fax: "(855) 532-5465",
@@ -36,7 +35,7 @@ class ShopNotice < Notice
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
     
-    @notice.broker = PdfTemplates::Broker.new({
+    notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
@@ -53,7 +52,7 @@ class ShopNotice < Notice
   end
 
   def append_primary_address(primary_address)
-    @notice.primary_address = PdfTemplates::NoticeAddress.new({
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
       street_1: primary_address.address_1.titleize,
       street_2: primary_address.address_2.titleize,
       city: primary_address.city.titleize,
@@ -62,10 +61,4 @@ class ShopNotice < Notice
       })
   end
 
-  def validate_params(params)
-    @@required_params.each do |key|
-      next if params[key].present?
-      raise("Required praramber #{key} not present")
-    end
-  end
 end

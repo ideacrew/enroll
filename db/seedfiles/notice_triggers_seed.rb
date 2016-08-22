@@ -72,7 +72,7 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'PlanYear Renewal',
-        notice_template: 'notices/shop_notices/3a_employee_renewal',
+        notice_template: 'notices/shop_notices/3a_employer_renewal',
         notice_builder: 'ShopNotices::EmployerNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],

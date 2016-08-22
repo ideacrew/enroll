@@ -1,21 +1,27 @@
 class Notice
 
-  attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name, :notice , :random_str
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient
 
-  def initialize(args = {})
-    @subject = "#{args[:subject]}" || "notice_#{random_str}"
-    @mpi_indicator = args[:mpi_indicator]
-    @template = arag[:template]
-    @layout = 'pdf_notice'
+  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:recipient_document_store]
+
+  def initialize(params = {})
+    validate_params(params)
+    self.subject = "#{params[:subject]}" || "notice_#{random_str}"
+    self.mpi_indicator = params[:mpi_indicator]
+    self.template = params[:template]
+    self.notice= params[:notice]
+    self.market_kind= params[:market_kind]
+    self.recipient= params[:recipient]
+    self.recipient_document_store = params[:recipient_document_store]
+    self.to = params[:to] || recipient.home_email.address
+    self.name = params[:name] || recipient.first_name
   end
 
   def html(options = {})
-    # notice_layout = 'bootstrap_email'
-    # notice_layout = 'boiler_plate_email'
     ApplicationController.new.render_to_string({ 
-      :template => @template,
-      :layout => @layout,
-      :locals => { notice: @notice }
+      :template => template,
+      :layout => layout,
+      :locals => { notice: notice }
     })
   end
 
@@ -27,6 +33,10 @@ class Notice
     WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
   end
 
+  def layout
+    'pdf_notice'
+  end
+
   def notice_filename
     "#{subject.titleize.gsub(/\s*/, '')}"
   end
@@ -35,7 +45,7 @@ class Notice
     Rails.root.join("tmp", "#{notice_filename}.pdf")
   end
 
-  def envolope_path 
+  def envelope_path
     Rails.root.join("tmp", "envelope_#{random_str}.pdf")
   end
 
@@ -54,7 +64,7 @@ class Notice
       encoding: 'utf8'
     }
 
-    if @market_kind == 'individual'
+    if market_kind == 'individual'
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
           template: "notices/shared/footer.html.erb", 
@@ -101,10 +111,9 @@ class Notice
     raise "unable to upload to amazon #{e}"
   end
 
-  #NOTE : This is a generic method to send secure message 
-  # @param recipient is a SecureMessageRecipient object
-  def send_generic_notice_alert(recipient)
-    UserMailer.generic_notice_alert(recipient.name,subject, recipient.email_address).deliver_now
+  # @param recipient is a Person object
+  def send_generic_notice_alert
+    UserMailer.generic_notice_alert(name,subject,to).deliver_now
   end
 
   def store_paper_notice
@@ -114,7 +123,7 @@ class Notice
   end
 
   def create_recipient_document(doc_uri)
-    notice = family.documents.build({
+    notice = recipient_document_store.documents.build({
       title: notice_filename, 
       creator: "hbx_staff",
       subject: "notice",
@@ -131,13 +140,23 @@ class Notice
 
   def create_secure_inbox_message(notice)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@family.class.to_s, @family.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
 
   def clear_tmp
-    File.delete(@envelope_path)
-    File.delete(@notice_path)
+    File.delete(envelope_path)
+    File.delete(notice_path)
+  end
+
+  def validate_params(params)
+    errors=[]
+    self.class::Required.uniq.each do |key|
+      next if params[key].present?
+      errors << key
+    end
+    raise("Required params #{errors.join(' ,')} not present") if errors.present?
   end
 end
