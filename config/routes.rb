@@ -39,14 +39,19 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        post :update_setting
         get :staff_index
         get :assister_index
         get :request_help
+        get :binder_index
+        get :binder_index_datatable
+        post :binder_paid
         get :verification_index
         get :verifications_index_datatable
       end
 
       member do
+        post :transmit_group_xml
         get :home
         get :inbox
       end

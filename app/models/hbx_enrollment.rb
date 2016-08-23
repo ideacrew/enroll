@@ -70,6 +70,7 @@ class HbxEnrollment
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
+  field :terminate_reason, type: String
 
   field :plan_id, type: BSON::ObjectId
   field :carrier_profile_id, type: BSON::ObjectId
@@ -99,6 +100,7 @@ class HbxEnrollment
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
+  field :termination_submitted_on, type: DateTime
 
 
   # An external enrollment is one which we keep for recording purposes,
@@ -126,6 +128,9 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
+  scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :effective_asc,      -> { order(effective_on: :asc) }
+  scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled"] )}
   scope :changing,            ->{ where(changing: true) }
@@ -353,19 +358,18 @@ class HbxEnrollment
   end
 
   def cancel_previous(year)
-
     #Perform cancel/terms of previous enrollments for the same plan year
     self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |p|
 
       p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
+      if (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
 
         if p.may_cancel_coverage?
           p.cancel_coverage!
           p.update_current(terminated_on: p.effective_on)
         end
-      elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
+      elsif (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
         if p.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
@@ -377,27 +381,47 @@ class HbxEnrollment
     end
   end
 
-  def propogate_selection
+  def update_existing_shop_coverage
+    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
-    cancel_previous(self.plan.active_year)
+    terminate_proc = lambda do |enrollment|
+      if enrollment.may_terminate_coverage?
+        enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+        enrollment.terminate_coverage!
+      end
+    end
+
+    shop_enrollments.each do |enrollment|
+      if enrollment.currently_active? && enrollment.may_terminate_coverage?
+        terminate_proc.call(enrollment)
+      elsif enrollment.future_active?
+        if enrollment.effective_on >= self.effective_on
+          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+        else
+          terminate_proc.call(enrollment)
+        end
+      end
+    end
+
+    # TODO: gereate or update passive renewal
+  end
+
+  def propogate_selection
+    if self.kind == "employer_sponsored"
+      update_existing_shop_coverage
+    else
+      cancel_previous(self.plan.active_year)
+    end
 
     if benefit_group_assignment
       benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
-    if consumer_role.present?
-      hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.invoke_verification!(effective_on)
-      end
-      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-      self.published_to_bus_at = Time.now
-    else
-      if is_shop_sep?
-        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-        self.published_to_bus_at = Time.now
-      end
-    end
+
+    callback_context = { :hbx_enrollment => self }
+    HandleCoverageSelected.call(callback_context)
   end
 
   def should_transmit_update?
@@ -1119,6 +1143,11 @@ class HbxEnrollment
     !(shopping_plan_year.start_on == effective_on)
   end
 
+  def update_coverage_kind_by_plan
+    if plan.present? && coverage_kind != plan.coverage_kind
+      self.update(coverage_kind: plan.coverage_kind)
+    end
+  end
 
  def set_submitted_at
    if submitted_at.blank?
@@ -1138,6 +1167,7 @@ class HbxEnrollment
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else
+      self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")
       false
     end
   end

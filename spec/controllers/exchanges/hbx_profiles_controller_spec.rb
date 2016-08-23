@@ -41,6 +41,40 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "binder methods" do
+    let(:user) { double("user")}
+    let(:person) { double("person")}
+    let(:hbx_profile) { double("HbxProfile") }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryGirl.create(:permission))}
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state: "enrolling") }
+
+    before(:each) do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders binder_index" do
+      xhr :get, :binder_index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/binder_index")
+    end
+
+    it "updates employers state to binder paid" do
+      post :binder_paid, :employer_profile_ids => [employer_profile.id]
+      expect(flash[:notice]).to eq 'Successfully submitted the selected employer(s) for binder paid.'
+    end
+
+    it "should render json template" do
+      get :binder_index_datatable, {format: :json}
+      expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
+    end
+
+  end
+
   describe "new" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
@@ -78,6 +112,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+    let(:search_params){{"value"=>""}}
 
     before :each do
       allow(user).to receive(:person).and_return(person)
@@ -94,7 +129,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "renders employer_invoice datatable payload" do
-      xhr :post, :employer_invoice_datatable
+      xhr :post, :employer_invoice_datatable, :search => search_params
       expect(response).to have_http_status(:success)
     end
 
@@ -350,18 +385,49 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "POST" do
-    let(:user) { double("user")}
-
+    let(:user) { FactoryGirl.create(:user)}
+    let(:person) { FactoryGirl.create(:person, user: user) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
       sign_in(user)
     end
 
     it "sends timekeeper a date" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      sign_in(user)
       expect(TimeKeeper).to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
+    end
+
+    it "sends timekeeper a date and fails because not updateable" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      sign_in(user)
+      expect(TimeKeeper).not_to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
+      post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
+    end
+
+    it "update setting" do
+      Setting.individual_market_monthly_enrollment_due_on
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      sign_in(user)
+
+      post :update_setting, :setting => {'name' => 'individual_market_monthly_enrollment_due_on', 'value' => 15}
+      expect(response).to have_http_status(:redirect)
+      expect(Setting.individual_market_monthly_enrollment_due_on).to eq 15
+    end
+
+    it "update setting fails because not updateable" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      sign_in(user)
+      post :update_setting, :setting => {'name' => 'individual_market_monthly_enrollment_due_on', 'value' => 19}
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
     end
   end
 

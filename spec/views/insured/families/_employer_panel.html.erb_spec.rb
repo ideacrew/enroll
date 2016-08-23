@@ -1,6 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_employer_panel.html.erb" do
+  let(:person) {FactoryGirl.build(:person)}
+  let(:employee_role) {FactoryGirl.build(:employee_role)}
+  let(:employer_profile) {FactoryGirl.build(:employer_profile)}
+
+  before :each do
+    assign(:person, person)
+    assign(:employee_role, employee_role)
+    allow(view).to receive(:is_under_open_enrollment?).and_return true
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
+    render "insured/families/employer_panel"
+  end
 
   context 'Person has a single employer/employee_role' do  
     let(:person) { FactoryGirl.create :person, :with_employee_role }

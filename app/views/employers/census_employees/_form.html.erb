@@ -55,7 +55,7 @@
 
 
 
-          <div class="key-btn">
+          <div class="key-btn <%=pundit_class EmployerProfile, :updateable?%>">
             <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
             <button class="btn btn-primary  pull-right" type="submit">
               <%= "#{button_label}".html_safe %>
