@@ -143,10 +143,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
-<<<<<<< HEAD
         allow(family).to receive(:active_family_members).and_return(family_members)
-=======
->>>>>>> 909ed9a... Refs #7476 fixed eligibility for effective date is being determined by renewal plan year issue
         sign_in user
         get :home
       end
@@ -217,10 +214,7 @@ RSpec.describe Insured::FamiliesController do
         let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
-<<<<<<< HEAD
           allow(family).to receive(:active_family_members).and_return(family_members)
-=======
->>>>>>> 909ed9a... Refs #7476 fixed eligibility for effective date is being determined by renewal plan year issue
           get :home
         end
         it "should be a success" do
