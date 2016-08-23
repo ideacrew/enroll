@@ -125,6 +125,8 @@ Rails.application.routes.draw do
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
+        get 'check_move_reason'
+        get 'check_insurance_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'

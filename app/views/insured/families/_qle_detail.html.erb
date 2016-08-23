@@ -9,9 +9,8 @@
           <a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
         </div>
       </div>
-      <hr>
+      <br>
     </div>
-
     <div class="panel-body">
       <div class="row">
         <% url, http_method = '/insured/family_members', :get %>
@@ -34,24 +33,24 @@
                 </div>
               </div>
             </div>
-
+            <div id="qle_reason">
+            </div>
             <div id="qle_message">
               <div class="success-info hidden">
                 <%= hidden_field_tag 'change_plan' %>
                 <%= hidden_field_tag 'qle_id' %>
                 <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
-
                 <p class="success-text">
                   <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
                 </p>
                 <div class="effective_on_kinds">
                 </div>
-
+                <div class="spec_reasons">
+                </div>
                 <div class="center <%=pundit_class Family,:updateable?%>">
                   <%= submit_tag 'Continue', class: 'btn btn-primary' %>
                 </div>
               </div>
-
               <div class="error-info hidden">
                 <h4 class="qle-details-title">Change in income that may impact my tax credits/cost-sharing reductions</h4>
                 <div class="alert alert-danger" role="alert">
@@ -68,3 +67,8 @@
     </div>
   </div>
 </div>
+<script>
+$(document).on('ready page:load', function () {
+  QLE.initialize();
+});
+</script>
