@@ -10,7 +10,7 @@ class ShopNotices::EmployerNotice < ShopNotice
     args[:recipient] = employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
-    args[:to] = person.work_email.address || person.home_email.address
+    args[:to] = person.work_email.try(:address) || person.home_email.try(:address)
     args[:name] = "testing"
     args[:recipient_document_store]= employer_profile
     super(args)
