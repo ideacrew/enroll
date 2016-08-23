@@ -609,7 +609,7 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -799,6 +799,14 @@ private
 
   def is_plan_year_end?
     TimeKeeper.date_of_record.end_of_day == end_on
+  end
+
+  def trigger_renew_notice
+    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal').first
+    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile, :subject => "PlanYear Renewal Notice(3A)",
+                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
+                                                  :template => application_event.notice_triggers.first.notice_template})
+    shop_notice.deliver
   end
 
   def record_transition
