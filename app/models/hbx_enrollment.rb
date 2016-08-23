@@ -142,6 +142,7 @@ class HbxEnrollment
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
+  scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }

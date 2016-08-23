@@ -61,14 +61,13 @@ class Admin::Aptc < ApplicationController
 
 
     def build_aptc_applied_values_for_enrollment(family, current_hbx, applied_aptc_array=nil)
-      # Get all aptc enrollments (coverage selected, terminated or cancelled) for the current year.
+      # Get all aptc enrollments (coverage selected, terminated or cancelled) that have the same hbx_id as current_hbx. 
       # These are the dups of the current enrollment that were saved when APTC values were updated.
-      # enrollments_with_same_hbx_id = family.active_household.hbx_enrollments.active.with_aptc.by_year(TimeKeeper.date_of_record.year).by_hbx_id(current_hbx.hbx_id)
-      all_aptc_enrollments = family.active_household.hbx_enrollments.with_aptc.by_year(TimeKeeper.date_of_record.year)
-      all_aptc_enrollments.sort! {|a, b| a.effective_on <=> b.effective_on}
+      enrollments_with_same_hbx_id = family.active_household.hbx_enrollments.active.with_aptc.by_year(TimeKeeper.date_of_record.year).by_hbx_id(current_hbx.hbx_id) 
+      enrollments_with_same_hbx_id.sort! {|a, b| a.effective_on <=> b.effective_on}
       aptc_applied_hash = Hash.new
       $months_array.each_with_index do |month, ind|
-        all_aptc_enrollments.each do |hbx_iter|
+        enrollments_with_same_hbx_id.each do |hbx_iter|
           update_aptc_applied_hash_for_month(aptc_applied_hash, current_hbx, month, hbx_iter, family, applied_aptc_array)
         end
       end

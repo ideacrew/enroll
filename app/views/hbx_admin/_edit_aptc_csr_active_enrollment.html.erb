@@ -14,6 +14,12 @@
       <div id = "validation-error"></div>
       
       <%= render 'household_level_info.html.erb'%>
+
+      <div align="right">
+        View Terminated / Cancelled APTC Enrollments <br />
+         -<%=@cancelled_and_terminated_hbxs.first.plan.name%>
+      </div> <br />
+      
       
       <div id = "enrollmentsDiv">
         <%count =0%>
@@ -23,6 +29,8 @@
         <%end%>
       </div>
       
+
+
       <div align = "right" id = "update-btn">
         <tr>
           <td><%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, aptc_csr_family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true,  class: 'btn btn-default btn-lg', "aria-expanded" => "true" %></td>

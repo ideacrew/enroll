@@ -8,6 +8,7 @@ class HbxAdminController < ApplicationController
     @family = Family.find(params[:family_id])
     @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
+    @cancelled_and_terminated_hbxs = @family.active_household.hbx_enrollments.canceled_and_terminated.with_aptc.by_year(@current_year)
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@family)
     @household_members = Admin::Aptc.build_household_members(@family)
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@family, @hbxs)
@@ -47,6 +48,7 @@ class HbxAdminController < ApplicationController
     @family = Family.find(params[:family_id])
     @hbx = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year)
+    @cancelled_and_terminated_hbxs = @family.active_household.hbx_enrollments.with_aptc.canceled_and_terminated.by_year(@current_year)
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage], params[:applied_aptcs_array])
     @enrollments_info = Admin::Aptc.build_enrollments_data(@family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@family)
