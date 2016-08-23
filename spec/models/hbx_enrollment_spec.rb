@@ -409,6 +409,7 @@ describe HbxEnrollment, dbclean: :after_all do
           coverage_household: coverage_household,
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
+
         )
         @enrollment5.save
         @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
@@ -453,30 +454,27 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
         expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
       end
+
     end
 
-    #context "find_by_benefit_group_assignments" do
-    #  before :all do
-    #    3.times.each do
-    #      enrollment = household.create_hbx_enrollment_from(
-    #        employee_role: mikes_employee_role,
-    #        coverage_household: coverage_household,
-    #        benefit_group: mikes_benefit_group,
-    #        benefit_group_assignment: @mikes_benefit_group_assignments
-    #      )
-    #      enrollment.save
-    #    end
-    #  end
+    context "find_by_benefit_group_assignments" do
+      before :all do
+          enrollment = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+          )
+          enrollment.aasm_state = "auto_renewing"
+          enrollment.is_active = false
+          enrollment.save
+      end
 
-    #  it "should find more than 3 hbx_enrollments" do
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
-    #  end
+    it "should return an auto renewing enrollment if there exists one" do
+      expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).map(&:aasm_state)).to include "auto_renewing"
+    end
 
-    #  it "should return empty array without params" do
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
-    #  end
-    #end
+  end
 
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
