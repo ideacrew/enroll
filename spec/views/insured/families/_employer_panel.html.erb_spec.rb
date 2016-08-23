@@ -10,7 +10,7 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
     assign(:employee_role, employee_role)
     allow(view).to receive(:is_under_open_enrollment?).and_return true
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
-    render "insured/families/employer_panel"
+    render "insured/families/employer_panel", employee_role: employee_role
   end
 
   context 'Person has a single employer/employee_role' do  
