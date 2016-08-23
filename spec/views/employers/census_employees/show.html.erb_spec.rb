@@ -139,6 +139,60 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /Owner?/i
     end
+  end
 
+  context "with health, dental, and past enrollments" do
+    let(:dental_plan){ FactoryGirl.create(:plan,
+      name: "Some plan name",
+      carrier_profile_id: carrier_profile._id,
+      active_year: TimeKeeper.date_of_record.year,
+      metal_level: "dental",
+      dental_level: "high",
+      coverage_kind: 'dental'
+    )}
+    let(:dental_hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
+      household: household,
+      plan: dental_plan,
+      benefit_group: benefit_group,
+      coverage_kind: 'dental'
+    )}
+    let(:carrier_profile) { FactoryGirl.build_stubbed(:carrier_profile) }
+    let(:past_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment, aasm_state: 'coverage_terminated' ) }
+      before :each do
+      assign(:past_enrollments, [past_enrollments])
+      allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
+    end
+
+    it "should display past enrollments" do
+      render template: "employers/census_employees/show.html.erb"
+      expect(rendered).to match /#{hbx_enrollment.coverage_year} health Coverage/i
+      expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+      expect(rendered).to match /Past Enrollments/i
+    end
+
+    context "with not health, but dental and past enrollments" do
+      before :each do
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([dental_hbx_enrollment])
+      end
+      it "should display past enrollments" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).not_to match /#{hbx_enrollment.coverage_year} health Coverage/i
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+        expect(rendered).to match /Past Enrollments/i
+      end
+    end
+
+    context "with health and dental, but no past enrollments" do
+      before :each do
+        assign(:past_enrollments, [])
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
+      end
+      it "should display past enrollments" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} health Coverage/i
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+        expect(rendered).not_to match /Past Enrollments/i
+      end
+    end
   end
 end

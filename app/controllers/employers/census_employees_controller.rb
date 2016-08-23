@@ -106,6 +106,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def terminate
+    status = params[:status]
     termination_date = params["termination_date"]
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
@@ -125,20 +126,21 @@ class Employers::CensusEmployeesController < ApplicationController
       format.js {
         if termination_date.present? && @fa
           flash[:notice] = "Successfully terminated Census Employee."
-          render text: true
         else
           flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
-          render text: false
         end
       }
       format.all {
         flash[:notice] = "Successfully terminated Census Employee."
-        redirect_to employers_employer_profile_path(@employer_profile)
       }
     end
+    flash.keep(:error)
+    flash.keep(:notice)
+    render js: "window.location = '#{employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, status: status)}'"
   end
 
   def rehire
+    status = params[:status]
     rehiring_date = params["rehiring_date"]
     if rehiring_date.present?
       rehiring_date = DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
@@ -172,6 +174,10 @@ class Employers::CensusEmployeesController < ApplicationController
     else
       flash[:error] = "Rehiring date can't occur before terminated date."
     end
+    flash.keep(:error)
+    flash.keep(:notice)
+    render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
+
   end
 
   def show
@@ -179,7 +185,6 @@ class Employers::CensusEmployeesController < ApplicationController
       @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
       @benefit_group = @benefit_group_assignment.benefit_group
     end
-
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
     @census_employee.build_address unless @census_employee.address.present?

@@ -204,11 +204,11 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(employee_role).to receive(:person).and_return(person)
       allow(census_employee).to receive(:save).and_return(true)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
-      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(census_employee.aasm_state).to eq "eligible"
       person.dob = "11/11/1990"
       person.save
-      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
   end
@@ -270,7 +270,7 @@ RSpec.describe Employers::CensusEmployeesController do
     it "should be redirect" do
       get :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(flash[:notice]).to eq "Successfully terminated Census Employee."
-      expect(response).to be_redirect
+      expect(response).to have_http_status(:success)
     end
 
     context "with termination date" do
