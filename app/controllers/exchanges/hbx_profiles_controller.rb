@@ -470,6 +470,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       #format.html { render "insured/families/aptc_csr_listing" }
       format.js {}
     end
+  end
 
   def update_setting
     authorize HbxProfile, :modify_admin_tabs?
