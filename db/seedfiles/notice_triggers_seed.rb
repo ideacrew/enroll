@@ -68,7 +68,7 @@ shop_notice_triggers = [
     title: 'Renewal/Conversion Employer Publishes Plan',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
-    event_name: 'planyear_renewal',
+    event_name: 'planyear_renewal_3a',
     notice_triggers: [
       {
         name: 'PlanYear Renewal',
@@ -88,11 +88,11 @@ shop_notice_triggers = [
     title: 'Renewal/Conversion Employer Auto-Published',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
-    event_name: 'planyear_renewal',
+    event_name: 'planyear_renewal_3b',
     notice_triggers: [
       {
         name: 'PlanYear Renewal Auto-Published',
-        notice_template: 'notices/shop_notices/3b_employee_renewal',
+        notice_template: 'notices/shop_notices/3b_employer_renewal',
         notice_builder: 'ShopNotices::EmployerNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],

@@ -802,7 +802,7 @@ private
   end
 
   def trigger_renew_notice
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal').first
+    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
     shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile, :subject => "PlanYear Renewal Notice(3A)",
                                                   :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
                                                   :template => application_event.notice_triggers.first.notice_template})
