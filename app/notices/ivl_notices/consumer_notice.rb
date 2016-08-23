@@ -33,6 +33,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
         )
     end
 
+    enrollments.reject!{|e| e.coverage_terminated? }
     enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
 
     if enrollments.empty?
