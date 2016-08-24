@@ -10,9 +10,7 @@ class UpdateBenefitGroup < MongoidMigrationTask
           employer_profile.census_employees.each do |census_employee|
             if census_employee.renewal_published_benefit_group.present? && census_employee.active_benefit_group.blank?
               if census_employee.benefit_group_assignments.present?
-                benefit_group_assignment = census_employee.benefit_group_assignments.first
-                benefit_group_assignment.is_active = true
-                benefit_group_assignment.save!
+                census_employee.benefit_group_assignments << active_plan_year.benefit_groups.first.benefit_group_assignments.detect { |assignment| assignment.is_active? }
               end
             end
           end
