@@ -201,7 +201,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
+  
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
@@ -256,6 +256,8 @@ class Person
   end
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -458,6 +460,11 @@ class Person
 
   def mobile_phone
     phones.detect { |phone| phone.kind == "mobile" }
+  end
+  
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
   end
 
   def has_active_consumer_role?

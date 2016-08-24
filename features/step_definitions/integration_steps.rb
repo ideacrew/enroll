@@ -164,10 +164,13 @@ def default_office_location
 end
 
 Given(/^Hbx Admin exists$/) do
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
@@ -389,7 +392,7 @@ end
 
 When(/^.+ accepts? the matched employer$/) do
   screenshot("update_personal_info")
-  find(:xpath, "//span[contains(., 'CONTINUE')]").click
+  find_by_id('btn-continue').click
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
@@ -663,7 +666,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do

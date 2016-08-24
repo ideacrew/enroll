@@ -100,6 +100,7 @@ class HbxEnrollment
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
+  field :termination_submitted_on, type: DateTime
 
 
   # An external enrollment is one which we keep for recording purposes,
@@ -363,13 +364,13 @@ class HbxEnrollment
 
       p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
+      if (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
 
         if p.may_cancel_coverage?
           p.cancel_coverage!
           p.update_current(terminated_on: p.effective_on)
         end
-      elsif (p.enrollment_signature == self.enrollment_signature && p.plan.carrier_profile_id == self.plan.try(:carrier_profile_id) && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
+      elsif (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
         if p.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
@@ -419,19 +420,9 @@ class HbxEnrollment
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
-    
-    if consumer_role.present?
-      hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.invoke_verification!(effective_on)
-      end
-      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-      self.published_to_bus_at = Time.now
-    else
-      if is_shop_sep?
-        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-        self.published_to_bus_at = Time.now
-      end
-    end
+
+    callback_context = { :hbx_enrollment => self }
+    HandleCoverageSelected.call(callback_context)
   end
 
   def should_transmit_update?

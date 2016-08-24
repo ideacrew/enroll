@@ -1,6 +1,7 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -57,7 +58,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
@@ -87,6 +87,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
       flash[:notice] = "Census Employee is successfully updated."
       if benefit_group_id.present?
+        @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully updated."
       else
         flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
@@ -182,8 +183,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def delink
-    authorize @census_employee, :delink?
-
     employee_role = @census_employee.employee_role
     if employee_role.present?
       employee_role.census_employee_id = nil
@@ -214,23 +213,11 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
-  def assignment_benefit_group
-    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
-    new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
-
-    if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
-      @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
-    end
-
-    if @census_employee.save
-      flash[:notice] = "Assignment benefit group is successfully."
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      render action: "benefit_group"
-    end
-  end
-
   private
+
+  def updateable?
+    authorize ::EmployerProfile, :updateable?
+  end  
 
   def benefit_group_id
     params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil

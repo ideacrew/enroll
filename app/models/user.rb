@@ -15,7 +15,7 @@ class User
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
   validates_presence_of :oim_id
-  validates_uniqueness_of :oim_id
+  validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
   validate :oim_id_rules
   validates_presence_of     :password, if: :password_required?
@@ -319,7 +319,8 @@ class User
   # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
   #   ID in a has_one association
   def self.orphans
-    all.order(:"email".asc).select() {|u| u.person.blank?}
+    user_ids=Person.where(:user_id=>{"$ne"=>nil}).pluck(:user_id)
+    User.where("_id"=>{"$nin"=>user_ids}).entries
   end
 
   def self.send_reset_password_instructions(attributes={})

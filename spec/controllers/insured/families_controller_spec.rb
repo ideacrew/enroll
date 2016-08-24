@@ -413,6 +413,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
 
     context 'when its initial enrollment' do
@@ -436,6 +437,62 @@ RSpec.describe Insured::FamiliesController do
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep'}))
+      end
+    end
+  end
+
+  describe "GET check_move_reason" do
+    before(:each) do
+      sign_in(user)
+      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      @family = FactoryGirl.build(:family, :with_primary_family_member)
+      allow(person).to receive(:primary_family).and_return(@family)
+    end
+
+    it "renders the 'check_move_reason' template" do
+      xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+      expect(response).to have_http_status(:success)
+    end
+
+    describe "with valid and invalid params" do
+      it "returns qualified_date as true" do
+        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(true)
+      end
+
+      it "returns qualified_date as false" do
+        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(false)
+      end
+    end
+  end
+
+  describe "GET check_insurance_reason" do
+    before(:each) do
+      sign_in(user)
+      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      @family = FactoryGirl.build(:family, :with_primary_family_member)
+      allow(person).to receive(:primary_family).and_return(@family)
+    end
+
+    it "renders the 'check_insurance_reason' template" do
+      xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+      expect(response).to have_http_status(:success)
+    end
+
+    describe "with valid and invalid params" do
+      it "returns qualified_date as true" do
+        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(true)
+      end
+
+      it "returns qualified_date as false" do
+        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(false)
       end
     end
   end
@@ -559,6 +616,7 @@ RSpec.describe Insured::FamiliesController do
     context "delete delete_consumer_broker" do
       let(:family) {FactoryGirl.build(:family)}
       before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
@@ -575,6 +633,7 @@ RSpec.describe Insured::FamiliesController do
     context "post unblock" do
       let(:family) { FactoryGirl.build(:family) }
       before :each do
+        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(Family).to receive(:find).and_return family
       end
 

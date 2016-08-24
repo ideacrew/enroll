@@ -20,14 +20,16 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     plan: plan,
     benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member],
-    coverage_kind: "health" )
+    coverage_kind: "health",
+    external_enrollment: false )
   }
   let(:hbx_enrollment_two){ FactoryGirl.create(:hbx_enrollment,
     household: household,
     plan: plan,
     benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member],
-    coverage_kind: "dental" )
+    coverage_kind: "dental",
+    external_enrollment: false )
   }
   # let(:hbx_enrollment_two) {double("HbxEnrollment2",waiver_reason: "this is reason", plan: double(name: "hbx enrollment plan name"), hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: 'dental')}
   # let(:plan) {double(total_premium: 10, total_employer_contribution: 20, total_employee_cost:30)}
@@ -51,6 +53,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
+    allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
   end
 
   it "should show the address of census employee" do
@@ -83,6 +86,22 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /#{hbx_enrollment.plan.name}/
+  end
+  
+  it "should not show the health plan if it is external enrollment" do
+    hbx_enrollment.update_attributes(:external_enrollment => true, coverage_kind: "health")
+    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+    render template: "employers/census_employees/show.html.erb"
+    expect(rendered).to_not match /Plan/
+    expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
+  end
+
+  it "should not show the dental plan if it is external enrollment" do
+    hbx_enrollment.update_attributes(:external_enrollment => true, coverage_kind: "dental" )
+    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+    render template: "employers/census_employees/show.html.erb"
+    expect(rendered).to_not match /Plan/
+    expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
   it "should show plan cost" do

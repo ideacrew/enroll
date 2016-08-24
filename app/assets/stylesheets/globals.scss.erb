@@ -73,6 +73,9 @@
       float: none;
     }
   }
+  .no-top-margin {
+    margin-top: 0;
+  }
   .no-vertical-padding {
     padding-top: 0;
     padding-bottom: 0;
@@ -104,6 +107,16 @@
       width:100%;
       max-width: 75%;
       display: inline-block;
+    }
+  }
+  .vertically-aligned-row {
+    display: table;
+    width: 100%;
+
+    >* {
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
     }
   }
 }

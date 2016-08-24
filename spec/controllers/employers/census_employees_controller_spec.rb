@@ -1,8 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe Employers::CensusEmployeesController do
-  let(:employer_profile_id) { "abecreded" }
+
+  before(:all) do
+    @user = FactoryGirl.create(:user)
+    p=FactoryGirl.create(:person, user: @user)
+    @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
+  end
+  # let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile_id) { employer_profile.id }
+
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 45.days,  hired_on: "2014-11-11") }
   let(:census_employee_params) {
     {"first_name" => "aqzz",
@@ -12,15 +20,14 @@ RSpec.describe Employers::CensusEmployeesController do
      "is_business_owner" => true,
      "hired_on" => "05/02/2015",
      "employer_profile_id" => employer_profile_id} }
-
-
+  let(:person) { FactoryGirl.create(:person, first_name: "aqzz", last_name: "White", dob: "11/11/1992", ssn: "123123123", gender: "male", employer_profile_id: employer_profile.id, hired_on: "2014-11-11")}
   describe "GET new" do
-    let(:user) { double("user") }
 
     it "should render the new template" do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:plan_years).and_return("2015")
-      sign_in(user)
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in(@user)
       get :new, :employer_profile_id => employer_profile_id
       expect(response).to have_http_status(:success)
       expect(response).to render_template("new")
@@ -30,20 +37,21 @@ RSpec.describe Employers::CensusEmployeesController do
     it "should render as normal with no plan_years" do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:plan_years).and_return("")
-      sign_in(user)
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in(@user)
       get :new, :employer_profile_id => employer_profile_id
       expect(response).to have_http_status(:success)
       expect(response).to render_template("new")
-      #expect(response).to be_redirect
-      #expect(flash[:notice]).to eq "Please create a plan year before you create your first census employee."
     end
+
   end
 
   describe "POST create" do
     let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
 
     before do
-      sign_in
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(BenefitGroup).to receive(:find).and_return(benefit_group)
       allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return([BenefitGroupAssignment.new])
@@ -98,7 +106,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
   describe "PUT update" do
     let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    let(:plan_year) { FactoryGirl.create(:plan_year, :aasm_state => "active") }
     let(:user) { FactoryGirl.create(:user, :employer_staff) }
     let(:census_employee_delete_params) {
       {
@@ -124,10 +132,15 @@ RSpec.describe Employers::CensusEmployeesController do
       }
     }
     let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
-
-
+    let(:benefit_group_assignment) { double(hbx_enrollment: hbx_enrollment, active_hbx_enrollments: [hbx_enrollment]) }
+    let(:benefit_groups) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+    let(:hbx_enrollment) { double }
+    let(:hbx_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment) }
+    let(:employee_role) { FactoryGirl.create(:employee_role)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male") }
     before do
-      sign_in user
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
       census_employee.census_dependents << child1
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
@@ -136,6 +149,14 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(census_employee).to receive(:add_benefit_group_assignment).and_return(true)
       allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return(BenefitGroupAssignment.new)
+
+      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
+      allow(CensusEmployee).to receive(:new).and_return(census_employee)
+      allow(census_employee).to receive(:employee_role).and_return(true)
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_groups)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
     end
 
     it "should be redirect when valid" do
@@ -180,6 +201,19 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(assigns(:reload)).to eq true
       expect(response).to render_template("edit")
     end
+
+
+    it "should have aasm state as eligible when there is no matching record found and employee_role_linked in reverse case" do
+      allow(employee_role).to receive(:person).and_return(person)
+      allow(census_employee).to receive(:save).and_return(true)
+      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      expect(census_employee.aasm_state).to eq "eligible"
+      person.dob = "11/11/1990"
+      person.save
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      expect(census_employee.aasm_state).to eq "employee_role_linked"
+    end
   end
 
   describe "GET show" do
@@ -207,7 +241,8 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:hbx_enrollment) { double(destroy: true) }
 
     before do
-      sign_in
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(controller).to receive(:authorize).and_return(true)
@@ -231,7 +266,8 @@ RSpec.describe Employers::CensusEmployeesController do
 
   describe "GET terminate" do
     before do
-      sign_in
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
     end
@@ -260,7 +296,8 @@ RSpec.describe Employers::CensusEmployeesController do
 
   describe "GET rehire" do
     it "should be error without rehiring_date" do
-      sign_in
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
@@ -270,7 +307,8 @@ RSpec.describe Employers::CensusEmployeesController do
 
     context "with rehiring_date" do
       it "should be error when has no new_family" do
-        sign_in
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in @user
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
         allow(CensusEmployee).to receive(:find).and_return(census_employee)
         xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
@@ -281,7 +319,8 @@ RSpec.describe Employers::CensusEmployeesController do
       context "when has new_census employee" do
         let(:new_census_employee) { double("test") }
         before do
-          sign_in
+          allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+          sign_in @user
           allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
           allow(CensusEmployee).to receive(:find).and_return(census_employee)
           allow(census_employee).to receive(:replicate_for_rehire).and_return(new_census_employee)
@@ -339,33 +378,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(response).to render_template("benefit_group")
-    end
-  end
-
-  describe "PUT assignment_benefit_group" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    before do
-      sign_in
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
-      plan_year.benefit_groups << benefit_group
-
-      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
-      allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      allow(controller).to receive(:census_employee_params).and_return({})
-    end
-
-    it "should be redirect when valid" do
-      allow(census_employee).to receive(:save).and_return(true)
-      post :assignment_benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
-      expect(response).to be_redirect
-    end
-
-    it "should be render benefit_group template when invalid" do
-      allow(census_employee).to receive(:save).and_return(false)
-      post :assignment_benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
       expect(response).to render_template("benefit_group")
     end
   end

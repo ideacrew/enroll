@@ -403,19 +403,21 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
 
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
   let(:plan_year) { benefit_group.plan_year }
+
   let(:employer_profile) { plan_year.employer_profile }
   let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
   let(:census_employee) { CensusEmployee.new(
     :ssn => census_ssn,
     :dob => census_dob,
     :gender => "male",
-    :employer_profile_id => "1111",
+    :employer_profile_id => employer_profile.id,
     :first_name => "Roger",
     :last_name => "Martin",
     :hired_on => 20.days.ago,
     :is_business_owner => false,
     :benefit_group_assignments => [benefit_group_assignment]
   ) }
+
 
   before do
     plan_year.update_attributes({:aasm_state => 'published'})
@@ -602,8 +604,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     context "with person matching ssn and dob" do
       let(:benefit_group) { FactoryGirl.create(:benefit_group) }
       let(:plan_year) { benefit_group.plan_year }
+      let(:employer_profile) { plan_year.employer_profile }
       let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
-      let(:census_employee) { FactoryGirl.create(:census_employee, ssn: ee0.ssn, dob: ee0.dob, employer_profile_id: "11112", benefit_group_assignments: [benefit_group_assignment]) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, ssn: ee0.ssn, dob: ee0.dob, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment]) }
       let(:params) do
         {  ssn:        ee0.ssn,
            first_name: ee0.first_name,

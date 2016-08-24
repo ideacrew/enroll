@@ -776,6 +776,39 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "ivl user switching plan from one carrier to other carrier previous hbx_enrollment aasm_sate should be cancel/terminate in DB." do
+    let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:family1) {FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
+    let(:household) {FactoryGirl.create(:household, family: family1)}
+    let(:date){ TimeKeeper.date_of_record }
+    let(:plan_year){ PlanYear.new(start_on: date) }
+    let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
+    let!(:carrier_profile1) {FactoryGirl.build(:carrier_profile)}
+    let!(:carrier_profile2) {FactoryGirl.create(:carrier_profile, organization: organization)}
+    let!(:organization) { FactoryGirl.create(:organization, legal_name: "CareFirst", dba: "care")}
+    let(:plan1){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1) }
+    let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
+
+    let(:hbx_enrollment1){ HbxEnrollment.new(benefit_group: benefit_group, kind: "unassisted_qhp", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
+    let(:hbx_enrollment2){ HbxEnrollment.new(benefit_group: benefit_group, kind: "unassisted_qhp", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: TimeKeeper.date_of_record) }
+
+    it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
+      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 10.days
+
+      hbx_enrollment2.select_coverage!
+      expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+      expect(hbx_enrollment2.coverage_selected?).to be_truthy
+    end
+
+    it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
+      hbx_enrollment1.effective_on = TimeKeeper.date_of_record - 10.days
+
+      hbx_enrollment2.select_coverage!
+      expect(hbx_enrollment1.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment2.coverage_selected?).to be_truthy
+    end
+  end
+
   context "can_terminate_coverage?" do
     let(:hbx_enrollment) {HbxEnrollment.new(
                             kind: 'employer_sponsored',
@@ -1879,8 +1912,8 @@ end
 
 describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
 
-  let!(:employer_profile) { 
-    org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+  let!(:employer_profile) {
+    org = FactoryGirl.create :organization, legal_name: "Corp 1"
     FactoryGirl.create :employer_profile, organization: org
   }
 
@@ -2003,13 +2036,13 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
         )
     }
 
-    context 'with same effective date as passive renewal' do 
-      it 'should cancel their passive renewal' do 
+    context 'with same effective date as passive renewal' do
+      it 'should cancel their passive renewal' do
         passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
         expect(passive_renewal).not_to be_nil
 
         new_enrollment.select_coverage!
-        passive_renewal.reload 
+        passive_renewal.reload
         new_enrollment.reload
 
         expect(passive_renewal.coverage_canceled?).to be_truthy
@@ -2020,15 +2053,15 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
     context 'with effective date later to the passive renewal' do
 
       before do
-        new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month) 
+        new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month)
       end
 
-      it 'should terminate the passive renewal' do 
+      it 'should terminate the passive renewal' do
         passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
         expect(passive_renewal).not_to be_nil
 
         new_enrollment.select_coverage!
-        passive_renewal.reload 
+        passive_renewal.reload
         new_enrollment.reload
 
         expect(new_enrollment.coverage_selected?).to be_truthy
