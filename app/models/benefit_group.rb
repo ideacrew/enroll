@@ -1,7 +1,6 @@
 class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
 
   embedded_in :plan_year
 
@@ -53,6 +52,8 @@ class BenefitGroup
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
+  field :_type, type: String, default: self.name
+
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
