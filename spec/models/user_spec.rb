@@ -67,7 +67,7 @@ RSpec.describe User, :type => :model do
       let(:params){valid_params.deep_merge!({email: "test@test"})}
       it 'does not match' do
         expect(User.create(**params).errors[:email].any?).to be_truthy
-        expect(User.create(**params).errors[:email]).to eq ["is invalid"]
+        expect(User.create(**params).errors[:email]).to eq ["(optional) is invalid"]
       end
     end
 
