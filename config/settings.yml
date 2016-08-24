@@ -61,8 +61,11 @@ aca:
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -3
+        months: -4
       monthly_open_enrollment_end_on: 13
+      open_enrollment:
+        minimum_length:
+          days: 3
 
     benefit_period:
       length_minimum:
