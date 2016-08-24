@@ -1,11 +1,13 @@
 class ShopNotice < Notice
 
-  def initialize(args = {})
-    super(args)
+  @@required_params= [:subject,:template,:employer_profile,:mpi_indicator]
+
+  def initialize(params = {})
+    validate_params(params)
+    super(params)
   end
 
   def deliver
-    build
     generate_pdf_notice
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -58,5 +60,12 @@ class ShopNotice < Notice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def validate_params(params)
+    @@required_params.each do |key|
+      next if params[key].present?
+      raise("Required praramber #{key} not present")
+    end
   end
 end

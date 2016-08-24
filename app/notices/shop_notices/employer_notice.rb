@@ -5,6 +5,7 @@ class ShopNotices::EmployerNotice < ShopNotice
 
     @employer_profile = employer_profile
     @template = args[:template]
+    @subject=args[:subject]
     @delivery_method = args[:delivery_method].split(',')
     @recipient = @employer_profile.staff_roles.first
     @secure_message_recipient = employer_profile

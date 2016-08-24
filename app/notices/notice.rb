@@ -1,14 +1,11 @@
 class Notice
 
-  attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name, :notice
+  attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name, :notice , :random_str
 
   def initialize(args = {})
-    random_str = rand(10**10).to_s
     @subject = "#{args[:subject]}" || "notice_#{random_str}"
-    @notice_filename = "#{@subject.titleize.gsub(/\s*/, '')}"
-    @notice_path = Rails.root.join("tmp", "#{@notice_filename}.pdf")
-    @envelope_path = Rails.root.join("tmp", "envelope_#{random_str}.pdf")
     @mpi_indicator = args[:mpi_indicator]
+    @template = arag[:template]
     @layout = 'pdf_notice'
   end
 
@@ -22,8 +19,24 @@ class Notice
     })
   end
 
+  def random_str
+    @random_str ||= rand(10**10).to_s
+  end
+
   def pdf
     WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
+  end
+
+  def notice_filename
+    "#{subject.titleize.gsub(/\s*/, '')}"
+  end
+
+  def notice_path
+    Rails.root.join("tmp", "#{notice_filename}.pdf")
+  end
+
+  def envolope_path 
+    Rails.root.join("tmp", "envelope_#{random_str}.pdf")
   end
 
   def pdf_options
@@ -64,7 +77,7 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(@notice_path, 'wb') do |file|
+    File.open(notice_path, 'wb') do |file|
       file << self.pdf
     end
     # clear_tmp
@@ -73,7 +86,7 @@ class Notice
   def join_pdfs(pdfs)
     pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
     pdf << CombinePDF.load(pdfs[1])
-    pdf.save @notice_path
+    pdf.save notice_path
   end
 
   def upload_and_send_secure_message
@@ -83,26 +96,26 @@ class Notice
   end
   
   def upload_to_amazonS3
-    Aws::S3Storage.save(@notice_path, 'notices')
+    Aws::S3Storage.save(notice_path, 'notices')
+  rescue => e
+    raise "unable to upload to amazon #{e}"
   end
 
-  def send_generic_notice_alert
-    email_address = @secure_message_recipient.home_email.try(:address) || @secure_message_recipient.user.try(:email)
-
-    if email_address.present?
-      UserMailer.generic_notice_alert(@secure_message_recipient.first_name, @subject, email_address).deliver_now
-    end
+  #NOTE : This is a generic method to send secure message 
+  # @param recipient is a SecureMessageRecipient object
+  def send_generic_notice_alert(recipient)
+    UserMailer.generic_notice_alert(recipient.name,subject, recipient.email_address).deliver_now
   end
 
   def store_paper_notice
     paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
-    FileUtils.cp(@notice_path, "#{Rails.root.to_s}/public/paper_notices/")
-    File.rename(paper_notices_folder + "#{@notice_filename}.pdf", paper_notices_folder + "#{@secure_message_recipient.hbx_id}_" + @notice_filename + File.extname(@notice_path))
+    FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
+    File.rename(paper_notices_folder + "#{notice_filename}.pdf", paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
   end
 
   def create_recipient_document(doc_uri)
-    notice = @family.documents.build({
-      title: @notice_filename, 
+    notice = family.documents.build({
+      title: notice_filename, 
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
@@ -119,7 +132,7 @@ class Notice
   def create_secure_inbox_message(notice)
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(@family.class.to_s, @family.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = @secure_message_recipient.inbox.messages.build({ subject: @subject, body: body, from: 'DC Health Link' })
+    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
 
