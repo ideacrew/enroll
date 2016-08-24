@@ -666,7 +666,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do

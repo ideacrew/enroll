@@ -1,7 +1,7 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
-  before_action :updateable?, except: [:edit, :show, :benefit_group, :assignment_benefit_group]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -211,22 +211,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
-  end
-
-  def assignment_benefit_group
-    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
-    new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
-
-    if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
-      @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
-    end
-
-    if @census_employee.save
-      flash[:notice] = "Assignment benefit group is successfully."
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      render action: "benefit_group"
-    end
   end
 
   private

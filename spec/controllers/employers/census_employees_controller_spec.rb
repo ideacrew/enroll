@@ -7,8 +7,10 @@ RSpec.describe Employers::CensusEmployeesController do
     p=FactoryGirl.create(:person, user: @user)
     @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
   end
-  let(:employer_profile_id) { "abecreded" }
+  # let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile_id) { employer_profile.id }
+
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 45.days,  hired_on: "2014-11-11") }
   let(:census_employee_params) {
     {"first_name" => "aqzz",
@@ -376,33 +378,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(response).to render_template("benefit_group")
-    end
-  end
-
-  describe "PUT assignment_benefit_group" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    before do
-      sign_in
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
-      plan_year.benefit_groups << benefit_group
-
-      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
-      allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      allow(controller).to receive(:census_employee_params).and_return({})
-    end
-
-    it "should be redirect when valid" do
-      allow(census_employee).to receive(:save).and_return(true)
-      post :assignment_benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
-      expect(response).to be_redirect
-    end
-
-    it "should be render benefit_group template when invalid" do
-      allow(census_employee).to receive(:save).and_return(false)
-      post :assignment_benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
       expect(response).to render_template("benefit_group")
     end
   end
