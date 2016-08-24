@@ -1,6 +1,7 @@
 class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
 
   embedded_in :plan_year
 
