@@ -878,9 +878,10 @@ private
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end    
 
-    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
-     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")
-    end
+    # TODO: Due to Force publish requests this check no longer satisfying for many employers. This needs to be updated.
+    # if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
+    #   errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")
+    # end
 
     if (open_enrollment_end_on - open_enrollment_start_on) > Settings.aca.shop_market.open_enrollment.maximum_length.months.months
      errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
