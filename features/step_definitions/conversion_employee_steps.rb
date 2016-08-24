@@ -1,8 +1,8 @@
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
-  secondary_organization = FactoryGirl.create :organization, legal_name: person[:legal_name], 
-                                                   dba: person[:dba], 
-                                                   fein: person[:fein].reverse
+  secondary_organization = FactoryGirl.create :organization, legal_name: person[:mlegal_name], 
+                                                   dba: person[:mdba], 
+                                                   fein: person[:mfein]
   secondary_employer_profile = FactoryGirl.create :employer_profile, organization: secondary_organization, 
                                                            profile_source:'conversion', 
                                                            registered_on: TimeKeeper.date_of_record
@@ -11,19 +11,20 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                             last_name: person[:last_name],
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
-  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
+  open_enrollment_start_on = (TimeKeeper.date_of_record-1.month).end_of_month + 1.day
   open_enrollment_end_on = open_enrollment_start_on.next_month + 12.days
   start_on = open_enrollment_start_on + 2.months
   end_on = start_on + 1.year - 1.day                                                            
 
   secondary_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile, 
-                                                       start_on: start_on - 1.year, 
-                                                       end_on: end_on - 1.year, 
-                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year, 
-                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, 
+                                                       start_on: start_on - 1.year - 3.months,
+                                                       end_on: end_on - 1.year - 3.months,
+                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year - 3.months,
+                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days - 3.months,
                                                        fte_count: 2, 
                                                        aasm_state: :published
   secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: secondary_plan_year
+  secondary_plan_year.expire!
 
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on
 
@@ -34,8 +35,9 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                              open_enrollment_end_on: open_enrollment_end_on, 
                                              fte_count: 2, 
                                              aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: secondary_plan_year, 
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, 
                                                      title: 'this is the BGGG'
+  plan_year.publish!
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")                                                          
@@ -104,7 +106,7 @@ And(/(.*) matches all employee roles to employers and is logged in/) do |named_p
   Person.all.select { |stored_person| stored_person["ssn"] == person.ssn && 
                                       stored_person["dob"] == person.dob 
                     }
-  organizations = Organization.in(fein: [person[:fein], person[:fein].reverse])
+  organizations = Organization.in(fein: [person[:fein], person[:mfein]])
   employer_profiles = organizations.map(&:employer_profile)
   counter = 0
   used_person = nil
@@ -167,7 +169,7 @@ end
 
 And(/Other Employer for (.*) is also under open enrollment/) do |named_person|
   person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:fein].reverse)
+  employer_profile = EmployerProfile.find_by_fein(person[:mfein])
   employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => TimeKeeper.date_of_record)
 end
 
@@ -177,6 +179,39 @@ end
 
 When(/(.*) has New Hire Badges for all employers/) do |named_person|
   expect(page).to have_css('#shop_for_employer_sponsored_coverage', count: 2)
+end
+
+When(/(.*) click the first button of new hire badge/) do |named_person|
+  person = people[named_person]
+  expect(find_all(".alert-notice").first.text).to match person[:legal_name]
+  find_all('#shop_for_employer_sponsored_coverage').first.click
+end
+
+Then(/(.*) should see the 1st ER name/) do |named_person|
+  person = people[named_person]
+  expect(page).to have_content(person[:legal_name])
+end
+
+Then(/(.*) should see New Hire Badges for 2st ER/) do |named_person|
+  person = people[named_person]
+  expect(page).to have_content(person[:mlegal_name])
+end
+
+When(/2st ER for (.*) published renewing plan year/) do |named_person|
+  person = people[named_person]
+  employer_profile = EmployerProfile.find_by_fein(person[:mfein])
+  employer_profile.renewing_plan_year.publish!
+end
+
+When(/(.*) click the button of new hire badge for 2st ER/) do |named_person|
+  #py =Person.last.active_employee_roles.last.census_employee.renewal_benefit_group_assignment.benefit_group.plan_year
+  #py.publish!
+  find_all('#shop_for_employer_sponsored_coverage').last.click
+end
+
+Then(/(.*) should see the 2st ER name/) do |named_person|
+  person = people[named_person]
+  expect(page).to have_content(person[:mlegal_name])
 end
 
 Then(/(.*) should see \"open enrollment not yet started\" error message/) do |named_person|
