@@ -62,12 +62,11 @@ namespace :reports do
                 renewing_enrollment_auto_renewing.first.created_at,
                 renewing_enrollment_waived.first.submitted_at
               ]
+              count += 1
             end
-            count += 1
           end
-
         end
-        puts "Waiver Report for 9/1 Employees Generated on #{Date.today}, Total 9/1 Employees count #{processed_count} and Employees information output file: #{file_name}"
+        puts "Waiver Report for 9/1 Employees Generated on #{Date.today}, Total 9/1 Employees count #{count} and Employees information output file: #{file_name}"
       end # CSV close
     end
 
