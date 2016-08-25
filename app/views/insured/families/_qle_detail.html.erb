@@ -43,7 +43,7 @@
                 <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
               </div>
               <div class="effective_on_kinds"></div>
-              <div class="text-center">
+              <div class="text-center <%= pundit_class Family,:updateable? %>">
                 <%= submit_tag 'Continue', class: 'btn btn-primary' %>
                 <br/>
                 <br/>

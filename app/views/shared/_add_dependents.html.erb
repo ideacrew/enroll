@@ -1,4 +1,6 @@
 <div class="form-inputs">
-  <%= link_to_add_fields 'add dependent', f, :census_dependents, 'btn btn-default' %>
+  <%= pundit_span @employer_profile, :updateable? %>
+    <%= link_to_add_fields 'add dependent', f, :census_dependents, 'btn btn-default' %>
+  </span>
   <span>&nbsp;</span>
 </div>

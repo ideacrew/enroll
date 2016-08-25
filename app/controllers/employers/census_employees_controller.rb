@@ -58,6 +58,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
+    authorize EmployerProfile, :updateable?
     @status = params[:status]
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
@@ -106,6 +107,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def terminate
+    authorize EmployerProfile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
     if termination_date.present?
@@ -140,6 +142,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def rehire
+    authorize EmployerProfile, :updateable?
     status = params[:status]
     rehiring_date = params["rehiring_date"]
     if rehiring_date.present?
