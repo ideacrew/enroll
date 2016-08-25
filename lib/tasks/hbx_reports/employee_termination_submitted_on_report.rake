@@ -39,7 +39,7 @@ namespace :reports do
         families.each do |family|
           if family.primary_family_member.person.active_employee_roles.present?
           # find hbx_enrollments who's aasm state=coverage_terminated and termination_submitted_on == yesterday day
-            hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && hbx.kind == "employer_sponsored" && hbx.termination_submitted_on.strftime('%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
+            hbx_enrollments = [family].flat_map(&:households).flat_map(&:hbx_enrollments).select{|hbx| hbx.aasm_state == "coverage_terminated" && hbx.kind == "employer_sponsored" && hbx.termination_submitted_on.try(:strftime, '%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
             hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
             hbx_enrollment_members.each do |hbx_enrollment_member|
               if hbx_enrollment_member
