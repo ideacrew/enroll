@@ -36,6 +36,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   before(:each) do
     sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     assign(:employer_profile, employer_profile)
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)

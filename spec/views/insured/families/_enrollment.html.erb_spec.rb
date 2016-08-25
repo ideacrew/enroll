@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:person) { double(id: '31111113') }
-  let(:family) { double(is_eligible_to_enroll?: true) }
+  let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
 
   before(:each) do
+    allow(view).to receive(:policy_helper).and_return(family)
     @family = family
     @person = person
   end
