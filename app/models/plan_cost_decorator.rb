@@ -95,8 +95,7 @@ class PlanCostDecorator < SimpleDelegator
 
   def max_employer_contribution(member)
     return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.has_key?(member._id)
-    value = ((large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00)
-    @max_contribution_cache[member._id] = BigDecimal.new("#{value}").round(2).to_f
+    @max_contribution_cache[member._id] = ((large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00).round(2)
   end
 
   def employer_contribution_for(member)
