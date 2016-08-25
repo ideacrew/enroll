@@ -18,7 +18,6 @@ describe UpdateBenefitGroup do
       let(:renewal_plan_year) { FactoryGirl.create(:renewing_plan_year, employer_profile: employer_profile, benefit_groups: [benefit_group], aasm_state: "renewing_enrolling")}
       let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
       let(:benefit_group)     { FactoryGirl.create(:benefit_group)}
-      let(:benefit_group_two) { FactoryGirl.create(:benefit_group)}
       let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
       it "should change the is_active state of the benefit group assignment" do
