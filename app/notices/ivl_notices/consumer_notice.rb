@@ -45,7 +45,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
     people = family_members.map(&:person).uniq
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
     people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
-    binding.pry
     if people.empty?
       raise 'no family member found with outstanding verification'
     end
