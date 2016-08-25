@@ -53,7 +53,7 @@ module VerificationHelper
   end
 
   def verification_needed?(person)
-    person.try(:primary_family).try(:active_household).try(:hbx_enrollments).verification_needed.any?
+    person.try(:primary_family).try(:active_household).try(:hbx_enrollments).try(:verification_needed).try(:any?)
   end
 
   def verification_due_date(family)
