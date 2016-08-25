@@ -6,7 +6,7 @@ namespace :reports do
     desc "List of EEs in with waived coverage state on ER roster, but has an active 7/1 renewal policy in EE account"
     task :waiver_not_cancelling_passive_renewals => :environment do
       count = 0
-      renewal_policy_date = Date.new(2016,7,1)
+      renewal_policy_date = Date.new(2016,9,1)
       # All Renewing Employers - Includes Conversion Employers too.
       all_renewing_employers = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => renewal_policy_date, :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE}})
 
