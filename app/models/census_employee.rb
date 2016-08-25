@@ -41,6 +41,8 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
+  before_save :assign_default_benefit_package
+
   index({aasm_state: 1})
   index({last_name: 1})
   index({dob: 1})
@@ -107,6 +109,63 @@ class CensusEmployee < CensusMember
     super(*args)
     write_attribute(:employee_relationship, "self")
   end
+
+  def assign_default_benefit_package
+    self.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING + ['draft']).order_by(:start_on.asc).each do |py|
+      if self.benefit_group_assignments.detect{|bg_assign| py.benefit_groups.map(&:id).include?(bg_assign.benefit_group_id) }.blank?
+        find_or_build_benefit_group_assignment(py.benefit_groups.first)
+      end
+    end
+  end
+
+  def find_or_build_benefit_group_assignment(benefit_group)
+    return unless benefit_group
+    return if self.benefit_group_assignments.where(:benefit_group_id => benefit_group.id).present?
+
+    active = false 
+    if active_benefit_group_assignment.blank?
+      active = true
+    else
+      if PlanYear::PUBLISHED.include?(benefit_group.plan_year.aasm_state)
+        self.benefit_group_assignments = self.benefit_group_assignments.map do |bg_assignment| 
+          bg_assignment.is_active = false
+          bg_assignment
+        end
+      end
+    end
+
+    self.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: benefit_group, start_on: benefit_group.start_on, is_active: active)
+  end
+
+  def find_or_create_benefit_group_assignment(benefit_group)
+    bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc)
+    valid_bg_assignment = bg_assignments.detect{|bg_assign| bg_assign.aasm_state != 'initialized'}
+    valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
+    if valid_bg_assignment.present?
+      valid_bg_assignment.make_active
+    else
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+    end
+  end
+
+  def add_renew_benefit_group_assignment(new_benefit_group)
+    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+
+    benefit_group_assignments.renewing.each do |benefit_group_assignment|
+      benefit_group_assignment.destroy
+    end
+
+    bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
+    bga.renew_coverage
+    benefit_group_assignments << bga
+  end
+
+  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
+    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+    reset_active_benefit_group_assignments(new_benefit_group)
+    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
+  end
+
 
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && hired_on != employee_role.hired_on
@@ -176,24 +235,6 @@ class CensusEmployee < CensusMember
   def employee_role
     return @employee_role if defined? @employee_role
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
-  end
-
-  def add_renew_benefit_group_assignment(new_benefit_group)
-    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-
-    benefit_group_assignments.renewing.each do |benefit_group_assignment|
-      benefit_group_assignment.destroy
-    end
-
-    bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
-    bga.renew_coverage
-    benefit_group_assignments << bga
-  end
-
-  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
-    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-    reset_active_benefit_group_assignments(new_benefit_group)
-    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
   end
 
   def active_benefit_group_assignment
@@ -437,17 +478,6 @@ class CensusEmployee < CensusMember
       last_name: lname_exp,
       dob: dob
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
-  end
-
-  def find_or_create_benefit_group_assignment(benefit_group)
-    bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc)
-    valid_bg_assignment = bg_assignments.detect{|bg_assign| bg_assign.aasm_state != 'initialized'}
-    valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
-    if valid_bg_assignment.present?
-      valid_bg_assignment.make_active
-    else
-      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
-    end
   end
 
   def self.to_csv
