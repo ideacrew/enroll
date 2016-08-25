@@ -1,7 +1,8 @@
 var QLE = ( function( window, undefined ) {
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
-      $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
+      if($(this).attr('id') == 'reason_accept2')
+        $('[for="reason_accept2"]').find('span:last').popover('toggle');
     });
   }
 
