@@ -10,6 +10,7 @@ def import_employee(in_file)
 end
 
 dir_glob = File.join(Rails.root, "conversion_employees", "*.{xlsx,csv}")
-Dir.glob(dir_glob).each do |file|
+Dir.glob(dir_glob).sort.each do |file|
+  puts "PROCESSING: #{file}"
   import_employee(file)
 end
