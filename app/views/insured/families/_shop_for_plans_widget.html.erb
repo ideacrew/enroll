@@ -42,11 +42,18 @@
                 </div>
                 <strong>Shop for health and dental plans</strong>
               </div>
-              <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-                <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
+              
+              <% if @family.special_enrollment_periods.where(:end_on.gte => Date.today).first.present? %>
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
+                  <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
                   Shop for Plans
-                </button>
-              </div>
+                  </button>
+                </div>
+              <% else %>  
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
+                  <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
+                </div>
+              <% end %>  
             </div>
           </div>
         </div>

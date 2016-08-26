@@ -65,8 +65,9 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+    find('btn.btn-default.pull-right.interaction-click-control-shop-for-plans', :wait => 10).click
   end
+  screenshot("Testing")
 end
 
 Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
