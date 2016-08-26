@@ -159,7 +159,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     )}
     let(:carrier_profile) { FactoryGirl.build_stubbed(:carrier_profile) }
     let(:past_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment, aasm_state: 'coverage_terminated' ) }
-      before :each do
+    before :each do
       assign(:past_enrollments, [past_enrollments])
       allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
     end
