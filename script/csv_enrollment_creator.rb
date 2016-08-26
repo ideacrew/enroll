@@ -48,15 +48,17 @@ def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
 end
 
-def find_census_employee(subscriber_params)
-	matched_employees = CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(subscriber_params["ssn"]))
+def find_census_employee(subscriber_params,employer_profile)
+	matched_employees = CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(subscriber_params["ssn"]),
+											 employer_profile_id: employer_profile._id)
 	census_employee = matched_employees.non_terminated.first || matched_employees.first
 
 	if census_employee.blank?
 		census_employee = CensusEmployee.where(first_name: subscriber_params["first_name"], 
 											   middle_name: subscriber_params["middle_name"],
 											   last_name: subscriber_params["last_name"],
-											   dob: subscriber_params["dob"]).first
+											   dob: subscriber_params["dob"],
+											   employer_profile_id: employer_profile._id).first
 	end
 
 	return census_employee
@@ -121,7 +123,7 @@ CSV.foreach(filename, headers: :true) do |row|
 	person_details = create_person_details(subscriber_params)
 	organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 
-	census_employee = find_census_employee(subscriber_params)
+	census_employee = find_census_employee(subscriber_params,organization.employer_profile)
 	census_dependents = []
 	6.times do |i|
 		if data_row["HBX ID (Dep #{i+1})"].present?
@@ -162,7 +164,6 @@ CSV.foreach(filename, headers: :true) do |row|
 		
     if  employee_role.blank?
       if subscriber.present?
-      	census_employee = organization.employer_profile.census_employees.where(:first_name => /#{data_row["First Name"]}/i, :last_name => /#{data_row["Last Name"]}/i).first
       	employee_role = Factories::EnrollmentFactory.build_employee_role(subscriber, false, census_employee.employer_profile, census_employee, census_employee.hired_on).first
       else
 	    employee_role = Factories::EnrollmentFactory.construct_employee_role(nil,census_employee,person_details).first
