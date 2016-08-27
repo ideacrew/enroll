@@ -138,5 +138,8 @@ module Insured::FamiliesHelper
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
     end
   end
-
+  
+  def has_active_sep?(family)
+    family.special_enrollment_periods.where(:end_on.gte => Date.today).first.present?
+  end
 end

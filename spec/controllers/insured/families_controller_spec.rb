@@ -378,6 +378,7 @@ RSpec.describe Insured::FamiliesController do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
     let(:employee_roles) { double }
     let(:employee_role) { [double("EmployeeRole")] }
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
 
     before :each do
       allow(person).to receive(:user).and_return(user)
@@ -386,6 +387,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
+      allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
