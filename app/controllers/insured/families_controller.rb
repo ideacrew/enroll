@@ -49,6 +49,9 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab'] 
     @family_members = @family.active_family_members
 
+    if @employee_role.present?
+      @ce = CensusEmployee.find(@employee_role.census_employee_id)  
+    end
     #if @employee_role.present?
      # ce = CensusEmployee.find(@employee_role.census_employee_id)
       # checking for future hire
