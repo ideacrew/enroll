@@ -197,22 +197,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
   end
 
-  context 'coverage_terminated_on' do
-    before :each do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return TimeKeeper.date_of_record
-    end
-
-    it "should have plan end date" do
-      render template: "employers/census_employees/show.html.erb"
-      expect(rendered).to match /Plan End Date:/
-    end
-
-    it "should have employee terminate date" do
-      render template: "employers/census_employees/show.html.erb"
-      expect(rendered).to match /Employee Termination Date:/
-    end
-  end
-
   context "for cobra" do
     context "when terminated" do
       before :each do

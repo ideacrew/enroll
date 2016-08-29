@@ -473,9 +473,9 @@ class CensusEmployee < CensusMember
 
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
-    enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| (hbx.coverage_terminated? || hbx.coverage_termination_pending?) && !hbx.is_cobra_status? }
+    hbx = active_benefit_group_assignment.latest_hbx_enrollment_for_cobra
 
-    enrollments.each do |hbx|
+    if hbx.present?
       enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
       enrollment_cobra_factory.family = family
       enrollment_cobra_factory.census_employee = self
@@ -653,7 +653,7 @@ class CensusEmployee < CensusMember
 
   def has_hbx_enrollments?
     return false if employee_role.blank?
-    benefit_group_assignments.any? { |bga| bga.hbx_enrollment.present? && !bga.hbx_enrollment.coverage_canceled? }
+    benefit_group_assignments.any? { |bga| bga.hbx_enrollment.present? }
   end
 
   def has_cobra_hbx_enrollment?

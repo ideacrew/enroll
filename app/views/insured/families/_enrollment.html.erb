@@ -115,6 +115,25 @@
     </div>
     <% end %>
     <% end %>
+    <% if hbx_enrollment.coverage_termination_pending? %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="enrollment-effective info">
+          <p>
+            <strong>Future enrollment termination date: </strong>
+            <%= hbx_enrollment.future_enrollment_termination_date %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-effective info">
+        <p>
+          <strong>Market Type: </strong>
+          <%= show_market_name_by_enrollment hbx_enrollment %>
+        </p>
+      </div>
+    </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>

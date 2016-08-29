@@ -1244,6 +1244,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "has_hbx_enrollments?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+
+    it "should return flase without employee_role" do
+      allow(census_employee).to receive(:employee_role).and_return nil
+      expect(census_employee.has_hbx_enrollments?).to be_falsey
+    end
+
+    it "should return true" do
+      allow(census_employee).to receive(:employee_role).and_return employee_role
+      allow(census_employee).to receive(:benefit_group_assignments).and_return [benefit_group_assignment]
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return hbx_enrollment
+      expect(census_employee.has_hbx_enrollments?).to be_truthy
+    end
+  end
+
   context "linked?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
 
