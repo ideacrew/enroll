@@ -68,7 +68,7 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
     end
 
     it "round premium contribution of a member" do
-      BigDecimal.stub_chain(:new, :round, :to_f).and_return("13.65")
+      allow(BigDecimal).to receive_message_chain(:new, :round, :to_f).and_return("13.65")
       expect(plan_cost_decorator.premium_for(three)).to eq "13.65"
     end
   end
