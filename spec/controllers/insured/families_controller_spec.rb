@@ -441,6 +441,62 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
+  describe "GET check_move_reason" do
+    before(:each) do
+      sign_in(user)
+      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      @family = FactoryGirl.build(:family, :with_primary_family_member)
+      allow(person).to receive(:primary_family).and_return(@family)
+    end
+
+    it "renders the 'check_move_reason' template" do
+      xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+      expect(response).to have_http_status(:success)
+    end
+
+    describe "with valid and invalid params" do
+      it "returns qualified_date as true" do
+        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(true)
+      end
+
+      it "returns qualified_date as false" do
+        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(false)
+      end
+    end
+  end
+
+  describe "GET check_insurance_reason" do
+    before(:each) do
+      sign_in(user)
+      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      @family = FactoryGirl.build(:family, :with_primary_family_member)
+      allow(person).to receive(:primary_family).and_return(@family)
+    end
+
+    it "renders the 'check_insurance_reason' template" do
+      xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+      expect(response).to have_http_status(:success)
+    end
+
+    describe "with valid and invalid params" do
+      it "returns qualified_date as true" do
+        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(true)
+      end
+
+      it "returns qualified_date as false" do
+        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        expect(response).to have_http_status(:success)
+        expect(assigns['qualified_date']).to eq(false)
+      end
+    end
+  end
+
   describe "GET check_qle_date" do
 
     before(:each) do

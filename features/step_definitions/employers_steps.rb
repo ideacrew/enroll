@@ -99,7 +99,7 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
 
-  find(:xpath, "//label[@for='radio_male']").click
+  find('label[for=census_employee_gender_male]').click
 
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', :with => "10/10/2014"
   find(:xpath, "//label[input[@name='census_employee[is_business_owner]']]").click
@@ -180,13 +180,12 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => 'Patrick'
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
-
+  find('.darkblue').click
   find(:xpath, '//p[@class="label"][contains(., "GA")]').click
   find(:xpath, "//li[contains(., 'VA')]").click
 
   fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
-
-  find("#census_employee_is_business_owner").click
+  find('label[for=census_employee_is_business_owner]').click
 
   find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
   find('.label', text: 'Child').click
@@ -447,5 +446,5 @@ Given /^the employer is logged in$/ do
 end
 
 Then /^they should see that employee's details$/ do
-  expect(page).to have_content(employees.first.dob.strftime('%m/%d/%Y'))
+  expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end

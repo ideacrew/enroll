@@ -246,6 +246,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end
+
+    it "should record termination submitted date on terminate of hbx_enrollment" do
+      expect(enrollment.termination_submitted_on).to eq nil
+      post :terminate, id: "hbx_id"
+      expect(enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(response).to be_redirect
+    end
   end
 
   context "POST waive" do

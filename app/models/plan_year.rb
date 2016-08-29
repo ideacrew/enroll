@@ -10,7 +10,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -569,6 +569,7 @@ class PlanYear
     state :terminated     # Coverage under this application is terminated
     state :ineligible     # Application is non-compliant for enrollment
     state :expired        # Non-published plans are expired following their end on date
+    state :migration_expired #  ERs are electing or no longer qualify to migrate
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -684,6 +685,10 @@ class PlanYear
     event :cancel_renewal, :after => :record_transition do
       transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
+
+    event :migration_expire, :after => :record_transition do
+      transitions from: [:expired, :active], to: :migration_expired, :guard => :can_be_migrated?
+    end
   end
 
 
@@ -774,6 +779,10 @@ private
     else
       false
     end
+  end
+  # Checks for external plan year
+  def can_be_migrated?
+    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
   end
 
   def is_event_date_valid?

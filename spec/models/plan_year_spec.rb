@@ -1862,9 +1862,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       blue_collar_employees.each do |ce|
+        ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: blue_collar_benefit_group)
       end
       white_collar_employees.each do |ce|
+        ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: white_collar_benefit_group)
       end
     end
@@ -2213,6 +2215,57 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
           end
         end
+      end
+    end
+  end
+
+  describe PlanYear, "Transitions from active or expired to expired migrations" do
+    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+    let!(:employer_profile) { FactoryGirl.build(:employer_profile, profile_source: "conversion", registered_on: TimeKeeper.date_of_record)}
+    let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record - 1.year + 1.month}  
+    let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+    let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+    let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
+
+    let(:valid_params) do
+      {
+        employer_profile: employer_profile,
+        start_on: valid_plan_year_start_on,
+        end_on: valid_plan_year_end_on,
+        open_enrollment_start_on: valid_open_enrollment_start_on,
+        open_enrollment_end_on: valid_open_enrollment_end_on,
+        fte_count: valid_fte_count
+      }
+    end
+    let(:workflow_plan_year_with_benefit_group) do
+      py = PlanYear.new(**valid_params)
+      py.aasm_state = "active"
+      py.employer_profile = employer_profile
+      py.benefit_groups = [benefit_group]
+      py.save
+      py
+    end
+
+    context "this should trigger a state transition" do
+      it "should change its aasm state" do
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
+        workflow_plan_year_with_benefit_group.migration_expire!
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "migration_expired"
+      end
+
+      it "should not change its aasm state" do
+        workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
+        workflow_plan_year_with_benefit_group.save
+        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
+      end
+
+      it "should not trigger a state transitioin" do
+        workflow_plan_year_with_benefit_group.employer_profile.registered_on = TimeKeeper.date_of_record + 45.days
+        workflow_plan_year_with_benefit_group.save
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
+        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
       end
     end
   end

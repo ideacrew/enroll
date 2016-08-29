@@ -14,6 +14,18 @@ module Factories
 
       if selected_enrollments.none? && renewal_enrollments.none?
         # TODO: update benefit group assignment to correct state from coverage_renewing
+        
+        bg_ids = @plan_year.benefit_groups.map(&:id)
+        assignment = @census_employee.benefit_group_assignments.detect{ |assignment| bg_ids.include?(assignment.benefit_group_id) }
+
+        if assignment.present?
+          assignment.make_active
+        else
+          benefit_group = @plan_year.default_benefit_group || @plan_year.benefit_groups.first
+          census_employee.add_benefit_group_assignment(benefit_group, benefit_group.start_on)
+          census_employee.save!
+        end
+
         return
       end
 

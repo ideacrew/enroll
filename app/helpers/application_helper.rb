@@ -373,8 +373,8 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(carrier_name, options = {:width => 50})
-    carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
     if carrier_name.present?
+      carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
   end
