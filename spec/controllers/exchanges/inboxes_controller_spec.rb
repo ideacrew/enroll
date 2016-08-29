@@ -5,20 +5,22 @@ RSpec.describe Exchanges::InboxesController do
     let(:user) { double("User") }
     let(:person) { double("Person") }
     let(:hbx_profile) { double("HbxProfile") }
-    let(:message) { double("Message") }
     let(:inbox) { double("Inbox") }
-    let(:message){double(to_a: double("to_array"), message_read: false)}
+    let(:message){ double("Message", message_read: true ) }
+    let(:inbox_provider){double(id: double("id"),full_name: double("inbox_provider"))}
 
     before :each do
       sign_in(user)
+      allow(user).to receive(:person).and_return(person)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(controller).to receive(:find_message)
       controller.instance_variable_set(:@message, message)
       allow(message).to receive(:update_attributes).and_return(true)
+      allow(Person).to receive(:find).and_return(inbox_provider)
     end
 
     context "as user" do
-      before do
+      before :each do
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       end
 
