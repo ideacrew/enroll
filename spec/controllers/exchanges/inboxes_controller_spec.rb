@@ -7,8 +7,9 @@ RSpec.describe Exchanges::InboxesController do
     let(:hbx_profile) { double("HbxProfile") }
     let(:message) { double("Message") }
     let(:inbox) { double("Inbox") }
+    let(:message){double(to_a: double("to_array"), message_read: false)}
 
-    before do
+    before :each do
       sign_in(user)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(controller).to receive(:find_message)
@@ -16,15 +17,33 @@ RSpec.describe Exchanges::InboxesController do
       allow(message).to receive(:update_attributes).and_return(true)
     end
 
-    it "should render show" do
-      get :show, id: "test"
-      expect(response).to have_http_status(:success)
+    context "as user" do
+      before do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      end
+
+      it "should render show" do
+        get :show, id: "test"
+        expect(response).to have_http_status(:success)
+        expect(message.message_read).to eq(true)
+      end
+
+      it "delete action" do
+        xhr :delete, :destroy, id: 1
+        expect(response).to have_http_status(:success)
+      end
     end
 
-    it "delete action" do
-      xhr :delete, :destroy, id: 1
-      expect(response).to have_http_status(:success)
+    context "as admin" do
+      before do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      end
+
+      it "should render show" do
+        get :show, id: "test"
+        expect(response).to have_http_status(:success)
+        expect(message.message_read).to eq(false)
+      end
     end
   end
-
 end
