@@ -453,6 +453,7 @@ RSpec.describe Insured::FamiliesController do
       xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:check_move_reason)
+      expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
     end
 
     describe "with valid and invalid params" do
