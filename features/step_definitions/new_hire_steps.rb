@@ -100,6 +100,7 @@ Then(/Employee should see \"may not enroll until eligible\" error message/) do
 end
 
 When(/Employee enters Qualifying Life Event/) do
+  sleep(2) #wair for homepage
   first("#carousel-qles a").click
   expect(page).to have_content "Married"
   screenshot("future_qle_date")

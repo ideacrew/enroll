@@ -84,5 +84,7 @@ Feature: COBRA basic
     And Jack Employee login in for employee
     Then Jack Employee should see my account page
     Then Jack Employee should see cobra enrollment on my account page
+    Then Jack Employee should see market type on my account page
+    Then Jack Employee should not see individual on enrollment title
     Then Set Date back to two months ago
     Then Employee logs out

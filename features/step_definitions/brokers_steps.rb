@@ -153,6 +153,7 @@ end
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
   find('.interaction-click-control-change-broker').trigger 'click'
+  sleep 2
 
   within '.modal-dialog' do
     click_link 'Terminate Broker'

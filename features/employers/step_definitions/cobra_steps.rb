@@ -51,7 +51,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
-  find(:xpath, "//label[@for='radio_male']").click
+  find(:xpath, "//label[@for='census_employee_gender_male']").click
 
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', :with => (TimeKeeper.date_of_record - 10.days).to_s
 
@@ -92,7 +92,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
-  find(:xpath, "//label[@for='radio_male']").click
+  find(:xpath, "//label[@for='census_employee_gender_male']").click
 
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', :with => (TimeKeeper.date_of_record - 10.days).to_s
 
@@ -237,6 +237,13 @@ Then(/^.+ should see cobra enrollment on my account page/) do
   expect(page).to have_content('Coverage Selected')
 end
 
+Then(/^.+ should see market type on my account page/) do
+  expect(page).to have_content("Market Type: Employer Sponsored COBRA/Continuation")
+end
+
+Then(/^.+ should not see individual on enrollment title/) do
+  expect(page).not_to have_content("Individual & Family")
+end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click

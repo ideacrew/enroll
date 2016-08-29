@@ -222,7 +222,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
     @census_employee.census_dependents.build unless @census_employee.census_dependents.present?
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
-    @status = params[:status]
+    @status = params[:status] || ''
     # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
