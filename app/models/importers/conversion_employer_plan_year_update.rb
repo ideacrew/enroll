@@ -70,7 +70,7 @@ module Importers
 
       current_coverage_start = calculated_coverage_start
       
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year - 1)
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year)
       reference_plan = select_reference_plan(available_plans)
 
 
@@ -86,18 +86,19 @@ module Importers
         errors.add(:base, 'Single Plan Hios Id missing')
       end
 
-      plan_year = employer.plan_years.where(:start_on => current_coverage_start - 1.year).first
+      plan_year = employer.plan_years.where(:start_on => current_coverage_start).first
       if plan_year.blank?
-        errors.add(:base, 'Plan year not imported')
+        error.add(:base, 'Plan year not imported')
       end
 
       if plan_year && plan_year.benefit_groups.size > 1
         errors.add(:base, 'Employer offering more than 1 benefit package')
+        return false
       end
 
       renewing_plan_year = employer.plan_years.where(:start_on => (current_coverage_start)).first
       if renewing_plan_year.blank?
-        errors.add(:base, 'Renewing plan year not present')
+        warnings.add(:base, 'Renewing plan year not present')
       end
 
       if renewing_plan_year && PlanYear::RENEWING_PUBLISHED_STATE.include?(renewing_plan_year.aasm_state)
@@ -108,8 +109,10 @@ module Importers
 
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
         update_reference_plan(plan_year, reference_plan)
-        renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
-        update_reference_plan(renewing_plan_year, renewal_reference_plan)
+        if renewing_plan_year
+          renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
+          update_reference_plan(renewing_plan_year, renewal_reference_plan)
+        end
         return true
       else
         errors.add(:base, "Reference plan is same")
