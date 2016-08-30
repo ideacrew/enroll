@@ -83,7 +83,7 @@ RSpec.describe ApplicationController do
           expect(subject).to receive(:log) do |msg, severity|
             expect(severity[:severity]).to eq('error')
             expect(msg[:user_id]).to match(user.id)
-            expect(msg[:email]).to match(user.email)
+            expect(msg[:oim_id]).to match(user.oim_id)
           end
           subject.instance_eval{set_current_person}
         end
@@ -132,6 +132,21 @@ RSpec.describe ApplicationController do
         expect(msg[:message]).to include("Application Exception")
       end
       controller.instance_eval{require_login}
+    end
+  end
+
+  context "page_alphabets" do
+    let(:person) { FactoryGirl.create(:person); }
+    let(:user) { FactoryGirl.create(:user, :person => person); }
+    let(:alphabet_array) { Person.distinct('last_name').collect { |word| word.first.upcase }.uniq.sort }
+
+    before do
+      sign_in(user)
+    end
+
+    it "return array of 1st alphabets of given field" do
+      pagination = subject.instance_eval { page_alphabets(Person.all, 'last_name') }
+      expect(pagination).to eq alphabet_array
     end
   end
 end

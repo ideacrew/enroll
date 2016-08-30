@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   # for current_user
   before_action :set_current_user
 
-  rescue_from Pundit::NotAuthorizedError, with: :access_denied
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   rescue_from ActionController::InvalidCrossOriginRequest do |exception|
     error_message = {
@@ -47,6 +47,17 @@ class ApplicationController < ActionController::Base
     render file: 'public/403.html', status: 403
   end
 
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+
+    flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
+      respond_to do |format|
+      format.json { render nothing: true, status: :forbidden }
+      format.html { redirect_to(request.referrer || root_path)}
+      format.js   { render nothing: true, status: :forbidden }
+    end
+  end
+
   def authenticate_me!
     # Skip auth if you are trying to log in
     return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
@@ -55,7 +66,7 @@ class ApplicationController < ActionController::Base
 
   def create_sso_account(user, personish, timeout, account_role = "individual")
     if !user.idp_verified?
-      IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+      IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
       user.switch_to_idp!
@@ -139,7 +150,7 @@ class ApplicationController < ActionController::Base
       message[:message] = "Application Exception - #{e.message}"
       message[:session_person_id] = session[:person_id] if session[:person_id]
       message[:user_id] = current_user.id if current_user
-      message[:email] = current_user.email if current_user
+      message[:oim_id] = current_user.oim_id if current_user
       message[:url] = request.original_url
       message[:params] = params if params
       log(message, :severity=>'error')
@@ -168,17 +179,12 @@ class ApplicationController < ActionController::Base
     end
 
     def page_alphabets(source, field)
-      if (fields = field.split(".")) && fields.count > 1
-        word_arr = source.map do |s|
-          fields.each do |f|
-            s = s.send(f)
-          end
-          s
-        end
-        word_arr.uniq.collect {|word| word.first.upcase}.uniq.sort
-      else
-        source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
-      end
+      # A good optimization would be an aggregate
+      # source.collection.aggregate([{ "$group" => { "_id" => { "$substr" => [{ "$toUpper" => "$#{field}"},0,1]}}}, "$sort" =>{"_id"=>1} ]).map do
+      #   |object| object["_id"]
+      # end
+      # but source.collection acts on the entire collection (Model.all) hence cant be used here as source is a Mongoid::Criteria
+    source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
     rescue
       ("A".."Z").to_a
     end
@@ -210,7 +216,7 @@ class ApplicationController < ActionController::Base
       message[:message] = 'Application Exception - person required'
       message[:session_person_id] = session[:person_id]
       message[:user_id] = current_user.id
-      message[:email] = current_user.email
+      message[:oim_id] = current_user.oim_id
       message[:url] = request.original_url
       log(message, :severity=>'error')
       return false
@@ -272,5 +278,19 @@ class ApplicationController < ActionController::Base
 
     def authorize_for
       authorize(controller_name.classify.constantize, "#{action_name}?".to_sym)
+    end
+
+    def set_flash_by_announcement
+      return if current_user.blank?
+      if flash.blank? || flash[:warning].blank?
+        announcements = if current_user.has_hbx_staff_role?
+                          Announcement.get_announcements_by_portal(request.path, @person)
+                        else
+                          current_user.get_announcements_by_roles_and_portal(request.path)
+                        end
+        dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+        announcements -= dismiss_announcements
+        flash.now[:warning] = announcements
+      end
     end
 end

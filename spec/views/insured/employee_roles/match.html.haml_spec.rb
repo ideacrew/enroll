@@ -12,6 +12,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
     found_census_employees = @employee_candidate.match_census_employees
     @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
     sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
     render template: "insured/employee_roles/match.html.haml"
   end
 
@@ -24,6 +25,6 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
     # expect(rendered).to have_selector("input[type=submit][value='This is my employer']")
     # expect(rendered).to have_selector('dt', text: 'Employer :')
     # expect(rendered).to have_selector("input", value: 'This is my employer')
-    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact DC Health Link's Customer Care Center: 1-855-532-5465.")
+    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact #{Settings.site.short_name}'s Customer Care Center: 1-855-532-5465.")
   end
 end

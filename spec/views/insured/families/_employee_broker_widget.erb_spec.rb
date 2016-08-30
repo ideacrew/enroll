@@ -42,7 +42,11 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
 
 
     it "should display broker widget for consumer" do
-      expect(rendered).to have_selector('h4', "Your Broker")
+      expect(rendered).to have_selector('h3', "Your Broker")
+    end
+
+    it "should display brokers email" do
+      expect(rendered).to match("mailto")
     end
   end
 

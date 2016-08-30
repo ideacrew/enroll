@@ -7,6 +7,7 @@ FactoryGirl.define do
     # name_sfx 'Jr'
     dob "1972-04-04".to_date
     is_active true
+    gender "male"
 
     #association :employee_role, strategy: :build
 
@@ -55,6 +56,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_general_agency_staff_role do
+      after(:create) do |p, evaluator|
+        create_list(:general_agency_staff_role, 1, person: p)
+      end
+    end
+
     trait :with_hbx_staff_role do
       after(:create) do |p, evaluator|
         create_list(:hbx_staff_role, 1, person: p)
@@ -93,5 +100,18 @@ FactoryGirl.define do
 
     factory :male, traits: [:male]
     factory :female, traits: [:female]
+
+    transient do
+      census_employee_id nil
+      employer_profile_id nil
+      hired_on nil
+    end
+
+    factory :person_with_employee_role do
+
+      after(:create) do |person, evaluator|
+        create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, hired_on: evaluator.hired_on)
+      end
+    end
   end
 end

@@ -23,10 +23,14 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       Struct.new(:determined_at, :vlp_authority).new(Time.now, "ssa")
     end
 
+    before :each do
+      person.consumer_role.coverage_purchased!("args")
+    end
+
     describe "when the enrollment is active" do
       before :each do
         enrollment
-        person.consumer_role.deny_lawful_presence!(denial_information)
+        person.consumer_role.ssn_invalid!(denial_information)
       end
 
       it "puts the enrollment in enrolled_contingent state" do
@@ -38,7 +42,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
     describe "when the enrollment is terminated" do
       before :each do
         enrollment.terminate_coverage!
-        person.consumer_role.deny_lawful_presence!(denial_information)
+        person.consumer_role.ssn_invalid!(denial_information)
       end
 
       it "does not change the state of the enrollment" do

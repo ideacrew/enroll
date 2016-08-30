@@ -5,3 +5,6 @@ $(".btn-danger").click(function(){
   $('#show_message_form').hide();
   $('#profile-content .container').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
 });
+$("#insured-nav").load(location.href+" #insured-nav>*", "");
+$("#inbox_form").load(location.href+" #inbox_form>*", "");
+$("#myTab").load(location.href+" #myTab>*", "");

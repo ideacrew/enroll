@@ -1,13 +1,15 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
+  before_action :check_and_download_invoice, only: [:download_invoice]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
+  before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
 
   def index
@@ -90,7 +92,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-        @plan_years = @employer_profile.plan_years.order(id: :desc)
+        sort_plan_years(@employer_profile.plan_years)
       when 'documents'
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
@@ -100,11 +102,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'inbox'
 
       else
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
         @current_plan_year = @employer_profile.show_plan_year
+        collect_and_sort_invoices(params[:sort_order])
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         enrollments = @employer_profile.enrollments_for_billing
         @premium_amt_total   = enrollments.map(&:total_premium).sum
         @employee_cost_total = enrollments.map(&:total_employee_cost).sum
         @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+
+        set_flash_by_announcement if @tab == 'home'
       end
     end
   end
@@ -155,8 +162,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
         if pending
-          flash[:notice] = 'Your Employer Staff application is pending'
-          render action: 'new'
+          # flash[:notice] = 'Your Employer Staff application is pending'
+          render action: 'show_pending'
         else
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
@@ -164,6 +171,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     else
       render action: "new"
     end
+  end
+
+  def show_pending
   end
 
   def update
@@ -215,8 +225,21 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to family_account_path
   end
 
+  def export_census_employees
+    respond_to do |format|
+      format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+    end
+  end
+
   def bulk_employee_upload_form
 
+  end
+
+  def download_invoice
+    options={}
+    options[:content_type] = @invoice.type
+    options[:filename] = @invoice.title
+    send_data Aws::S3Storage.find(@invoice.identifier) , options
   end
 
   def bulk_employee_upload
@@ -242,6 +265,30 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   private
+
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
+
+  def collect_and_sort_invoices(sort_order='ASC')
+    @invoices = @employer_profile.organization.try(:documents)
+    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+  end
+
+  def check_and_download_invoice
+    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+  end
+
+  def sort_plan_years(plans)
+    renewing_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::RENEWING
+    renewing = plans.select { |plan_year| renewing_states.include? plan_year.aasm_state }
+    ineligible_plans, active_plans = plans.partition { |plan_year| PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state }
+    ineligible_plans = ineligible_plans.select { |plan_year| renewing.exclude? plan_year }
+    active_plans = active_plans.partition { |plan_year| PlanYear::PUBLISHED.include? plan_year.aasm_state }.flatten
+    active_plans = active_plans.select { |plan_year| renewing.exclude? plan_year }
+    @plan_years = renewing + active_plans + ineligible_plans
+  end
+
   def paginate_employees
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'

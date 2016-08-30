@@ -17,6 +17,7 @@ class BenefitGroupAssignment
   field :coverage_end_on, type: Date
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
+  field :activated_at, type: DateTime
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -169,7 +170,7 @@ class BenefitGroupAssignment
       end
     end
 
-    update_attributes(is_active: true) unless is_active?
+    update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
   private
@@ -201,7 +202,9 @@ class BenefitGroupAssignment
 
     if hbx_enrollment.present?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-      self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
+      # TODO: Re-enable this after enrollment propagation issues resolved. 
+      #       Right now this is causing issues when linking census employee under Enrollment Factory.
+      # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
     end
   end
 

@@ -9,7 +9,7 @@ class Person
   include FullStrippedNames
 
   extend Mongorder
-  validates_with Validations::DateRangeValidator
+#  validates_with Validations::DateRangeValidator
 
 
   GENDER_KINDS = %W(male female)
@@ -65,6 +65,11 @@ class Person
                 inverse_of: :broker_agency_contacts,
                 index: true
 
+  belongs_to :general_agency_contact,
+                class_name: "GeneralAgencyProfile",
+                inverse_of: :general_agency_contacts,
+                index: true
+
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
@@ -76,11 +81,13 @@ class Person
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
+  embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -109,6 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
+  after_save :generate_family_search
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -174,13 +182,18 @@ class Person
 
   scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_applicant,     -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
+  scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
-  scope :unverified_persons,        -> {Person.in(:'consumer_role.aasm_state'=>['verifications_outstanding', 'verifications_pending'])}
+  scope :unverified_persons,        -> { where(:'consumer_role.aasm_state' => { "$ne" => "fully_verified" })}
   scope :matchable,                 ->(ssn, dob, last_name) { where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name: last_name) }
 
+  scope :general_agency_staff_applicant,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :applicant })}
+  scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
+  scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
+  scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
 
 #  ViewFunctions::Person.install_queries
 
@@ -188,7 +201,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
+  
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
@@ -243,6 +256,8 @@ class Person
   end
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -324,6 +339,16 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
+  def first_name_last_name_and_suffix
+    [first_name, last_name, name_sfx].compact.join(" ")
+    case name_sfx
+      when "ii" ||"iii" || "iv" || "v"
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      else
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+      end
+  end
+
   def age_on(date)
     age = date.year - dob.year
     if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
@@ -339,6 +364,18 @@ class Person
 
   def is_active?
     is_active
+  end
+
+  # collect all verification types user can have based on information he provided
+  def verification_types
+    verification_types = []
+    verification_types << 'Social Security Number' if self.ssn
+    if self.us_citizen
+      verification_types << 'Citizenship'
+    else
+      verification_types << 'Immigration status'
+    end
+    verification_types
   end
 
   def relatives
@@ -424,6 +461,11 @@ class Person
   def mobile_phone
     phones.detect { |phone| phone.kind == "mobile" }
   end
+  
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
 
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
@@ -431,6 +473,10 @@ class Person
 
   def has_active_employee_role?
     active_employee_roles.any?
+  end
+
+  def has_employer_benefits?
+    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
   end
 
   def active_employee_roles
@@ -529,6 +575,19 @@ class Person
       Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
     end
 
+    def person_has_an_active_enrollment?(person)
+      if !person.primary_family.blank? && !person.primary_family.enrollments.blank?
+        person.primary_family.enrollments.each do |enrollment|
+          return true if enrollment.is_active
+        end
+      end
+      return false
+    end
+
+    def find_by_ssn(ssn)
+      Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
@@ -597,8 +656,8 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
-        role.update_attributes!(:aasm_state => :is_closed)
+      if (roles = person.employer_staff_roles.select{ |role| role.employer_profile_id.to_s == employer_profile_id.to_s }).present?
+        roles.each { |role| role.update_attributes!(:aasm_state => :is_closed) }
         return true, 'Employee Staff Role is inactive'
       else
         return false, 'No matching employer staff role'
@@ -682,7 +741,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present?
     !!agent
   end
 
@@ -707,6 +766,10 @@ class Person
       self.update_attributes!(phones: phones)
       save!
     end
+  end
+
+  def generate_family_search
+    ::MapReduce::FamilySearchForPerson.populate_for(self)
   end
 
   private
@@ -736,7 +799,7 @@ class Person
     welcome_subject = "Welcome to #{Settings.site.short_name}"
     welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
   end
 
   def update_full_name

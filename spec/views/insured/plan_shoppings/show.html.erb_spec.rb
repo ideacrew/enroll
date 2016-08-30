@@ -13,6 +13,7 @@ RSpec.describe "insured/show" do
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
   let(:broker_person){ FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
   let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
+  let(:consumer_role) {FactoryGirl.create(:consumer_role, person: person)}
   let(:current_broker_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
  		:person => broker_person) }
   let(:consumer_user){FactoryGirl.create(:user, :roles => ['consumer'], :person => person)}
@@ -60,9 +61,9 @@ RSpec.describe "insured/show" do
   end
 
   it 'should not identify Broker control in the header when signed in as Consumer' do
+    FactoryGirl.create(:consumer_role, person: consumer_user.person)
+    allow(consumer_user).to receive(:identity_verified_date).and_return(true)
     sign_in consumer_user
-
-
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to_not match(/I'm a Broker/)
     expect(rendered).to match(/Individual and Family/i)

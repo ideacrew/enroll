@@ -10,7 +10,8 @@ class Invitation
     "employer_staff_role" => "employer_staff_role",
     "assister_role" => "assister_role",
     "csr_role" => "csr_role",
-    "hbx_staff_role" => "hbx_staff_role"
+    "hbx_staff_role" => "hbx_staff_role",
+    "general_agency_staff_role" => "general_agency_staff_role"
   }
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
@@ -62,6 +63,8 @@ class Invitation
       claim_csr_role(user_obj, redirection_obj)
     when "hbx_staff_role"
       claim_hbx_staff_role(user_obj, redirection_obj)
+    when "general_agency_staff_role"
+      claim_general_agency_staff_role(user_obj, redirection_obj)
     else
       raise "Unrecognized role: #{self.role}"
     end
@@ -119,6 +122,19 @@ class Invitation
     end
   end
 
+  def claim_general_agency_staff_role(user_obj, redirection_obj)
+    staff_role = GeneralAgencyStaffRole.find(source_id)
+    person = staff_role.person
+    redirection_obj.create_sso_account(user_obj, person, 15, "general_agent") do
+      person.user = user_obj
+      person.save!
+      general_agency_profile = staff_role.general_agency_profile
+      user_obj.roles << "general_agency_staff" unless user_obj.roles.include?("general_agency_staff")
+      user_obj.save!
+      redirection_obj.redirect_to_general_agency_profile(general_agency_profile)
+    end
+  end
+
   def claim_assister_role(user_obj, redirection_obj)
     staff_role = AssisterRole.find(source_id)
     person = staff_role.person
@@ -169,6 +185,10 @@ class Invitation
     UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
+  def send_renewal_invitation!(census_employee)
+    UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
+  end
+
   def send_agent_invitation!(invitee_name)
     UserMailer.agent_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
@@ -186,6 +206,19 @@ class Invitation
         :invitation_email => census_employee.email_address
       )
       invitation.send_invitation!(census_employee.full_name)
+      invitation
+    end
+  end
+
+  def self.invite_renewal_employee!(census_employee)
+    if !census_employee.email_address.blank?
+      invitation = self.create(
+        :role => "employee_role",
+        :source_kind => "census_employee",
+        :source_id => census_employee.id,
+        :invitation_email => census_employee.email_address
+      )
+      invitation.send_renewal_invitation!(census_employee)
       invitation
     end
   end
@@ -212,6 +245,19 @@ class Invitation
         :invitation_email => broker_role.email_address
       )
       invitation.send_invitation!(broker_role.parent.full_name)
+      invitation
+    end
+  end
+
+  def self.invite_general_agency_staff!(staff_role)
+    if !staff_role.email_address.blank?
+      invitation = self.create(
+        :role => "general_agency_staff_role",
+        :source_kind => "general_agency_staff_role",
+        :source_id => staff_role.id,
+        :invitation_email => staff_role.email_address
+      )
+      invitation.send_agent_invitation!(staff_role.parent.full_name)
       invitation
     end
   end

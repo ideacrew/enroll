@@ -1,14 +1,15 @@
-<div class="panel panel-default" id='shop-for-plans-widget'>
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-        <%= link_to 'Apply', navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
+<div class="module shop-for-plans-widget">
+  <div class="panel panel-default" id='shop-for-plans-widget'>
+    <div class="panel-body">
+      <div class="row flex">
+      <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+        <%= link_to 'Medicaid & Tax Credits', navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
       </div>
-      <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-        <div class='image-area'>
-        </div>
-        <strong>Apply for Medicaid or for Tax Credit Assisted Coverage</strong>
+      <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+        <div class='image-area'></div>
+        <strong>Apply, renew, read notices or find out what documents are needed for Medicaid or tax credit assisted coverage</strong>
       </div>
     </div>
+  </div>
   </div>
 </div>

@@ -136,7 +136,13 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
 
   context "show_keep_existing_plan" do
     let(:date) { TimeKeeper.date_of_record }
-    let(:hbx_enrollment) {double(effective_on: date)}
+    let(:hbx_enrollment) {HbxEnrollment.new(effective_on: date, kind: 'individual')}
+    let(:shop_hbx) {HbxEnrollment.new(effective_on: date, kind: 'employer_sponsored')}
+
+    it "should return true when hbx_enrollment is shop" do
+      expect(helper.show_keep_existing_plan("shop_for_plans", shop_hbx, date)).to eq true
+      expect(helper.show_keep_existing_plan("", shop_hbx, date)).to eq true
+    end
 
     it "should return false with shop_for_plans" do
       expect(helper.show_keep_existing_plan("shop_for_plans", hbx_enrollment, date)).to eq false
@@ -150,29 +156,6 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       it "hbx_enrollment and new_effective_on is not in the same year" do
         expect(helper.show_keep_existing_plan("", hbx_enrollment, (date + 1.year))).to eq false
       end
-    end
-  end
-
-  context "show_consumer_role_state" do
-    let(:consumer_role) {FactoryGirl.build(:consumer_role)}
-
-    it "should return blank when consumer_role is nil" do
-      expect(helper.show_consumer_role_state(nil)).to eq ""
-    end
-
-    it "should return Pending when consumer_role is verifications_pending" do
-      allow(consumer_role).to receive(:aasm_state).and_return "verifications_pending"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Pending"
-    end
-
-    it "should return Verified when consumer_role is Verified" do
-      allow(consumer_role).to receive(:aasm_state).and_return "fully_verified"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Verified"
-    end
-
-    it "should return Outstanding verifications when consumer_role is verification_outstanding" do
-      allow(consumer_role).to receive(:aasm_state).and_return "verification_outstanding"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Outstanding verification"
     end
   end
 end

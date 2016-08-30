@@ -1,0 +1,85 @@
+@import "variables";
+.module, .modal {
+  .enroll-label {
+    font-weight: $float-labels-weight;
+    color: $float-labels-color;
+    font-size: $float-labels-text-size;
+    text-transform: $float-labels-casing;
+  }
+  .label {
+    &.inactive, &.canceled {
+      background-color: $primary-gray;
+    }
+    &.employment_terminated {
+      background-color: $primary-red;
+    }
+  }
+  &.flash {
+    .col-xs-12 {
+      max-width: 1170px;
+      width: 100%;
+      margin: auto;
+      display: block;
+      float: none;
+    }
+  }
+  .census-employee-details .n-radio-row {
+    border: none !important;
+    padding: inherit;
+  }
+  .no-vertical-padding {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .no-bottom-padding {
+    padding-bottom: 0;
+  }
+  .selectric-labeled {
+    padding: 0 0 0 10px;
+    width: 100%;
+    white-space: nowrap;
+    &>* {
+      display:table-cell;
+      width:100%;
+      text-align: center;
+      vertical-align:middle;
+      white-space: normal;
+    }
+    span {
+      width:100%;
+      max-width: 25%;
+      display: inline-block;
+      font-size: 10px;
+      color: rgb(131, 135, 128);
+      text-transform: uppercase;
+      text-align: left;
+      line-height: 1.2;
+      strong {
+        font-weight: bold;
+      }
+    }
+    .selectric-wrapper {
+      width:100%;
+      max-width: 75%;
+      display: inline-block;
+    }
+  }
+  .vertically-aligned-row {
+    display: table;
+    width: 100%;
+    &.auto-width {
+      width: auto !important;
+    }
+    >* {
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
+      &.vertical-align-top {
+        vertical-align: top !important;
+      }
+    }
+  }
+  .date-field {
+    font-family: FontAwesome;
+  }
+}

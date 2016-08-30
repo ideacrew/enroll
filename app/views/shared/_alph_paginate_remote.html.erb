@@ -4,7 +4,9 @@
 <% url_params ||= {} %>
 <ul class='pagination'>
   <% if all %>
-    <li><%= link_to "ALL", all, remote: true %></li>
+      <% all_url = all %>
+      <% all_url += "?" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
+    <li><%= link_to "ALL", all_url, remote: true %></li>
   <% end %>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>

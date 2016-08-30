@@ -1,7 +1,7 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
   before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
-
+  before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
   def new
@@ -74,6 +74,30 @@ class Employers::PlanYearsController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def delete_benefit_group
+    plan_year = params[:plan_year_id]
+    plan_year = PlanYear.find(plan_year)
+    benefit_group_id = params[:benefit_group_id]
+    benefit_groups = plan_year.benefit_groups
+    if benefit_groups.count > 1
+      bg = benefit_groups.find(benefit_group_id)
+      bg_title = bg.title
+      invalid_benefit_group_assignments = @employer_profile.benefit_group_assignments.select { |bga| bga.benefit_group_id.to_s == benefit_group_id }
+      invalid_benefit_group_assignments.each do |invalid_benefit_group_assignment|
+        census_employee = invalid_benefit_group_assignment.census_employee
+        invalid_benefit_group_assignment.delete
+        census_employee.save
+      end
+      bg.delete
+      if plan_year.save
+        flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
+      end
+    else
+      flash[:error] = "Benefit package can not be deleted because it is the only benefit package remaining in the plan year."
+    end
+    render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
   end
 
   def make_default_benefit_group
@@ -271,6 +295,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def revert
+    authorize EmployerProfile, :revert_application?
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     if @employer_profile.plan_years.renewing.include?(@plan_year) && @plan_year.may_revert_renewal?
       @plan_year.revert_renewal
@@ -302,7 +327,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish!
+    @plan_year.publish! if @plan_year.may_publish?
     if @plan_year.publish_pending?
       respond_to do |format|
         format.js
@@ -337,7 +362,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
- 
+
     @benefit_group = @plan_year.benefit_groups[0]
 
     if @coverage_type == '.dental'
@@ -376,6 +401,11 @@ class Employers::PlanYearsController < ApplicationController
 
   private
 
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end  
+
+
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan
     plan = @benefit_group.dental_reference_plan if @coverage_type == '.dental'
@@ -383,7 +413,7 @@ class Employers::PlanYearsController < ApplicationController
 
     employee_costs = @plan_year.employer_profile.census_employees.active.inject({}) do |census_employees, employee|
 
-     
+
       costs = {
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee, plan)
       }
@@ -430,7 +460,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year_params = params.require(:plan_year).permit(
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
-      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
+      :benefit_groups_attributes => [ :id, :title, :description, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
                                       :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
                                       :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
                                       :relationship_benefits_attributes => [

@@ -34,7 +34,7 @@ describe Forms::BrokerAgencyProfile, "given nothing" do
 end
 
 
-describe Forms::BrokerAgencyProfile, ".save" do
+describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
 
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency, fein: "223230323") }
   let(:employer_profile) { FactoryGirl.create(:employer_profile, fein: "333230323") }
@@ -117,7 +117,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")
+      expect(subject.errors.to_hash[:base]).to include("fein is already in use.")
     end
   end
 

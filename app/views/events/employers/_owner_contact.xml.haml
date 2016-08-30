@@ -2,9 +2,12 @@
   %id
     %id= owner_contact.hbx_id
   = render :partial => "events/shared/person_name", :object => owner_contact
-  - work_email = owner_contact.emails.detect { |em| em.kind == "work" }
-  - if work_email.present?
+  - if owner_contact.addresses.present?
+    %addresses
+      = render :partial => "events/addresses/address", :collection => owner_contact.addresses
+  - if owner_contact.work_email_or_best.present?
     %emails
-      %email
-        %type= "urn:openhbx:terms:v1:email_type#work"
-        %email_address= work_email.address
+      = render :partial => "events/emails/email", :locals => {email:owner_contact.work_email_or_best}
+  - if owner_contact.phones.present?
+    %phones
+      = render :partial => "events/phones/phone", :collection => owner_contact.phones

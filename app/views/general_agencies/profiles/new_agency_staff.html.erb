@@ -1,0 +1,61 @@
+<div id="general_agency_form" class="container">
+<h3>New General Agency Staff</h3>
+<%= link_to "General Agency", general_agency_registration_path, class: "btn btn-default" %>
+<%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
+<%= render 'shared/error_messages', :object => @organization %>
+<%= f.hidden_field :applicant_type, value: 'staff' %>
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12">
+      <h4>Personal Information</h4>
+      <div class="row no-buffer row-form-wrapper">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *' %>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *' %>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= datepicker_control f, :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'yy-mm-dd', required: true} %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
+        <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'EMAIL *' %>
+        </div>
+        <% if @filter != 'staff' %>
+          <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
+            <%= f.text_field :npn, class: "floatlabel form-control npn_field interaction-field-control-person-npn", required: true, placeholder: 'NPN *' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12 general-agency-search">
+      <div class="row search-dropdown-wrapper">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <h4>Select Your General Agency</h4>
+          <div class="col-md-4 col-sm-6 col-xs-12 input-group input-no-pd">
+            <%= f.hidden_field :general_agency_profile_id %>
+            <%= text_field_tag :agency_search, nil, placeholder: 'Name/FEIN', class: 'form-control' %>
+            <div class="input-group-btn">
+              <a href="#" onclick="return false;" class="btn btn-select search" data-loading-text="Loading..."><i class="fa fa-search"></i> search</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='result'></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="action-group">
+      <div class="row no-buffer">
+        <button type="submit" class="btn btn-primary create_general_agency_btn interaction-click-control-create-general-agency">Create General Agency</button>
+      </div>
+    </div>
+  </div>
+<% end %>
+</div>

@@ -1,7 +1,21 @@
 module ApplicationHelper
 
+  def get_portals_text(insured, employer, broker)
+    my_portals = []
+    if insured == true
+      my_portals << "<strong>Insured</strong>"
+    end
+    if employer == true
+      my_portals << "<strong>Employer</strong>"
+    end
+    if broker == true
+      my_portals << "<strong>Broker</strong>"
+    end
+    my_portals.to_sentence
+  end
+
   def copyright_notice
-    raw("&copy; #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.")
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -46,7 +60,7 @@ module ApplicationHelper
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
-      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
+      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
 
@@ -81,6 +95,14 @@ module ApplicationHelper
 
   def format_datetime(date_value)
     date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
+  end
+
+  def group_xml_transmitted_message(employer)
+    employer.xml_transmitted_timestamp.present? ? "The group xml for employer #{employer.legal_name} was transmitted on #{format_time_display(employer.xml_transmitted_timestamp)}. Are you sure you want to transmit again?" : "Are you sure you want to transmit the group xml for employer #{employer.legal_name}?"
+  end
+
+  def format_time_display(timestamp)
+    timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
   # Builds a Dropdown button
@@ -132,7 +154,7 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph
   def boolean_to_glyph(test)
-    test ? content_tag(:span, "", class: "fui-checkbox-checked") : content_tag(:span, "", class: "fui-checkbox-unchecked")
+    test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -287,7 +309,13 @@ module ApplicationHelper
 
   def user_full_name
     if signed_in?
-      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.email
+      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.oim_id
+    end
+  end
+
+  def user_first_name_last_name_and_suffix
+    if signed_in?
+      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.oim_id).downcase
     end
   end
 
@@ -302,6 +330,8 @@ module ApplicationHelper
       broker_agencies_inbox_path(provider, message_id: message.id)
     when "HbxProfile"
       exchanges_inbox_path(provider, message_id: message.id)
+    when "GeneralAgencyProfile"
+      general_agencies_inbox_path(provider, message_id: message.id)
     end
   end
 
@@ -317,6 +347,8 @@ module ApplicationHelper
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
       inbox_insured_families_path(profile_id: provider.id, folder: folder)
+    when "GeneralAgencyProfile"
+      inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 
@@ -341,8 +373,8 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(carrier_name, options = {:width => 50})
-    carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
     if carrier_name.present?
+      carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
   end
@@ -517,26 +549,56 @@ module ApplicationHelper
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
   end
 
-  def admin_docs_filter(filter_param, title = nil, style = nil)
-    direction = filter_param == sort_filter && sort_direction == 'asc' ? 'desc' : 'asc'
-    style = direction if style == 'admin_docs'
-    link_to title, consumer_role_status_documents_path(:sort => filter_param, :direction => direction), remote: true, class: style
-  end
-
-  def docs_waiting_for_review
-    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
-  end
-
-  def missing_docs
-    Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').count
-  end
-
-  def all_unverified
-    number_with_delimiter(@unverified_persons.count)
-  end
-
   def display_dental_metal_level(plan)
     return plan.metal_level.humanize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
+
+  def make_binder_checkbox_disabled(employer)
+    eligibility_criteria(employer)
+    (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
+  end
+
+  def favorite_class(broker_role, general_agency_profile)
+    return "" if broker_role.blank?
+
+    if broker_role.included_in_favorite_general_agencies?(general_agency_profile.id)
+      "glyphicon-star"
+    else
+      "glyphicon-star-empty"
+    end
+  end
+
+  def show_default_ga?(general_agency_profile, broker_agency_profile)
+    return false if general_agency_profile.blank? || broker_agency_profile.blank?
+    broker_agency_profile.default_general_agency_profile == general_agency_profile
+  end
+
+  def eligibility_criteria(employer)
+    if employer.show_plan_year.present?
+      participation_rule_text = participation_rule(employer)
+      non_owner_participation_rule_text = non_owner_participation_rule(employer)
+      text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
+      ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+    end
+  end
+
+  def participation_rule(employer)
+    @participation_count = employer.show_plan_year.additional_required_participants_count
+    if @participation_count == 0
+      "1. 2/3 Rule Met? : Yes"
+    else
+      "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
+    end
+  end
+
+  def non_owner_participation_rule(employer)
+    @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
+    if @non_owner_participation_rule == true
+      "2. Non-Owner exists on the roster for the employer"
+    else
+      "2. You have 0 non-owner employees on your roster"
+    end
+  end
+
 end

@@ -145,7 +145,7 @@ end
 
 def fill_user_registration_form(credentials)
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  @browser.text_field(name: "user[email]").set(credentials[:email])
+  @browser.text_field(name: "user[login]").set(credentials[:email])
   @browser.text_field(name: "user[password]").set(credentials[:password])
   @browser.text_field(name: "user[password_confirmation]").set(credentials[:password])
 end
@@ -164,10 +164,13 @@ def default_office_location
 end
 
 Given(/^Hbx Admin exists$/) do
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
@@ -242,7 +245,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
-  save_page
+
   find('.interaction-click-control-confirm').click
 end
 
@@ -254,11 +257,11 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   portal_uri = find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
-  fill_in "user[email]", :with => person[:email]
-  find('#user_email').set(person[:email])
+  fill_in "user[login]", :with => person[:email]
+  find('#user_login').set(person[:email])
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => person[:email] unless find(:xpath, '//*[@id="user_email"]').value == person[:email]
+  fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
   visit portal_uri
 end
@@ -271,7 +274,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
-  find(:xpath, '//label[@for="radio_male"]').click
+  find('label[for=census_employee_gender_male]').click
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
@@ -300,7 +303,7 @@ When(/^I visit the Employer portal$/) do
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -324,7 +327,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  click_link "LOGOUT"
+  click_link "Logout"
   visit "/"
 end
 
@@ -338,7 +341,11 @@ Then(/^.+ should see the employee search page$/) do
 end
 
 Given(/^(.*) visits the employee portal$/) do |named_person|
-  visit "/insured/employee/search"
+  visit "/insured/employee/privacy"
+end
+
+Then(/^.+ should see the employee privacy text$/) do
+  click_link "CONTINUE"
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
@@ -385,24 +392,31 @@ end
 
 When(/^.+ accepts? the matched employer$/) do
   screenshot("update_personal_info")
-  find(:xpath, "//span[contains(., 'CONTINUE')]").click
+  find_by_id('btn-continue').click
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
+  sleep 3
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
-  wait_for_ajax(10)
+  wait_for_ajax
+  page.evaluate_script("window.location.reload()")
   person = people[named_person]
-  find('.interaction-click-control-click-here').click
-  find('.interaction-click-control-close').click
+  screenshot("before modal")
+  # find('.interaction-click-control-click-here').click
+  screenshot("during modal")
+  # find('.interaction-click-control-close').click
+  screenshot("after modal")
 
-  wait_for_ajax(10)
+  sleep 3
+  wait_for_ajax
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  find("#person_addresses_attributes_0_address_1").trigger('click')
-  find("#person_addresses_attributes_0_address_2").trigger('click')
-  find("#person_addresses_attributes_0_city").click
-  find("#person_addresses_attributes_0_zip").click
-
+  # find("#person_addresses_attributes_0_address_1").trigger('click')
+  # find("#person_addresses_attributes_0_address_2").trigger('click')
+  # there is a flickering failure here due to over-lapping modals
+  # find("#person_addresses_attributes_0_city").trigger('click')
+  # find("#person_addresses_attributes_0_zip").trigger('click')
+  find_by_id("person_phones_attributes_0_full_phone_number")
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
@@ -438,6 +452,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
+  sleep 3
   expect(page).to have_content('Confirm Member')
 end
 
@@ -445,13 +460,13 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
 
 When(/^.+ clicks? confirm member$/) do
-  click_button 'Confirm Member'
+  all(:css, ".mz").last.click
   expect(page).to have_link('Add Member')
 end
 
@@ -532,7 +547,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
-  expect(page).to have_content('My DC Health Link')
+  expect(page).to have_content("My #{Settings.site.short_name}")
   screenshot("my_account")
 end
 
@@ -602,7 +617,7 @@ When(/^.+ clicks? on the add employee button$/) do
 end
 
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
-  find(:xpath, "//li[contains(., '#{tab_name}')]").click
+  find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -642,6 +657,7 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  find(".navbar-brand").click #to stop datepicker blocking shit
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
@@ -650,7 +666,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do
@@ -678,6 +694,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     all('.compare-selected-plans-link')[1].click
+    sleep 3
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')

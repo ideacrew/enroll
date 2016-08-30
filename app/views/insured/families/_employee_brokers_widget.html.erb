@@ -1,49 +1,28 @@
 <% if @employee_role.employer_profile.active_broker_agency_account.present? %>
-<aside class="panel panel-default">
-  <section class="row">
-    <article class="col-xs-12">
-      <div>
-        <%= link_to brokers_insured_families_path do %>
-
-        <div class="col-xs-4">
-          <figure>
-            <figcaption>
-              <h2 style="text-align: center;">
-                <%= image_tag('icons/icon-expert.png' ) %>
-              </h2>
-              <span style="display: block; text-align: center; margin-top: 10%;">
-                <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
-                <br/><br/>
-
-              </span>
-            </figcaption>
-          </span>
-        </figure>
-      </div>
-      <% end %>
-      <div class="col-xs-8">
-        <div class="row">
-          <h4>
-              Your Broker
-          </h4>
-        </strong>
-        <span>
-          <small>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %><br>
-          </small>
-          <small>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
-            <br/><br/>
-          </small>
-        </span>
-      </div>
+<div class="panel panel-default module employee-broker-widget">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <strong>
+        Your Broker or Assister
+      </strong>
+    </h3>
+  </div>
+  <div class="panel-body">
+    <div class="text-center">
+      <i class="fa fa-user fa-3x" aria-hidden="true"></i>
+      <br/>
+      <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+    </div>
+    <div class="text-left">
+        <div class="broker-information">
+          <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
+          <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %>
+          <br/>
+          <a href="tel:1-<%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>">1 <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %></a>
+          <br/>
+          <%= mail_to @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address, @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
+        </div>
     </div>
   </div>
-</article>
-
-</section>
-</aside>
-
+</div>
 <% end %>

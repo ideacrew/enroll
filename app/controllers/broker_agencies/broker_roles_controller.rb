@@ -4,7 +4,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def new_broker
     @broker_candidate = Forms::BrokerCandidate.new
-
+    @organization = Forms::BrokerAgencyProfile.new
     respond_to do |format|
       format.html { render 'new' }
       format.js
@@ -34,13 +34,33 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
     @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
 
+  def favorite
+    @broker_role = BrokerRole.find(params[:id])
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
+    if @broker_role.present? && @general_agency_profile.present?
+      favorite_general_agencies = @broker_role.search_favorite_general_agencies(@general_agency_profile.id)
+      if favorite_general_agencies.present?
+        favorite_general_agencies.destroy_all
+        @favorite_status = false
+      else
+        @broker_role.favorite_general_agencies.create(general_agency_profile_id: @general_agency_profile.id)
+        @favorite_status = true
+      end
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def create
     # failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
+    notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
     if params[:person].present?
       @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @filter = params[:person][:broker_applicant_type]
@@ -51,7 +71,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
       # if verify_recaptcha(model: @organization, message: failed_recaptcha_message) && @organization.save
       if @organization.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @agency_type = 'new'
@@ -69,7 +89,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def assign_filter_and_agency_type
     @filter = params[:filter] || 'broker'
-    @agency_type = params[:agency_type] || 'existing'
+    @agency_type = params[:agency_type] || 'new'
   end
 
   def primary_broker_role_params

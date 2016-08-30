@@ -32,9 +32,9 @@
         </div>
         <% if @enrollment.employee_role.present? %>
         <% else %>
-          <span class="btn btn-trans" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+          <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-trans interaction-click-control-print-purchase-confirmation" %>
+        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
       </div>
 
       <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
@@ -53,7 +53,7 @@
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. DC Health Link doesn’t collect your premium payments.
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= Settings.site.short_name %> doesn’t collect your premium payments.
                   <br/>
                 </li>
                 <br>
@@ -122,7 +122,7 @@
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   DC Health Link does not collect premiums.
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   <%= Settings.site.short_name %> does not collect premiums.
                   <br/>
                 </li>
                 <div class="carrier-numbers">

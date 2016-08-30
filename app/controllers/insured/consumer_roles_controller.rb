@@ -1,6 +1,7 @@
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
+  include ErrorBubble
 
   before_action :check_consumer_role, only: [:search]
   before_action :find_consumer_role, only: [:edit, :update]
@@ -11,8 +12,15 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
+    @val = params[:aqhp] || params[:uqhp]
+    @key = params.key(@val)
+    @search_path = {@key => @val}
+    if @person.try(:consumer_role?)
+      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
+      redirect_to bookmark_url || family_account_path 
+    end
   end
+
 
   def search
     @no_previous_button = true
@@ -23,7 +31,7 @@ class Insured::ConsumerRolesController < ApplicationController
       session.delete(:individual_assistance_path)
     end
 
-    if params.permit(:build_consumer_role)[:build_consumer_role].present?
+    if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
       person = Person.find(session[:person_id])
 
       @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
@@ -174,6 +182,7 @@ class Insured::ConsumerRolesController < ApplicationController
       else
         @consumer_role.build_nested_models_for_person
         @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+        bubble_address_errors_by_person(@consumer_role.person)
         respond_to do |format|
           format.html { render "edit" }
         end

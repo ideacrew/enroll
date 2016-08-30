@@ -26,7 +26,7 @@ And(/Individual asks how to make an email account$/) do
 end
 
 Then(/Individual creates HBX account$/) do
-  click_button 'Create account'
+  click_button 'Create account', :wait => 10
   fill_in "user[email]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -48,10 +48,11 @@ When(/user goes to register as an individual$/) do
   find(:xpath, '//label[@for="radio_male"]').click
 
   screenshot("register")
-  find('.interaction-click-control-continue').click
+  find('.btn', text: 'CONTINUE').click
 end
 
 When(/^\w+ clicks? on continue button$/) do
+  sleep(2)
   click_link "Continue"
 end
 
@@ -60,8 +61,8 @@ Then(/^user should see heading labeled personal information/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
-  expect(page).to have_button("CONTINUE")
-  click_button "CONTINUE"
+  expect(page).to have_button("CONTINUE", visible: false)
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/Individual should see a form to enter personal information$/) do
@@ -82,7 +83,7 @@ Then(/Individual should see a form to enter personal information$/) do
 end
 
 When(/Individual clicks on Save and Exit/) do
-  find(:xpath, '//*[@id="new_person_wrapper"]/div/div[2]/ul[2]/li[2]/a').trigger('click') #overlapping li element wat?
+  find('li a', text: 'SAVE & EXIT').trigger('click')
 end
 
 Then (/Individual resumes enrollment/) do
@@ -92,7 +93,7 @@ end
 
 Then (/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD')
-  click_button "CONTINUE"
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^\w+ agrees? to the privacy agreeement/) do
@@ -124,16 +125,15 @@ And(/Individual clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION *')]").click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[3]/div[4]/div/div/div[3]/div/ul/li[3]').click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
   screenshot("add_member")
-  click_button "Confirm Member"
+  all(:css, ".mz").last.click
 end
 
 And(/Individual again clicks on add member button/) do
@@ -144,8 +144,8 @@ And(/Individual again clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION *')]").click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[3]/div[4]/div/div/div[3]/div/ul/li[4]').click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -154,7 +154,7 @@ And(/Individual again clicks on add member button/) do
 
   #testing
   screenshot("added member")
-  click_button "Confirm Member"
+  all(:css, ".mz").last.click
 end
 
 
@@ -199,12 +199,12 @@ And(/I click on continue button to go to the individual home page/) do
 end
 
 And(/I should see the individual home page/) do
-  expect(page).to have_content "My DC Health Link"
+  expect(page).to have_content "My #{Settings.site.short_name}"
   screenshot("my_account")
   # something funky about these tabs in JS
   # click_link "Documents"
   # click_link "Manage Family"
-  # click_link "My DC Health Link"
+  # click_link "My #{Settings.site.short_name}"
 end
 
 Then(/^Individual edits a dependents address$/) do
@@ -232,7 +232,7 @@ Then(/^Individual ads address for dependent$/) do
   find('#address_info .selectric p.label').trigger 'click'
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
-  click_button 'Confirm Member'
+  all(:css, ".mz").last.click
   find('#btn-continue').click
 end
 
@@ -269,7 +269,7 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
-  find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  find('.container .row div div.btn', text: 'Help').click
   sleep 1
   click_link "Help from a Customer Service Representative"
   sleep 1
@@ -291,6 +291,7 @@ end
 
 When(/^a CSR exists/) do
   p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
+  sleep 2
   FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
 end
 
@@ -299,7 +300,7 @@ When(/^CSR accesses the HBX portal$/) do
   click_link 'HBX Portal'
 
   find('.interaction-click-control-sign-in-existing-account').click
-  fill_in "user[email]", :with => "sherry.buckner@dc.gov"
+  fill_in "user[login]", :with => "sherry.buckner@dc.gov"
   find('#user_email').set("sherry.buckner@dc.gov")
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
@@ -320,8 +321,8 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  expect(page).to have_content "I'm a Trained Expert"
-  click_link "I'm a Trained Expert"
+  expect(page).to have_content "I'm a Trained Expert", :wait => 10
+  find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").trigger('click')
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
@@ -372,7 +373,7 @@ end
 
 When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In Existing Account'
-  fill_in 'user[email]', with: (@u.find 'email' + person)
+  fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   click_button 'Sign in'
@@ -496,7 +497,7 @@ Then(/Aptc user should see aptc amount on receipt page/) do
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
-  @browser.h1(text: /My DC Health Link/).wait_until_present
+  @browser.h1(text: /My #{Settings.site.short_name}/).wait_until_present
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")

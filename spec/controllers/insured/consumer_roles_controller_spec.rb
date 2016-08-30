@@ -17,9 +17,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(person).to receive(:consumer_role?).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(consumer_role).to receive(:bookmark_url).and_return("test")
-      get :privacy
+      get :privacy, {:aqhp => 'true'}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(person.consumer_role.bookmark_url)
+      expect(response).to redirect_to(person.consumer_role.bookmark_url+"?aqhp=true")
     end
     it "should render privacy" do
       allow(person).to receive(:consumer_role?).and_return(false)
@@ -241,6 +241,15 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
       expect(person.errors.full_messages).to include "Document type cannot be blank"
+    end
+
+    it "should call bubble_address_errors_by_person" do
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(consumer_role).to receive(:update_by_person).and_return(false)
+      expect(controller).to receive(:bubble_address_errors_by_person)
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:edit)
     end
   end
 

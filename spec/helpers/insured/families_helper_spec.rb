@@ -45,15 +45,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:health_plan_2016){FactoryGirl.create(:plan_template,:shop_health, active_year: 2016, metal_level: "silver")}
 
     it "should return dental plan with dental_level = high for 2016 plan" do
-      expect(helper.render_plan_type_details(dental_plan_2016)).to eq "<label><span class=\"dental-icon\">High</span></label>"
+      expect(helper.render_plan_type_details(dental_plan_2016)).to eq "<span class=\"dental-icon\">High</span>"
     end
 
     it "should return dental plan with metal_level = dental for 2015 plan" do
-      expect(helper.render_plan_type_details(dental_plan_2015)).to eq "<label><span class=\"dental-icon\">Dental</span></label>"
+      expect(helper.render_plan_type_details(dental_plan_2015)).to eq "<span class=\"dental-icon\">Dental</span>"
     end
 
     it "should return health plan with metal_level = bronze" do
-      expect(helper.render_plan_type_details(health_plan_2016)).to eq "<label><span class=\"silver-icon\">Silver</span></label>"
+      expect(helper.render_plan_type_details(health_plan_2016)).to eq "<span class=\"silver-icon\">Silver</span>"
     end
   end
 
@@ -105,6 +105,40 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
     it "should return false" do
       expect(helper.has_writing_agent?(employee_role)).to eq false
+    end
+  end
+
+  describe "display_aasm_state?" do
+    let(:person) { FactoryGirl.build_stubbed(:person)}
+    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
+    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
+    let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
+
+    context "IVL market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      end
+      states.each do |status|
+        it "returns #{show_for_ivl.include?(status)} for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq show_for_ivl.include?(status)
+        end
+      end
+    end
+
+    context "SHOP market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      end
+      states.each do |status|
+        it "returns true for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq true
+        end
+      end
     end
   end
 end

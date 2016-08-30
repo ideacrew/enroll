@@ -55,18 +55,10 @@ module ConsumerRolesHelper
     show_naturalization_doc_type(obj) || show_immigration_doc_type(obj)
   end
 
+  # just work for ivl
   def show_keep_existing_plan(shop_for_plans, hbx_enrollment, new_effective_on)
-    shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
-  end
+    return true if hbx_enrollment.is_shop?
 
-  def show_consumer_role_state(consumer_role)
-    return "" if consumer_role.blank?
-    if consumer_role.verifications_pending?
-      "Pending"
-    elsif consumer_role.fully_verified?
-      "Verified"
-    else
-      "Outstanding verification"
-    end
+    shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
   end
 end
