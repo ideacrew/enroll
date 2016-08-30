@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "Redmine-6299-6593-6850-6879-7481-7696-6922-8336.csv"
+filename = "Redmine-8905_enrollments.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -107,7 +107,10 @@ CSV.foreach(filename, headers: :true) do |row|
 	
 	# begin
 	data_row = row.to_hash
-	
+	if HbxEnrollment.by_hbx_id(data_row["Enrollment Group ID"]).size > 0
+		puts "Enrollment with hbx_id #{data_row["Enrollment Group ID"]} already exists."
+		next
+	end
 	# subscriber = Person.where(hbx_id: data_row['HBX ID']).first
 	subscriber_params = {"name_pfx" => data_row["Name Prefix"],
 									 "first_name" => data_row["First Name"],
@@ -124,6 +127,10 @@ CSV.foreach(filename, headers: :true) do |row|
 	organization = Organization.where(fein: data_row["Employer FEIN"].gsub("-","")).first
 
 	census_employee = find_census_employee(subscriber_params,organization.employer_profile)
+	if census_employee == nil
+		puts "Cannot find #{subscriber_params["first_name"]} #{subscriber_params["last_name"]}"
+		next
+	end
 	census_dependents = []
 	6.times do |i|
 		if data_row["HBX ID (Dep #{i+1})"].present?
@@ -224,18 +231,18 @@ CSV.foreach(filename, headers: :true) do |row|
             		puts e.inspect
             	end
               family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
-              family_member.save
-              family_member.person.gender = data_row["Gender (Dep #{i+1})"] 
-              family_member.person.save              
-              ch_member = ch.add_coverage_household_member(family_member)
-              ch_member.save
-              ch.save
-              family.save
+              unless family_member == nil
+              	family_member.save
+              	family_member.person.gender = data_row["Gender (Dep #{i+1})"]
+              	family_member.person.hbx_id =  data_row["HBX ID (Dep #{i+1})"]
+              	family_member.person.save              
+              	ch_member = ch.add_coverage_household_member(family_member)
+              	ch_member.save
+              	ch.save
+              	family.save
+              end
+
             end
-            dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
-				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
-			dependent.hbx_id = data_row["HBX ID (Dep #{i+1})"]
-			dependent.save
 		end
 	end
 
