@@ -13,6 +13,18 @@ def elected_plans_choice(benefit_group)
 	end
 end
 
+def find_date_term_added(workflow_state_transitions)
+	if workflow_state_transitions.blank?
+		return nil
+	else
+		if workflow_state_transitions.size == 1
+			return workflow_state_transitions.first.transition_at
+		elsif workflow_state_transitions.size > 1
+			return workflow_state_transitions.sort_by{|wst| wst.transition_at}.last.transition_at
+		end
+	end
+end
+
 CSV.open("employer_audit_data_tab1.csv", "w") do |csv|
 	csv << ["Legal Name", "DBA", "FEIN", "AASM State", "Coverage Year Start", "Coverage Year End",
 			"Plan Offerings", "Reference Plan Name", "Reference Plan HIOS", "Reference Plan Metal Level",
@@ -88,7 +100,7 @@ count = 0
 CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 	csv << ["Employer Name", "Employer FEIN", "Employee Name", "HBX ID",
 			"Hire Date", "Date Added to Roster", "Employment State",
-			"Coverage Status"]
+			"Coverage Status","Employment Termination Date","Coverage Termination Date", "Date Termination Added"]
 	all_employers.each do |employer|
 			employer_name = employer.legal_name
 			fein = employer.fein
@@ -104,11 +116,19 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 				hire_date = census_employee.hired_on
 				roster_added = census_employee.created_at
 				employment_state = census_employee.aasm_state
-				if coverage_state.present?
-					coverage_state = coverage_state.humanize
+				if employment_state == "eligible" || employment_state == "employee_role_linked"
+					employment_state = employment_state
+				else
+					employment_state = employment_state
+					employment_termination_date = census_employee.employment_terminated_on
+					coverage_termination_date = census_employee.coverage_terminated_on
+					correct_state_transitions = census_employee.workflow_state_transitions.where(to_state: "employment_terminated")
+					date_added = find_date_term_added(correct_state_transitions)
 				end
 				state_of_enrollment = enrollment_state(census_employee)
-				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, employment_state, state_of_enrollment]
+				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, 
+						employment_state, state_of_enrollment,
+						employment_termination_date,coverage_termination_date, date_added]
 				rescue Exception=>e
 					puts "#{count} - #{census_employee.first_name} #{census_employee.last_name}"
 					puts e.backtrace
