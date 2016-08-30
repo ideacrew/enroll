@@ -87,7 +87,7 @@ count = 0
 
 CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 	csv << ["Employer Name", "Employer FEIN", "Employee Name", "HBX ID",
-			"Hire Date", "Date Added to Roster", "Coverage State",
+			"Hire Date", "Date Added to Roster", "Employment State",
 			"Coverage Status"]
 	all_employers.each do |employer|
 			employer_name = employer.legal_name
@@ -103,12 +103,12 @@ CSV.open("employer_audit_data_tab2.csv","w") do |csv|
 				end
 				hire_date = census_employee.hired_on
 				roster_added = census_employee.created_at
-				coverage_state = census_employee.active_benefit_group_assignment.try(:aasm_state)
+				employment_state = census_employee.aasm_state
 				if coverage_state.present?
 					coverage_state = coverage_state.humanize
 				end
 				state_of_enrollment = enrollment_state(census_employee)
-				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, coverage_state, state_of_enrollment]
+				csv << [employer_name, fein, name, hbx_id, hire_date, roster_added, employment_state, state_of_enrollment]
 				rescue Exception=>e
 					puts "#{count} - #{census_employee.first_name} #{census_employee.last_name}"
 					puts e.backtrace
