@@ -1,7 +1,9 @@
 var Registration = (function (window){
+  
   function toggleEmail(element){
+    $(element).val($.trim($(element).val()));
     var username= $(element).val();
-     var email_regexp = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+    var email_regexp = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
     
     if(email_regexp.test(username)) {
       $('.email_field').addClass("hidden_field"); 
@@ -13,7 +15,12 @@ var Registration = (function (window){
       $('.email_field').removeClass("hidden_field");  
     }  
   }
+
+  function trimEmail(element){
+    $(element).val($.trim($(element).val()));
+  }
   return {
-    toggleEmail : toggleEmail
+    toggleEmail : toggleEmail,
+    trimEmail: trimEmail
   }
 })(window);

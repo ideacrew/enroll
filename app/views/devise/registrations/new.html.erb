@@ -35,7 +35,7 @@
         <%= f.label :email %>
         <em> (Optional)</em>
         <br/>
-        <%= f.text_field :email, class: "form-control" %>
+        <%= f.text_field :email, class: "form-control" ,:oninput => "Registration.trimEmail(this);" %>
       </div>
       <%= f.hidden_field :invitation_id %>
       <br/>

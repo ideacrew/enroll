@@ -16,6 +16,11 @@ before_filter :configure_sign_up_params, only: [:create]
       render :new and return
     end
 
+    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present? 
+      flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+      render :new and return
+    end
+
     headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
 
     if headless.present? && !headless.person.present?
