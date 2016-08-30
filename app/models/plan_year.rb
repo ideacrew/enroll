@@ -74,6 +74,7 @@ class PlanYear
     )
   }
 
+
   def hbx_enrollments_by_month(date)
     id_list = benefit_groups.collect(&:_id).uniq
     families = Family.where({
@@ -210,7 +211,26 @@ class PlanYear
 
   # does the plan year violate model integrity relative to publishing
   def is_application_unpublishable?
-    application_errors.blank? ? false : true
+    enrollment_period_errors.present? || application_errors.present?
+  end
+
+  def enrollment_period_errors
+    errors = []
+    minimum_length = RENEWING.include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
+      : Settings.aca.shop_market.open_enrollment.minimum_length.days 
+
+    if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
+      errors.push "open enrollment period is less than minumum: #{minimum_length} days"
+    end
+
+    enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
+      : Settings.aca.shop_market.open_enrollment.monthly_end_on
+
+    if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
+      errors.push "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"
+    end
+
+    errors
   end
 
   # is the plan year compliant with all regulations
@@ -847,69 +867,48 @@ private
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
 
-    if start_on.day != 1
+    if start_on != start_on.beginning_of_month
       errors.add(:start_on, "must be first day of the month")
     end
 
-    if end_on != Date.civil(end_on.year, end_on.month, -1)
+    if end_on != end_on.end_of_month
       errors.add(:end_on, "must be last day of the month")
-    end
-
-    # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
-    shop_plan_year_maximum_in_days = 365
-    if (end_on - start_on).to_i > shop_plan_year_maximum_in_days
-      errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")
     end
 
     if open_enrollment_end_on > start_on
       errors.add(:start_on, "can't occur before open enrollment end date")
     end
 
-    # if TimeKeeper.date_of_record > ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-    #  errors.add(:start_on, "must choose a start on date #{effect_date + 1.month} or later")
-    # end
-
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
     
-
     if open_enrollment_start_on < (start_on - 2.months)
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
-    end    
-
-    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
-     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")
     end
 
     if (open_enrollment_end_on - open_enrollment_start_on) > Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
-    end
-
-    if start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day < end_on
-      errors.add(:end_on, "plan year period is less than minumum: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
-    end
-
-    if start_on + Settings.aca.shop_market.benefit_period.length_maximum.year.years - 1.day > end_on
-      errors.add(:end_on, "plan year period is greater than maximum: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_maximum.year.years - 1.day)} days")
+      errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
     end
 
     if (start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
-     errors.add(:start_on, "may not start application before " \
+      errors.add(:start_on, "may not start application before " \
         "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
-    return if active?
-
-    if is_renewing?
-      if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
-       errors.add(:open_enrollment_end_on, "renewal open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
-      end
-    else
-      if open_enrollment_end_on - (start_on - 1.month) >= Settings.aca.shop_market.open_enrollment.monthly_end_on
-       errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
+    if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+      if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
+        errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
     end
 
+    if ['draft', 'renewing_draft'].include?(aasm_state)
+      enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
+        : Settings.aca.shop_market.open_enrollment.monthly_end_on
+
+      if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
+        errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
+      end
+    end
   end
 end
