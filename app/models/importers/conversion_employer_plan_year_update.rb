@@ -73,7 +73,6 @@ module Importers
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year)
       reference_plan = select_reference_plan(available_plans)
 
-
       if reference_plan.blank?
         errors.add(:base, 'Unable to find a Reference plan with given Hios ID')
       end
@@ -88,7 +87,8 @@ module Importers
 
       plan_year = employer.plan_years.where(:start_on => current_coverage_start).first
       if plan_year.blank?
-        error.add(:base, 'Plan year not imported')
+        errors.add(:base, 'Plan year not imported')
+        return false
       end
 
       if plan_year && plan_year.benefit_groups.size > 1
@@ -96,7 +96,7 @@ module Importers
         return false
       end
 
-      renewing_plan_year = employer.plan_years.where(:start_on => (current_coverage_start)).first
+      renewing_plan_year = employer.plan_years.where(:start_on => (current_coverage_start + 1.year)).first
       if renewing_plan_year.blank?
         warnings.add(:base, 'Renewing plan year not present')
       end
