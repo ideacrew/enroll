@@ -1,6 +1,6 @@
 namespace :check do
   namespace :census_employee do
-    desc "check hired_on should later than dob for census employees"
+    desc "check hired_on should not before dob for census employees"
     task :hired_on => [:environment] do
       count = 0
       CensusEmployee.all.each do |ce|
@@ -9,7 +9,7 @@ namespace :check do
           puts "ssn: #{ce.ssn} (dob: #{ce.dob}; hired_on: #{ce.hired_on})"
         end
       end
-      puts "There are #{count} invalid census employees which dob later than hired_on."
+      puts "There are #{count} invalid census employees which dob before the hired_on."
     end
   end
 end
