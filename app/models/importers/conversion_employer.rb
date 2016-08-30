@@ -63,7 +63,7 @@ module Importers
       unless find_ga
         warnings.add(:tpa_fein, "is not an existing General Agency")
         if find_broker
-          found_ga = find_broker.default_general_agency_profile
+          found_ga = find_broker.broker_agency_profile.default_general_agency_profile
           unless found_ga
             warnings.add(:tpa_fein, "can not be assigned from broker default - broker doesn't have one")
           end
@@ -232,7 +232,7 @@ module Importers
       return [] unless broker
       general_agency = find_ga
       unless general_agency
-        general_agency = broker.default_general_agency_profile
+        general_agency = broker.broker_agency_profile.default_general_agency_profile
       end
       return [] unless general_agency
       general_agency_accounts = []
