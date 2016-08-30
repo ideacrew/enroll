@@ -1,16 +1,23 @@
 <table class="total_table address" border="0">
   <tbody>
     <tr class="fssize mar20">
-      <td><%= "Lydia Austin" %></td>
+      <td><%= notice.primary_fullname %></td>
     </tr>
+    <% if notice.shop? %>
     <tr class="fssize1">
-       <td><%= "609 H St, NE" %></td>
+      <td><%= notice.employer_name %></td>
     </tr>
+    <% end %>
     <tr class="fssize1">
-      <td><%= "Suite 200" %></td>
+       <td><%= notice.primary_address.street_1 %></td>
     </tr>
+    <% if notice.primary_address.street_2.present? %>
+    <tr class="fssize1">
+      <td><%= notice.primary_address.street_2 %></td>
+    </tr>
+    <% end %>
     <tr class="fssize">
-    <td><%= "Washington" %> <%= "DC" %> <%= "20877" %></td>
+    <td><%= notice.primary_address.city %> <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
     </tr>
   </tbody>
 </table>

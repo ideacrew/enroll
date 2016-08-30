@@ -64,7 +64,7 @@ class Notice
       encoding: 'utf8'
     }
 
-    if market_kind == 'shop'
+    if market_kind == 'individual'
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
           template: "notices/shared/footer.html.erb", 

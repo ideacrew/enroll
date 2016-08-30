@@ -30,9 +30,9 @@ class ShopNotices::EmployerNotice < ShopNotice
 
   def build
     notice.trigger_type = self.trigger_type
-    notice.primary_fullname = "Lydia Austin"
-    notice.employer_name = ""
-    notice.primary_identifier = ""
+    notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
+    notice.employer_name = recipient.organization.legal_name.titleize
+    notice.primary_identifier = employer_profile.hbx_id
     append_address(employer_profile.organization.primary_office_location.address)
     # @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
     # @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
@@ -51,11 +51,11 @@ class ShopNotices::EmployerNotice < ShopNotice
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: "609 H St, NE",
-      street_2: "Suite 200",
-      city: "Washington",
-      state: "DC",
-      zip: "20092"
+      street_1: primary_address.address_1.titleize,
+      street_2: primary_address.address_2.titleize,
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
       })
   end
 
