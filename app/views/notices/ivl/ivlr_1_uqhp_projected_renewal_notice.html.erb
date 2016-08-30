@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Your 2017 Health Insurance Coverage and Preliminary Renewal Information</h3></td>
+      <td><h3>Subject: Your 2017 Health Insurance Coverage and Preliminary Renewal Information</h3></td>
     </tr>
   </tbody>
 </table>
@@ -19,7 +19,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "DC Health Link has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by #{TimeKeeper.date_of_record + 35.days} if anything will be different next year."} %>
+content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y")} if anything will be different next year."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
@@ -46,8 +46,8 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
 
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{TimeKeeper.date_of_record + 35.days}.</strong> You can report any changes online in your account on <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> or by calling DC Health Link Customer Service at #{Settings.contact_center.phone_number} and telling the customer service representative that you want to make changes to the information used for your 2017 renewal."} %>
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y")}.</strong> You can report any changes online in your account on <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> or by calling #{Settings.site.short_name} Customer Service at (855) 532-5465 and telling the customer service representative that you want to make changes to the information used for your 2017 renewal."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at #{Settings.contact_center.phone_number}."],
+ contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465."],
    heading: 'Your Secure User Account', sub_heading: ''} %>

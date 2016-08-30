@@ -1,7 +1,7 @@
 class Envelope < PdfReport
 
   def initialize(template_name = nil)
-    template_name ||= 'ivl_envelope.pdf'
+    template_name ||= 'envelope.pdf'
     template = Rails.root.join('lib/pdf_templates', template_name)
 
     super({:template => template, :margin => [30, 55]})

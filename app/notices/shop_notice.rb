@@ -7,10 +7,35 @@ class ShopNotice < Notice
   end
 
   def deliver
+    build
     generate_pdf_notice
+    attach_blank_page
+    prepend_envelope
+    attach_voter_application
     upload_and_send_secure_message
     send_generic_notice_alert
   end
+
+  def prepend_envelope
+    envelope = Envelope.new
+    envelope.fill_envelope(notice, mpi_indicator)
+    envelope.render_file(envelope_path)
+    join_pdfs [envelope_path, notice_path]
+  end
+
+  def attach_voter_application
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
+  end
+
+  def attach_blank_page
+    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+
+    page_count = Prawn::Document.new(:template => notice_path).page_count
+    if (page_count % 2) == 1
+      join_pdfs [notice_path, blank_page]
+    end
+  end
+
 
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
@@ -53,11 +78,11 @@ class ShopNotice < Notice
 
   def append_primary_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
+      street_1: "609 H St, NE",
+      street_2: "Suite 200",
+      city: "Washington",
+      state: "DC",
+      zip: "20020"
       })
   end
 
