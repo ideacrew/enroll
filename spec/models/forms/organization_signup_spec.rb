@@ -48,8 +48,8 @@ describe Forms::OrganizationSignup, "office location kind validtion", :dbclean =
 end
 
 describe Forms::OrganizationSignup, "fein validation" do
-  let(:organization) { FactoryGirl.create(:organization, broker_agency_profile:
-                                                            FactoryGirl.create(:broker_agency_profile)) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:organization) { FactoryGirl.create(:organization, broker_agency_profile: broker_agency_profile) }
   let(:organization_not_broker) { FactoryGirl.create(:organization) }
   let(:office_location_1) { OfficeLocation.new(organization: organization,
                                                                           :address => FactoryGirl.build(:address, :kind => "primary"), phone: FactoryGirl.build(:phone)) }
