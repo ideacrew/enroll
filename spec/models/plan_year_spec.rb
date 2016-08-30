@@ -1862,9 +1862,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       blue_collar_employees.each do |ce|
+        ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: blue_collar_benefit_group)
       end
       white_collar_employees.each do |ce|
+        ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: white_collar_benefit_group)
       end
     end

@@ -125,6 +125,8 @@ Rails.application.routes.draw do
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
+        get 'check_move_reason'
+        get 'check_insurance_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -242,7 +244,6 @@ Rails.application.routes.draw do
         get :terminate
         get :rehire
         get :benefit_group, on: :member
-        patch :assignment_benefit_group, on: :member
       end
     end
   end
