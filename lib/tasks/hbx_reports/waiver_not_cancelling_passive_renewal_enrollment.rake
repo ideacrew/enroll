@@ -47,23 +47,25 @@ namespace :reports do
               renewing_enrollment_auto_renewing = renewing_enrollments.select{ |hbx|
                 (HbxEnrollment::RENEWAL_STATUSES).include?(hbx.aasm_state) && hbx.coverage_kind==ct }
 
-            # If there are renewing enrollments with both [ Waived(inactive) and Renewing ] statuses for an employee, we want to report them
-            if renewing_enrollment_auto_renewing.present? && renewing_enrollment_waived.present?
+              # If there are renewing enrollments with both [ Waived(inactive) and Renewing ] statuses for an employee, we want to report them
+              if renewing_enrollment_auto_renewing.present? && renewing_enrollment_waived.present?
 
 
-              csv << [
-                ce.employer_profile.organization.legal_name,
-                ce.employer_profile.fein,
-                ce.first_name,
-                ce.last_name,
-                ce.employee_role.person.hbx_id,
-                ce.ssn,
-                ce.dob,
-                renewing_enrollment_auto_renewing.first.hbx_id,
-                renewing_enrollment_auto_renewing.first.created_at,
-                renewing_enrollment_waived.first.submitted_at
-              ]
-              count += 1
+                csv << [
+                    ce.employer_profile.organization.legal_name,
+                    ce.employer_profile.fein,
+                    ce.first_name,
+                    ce.last_name,
+                    ce.employee_role.person.hbx_id,
+                    ce.ssn,
+                    ce.dob,
+                    renewing_enrollment_auto_renewing.first.coverage_kind,
+                    renewing_enrollment_auto_renewing.first.hbx_id,
+                    renewing_enrollment_auto_renewing.first.created_at,
+                    renewing_enrollment_waived.first.submitted_at
+                ]
+                count += 1
+              end
             end
           end
         end
