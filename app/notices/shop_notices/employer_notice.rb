@@ -14,6 +14,7 @@ class ShopNotices::EmployerNotice < ShopNotice
     args[:to] = person.work_email.try(:address) || person.home_email.try(:address)
     args[:name] = "testing"
     args[:recipient_document_store]= employer_profile
+    self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
     
     # @email_notice = args[:email_notice] || true

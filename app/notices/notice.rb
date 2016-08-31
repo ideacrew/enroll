@@ -1,6 +1,6 @@
 class Notice
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
 
   Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:recipient_document_store]
 
@@ -61,9 +61,14 @@ class Notice
       dpi: 96,
       page_size: 'Letter',
       formats: :html,
-      encoding: 'utf8'
+      encoding: 'utf8',
+      header: {
+        content: ApplicationController.new.render_to_string({
+          template: header,
+          layout: false,
+          }),
+        }
     }
-
     if market_kind == 'individual'
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
