@@ -8,25 +8,32 @@ module Importers
     def save
       return false unless valid?
 
-      organization = Organization.where(:fein => fein).first
-      if organization.present?
-        errors.add(:fein, "employer already exists with given fein")
-      end
+      new_organization = Organization.where(:fein => fein).first
 
       puts "Processing Add ---#{legal_name}"
-      new_organization = Organization.new({
-        :fein => fein,
-        :legal_name => legal_name,
-        :dba => dba,
-        :office_locations => map_office_locations,
-        :employer_profile => EmployerProfile.new({
+      if new_organization
+        new_organization.create_employer_profile({
           :broker_agency_accounts => assign_brokers,
           :general_agency_accounts => assign_general_agencies,
           :entity_kind => "c_corporation",
           :profile_source => "conversion",
           :registered_on => registered_on
         })
-      })
+      else
+        new_organization = Organization.new({
+          :fein => fein,
+          :legal_name => legal_name,
+          :dba => dba,
+          :office_locations => map_office_locations,
+          :employer_profile => EmployerProfile.new({
+            :broker_agency_accounts => assign_brokers,
+            :general_agency_accounts => assign_general_agencies,
+            :entity_kind => "c_corporation",
+            :profile_source => "conversion",
+            :registered_on => registered_on
+          })
+        })
+      end
       save_result = new_organization.save
       if save_result
         emp = new_organization.employer_profile
