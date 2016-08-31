@@ -257,7 +257,11 @@ CSV.foreach(filename, headers: :true) do |row|
               	family_member.save
               	family_member.person.gender = data_row["Gender (Dep #{i+1})"]
               	family_member.person.hbx_id =  data_row["HBX ID (Dep #{i+1})"]
-              	family_member.person.save              
+              	begin
+              		family_member.person.save
+              	rescue Exception=>e
+              		puts " #{e.inspect}"
+              	end              
               	ch_member = ch.add_coverage_household_member(family_member)
               	ch_member.save
               	ch.save
