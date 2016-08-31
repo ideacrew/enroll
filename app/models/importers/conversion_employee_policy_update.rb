@@ -155,6 +155,7 @@ module Importers
 
     def update_coverage_dependents(family, enrollment, employer, plan)
       census_dependents = map_dependents
+
       dependents = census_dependents.inject([]) do |dependents, dependent|
         dependents << Factories::EnrollmentFactory.initialize_dependent(enrollment.family, enrollment.subscriber.person, dependent)
       end.compact
@@ -210,18 +211,19 @@ module Importers
         return true
       end
 
-      manual_selection = enrollments.detect{|e| e.workflow_state_transitions.where(:to_state => 'auto_renewing').none?}
-      if manual_selection.present?
+      renewal_enrollments = enrollments.select{|e| e.auto_renewing? || e.workflow_state_transitions.where(:to_state => 'auto_renewing').present?}
+      
+      if (enrollments - renewal_enrollments).present?
         warnings.add(:base, "employee already made plan selection")
         return true
       end
 
-      if enrollments.size > 1
+      if renewal_enrollments.size > 1
         errors.add(:base, "more than 1 passive renewal found for given benefit groups")
         return false
       end
 
-      enrollments.first
+      renewal_enrollments.first
     end
 
     def update_enrollment_members(family, enrollment, dependents, passive=false)
@@ -244,8 +246,8 @@ module Importers
         enrollment_member = updated_enrollment_members.detect{|enrollment_member| enrollment_member.applicant_id == family_member.id}
         if enrollment_member.blank?
           coverage_member = ch.coverage_household_members.detect{|cm| cm.family_member == family_member }
-          if coverage_member.present?        
-            updated_enrollment_members << HbxEnrollmentMember.new({
+          if coverage_member.present?
+            updated_enrollment_members << enrollment.hbx_enrollment_members.build({
               applicant_id: family_member.id,
               eligibility_date: enrollment.effective_on,
               coverage_start_on: enrollment.effective_on
@@ -333,6 +335,7 @@ module Importers
     end
 
     def save
+
       begin
         return false unless valid?
         employer = find_employer
