@@ -162,45 +162,15 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
-      context "and the open enrollment period is too short" do
-        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.minimum_length.days - 2 }
-        let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
-        let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
-
+      context "when open enrollment end date is greater than allowed date" do
         before do
-          plan_year.open_enrollment_start_on = open_enrollment_start_on
-          plan_year.open_enrollment_end_on = open_enrollment_end_on
+          plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 2.days
         end
 
         it "should fail validation" do
           expect(plan_year.valid?).to be_falsey
           expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
-        end
-      end
-
-      context "when open enrollment period is over the end of year" do
-        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.minimum_length.days - 2 }
-        let(:valid_length) { Settings.aca.shop_market.open_enrollment.minimum_length.days + 2 }
-        let(:open_enrollment_start_on)  { Date.new(2015,12,30) }
-        let(:open_enrollment_end_on_invalid)    { open_enrollment_start_on + invalid_length }
-        let(:open_enrollment_end_on_valid)    { open_enrollment_start_on + valid_length }
-
-        before do
-          plan_year.open_enrollment_start_on = open_enrollment_start_on
-        end
-
-        it "should fail validation" do
-          plan_year.open_enrollment_end_on = open_enrollment_end_on_invalid
-          expect(plan_year.valid?).to be_falsey
-          expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
-        end
-
-        it "should success" do
-          plan_year.open_enrollment_end_on = open_enrollment_end_on_valid
-        end
-
-        it "should has no error messages" do
-          expect(plan_year.errors[:open_enrollment_end_on]).to eq []
+          expect(plan_year.errors[:open_enrollment_end_on]).to include("open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
         end
       end
 
@@ -368,6 +338,68 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
+
+  context ".publish" do
+
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
+    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
+    let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
+    let(:plan_year) { 
+      py = FactoryGirl.create(:plan_year,
+        start_on: plan_year_start_on,
+        end_on: plan_year_start_on + 1.year - 1.day,
+        open_enrollment_start_on: open_enrollment_start_on,
+        open_enrollment_end_on: open_enrollment_end_on,
+        employer_profile: employer_profile,
+        aasm_state: 'renewing_draft'
+        )
+
+      blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+      py.benefit_groups = [blue]
+      py.save(:validate => false)
+      py
+    }
+
+
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 1))
+    end
+
+    context "when open enrollment dates valid" do 
+      it 'should publish' do
+        plan_year.publish!
+        expect(plan_year.renewing_draft?).to be_falsey
+      end
+    end
+
+    context "when open enrollment period too short" do
+      before do 
+        plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 1.day
+        plan_year.save(:validate => false)
+      end
+
+      it 'should error out' do 
+        plan_year.publish!
+        expect(plan_year.renewing_draft?).to be_truthy
+        expect(plan_year.enrollment_period_errors).to include("open enrollment period is less than minumum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
+      end
+    end
+
+    context "when open enrollment period end date not satisfy business rule" do 
+      before do
+        plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 1.day
+        plan_year.save(:validate => false) 
+      end
+
+      it 'should error out' do 
+        plan_year.publish!
+        expect(plan_year.renewing_draft?).to be_truthy
+        expect(plan_year.enrollment_period_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
+      end
+    end
+  end
 
   context "an employer with renewal plan year application" do
 
