@@ -50,6 +50,9 @@ Rails.application.configure do
 
   HbxIdGenerator.slug!
 
-  Mongoid.logger.level = Logger::ERROR
-  Mongo::Logger.logger.level = Logger::ERROR
+  config.mongoid.logger = Logger.new($stdout)
+
+#  Mongoid.logger.level = Logger::INFO
+#  Mongo::Logger.logger.level = Logger::INFO
+
 end
