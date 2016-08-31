@@ -90,8 +90,13 @@ module Importers
 
     def validate_new_fein
       return true if fein.blank?
-      if Organization.where(:fein => fein).any?
-        errors.add(:fein, "is already taken")
+      found_org = Organization.where(:fein => fein).first
+      if found_org
+        if found_org.employer_profile
+          errors.add(:fein, "is already taken")
+        else
+          warnings.add(:fein, "already exists for organization, but does not have an employer profile")
+        end
       end
     end
 
