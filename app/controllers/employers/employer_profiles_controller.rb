@@ -429,9 +429,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def wrap_in_benefit_group_cache
-    Caches::RequestScopedCache.allocate(:employer_calculation_cache)
-    yield
-    Caches::RequestScopedCache.release(:employer_calculation_cache)
+#    prof_result = RubyProf.profile do
+      Caches::RequestScopedCache.allocate(:employer_calculation_cache_for_benefit_groups)
+      yield
+      Caches::RequestScopedCache.release(:employer_calculation_cache_for_benefit_groups)
+#    end
+#    printer = RubyProf::MultiPrinter.new(prof_result)
+#    printer.print(:path => File.join(Rails.root, "rprof"), :profile => "profile")
   end
 
   def employer_params
