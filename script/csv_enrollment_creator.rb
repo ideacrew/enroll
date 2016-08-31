@@ -103,18 +103,22 @@ end
 # EnrollmentFactory#initialize_dependent
 # dependent_person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
 
-error_rows = []
+complete_rows = []
+
 
 CSV.foreach(filename, headers: :true) do |row|
 	
 	# begin
 	data_row = row.to_hash
-	if HbxEnrollment.by_hbx_id(data_row["Enrollment Group ID"]).size > 0
-		row["Error Message"] = "Enrollment with hbx_id #{data_row["Enrollment Group ID"]} already exists."
-		error_rows.push(row)
+	existing_enrollments = HbxEnrollment.by_hbx_id(data_row["Enrollment Group ID"])
+	if existing_enrollments.size > 0
+		subscriber_ids = existing_enrollments.map(&:subscriber).map(&:person).map(&:hbx_id).join(",")
+		row["Error Message"] = "Enrollment with hbx_id #{data_row["Enrollment Group ID"]} already exists on"
+		row["E-HBX_ID"] = "Enroll HBX ID(s): #{subscriber_ids},"
+		row["G-HBX_ID"] = "Glue HBX ID: #{data_row['HBX ID']}"
+		complete_rows.push(row)
 		next
 	end
-	next if data_row["Benefit Package/Benefit Group"] == "LeverGroup Standard"
 	# subscriber = Person.where(hbx_id: data_row['HBX ID']).first
 	subscriber_params = {"name_pfx" => data_row["Name Prefix"],
 									 "first_name" => data_row["First Name"],
@@ -132,8 +136,8 @@ CSV.foreach(filename, headers: :true) do |row|
 
 	census_employee = find_census_employee(subscriber_params,organization.employer_profile)
 	if census_employee == nil
-		row["Error Message"] = "Cannot find #{subscriber_params["first_name"]} #{subscriber_params["last_name"]}"
-		error_rows.push(row)
+		row["Error Message"] = "Cannot find Census Employee #{subscriber_params["first_name"]} #{subscriber_params["last_name"]}"
+		complete_rows.push(row)
 		next
 	end
 	census_dependents = []
@@ -158,11 +162,23 @@ CSV.foreach(filename, headers: :true) do |row|
 	end
 
 	benefit_begin_date = format_date(data_row["Benefit Begin Date"])
+
 	plan_year = organization.employer_profile.plan_years.published_plan_years_by_date(benefit_begin_date).first
 	plan_year = organization.employer_profile.plan_years.detect{|py| (py.start_on..py.end_on).cover?(benefit_begin_date)} if plan_year.blank?
 
-	correct_benefit_group = plan_year.benefit_groups.detect{|bg| data_row["Benefit Package/Benefit Group"].strip.downcase == bg.title.downcase.strip }
-	benefit_group_assignment = select_benefit_group_assignment(data_row["Benefit Package/Benefit Group"], census_employee)
+	if plan_year.blank?
+		row["Error Message"] = "No plan year Found to cover this enrollment"
+		next
+	end
+
+	begin
+		correct_benefit_group = plan_year.benefit_groups.detect{|bg| data_row["Benefit Package/Benefit Group"].strip.downcase == bg.title.strip.downcase }
+		benefit_group_assignment = select_benefit_group_assignment(data_row["Benefit Package/Benefit Group"], census_employee)
+	rescue Exception=>e
+		row["Error Message"] = e.inspect
+		complete_rows.push(row)
+		next
+	end
 
 	if benefit_group_assignment.blank?
 		benefit_group_assignment = census_employee.benefit_group_assignments.new(benefit_group: correct_benefit_group, start_on: benefit_begin_date)
@@ -233,8 +249,8 @@ CSV.foreach(filename, headers: :true) do |row|
             																			  last_name: dependent.last_name,
             																			  dob: dependent.dob).first.employee_relationship
             	rescue Exception=>e
-            		row["Error Message"] = e.inspect
-            		error_rows.push(row)
+            		row["Error Message"] = "Cannot find census dependent #{data_row["First Name (Dep #{i+1})"]} #{data_row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
+            		complete_rows.push(row)
             	end
               family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
               unless family_member == nil
@@ -258,7 +274,7 @@ CSV.foreach(filename, headers: :true) do |row|
 	if plan.blank?
 		raise "	Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
 		row["Error Message"] = "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
-		error_rows.push(row)
+		complete_rows.push(row)
 	end
 
 	en = hh.new_hbx_enrollment_from({
@@ -282,6 +298,10 @@ CSV.foreach(filename, headers: :true) do |row|
 	en.save!
 
 	true
+
+	row["Error Message"] = "#{en.hbx_id} loaded successfully."
+	complete_rows.push(row)
+
 	# rescue Exception=>e
 	# 	puts e.inspect
 	# 	binding.pry
@@ -311,7 +331,7 @@ CSV.open("#{filename.gsub(".csv","")}_errors.csv","w") do |csv|
 			"SSN (Dep 5)","DOB (Dep 5)","Gender (Dep 5)","Relationship (Dep 5)",
 			"HBX ID (Dep 6)","First Name (Dep 6)","Middle Name (Dep 6)","Last Name (Dep 6)",
 			"SSN (Dep 6)","DOB (Dep 6)","Gender (Dep 6)","Relationship (Dep 6)"]
-	error_rows.each do |row|
+	complete_rows.each do |row|
 		csv << row
 	end
 end
