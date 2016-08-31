@@ -261,6 +261,8 @@ CSV.foreach(filename, headers: :true) do |row|
               	rescue Exception=>e
               		row["Error Message"] = "#{e.inspect}"
               		complete_rows.push(row)
+              	end
+              	
               	begin
               		family_member.person.save           
 	              	ch_member = ch.add_coverage_household_member(family_member)
