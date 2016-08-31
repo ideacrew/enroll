@@ -13,10 +13,9 @@ module Insured
     end
 
     def health_relationship_benefits(employee_role)
-      if employee_role.census_employee.renewal_published_benefit_group.present?
-        employee_role.census_employee.renewal_published_benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
-      elsif employee_role.census_employee.active_benefit_group.present?
-        employee_role.census_employee.active_benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
+      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+      if benefit_group.present?
+        benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
 
