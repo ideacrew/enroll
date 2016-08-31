@@ -254,18 +254,23 @@ CSV.foreach(filename, headers: :true) do |row|
             	end
               family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
               unless family_member == nil
+              	begin
               	family_member.save
               	family_member.person.gender = data_row["Gender (Dep #{i+1})"]
               	family_member.person.hbx_id =  data_row["HBX ID (Dep #{i+1})"]
-              	begin
-              		family_member.person.save
               	rescue Exception=>e
-              		puts " #{e.inspect}"
-              	end              
-              	ch_member = ch.add_coverage_household_member(family_member)
-              	ch_member.save
-              	ch.save
-              	family.save
+              		row["Error Message"] = "#{e.inspect}"
+              		complete_rows.push(row)
+              	begin
+              		family_member.person.save           
+	              	ch_member = ch.add_coverage_household_member(family_member)
+	              	ch_member.save
+	              	ch.save
+	              	family.save
+              	rescue Exception=>e
+              		row["Error Message"] = "#{e.inspect}"
+              		complete_rows.push(row)
+              	end   
               end
 
             end
