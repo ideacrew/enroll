@@ -39,12 +39,13 @@ namespace :reports do
 
             next if renewing_enrollments.blank?
             # enrollment wavied in open ernrollment period
-            renewing_enrollment_waived = renewing_enrollments.select{ |hbx|
-              (HbxEnrollment::WAIVED_STATUSES).include?(hbx.aasm_state) &&
-                  (hbx.benefit_group.plan_year.open_enrollment_start_on..hbx.benefit_group.plan_year.open_enrollment_end_on).cover?(hbx.submitted_at)}
-            # employer sponsored renewing_enrollment
-            renewing_enrollment_auto_renewing = renewing_enrollments.select{ |hbx|
-              (HbxEnrollment::RENEWAL_STATUSES).include?(hbx.aasm_state)}
+            ['health','dental'].each do |ct|
+              renewing_enrollment_waived = renewing_enrollments.select{ |hbx|
+                (HbxEnrollment::WAIVED_STATUSES).include?(hbx.aasm_state) && hbx.coverage_kind==ct
+                    (hbx.benefit_group.plan_year.open_enrollment_start_on..hbx.benefit_group.plan_year.open_enrollment_end_on).cover?(hbx.submitted_at)}
+              # employer sponsored renewing_enrollment
+              renewing_enrollment_auto_renewing = renewing_enrollments.select{ |hbx|
+                (HbxEnrollment::RENEWAL_STATUSES).include?(hbx.aasm_state) && hbx.coverage_kind==ct }
 
             # If there are renewing enrollments with both [ Waived(inactive) and Renewing ] statuses for an employee, we want to report them
             if renewing_enrollment_auto_renewing.present? && renewing_enrollment_waived.present?
