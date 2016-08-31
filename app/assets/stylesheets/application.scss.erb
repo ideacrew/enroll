@@ -243,7 +243,6 @@ img {
   display: none;
 }
 
-
 #showhidebutton {
   font-family: 'Open Sans', sans-serif;
   background: none!important;
@@ -253,4 +252,16 @@ img {
   cursor: pointer;
   outline:0;
   float: right;
+}
+
+// disables the click action on any element; more general than :disabled
+// Used to implement readonly permissions for admin
+.blocking {
+    opacity: 0.5 !important;
+    pointer-events: none;
+    cursor: default;
+}
+.read_only_dropdown {
+  cursor: not-allowed !important;
+  pointer-events: none;
 }

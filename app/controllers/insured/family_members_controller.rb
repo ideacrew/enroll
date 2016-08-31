@@ -21,7 +21,9 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
+      @market_kind = qle.market_kind
     end
 
     if request.referer.present?

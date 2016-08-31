@@ -9,6 +9,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   before_action :check_access_to_organization, only: [:edit]
   before_action :check_and_download_invoice, only: [:download_invoice]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
+  before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
 
   def index
@@ -265,6 +266,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)

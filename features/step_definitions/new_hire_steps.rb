@@ -56,11 +56,11 @@ Then(/Employee tries to complete purchase of another plan/) do
   step "Employee clicks on Continue button on receipt page"
 end
 
-When(/Employee clicks \"Shop for Plans\" on my account page/) do
+When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
   find('.interaction-click-control-shop-for-plans').click
 end
 
-When(/Employee clicks continue on the group selection page/) do
+When(/(.*) clicks continue on the group selection page/) do |named_person|
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
@@ -68,17 +68,17 @@ When(/Employee clicks continue on the group selection page/) do
   end
 end
 
-Then(/Employee should see (.*) page with employer name and plan details/) do |page|
+Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
 end
 
-When(/Employee clicks on Continue button on receipt page/) do
+When(/(.*) clicks on Continue button on receipt page/) do |named_person|
   find('.interaction-click-control-continue').click
 end
 
-Then(/Employee should see \"my account\" page with enrollment/) do
+Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep(1) #wait for e-mail nonsense
   enrollment = first('.hbx-enrollment-panel')
   enrollment.find('.enrollment-effective', text: expected_effective_on.strftime("%m/%d/%Y"))
@@ -100,9 +100,11 @@ Then(/Employee should see \"may not enroll until eligible\" error message/) do
 end
 
 When(/Employee enters Qualifying Life Event/) do
+  sleep 1
   first("#carousel-qles a").click
   expect(page).to have_content "Married"
   screenshot("future_qle_date")
+  sleep 2
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
   click_button "Continue"

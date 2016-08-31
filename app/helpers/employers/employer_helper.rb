@@ -26,7 +26,7 @@ module Employers::EmployerHelper
     end
 
     "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
-    
+
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -103,5 +103,21 @@ module Employers::EmployerHelper
     benefit_groups = plan_years.flat_map(&:benefit_groups)
     renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
     return benefit_groups, (renewing_benefit_groups || [])
+  end
+
+  def display_families_tab(user)
+    if user.present?
+      user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
+    end
+  end
+
+
+
+  def display_employee_status_transitions(census_employee)
+    content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
+    content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
+    links = link_to "Terminate", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual" if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
+    links = "#{link_to("Rehire", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual")} #{link_to("COBRA", "javascript:;", onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))")}" if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
+    return [links, content]
   end
 end

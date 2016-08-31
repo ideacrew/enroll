@@ -33,6 +33,11 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context 'oim_id validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:oim_id).case_insensitive }
+    end
+
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
       it 'is too long' do
@@ -266,6 +271,33 @@ describe User do
       it "with broker agency portal" do
         user.roles = ['consumer', 'broker']
         expect(user.get_announcements_by_roles_and_portal("dc.org/broker_agencies")).to eq ["msg for Broker"]
+      end
+    end
+  end
+
+  describe "orphans" do
+    context "when users have person associated" do
+      before do
+        user = FactoryGirl.create :user
+        user.person = FactoryGirl.create :person
+      end
+      it "should return no orphans" do
+        expect(User.orphans).to eq []
+      end
+    end
+
+    context "when some users does NOT have person associated", dbclean: :after_each do
+      before do
+        user_with_person = FactoryGirl.create :user
+        user_with_person.person = FactoryGirl.create :person
+        @user1_without_person = FactoryGirl.create :user , :email => "aaa@aaa.com"
+        @user2_without_person = FactoryGirl.create :user , :email => "zzz@zzz.com"
+      end
+      it "should return orphans" do
+        expect(User.orphans).to eq [@user1_without_person,@user2_without_person]
+      end
+      it "should return orphans with email ASC" do
+        expect(User.orphans.first.email).to eq "aaa@aaa.com"
       end
     end
   end
