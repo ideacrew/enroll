@@ -20,6 +20,7 @@ namespace :reports do
                         Employee_HBX_ID
                         SSN
                         DOB
+                        Coverage_kind
                         ER_Sponsored_Passive_Enrollment_ID
                         Passive_Enrollment_Created_At
                         Enrollment_Waived_Time_Stamp
