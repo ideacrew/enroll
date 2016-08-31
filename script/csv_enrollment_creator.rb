@@ -103,14 +103,18 @@ end
 # EnrollmentFactory#initialize_dependent
 # dependent_person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
 
+error_rows = []
+
 CSV.foreach(filename, headers: :true) do |row|
 	
 	# begin
 	data_row = row.to_hash
 	if HbxEnrollment.by_hbx_id(data_row["Enrollment Group ID"]).size > 0
-		puts "Enrollment with hbx_id #{data_row["Enrollment Group ID"]} already exists."
+		row["Error Message"] = "Enrollment with hbx_id #{data_row["Enrollment Group ID"]} already exists."
+		error_rows.push(row)
 		next
 	end
+	next if data_row["Benefit Package/Benefit Group"] == "LeverGroup Standard"
 	# subscriber = Person.where(hbx_id: data_row['HBX ID']).first
 	subscriber_params = {"name_pfx" => data_row["Name Prefix"],
 									 "first_name" => data_row["First Name"],
@@ -128,7 +132,8 @@ CSV.foreach(filename, headers: :true) do |row|
 
 	census_employee = find_census_employee(subscriber_params,organization.employer_profile)
 	if census_employee == nil
-		puts "Cannot find #{subscriber_params["first_name"]} #{subscriber_params["last_name"]}"
+		row["Error Message"] = "Cannot find #{subscriber_params["first_name"]} #{subscriber_params["last_name"]}"
+		error_rows.push(row)
 		next
 	end
 	census_dependents = []
@@ -228,7 +233,8 @@ CSV.foreach(filename, headers: :true) do |row|
             																			  last_name: dependent.last_name,
             																			  dob: dependent.dob).first.employee_relationship
             	rescue Exception=>e
-            		puts e.inspect
+            		row["Error Message"] = e.inspect
+            		error_rows.push(row)
             	end
               family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
               unless family_member == nil
@@ -250,7 +256,9 @@ CSV.foreach(filename, headers: :true) do |row|
 	plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: data_row["Plan Year"].strip).first
 
 	if plan.blank?
-		raise "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
+		raise "	Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
+		row["Error Message"] = "Unable to find plan with HIOS ID #{data_row["HIOS ID"]} for year #{data_row["Plan Year"].strip}"
+		error_rows.push(row)
 	end
 
 	en = hh.new_hbx_enrollment_from({
@@ -280,5 +288,31 @@ CSV.foreach(filename, headers: :true) do |row|
 	# 	puts "-"*100
 	# 	#puts e.backtrace
 	# end
+end
+
+CSV.open("#{filename.gsub(".csv","")}_errors.csv","w") do |csv|
+	csv << ["Redmine Ticket","Employer Name","Employer FEIN",
+			"HBX ID","First Name","Middle Name","Last Name","SSN","DOB","Gender",
+			"Address Kind","Address 1","Address 2","City","State","Zip",
+			"Phone Type","Phone Number",
+			"Email Kind","Email Address",
+			"AASM State",
+			"Enrollment Group ID","Enrollment Kind","Benefit Begin Date", "Benefit End Date",
+			"Plan Year","HIOS ID","Benefit Package/Benefit Group","Date Plan Selected","Relationship",
+			"HBX ID (Dep 1)","First Name (Dep 1)","Middle Name (Dep 1)","Last Name (Dep 1)",
+			"SSN (Dep 1)","DOB (Dep 1)","Gender (Dep 1)","Relationship (Dep 1)",
+			"HBX ID (Dep 2)","First Name (Dep 2)","Middle Name (Dep 2)","Last Name (Dep 2)",
+			"SSN (Dep 2)","DOB (Dep 2)","Gender (Dep 2)","Relationship (Dep 2)",
+			"HBX ID (Dep 3)","First Name (Dep 3)","Middle Name (Dep 3)","Last Name (Dep 3)",
+			"SSN (Dep 3)","DOB (Dep 3)","Gender (Dep 3)","Relationship (Dep 3)",
+			"HBX ID (Dep 4)","First Name (Dep 4)","Middle Name (Dep 4)","Last Name (Dep 4)",
+			"SSN (Dep 4)","DOB (Dep 4)","Gender (Dep 4)","Relationship (Dep 4)",
+			"HBX ID (Dep 5)","First Name (Dep 5)","Middle Name (Dep 5)","Last Name (Dep 5)",
+			"SSN (Dep 5)","DOB (Dep 5)","Gender (Dep 5)","Relationship (Dep 5)",
+			"HBX ID (Dep 6)","First Name (Dep 6)","Middle Name (Dep 6)","Last Name (Dep 6)",
+			"SSN (Dep 6)","DOB (Dep 6)","Gender (Dep 6)","Relationship (Dep 6)"]
+	error_rows.each do |row|
+		csv << row
+	end
 end
 
