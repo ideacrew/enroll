@@ -61,7 +61,10 @@ class BenefitGroupAssignment
 
   def benefit_group
     return @benefit_group if defined? @benefit_group
-    @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
+    return nil if benefit_group_id.blank?
+    @benefit_group = ::Caches::RequestScopedCache.lookup(:employer_calculation_cache, self.benefit_group_id) do
+      BenefitGroup.find(self.benefit_group_id)
+    end
   end
 
   def hbx_enrollment=(new_hbx_enrollment)
