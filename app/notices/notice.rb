@@ -122,9 +122,16 @@ class Notice
   end
 
   def store_paper_notice
-    paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
-    FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
-    File.rename(paper_notices_folder + "#{notice_filename}.pdf", paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
+    file_path = "#{notice_filename}.pdf"
+    bucket_name= Setting.paper_notice
+    begin
+      doc_uri = Aws::S3Storage.save(file_path,bucket_name)
+    rescue Exception => e
+      puts "Unable to upload paper notices to Amazon"
+    end
+    # paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
+    # FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
+    # File.rename(paper_notices_folder + , paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
   end
 
   def create_recipient_document(doc_uri)
