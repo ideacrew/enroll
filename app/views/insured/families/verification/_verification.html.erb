@@ -34,9 +34,7 @@
             <td><%= member.person.first_name.capitalize %>
               <%= member.person.last_name.capitalize %></td>
             <td colspan="3">
-              <% if unverified?(member.person) %>
-                  <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
-              <% end %>
+              <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
             </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
