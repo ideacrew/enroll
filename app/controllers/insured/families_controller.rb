@@ -379,7 +379,7 @@ class Insured::FamiliesController < FamiliesController
       @sep = Person.where(id:@person.id).first.primary_family.active_seps.last
       if @sep.admin_flag
         @sep_flag = @sep.admin_flag  
-        @sep.admin_flag = false
+        #@sep.admin_flag = false
         @sep.save!
       end
     end
