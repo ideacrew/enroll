@@ -71,15 +71,16 @@ $(document).on('change','.admin_effective_on_kind_options select', function(){
 
 $(document).on('change','.radio_option input', function(){
   if($(this).val() == 'shop')
-    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
   else
-    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_ivl.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_ivl.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
 
   $('.admin_effective_on_kind_options').hide();
   $('.init_event_date').hide();
   $('.sep_dates_filter').hide();
   $('.init_effective_date input').val('');
   $('.csl_num_options input').val('');
+  $('.optional_date').hide();
 });
 
 $(document).on('change','.init_event_date input', function(){

@@ -11,6 +11,7 @@ module SepAll
     @end_on = special_enrollment_period.end_on
     @effective_on = special_enrollment_period.effective_on
     @self_attested = qle.is_self_attested
+    @date_options = qle.date_options_available
   end
 
   def getActionParams

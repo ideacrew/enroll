@@ -35,7 +35,7 @@
 						</div>
 	          <div class='admin_selected_sep_reason'>
 		        	<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
-		           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'selectric form-control qle_reason_select', required: true, prompt: "SEP REASON" %>
+		           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'selectric form-control qle_reason_select', required: true, prompt: "SEP REASON" %>
 		         	</div>
 	         	</div>
 	         	<div class='init_event_date'>
