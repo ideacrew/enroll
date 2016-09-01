@@ -6,12 +6,22 @@ FactoryGirl.define do
     submitted_at Time.now
     updated_at "user"
 
+    transient do
+      people [] 
+    end
+
     trait :with_primary_family_member do
       family_members { [FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person)] }
     end
 
+    trait :with_family_members do 
+      family_members { people.map{|person| FactoryGirl.build(:family_member, family: self, is_primary_applicant: (self.person == person), is_active: true, person: person) }}
+    end
+
     after :create do |f, evaluator|
-      f.households.first.add_household_coverage_member(f.family_members.first)
+      f.family_members.each do |family_member|
+        f.households.first.add_household_coverage_member(family_member)
+      end
       f.save
     end
   end
