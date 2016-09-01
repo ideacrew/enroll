@@ -9,6 +9,8 @@
   <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
 
+  <%= render 'admin_message' if @sep_flag %>  
+
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
