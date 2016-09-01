@@ -87,6 +87,24 @@ module Insured::FamiliesHelper
     link_to qle.title, "javascript:void(0)", options
   end
 
+  # This is the case when you have an existing SEP and you are prompted to use that
+  def qle_link_generater_for_an_existing_qle(qle)
+    options = {class: 'existing-sep-item'}
+    data = {
+      title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
+      is_self_attested: qle.is_self_attested,
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+    }
+
+    #if qle.tool_tip.present?
+      #data.merge!(toggle: 'tooltip', placement: index > 1 ? 'top' : 'bottom')
+      #options.merge!(data: data, title: qle.tool_tip)
+    #else
+      options.merge!(data: data)
+    #end
+    link_to qle.title, "javascript:void(0)", options
+  end
+
   def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
     return [] if effective_on_kinds.blank?
 
