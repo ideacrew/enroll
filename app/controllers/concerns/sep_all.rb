@@ -127,6 +127,8 @@ module SepAll
     date_arr.push(Date.strptime(params[:option3_date], "%m/%d/%Y").to_s) if params[:option3_date].present?
     special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
     special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
+    special_enrollment_period.admin_flag = true
+    
     if special_enrollment_period.save
       flash[:notice] = 'SEP added for ' + @name
     else

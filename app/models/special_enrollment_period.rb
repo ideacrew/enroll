@@ -57,6 +57,10 @@ class SpecialEnrollmentPeriod
   # MARKET KIND
   field :market_kind, type:String
 
+  # ADMIN FLAG
+  field :admin_flag, type:Boolean
+
+
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
     allow_blank: true,

@@ -11,6 +11,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_flash_by_announcement
     set_bookmark_url
+    check_admin_message
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
     
@@ -371,5 +372,16 @@ class Insured::FamiliesController < FamiliesController
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+  end
+
+  def check_for_admin_message    
+    if Person.where(id:@person.id).first.primary_family.active_seps.present? && Person.where(id:@person.id).first.primary_family.active_seps.last.admin_flag.present?
+      @sep = Person.where(id:@person.id).first.primary_family.active_seps.last
+      if @sep.admin_flag
+        @sep_flag = @sep.admin_flag  
+        @sep.admin_flag = false
+        @sep.save!
+      end
+    end
   end
 end
