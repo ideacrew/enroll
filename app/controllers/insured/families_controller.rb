@@ -385,4 +385,15 @@ class Insured::FamiliesController < FamiliesController
       end
     end
   end
+
+  def check_for_admin_message    
+    if Person.where(id:@person.id).first.primary_family.active_seps.present? && Person.where(id:@person.id).first.primary_family.active_seps.last.admin_flag.present?
+      @sep = Person.where(id:@person.id).first.primary_family.active_seps.last
+      if @sep.admin_flag
+        @sep_flag = @sep.admin_flag  
+        @sep.admin_flag = false
+        @sep.save!
+      end
+    end
+  end
 end
