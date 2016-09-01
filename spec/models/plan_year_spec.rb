@@ -907,7 +907,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     enrolled_bga_ids = census_employees[0..2].map do |ce|
                       ce.active_benefit_group_assignment.id 
                     end
-                    allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with(bga_ids).and_return(enrolled_bga_ids)
+                    allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with(array_including(bga_ids)).and_return(enrolled_bga_ids)
                   end
 
                   it "should include all eligible employees" do
@@ -967,7 +967,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                       enrolled_bga_ids = census_employees[0..4].map do |ce|
                         ce.active_benefit_group_assignment.id
                       end
-                      allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with(bga_ids).and_return(enrolled_bga_ids)
+                      allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with(array_including(bga_ids)).and_return(enrolled_bga_ids)
                       # allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).with(ee.active_benefit_group_assignment).and_return [hbx_enrollment]
                     end
 
