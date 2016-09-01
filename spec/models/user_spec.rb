@@ -295,28 +295,24 @@ describe User do
   end
 
   describe "orphans" do
+    let(:person){create :person}
+    let(:user){create :user , person: person}
     context "when users have person associated" do
-      before do
-        user = FactoryGirl.create :user
-        user.person = FactoryGirl.create :person
-      end
       it "should return no orphans" do
         expect(User.orphans).to eq []
       end
     end
-
-    context "when some users does NOT have person associated", dbclean: :after_each do
+    context "when some users does NOT have person associated",dbclean: :after_each do
       before do
-        user_with_person = FactoryGirl.create :user
-        user_with_person.person = FactoryGirl.create :person
-        @user1_without_person = FactoryGirl.create :user , :email => "aaa@aaa.com"
-        @user2_without_person = FactoryGirl.create :user , :email => "zzz@zzz.com"
+        @user1_without_person=create :user ,:email => "a@example.com"
+        @user2_without_person=create :user ,:email => "z@example.com"
       end
+      
       it "should return orphans" do
         expect(User.orphans).to eq [@user1_without_person,@user2_without_person]
       end
       it "should return orphans with email ASC" do
-        expect(User.orphans.first.email).to eq "aaa@aaa.com"
+        expect(User.orphans.first.email).to eq @user1_without_person.email
       end
     end
   end
