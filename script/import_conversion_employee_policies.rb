@@ -1,7 +1,7 @@
 def import_employee(in_file)
 #  begin
     result_file = File.open(File.join(Rails.root, "conversion_employee_policy_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
-    importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, Date.new(2016,8,1), 2015)
+    importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, Date.new(2016,9,1), 2015)
     importer.import!
     result_file.close
 #  rescue
