@@ -29,12 +29,14 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   portal_class = '.interaction-click-control-employer-portal'
   find(portal_class).click
   @pswd = 'aA1!aA1!aA1!'
-  fill_in "user[email]", :with => email
-  find('#user_email').set(email)
+  fill_in "user[oim_id]", :with => email
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
+  sleep(1)
+  find(:xpath, '//label[@for="user_email_or_username"]').set(email)
+  # find('#user_email_or_username').set(email)
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => email unless find(:xpath, '//*[@id="user_email"]').value == email
+  fill_in "user[oim_id]", :with => email unless find(:xpath, '//label[@for="user_email_or_username"]').value == email
   find('.interaction-click-control-create-account').click
 end
 
