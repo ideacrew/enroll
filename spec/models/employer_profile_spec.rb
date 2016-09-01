@@ -275,7 +275,7 @@ describe EmployerProfile, dbclean: :after_each do
       if employer_profile.plan_years.last.valid?
         employer_profile.save!
       else
-        employer_profile.plan_years.last.open_enrollment_start_on += 2.days
+        employer_profile.plan_years.last.open_enrollment_start_on += 1.day
         employer_profile.save!
       end
     end
