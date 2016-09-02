@@ -7,7 +7,6 @@ module Queries
     def execute
       plan_year, billing_date = @employer_profile.billing_plan_year
       enrollment_cost_totals = get_decorators_for_enrollments
-      puts enrollment_cost_totals[:total_employer_contribution].inspect
       OpenStruct.new(enrollment_cost_totals)
     end
 
