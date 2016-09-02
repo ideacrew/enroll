@@ -7,11 +7,10 @@ class ShopNotices::EmployerNotice < ShopNotice
   def initialize(args = {})
     self.employer_profile=args[:employer_profile]
     self.trigger_type = args[:trigger_type]
-    # person= employer_profile.staff_roles.first
     args[:recipient] = employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
-    args[:to] = recipient.staff_roles.first.work_email_or_best #person.work_email.try(:address) || person.home_email.try(:address) 
+    args[:to] = employer_profile.staff_roles.first.work_email_or_best
     args[:name] = "testing"
     args[:recipient_document_store]= employer_profile
     self.header = "notices/shared/header_with_page_numbers.html.erb"
