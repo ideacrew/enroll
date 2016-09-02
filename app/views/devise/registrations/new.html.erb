@@ -1,39 +1,55 @@
 <div class="container signin top-pd module">
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div class="col-md-6 col-sm-8 col-xs-12">
-      <h1 class="darkblue">Create Account</h1>
+      <h1 class="darkblue no-top-margin">Create Account</h1>
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'input-no-pd'}) do |f| %>
   	      <%= devise_error_messages! %>
+  	      <%if resource.errors.full_messages.blank? %>
+        		<%= render partial: "registration_rules" %>
+        	<%end%>
 	        <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
 
-	        <div class="form-group">
-	          <%= f.label :username %>
+      <div class="form-group">
+        <%= f.label :email_or_username %>
 
 <!-- Modal -->
-	          <%= f.text_field :email, class: "form-control", required: true %>
-	        </div>
-
-	        <div class="form-group">
-	          <%= f.label :password %>
-	          <em>(<%= User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum] %> characters minimum)</em>
-	          <br />
-	          <%= f.password_field :password, autocomplete: "off", class: "form-control", required: true %>
-	        </div>
-
-	        <div class="form-group">
-	          <%= f.label :password_confirmation, "Password Confirmation" %><br />
-	          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
-	        </div>
-      		<%= f.hidden_field :invitation_id %>
-          <br/>
-	        <div class="actions text-center">
-  	          <%= f.submit "Create account", class: "btn btn-primary btn-lg " %>
-              <br/>
-              <br/>
-            <span>
-              <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
-            </span>
-          </div>
-		    <% end %>
+        <%= f.text_field :oim_id, class: "form-control", required: true , onblur: "Registration.toggleEmail(this)",
+        :data => { :toggle=>"popover" ,:content=>"You can create a username or use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.",
+          :placement => 'right', :trigger => 'focus' }
+        %>
       </div>
-    </div>
+
+      <div class="form-group">
+        <%= f.label :password %>
+        <em>(<%= User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum] %> characters minimum)</em>
+        <br />
+        <%= f.password_field :password, autocomplete: "off", class: "form-control", required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password_confirmation, "Password Confirmation" %><br />
+        <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
+      </div>
+
+      <div class="email_field form-group <%= 'hidden_field' if f.object.oim_id.size ==0 %>">
+        <%= f.label :email %>
+        <em> (Optional)</em>
+        <br/>
+        <%= f.text_field :email, class: "form-control" ,:oninput => "Registration.trimEmail(this);" %>
+      </div>
+      <%= f.hidden_field :invitation_id %>
+      <br/>
+
+      <div class="actions text-center">
+        <%= f.submit "Create account", class: "btn btn-primary btn-lg " %>
+        <br/> <br/>
+        <span>
+          <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>
+<script type="text/javascript">
+  
+</script>

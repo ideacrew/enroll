@@ -178,7 +178,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
+      expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
       expect(response).to redirect_to(family_account_path)
     end
 
