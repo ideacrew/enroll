@@ -123,7 +123,7 @@ class Notice
 
   def store_paper_notice
     file_path = "#{notice_filename}.pdf"
-    bucket_name= Setting.paper_notice
+    bucket_name= Settings.paper_notice
     begin
       doc_uri = Aws::S3Storage.save(file_path,bucket_name)
     rescue Exception => e
