@@ -6,6 +6,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person.primary_family
+    args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end

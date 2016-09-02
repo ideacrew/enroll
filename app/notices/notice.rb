@@ -13,7 +13,7 @@ class Notice
     self.market_kind= params[:market_kind]
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
-    self.to = params[:to] || recipient.staff_roles.first.work_email_or_best
+    self.to = params[:to]
     self.name = params[:name] || recipient.first_name
   end
 

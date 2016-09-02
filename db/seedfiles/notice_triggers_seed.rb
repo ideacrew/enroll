@@ -213,7 +213,95 @@ ivl_notice_triggers = [
         }
       }
     ]
-  }
+  },
+
+  {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+    resource_name: 'consumer_role',
+    event_name: '',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::ConsumerRenewalNotice',
+        mpi_indicator: 'MPI_IVLR1',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR2',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals staying in APTC only',
+    resource_name: 'consumer_role',
+    event_name: '',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
+        notice_builder: 'IvlNotices::ConsumerRenewalNotice',
+        mpi_indicator: 'MPI_IVLR2',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR3',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals moving from APTC to Medicaid',
+    resource_name: 'consumer_role',
+    event_name: '',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
+        notice_builder: 'IvlNotices::ConsumerRenewalNotice',
+        mpi_indicator: 'MPI_IVLR3',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR4',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals moving from APTC to UQHP',
+    resource_name: 'consumer_role',
+    event_name: '',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
+        notice_builder: 'IvlNotices::ConsumerRenewalNotice',
+        mpi_indicator: 'MPI_IVLR4',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
