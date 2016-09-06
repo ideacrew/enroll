@@ -271,7 +271,13 @@ describe EmployerProfile, dbclean: :after_each do
     }
 
     before do
-      employer_profile.save!
+      #patchy 1st of month spec fix
+      if employer_profile.plan_years.last.valid?
+        employer_profile.save!
+      else
+        employer_profile.plan_years.last.open_enrollment_start_on += 1.day
+        employer_profile.save!
+      end
     end
 
     context 'when upcoming month plan year present' do

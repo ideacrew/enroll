@@ -1063,4 +1063,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  context "check_hired_on_before_dob" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should fail" do
+      census_employee.dob = TimeKeeper.date_of_record - 30.years
+      census_employee.hired_on = TimeKeeper.date_of_record - 31.years
+      expect(census_employee.save).to be_falsey
+      expect(census_employee.errors[:hired_on].any?).to be_truthy
+      expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
+    end
+  end
 end
