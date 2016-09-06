@@ -204,7 +204,7 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
-    date_options_available: false,
+    date_options_available: true,
     ordinal_position: 75,
     event_kind_label: "Date of contract violation",
     tool_tip: "Enroll due to contract violation"
