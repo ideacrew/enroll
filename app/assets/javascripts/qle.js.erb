@@ -107,6 +107,7 @@ $(function () {
     };
 
     $('#qle-details').removeClass('hidden');
+    $('#qle-details-for-existing-sep').addClass('hidden');
   });
 
 
@@ -132,6 +133,7 @@ $(function () {
     // };
 
     $('#qle-details-for-existing-sep').removeClass('hidden');
+    $('#qle-details').addClass('hidden');
   });
 
   $(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {

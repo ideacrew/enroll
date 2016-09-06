@@ -1,9 +1,10 @@
+<%qle = find_qle_for_sep(@active_admin_sep)%>
 <div id="qle-details-for-existing-sep" class='module hidden'>
   <div class="hbx-enrollment-panel panel panel-default">
     <div class="panel-heading">
       <div class="row">
         <div class="col-xs-11">
-          <h4>SPECIAL ENROLLMENT PERIOD</h4>
+          <h4>ELIGIBLE TO ENROLL</h4>
         </div>
         <div class="col-xs-1">
           <a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
@@ -13,66 +14,29 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <% url, http_method = '/insured/family_members', :get %>
-        <% if action_name == 'find_sep'%>
-          <% url, http_method = record_sep_insured_families_path, :post %>
-        <% end %>
-
+      <% url, http_method = '/insured/family_members', :get %>
         <%= form_tag url, method: http_method, class: 'input-no-pd', id: 'qle_form' do %>
+          <%= hidden_field_tag 'change_plan', qle.title %>
+          <%= hidden_field_tag 'qle_id', qle.id %>
+          <%= hidden_field_tag 'sep_id', @active_admin_sep.id %>
+          <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+          <p class="success-text">
+            <strong id="qle-input-info">Your ‘<%=@active_admin_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_admin_sep.start_on%>.</strong><br>
+          </p>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div id='qle-date-chose'>
-              <h3 class="qle-details-title">I got married</h3>
-              <h5 class='qle-label'>Enter the date of the event.</h5>
-              <div class="form-inline">
-                <div class="form-group">
-                  <%= text_field_tag 'qle_date', @existing_sep.try(:qle_on).try(:strftime, '%m/%d/%Y'),
-                    :'data-date-max'=> "+30d",
-                    :'data-date-min'=> "-30d",
-                    placeholder: "mm/dd/yyyy",
-                    class: "required date-picker qle-date-picker form-control",
-                    required: true %>
-                </div>
-                <div class="form-group">
-                  <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
-                </div>
+            <% if qle.date_options_available? && @active_admin_sep.optional_effective_on.present?%> <!--Show Dropdown if there are choice Dates available.-->
+              <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'>Please Select Effective Date</div>
+              <div style='margin: 0 auto;max-width:250px;'>
+                  <%= select_tag 'effective_on_option', options_for_select(@active_admin_sep.optional_effective_on), include_blank: 'SELECT EFFECTIVE DATE *' %>
               </div>
-            </div>
-            <div id="qle_reason">
-            </div>
-            <div id="qle_message">
-              <div class="success-info hidden">
-                <%= hidden_field_tag 'change_plan' %>
-                <%= hidden_field_tag 'qle_id' %>
-                <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
-                <p class="success-text">
-                  <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
-                </p>
-                <div class="effective_on_kinds">
-                </div>
-                <div class="spec_reasons">
-                </div>
-                <div class="center <%=pundit_class Family,:updateable?%>">
-                  <%= submit_tag 'Continue', class: 'btn btn-primary' %>
-                </div>
-              </div>
-              <div class="error-info hidden">
-                <h4 class="qle-details-title">Change in income that may impact my tax credits/cost-sharing reductions</h4>
-                <div class="alert alert-danger" role="alert">
-                  <p class="error-text">
-                    Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.
-                  </p>
-                </div>
-                <br/>
-              </div>
-            </div>
+            <% else %>  <!--Go with the Next possible effective date.-->
+              <%= hidden_field_tag 'effective_on_option', @active_admin_sep.next_poss_effective_date %>
+            <% end %>
+            <br />
+            <div align="center"> <%= submit_tag 'Continue', class: 'btn btn-primary' %> </div>
           </div>
-        <% end %>
+        <% end %> <!--End Form tag-->
       </div>
     </div>
   </div>
 </div>
-<script>
-$(document).on('ready page:load', function () {
-  QLE.initialize();
-});
-</script>

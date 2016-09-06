@@ -1,8 +1,3 @@
-<!--TODO : DELETE THIS!!!, Replace with Banner--> 
-    <% if existing_sep = @person.primary_family.active_seps.last %>
-      <p>Would you like to use your existing special enrollment period? "<%= qle_link_generater_for_an_existing_qle(QualifyingLifeEventKind.find(existing_sep.qualifying_life_event_kind_id))%>"</p>
-    <% end %>
-<!---->
 <% content_for :navigation do %>
 <%= render 'navigation' %>
 <% end %>
@@ -14,7 +9,7 @@
   <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
 
-  <%= render 'admin_message' if @sep_flag %>  
+  <%= render 'sep_message' if @family.active_admin_seps.present? %>  
 
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
