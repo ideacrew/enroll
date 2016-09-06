@@ -384,6 +384,5 @@ class Insured::FamiliesController < FamiliesController
   #       @sep.save!
   #     end
   #   end
-  # end
-
+  # ends
 end

@@ -6,18 +6,16 @@
 </div>
 <div id='account-detail'>
   <% @person.active_employee_roles.each do |employee_role|%>
-  <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
+    <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
-
   <%= render 'sep_message' if @family.active_admin_seps.present? %>  
-
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' %>
+      <%= render partial: 'qle_detail_for_existing_sep' if @family.active_admin_seps.present?%>
       <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
       <% if @waived %>
         <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
@@ -29,5 +27,5 @@
       <%= render 'right_column' %>
     </div>
   </div>
-  </div>
-  <%= render 'insured/plan_shoppings/help_with_plan' %>
+</div>
+<%= render 'insured/plan_shoppings/help_with_plan' %>
