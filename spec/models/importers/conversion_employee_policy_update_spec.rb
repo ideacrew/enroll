@@ -32,8 +32,10 @@ describe Importers::ConversionEmployeePolicyUpdate do
       FactoryGirl.create(:census_employee_with_active_and_renewal_assignment, employer_profile: employer_profile, benefit_group: benefit_group, renewal_benefit_group: renewal_benefit_group)
     }
 
-    let(:spouse) { FactoryGirl.create(:person, last_name: "richards", first_name: "denise", ssn: '555532232') }
-    let(:child)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "sam", ssn: '555532230') }
+    let(:spouse) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 30.years, ssn: '555532232') }
+    let(:child)  { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 7.years, ssn: '555532230') }
+    let(:child1) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 2.years, ssn: '555532229') }
+
     let!(:person) { FactoryGirl.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on, person_relationships: family_relationships) }
     let!(:family) { FactoryGirl.create(:family, :with_family_members, person: person, people: family_members) }
 
@@ -55,18 +57,45 @@ describe Importers::ConversionEmployeePolicyUpdate do
         :subscriber_city=>"Falls Church",
         :subscriber_state=>"VA",
         :subscriber_zip=>"22046",
+        :default_policy_start => employer_profile.active_plan_year.start_on, 
+        :plan_year => employer_profile.active_plan_year.start_on.year
+      }
+    end
+
+    let(:dependent1_attrs) do 
+      {
         :dep_1_ssn=>spouse.ssn,
         :dep_1_dob=>spouse.dob,
         :dep_1_gender=>spouse.gender,
         :dep_1_name_first=>spouse.first_name,
         :dep_1_name_last=>spouse.last_name,
         :dep_1_relationship=>"spouse",
-        :default_policy_start => employer_profile.active_plan_year.start_on, 
-        :plan_year => employer_profile.active_plan_year.start_on.year
       }
     end
 
-    context "and dependent dropped from employee's enrollment" do
+    let(:dependent2_attrs) do
+      {
+        :dep_2_ssn=>child.ssn,
+        :dep_2_dob=>child.dob,
+        :dep_2_gender=>child.gender,
+        :dep_2_name_first=>child.first_name,
+        :dep_2_name_last=>child.last_name,
+        :dep_2_relationship=>"child",
+      }
+    end
+
+    let(:dependent3_attrs) do
+      {
+        :dep_3_ssn=>child1.ssn,
+        :dep_3_dob=>child1.dob,
+        :dep_3_gender=>child1.gender,
+        :dep_3_name_first=>child1.first_name,
+        :dep_3_name_last=>child1.last_name,
+        :dep_3_relationship=>"child",
+      }
+    end
+
+    context "and child dropped from employee's enrollment" do
       let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, spouse, child] }
 
@@ -80,7 +109,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
 
-          ::Importers::ConversionEmployeePolicyAction.new(record_attrs).save
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
           hbx_enrollment.reload 
           renewing_hbx_enrollment.reload
@@ -97,7 +126,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
 
-          ::Importers::ConversionEmployeePolicyAction.new(record_attrs).save
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
           hbx_enrollment.reload 
           renewing_hbx_enrollment.reload
@@ -108,21 +137,9 @@ describe Importers::ConversionEmployeePolicyUpdate do
       end
     end
 
-
-    context "and dependent added to employee's enrollment" do
+    context "and spouse added to employee's enrollment" do
       let(:family_relationships) { [PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, child] }
-
-      let(:dependent_attrs) do
-        {
-          :dep_2_ssn=>child.ssn,
-          :dep_2_dob=>child.dob,
-          :dep_2_gender=>child.gender,
-          :dep_2_name_first=>child.first_name,
-          :dep_2_name_last=>child.last_name,
-          :dep_2_relationship=>"child"
-        }
-      end
 
       before do
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
@@ -134,13 +151,13 @@ describe Importers::ConversionEmployeePolicyUpdate do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
 
-          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent_attrs)).save
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
           hbx_enrollment.reload 
           renewing_hbx_enrollment.reload
 
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child, spouse]
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
         end
       end
@@ -152,14 +169,60 @@ describe Importers::ConversionEmployeePolicyUpdate do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
 
-          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent_attrs)).save
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
           hbx_enrollment.reload 
           renewing_hbx_enrollment.reload
 
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child, spouse]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child, spouse]
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+        end
+      end
+    end
+
+
+    context "and child dropped and new child added to employee's enrollment" do
+      let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
+      let(:family_members) { [person, spouse, child] }
+
+      before do
+        census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
+      end
+
+      context 'when renewing enrollment is manually selected' do 
+        it 'should add and drop children on current enrollment' do
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
+
+          family.reload
+          hbx_enrollment.reload 
+          renewing_hbx_enrollment.reload
+
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+        end
+      end
+
+      context 'when renewing enrollment is a passive renewal' do
+        let!(:renewing_hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
+
+        it 'should add and drop children on both current and renewing enrollment' do
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+
+          ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
+
+          family.reload
+          hbx_enrollment.reload 
+          renewing_hbx_enrollment.reload
+
+          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+
+          expect(family.find_family_member_by_person(child)).to be_nil
         end
       end
     end

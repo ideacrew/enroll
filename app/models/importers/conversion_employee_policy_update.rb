@@ -119,7 +119,6 @@ module Importers
     end
 
     def find_current_enrollment(family, employer)
-
       plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
       plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
    
@@ -153,38 +152,14 @@ module Importers
       enrollment
     end
 
-    def update_coverage_dependents(family, enrollment, employer, plan)
-      census_dependents = map_dependents
-
-      dependents = census_dependents.inject([]) do |dependents, dependent|
-        dependents << Factories::EnrollmentFactory.initialize_dependent(enrollment.family, enrollment.subscriber.person, dependent)
-      end.compact
-
-      family.save!
-      family.reload
-
-      if enrollment.plan_id != plan.id
-        enrollment.update_attributes(plan_id: plan.id)
-      end
-
-      enrollment.reload
-
-      if update_enrollment_members(family, enrollment, dependents)         
-        if passive_renewal = get_passively_renewed_coverage(employer, family)
-          return passive_renewal if passive_renewal.is_a?(Boolean)
-          update_enrollment_members(family, passive_renewal, dependents, true)
-
-          renewal_plan = enrollment.plan.renewal_plan
-          if passive_renewal.plan_id != renewal_plan.try(:id)
-            passive_renewal.update_attributes(plan_id: renewal_plan.id)
-          end
-          
-          return true
-        else
-          return false
-        end
-      else
-        return false
+    def person_relationship_for(census_relationship)
+      case census_relationship
+      when "spouse"
+        "spouse"
+      when "domestic_partner"
+        "life_partner"
+      when "child_under_26", "child_26_and_over", "disabled_child_26_and_over"
+        "child"
       end
     end
 
@@ -226,48 +201,126 @@ module Importers
       renewal_enrollments.first
     end
 
-    def update_enrollment_members(family, enrollment, dependents, passive=false)
-      update_msgs = []
+    def update_coverage_dependents(family, enrollment, employer, plan)
+      people = map_dependents.inject([]) do |people, dependent|
 
-      dependent_ids = dependents.map(&:id)
-      updated_enrollment_members = enrollment.hbx_enrollment_members.inject([]) do |enrollment_members, enrollment_member|
-        if enrollment_member.is_subscriber? || (enrollment_member.family_member.present? && dependent_ids.include?(enrollment_member.family_member.person_id))
-          enrollment_members << enrollment_member
+        matched = Person.match_by_id_info(ssn: dependent.ssn, dob: dependent.dob, last_name: dependent.last_name, first_name: dependent.first_name)
+        primary = enrollment.subscriber.person
+
+        if matched.empty?
+          alternate_member = alternate_family_member_record(family, dependent)
+          if dependent.ssn.present? && alternate_member.person.ssn != dependent.ssn
+            alternate_member.person.update_attributes(ssn: dependent.ssn)
+          end
+
+          people << (alternate_member.present? ? alternate_member.person : Factories::EnrollmentFactory.initialize_dependent(family, primary, dependent))
         else
-          update_msgs << "Dropped #{enrollment_member.try(:family_member).try(:person).try(:full_name)} from the #{'renewed' if passive} enrollment"
-          enrollment_members
+          person = matched.detect{|match| family.find_family_member_by_person(match).present? }
+
+          if person.blank?
+            relationship = person_relationship_for(dependent.employee_relationship)
+            primary.ensure_relationship_with(matched[0], relationship)
+            family.add_family_member(matched[0])
+          end
+
+          people << (person || matched[0])
         end
       end
 
+      family.save!
+      family.reload
+      enrollment.reload
+
+      filter_people_for_removal = Proc.new{|enrollment, people|
+        enrollment.hbx_enrollment_members.inject([]){|people_to_delete, enrollment_member| 
+          (people + [enrollment.subscriber.person]).include?(enrollment_member.person) ? people_to_delete : (people_to_delete << enrollment_member.person)
+        }
+      }
+
+      people_for_removal = filter_people_for_removal.call(enrollment, people)
+      if update_enrollment_members(family, enrollment, people)
+
+        passive_renewal = get_passively_renewed_coverage(employer, family)
+        return passive_renewal if passive_renewal.is_a?(Boolean)
+        people_for_removal += filter_people_for_removal.call(passive_renewal, people)
+
+        if update_enrollment_members(family, passive_renewal, people, true)
+          people_for_removal.uniq.each do |person|
+            family_member = family.find_family_member_by_person(person)
+            next if family_member.blank?
+            next if family.active_household.hbx_enrollments.where("hbx_enrollment_members.applicant_id" => family_member.id).present?
+            family.active_household.remove_family_member(family_member)
+            family_member.delete
+          end
+
+          return true
+        end
+      end
+
+      false
+    end
+
+    def alternate_family_member_record(family, fm)
+      family.family_members.detect do |family_member|
+        family_member.first_name.match(/#{fm.first_name}/i) && family_member.last_name.match(/#{fm.last_name}/i) && family_member.dob == fm.dob
+      end
+    end
+
+    def replace_enrollment_member(enrollments, family_member, alternate_member)
+      enrollments.each do |enrollment|
+        enrollment_members = enrollment.hbx_enrollment_members
+        enrollment_members.reject!{|em| em.family_member == family_member}
+        enrollment_members << enrollment.hbx_enrollment_members.build({
+          applicant_id: alternate_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
+        })
+
+        enrollment.hbx_enrollment_members = enrollment_members
+        enrollment.save
+      end
+    end
+
+    def update_enrollment_members(family, enrollment, people, passive=false)
+      added = []
+      dropped = []
+
+      enrollment_members = enrollment.hbx_enrollment_members.select{|em| em.is_subscriber? }
       hh = family.active_household
       ch = hh.immediate_family_coverage_household
-      dependents.each do |dependent|
-        family_member = family.find_family_member_by_person(dependent)
-        enrollment_member = updated_enrollment_members.detect{|enrollment_member| enrollment_member.applicant_id == family_member.id}
+
+      people.each do |person|
+        enrollment_member = enrollment.hbx_enrollment_members.detect{|em| em.person == person}
         if enrollment_member.blank?
-          coverage_member = ch.coverage_household_members.detect{|cm| cm.family_member == family_member }
-          if coverage_member.present?
-            updated_enrollment_members << enrollment.hbx_enrollment_members.build({
-              applicant_id: family_member.id,
-              eligibility_date: enrollment.effective_on,
-              coverage_start_on: enrollment.effective_on
-              })
-            update_msgs << "Added #{family_member.person.full_name} to the #{'renewed' if passive} enrollment"
-          else
-            errors.add(:base, "Immediate coverage household member missing for #{family_member.person.full_name}")
-          end
+          family_member = family.find_family_member_by_person(person)
+          family.active_household.add_household_coverage_member(family_member)
+          family.save
+
+          enrollment_member = enrollment.hbx_enrollment_members.build({
+            applicant_id: family_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
+          })
+          added << "#{family_member.person.full_name}"
+        end
+
+        enrollment_members << enrollment_member if enrollment_member
+      end
+
+      enrollment.hbx_enrollment_members.each do |enrollment_member|
+        if !people.include?(enrollment_member.person) && !enrollment_member.is_subscriber?
+          dropped << "#{enrollment_member.person.full_name}(#{enrollment_member.person.ssn})"
         end
       end
 
-      enrollment.hbx_enrollment_members = updated_enrollment_members
+      enrollment.hbx_enrollment_members = enrollment_members
 
       if enrollment.save
-        warnings.add(:base, update_msgs.join(',')) if update_msgs.any?
+        family.reload
+
+        msg_str  = ""
+        msg_str += "Added " + (added.join(',') + " to the #{'renewed' if passive} enrollment") if added.any?
+        msg_str += "Dropped " + (dropped.join(',') + "from the #{'renewed' if passive} enrollment") if dropped.any?
+        warnings.add(:base, msg_str) unless msg_str.blank?
         return true
       else
-        enrollment.errors.each do |attr, err|
-          errors.add("family_" + attr.to_s, err)
-        end
+        enrollment.errors.each{|attr, err| errors.add("family_" + attr.to_s, err)}
         return false
       end
     end
