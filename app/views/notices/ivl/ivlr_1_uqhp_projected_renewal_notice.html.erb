@@ -28,7 +28,7 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
  contents: ["Information we have for you and other members of your household: "],
    heading: 'Review Your Information', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/table', locals: {headers: ["Lydia Austin"], 
+<%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ["Lydia Austin"], 
                            rows: [['State of Residency', ''],
                               ['Citizenship/Lawful Presence', ''],
                               ['Incarcerated','']],
@@ -37,7 +37,7 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
 
 
 
-    <%= render partial: 'notices/shared/table', locals: {headers: ["Soren White"], 
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ["Soren White"], 
                            rows: [['State of Residency', ''],
                               ['Citizenship/Lawful Presence', ''],
                               ['Incarcerated','']],

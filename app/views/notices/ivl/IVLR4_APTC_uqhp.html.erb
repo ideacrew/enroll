@@ -31,7 +31,7 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Information we have for you or other members of your household:"} %>
 
-<%= render partial: 'notices/shared/table', locals: {headers: ['#{notice.primary_fullname}'], 
+<%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ['#{notice.primary_fullname}'], 
                            rows: [['State of Residency', ''],
                               ['Citizenship/Lawful Presence', ''],
                               ['Tax Status',''],
@@ -44,7 +44,7 @@ content: "Information we have for you or other members of your household:"} %>
 <% if notice.family.size > 1 %>
   <% notice.family.active_household.latest_active_tax_household.tax_household_members.each do |thm| %>
     <% next if thm.is_primary_applicant? %>
-    <%= render partial: 'notices/shared/table', locals: {headers: ['#{thm.person.full_name}'], 
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ['#{thm.person.full_name}'], 
                            rows: [['State of Residency', ''],
                               ['Citizenship/Lawful Presence', ''],
                               ['Tax Status',''],
