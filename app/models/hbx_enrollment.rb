@@ -434,8 +434,10 @@ class HbxEnrollment
       elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
         if previous_enrollment.may_terminate_coverage?
           term_date = self.effective_on - 1.day
-          term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
-          previous_enrollment.terminate_coverage!(term_date)
+          term_date = TimeKeeper.date_of_record + IndividualEnrollmentTerminationMinimum if (TimeKeeper.date_of_record + IndividualEnrollmentTerminationMinimum) > term_date && self.effective_on > (TimeKeeper.date_of_record + IndividualEnrollmentTerminationMinimum)
+
+          previous_enrollment.terminate_coverage
+          previous_enrollment.update_current(terminated_on: term_date)
         end
       end
     end
