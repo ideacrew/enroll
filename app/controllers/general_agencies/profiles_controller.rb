@@ -64,8 +64,9 @@ class GeneralAgencies::ProfilesController < ApplicationController
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
     elsif @q.present?
-      q_args= @q.split(/\s+/)
-      reg_ex = q_args.join('(.*)?')
+      query= Regexp.escape(@q)
+      query_args= query.split("\\ ")
+      reg_ex = query_args.join('(.*)?')
       @families = total_families.select {|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i}
     else
       @families = total_families[0..20]
