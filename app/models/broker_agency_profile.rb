@@ -152,7 +152,8 @@ class BrokerAgencyProfile
   end
 
   def families
-    employee_families = linked_employees.map(&:primary_family).to_a
+    linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+    employee_families = linked_active_employees.map(&:primary_family).to_a
     consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
     families = (consumer_families + employee_families).uniq
     families.sort_by{|f| f.primary_applicant.person.last_name}
