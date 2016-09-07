@@ -196,6 +196,10 @@ class CensusEmployee < CensusMember
     benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
   end
 
+  def qle_30_day_eligible?
+    is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
+  end
+
   def active_benefit_group_assignment
     benefit_group_assignments.detect { |assignment| assignment.is_active? }
   end
@@ -340,6 +344,10 @@ class CensusEmployee < CensusMember
 
   def is_active?
     EMPLOYMENT_ACTIVE_STATES.include?(aasm_state)
+  end
+
+  def is_inactive?
+    EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
   end
 
   def employee_relationship
