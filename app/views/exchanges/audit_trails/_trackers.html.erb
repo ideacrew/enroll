@@ -1,0 +1,73 @@
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Entry ID</th>
+      <th>Action</th>
+      <th>Scope</th>
+      <th>Instance/Attrib</th>
+      <th colspan="2">Version</th>
+      <th>User</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% trackers.each do |tracker| %>
+      <tr>
+        <td><%= "#{truncate(tracker.id.to_s, length: 15)}" || "&nbsp;" %></td>
+        <td><%= "#{tracker.action}"  || "&nbsp;" %></td>
+        <td><%= "#{tracker.scope}"  || "&nbsp;" %></td>
+          <td>
+            <% tracker.association_chain.each do |instance| %>
+              <% path = "#{instance[:name].underscore.downcase.pluralize}_path" %>
+              <%= link_to "#{instance[:name]}", "/#{path}(#{instance[:id]})" %>
+            <% end %>
+          </td>
+        <td colspan="2"><%= "#{tracker.version}"  || "&nbsp;" %></td>
+        <td><%= "system #{tracker.modifier_id}" || "&nbsp;" %></td>
+        <td><%= "#{tracker.created_at}"  || "&nbsp;" %></td>
+      </tr>
+
+      <% (tracker.tracked_edits[:add] || []).each do |k,v| %>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>add</td>
+          <td><%= "#{k}" %></td>
+          <td><%= "nil" %></td>
+          <td><%= "#{truncate(v.to_s, length: 15)}" %></td>
+        </tr>
+      <% end %>
+
+      <% (tracker.tracked_edits[:modify] || []).each do |k,v| %>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>modify</td>
+          <td><%= "#{k}" %></td>
+          <td><%= "#{v[:from]}" %></td>
+          <td><%= "#{v[:to]}" %></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+  </tbody>
+</table>
+
+
+<ul>
+  <% trackers.each do |tracker| %>
+    <li><%= "Tracker: #{tracker.id}" %>
+      <ul>
+        <% (tracker.tracked_edits[:add] || []).each do |k,v| %>
+          <li><%= "Added field: #{k} = #{v}" %></li>
+        <% end %>
+
+        <% (tracker.tracked_edits[:modify] || []).each do |k,v| %>
+          <li><%= "Changed field: #{k}, from #{v[:from]} to #{v[:to]}" %></li>
+        <% end %>
+      </ul>
+    </li>
+  <% end %>
+</ul>
+
+
