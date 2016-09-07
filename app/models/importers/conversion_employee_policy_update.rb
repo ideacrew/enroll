@@ -209,7 +209,7 @@ module Importers
 
         if matched.empty?
           alternate_member = alternate_family_member_record(family, dependent)
-          if dependent.ssn.present? && alternate_member.person.ssn != dependent.ssn
+          if dependent.ssn.present? && alternate_member.present? && alternate_member.person.ssn != dependent.ssn
             alternate_member.person.update_attributes(ssn: dependent.ssn)
           end
 
