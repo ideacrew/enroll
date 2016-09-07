@@ -118,4 +118,14 @@ module Employers::EmployerHelper
       user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
     end
   end
+
+
+
+  def display_employee_status_transitions(census_employee)
+    content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
+    content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
+    links = link_to "Terminate", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual" if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
+    links = "#{link_to("Rehire", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual")} #{link_to("COBRA", "javascript:;", onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))")}" if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
+    return [links, content]
+  end
 end
