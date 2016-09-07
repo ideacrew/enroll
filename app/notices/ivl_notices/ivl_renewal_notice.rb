@@ -1,5 +1,5 @@
 class IvlNotices::IvlRenewalNotice < IvlNotice
-  attr_accessor :family
+  attr_accessor :family, :data
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person
@@ -7,12 +7,14 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
+    self.data = args[:data]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
 
   def build
-    family = recipient.primary_family    
+    family = recipient.primary_family
+    append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
@@ -20,6 +22,14 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
       # @notice.primary_address = nil
       raise 'mailing address not present' 
     end
+  end
+
+  def append_data
+    notice.individuals= PdfTemplates::Individual.new({
+    :incarcerated=>data["is_incarcerated"],
+    :residency_verified=>data["is_dc_resident?"],
+    :citizen_status=>data["citizen_status"]
+    })
   end
 
   def append_address(primary_address)
@@ -38,4 +48,4 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     end.join(' ')
   end
 
-end 
+end
