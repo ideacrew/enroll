@@ -38,7 +38,7 @@
   <section class="row" style="background-color: #fff;">
     <article class="col-xs-12">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
-      <% if billing_date.present? %>
+      <% if billing_date.present? && plan_year.present? %>
       <% bill_query = Queries::EmployerShowPageBill.new(@employer_profile) %>
       <% bill = bill_query.execute %>
 
