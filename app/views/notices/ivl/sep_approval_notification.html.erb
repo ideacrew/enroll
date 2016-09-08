@@ -32,7 +32,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["To select your new health insurance plan, login to your online account and click on the “Shop for Plans” link."], heading: 'Selecting a Private Health Insurance Plan', sub_heading: ''} %>
 
-[Insert Shop for Plans Image Here]
+<%= render partial: 'notices/shared/sep' %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not see this link, call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}."} %>
 
