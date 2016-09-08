@@ -15,7 +15,7 @@
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' if @family.active_admin_seps.present?%>
+      <%= render partial: 'qle_detail_for_existing_sep' if @active_admin_sep.present?%>
       <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
       <% if @waived %>
         <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
