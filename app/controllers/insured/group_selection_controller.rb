@@ -49,7 +49,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    #binding.pry
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
 

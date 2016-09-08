@@ -112,7 +112,9 @@ $(function () {
 
 
   $(document).on('click', 'a.existing-sep-item', function() {
-    //alert("Right On!");
+    $('#choose_flow').modal('hide');
+    //window.scrollTo(0, 0);
+    $('html,body').animate({scrollTop: 0});
     init_qle_message();
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
@@ -124,16 +126,10 @@ $(function () {
     $('#qle_reason .special_qle_reasons').addClass('hidden');
     $('#qle-date-chose').show();
     var is_self_attested = $(this).data('is-self-attested');
-    // if (!is_self_attested) {
-    //   $('#qle-date-chose').addClass('hidden');
-    //   $('#qle-details .error-info').removeClass('hidden');
-    // } else {
-    //   init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'), $(this).data('current-date'));
-    //   $('#qle-date-chose').removeClass('hidden');
-    // };
 
     $('#qle-details-for-existing-sep').removeClass('hidden');
     $('#qle-details').addClass('hidden');
+
   });
 
   $(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
