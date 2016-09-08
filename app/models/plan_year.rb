@@ -355,7 +355,27 @@ class PlanYear
 
   # Any employee who selected or waived coverage
   def enrolled
-    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
+    calc_active_health_assignments_for(eligible_to_enroll)
+#    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
+  end
+
+  def calc_active_health_assignments_for(employee_pool)
+    benefit_group_ids = self.benefit_groups.map(&:id)
+    candidate_benefit_group_assignments = employee_pool.map do |ce|
+        bg_assignment = nil
+        bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
+        bg_assignment = ce.renewal_benefit_group_assignment if benefit_group_ids.include?(ce.renewal_benefit_group_assignment.try(:benefit_group_id))
+        bg_assignment ? [ce, bg_assignment] : nil
+    end
+    benefit_group_assignment_pairs = candidate_benefit_group_assignments.compact
+    benefit_group_assignment_ids = benefit_group_assignment_pairs.map do |bgap|
+      bgap.last._id
+    end
+    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(benefit_group_assignment_ids)
+    have_shop_health_bgap = benefit_group_assignment_pairs.select do |bgap|
+      enrolled_benefit_group_assignment_ids.include?(bgap.last.id)
+    end
+    have_shop_health_bgap.map(&:first)
   end
 
   def total_enrolled_count
