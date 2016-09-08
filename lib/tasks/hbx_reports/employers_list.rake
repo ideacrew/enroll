@@ -5,8 +5,7 @@ namespace :reports do
 
     desc "Employer's  account information"
     task :employer_list => :environment do
-      # dange range =past 7 days changes from current 
-      # collect active organizations
+      # collecting all the employers list and comparing with glue DB
       organizations = Organization.where(:'employer_profile'.exists=>true)
 
       field_names  = %w(
