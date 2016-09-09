@@ -12,6 +12,27 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     super(args)
   end
 
+  def deliver
+    build
+    generate_pdf_notice
+    attach_blank_page
+    attach_voter_application
+    prepend_envelope
+    upload_and_send_secure_message
+
+    if recipient.consumer_role.can_receive_electronic_communication?
+      send_generic_notice_alert
+    end
+
+    if recipient.consumer_role.can_receive_paper_communication?
+      store_paper_notice
+    end
+  end
+
+  def attach_voter_application
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
+  end
+
   def build
     family = recipient.primary_family
     append_data
