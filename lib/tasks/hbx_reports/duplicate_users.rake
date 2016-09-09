@@ -10,7 +10,8 @@ namespace :report do
       all_dups = User.collection.aggregate([{'$project': {oim_id: {"$toLower" => '$oim_id'},legal_name: 1 }},{'$group': {_id: '$oim_id', count: {'$sum':1}}},{ '$match': { count: { '$gt': 1 } }}]).entries
       field_names  = %w(
                username
-               work_email_or_best
+               user_email
+               person_email
                person_hbx_id
                user_first_name
                user_last_name
@@ -26,7 +27,8 @@ namespace :report do
           users= User.where(:oim_id => Regexp.new("^#{dup['_id']}$",true))
           users.each do |user|
             csv << [
-                user.try(:emails),
+                user.oim_id,
+                user.email,
                 user.try(:person).try(:work_email_or_best),
                 user.try(:person).try(:hbx_id),
                 user.try(:person).try(:first_name),
