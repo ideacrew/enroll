@@ -143,11 +143,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
-    if hbx_enrollment.may_terminate_coverage?
+    if hbx_enrollment.may_schedule_coverage_termination?
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
-      hbx_enrollment.terminated_on = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
-      hbx_enrollment.terminate_coverage!
+      hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
 
       redirect_to family_account_path
     else

@@ -224,13 +224,11 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "POST terminate" do
-    let(:enrollment) { HbxEnrollment.new }
+    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected"}) }
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
-      allow(enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(enrollment).to receive(:terminate_coverage!).and_return(true)
-      #allow(hbx_enrollment).to receive(:update_current).and_return(true)
-      #allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
+      allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
+      allow(enrollment).to receive(:schedule_coverage_termination!).and_return(true)
       allow(person).to receive(:primary_family).and_return(Family.new)
       sign_in user
     end
@@ -242,7 +240,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(enrollment).to receive(:may_terminate_coverage?).and_return(false)
+      allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end
