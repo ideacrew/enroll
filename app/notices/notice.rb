@@ -122,10 +122,9 @@ class Notice
   end
 
   def store_paper_notice
-    file_path = "#{notice_filename}.pdf"
     bucket_name= Settings.paper_notice
     begin
-      doc_uri = Aws::S3Storage.save(file_path,bucket_name)
+      doc_uri = Aws::S3Storage.save(notice_path,bucket_name)
     rescue Exception => e
       puts "Unable to upload paper notices to Amazon"
     end
