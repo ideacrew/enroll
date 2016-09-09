@@ -8,7 +8,7 @@
   <% @person.active_employee_roles.each do |employee_role|%>
     <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
-  <%= render 'sep_message' if @family.active_admin_seps.present? %>  
+  <%= render 'sep_message' if @active_admin_sep.present? %>  
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
