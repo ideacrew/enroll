@@ -61,7 +61,8 @@ class BenefitGroupAssignment
 
   def benefit_group
     return @benefit_group if defined? @benefit_group
-    @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
+    return nil if benefit_group_id.blank?
+    @benefit_group = BenefitGroup.find(self.benefit_group_id)
   end
 
   def hbx_enrollment=(new_hbx_enrollment)

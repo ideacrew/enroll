@@ -131,6 +131,9 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
+  rescue => e
+    log(e.message, :severity=>'error')
+    redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
   end
 
   def print_waiver
