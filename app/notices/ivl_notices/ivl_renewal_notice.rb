@@ -46,11 +46,15 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def append_data
-    notice.individuals= PdfTemplates::Individual.new({
-    :incarcerated=>data["is_incarcerated"],
-    :residency_verified=>data["is_dc_resident?"],
-    :citizen_status=>data["citizen_status"]
-    })
+    notice.individuals=data.collect do |datum|
+        person = Person.where(:hbx_id => datum["glue_person.hbx_id"]).first
+        PdfTemplates::Individual.new({
+          :full_name => person.full_name,
+          :incarcerated=>datum["glue_incarcerated"],
+          :citizen_status=> citizen_status(datum["glue_citizenship"]),
+          :residency_verified => datum["glue_dc_resident"].upcase == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
+        })
+    end
   end
 
   def append_address(primary_address)
@@ -67,6 +71,17 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     address_line.split(/\s/).map do |x| 
       x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
+  end
+
+  def citizen_status(status)
+    case status
+    when "us_citizen"
+      "U.S. Citizen"
+    when "alien_lawfully_present"
+      "Lawfully Present"
+    else
+      "Not Lawfully Present"
+    end
   end
 
 end
