@@ -8,6 +8,16 @@ module Importers
     validates_presence_of :plan_selection, :allow_blank => false
     validates_numericality_of :enrolled_employee_count, :allow_blank => false
 
+    def calculated_coverage_start
+      return @calculated_coverage_start if @calculated_coverage_start
+      if coverage_start.present?
+        start_date = Date.strptime(coverage_start, "%m/%d/%Y")
+        Date.new(default_plan_year_start.year,start_date.month,start_date.day)
+      else
+        default_plan_year_start
+      end
+    end
+
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer

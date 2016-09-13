@@ -192,9 +192,8 @@ module Importers
         ]
       }
       if !contact_email.blank?
-        person_attrs[:emails] = [
-          Email.new(:kind => "work", :address => contact_email)
-        ]
+        emails = contact_email.strip.split(',')
+        person_attrs[:emails] = emails.map{|email| Email.new(:kind => "work", :address => email.gsub(/\s/, '')) }
       end
       Person.create!(person_attrs)
     end

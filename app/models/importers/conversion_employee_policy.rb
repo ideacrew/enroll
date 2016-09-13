@@ -156,6 +156,11 @@ module Importers
       if bga.blank?
         plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
+        if plan_years.any?{|py| py.migration_expired? }
+          errors.add(:base, "ER migration expired!")
+          return false
+        end
+
         if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
           employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
           employee.reload

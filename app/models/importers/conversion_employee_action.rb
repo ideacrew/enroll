@@ -38,6 +38,12 @@ module Importers
       def save
         return false unless valid?
         found_employee = find_employee
+
+        employer = find_employer
+        if employer.legal_name.match(/OLD DO NOT USE/i).present?
+          puts "OLD DO NOT USE #{fein} #{employer_name}"
+        end
+
         proxy = found_employee.nil? ? ::Importers::ConversionEmployeeCreate.new(@original_attributes) : ::Importers::ConversionEmployeeUpdate.new(@original_attributes)
         result = proxy.save
         propagate_warnings(proxy)
