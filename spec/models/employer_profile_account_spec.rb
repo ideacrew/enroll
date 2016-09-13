@@ -121,7 +121,8 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
       before do
         plan_year.publish!
-        allow_any_instance_of(CensusEmployee).to receive(:has_active_health_coverage?).and_return(true)
+#        allow_any_instance_of(CensusEmployee).to receive(:has_active_health_coverage?).and_return(true)
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with([census_employee.active_benefit_group_assignment.id]).and_return([census_employee.active_benefit_group_assignment.id])
         census_employee.active_benefit_group_assignment.select_coverage!
 
         TimeKeeper.set_date_of_record(open_enrollment_end_on + 1.day)

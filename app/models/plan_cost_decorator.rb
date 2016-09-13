@@ -77,8 +77,14 @@ class PlanCostDecorator < SimpleDelegator
     end
   end
 
+  def reference_plan_member_premium(member)
+    Caches::PlanDetails.lookup_rate(reference_plan.id, plan_year_start_on, age_of(member))
+  end
+
   def reference_premium_for(member)
-    (reference_plan.premium_for(plan_year_start_on, age_of(member)) * large_family_factor(member)).round(2)
+    # FIXME: I've just fixed this to use the plan rate cache - it seems there
+    #        multiple areas where this isn't being used - we need to correct this.
+    (reference_plan_member_premium(member) * large_family_factor(member)).round(2)
   rescue
     0.00
   end

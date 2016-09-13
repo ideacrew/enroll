@@ -89,7 +89,7 @@ When(/^.+ clicks? on Create Account$/) do
 end
 
 When(/^.+ registers? with valid information$/) do
-  fill_in "user[email]", with: "ricky.martin@example.com"
+  fill_in "user[oim_id]", with: "ricky.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
