@@ -130,6 +130,7 @@ class HbxEnrollment
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
@@ -316,7 +317,7 @@ class HbxEnrollment
     return false if shopping?
     return false unless (effective_on > TimeKeeper.date_of_record)
     return true if terminated_on.blank?
-    terminated_on >= effective_on   
+    terminated_on >= effective_on
   end
 
   def generate_hbx_id
@@ -348,7 +349,6 @@ class HbxEnrollment
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
     update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
     propogate_waiver
-
     hbxs = HbxEnrollment.find_by_benefit_group_assignments([benefit_group_assignment])
     return if hbxs.blank?
     hbxs.each do |hbx|
@@ -892,9 +892,23 @@ class HbxEnrollment
     end
   end
 
+  def self.enrolled_shop_health_benefit_group_ids(benefit_group_assignment_list)
+    return [] if benefit_group_assignment_list.empty?
+    enrollment_list = []
+    families = Family.where("households.hbx_enrollments.benefit_group_assignment_id" => {"$in" => benefit_group_assignment_list})
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.show_enrollments_sans_canceled.shop_market.by_coverage_kind("health").each do |enrollment|
+          enrollment_list << enrollment if (benefit_group_assignment_list.include?(enrollment.benefit_group_assignment_id))
+        end
+      end
+    end rescue ''
+    enrollment_list.map(&:benefit_group_assignment_id).uniq
+  end
+
   def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
     return [] if benefit_group_assignment.blank?
-    benefit_group_assignment_id = benefit_group_assignment.id    
+    benefit_group_assignment_id = benefit_group_assignment.id
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
     enrollment_list = []
     families.each do |family|
@@ -915,7 +929,7 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.active.each do |enrollment|
+        household.hbx_enrollments.enrolled_and_renewing_and_shopping.each do |enrollment|
           enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
         end
       end
@@ -1153,7 +1167,7 @@ class HbxEnrollment
 
  def set_submitted_at
    if submitted_at.blank?
-      write_attribute(:submitted_at, TimeKeeper.date_of_record) 
+      write_attribute(:submitted_at, TimeKeeper.date_of_record)
    end
  end
 
