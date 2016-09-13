@@ -43,7 +43,7 @@ gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", bra
 gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "mongoid-autoinc"
-
+gem 'mongoid-versioning'
 gem 'money-rails', '~> 1.3.0'
 gem "mongoid-enum"
 gem 'mongo_session_store-rails4', '~> 6.0.0'
