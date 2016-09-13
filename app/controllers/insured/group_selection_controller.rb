@@ -122,10 +122,9 @@ class Insured::GroupSelectionController < ApplicationController
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
 
-    if hbx_enrollment.may_terminate_coverage?
+    if hbx_enrollment.may_schedule_coverage_termination?
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
-      hbx_enrollment.terminate_benefit(term_date)
-      hbx_enrollment.propogate_terminate(term_date)
+      hbx_enrollment.schedule_coverage_termination!(term_date)
       redirect_to family_account_path
     else
       redirect_to :back

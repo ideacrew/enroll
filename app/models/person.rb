@@ -471,6 +471,10 @@ class Person
     consumer_role.present? and consumer_role.is_active?
   end
 
+  def can_report_shop_qle?
+    employee_roles.first.census_employee.qle_30_day_eligible?
+  end
+
   def has_active_employee_role?
     active_employee_roles.any?
   end
