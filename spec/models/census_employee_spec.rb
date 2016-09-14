@@ -160,6 +160,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(CensusEmployee.find_all_by_employer_profile(employer_profile).first).to eq initial_census_employee
         end
 
+        it "should be findable by first_name, last_name, dob" do
+          expect(CensusEmployee.by_first_name_last_name_dob(first_name, last_name, dob).size).to eq 1
+        end
+
         context "and a benefit group isn't yet assigned to employee" do
           it "the roster instance should not be ready for linking" do
             expect(initial_census_employee.may_link_employee_role?).to be_falsey
