@@ -2,8 +2,8 @@ module SepAll
 
   def calculateDates
     @family = Family.find(params[:person]) if params[:person].present?
-    @eff_kind  = params[:effective_kind] if params[:effective_kind].present?
-    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_kind])
+    @eff_kind  = params[:effective_kind].split.join("_") if params[:effective_kind].present?
+    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_kind].split.join("_").downcase)
     qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
     special_enrollment_period.qualifying_life_event_kind = qle
     special_enrollment_period.qle_on = Date.strptime(params[:eventDate], "%m/%d/%Y")
