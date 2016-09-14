@@ -7,9 +7,7 @@ module Events
         reply_to = properties.reply_to
         headers = properties.headers || {}
 
-        ssn = headers[:ssn]
-        dob = headers[:dob]
-        census_employees = find_census_employee({ssn: ssn, dob: dob})
+        census_employees = find_census_employee({ssn: headers[:ssn], dob: headers[:dob], first_name: headers[:first_name], last_name: headers[:last_name]})
 
         return_status = "200"
         if census_employees.empty?
@@ -34,7 +32,7 @@ module Events
     end
 
     def find_census_employee(options)
-      CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(options[:ssn])).and(dob: Date.strptime(options[:dob], "%Y%m%d"))
+      (CensusEmployee.by_ssn(options[:ssn]).to_a + CensusEmployee.by_first_name_last_name_dob(options[:first_name], options[:last_name], options[:dob]).to_a).uniq
     end
   end
 end
