@@ -3,7 +3,11 @@ class SpecialEnrollmentPeriod
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  include Mongoid::History::Trackable
+  include AuditTrail
+
   embedded_in :family
+  embeds_many :comments, as: :commentable, cascade_callbacks: true
 
   # for employee gaining medicare qle
   attr_accessor :selected_effective_on
@@ -13,8 +17,8 @@ class SpecialEnrollmentPeriod
   # Date Qualifying Life Event occurred
   field :qle_on, type: Date
 
-  # Comments made by admin
-  field :admin_comment, type: String
+  # Comments made by admin_comment
+  # field :admin_comment, type: String  #Removing this, using polymorphic comment association.
 
   # Date coverage starts
   field :effective_on_kind, type: String

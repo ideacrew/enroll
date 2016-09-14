@@ -18,6 +18,7 @@ class Comment
   validates_presence_of :content
 
   embedded_in :person
+  embedded_in :special_enrollment_period
 
   def high?
     priority == "high"

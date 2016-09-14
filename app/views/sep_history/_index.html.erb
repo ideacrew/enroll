@@ -49,14 +49,20 @@
                   <% else %>
                     <td class="text-center">N/A</td>
                   <% end %>
-             
-                  <% if f.admin_comment.present? %>
-                    <td class="text-center"><%= f.admin_comment %></td>
-                  <% else %>
-                    <td class="text-center">Admin: N/A</td>
-                  <% end %>
-              </tbody>
-            <% end %>
+
+                </tr>
+                <div class="col-md-12 col-sm-12 col-xs-12">            
+                  <tr>
+                    <% if f.comments.present? %>
+                      <td colspan = "8"> <b>Admin Comment: </b> <%= f.comments.first.content %> </td>
+                    <% else %>
+                      <td colspan = "8"><b>Admin Comment:</b> N/A </td>
+                    <% end %>
+                  </tr>
+                </div>
+            </tbody>
+          <% end %>
+
           </div>
         </table>
       </div>

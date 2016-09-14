@@ -118,7 +118,8 @@ module SepAll
     special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
     special_enrollment_period.end_on = Date.strptime(params[:end_on], "%m/%d/%Y") if params[:end_on].present?
     special_enrollment_period.selected_effective_on = params.permit(:effective_on_date)[:effective_on_date] if params[:effective_on_date].present?
-    special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
+    # special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
+    special_enrollment_period.comments << Comment.new(content: params[:admin_comment], user: current_user.email) if params[:admin_comment].present?
     special_enrollment_period.csl_num = params.permit(:csl_num)[:csl_num] if params[:csl_num].present?
     special_enrollment_period.next_poss_effective_date = Date.strptime(params[:next_poss_effective_date], "%m/%d/%Y") if params[:next_poss_effective_date].present?
     date_arr = Array.new

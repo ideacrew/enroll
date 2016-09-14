@@ -73,7 +73,8 @@ class Person
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
-#  embeds_one :responsible_party, cascade_callbacks: true, validate: true
+  #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
+
   embeds_one :csr_role, cascade_callbacks: true, validate: true
   embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
@@ -162,14 +163,17 @@ class Person
   index({"person_relationship.relative_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
-#  index({"hbx_responsible_party_role._id" => 1})
+
+  #index({"hbx_responsible_party_role._id" => 1})
+
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_role: true) }
-#  scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
+
+  #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
