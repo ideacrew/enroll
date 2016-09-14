@@ -3,7 +3,7 @@ $('.sep_dates_filter').hide();
 $('.init_effective_date input').val("");
 $('.optional_date').hide();
 $('.init_event_date').show();
-$('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@qle.effective_on_kinds)%>").selectric("refresh");
+$('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@effective_kinds)%>").selectric("refresh");
 if("<%= @qle.is_self_attested %>" == 'true'){
   $('#start_on, #end_on').addClass("disabled-input");
   $('#next_poss_effective_date').addClass("disabled-input");

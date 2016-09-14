@@ -1,7 +1,7 @@
 <br/>
-<div class="container">
+<div class="">
     <div class = "table-responsive"> 
-      <table class = "table table-striped table-bordered table-history">
+      <table class = "table table-striped table-bordered" style="table-layout: fixed;">
         <h3 class='title'>SEP HISTORY</h3>
         <div class="row">        
             <% @family.special_enrollment_periods.to_a.reverse_each do |f| %>
@@ -15,6 +15,7 @@
                   <th>NEXT POSSIBLE EVENT DATE</th>
                   <th>OPTION DATES</th>
                   <th>CSL#</th>
+                  <th>ADMIN COMMENTS</th>
                 </tr>
               </thead>
               <tbody>
@@ -22,46 +23,42 @@
                   <td><%=f.title %></td>
 
                   <% if f.effective_on_kind.present? %>
-                    <td><%=f.effective_on_kind.humanize %></td>
+                    <td class="text-center"><%=f.effective_on_kind.humanize %></td>
                   <% else %>
-                    <td>N/A</td>
+                    <td class="text-center">N/A</td>
                   <% end %>
                   
                   <td><%=f.qle_on%></td>
-                  <td><%=f.start_on%></td>
-                  <td><%=f.end_on%></td>
+                  <td class="text-center"><%=f.start_on%></td>
+                  <td class="text-center"><%=f.end_on%></td>
                   
                   <% if f.next_poss_effective_date.present? %>
-                    <td><%=f.next_poss_effective_date %></td>
+                    <td class="text-center"><%=f.next_poss_effective_date %></td>
                   <% else %>
-                    <td>N/A</td>
+                    <td class="text-center">N/A</td>
                   <% end %>
 
                   <% if f.optional_effective_on.length > 0 %>
-                      <td><%=f.optional_effective_on.join(", ") %></td>
+                      <td class="text-center"><%=f.optional_effective_on.join(", ") %></td>
                   <% else %>
-                    <td>N/A</td>
+                    <td class="text-center">N/A</td>
                   <% end %>
 
                   <% if f.csl_num.present? %>
-                    <td><%=f.csl_num %></td>
+                    <td class="text-center"><%=f.csl_num %></td>
                   <% else %>
-                    <td>N/A</td>
+                    <td class="text-center">N/A</td>
                   <% end %>
-                </tr>
-                <div class="col-md-12 col-sm-12 col-xs-12">            
-                  <tr>
-                    <% if f.admin_comment.present? %>
-                      <td><%="Admin Comment: " + f.admin_comment %></td>
-                    <% else %>
-                      <td>&nbsp;&nbsp;Admin: N/A</td>
-                    <% end %>
-                  </tr>
-                </div>
-            </tbody>
-          <% end %>
+             
+                  <% if f.admin_comment.present? %>
+                    <td><%= f.admin_comment %></td>
+                  <% else %>
+                    <td>&nbsp;&nbsp;Admin: N/A</td>
+                  <% end %>
+              </tbody>
+            <% end %>
           </div>
-       </table>
+        </table>
       </div>
     <br/>
 </div>
