@@ -3,7 +3,7 @@
     <div class = "table-responsive"> 
       <table class = "table table-striped table-bordered" style="table-layout: fixed;">
         <h3 class='title'>SEP HISTORY</h3>
-        <div class="row">        
+          <div class="row">      
             <% @family.special_enrollment_periods.to_a.reverse_each do |f| %>
               <thead>              
                 <tr>
@@ -20,7 +20,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><%=f.title %></td>
+                  <td class="text-center"><%=f.title %></td>
 
                   <% if f.effective_on_kind.present? %>
                     <td class="text-center"><%=f.effective_on_kind.humanize %></td>
@@ -28,7 +28,7 @@
                     <td class="text-center">N/A</td>
                   <% end %>
                   
-                  <td><%=f.qle_on%></td>
+                  <td class="text-center"><%=f.qle_on%></td>
                   <td class="text-center"><%=f.start_on%></td>
                   <td class="text-center"><%=f.end_on%></td>
                   
@@ -51,9 +51,9 @@
                   <% end %>
              
                   <% if f.admin_comment.present? %>
-                    <td><%= f.admin_comment %></td>
+                    <td class="text-center"><%= f.admin_comment %></td>
                   <% else %>
-                    <td>&nbsp;&nbsp;Admin: N/A</td>
+                    <td class="text-center">Admin: N/A</td>
                   <% end %>
               </tbody>
             <% end %>
