@@ -46,7 +46,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       expect(rule.is_age_range_satisfied?).to eq false
     end
   end
-
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
     before :all do
@@ -247,6 +246,54 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns true if person is lawfully present" do
         role.citizen_status = "alien_lawfully_present"
         expect(rule.is_citizenship_status_satisfied?).to eq true
+      end
+    end
+
+    context "#primary applicant" do
+      let(:consumer_role) {double}
+      let(:benefit_package) {double}
+      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
+      let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+      it "should return family member record of primary applicant" do
+        pa = family.family_members.where(is_primary_applicant: true).first
+        expect(rule.send(:primary_applicant)).to eq pa
+      end
+    end
+ 
+    context "#is_family_relationships_satisfied?" do
+      let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
+      let(:consumer_role_two) {FactoryGirl.create(:consumer_role, person: person)}
+      let(:benefit_package) {double}
+      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
+      let(:rule2) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family_two) }
+      let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, 'health', family) }
+      let(:family) {
+        family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent, person: person)
+        persn = family.family_members.where(is_primary_applicant: false).first.person
+        persn.dob = person.dob
+        persn.gender = person.gender
+        persn.save
+        family
+       }
+      let(:person) { FactoryGirl.create(:person)}
+      let(:family_two) { FactoryGirl.build(:family, :with_primary_family_member, person: family.family_members.where(is_primary_applicant: false).first.person)}
+      before :each do
+        person.person_relationships << PersonRelationship.new({
+          :kind => 'child',
+          :relative_id => family.family_members.where(is_primary_applicant: false).first.person.id
+        })
+      end
+
+      it "should return true if person is primary applicant" do
+        expect(rule3.is_family_relationships_satisfied?).to eq true
+      end
+
+      it "should return false if person is >26 and in child relation to primary" do
+        expect(rule.is_family_relationships_satisfied?).to eq false
+      end
+
+      it "should return true if the same person now the primary applicant" do
+        expect(rule2.is_family_relationships_satisfied?).to eq true
       end
     end
   end

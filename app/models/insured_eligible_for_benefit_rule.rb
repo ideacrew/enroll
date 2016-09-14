@@ -11,8 +11,9 @@ class InsuredEligibleForBenefitRule
   #     lawful_permanent_resident
   # )
 
-  def initialize(role, benefit_package, coverage_kind='health')
+  def initialize(role, benefit_package, coverage_kind='health', family=nil)
     @role = role
+    @family = family
     @benefit_package = benefit_package
     @coverage_kind = coverage_kind
   end
@@ -149,7 +150,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def primary_applicant
-    @role.person.families.last.family_members.select {|s| s.is_primary_applicant}.first || nil
+    @family.family_members.select {|s| s.is_primary_applicant}.first || nil
   end
 
   def relation_ship_with_primary_applicant
