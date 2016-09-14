@@ -61,10 +61,10 @@ When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  if find_all('.interaction-click-control-continue').any?
+  if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
+    find('.interaction-click-control-shop-for-new-plan', wait: 10).click
   end
 end
 
