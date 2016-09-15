@@ -31,5 +31,8 @@ class Permission
     def hbx_csr_tier2 
       Permission.where(name: 'hbx_csr_tier2').first 
     end
+    def developer
+      Permission.where(name: 'developer').first
+    end
   end
 end
