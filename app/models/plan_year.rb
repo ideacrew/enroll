@@ -84,7 +84,7 @@ class PlanYear
           "$in" => id_list
         },
         "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
-        "effective_on" =>  {"$lte" => date.end_of_month}
+        "effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on}
       }}}},
       {"$unwind" => "$households"},
       {"$unwind" => "$households.hbx_enrollments"},
@@ -93,7 +93,7 @@ class PlanYear
           "$in" => id_list
         },
         "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
-        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month}
+        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on}
       }},
       {"$sort" => {
         "households.hbx_enrollments.submitted_at" => 1
@@ -109,6 +109,7 @@ class PlanYear
       }},
       {"$match" => {"aasm_state" => {"$nin" => HbxEnrollment::WAIVED_STATUSES}}}
     ])
+    return [] if (enrollment_proxies.count > 100)
     enrollment_proxies.map do |ep|
       OpenStruct.new(ep)
     end
