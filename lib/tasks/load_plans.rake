@@ -114,7 +114,7 @@ end
 namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2016", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
     # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
     qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
       puts file
