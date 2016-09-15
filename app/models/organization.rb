@@ -193,6 +193,15 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
+  def mailling_address
+    office_locations.detect{|l| !l.is_primary? }
+  end
+
+  def billing_address
+    primary_office_location
+  end
+
+
   def self.search_by_general_agency(search_content)
     Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
   end
