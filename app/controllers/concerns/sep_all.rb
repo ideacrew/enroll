@@ -111,8 +111,8 @@ module SepAll
   def createSep
     qle = QualifyingLifeEventKind.find(params[:qle_id])
     @family = Family.find(params[:person])
-    @name = params.permit(:firstName)[:firstName] + " " + params.permit(:lastName)[:lastName] 
-    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+    @name = params.permit(:firstName)[:firstName] + " " + params.permit(:lastName)[:lastName]
+    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind].downcase)
     special_enrollment_period.qualifying_life_event_kind = qle
     special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y") if params[:event_date].present?
     special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
