@@ -1,6 +1,5 @@
 ### Redmine ticket(s)
-* (redmine links here)
-* (if more)
+* ( ONLY ONE redmine links here (open up additional PRs if more than ONE)
 
 ### Local build result
 
