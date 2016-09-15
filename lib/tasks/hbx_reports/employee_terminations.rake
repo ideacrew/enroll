@@ -6,7 +6,10 @@ namespace :reports do
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
 
-      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
+      today = Date.today
+      yesterday = today - 1.day
+
+      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => yesterday)
 
       field_names  = %w(
           employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at
@@ -46,7 +49,7 @@ namespace :reports do
         end
       end
 
-      puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
+      puts "For period #{yesterday} - #{today}, #{processed_count} employee terminations output to file: #{file_name}"
     end
   end
 end
