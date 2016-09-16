@@ -349,5 +349,6 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
 end
