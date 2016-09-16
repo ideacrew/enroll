@@ -22,6 +22,7 @@ namespace :report do
                person_hbx_id
                person_home_email
                person_work_email
+               user_created_at
              )
       processed_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
@@ -39,7 +40,8 @@ namespace :report do
                 person.user.roles,
                 person.hbx_id,
                 person.try(:emails).where(kind: "home").try(:first).try(:address),
-                person.try(:emails).where(kind: "work").try(:first).try(:address)
+                person.try(:emails).where(kind: "work").try(:first).try(:address),
+                person.user.created_at
             ]
             processed_count += 1
           end
