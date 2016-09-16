@@ -619,7 +619,6 @@ end
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
   wait_for_ajax
-  binding.pry
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
