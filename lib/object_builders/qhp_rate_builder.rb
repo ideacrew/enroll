@@ -52,7 +52,8 @@ class QhpRateBuilder
     if METLIFE_HIOS_IDS.include?(@rate[:plan_id])
       calculate_and_build_metlife_premium_tables
     else
-      @results[@rate[:plan_id]] << {
+      key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      @results[key] << {
         age: assign_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
@@ -73,9 +74,10 @@ class QhpRateBuilder
   end
 
   def find_plan_and_create_premium_tables
-    @results.each do |plan_id, premium_tables|
-      unless INVALID_PLAN_IDS.include?(plan_id)
-        @plans = Plan.where(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
+    @results.each do |key, premium_tables|
+      hios_id, year = key.split(",")
+      unless INVALID_PLAN_IDS.include?(hios_id)
+        @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
         @plans.each do |plan|
           plan.premium_tables = nil
           plan.premium_tables.create!(premium_tables)
@@ -87,9 +89,10 @@ class QhpRateBuilder
   end
 
   def find_plan_and_update_premium_tables
-    @results.each do |plan_id, premium_table_hash|
-      unless INVALID_PLAN_IDS.include?(plan_id)
-        @plans = Plan.where(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
+    @results.each do |key, premium_tables|
+      hios_id, year = key.split(",")
+      unless INVALID_PLAN_IDS.include?(hios_id)
+        @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
         @plans.each do |plan|
           pts = plan.premium_tables
           premium_table_hash.each do |value|
