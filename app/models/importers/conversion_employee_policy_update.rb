@@ -43,19 +43,6 @@ module Importers
       end
     end
 
-    def find_benefit_group_assignment
-      return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
-      census_employee = find_employee
-      return nil unless census_employee
-      candidate_bgas = census_employee.benefit_group_assignments.select do |bga|
-        bga.start_on <= start_date
-      end
-      non_terminated_employees = candidate_bgas.reject do |ce|
-        (!ce.end_on.blank?) && ce.end_on <= Date.today
-      end
-      @found_benefit_group_assignment = non_terminated_employees.sort_by(&:start_on).last
-    end
-
     def find_employee
       return @found_employee unless @found_employee.nil?
       return nil if subscriber_ssn.blank?
@@ -119,9 +106,8 @@ module Importers
     end
 
     def find_current_enrollment(family, employer)
-      plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
-      plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
-   
+      plan_year = employer.plan_years.published_and_expired_plan_years_by_date(employer.registered_on).first
+
       if plan_year.blank?
         errors.add(:base, "plan year missing")
         return false
@@ -145,7 +131,7 @@ module Importers
       # end
 
       enrollments.each do |enrollment|
-        enrollment.cancel_coverage!
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
       end
 
       enrollment.expire_coverage! if enrollment.may_expire_coverage?
@@ -388,7 +374,6 @@ module Importers
     end
 
     def save
-
       begin
         return false unless valid?
         employer = find_employer
@@ -397,6 +382,7 @@ module Importers
         return false unless person
 
         puts '----processing ' + person.full_name
+
         family = person.primary_family
         enrollment = find_current_enrollment(family, employer)
 

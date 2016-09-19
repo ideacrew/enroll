@@ -43,19 +43,6 @@ module Importers
       end
     end
 
-    def find_benefit_group_assignment
-      return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
-      census_employee = find_employee
-      return nil unless census_employee
-      candidate_bgas = census_employee.benefit_group_assignments.select do |bga|
-        bga.start_on <= start_date
-      end
-      non_terminated_employees = candidate_bgas.reject do |ce|
-        (!ce.end_on.blank?) && ce.end_on <= Date.today
-      end
-      @found_benefit_group_assignment = non_terminated_employees.sort_by(&:start_on).last
-    end
-
     def find_employee
       return @found_employee unless @found_employee.nil?
       return nil if subscriber_ssn.blank?

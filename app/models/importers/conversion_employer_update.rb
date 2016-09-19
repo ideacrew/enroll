@@ -24,6 +24,13 @@ module Importers
           end
         end
 
+        broker = find_broker
+        general_agency = find_ga
+
+        if broker.present? && general_agency.present? && organization.employer_profile.general_agency_accounts.where(:general_agency_profile_id => general_agency.id).blank?
+          organization.employer_profile.general_agency_accounts = assign_general_agencies
+        end
+
         update_result = organization.save
       rescue Mongoid::Errors::UnknownAttribute
         organization.employer_profile.plan_years.each do |py|

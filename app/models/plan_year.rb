@@ -74,6 +74,14 @@ class PlanYear
     )
   }
 
+  scope :published_and_expired_plan_years_by_date, ->(date) {
+    where(
+      "$and" => [
+        {:aasm_state.in => PUBLISHED + ['expired'] },
+        {:"start_on".lte => date, :"end_on".gte => date}
+      ]
+    )
+  }
 
   def hbx_enrollments_by_month(date)
     id_list = benefit_groups.collect(&:_id).uniq
@@ -820,6 +828,7 @@ private
       false
     end
   end
+
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on

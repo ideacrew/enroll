@@ -85,6 +85,18 @@ module Importers
       end
     end
 
+    def find_benefit_group_assignment
+      return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
+      census_employee = find_employee
+      return nil unless census_employee
+
+      found_employer = find_employer
+      if plan_year = found_employer.plan_years.published_and_expired_plan_years_by_date(found_employer.registered_on).first
+        candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_group_id".in  => plan_year.benefit_groups.map(&:id))
+        @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+      end
+    end
+
     def start_date
       [default_policy_start].detect { |item| !item.blank? }
     end

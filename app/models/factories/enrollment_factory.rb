@@ -254,11 +254,13 @@ module Factories
       when 0
         # Assign employee-specifc attributes
         person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
-      when 1
-        roles.first
+        # when 1
+        #   roles.first
+        # else
+        #   # What am I doing here?
+        #   nil
       else
-        # What am I doing here?
-        nil
+        roles.first
       end
     end
 

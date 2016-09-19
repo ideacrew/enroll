@@ -48,21 +48,6 @@ module Importers
       end
     end
 
-    def find_benefit_group_assignment
-      return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
-      census_employee = find_employee
-      return nil unless census_employee
-
-      candidate_bgas = census_employee.benefit_group_assignments.select do |bga|
-        bga.start_on <= start_date
-      end
-      
-      non_terminated_employees = candidate_bgas.reject do |ce|
-        (!ce.end_on.blank?) && ce.end_on <= Date.today
-      end
-      @found_benefit_group_assignment = non_terminated_employees.sort_by(&:start_on).last
-    end
-
     def find_employee
       return @found_employee unless @found_employee.nil?
       return nil if subscriber_ssn.blank?
@@ -105,10 +90,12 @@ module Importers
       employee_role = employee.employee_role
 
       if find_benefit_group_assignment.blank?
-        plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
-
-        if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
-          employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
+        if plan_year = employer.plan_years.published_and_expired_plan_years_by_date(employer.registered_on).first
+          employee.benefit_group_assignments << BenefitGroupAssignment.new({ 
+            benefit_group: plan_year.benefit_groups.first, 
+            start_on: plan_year.start_on, 
+            is_active: PlanYear::PUBLISHED.include?(plan_year.aasm_state)})
+          employee.save
         end
       end
 

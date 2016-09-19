@@ -132,6 +132,7 @@ class CensusEmployee < CensusMember
           bg_assignment.is_active = false
           bg_assignment
         end
+        active = true
       end
     end
 
