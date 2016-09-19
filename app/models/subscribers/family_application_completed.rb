@@ -36,7 +36,6 @@ module Subscribers
       family.save! # In case the tax household does not exist
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
-      new_person_flag = (active_household.tax_households.size == 0) ? true : false
       active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
       active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
@@ -52,6 +51,15 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
       throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
+      new_person_flag = false
+      if active_household.tax_households.size == 0
+        if active_verified_tax_households.present?
+          primary_tax_household_member = active_verified_tax_households.first.tax_household_members.detect{ |th| th.id.split('#').last == active_verified_tax_households.first.primary_applicant_id}
+           if primary_tax_household_member.is_medicaid_chip_eligible == false && active_verified_tax_households.first.eligibility_determinations.present?
+             new_person_flag = true
+          end
+        end
+      end
       family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
       begin
         active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
