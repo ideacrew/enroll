@@ -7,7 +7,7 @@ namespace :report do
 
     desc "List of users with same user account"
     task :duplicate_users => :environment do
-      all_dups = User.collection.aggregate([{'$project': {oim_id: {"$toLower" => '$oim_id'},legal_name: 1 }},{'$group': {_id: '$oim_id', count: {'$sum':1}}},{ '$match': { count: { '$gt': 1 } }}]).entries
+      all_dups = User.collection.aggregate([{'$project': {oim_id: {"$toLower" => '$oim_id'}}},{'$group': {_id: '$oim_id', count: {'$sum':1}}},{ '$match': { count: { '$gt': 1 } }}]).entries
       field_names  = %w(
                username
                user_email
