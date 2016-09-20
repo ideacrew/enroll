@@ -1,11 +1,11 @@
   begin
-    csv = CSV.open('testing_person_1.csv',"r",:headers =>true)
+    csv = CSV.open('preprod_test_data_for_ivlr_1.csv',"r",:headers =>true)
     @data= csv.to_a
     @data_hash = {}
     @data.each do |d|
       if @data_hash[d["family_id"]].present?
-        hbx_ids = @data_hash[d["family_id"]].collect{|r| r['glue_person.hbx_id']}
-        next if hbx_ids.include?(d["glue_person.hbx_id"])
+        hbx_ids = @data_hash[d["family_id"]].collect{|r| r['glue_hbx_id']}
+        next if hbx_ids.include?(d["glue_hbx_id"])
         @data_hash[d["family_id"]] << d
       else
         @data_hash[d["family_id"]] = [d]
@@ -27,7 +27,7 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |family_id , members|
       primary_member = members[0]
-      person = Person.where(:hbx_id => primary_member["glue_person.hbx_id"]).first
+      person = Person.where(:hbx_id => primary_member["glue_hbx_id"]).first
       consumer_role =person.consumer_role
       if  consumer_role.present?
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {

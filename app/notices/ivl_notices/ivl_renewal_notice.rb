@@ -47,12 +47,12 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
 
   def append_data
     notice.individuals=data.collect do |datum|
-        person = Person.where(:hbx_id => datum["glue_person.hbx_id"]).first
+        person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
         PdfTemplates::Individual.new({
           :full_name => person.full_name,
-          :incarcerated=>datum["glue_incarcerated"],
-          :citizen_status=> citizen_status(datum["glue_citizenship"]),
-          :residency_verified => datum["glue_dc_resident"].upcase == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
+          :incarcerated=> datum["ea_incarcerated"].upcase == "FALSE" ? "No" : "Yes",
+          :citizen_status=> citizen_status(datum["ea_citizenship"]),
+          :residency_verified => datum["ea_dc_resident"].upcase == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
         })
     end
   end
@@ -79,6 +79,10 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
       "U.S. Citizen"
     when "alien_lawfully_present"
       "Lawfully Present"
+    when "indian_tribe_member"
+      "U.S. Citizen"
+    when "naturalized_citizen"
+      "U.S. Citizen"
     else
       "Not Lawfully Present"
     end
