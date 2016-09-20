@@ -115,7 +115,7 @@
     </div>
     <% end %>
     <% end %>
-    <% if hbx_enrollment.coverage_termination_pending? %>
+    <% if hbx_enrollment.future_enrollment_termination_date.present? %>
       <div class="col-xs-12 vertically-aligned-row">
         <div class="enrollment-effective info">
           <p>

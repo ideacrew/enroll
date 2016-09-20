@@ -498,11 +498,19 @@ class CensusEmployee < CensusMember
     false
   end
 
+  def need_to_build_renewal_hbx_enrollment_for_cobra?
+    renewal_benefit_group_assignment.present? && active_benefit_group_assignment != renewal_benefit_group_assignment
+  end
+
+  def benefit_group_assignments_for_cobra
+    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.active_plan_year) }
+  end
+
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
-    hbx = active_benefit_group_assignment.latest_hbx_enrollment_for_cobra
+    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollment_for_cobra) rescue []
 
-    if hbx.present?
+    hbxs.compact.each do |hbx|
       enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
       enrollment_cobra_factory.family = family
       enrollment_cobra_factory.census_employee = self
