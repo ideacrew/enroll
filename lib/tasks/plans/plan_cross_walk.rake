@@ -1,17 +1,21 @@
 namespace :xml do
   task :plan_cross_walk, [:file] => :environment do |task,args|
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml/2016", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
     files.each do |file_path|
       @file_path = file_path
 
-      puts "*"*80
-      puts "processing #{file_path} "
       set_data
+
+      puts "*"*80
+      puts "processing file: #{@file_name} \n"
+      puts "*"*80
+
       # sheets = ["IVL HIOS Plan Crosswalk", "SHOP HIOS Plan Crosswalk"]
       sheets = ["SHOP HIOS Plan Crosswalk"]
 
       sheets.each do |sheet|
+        puts "#{previous_year}-#{current_year} Plan mapping started. (#{sheet}) \n"
         set_sheet_data(sheet)
         (@first_row..@last_row).each do |row_number| # update renewal plan_ids
           @row_data = @sheet_data.row(row_number)
@@ -19,13 +23,18 @@ namespace :xml do
           if @new_hios_id.present?
             find_old_plan_and_update_renewal_plan_id
           else
-            puts " #{@carrier} plan with #{headers[1]} : #{@old_hios_id} is retired."
+            puts "#{@carrier} plan with #{headers[1]} : #{@old_hios_id} is retired."
             @rejected_hios_ids_list << @old_hios_id
           end
         end
+        puts "#{previous_year}-#{current_year} Plan mapping completed. (#{sheet}) \n"
+        puts "*"*80
       end
 
+      puts "#{previous_year}-#{current_year} Plan carry over started.\n"
       find_and_update_carry_over_plans
+      puts "#{previous_year}-#{current_year} Plan carry over completed.\n"
+      puts "*"*80
     end
 
   end
@@ -80,7 +89,7 @@ namespace :xml do
       if new_plan.present? && new_plan.csr_variant_id != "00"
         old_plan = by_hios_id_active_year_and_csr_varaint_id(@old_hios_id.squish, previous_year, new_plan.csr_variant_id).first
         if old_plan.present?
-          # old_plan.update(renewal_plan_id: new_plan.id)
+          old_plan.update(renewal_plan_id: new_plan.id)
           puts "Old #{previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{current_year} plan hios_id: #{new_plan.hios_id}"
           @updated_hios_ids_list << old_plan.hios_id
         else
@@ -91,7 +100,9 @@ namespace :xml do
   end
 
   def set_data
-    @year = @file_path.split("/")[-2].to_i # Retrieve the year of the master xml file you are uploading
+    @file_path_array = @file_path.split("/")
+    @year = @file_path_array[-2].to_i # Retrieve the year of the master xml file you are uploading
+    @file_name = @file_path_array.last
     @result = Roo::Spreadsheet.open(@file_path)
     @updated_hios_ids_list = []
     @rejected_hios_ids_list = []
@@ -111,7 +122,7 @@ namespace :xml do
       new_plans.each do |new_plan|
         old_plan = by_hios_id_active_year_and_csr_varaint_id(hios_id.squish, previous_year, new_plan.csr_variant_id).first
         if old_plan.present? && new_plan.present? && new_plan.csr_variant_id != "00"
-          # old_plan.update(renewal_plan_id: new_plan.id)
+          old_plan.update(renewal_plan_id: new_plan.id)
           puts "Old #{previous_year} plan hios_id #{old_plan.hios_id} carry overed with New #{current_year} plan hios_id: #{new_plan.hios_id}"
         else
           puts " plan not present : #{hios_id}"
