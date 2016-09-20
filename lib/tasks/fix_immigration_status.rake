@@ -1,9 +1,10 @@
 require 'csv'
-csv_file_path = "#{Rails.root}/non_native_NLP.csv"
+
 namespace :consumer do
   desc "Fix Immigration Status"
   task fix_immigration_status: :environment do
-    output_file_path = "#{Rails.root}/immigration_status_fix_result.csv"
+    csv_file_path = "#{Rails.root}/#{ENV['csv_file_name']}"
+    output_file_path = "#{Rails.root}/immigration_status_fix_result_for_#{ENV['csv_file_name']}"
     file = File.open(output_file_path, "w")
     CSV.foreach(csv_file_path, headers: true, :encoding => 'utf-8') do |row|
       person = Person.where(hbx_id: row.to_hash["policy.subscriber.person.hbx_id"]).first
@@ -14,24 +15,29 @@ namespace :consumer do
 end
 
 def fix_citizen_status_overwritten_by_fedhub(person, file)
-  # 1. Iterate over all versions of the person instance in a descending order (latest first)
-  # 2. Compare the citizen_status on the current person record to each Version of the person instance
-        # 2a. When the two statuses differ, Copy the citizen_status of that specific version to the current person record.
-
-  citizen_status = person.try(:consumer_role).try(:lawful_presence_determination).try(:citizen_status)
-  file.puts "HBX ID : #{person.hbx_id}, Version Num. #{person.version} (updated_at: #{person.updated_at}), Citizen Status: #{citizen_status} (*current version*)"
+  lpd_person =  person.try(:consumer_role).try(:lawful_presence_determination)
+  file.puts "HBX ID, VERSION NUM., UPDATED_AT, CITIZEN_STATUS, CITIZENSHIP_RESULT, VLP_VERIFIED_AT"
+  #Values for person record
+  file.puts "#{person.hbx_id}, #{person.version}, #{person.updated_at}, #{lpd_person.try(:citizen_status)}, #{lpd_person.try(:citizenship_result)}, #{lpd_person.try(:vlp_verified_at)}, (*current version*)"
   
-  # Print Citizen Status for all Versions of Person record.
-  person.versions.reverse.each { |pv| file.puts "HBX ID : #{pv.hbx_id}, Version Num. #{pv.version} (updated_at: #{pv.updated_at}), Citizen Status: #{pv.try(:consumer_role).try(:lawful_presence_determination).try(:citizen_status)}"}
+  # Values for all Versions of Person record.
+  person.versions.reverse.each { |pv|
+    lpd_version =  pv.try(:consumer_role).try(:lawful_presence_determination)
+    file.puts "#{pv.hbx_id}, #{pv.version}, #{pv.updated_at}, #{lpd_version.try(:citizen_status)}, #{lpd_version.try(:citizenship_result)}, #{lpd_version.try(:vlp_verified_at)}"
+  }
+  # 1 The citizen_status values which have been received from the fed-hub prior to the addition of the field needs to be copied into citizenship_result.
+  lpd_person.update_attributes!(citizenship_result: lpd_person.citizen_status) if lpd_person.present? && lpd_person.citizen_status.present? && lpd_person.citizenship_result.blank?
 
-  # 2a. When the two statuses differ, copy the citizen_status of that specific version to the current person record. 
+  # 2. Iterate over all versions of the Person instance (person->consumer_role->lawful_presence_determination) in a descending order (latest first)
+    # 2a. When you get to a version that has 'vlp_verified_at' (LawfulPresenceDetermination) as blank, we know that is the version before Fedhub populated 'citizen_status' & 'vlp_verified_at'.
+    #     We want to resotre citizen_status to the same value as that version.   
   person.versions.reverse.each do |pv|
-    citizen_status_for_this_version = pv.try(:consumer_role).try(:lawful_presence_determination).try(:citizen_status)
-    if (citizen_status_for_this_version.present? && citizen_status == "non_native_not_lawfully_present_in_us" && citizen_status != citizen_status_for_this_version)
-      person.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: citizen_status_for_this_version)
+    lpd_version = pv.try(:consumer_role).try(:lawful_presence_determination)
+    if ( lpd_version.try(:citizen_status).present? && lpd_version.try(:vlp_verified_at).blank? && lpd_person.citizen_status != lpd_version.citizen_status) 
+      person.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: lpd_version.citizen_status)
       file.puts "Copied citizen_status from [Version #{pv.version}] to [Version: #{person.version} (current Person record)]"
       break
     end
   end
-  file.puts "*" * 125
+  file.puts "*" * 140
 end
