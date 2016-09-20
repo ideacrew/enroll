@@ -3,9 +3,6 @@ class SpecialEnrollmentPeriod
   include SetCurrentUser
   include Mongoid::Timestamps
 
-  include Mongoid::History::Trackable
-  include AuditTrail
-
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 

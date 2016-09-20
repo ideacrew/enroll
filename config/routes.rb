@@ -19,11 +19,6 @@ Rails.application.routes.draw do
   end
 
   namespace :exchanges do
-    resources :audit_trails do
-      collection do
-        get :transaction_journals
-      end
-    end
     
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
