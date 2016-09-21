@@ -160,10 +160,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(CensusEmployee.find_all_by_employer_profile(employer_profile).first).to eq initial_census_employee
         end
 
-        it "should be findable by first_name, last_name, dob" do
-          expect(CensusEmployee.by_first_name_last_name_dob(first_name, last_name, dob).size).to eq 1
-        end
-
         context "and a benefit group isn't yet assigned to employee" do
           it "the roster instance should not be ready for linking" do
             expect(initial_census_employee.may_link_employee_role?).to be_falsey
@@ -356,6 +352,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 end
 
+              end
+
+              context "and a roster match by dependents SSN and DOB is performed" do
+                before do
+                  initial_census_employee.census_dependents = [FactoryGirl.build(:census_dependent)]
+                  initial_census_employee.save
+                end
+
+                context "using non-matching dependent ssn and dob" do
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents('000000000', Date.new(1700,01,01))).to eq []
+                  end
+                end
+
+                context "using matching dependent ssn and dob" do
+                  let(:valid_census_dependent) { initial_census_employee.census_dependents.first }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
+                  end
+                end
               end
 
             end
