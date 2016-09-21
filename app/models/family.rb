@@ -566,17 +566,20 @@ class Family
     Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
   end
 
+  def all_enrollments
+    if self.active_household.present?
+      active_household.hbx_enrollments
+    end
+  end
+
   def enrollments_for_display
     Family.collection.aggregate([
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
-      {"$match" => {
-        "$or" => [
-          {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}},
-          {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}
-        ]}},
+      {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},

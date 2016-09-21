@@ -1,7 +1,4 @@
 class EmployerProfile
-  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
-  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
-
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -11,8 +8,19 @@ class EmployerProfile
   include StateTransitionPublisher
 
   embedded_in :organization
-
   attr_accessor :broker_role_id
+
+  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+
+  ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+  INACTIVE_STATES = ["suspended", "ineligible"]
+
+  PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
+
+  INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
+  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+
 
   field :entity_kind, type: String
   field :sic_code, type: String
@@ -20,10 +28,6 @@ class EmployerProfile
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
-  ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
-  INACTIVE_STATES = ["suspended", "ineligible"]
-
-  PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }

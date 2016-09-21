@@ -15,7 +15,11 @@ RSpec.describe "events/employers/updated.haml.erb" do
       download_vocabularies
     end
 
-    let(:plan_year) { PlanYear.new(:aasm_state => "published", :created_at => DateTime.now, :start_on => DateTime.now, :open_enrollment_start_on => DateTime.now, :open_enrollment_end_on => DateTime.now) }
+    let(:plan_year) { PlanYear.new(:aasm_state => "published", :created_at => DateTime.now, 
+                                  :start_on => DateTime.now,
+                                  :open_enrollment_start_on => DateTime.now, 
+                                  :open_enrollment_end_on => DateTime.now) 
+                    }
     let(:employer) { EmployerProfile.new(:organization => organization, :plan_years => [plan_year], :entity_kind => entity_kind) }
 
     before :each do

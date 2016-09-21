@@ -257,6 +257,8 @@ class Person
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
 
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+
   # before_save :notify_change
   # def notify_change
   #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
@@ -460,12 +462,25 @@ class Person
     phones.detect { |phone| phone.kind == "mobile" }
   end
 
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
+
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
+  def can_report_shop_qle?
+    employee_roles.first.census_employee.qle_30_day_eligible?
+  end
+
   def has_active_employee_role?
     active_employee_roles.any?
+  end
+
+  def has_employer_benefits?
+    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
   end
 
   def active_employee_roles
