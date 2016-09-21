@@ -1,6 +1,11 @@
 class QhpRateBuilder
-  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plan_rates_#{Time.now.to_s.gsub(' ', '')}.log"
+
+  dir = File.dirname("#{Rails.root}/tmp/rake_xml_import_plan_rates_#{Time.now.to_s.gsub(' ', '')}.log")
+  FileUtils.mkdir_p(dir) unless File.directory?(dir)
+
+  LOG_PATH = "#{Rails.root}/tmp/rake_xml_import_plan_rates_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
+
   INVALID_PLAN_IDS = ["78079DC0320003","78079DC0320004","78079DC0340002","78079DC0330002"]
   METLIFE_HIOS_IDS = ["43849DC0090001", "43849DC0080001"]
 
