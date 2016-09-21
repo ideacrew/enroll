@@ -7,7 +7,7 @@ module Events
         reply_to = properties.reply_to
         headers = properties.headers || {}
 
-        census_employees = find_census_employee({ssn: headers[:ssn], dob: headers[:dob], first_name: headers[:first_name], last_name: headers[:last_name]})
+        census_employees = find_census_employee({ssn: headers[:ssn], dob: Date.parse(headers[:dob])})
 
         return_status = "200"
         if census_employees.empty?
@@ -32,7 +32,7 @@ module Events
     end
 
     def find_census_employee(options)
-      (CensusEmployee.by_ssn(options[:ssn]).to_a + CensusEmployee.by_first_name_last_name_dob(options[:first_name], options[:last_name], options[:dob]).to_a).uniq
+      (CensusEmployee.matchable(options[:ssn], options[:dob]).to_a + CensusEmployee.matchable_census_dependents(options[:ssn], options[:dob]).to_a).uniq
     end
   end
 end

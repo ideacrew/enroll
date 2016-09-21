@@ -8,15 +8,17 @@ describe Events::CensusEmployeesController do
     let(:exchange) { double }
     let(:connection) { double(:create_channel => channel) }
     let(:census_employee) { ep = FactoryGirl.create(:employer_profile);
-    ce = FactoryGirl.create(:census_employee, employer_profile_id: ep.id);
+    ce = FactoryGirl.create(:census_employee, {employer_profile_id: ep.id, middle_name: 'sample_middle'});
     ce }
-    let(:headers) { {ssn: census_employee.ssn, dob: census_employee.dob, first_name: census_employee.first_name, last_name: census_employee.last_name} }
+    let(:headers) { {ssn: census_employee.ssn, dob: census_employee.dob.strftime("%Y%m%d")} }
     let(:properties) { double(:headers => headers, :reply_to => reply_to_key) }
 
     let(:body) { rendered_template }
 
     before :each do
-      allow(controller).to receive(:find_census_employee).with(headers).and_return([census_employee])
+      header_params = { ssn:headers[:ssn], dob:census_employee.dob}
+      allow(controller).to receive(:find_census_employee).with(header_params).and_return([census_employee])
+      allow(CensusEmployee).to receive(:matchable).with(census_employee.ssn, census_employee.dob.strftime("%Y%m%d")).and_return(census_employee)
 
       allow(controller).to receive(:render_to_string).with(
           "events/census_employee/employer_response", {:formats => ["xml"], :locals => {
@@ -35,34 +37,60 @@ describe Events::CensusEmployeesController do
     end
   end
 
-  describe "find_census_employee()" do
+  describe "find_census_employee" do
+    context "census employee" do
+      let(:census_employee) { ep = FactoryGirl.create(:employer_profile);
+      ce = FactoryGirl.create(:census_employee, employer_profile_id: ep.id, middle_name: 'sample_middle');
+      ce }
 
-    let(:census_employee) { ep = FactoryGirl.create(:employer_profile);
-    ce = FactoryGirl.create(:census_employee, employer_profile_id: ep.id);
-    ce }
+      context "matching ssn and dob" do
+        it "should find the census_employee" do
+          allow(CensusEmployee).to receive(:matchable).with(census_employee.ssn, census_employee.dob).and_return(census_employee)
+          census_employees = @controller.send(:find_census_employee, {ssn: census_employee.ssn, dob: census_employee.dob})
+          expect(census_employees).to eql([census_employee])
+        end
+      end
 
-    context "given existing ssn, first_name, last_name, dob" do
-      it "should find the census_employee" do
-        census_employees = @controller.send(:find_census_employee, {ssn: census_employee.ssn, dob: census_employee.dob,
-                                                                    first_name: 'sample', last_name:'sample ii'}).to_a
-        expect(census_employees).to eql([census_employee])
+      context "mismatching ssn, matching dob" do
+        it "should not find the census_employee" do
+          allow(CensusEmployee).to receive(:matchable).with('999999999', census_employee.dob).and_return([])
+          census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob: census_employee.dob})
+          expect(census_employees).to eql([])
+        end
       end
     end
 
+    context "census dependent" do
+      let(:census_employee) { ep = FactoryGirl.create(:employer_profile);
+      ce = FactoryGirl.create(:census_employee, employer_profile_id: ep.id, middle_name: 'sample_middle');
+      ce.census_dependents << FactoryGirl.build(:census_dependent);
+      ce }
+      let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
-    context "given non existing ssn and existing first_name, last_name, dob" do
-      it "should find the census_employee" do
-        census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob: census_employee.dob,
-                                                                    first_name: census_employee.first_name, last_name: census_employee.last_name}).to_a
-        expect(census_employees).to eql([census_employee])
+      let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+      let(:census_dependent) { census_employee.census_dependents.first }
+
+        before do
+          census_employee.benefit_group_assignments = [benefit_group_assignment]
+          census_employee.save
+        end
+
+      context "matching" do
+        it "should find a census_employee with the dependent" do
+          allow(CensusEmployee).to receive(:matchable).with(census_dependent.ssn, census_dependent.dob).and_return([])
+          allow(CensusEmployee).to receive(:matchable_census_dependents).with(census_dependent.ssn, census_dependent.dob).and_return([census_employee])
+          census_employees = @controller.send(:find_census_employee, {ssn: census_dependent.ssn, dob: census_dependent.dob})
+          expect(census_employees).to eql([census_employee])
+        end
       end
-    end
 
-    context "given non-existent ssn and non-existent first_name, last_name, dob" do
-      it "should not find a census_employee" do
-        census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob:  Date.strptime("17000101", "%Y%m%d"),
-                                                                    first_name: 'sample', last_name:'sample'}).to_a
-        expect(census_employees).to eql([])
+      context "mismatching ssn, matching dob " do
+        it "should not find a census_employee with the dependent" do
+          allow(CensusEmployee).to receive(:matchable).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
+          allow(CensusEmployee).to receive(:matchable_census_dependents).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
+          census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob: Date.strptime("17000101", "%Y%m%d")})
+          expect(census_employees).to eql([])
+        end
       end
     end
   end
