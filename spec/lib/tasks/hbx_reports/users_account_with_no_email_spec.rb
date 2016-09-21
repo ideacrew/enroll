@@ -12,10 +12,9 @@ describe 'user account with no email address' do
     end
 
     it 'should generate csv report with user and person information' do
+      user.reload
       start_date = (TimeKeeper.date_of_record-5.days).strftime('%d/%m/%Y')
       end_date = TimeKeeper.date_of_record.strftime('%d/%m/%Y')
-      allow(user).to receive(:oim_id).and_return(true)
-      allow(user).to receive(:email).and_return(false)
       Rake::Task["report:user_account:with_no_email_address"].invoke(start_date,end_date)
       result =  [["username", "user_first_name", "user_last_name", "user_roles", "person_hbx_id", "person_home_email", "person_work_email", "user_created_at"], ["example1", "John", person.last_name, "[\"consumer\"]", person.hbx_id, person.emails.first.address, "", person.user.created_at.to_s]]
       data = CSV.read "#{Rails.root}/hbx_report/users_account_with_no_email.csv"
