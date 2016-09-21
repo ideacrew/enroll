@@ -184,18 +184,17 @@ end
 
 
 describe Household, "for dependent with domestic partner relationship", type: :model, dbclean: :after_each do
-  let(:family) { FactoryGirl.build(:family) }
-  let(:family_member)  { FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
   let(:person) do
     p = FactoryGirl.build(:person)
-    p.person_relationships.build(relative: family_member, kind: "domestic_partner")
+    p.person_relationships.build(relative: person_two, kind: "domestic_partner")
     p.save
     p
   end
+  let(:person_two)  { FactoryGirl.create(:person)}
+  let(:family_member) { FactoryGirl.create(:family_member, family: family, person: person_two)}
   before(:each) do
-    f_id = family.id
-    family.add_family_member(person, is_primary_applicant: true)
-    family.relate_new_member(family_member, "domestic_partner")
+    family.relate_new_member(person_two, "domestic_partner")
     family.save!
   end
   it "should have the extended family member in the extended coverage household" do
