@@ -56,6 +56,7 @@ module Factories
       if active_enrollment.benefit_group.plan_year.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
         active_enrollment.cancel_coverage! if active_enrollment.may_cancel_coverage?
+        clone_enrollment.effective_on = active_enrollment.effective_on
       else
         clone_enrollment.select_coverage
         clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on_for_cobra
