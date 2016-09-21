@@ -4,21 +4,20 @@ require 'csv'
 
 describe 'user account with no email address' do
   describe 'report:user_account:with_no_email_address' do
-    let(:person)   { FactoryGirl.create(:person) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person, oim_id:'example1', email:'', roles: ['consumer'], created_at: TimeKeeper.date_of_record) }
     before do
       load File.expand_path("#{Rails.root}/lib/tasks/hbx_reports/users_account_with_no_email.rake", __FILE__)
       Rake::Task.define_task(:environment)
     end
 
     it 'should generate csv report with user and person information' do
-      allow(User).to receive_message_chain(:where, :map, :compact).and_return([person])
-      allow(person).to receive_message_chain(:user, :oim_id).and_return('Test123')
-      allow(person).to receive_message_chain(:user, :roles).and_return(['consumer'])
-      allow(person).to receive_message_chain(:user, :created_at).and_return('10/9/2016')
-      start_date = (Date.today-10).strftime('%d/%m/%Y')
-      end_date = Date.today.strftime('%d/%m/%Y')
+      start_date = (TimeKeeper.date_of_record-5.days).strftime('%d/%m/%Y')
+      end_date = TimeKeeper.date_of_record.strftime('%d/%m/%Y')
+      allow(user).to receive(:oim_id).and_return(true)
+      allow(user).to receive(:email).and_return(false)
       Rake::Task["report:user_account:with_no_email_address"].invoke(start_date,end_date)
-      result =  [["username", "user_first_name", "user_last_name", "user_roles", "person_hbx_id", "person_home_email", "person_work_email", "user_created_at"], ["Test123", "John", person.last_name, "[\"consumer\"]", person.hbx_id, person.emails.first.address, "", "10/9/2016"]]
+      result =  [["username", "user_first_name", "user_last_name", "user_roles", "person_hbx_id", "person_home_email", "person_work_email", "user_created_at"], ["example1", "John", person.last_name, "[\"consumer\"]", person.hbx_id, person.emails.first.address, "", person.user.created_at.to_s]]
       data = CSV.read "#{Rails.root}/hbx_report/users_account_with_no_email.csv"
       expect(data).to eq result
     end
