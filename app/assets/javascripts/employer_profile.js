@@ -311,7 +311,7 @@ var EmployerProfile = ( function( window, undefined ) {
         var hired_on = new Date(hired_on_str);
         var cobra_begin_date = new Date(cobra_begin_date_str);
         if (hired_on > cobra_begin_date) {
-          alert('Hire Date must before Cobra Begin Date.');
+          alert('Hire Date must be before Cobra Begin Date.');
         }
       }
     }

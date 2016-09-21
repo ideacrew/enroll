@@ -143,6 +143,13 @@ module Employers::EmployerHelper
 
   def show_cobra_fields?(employer_profile, user)
     return true if user && user.has_hbx_staff_role?
+    if employer_profile && employer_profile.show_plan_year.present? && employer_profile.show_plan_year.is_renewing?
+      if employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+        return false
+      else
+        return true
+      end
+    end
 
     employer_profile && employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end

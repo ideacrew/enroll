@@ -742,7 +742,7 @@ class CensusEmployee < CensusMember
 
   def check_cobra_begin_date
     if existing_cobra && hired_on > cobra_begin_date
-      errors.add(:cobra_begin_date, 'Cobra Begin Date should later than Hire Date')
+      errors.add(:cobra_begin_date, 'must be after Hire Date')
     end
   end
 
