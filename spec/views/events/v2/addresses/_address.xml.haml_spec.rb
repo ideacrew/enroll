@@ -16,17 +16,5 @@ RSpec.describe "app/views/events/v2/addresses/_address.xml.haml" do
         expect(@doc.xpath("//address/type").first.text).to eq "urn:openhbx:terms:v1:address_type#work"
       end
     end
-
-    context "kind=`home`" do
-      before :each do
-        address.kind = 'home'
-        render :template => "events/v2/addresses/_address.xml.haml", :locals => {:address => address}
-        @doc = Nokogiri::XML(rendered)
-      end
-
-      it "should have type as `home`" do
-        expect(@doc.xpath("//address/type").first.text).to eq "urn:openhbx:terms:v1:address_type#home"
-      end
-    end
   end
 end
