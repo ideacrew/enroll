@@ -53,19 +53,12 @@ module Factories
       clone_enrollment.plan_id = active_enrollment.plan_id
       clone_enrollment.kind = 'employer_sponsored_cobra'
       clone_enrollment.effective_on = effective_on_for_cobra
-      if active_enrollment.auto_renewing?
+      if active_enrollment.benefit_group.plan_year.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
-        active_enrollment.cancel_coverage!
+        active_enrollment.cancel_coverage! if active_enrollment.may_cancel_coverage?
       else
-        keep_pending = active_enrollment.employee_role.census_employee.need_to_build_renewal_hbx_enrollment_for_cobra? rescue false
-        if keep_pending
-          clone_enrollment.aasm_state = active_enrollment.aasm_state
-          clone_enrollment.terminated_on = active_enrollment.terminated_on
-          clone_enrollment.effective_on = TimeKeeper.date_of_record
-          active_enrollment.terminate_coverage!
-        else
-          clone_enrollment.select_coverage
-        end
+        clone_enrollment.select_coverage
+        clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on_for_cobra
       end
       clone_enrollment.generate_hbx_signature
 

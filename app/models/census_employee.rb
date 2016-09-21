@@ -503,7 +503,7 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_group_assignments_for_cobra
-    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.active_plan_year) }
+    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year) }
   end
 
   def build_hbx_enrollment_for_cobra
