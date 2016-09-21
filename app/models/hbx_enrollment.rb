@@ -30,6 +30,7 @@ class HbxEnrollment
       "transmitted_to_carrier",
       "coverage_enrolled",
       "coverage_renewed",
+      "coverage_termination_pending",
       "enrolled_contingent",
       "unverified"
     ]
@@ -197,6 +198,23 @@ class HbxEnrollment
 
   class << self
 
+    # terminate all Enrollments scheduled for termination
+    def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
+      families = Family.where("households.hbx_enrollments" => {
+        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
+        })
+
+        enrollments_for_termination = families.inject([]) do |enrollments, family|
+          enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
+          :terminated_on.lt => as_of_date).to_a
+        end
+
+        enrollments_for_termination.each do |hbx_enrollment|
+            hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        end
+
+    end
+
     def families_with_contingent_enrollments
       Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
         :$elemMatch => {
@@ -236,6 +254,8 @@ class HbxEnrollment
       #     end
       #   end
       # end
+
+      HbxEnrollment.terminate_scheduled_enrollments
 
       # #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
@@ -322,6 +342,15 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
+  def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
+    self.terminated_on ||= term_date
+    if benefit_group_assignment
+      benefit_group_assignment.end_benefit(terminated_on)
+      benefit_group_assignment.save
+    end
+
+  end
+
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
     self.terminated_on ||= term_date
     if benefit_group_assignment
@@ -359,27 +388,25 @@ class HbxEnrollment
 
   def cancel_previous(year)
     #Perform cancel/terms of previous enrollments for the same plan year
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |p|
+    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |previous_enrollment|
 
-      p.update_attributes(enrollment_signature: p.generate_hbx_signature) if !p.enrollment_signature.present?
+      previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
 
-      if (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record < p.effective_on)
+      if (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on)
 
-        if p.may_cancel_coverage?
-          p.cancel_coverage!
-          p.update_current(terminated_on: p.effective_on)
+        if previous_enrollment.may_cancel_coverage?
+          previous_enrollment.cancel_coverage!(previous_enrollment.effective_on)
         end
-      elsif (p.enrollment_signature == self.enrollment_signature && p.kind != "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on) || (p.kind == "employer_sponsored" && TimeKeeper.date_of_record >= p.effective_on)
-        if p.may_terminate_coverage?
+      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
+        if previous_enrollment.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + 14.days if (TimeKeeper.date_of_record + 14.days) > term_date
-
-          p.terminate_coverage
-          p.update_current(terminated_on: term_date)
+          previous_enrollment.terminate_coverage!(term_date)
         end
       end
     end
   end
+
 
   def update_existing_shop_coverage
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
@@ -519,6 +546,10 @@ class HbxEnrollment
   def plan
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
+  end
+
+  def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)
+    self.terminated_on = coverage_terminated_on
   end
 
   def select_applicable_broker_account(broker_accounts)
@@ -946,6 +977,7 @@ class HbxEnrollment
     state :transmitted_to_carrier
     state :coverage_enrolled      # effectuated
 
+    state :coverage_termination_pending
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
 
@@ -1006,13 +1038,17 @@ class HbxEnrollment
     # event :cancel_coverage, :after => :record_transition do
     #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     # end
+    event :schedule_coverage_termination, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+    end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled, after: :set_coverage_termination_date
       transitions from: :renewing_waived, to: :inactive
     end
 
     event :terminate_coverage, :after => :record_transition do
+      transitions from: :coverage_termination_pending, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :auto_renewing, to: :coverage_terminated, after: :propogate_terminate
       transitions from: :renewing_coverage_selected, to: :coverage_terminated, after: :propogate_terminate
@@ -1065,6 +1101,7 @@ class HbxEnrollment
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
     end
   end
+
 
   def can_be_expired?
     if benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record

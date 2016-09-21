@@ -296,6 +296,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                             end
                           end
 
+                          context "and the termination date is in the future" do
+                              before { initial_census_employee.terminate_employment!(TimeKeeper.date_of_record + 10.days) }
+                              it "is in termination pending state" do
+                                expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
+                              end
+                          end
+
                           context "and the termination date is within the retroactive reporting time period" do
                             before { initial_census_employee.terminate_employment!(earliest_valid_employment_termination_date) }
 
@@ -542,7 +549,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
               context "and existing employee instance is terminated" do
                 before do
-                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record)
+                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record-1.day)
                   saved_census_employee.save
                 end
 
