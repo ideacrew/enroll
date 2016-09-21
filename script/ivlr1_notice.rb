@@ -1,5 +1,5 @@
   begin
-    csv = CSV.open('preprod_test_data_for_ivlr_1.csv',"r",:headers =>true)
+    csv = CSV.open('final_report_sep_20.csv',"r",:headers =>true)
     @data= csv.to_a
     @data_hash = {}
     @data.each do |d|
