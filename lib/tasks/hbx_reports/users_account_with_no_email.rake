@@ -46,7 +46,7 @@ namespace :report do
             processed_count += 1
           end
         end
-        puts "Total users with no email address in user account and with email in person record count #{processed_count} and users account output file: #{file_name}"
+        puts "Total users with no email address in user account and with email in person record count #{processed_count} and users account output file: #{file_name}" unless Rails.env == 'test'
       end
     end
   end
