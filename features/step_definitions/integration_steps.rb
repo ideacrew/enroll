@@ -408,15 +408,15 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # find('.interaction-click-control-close').click
   screenshot("after modal")
 
-  sleep 3
-  wait_for_ajax
+  expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
+  wait_for_ajax(3)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
   # there is a flickering failure here due to over-lapping modals
   # find("#person_addresses_attributes_0_city").trigger('click')
   # find("#person_addresses_attributes_0_zip").trigger('click')
-  find_by_id("person_phones_attributes_0_full_phone_number")
+  find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
@@ -618,6 +618,7 @@ end
 
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  wait_for_ajax
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
