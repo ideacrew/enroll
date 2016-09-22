@@ -143,15 +143,18 @@ module Employers::EmployerHelper
 
   def show_cobra_fields?(employer_profile, user)
     return true if user && user.has_hbx_staff_role?
-    if employer_profile && employer_profile.show_plan_year.present? && employer_profile.show_plan_year.is_renewing?
-      if employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-        return false
-      else
-        return true
-      end
+    return false if employer_profile.blank?
+
+    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year rescue nil
+    return false if plan_year.blank?
+
+    if employer_profile.is_coversion_employer?
+      return false if employer_profile.plan_years.count > 2
+    else
+      return false if plan_year.is_renewing?
     end
 
-    employer_profile && employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def rehire_date_min(census_employee)
