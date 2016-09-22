@@ -345,6 +345,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVLR9',
+    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_9',
+    notice_triggers: [
+      {
+        name: 'December Final Insurance Enrollment Notice',
+        notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR9',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
