@@ -2,14 +2,6 @@
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-<style type="text/css" media="screen,print"> 
-.break{ 
-   display: block;
-   clear: both;
-   page-break-after: always;
-}
-</style>
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -35,8 +27,6 @@ content: "During open enrollment you can shop for new coverage.  Last open enrol
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Remember if you do not select a new plan, we will automatically renew your current coverage or renew you into the most comparable 2017 coverage."} %>
 
-<div class="break"></div>
-
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<strong>TIPS:</strong>",
   listings: ["<strong>Shop and save during open enrollment:</strong> Open enrollment begins November 1, 2016 and ends January 31, 2017. To make sure your new plan is active by January 1, 2017, you must complete your plan selection no later than December 15, 2016. If you do not select a new plan, we will renew your coverage in the same plan or a similar one for 2017.","<strong>Pay your premiums: </strong> You must continue to pay your premiums for your 2016 plan on time to have your coverage renewed for 2017. You must also make sure to update any auto-payment arrangements you have made either directly with your insurance company or with your bank to make sure the new 2017 premium is being paid. <u>If you do not do so, and do not make payments through another method, your 2017 plan will be terminated.</u>"]} %>
@@ -49,7 +39,7 @@ content: "The rest of this notice has important information to ensure you are su
    heading: 'Choose Your 2017 Plan', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/table', locals: {headers: ['Date new plan is selected', 'Date new plan starts'], rows: [['November 1 - December 15, 2016', 'January 1, 2017'],['December 16 - January 15, 2017', 'February 1, 2017'],['January 16 - January 31, 2017', 'March 1, 2017']],
-  col_styles: ['width: 30%;', 'width: 70%; text-align: center;'], table_width: '100%'} %>
+  col_styles: ['width: 60%;', 'width: 40%; text-align: center;'], table_width: '70%'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "After January 31, 2017, you won’t be able to sign up for a plan or change to a different plan until the next open enrollment period starting late in 2017 unless you experience a major life change like getting married or having a baby."} %>
