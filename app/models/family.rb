@@ -101,8 +101,8 @@ class Family
   validate :family_integrity
 
   after_initialize :build_household
-  after_save :update_family_search_collection
-  after_destroy :remove_family_search_record
+ # after_save :update_family_search_collection
+ # after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
       where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)

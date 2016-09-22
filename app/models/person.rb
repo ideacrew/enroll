@@ -242,7 +242,7 @@ class Person
     end
   end
 
-  after_save :update_family_search_collection
+  #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
   def move_encrypted_ssn_errors
