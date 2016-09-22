@@ -156,7 +156,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           it "should have errors when hired_on later than cobra_begin_date" do
             initial_census_employee.cobra_begin_date = initial_census_employee.hired_on - 5.days
             expect(initial_census_employee.save).to be_falsey
-            expect(initial_census_employee.errors[:cobra_begin_date].to_s).to match(/Cobra Begin Date should later than Hire Date/)
+            expect(initial_census_employee.errors[:cobra_begin_date].to_s).to match(/must be after Hire Date/)
           end
         end
       end
