@@ -116,7 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
-  after_save :generate_family_search
+  #after_save :generate_family_search
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})

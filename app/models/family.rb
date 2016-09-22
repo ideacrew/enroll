@@ -29,7 +29,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
-  after_save :generate_family_search
+ #after_save :generate_family_search
 
   belongs_to  :person
 
