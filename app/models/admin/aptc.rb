@@ -17,7 +17,8 @@ class Admin::Aptc < ApplicationController
 
     def build_avalaible_aptc_values(family, hbxs, applied_aptc_array=nil, max_aptc=nil,  member_ids=nil)
       available_aptc_hash = Hash.new
-      max_aptc_vals             = build_max_aptc_values(family, max_aptc)
+      #max_aptc_vals             = build_max_aptc_values(family, max_aptc)
+      max_aptc_vals             = build_max_aptc_values(family, max_aptc, hbxs)
       total_aptc_applied_vals_for_household = Hash[$months_array.map { |x| [x, '%.2f' % 0.0] }] # Initialize a Hash for monthly values.
       hbxs.each do |hbx|
         aptc_applied_vals_for_enrollment = build_aptc_applied_values_for_enrollment(family, hbx, applied_aptc_array)
@@ -118,7 +119,8 @@ class Admin::Aptc < ApplicationController
 
     def build_max_aptc_values(family, max_aptc=nil, hbxs=nil)
       max_aptc_hash = Hash.new
-      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      eligibility_determinations = family.active_household.all_eligibility_determinations
       eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       $months_array.each_with_index do |month, ind|
         # iterate over all the EligibilityDeterminations and store the correct max_aptc value for each month. Account for any monthly change in Eligibility Determination.
@@ -152,7 +154,8 @@ class Admin::Aptc < ApplicationController
 
     def build_csr_percentage_values(family, csr_percentage=nil)
       csr_percentage_hash = Hash.new
-      eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      eligibility_determinations = family.active_household.all_eligibility_determinations
       eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
       $months_array.each_with_index do |month, ind|
         eligibility_determinations.each do |ed|

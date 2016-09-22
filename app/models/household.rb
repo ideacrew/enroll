@@ -291,4 +291,15 @@ class Household
   def hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
   end
+
+  def all_eligibility_determinations
+    eds = []
+    tax_households.each do |th|
+      th.eligibility_determinations.each do |ed|
+        eds << ed
+      end
+    end
+    eds
+  end
 end
+
