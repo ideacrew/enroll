@@ -4,6 +4,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
+  wait_for_ajax
   expect(page).to have_css("#broker_agency_form")
 end
 
@@ -142,6 +143,7 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
+  wait_for_ajax
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
@@ -152,7 +154,7 @@ end
 
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
-  find('.interaction-click-control-change-broker').trigger 'click'
+  wait_for_ajax
 
   within '.modal-dialog' do
     click_link 'Terminate Broker'
@@ -210,7 +212,7 @@ Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
 end
 
 Then(/^Broker Assisted is a family$/) do
-  #sleep 1
+  #
   wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
