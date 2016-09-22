@@ -50,9 +50,9 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
         person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
         PdfTemplates::Individual.new({
           :full_name => person.full_name,
-          :incarcerated=> datum["ea_incarcerated"].upcase == "FALSE" ? "No" : "Yes",
+          :incarcerated=> datum["ea_incarcerated"].try(:upcase) == "FALSE" ? "No" : "Yes",
           :citizen_status=> citizen_status(datum["ea_citizenship"]),
-          :residency_verified => datum["ea_dc_resident"].upcase == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
+          :residency_verified => datum["ea_dc_resident"].try(:upcase) == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
         })
     end
   end
