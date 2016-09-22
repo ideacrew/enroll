@@ -108,22 +108,22 @@ RSpec.describe Factories::CensusEmployeeFactory, type: :model, dbclean: :after_e
         expect(enrollment_two.aasm_state).to eq "coverage_canceled"
       end
     end
-  end
 
-  it "should transit to coverage_canceled status for both one and coverage_enrolled for other" do
-    employer_profile = organization.employer_profile
-    census_employee = employer_profile.census_employees.first
-    renewing_plan_year = organization.employer_profile.plan_years.last
-    subject = Factories::CensusEmployeeFactory.new
-    employer_profile.census_employees.each do |census_employee|
-      enrollment_one = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first
-      enrollment_two = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.last
-      enrollment_two.update_attribute(:coverage_kind, "dental")
-      subject.census_employee = census_employee
-      subject.plan_year = renewing_plan_year
-      subject.begin_coverage
-      expect(enrollment_one.aasm_state).to eq "coverage_enrolled"
-      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+    it "should transit to coverage_canceled status for both one and coverage_enrolled for other" do
+      employer_profile = organization.employer_profile
+      census_employee = employer_profile.census_employees.first
+      renewing_plan_year = organization.employer_profile.plan_years.last
+      subject = Factories::CensusEmployeeFactory.new
+      employer_profile.census_employees.each do |census_employee|
+        enrollment_one = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first
+        enrollment_two = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.last
+        enrollment_two.update_attribute(:coverage_kind, "dental")
+        subject.census_employee = census_employee
+        subject.plan_year = renewing_plan_year
+        subject.begin_coverage
+        expect(enrollment_one.aasm_state).to eq "coverage_enrolled"
+        expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+      end
     end
   end
 end
