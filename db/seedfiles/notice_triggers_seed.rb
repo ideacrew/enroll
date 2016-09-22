@@ -324,6 +324,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVLR8',
+    title: '2017 Insurance Renewal Notice and Opportunity to Change Plans',
+    description: 'Notice to be sent out to individuals staying on UQHP',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_8',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice - UQHP',
+        notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR8',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
