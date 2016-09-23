@@ -156,4 +156,6 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80
+system "bundle exec rake permissions:initial_hbx"
+puts "*"*80
 puts "End of Seed Data"
