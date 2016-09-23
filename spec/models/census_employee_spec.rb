@@ -1071,6 +1071,36 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
+    let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
+    let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
+
+    let(:user)          { double("user") }
+    let(:employee_role) {FactoryGirl.create(:employee_role)}
+
+
+    it 'should allow Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return true # Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).to eq person.ssn
+      expect(census_employee.dob).to eq person.dob
+    end
+
+    it 'should NOT allow Non-Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return false # Non-Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).not_to eq person.ssn
+      expect(census_employee.dob).not_to eq person.dob
+    end
+
+  end
+
   context "check_hired_on_before_dob" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
 
