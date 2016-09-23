@@ -516,6 +516,14 @@ class Family
     person.save!
   end
 
+  def check_for_consumer_role
+    if primary_applicant.person.consumer_role.present?
+      active_family_members.each do |family_member|
+        build_consumer_role(family_member)
+      end
+    end
+  end
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
