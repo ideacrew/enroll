@@ -126,7 +126,9 @@ class Notice
     notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}"
     notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
     begin
-      doc_uri = Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name)
+      FileUtils.cp(notice_path, notice_path_for_paper_notice)
+      doc_uri = Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
+      File.delete(notice_path_for_paper_notice)
     rescue Exception => e
       puts "Unable to upload paper notices to Amazon"
     end
