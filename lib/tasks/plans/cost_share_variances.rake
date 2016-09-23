@@ -14,7 +14,7 @@ namespace :serff do
         plan.family_deductible = csr.qhp_deductable.in_network_tier_1_family
         if plan.valid?
           plan.save
-          puts "successfully updated cost_share_variance for #{plan.active_year} plan hios_id: #{hios_id} "
+          puts "successfully updated cost_share_variance for #{plan.active_year} plan with hios_id: #{hios_id} "
         end
       end
     end
