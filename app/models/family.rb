@@ -180,7 +180,19 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
+  end
 
+  def primary_family_member=(new_primary_family_member)
+    self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
+
+    existing_family_member = find_family_member_by_person(new_primary_family_member)
+    if existing_family_member.present?
+      existing_family_member.is_primary_applicant = true
+    else
+      add_family_member(new_primary_family_member, is_primary_applicant: true)
+    end
+    
+    primary_family_member
   end
 
   def primary_family_member
