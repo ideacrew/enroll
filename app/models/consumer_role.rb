@@ -175,7 +175,7 @@ class ConsumerRole
   def is_type_outstanding?(type)
     if type == 'Social Security Number'
       !self.ssn_verified? && !self.has_docs_for_type?(type)
-    elsif type == 'Citizenship' || type == 'Immigration status'
+    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
       !lawful_presence_authorized? && !self.has_docs_for_type?(type)
     end
   end
@@ -638,6 +638,18 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+  end
+
+  def all_types_verified?
+    person.verification_types.all?{ |type| is_type_verified?(type) }
+  end
+
+  def is_type_verified?(type)
+    if type == 'Social Security Number'
+      ssn_verified?
+    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
+      lawful_presence_verified?
+    end
   end
 
   def record_transition(*args)

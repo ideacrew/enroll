@@ -22,7 +22,7 @@ module VerificationHelper
        else
          "outstanding"
        end
-     elsif type == 'Citizenship' || type == 'Immigration status'
+     elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
        if member.consumer_role.lawful_presence_verified?
          "verified"
        elsif member.consumer_role.has_docs_for_type?(type)
