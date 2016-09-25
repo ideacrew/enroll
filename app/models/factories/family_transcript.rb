@@ -28,7 +28,7 @@ module Factories
 
     end
 
-    def difference(base_record, compare_record)
+    def compare(base_record, compare_record)
       differences = HashWithIndifferentAccess.new
       all_keys = (base_record.keys + compare_record.keys).uniq!
       all_keys.each do |k|
@@ -45,8 +45,7 @@ module Factories
           old_values = base_record[k] - compare_record[k]
           new_values = compare_record[k] - base_record[k]
           differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
-# binding.pry
-          differences[:array][k].delete_if { |_, v| v.blank? }
+          differences[:array][k].blank? ? differences = {} : differences[:array]
         else
           if base_record[k] != compare_record[k]
             differences[:update] ||= {}
@@ -106,21 +105,21 @@ module Factories
 
       { family: family.attributes.merge({
                     family_members: [
-                        family.family_members.first.attributes
+                        family_member: family.family_members.first.attributes
                       ],
                     irs_groups: [
-                        family.irs_groups.first.attributes
+                        irs_group: family.irs_groups.first.attributes
                       ],
                     households: [
-                        family.households.first.attributes.merge({
+                        household: family.households.first.attributes.merge({
                           hbx_enrollments: [
-                              family.households.first.hbx_enrollments.first.attributes
+                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
                             ]
                           })
                       ]
                   }),
         people: [
-                    person.attributes.merge({
+                    person: person.attributes.merge({
                         consumer_role: person.consumer_role.attributes
                       })
                   ] }
