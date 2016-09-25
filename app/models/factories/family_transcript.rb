@@ -1,12 +1,39 @@
 module Factories
+  class FamilyTranscriptError < StandardError; end
+
   class FamilyTranscript
 
-    # Expect family_transcript is a hash structured after CV2
-    def find_or_build_local(family_transcript = {})
+    def initialize
+      @logger = Logger.new("#{Rails.root}/log/family_transcript_logfile.log")
+    end
+
+    ## Callbacks
+    # TODO: determine needs for callbacks
+    # before_create
+    before_update :update_person
+
+    # Expect family_transcript is a hash structured after CV2?
+    def process_transcript(family_transcript = {})
       return family_transcript_prototype if family_transcript.blank?
 
-      local_people = family_transcript.people.reduce([]) { |list, person| list << find_or_build_person(person) }
-      local_family = find_or_build_family(family_transcript.family)
+      local_people = family_transcript[:people].reduce([]) { |person| process_person(person) }
+
+      # Syntactic check
+      if local_people.detect { |processed_person| processed_person.errors.count > 0 }
+    #     with_logging('save', local_people) { |instance | instance.save }
+      end
+
+      # TODO: Compare the locally found records against the transcript values
+
+      # TODO: Eligibility/Functional checks, e.g. Citizenship and VLP
+      # TODO: Any need to create User object for each person with respective roles?
+
+      # TODO: Once all is clear with the people, they must be persisted to construct the family
+      local_people.each { |person| person.save }
+
+      # TODO: identify primary_family_member
+      local_family = find_or_build_family(local_people)
+
       local_family_enrollments = family_transcript.households.each do |household|
         household.hbx_enrollments.each { |hbx_enrollment|  find_or_build_hbx_enrollment(hbx_enrollment, family_transcript.family) }
       end
@@ -23,47 +50,26 @@ module Factories
       }
     end
 
+    def process_people(transcript_people)
+      local_people = transcript_people.reduce([]) { |list, person| list << find_or_build_person(person) }
+      invalid_people = local_people.reduce([]) { |list, person| list << { id: person.id, errors: person.errors } if person.is_valid? == false }
+      { people: local_people, errors: invalid_people }
+    end
+
     def audit_family(family_transcript)
       local_family = find_or_build_local(family_transcript)
 
     end
 
-    def compare(base_record, compare_record)
-      differences = HashWithIndifferentAccess.new
-      all_keys = (base_record.keys + compare_record.keys).uniq!
-      all_keys.each do |k|
-        next if base_record[k].blank? && compare_record[k].blank?
+    def find_or_build_person(transcript_person)
+      Factories::Types::Person.find_or_build(transcript_person)
 
-        if base_record[k].blank?
-          differences[:add] ||= {}
-          differences[:add][k] = compare_record[k]
-        elsif compare_record[k].blank?
-          differences[:remove] ||= {}
-          differences[:remove][k] = base_record[k]
-        elsif base_record[k].is_a?(Array) && compare_record[k].is_a?(Array)
-          differences[:array] ||= {}
-          old_values = base_record[k] - compare_record[k]
-          new_values = compare_record[k] - base_record[k]
-          differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
-          differences[:array][k].blank? ? differences = {} : differences[:array]
-        else
-          if base_record[k] != compare_record[k]
-            differences[:update] ||= {}
-            differences[:update][k] = compare_record[k]
-          end
-        end
-      end
+      # Support citizenship and VLP status override?  Use Ruleset?
 
-      differences
     end
 
-    # Use 
     def find_or_build_family(transcript_primary_member)
 
-    end
-
-    def find_or_build_person(transcript_person)
-      # Support citizenship and VLP status override
     end
 
     def build_consumer_role(transcript_consumer)
@@ -83,7 +89,6 @@ module Factories
   private
 
     def match_family(family)
-
     end
 
     def match_person(transcript_person)
@@ -92,6 +97,33 @@ module Factories
 
     def match_hbx_enrollment(hbx_enrollment)
 
+    end
+
+    # This code pulled from Interactors::FindOfCreateInsuredPerson
+    def update_person
+      # person = people.first
+      # user.save if user
+      # person.user = user if user
+      # if person.ssn.nil?
+      #   #matched on last_name and dob
+      #   person.ssn = context.ssn
+      #   person.gender = context.gender
+      # end
+      # person.save
+      # user = person.user if context.role_type == User::ROLES[:consumer]
+      # person, is_new = person, false
+    end
+
+
+    def with_logging(description, the_object)
+      begin
+        @logger.debug("Starting #{description}")
+        yield(the_object)
+        @logger.debug("Completed #{description}")
+      rescue
+        @logger.error("#{description} failed!!")
+        raise
+      end
     end
 
 
@@ -125,6 +157,4 @@ module Factories
                   ] }
     end
   end
-
-  class FamilyTranscriptError < StandardError; end
 end
