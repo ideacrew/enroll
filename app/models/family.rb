@@ -228,6 +228,10 @@ class Family
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
   end
 
+  def has_checkbook_url?
+    enrollments.any? {|e| e.checkbook_url.present? }
+  end
+
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
