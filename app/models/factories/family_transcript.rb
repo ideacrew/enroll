@@ -18,17 +18,7 @@ module Factories
 
       local_people = family_transcript[:people].reduce([]) { |person| process_person(person) }
 
-      # Syntactic check
-      if local_people.detect { |processed_person| processed_person.errors.count > 0 }
-    #     with_logging('save', local_people) { |instance | instance.save }
-      end
-
-      # TODO: Compare the locally found records against the transcript values
-
-      # TODO: Eligibility/Functional checks, e.g. Citizenship and VLP
-      # TODO: Any need to create User object for each person with respective roles?
-
-      # TODO: Once all is clear with the people, they must be persisted to construct the family
+      # TODO: Once all is clear with the people, they must be persisted to construct the family????
       local_people.each { |person| person.save }
 
       # TODO: identify primary_family_member
@@ -127,34 +117,5 @@ module Factories
     end
 
 
-    def family_transcript_prototype
-      person = Person.new
-      person.build_consumer_role
-
-      family = Family.new
-      family.primary_family_member = person
-      family.latest_household.hbx_enrollments << HbxEnrollment.new
-
-      { family: family.attributes.merge({
-                    family_members: [
-                        family_member: family.family_members.first.attributes
-                      ],
-                    irs_groups: [
-                        irs_group: family.irs_groups.first.attributes
-                      ],
-                    households: [
-                        household: family.households.first.attributes.merge({
-                          hbx_enrollments: [
-                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
-                            ]
-                          })
-                      ]
-                  }),
-        people: [
-                    person: person.attributes.merge({
-                        consumer_role: person.consumer_role.attributes
-                      })
-                  ] }
-    end
   end
 end
