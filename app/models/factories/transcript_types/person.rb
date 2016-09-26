@@ -28,7 +28,6 @@ module Factories
 
         compare
         validate
-        @transcript
       end
 
       private

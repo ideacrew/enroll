@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Factories::Types::Base, type: :model do
+RSpec.describe Factories::TranscriptTypes::Base, type: :model do
   let(:person_template)             { Person.new.attributes.except("_id", "version") }
   let(:consumer_role_template)      { person_template.buiild.attributes.except("_id", "version") }
   let(:family_transcript_template)  { }
