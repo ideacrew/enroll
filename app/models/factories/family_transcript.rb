@@ -20,7 +20,7 @@ module Factories
 
       # Syntactic check
       if local_people.detect { |processed_person| processed_person.errors.count > 0 }
-    #     with_logging('save', local_people) { |instance | instance.save }
+        #     with_logging('save', local_people) { |instance | instance.save }
       end
 
       # TODO: Compare the locally found records against the transcript values
@@ -62,7 +62,7 @@ module Factories
     end
 
     def find_or_build_person(transcript_person)
-      Factories::Types::Person.find_or_build(transcript_person)
+      person_transcript = Factories::Types::Person.find_or_build(transcript_person).transcript
 
       # Support citizenship and VLP status override?  Use Ruleset?
 

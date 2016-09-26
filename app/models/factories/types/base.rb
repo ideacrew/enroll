@@ -2,7 +2,7 @@ module Factories
   module Types
     class Base
 
-      attr_reader :transcript
+      attr_reader :transcript, :fields_to_ignore
 
       def initialize
         @transcript = transcript_template
@@ -20,7 +20,9 @@ module Factories
         differences     = HashWithIndifferentAccess.new
         base_record     = @transcript[:source]
         compare_record  = @transcript[:other]
-        all_keys        = (base_record.keys + compare_record.keys).uniq!
+        # all_keys        = (base_record.keys + compare_record.keys).uniq!
+
+        all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
 
         all_keys.each do |k|
           next if base_record[k].blank? && compare_record[k].blank?
@@ -48,8 +50,11 @@ module Factories
         @transcript[:compare] = differences
       end
 
-      def validate
+      def validate_import
         @transcript[:source].is_valid?
+        @transcript[:other].is_valid?
+        @transcript[:source_errors] = @transcript[:source].errors
+        @transcript[:other_errors] = @transcript[:other].errors
       end
 
       # Return model instance using the transcript hash table values
