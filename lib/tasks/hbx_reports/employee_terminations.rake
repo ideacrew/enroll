@@ -9,7 +9,9 @@ namespace :reports do
       today = Date.today
       yesterday = today - 1.day
 
-      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => yesterday)
+      census_employees = CensusEmployee.unscoped.terminated.
+                          where(:employment_terminated_on.gte => yesterday).
+                          where(:employment_terminated_on.lt => today)
 
       field_names  = %w(
           employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at
