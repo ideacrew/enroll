@@ -14,7 +14,7 @@ module Factories
         @transcript[:other] = person
         people = match(person)
 
-        case people.count 
+        case people.count
         when 0
           @transcript[:source_is_new] = true
           @transcript[:source] = initialize_person
@@ -47,11 +47,9 @@ module Factories
       end
 
       def initialize_person
-        person = Person.new
-        person.emails.build
-        person.phones.build
-        person.addresses.build
-        person
+        fields = Person.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
+        fields.delete_if{|key,val| @fields_to_ignore.include?(key)}
+        Person.new(fields)
       end
     end
   end
