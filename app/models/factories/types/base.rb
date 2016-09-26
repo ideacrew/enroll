@@ -17,6 +17,9 @@ module Factories
       end
 
       def compare
+        return unless @transcript[:other].present?
+        return if @transcript[:source_is_new]
+
         differences     = HashWithIndifferentAccess.new
         base_record     = @transcript[:source]
         compare_record  = @transcript[:other]
@@ -50,7 +53,7 @@ module Factories
         @transcript[:compare] = differences
       end
 
-      def validate_import
+      def validate
         @transcript[:source].is_valid?
         @transcript[:other].is_valid?
         @transcript[:source_errors] = @transcript[:source].errors
@@ -83,9 +86,72 @@ module Factories
           # Functional errors in the "other" data set
           other_errors:   HashWithIndifferentAccess.new,
           # "source" data set was generated from the "other" data set values?
-          source_is_new:  true,
+          source_is_new:  false,
         }
       end
+
+
+    def family_transcript_prototype
+      person = Person.new
+      person.build_consumer_role
+
+      family = Family.new
+      family.primary_family_member = person
+      family.latest_household.hbx_enrollments << HbxEnrollment.new
+
+      { family: family.attributes.merge({
+                    family_members: [
+                        family_member: family.family_members.first.attributes
+                      ],
+                    irs_groups: [
+                        irs_group: family.irs_groups.first.attributes
+                      ],
+                    households: [
+                        household: family.households.first.attributes.merge({
+                          hbx_enrollments: [
+                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
+                            ]
+                          })
+                      ]
+                  }),
+        people: [
+                    person: person.attributes.merge({
+                        consumer_role: person.consumer_role.attributes
+                      })
+                  ] }
+    end
+
+    
+    def family_transcript_prototype
+      person = Person.new.fields.keys
+      consumer_role = ConsumerRole.new.fields.keys
+      person.consumer_role = consumer_role
+
+      family = Family.new.fields.keys
+      family.primary_family_member = person
+      family.latest_household.hbx_enrollments << HbxEnrollment.new.fields.keys
+
+      { family: family.attributes.merge({
+                    family_members: [
+                        family_member: family.family_members.first.attributes
+                      ],
+                    irs_groups: [
+                        irs_group: family.irs_groups.first.attributes
+                      ],
+                    households: [
+                        household: family.households.first.attributes.merge({
+                          hbx_enrollments: [
+                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
+                            ]
+                          })
+                      ]
+                  }),
+        people: [
+                    person: person.attributes.merge({
+                        consumer_role: person.consumer_role.attributes
+                      })
+                  ] }
+    end
     end
   end
 end

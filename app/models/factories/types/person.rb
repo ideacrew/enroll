@@ -2,7 +2,7 @@ module Factories
   module Types
     class PersonError < StandardError; end
 
-    class Person
+    class Person < Factories::Types::Base
 
       def initialize
         @fields_to_ignore = ['_id', 'created_at', 'updated_at']
@@ -18,23 +18,20 @@ module Factories
         when 0
           @transcript[:source_is_new] = true
           @transcript[:source] = initialize_person
-          return @transcript
         when 1
           @transcript[:source_is_new] = false
           @transcript[:source] = people.first
-          return @transcript
         else
           message = "Ambiguous person match: more than one person matches criteria"
           raise Factories::Types::PersonError message
         end
 
         compare
-        validate_import
-
+        validate
         @transcript
       end
 
-    private
+      private
 
       def match(person)
         if person.hbx_id.present?
