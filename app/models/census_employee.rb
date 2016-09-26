@@ -504,6 +504,18 @@ class CensusEmployee < CensusMember
       query.to_a
     end
 
+    # Update CensusEmployee records when Person record is updated. (SSN / DOB change)
+    def update_census_employee_records(person, current_user)
+      person.employee_roles.each do |employee_role|
+        ce = employee_role.census_employee
+        if current_user.has_hbx_staff_role? && ce.present?
+          ce.ssn = person.ssn
+          ce.dob = person.dob
+          ce.save!(validate: false)
+        end
+      end
+    end 
+
   end
 
   aasm do

@@ -130,6 +130,7 @@ module Insured::FamiliesHelper
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
+
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
