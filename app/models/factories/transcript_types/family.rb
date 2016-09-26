@@ -1,8 +1,8 @@
 module Factories
-  module Types
+  module TranscriptTypes
     class FamilyError < StandardError; end
 
-    class Family < Factories::Types::Base
+    class Family < Factories::TranscriptTypes::Base
 
       def find_or_build(family)
       end

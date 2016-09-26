@@ -1,8 +1,8 @@
 module Factories
-  module Types
+  module TranscriptTypes
     class PersonError < StandardError; end
 
-    class Person < Factories::Types::Base
+    class Person < Factories::TranscriptTypes::Base
 
       def initialize
         @fields_to_ignore = ['_id', 'created_at', 'updated_at']
@@ -23,7 +23,7 @@ module Factories
           @transcript[:source] = people.first
         else
           message = "Ambiguous person match: more than one person matches criteria"
-          raise Factories::Types::PersonError message
+          raise Factories::TranscriptTypes::PersonError message
         end
 
         compare

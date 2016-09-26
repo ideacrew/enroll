@@ -63,7 +63,7 @@ module Factories
     end
 
     def find_or_build_person(transcript_person)
-      person_transcript = Factories::Types::Person.find_or_build(transcript_person).transcript
+      person_transcript = Factories::TranscriptTypes::Person.find_or_build(transcript_person).transcript
 
       # Support citizenship and VLP status override?  Use Ruleset?
 

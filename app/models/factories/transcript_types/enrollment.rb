@@ -1,8 +1,8 @@
 module Factories
-  module Types
+  module TranscriptTypes
     class EnrollmentError < StandardError; end
 
-    class Enrollment < Factories::Types::Base
+    class Enrollment < Factories::TranscriptTypes::Base
 
       def find_or_build
       end

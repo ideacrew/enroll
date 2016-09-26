@@ -1,5 +1,5 @@
 module Factories
-  module Types
+  module TranscriptTypes
     class Base
 
       attr_reader :transcript, :fields_to_ignore
