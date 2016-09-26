@@ -269,7 +269,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR2',
         notice_trigger_element_group: {
           market_places: ['individual'],
