@@ -63,10 +63,11 @@ module Factories
     end
 
     def find_or_build_person(transcript_person)
-      person_transcript = Factories::TranscriptTypes::Person.find_or_build(transcript_person).transcript
+      builder = Factories::TranscriptTypes::Person.new
+      builder.find_or_build(transcript_person)
+      person_transcript = builder.transcript
 
       # Support citizenship and VLP status override?  Use Ruleset?
-
     end
 
     def find_or_build_family(transcript_primary_member)

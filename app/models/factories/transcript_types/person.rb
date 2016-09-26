@@ -5,13 +5,14 @@ module Factories
     class Person < Factories::TranscriptTypes::Base
 
       def initialize
-        @fields_to_ignore = ['_id', 'created_at', 'updated_at']
+        @fields_to_ignore = ['_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn']
 
         super
       end
 
       def find_or_build(person)
         @transcript[:other] = person
+
         people = match(person)
 
         case people.count
@@ -27,16 +28,17 @@ module Factories
         end
 
         compare
-        validate
+        validate        
       end
 
       private
 
       def match(person)
+
         if person.hbx_id.present?
-          matched_people = Person.where(hbx_id: person.hbx_id) || []
+          matched_people = ::Person.where(hbx_id: person.hbx_id) || []
         else
-          matched_people = Person.match_by_id_info(
+          matched_people = ::Person.match_by_id_info(
               ssn: person.ssn,
               dob: person.dob,
               last_name: person.last_name,
@@ -47,9 +49,9 @@ module Factories
       end
 
       def initialize_person
-        fields = Person.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
+        fields = ::Person.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
         fields.delete_if{|key,val| @fields_to_ignore.include?(key)}
-        Person.new(fields)
+        ::Person.new(fields)
       end
     end
   end

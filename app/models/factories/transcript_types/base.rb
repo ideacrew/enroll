@@ -54,6 +54,7 @@ module Factories
       end
 
       def validate
+        return
         @transcript[:source].is_valid?
         @transcript[:other].is_valid?
         @transcript[:source_errors] = @transcript[:source].errors
