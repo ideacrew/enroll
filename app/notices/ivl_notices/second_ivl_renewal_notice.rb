@@ -37,7 +37,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
   def build
     family = recipient.primary_family
     append_data
-    notice.primary_identifier = "AccountID: #{identifier}"
+    notice.primary_identifier = "Account ID: #{identifier}"
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
