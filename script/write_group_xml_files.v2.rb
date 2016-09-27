@@ -81,7 +81,9 @@ def remove_other_carrier_nodes(xml, trading_partner, employer_profile, pys, opti
     end
   else
     if has_this_year
-      event = "urn:openhbx:events:v1:employer#benefit_coverage_initial_application_eligible"
+      if employer_profile.eligible? || employer_profile.enrolled? || employer_profile.binder_paid? || employer_profile.registered?
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_initial_application_eligible"
+      end
     end
   end
 
