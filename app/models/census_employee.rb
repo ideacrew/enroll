@@ -1,3 +1,5 @@
+require 'services/checkbook_services'
+
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
@@ -381,6 +383,11 @@ class CensusEmployee < CensusMember
       self
     end
   end
+  def generate_and_deliver_checkbook_url    
+     cs= ::CheckbookServices::PlanComparision.new(self)    
+     url = cs.generate_url   
+     ## deliver mail now   
+   end
 
   def terminate_employment!(employment_terminated_on)
 
