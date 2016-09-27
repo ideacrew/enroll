@@ -55,12 +55,12 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
           :full_name => datum["full_name"],
           :incarcerated=>datum["incarcerated"].try(:upcase) == "N" ? "No" : "",
           :citizen_status=> citizen_status(datum["citizen_status"]),
-          :residency_verified => datum["resident"].upcase == "Y"  ? "District of Columbia Resident" : "Not a District of Columbia Resident",
+          :residency_verified => datum["resident"].try(:upcase) == "Y"  ? "District of Columbia Resident" : "Not a District of Columbia Resident",
           :projected_amount => datum["actual_income"],
           :taxhh_count => datum["taxhhcount"],
           :uqhp_reason => datum["uqhp_reason"],
           :tax_status => filer_type(datum["filer_type"]),
-          :mec => datum["mec"].upcase == "N" ? "No" : "Yes"
+          :mec => datum["mec"].upcase == "N" ? "None" : "Yes"
 
         })
     end
