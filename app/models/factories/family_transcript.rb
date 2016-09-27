@@ -10,7 +10,7 @@ module Factories
     ## Callbacks
     # TODO: determine needs for callbacks
     # before_create
-    before_update :update_person
+    # before_update :update_person
 
     # Expect family_transcript is a hash structured after CV2?
     def process_transcript(family_transcript = {})

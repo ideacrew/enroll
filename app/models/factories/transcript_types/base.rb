@@ -4,19 +4,21 @@ module Factories
 
       attr_reader :transcript, :fields_to_ignore
 
-      def initialize
+      def initialize(options = {})
+        @transcript = options
         @transcript = transcript_template
+        @fields_to_ignore ||= ['_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn']
       end
 
-      def match
+      def match_instance
         raise StandardError "Implement this method in child class"
       end
 
-      def build
+      def build_instance
         raise StandardError "Implement this method in child class"
       end
 
-      def compare
+      def compare_instance
         return unless @transcript[:other].present?
         return if @transcript[:source_is_new]
 
@@ -53,7 +55,7 @@ module Factories
         @transcript[:compare] = differences
       end
 
-      def validate
+      def validate_instance
         return
         @transcript[:source].is_valid?
         @transcript[:other].is_valid?
@@ -91,6 +93,12 @@ module Factories
         }
       end
 
+    def instance_with_all_attributes(class_name)
+      klass.classify.constantize
+      fields = klass.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
+      fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
+      klass.new(fields)
+    end
 
     def family_transcript_prototype
       person = Person.new

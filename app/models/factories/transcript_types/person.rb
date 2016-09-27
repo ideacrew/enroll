@@ -13,7 +13,7 @@ module Factories
       def find_or_build(person)
         @transcript[:other] = person
 
-        people = match(person)
+        people = match_instance(person)
 
         case people.count
         when 0
@@ -27,13 +27,13 @@ module Factories
           raise Factories::TranscriptTypes::PersonError message
         end
 
-        compare
-        validate        
+        compare_instance
+        validate_instance
       end
 
       private
 
-      def match(person)
+      def match_instance(person)
 
         if person.hbx_id.present?
           matched_people = ::Person.where(hbx_id: person.hbx_id) || []
@@ -50,7 +50,7 @@ module Factories
 
       def initialize_person
         fields = ::Person.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
-        fields.delete_if{|key,val| @fields_to_ignore.include?(key)}
+        fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
         ::Person.new(fields)
       end
     end
