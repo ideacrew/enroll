@@ -375,14 +375,4 @@ class Insured::FamiliesController < FamiliesController
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
 
-  # def check_admin_message 
-  #   if @family.active_seps.present? && Person.where(id:@person.id).first.primary_family.active_seps.last.admin_flag.present?
-  #     @sep = Person.where(id:@person.id).first.primary_family.active_seps.last
-  #     if @sep.admin_flag
-  #       @sep_flag = @sep.admin_flag  
-  #       #@sep.admin_flag = false
-  #       @sep.save!
-  #     end
-  #   end
-  # ends
 end
