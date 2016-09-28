@@ -71,6 +71,7 @@ class Person
                 index: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
+  embeds_one :resident_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
@@ -599,7 +600,7 @@ class Person
       active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
 
       # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
-      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the 
+      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the
       #       change is all within the 0-20 age range or all within the 61+ age range (20 >= age <= 61)
       active_enrolled_hbxs.each do |hbx|
         new_temp_person = person.dup
