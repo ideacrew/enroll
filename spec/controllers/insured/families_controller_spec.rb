@@ -676,6 +676,7 @@ RSpec.describe Insured::FamiliesController do
     let(:file_path) { File.dirname(__FILE__) }
     let(:bucket_name) { 'notices' }
     let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
+    let(:subject) {"New Notice"}
 
     before(:each) do
       @controller = Insured::FamiliesController.new
@@ -696,15 +697,15 @@ RSpec.describe Insured::FamiliesController do
     end
 
     it "when successful displays 'File Saved'" do
-      post :upload_notice, {:file => file}
-      expect(flash[:notice]).to include("File Saved")
+      post :upload_notice, {:file => file, :subject=> subject}
+      expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
     end
 
     it "when failure displays 'File not uploaded'" do
       post :upload_notice
-      expect(flash[:error]).to include("File not uploaded")
+      expect(flash[:error]).to eq("File or Subject not provided")
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
     end
@@ -716,7 +717,7 @@ RSpec.describe Insured::FamiliesController do
 
       before do
         allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
-        @controller.send(:notice_upload_secure_message, notice)
+        @controller.send(:notice_upload_secure_message, notice, subject)
       end
 
       it "adds a message to person inbox" do
