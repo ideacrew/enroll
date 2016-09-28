@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<qhpApplicationRateGroupVO xmlns="http://vo.ffe.cms.hhs.gov">
+  <header>
+    <templateVersion>v5.05</templateVersion>
+    <issuerId cellLocation="Rate_Table_(4)-B.6">
+      <cellValue>43849</cellValue>
+    </issuerId>
+    <tin cellLocation="Rate_Table_(4)-B.7">
+      <cellValue>13-5581829</cellValue>
+    </tin>
+  </header>
+  <items>
+    <effectiveDate cellLocation="Rate_Table-B.8">
+      <cellValue>2016-01-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table-B.9">
+      <cellValue>2016-03-31</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table-A.14">
+      <cellValue>43849DC0080001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table-B.14">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table-C.14">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table-D.14">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table-E.14">
+      <cellValue>27.41</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table-G.14">
+      <cellValue>54.82</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table-H.14">
+      <cellValue>54.72</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table-I.14">
+      <cellValue>82.04</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table-J.14">
+      <cellValue>109.35</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table-K.14">
+      <cellValue>82.13</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table-L.14">
+      <cellValue>109.45</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table-M.14">
+      <cellValue>136.76</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table-B.8">
+      <cellValue>2016-01-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table-B.9">
+      <cellValue>2016-03-31</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table-A.15">
+      <cellValue>43849DC0090001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table-B.15">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table-C.15">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table-D.15">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table-E.15">
+      <cellValue>34.16</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table-G.15">
+      <cellValue>68.33</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table-H.15">
+      <cellValue>68.09</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table-I.15">
+      <cellValue>102.02</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table-J.15">
+      <cellValue>135.94</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table-K.15">
+      <cellValue>102.25</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table-L.15">
+      <cellValue>136.18</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table-M.15">
+      <cellValue>170.11</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(2)-B.8">
+      <cellValue>2016-04-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(2)-B.9">
+      <cellValue>2016-06-30</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(2)-A.14">
+      <cellValue>43849DC0080001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(2)-B.14">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(2)-C.14">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(2)-D.14">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(2)-E.14">
+      <cellValue>27.63</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(2)-G.14">
+      <cellValue>55.25</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(2)-H.14">
+      <cellValue>55.14</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(2)-I.14">
+      <cellValue>82.64</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(2)-J.14">
+      <cellValue>110.15</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(2)-K.14">
+      <cellValue>82.76</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(2)-L.14">
+      <cellValue>110.27</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(2)-M.14">
+      <cellValue>137.78</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(2)-B.8">
+      <cellValue>2016-04-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(2)-B.9">
+      <cellValue>2016-06-30</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(2)-A.15">
+      <cellValue>43849DC0090001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(2)-B.15">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(2)-C.15">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(2)-D.15">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(2)-E.15">
+      <cellValue>34.44</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(2)-G.15">
+      <cellValue>68.89</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(2)-H.15">
+      <cellValue>68.63</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(2)-I.15">
+      <cellValue>102.81</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(2)-J.15">
+      <cellValue>136.99</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(2)-K.15">
+      <cellValue>103.07</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(2)-L.15">
+      <cellValue>137.25</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(2)-M.15">
+      <cellValue>171.44</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(3)-B.8">
+      <cellValue>2016-07-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(3)-B.9">
+      <cellValue>2016-09-30</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(3)-A.14">
+      <cellValue>43849DC0080001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(3)-B.14">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(3)-C.14">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(3)-D.14">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(3)-E.14">
+      <cellValue>27.85</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(3)-G.14">
+      <cellValue>55.69</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(3)-H.14">
+      <cellValue>55.55</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(3)-I.14">
+      <cellValue>83.26</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(3)-J.14">
+      <cellValue>110.96</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(3)-K.14">
+      <cellValue>83.40</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(3)-L.14">
+      <cellValue>111.10</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(3)-M.14">
+      <cellValue>138.81</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(3)-B.8">
+      <cellValue>2016-07-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(3)-B.9">
+      <cellValue>2016-09-30</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(3)-A.15">
+      <cellValue>43849DC0090001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(3)-B.15">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(3)-C.15">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(3)-D.15">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(3)-E.15">
+      <cellValue>34.73</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(3)-G.15">
+      <cellValue>69.45</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(3)-H.15">
+      <cellValue>69.17</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(3)-I.15">
+      <cellValue>103.61</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(3)-J.15">
+      <cellValue>138.05</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(3)-K.15">
+      <cellValue>103.89</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(3)-L.15">
+      <cellValue>138.33</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(3)-M.15">
+      <cellValue>172.78</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+      <cellValue>2016-10-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(4)-B.9">
+      <cellValue>2016-12-31</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(4)-A.14">
+      <cellValue>43849DC0080001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(4)-B.14">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(4)-C.14">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(4)-D.14">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(4)-E.14">
+      <cellValue>28.07</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(4)-G.14">
+      <cellValue>56.13</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(4)-H.14">
+      <cellValue>55.97</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(4)-I.14">
+      <cellValue>83.87</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(4)-J.14">
+      <cellValue>111.78</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(4)-K.14">
+      <cellValue>84.04</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(4)-L.14">
+      <cellValue>111.94</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(4)-M.14">
+      <cellValue>139.84</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+  <items>
+    <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+      <cellValue>2016-10-01</cellValue>
+    </effectiveDate>
+    <expirationDate cellLocation="Rate_Table_(4)-B.9">
+      <cellValue>2016-12-31</cellValue>
+    </expirationDate>
+    <planId cellLocation="Rate_Table_(4)-A.15">
+      <cellValue>43849DC0090001</cellValue>
+    </planId>
+    <rateAreaId cellLocation="Rate_Table_(4)-B.15">
+      <cellValue>Rating Area 1</cellValue>
+    </rateAreaId>
+    <tobacco cellLocation="Rate_Table_(4)-C.15">
+      <cellValue>No Preference</cellValue>
+    </tobacco>
+    <ageNumber cellLocation="Rate_Table_(4)-D.15">
+      <cellValue>Family Option</cellValue>
+    </ageNumber>
+    <primaryEnrollee cellLocation="Rate_Table_(4)-E.15">
+      <cellValue>35.01</cellValue>
+    </primaryEnrollee>
+    <coupleEnrollee cellLocation="Rate_Table_(4)-G.15">
+      <cellValue>70.02</cellValue>
+    </coupleEnrollee>
+    <primaryEnrolleeOneDependent cellLocation="Rate_Table_(4)-H.15">
+      <cellValue>69.71</cellValue>
+    </primaryEnrolleeOneDependent>
+    <primaryEnrolleeTwoDependent cellLocation="Rate_Table_(4)-I.15">
+      <cellValue>104.41</cellValue>
+    </primaryEnrolleeTwoDependent>
+    <primaryEnrolleeManyDependent cellLocation="Rate_Table_(4)-J.15">
+      <cellValue>139.11</cellValue>
+    </primaryEnrolleeManyDependent>
+    <coupleEnrolleeOneDependent cellLocation="Rate_Table_(4)-K.15">
+      <cellValue>104.72</cellValue>
+    </coupleEnrolleeOneDependent>
+    <coupleEnrolleeTwoDependent cellLocation="Rate_Table_(4)-L.15">
+      <cellValue>139.42</cellValue>
+    </coupleEnrolleeTwoDependent>
+    <coupleEnrolleeManyDependent cellLocation="Rate_Table_(4)-M.15">
+      <cellValue>174.13</cellValue>
+    </coupleEnrolleeManyDependent>
+  </items>
+</qhpApplicationRateGroupVO>
