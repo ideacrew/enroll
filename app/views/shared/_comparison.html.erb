@@ -75,7 +75,8 @@
         <tr>
           <th>PLAN BENEFITS <br> (In Network)</th>
           <% qhps.each do |qhp|%>
-            <th colspan="2"> COST SHARING </th>
+            <th colspan="2" data-toggle="tooltip" data-container="body" title="Once you meet your deductible, you'll share the costs for any covered services you receive until you reach your out-of-pocket limit.
+                Copayments are a fixed dollar amount you pay for a covered service, usually when you receive the service. Coinsurance is calculated as a percent of the allowed amount for a covered service."> COST SHARING </th>
           <% end %>
         </tr>
         <%= render partial: "shared/plan_shoppings/plan_visit_types" %>
