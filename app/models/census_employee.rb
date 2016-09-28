@@ -373,11 +373,20 @@ class CensusEmployee < CensusMember
       self
     end
   end
+
   def generate_and_deliver_checkbook_url    
      cs= ::CheckbookServices::PlanComparision.new(self)    
-     url = cs.generate_url   
-     ## deliver mail now   
-   end
+     url = cs.generate_url
+     event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+     notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(census_employee, {
+              template: notice_trigger.notice_template,
+              subject: event_kind.title,
+              mpi_indicator: notice_trigger.mpi_indicator,
+              data: url
+              }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+        builder.deliver
+  end
 
   def terminate_employment!(employment_terminated_on)
 
