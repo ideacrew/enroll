@@ -203,7 +203,7 @@ class Insured::FamiliesController < FamiliesController
   # admin manually uploads a notice for person
   def upload_notice
 
-    if params.permit![:file]
+    if params.permit![:file] && params.permit![:subject]
       doc_uri = Aws::S3Storage.save(file_path, 'notices')
 
       if doc_uri.present?
@@ -213,7 +213,7 @@ class Insured::FamiliesController < FamiliesController
           @person.documents << notice_document
           @person.save!
 
-          send_notice_upload_notifications(notice_document)
+          send_notice_upload_notifications(notice_document, params.permit![:subject])
 
           flash[:notice] = "File Saved"
           redirect_to(:back)
@@ -228,7 +228,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to(:back)
       end
     else
-      flash[:error] = "File not uploaded"
+      flash[:error] = "File or Subject not provided"
       redirect_to(:back)
     end
   end
@@ -329,19 +329,18 @@ class Insured::FamiliesController < FamiliesController
     params.permit![:file].content_type
   end
 
-  def send_notice_upload_notifications(notice)
+  def send_notice_upload_notifications(notice, subject)
     notice_upload_email
-    notice_upload_secure_message(notice)
+    notice_upload_secure_message(notice, subject)
   end
 
   def notice_upload_email
-    UserMailer.notice_uploaded_notification(@person).deliver_now
+    UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
   end
 
-  def notice_upload_secure_message(notice)
-    subject = "New Notice Available"
+  def notice_upload_secure_message(notice, subject)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
