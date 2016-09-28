@@ -12,11 +12,7 @@
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
-  
-  <% if @person.primary_family.has_checkbook_url?  %>
-    <%= render partial: 'out_of_pocket_calculator'%> <br/>
-  <%end%>
-
+  <%= render partial: 'out_of_pocket_calculator'%> <br/>
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'qle_detail' %>
