@@ -12,3 +12,10 @@ Feature: Consumer requests enrollment in CoverAll
     And selects which household members will be included in the plan
     And enters enroll in Cover All
     Then a notification appears stating that the enrollment in coverall has been submitted
+
+  Scenario: Consumer has been entered into CoverAll
+    Given I have been entered into CoverAll
+    And I have not previously logged into EA
+    When I login for the first time to create my account
+    And enter my name and DOB
+    Then I should be notified that I match with a record in the system
