@@ -249,15 +249,32 @@ class PlanYear
     employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
   end
 
-  # # does the plan year violate model integrity relative to publishing
-  def is_application_unpublishable?
-    open_enrollment_date_errors.present? || application_errors.present?
-  end
-
-  # is the plan year compliant with all regulations
-  def is_application_valid?
+  def is_application_eligible?
     application_eligibility_warnings.blank?
   end
+
+  def is_application_valid?
+    application_errors.blank?
+  end
+
+  def is_application_invalid?
+    !is_application_valid?
+  end
+
+  def is_application_unpublishable?
+    open_enrollment_date_errors.present? || is_application_invalid?
+  end
+
+
+  # # # does the plan year violate model integrity relative to publishing
+  # def is_application_unpublishable?
+  #   open_enrollment_date_errors.present? || application_errors.present?
+  # end
+
+  # # is the plan year compliant with all regulations
+  # def is_application_valid?
+  #   application_eligibility_warnings.blank?
+  # end
 
   def due_date_for_publish
     if employer_profile.plan_years.renewing.any?
@@ -327,7 +344,7 @@ class PlanYear
 
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
-    warnings = application_errors
+    warnings = {}
 
     unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Primary office must be located in #{Settings.aca.state_name}"})
@@ -685,12 +702,13 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?
       transitions from: :draft, to: :publish_pending
+
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => :trigger_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -703,12 +721,14 @@ class PlanYear
     event :force_publish, :after => :record_transition do
       transitions from: :publish_pending, to: :published_invalid
 
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?
       transitions from: :draft, to: :publish_pending
 
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => :trigger_auto_renew_notice
+      transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => :trigger_auto_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 

@@ -432,8 +432,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       it "and should provide relevant warnings" do
-        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+        expect(plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
+        expect(plan_year_with_benefit_group.application_errors[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
       end
 
       it "and plan year should be in publish pending state" do
@@ -570,7 +570,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -586,7 +586,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -611,8 +611,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "and should provide relevant warnings" do
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -660,7 +660,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
           it "application should not be valid" do
-            expect(invalid_plan_year.is_application_valid?).to be_falsey
+            expect(invalid_plan_year.is_application_eligible?).to be_falsey
           end
 
           it "and should provide relevent warning message" do
@@ -700,7 +700,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "should transition into publish pending status" do
@@ -1355,7 +1355,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(plan_year.is_application_valid?).to be_falsey
+          expect(plan_year.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -1400,7 +1400,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       it "and application should not be valid" do
-        expect(plan_year.is_application_valid?).to be_falsey
+        expect(plan_year.is_application_eligible?).to be_falsey
       end
 
       it "and plan year should be in publish pending state" do
