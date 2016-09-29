@@ -29,11 +29,6 @@ describe Family, "given a primary applicant and a dependent" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
   end
-
-  context "#any_unverified_enrollments?" do
-
-  end
-
 end
 
 describe Family, type: :model, dbclean: :after_each do
