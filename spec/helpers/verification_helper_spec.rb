@@ -178,7 +178,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     context "with no special verification period" do
       it "calls determine due date method" do
-        expect((helper.verification_due_date(family)).to_s).to include TimeKeeper.date_of_record.strftime("%Y")
+        expect((helper.verification_due_date(family)).to_s).to include (TimeKeeper.date_of_record + 95.days).strftime("%Y")
       end
     end
   end

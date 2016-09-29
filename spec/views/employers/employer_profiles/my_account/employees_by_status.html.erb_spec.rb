@@ -82,6 +82,18 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_selector('tr.cobra_confirm')
     end
+
+    it "should displays termination date when status is all" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_content('Termination Date')
+    end
+
+    it "should displays termination date when status is terminated" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "terminated"
+      expect(rendered).to have_content('Termination Date')
+    end
   end
 
   context 'when employee is waived' do
