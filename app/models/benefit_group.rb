@@ -330,10 +330,12 @@ class BenefitGroup
   end
 
   def self.find(id)
-    organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
-    organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
-      bg.id == id
-    end.first
+    ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
+      organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
+      organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
+        bg.id == id
+      end.first
+    end
   end
 
 

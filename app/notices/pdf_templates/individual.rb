@@ -6,6 +6,7 @@ module PdfTemplates
 
     attribute :ssn_verified, Boolean, :default => false
     attribute :citizenship_verified, Boolean, :default => false
+    attribute :citizen_status, String
     attribute :residency_verified, Boolean, :default => false
     attribute :indian_conflict, Boolean, :default => false
     attribute :incarcerated, Boolean, :default => false

@@ -409,6 +409,7 @@ describe HbxEnrollment, dbclean: :after_all do
           coverage_household: coverage_household,
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
+
         )
         @enrollment5.save
         @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
@@ -453,30 +454,27 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
         expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
       end
+
     end
 
-    #context "find_by_benefit_group_assignments" do
-    #  before :all do
-    #    3.times.each do
-    #      enrollment = household.create_hbx_enrollment_from(
-    #        employee_role: mikes_employee_role,
-    #        coverage_household: coverage_household,
-    #        benefit_group: mikes_benefit_group,
-    #        benefit_group_assignment: @mikes_benefit_group_assignments
-    #      )
-    #      enrollment.save
-    #    end
-    #  end
+    context "find_by_benefit_group_assignments" do
+      before :all do
+          enrollment = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+          )
+          enrollment.aasm_state = "auto_renewing"
+          enrollment.is_active = false
+          enrollment.save
+      end
 
-    #  it "should find more than 3 hbx_enrollments" do
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
-    #  end
+    it "should return an auto renewing enrollment if there exists one" do
+      expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).map(&:aasm_state)).to include "auto_renewing"
+    end
 
-    #  it "should return empty array without params" do
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
-    #    expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
-    #  end
-    #end
+  end
 
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
@@ -1829,6 +1827,84 @@ context "A cancelled external enrollment", :dbclean => :after_each do
     enrollment.external_enrollment = false
     enrollment.save!
     expect(family.enrollments_for_display.to_a).not_to eq([])
+  end
+end
+
+context '.process_verification_reminders' do 
+  context "when family exists with pending outstanding verifications" do
+
+    let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: rand(10000), person: consumer_role.person) }
+    let(:plan) { FactoryGirl.create(:plan) }
+
+    let(:hbx_enrollment) {
+      enrollment = family.active_household.new_hbx_enrollment_from(
+        consumer_role: consumer_role,
+        coverage_household: family.active_household.coverage_households.first,
+        benefit_package: benefit_package,
+        qle: true
+      )
+      enrollment.plan_id = plan.id
+      enrollment.aasm_state = 'coverage_selected'
+      enrollment
+    }
+
+    before do
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return(true)
+      hbx_enrollment.save
+      consumer_role.lawful_presence_determination.update_attributes(:aasm_state => 'verification_outstanding')
+      consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
+    end
+
+    context 'when first verification due date reached' do 
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now) 
+      end
+
+      it 'should trigger first reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when second verification due date reached' do
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now) 
+      end
+
+      it 'should trigger second reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when third verification due date reached' do
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now) 
+      end
+
+      it 'should trigger third reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when fourth verification due date reached' do 
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now) 
+      end 
+
+      it 'should trigger fourth reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
   end
 end
 
