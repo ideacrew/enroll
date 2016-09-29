@@ -807,7 +807,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           workflow_plan_year_with_benefit_group.publish!
         end
 
-        it "application should not be valid" do
+        it "application should be valid" do
           expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_truthy
         end
 
