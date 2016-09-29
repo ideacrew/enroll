@@ -10,7 +10,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled conversion_expired)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -249,33 +249,14 @@ class PlanYear
     employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
   end
 
-  # does the plan year violate model integrity relative to publishing
+  # # does the plan year violate model integrity relative to publishing
   def is_application_unpublishable?
-    enrollment_period_errors.present? || application_errors.present?
-  end
-
-  def enrollment_period_errors
-    errors = []
-    minimum_length = RENEWING.include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
-      : Settings.aca.shop_market.open_enrollment.minimum_length.days 
-
-    if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
-      errors.push "open enrollment period is less than minumum: #{minimum_length} days"
-    end
-
-    enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
-      : Settings.aca.shop_market.open_enrollment.monthly_end_on
-
-    if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-      errors.push "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"
-    end
-
-    errors
+    open_enrollment_date_errors.present? || application_errors.present?
   end
 
   # is the plan year compliant with all regulations
   def is_application_valid?
-    application_eligibility_warnings.blank? ? true : false
+    application_eligibility_warnings.blank?
   end
 
   def due_date_for_publish
@@ -289,6 +270,28 @@ class PlanYear
   def is_publish_date_valid?
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
+  end
+
+  def open_enrollment_date_errors
+    errors = []
+
+    if is_renewing?
+      minimum_length = Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
+      enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+    else
+      minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days 
+      enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
+    end
+
+    if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
+      errors.push "open enrollment period is less than minimum: #{minimum_length} days"
+    end
+
+    if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
+      errors.push "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"
+    end
+
+    errors
   end
 
   # Check plan year for violations of model integrity relative to publishing
@@ -649,7 +652,7 @@ class PlanYear
     state :terminated     # Coverage under this application is terminated
     state :ineligible     # Application is non-compliant for enrollment
     state :expired        # Non-published plans are expired following their end on date
-    state :migration_expired #  ERs are electing or no longer qualify to migrate
+    state :conversion_expired # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -681,11 +684,11 @@ class PlanYear
 
     # Submit plan year application
     event :publish, :after => :record_transition do
-      transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
+      transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
       transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
-      transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
+      transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
@@ -766,8 +769,8 @@ class PlanYear
       transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
     end
 
-    event :migration_expire, :after => :record_transition do
-      transitions from: [:expired, :active], to: :migration_expired, :guard => :can_be_migrated?
+    event :conversion_expire, :after => :record_transition do
+      transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
     end
   end
 
@@ -929,10 +932,10 @@ private
     end
   end
 
-    # attempted to publish but plan year violates publishing plan model integrity
-  def report_unpublishable
-    application_eligibility_warnings.each_pair(){ |key, value| errors.add(key, value) }
-  end
+  # attempted to publish but plan year violates publishing plan model integrity
+  # def report_unpublishable
+  #   application_eligibility_warnings.each_pair(){ |key, value| errors.add(key, value) }
+  # end
 
   def within_review_period?
     (latest_workflow_state_transition.transition_at.end_of_day + Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days) > TimeKeeper.date_of_record
@@ -981,10 +984,15 @@ private
       end
     end
 
+    # Open enrollment end date can't be after 10th of the prev month for new plan years and 13th of the prev for renewing plan years
     if ['draft', 'renewing_draft'].include?(aasm_state)
-      enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
-        : Settings.aca.shop_market.open_enrollment.monthly_end_on
 
+      if is_renewing?
+        enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+      else
+        enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
+      end
+      
       if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
         errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
       end

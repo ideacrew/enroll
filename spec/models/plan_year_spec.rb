@@ -383,7 +383,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it 'should error out' do 
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.enrollment_period_errors).to include("open enrollment period is less than minumum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
+        expect(plan_year.open_enrollment_date_errors).to include("open enrollment period is less than minimum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
       end
     end
 
@@ -396,7 +396,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it 'should error out' do 
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.enrollment_period_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
+        expect(plan_year.open_enrollment_date_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
       end
     end
   end
@@ -2292,14 +2292,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "this should trigger a state transition" do
       it "should change its aasm state" do
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
-        workflow_plan_year_with_benefit_group.migration_expire!
-        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "migration_expired"
+        workflow_plan_year_with_benefit_group.conversion_expire!
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "conversion_expired"
       end
 
       it "should not change its aasm state" do
         workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
         workflow_plan_year_with_benefit_group.save
-        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
       end
 
@@ -2307,7 +2307,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         workflow_plan_year_with_benefit_group.employer_profile.registered_on = TimeKeeper.date_of_record + 45.days
         workflow_plan_year_with_benefit_group.save
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
-        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
       end
     end

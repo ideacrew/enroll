@@ -229,6 +229,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = @employer_profile.find_plan_year(params[:id])
     @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
     @just_a_warning = false
+
     if plan_year.publish_pending?
       plan_year.withdraw_pending!
       if !plan_year.is_application_valid?
@@ -236,6 +237,7 @@ class Employers::PlanYearsController < ApplicationController
         plan_year.application_eligibility_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
       end
     end
+
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.build_relationship_benefits if benefit_group.relationship_benefits.empty?
@@ -340,7 +342,7 @@ class Employers::PlanYearsController < ApplicationController
           flash[:error] = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
         end
       else
-        errors = @plan_year.application_errors.try(:values) + @plan_year.enrollment_period_errors
+        errors = @plan_year.application_errors.try(:values) + @plan_year.open_enrollment_date_errors
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
