@@ -111,6 +111,10 @@ describe "shared/_comparison.html.erb" do
       expect(rendered).to_not have_selector('th', text: 'CO-PAY')
     end
 
+    it "should have title text" do
+      expect(rendered).to match("Once you meet your deductible, you'll share the costs for any covered services you receive until you reach your out-of-pocket limit. Copayments are a fixed dollar amount you pay for a covered service, usually when you receive the service. Coinsurance is calculated as a percent of the allowed amount for a covered service.")
+    end
+
     it "should have plan data" do
       expect(rendered).to match(/#{mock_plan.name}/)
     end
