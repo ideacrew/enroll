@@ -1,12 +1,13 @@
 class IvlNotices::SecondIvlRenewalNotice < IvlNotice
-  attr_accessor :family, :data,:identifier
+  attr_accessor :family, :data,:identifier, :person
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person
+    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
-    args[:to] = consumer_role.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
+    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    self.person = args[:person]
     self.data = args[:data]
     self.identifier = args[:primary_identifier]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
@@ -38,9 +39,9 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     family = recipient.primary_family
     append_data
     notice.primary_identifier = "Account ID: #{identifier}"
-    notice.primary_fullname = recipient.full_name.titleize || ""
-    if recipient.mailing_address
-      append_address(recipient.mailing_address)
+    notice.primary_fullname = person.full_name.titleize || ""
+    if person.mailing_address
+      append_address(person.mailing_address)
     else  
       # @notice.primary_address = nil
       raise 'mailing address not present' 

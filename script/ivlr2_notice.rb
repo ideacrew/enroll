@@ -13,8 +13,8 @@
     @data_hash = {}
     @data.each do |d|
       if @data_hash[d["ic_ref"]].present?
-        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['hbx_id']}
-        next if hbx_ids.include?(d["hbx_id"])
+        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['personid']}
+        next if hbx_ids.include?(d["personid"])
         @data_hash[d["ic_ref"]] << d
       else
         @data_hash[d["ic_ref"]] = [d]
@@ -44,7 +44,7 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |ic_ref, members|
       begin
-        primary_member = members.detect{|m| !m["hbx_id"].nil? }
+        primary_member = members.detect{|m| m["subscriber"] == "Y"}
         person = Person.where(:hbx_id => primary_member["hbx_id"]).first
         consumer_role =person.consumer_role
         if consumer_role.present?
@@ -53,6 +53,7 @@
                   subject: event_kind.title,
                   mpi_indicator: notice_trigger.mpi_indicator,
                   data: members,
+                  person: person,
                   primary_identifier: ic_ref
                   }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
                   )
