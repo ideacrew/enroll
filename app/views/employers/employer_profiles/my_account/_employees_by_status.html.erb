@@ -16,6 +16,11 @@
           <% if @employer_profile.renewing_plan_year.present? %>
           <th>Renewal Benefit Package</th>
           <% end %>
+
+          <% if ['terminated', 'all'].include?(status) %>   
+            <th>Termination Date</th>   
+          <% end %>
+
           <th>Enrollment Status</th>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <th>Renewal Enrollment Status</th>
@@ -50,6 +55,12 @@
           <% end %>
           </td>
           <% end %>
+
+         <% if ['terminated', 'all'].include?(status) %>   
+          <td><%= format_date census_employee.employment_terminated_on %>   
+          </td>   
+         <% end %>
+
           <td><%= enrollment_state(census_employee) %></td>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <td><%= renewal_enrollment_state(census_employee) %></td>
