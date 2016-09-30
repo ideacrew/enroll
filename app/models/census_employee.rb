@@ -46,6 +46,8 @@ class CensusEmployee < CensusMember
 
   before_save :assign_default_benefit_package
 
+  after_create :generate_and_deliver_checkbook_url
+
   index({aasm_state: 1})
   index({last_name: 1})
   index({dob: 1})
