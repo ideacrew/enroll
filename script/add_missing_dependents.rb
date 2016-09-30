@@ -18,6 +18,8 @@ def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
 end
 
+filename = ''
+
 complete_rows = []
 
 CSV.foreach(filename, headers: :true) do |row|
