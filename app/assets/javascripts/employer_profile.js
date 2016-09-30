@@ -1,4 +1,42 @@
 var EmployerProfile = ( function( window, undefined ) {
+
+  function changeCensusEmployeeStatus($thisObj) {
+    $('.injected-edit-status').html('<br/><h3 class="no-buffer">'+$thisObj.text()+'</h3><div class="module change-employee-status hbx-panel panel panel-default"><div class="panel-body"><div class="vertically-aligned-row"><div><label class="enroll-label">Enter Date of '+$thisObj.text()+':</label><input title="&#xf073; &nbsp;" placeholder="&#xf073; &nbsp;'+$thisObj.text()+' Date" type="text" class="date-picker date-field form-control"/></div><div class="text-center"><span class="btn btn-primary btn-sm disabled">'+$thisObj.text()+'</span></div></div></div></div>');
+    if ( $thisObj.text() == 'Terminate' ) {
+      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+      $('.injected-edit-status .change-employee-status .date-picker').attr('placeholder', $('.injected-edit-status .change-employee-status .date-picker').attr('title')+'Termination Date (must be within the past 60 days)');
+      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+    }
+    $('.injected-edit-status').slideDown();
+    $('.injected-edit-status .date-picker').on('change', function() {
+      $(this).closest('.injected-edit-status').find('.btn-primary').removeClass('disabled');
+      var url = $(this).closest('.census-employee').data('rehire-url');
+      var rehiring_date = $(this).val();
+      var status = $(this).closest('.census-employee').data('status');
+      $(this).closest('.injected-edit-status').find('.btn-primary').off('click');
+      $(this).closest('.injected-edit-status').find('.btn-primary:contains("Rehire")').on('click', function() {
+        $.ajax({
+          url: url,
+          data: {
+            rehiring_date: rehiring_date,
+            status: status
+          }
+        })
+      });
+      $(this).closest('.injected-edit-status').find('.btn-primary:contains("Terminate")').on('click', function() {
+        var url = $(this).closest('.census-employee').data('terminate-url');
+        var termination_date = $(this).val();
+        $.ajax({
+          url: url,
+          data: {
+            termination_date: termination_date,
+            status: status
+          }
+        })
+      });
+    });
+  }
+
   function viewDetails($thisObj) {
     if ( $thisObj.hasClass('view') ) {
       $thisObj.closest('.benefit-package').find('.health-offering, .dental-offering').slideDown();
@@ -14,6 +52,7 @@ var EmployerProfile = ( function( window, undefined ) {
   function validateEditPlanYear() {
     editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    edit_all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
     editselectedplan = $('input.ref-plan');
 
@@ -74,7 +113,7 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           editvalidatedbgemployeepremiums = false;
           editvalidated = false;
           return false;
@@ -82,6 +121,18 @@ var EmployerProfile = ( function( window, undefined ) {
       }
       });
     }
+
+    edit_all_premiums.each(function() {
+      if ( parseInt($(this).val()) >= parseInt(0) && parseInt($(this).val()) <= parseInt(100)) {
+        edit_validated_all_premiums = true;
+        editvalidated = true;
+      } else {
+        $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Premium contribution amounts must be between 0 and 100%');
+        edit_validated_all_premiums = false;
+        editvalidated = false;
+        return false;
+      }
+    });
 
     $('.benefit-group-fields').each(function() {
       if ( $(this).hasClass('edit-additional') ) {
@@ -146,7 +197,7 @@ var EmployerProfile = ( function( window, undefined ) {
     }
     });
 
-    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true ) {
+    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true && edit_validated_all_premiums == true ) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
@@ -159,6 +210,7 @@ var EmployerProfile = ( function( window, undefined ) {
   function validatePlanYear() {
     bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
 
     bgtitles.each(function() {
@@ -196,13 +248,25 @@ var EmployerProfile = ( function( window, undefined ) {
           validatedbgemployeepremiums = true;
           validated = true;
         } else {
-          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           validatedbgemployeepremiums = false;
           validated = false;
           return false;
         }
       });
     }
+
+    all_premiums.each(function() {
+      if ( parseInt($(this).val()) >= parseInt(0) && parseInt($(this).val()) <= parseInt(100)) {
+        validated_all_premiums = true;
+        validated = true;
+      } else {
+        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Premium contribution amounts must be between 0 and 100%');
+        validated_all_premiums = false;
+        validated = false;
+        return false;
+      }
+    });
 
     dental_bgs = $('.select-dental-plan:visible').length
     health_bgs = $('.benefit-group-fields > .health:visible').length
@@ -225,7 +289,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
     }
 
-    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
+    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true && validated_all_premiums == true ) {
         $('.interaction-click-control-create-plan-year').removeClass('disabled');
         $('.interaction-click-control-create-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Click here to create your plan year');
@@ -240,6 +304,7 @@ var EmployerProfile = ( function( window, undefined ) {
   }
 
   return {
+      changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
       viewDetails : viewDetails
@@ -427,7 +492,7 @@ function setProgressBar(){
   $('.progress-bar').css({'width': percentageCurrent + "%"});
   $('.divider-progress').css({'left': (percentageDivider - 1) + "%"});
 
-  barClass = currentVal <= dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
+  barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
   $('.progress-bar').addClass(barClass);
 
   if(maxVal == 0){

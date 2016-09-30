@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :user do
-    sequence(:email) {|n| "example\##{n}@example.com"}
+    sequence(:email) {|n| "example#{n}@example.com"}
+    sequence(:oim_id) {|n| "example#{n}"}
     gen_pass = User.generate_valid_password
     password gen_pass
     password_confirmation gen_pass
@@ -20,6 +21,7 @@ FactoryGirl.define do
   trait :without_password_confirmation do
     password_confirmation ' '
   end
+
 
   trait :hbx_staff do
     roles ["hbx_staff"]
@@ -48,18 +50,6 @@ FactoryGirl.define do
     roles ["employee"]
   end
 
-  trait :employer_staff do
-    roles ["employer_staff"]
-  end
-
-  trait "broker" do
-    roles ["broker"]
-  end
-
-  trait "broker_agency_staff" do
-    roles ["broker_agency_staff"]
-  end
-
   trait :employer do
     transient do
       organization {}
@@ -73,6 +63,18 @@ FactoryGirl.define do
       user.person.employer_staff_roles.push FactoryGirl.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
       user.save
     end
+  end
+
+  trait :employer_staff do
+    roles ["employer_staff"]
+  end
+
+  trait "broker" do
+    roles ["broker"]
+  end
+
+  trait "broker_agency_staff" do
+    roles ["broker_agency_staff"]
   end
 
   trait :general_agency_staff do

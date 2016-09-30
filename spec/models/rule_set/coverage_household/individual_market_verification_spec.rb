@@ -38,8 +38,8 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
         describe "where one of the members is pending and the other has passed validation" do
           let(:enrollment_members) { [member_1, member_2] }
           before :each do
-            allow(consumer_role_1).to receive(:verifications_pending?).and_return(false)
-            allow(consumer_role_2).to receive(:verifications_pending?).and_return(true)
+            allow(consumer_role_1).to receive(:ssa_pending?).and_return(false)
+            allow(consumer_role_2).to receive(:ssa_pending?).and_return(true)
           end
 
           it "should recommend the unverified state" do
@@ -49,8 +49,8 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
         describe "where one of the members is pending and the other has failed validation" do
           let(:enrollment_members) { [member_1, member_2] }
           before :each do
-            allow(consumer_role_1).to receive(:verifications_pending?).and_return(true)
-            allow(consumer_role_2).to receive(:verifications_pending?).and_return(false)
+            allow(consumer_role_1).to receive(:ssa_pending?).and_return(true)
+            allow(consumer_role_2).to receive(:ssa_pending?).and_return(false)
           end
 
           it "should recommend the unverified state" do
@@ -60,33 +60,17 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
         describe "where one of the members is verified and the other has failed validation" do
           let(:enrollment_members) { [member_1, member_2] }
           before :each do
-            allow(consumer_role_1).to receive(:verifications_pending?).and_return(false)
-            allow(consumer_role_2).to receive(:verifications_pending?).and_return(false)
-            allow(consumer_role_1).to receive(:verifications_outstanding?).and_return(false)
-            allow(consumer_role_2).to receive(:verifications_outstanding?).and_return(true)
+            allow(consumer_role_1).to receive(:ssa_pending?).and_return(false)
+            allow(consumer_role_2).to receive(:ssa_pending?).and_return(false)
+            allow(consumer_role_1).to receive(:dhs_pending?).and_return(false)
+            allow(consumer_role_2).to receive(:dhs_pending?).and_return(false)
+            allow(consumer_role_1).to receive(:verification_outstanding?).and_return(false)
+            allow(consumer_role_2).to receive(:verification_outstanding?).and_return(true)
           end
 
           it "should recommend the enrolled_contingent state" do
             expect(subject.determine_next_state).to eq(:move_to_contingent!)
           end
-        end
-      end
-
-      describe "where one of the members is not on any enrollments, and that member is unverified, but the other member is verified" do
-        let(:consumer_role_1) { instance_double(ConsumerRole) }
-        let(:person_1) { instance_double(Person, :consumer_role => consumer_role_1) }
-        let(:enrollment_members) { [member_1] }
-        let(:member_1) { 
-          instance_double(HbxEnrollmentMember, :person => person_1)
-        }
-
-        before :each do
-          allow(consumer_role_1).to receive(:verifications_pending?).and_return(false)
-          allow(consumer_role_1).to receive(:verifications_outstanding?).and_return(false)
-        end
-
-        it "should recommend the enrolled state" do
-          expect(subject.determine_next_state).to eq(:move_to_enrolled!)
         end
       end
     end

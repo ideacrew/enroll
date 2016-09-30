@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
+  before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :update_individual, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
 
   def download
@@ -29,35 +30,23 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def update_individual
-    @person.consumer_role.authorize_residency! verification_attr
-    @person.consumer_role.authorize_lawful_presence! verification_attr
-    respond_to do |format|
-      format.html { redirect_to :back }
-    end
-  end
-
   def update_verification_type
     v_type = params[:verification_type]
     if v_type == "Social Security Number"
       @person.consumer_role.update_attributes(:ssn_validation => "valid",
                                               :ssn_update_reason => params[:verification_reason])
     else
-     @person.consumer_role.lawful_presence_determination.authorize! verification_attr
-     @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
+      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
+      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
                                              {:v_type => v_type,
                                               :update_reason => params[:verification_reason]
                                              } )
     end
+    @person.consumer_role.verify_ivl_by_admin if all_types_verified?(@person)
     respond_to do |format|
       format.html {
-        if all_types_verified?(@person)
-          flash[:notice] = "Individual verification status was completely approved."
-          redirect_to update_individual_documents_path(:person_id => @person)
-        else
-          flash[:notice] = "Verification type successfully approved."
-          redirect_to :back
-        end
+        flash[:notice] = "Verification successfully approved."
+        redirect_to :back
       }
     end
   end
@@ -149,6 +138,10 @@ class DocumentsController < ApplicationController
   end
 
   private
+  def updateable?
+    authorize Family, :updateable?
+  end
+
   def get_options(params)
     options = {}
     options[:content_type] = params[:content_type] if params[:content_type]
@@ -170,7 +163,7 @@ class DocumentsController < ApplicationController
     if type == 'Social Security Number'
       person.consumer_role.ssn_verified?
     elsif type == 'Citizenship' || type == 'Immigration status'
-      person.consumer_role.citizenship_verified?
+      person.consumer_role.lawful_presence_verified?
     end
   end
 
@@ -184,9 +177,9 @@ class DocumentsController < ApplicationController
   end
 
   def verification_attr
-    OpenStruct.new({
-       :verified_at => Time.now,
-       :authority => "hbx"
+    OpenStruct.new({:determined_at => Time.now,
+                    :authority => "hbx"
                    })
   end
+
 end

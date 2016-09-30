@@ -8,15 +8,15 @@
         <div id='help_list'  style='font-size: 140%; margin: 140px 100px 0px'>
            <b>Help me Sign Up Options</b><br/><br/>
           <ul>
-            <li>  <%=link_to 'Help from a Broker', 
+            <li>  <%=link_to 'Help from a Broker',
                   staff_index_broker_agencies_profiles_path, remote: true %></li>
-            <li>   <%=link_to 'Help from an In-Person Assister', 
+            <li>   <%=link_to 'Help from an In-Person Assister',
                assister_index_exchanges_hbx_profiles_path, remote: true%></li>
             <li class='name_search_only' id='CSR'> <a href= '#'>   Help from a Customer Service Representative </a></li>
             <li class='name_search_only' id='CAC'> <a href= '#'> Help from a Certified Applicant Counselor (CAC) </a></li>
           </ul>
         </div>
-           <div id='help_search' class='help_reset'> 
+           <div id='help_search' class='help_reset'>
            <h4> Search by Name </h4>
                 First name:<br>
                 <input type="text" id="help_first_name">
@@ -25,9 +25,9 @@
                 <input type="text" id="help_last_name">
                 <div class='btn btn-primary' id='search_for_plan_shopping_help'> Search for Help</div>
                  <br/>
-                <h4 id='help_status'></h4>  
+                <h4 id='help_status'></h4>
                 <div class= 'hide' id='help_requestor'><%= @person.try(:id)%></div>
-                <div class= 'hide' id='help_requestor_email'><%= current_user.email%></div>
+                <div class= 'hide' id='help_requestor_email'><%= current_user.oim_id%></div>
                 <div class='hide' id='help_type'> </div>
           </div>
         <div id='inbox' class='help_reset'><div class='col-md-10 col-md-12 col-lg-12'></div>

@@ -196,7 +196,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     context "consumer_role aasm_state is NOT fully_verified" do
       before :each do
-        role.aasm_state = "verifications_pending"
+        role.aasm_state = "ssa_pending"
       end
       it "returns true for verification_successful state" do
         role.lawful_presence_determination.aasm_state = "verification_successful"
@@ -213,7 +213,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         args.vlp_authority = "dhs"
         role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
-        role.deny_lawful_presence!(args)
+        role.ssn_invalid!(args)
         role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq (Settings.aca.individual_market.verification_outstanding_window.days == 0)
       end
@@ -223,7 +223,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days - 10.days)
         args.vlp_authority = "dhs"
         role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
-        role.deny_lawful_presence!(args)
+        role.ssn_invalid!(args)
         role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end

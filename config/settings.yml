@@ -22,11 +22,13 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
+
+#
+  qle:
+    with_in_sixty_days: 60
 #
   individual_market:
-    # IndividualEnrollmentDueDayOfMonth = 15
-    # Temporary change for Dec 2015 extension
-    monthly_enrollment_due_on: 18
+    monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
 #
@@ -65,6 +67,9 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
       monthly_open_enrollment_end_on: 13
+      open_enrollment:
+        minimum_length:
+          days: 3
 
     benefit_period:
       length_minimum:
@@ -80,7 +85,7 @@ aca:
         days: 5
       maximum_length:
         months: 2
-
+paper_notice: 'paper-notices'
 
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
