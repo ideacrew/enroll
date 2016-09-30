@@ -16,10 +16,17 @@ FactoryGirl.define do
 
     # association :premium_tables, strategy: :build
 
+    trait :with_dental_coverage do
+      coverage_kind "dental"
+       metal_level "dental"
+      dental_level "high"
+    end
+
     trait :with_premium_tables do
       transient do
         premium_tables_count 48
       end
+
 
       after(:create) do |plan, evaluator|
         create_list(:premium_table, evaluator.premium_tables_count, plan: plan)
@@ -78,6 +85,8 @@ FactoryGirl.define do
       metal_level "dental"
       dental_level "high"
     end
+
+
     trait :ivl_dental do
       market "individual"
       coverage_kind "dental"
