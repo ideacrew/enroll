@@ -18,7 +18,7 @@
           <% end %>
 
           <% if ['terminated', 'all'].include?(status) %>   
-            <th>Termination Date</th>   
+          <th>Termination Date</th>   
           <% end %>
 
           <th>Enrollment Status</th>
@@ -56,10 +56,10 @@
           </td>
           <% end %>
 
-         <% if ['terminated', 'all'].include?(status) %>   
+          <% if ['terminated', 'all'].include?(status) %>   
           <td><%= format_date census_employee.employment_terminated_on %>   
           </td>   
-         <% end %>
+          <% end %>
 
           <td><%= enrollment_state(census_employee) %></td>
           <% if @employer_profile.renewing_published_plan_year.present? %>
