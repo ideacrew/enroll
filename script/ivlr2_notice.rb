@@ -46,6 +46,14 @@
       begin
         primary_member = members.detect{|m| m["subscriber"] == "Y"}
         person = Person.where(:hbx_id => primary_member["hbx_id"]).first
+        address = {
+          :address_1 => primary_member["glue_address_1"],
+          :address_2 => primary_member["glue_address_2"],
+          :city => primary_member["glue_city"],
+          :state => primary_member["glue_state"],
+          :zip => primary_member["glue_zip"]
+
+        }
         consumer_role =person.consumer_role
         if consumer_role.present?
             builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -54,6 +62,7 @@
                   mpi_indicator: notice_trigger.mpi_indicator,
                   data: members,
                   person: person,
+                  address: address,
                   primary_identifier: ic_ref
                   }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
                   )

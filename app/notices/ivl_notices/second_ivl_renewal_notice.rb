@@ -1,5 +1,5 @@
 class IvlNotices::SecondIvlRenewalNotice < IvlNotice
-  attr_accessor :family, :data,:identifier, :person
+  attr_accessor :family, :data,:identifier, :person,:address
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -8,6 +8,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.person = args[:person]
+    self.address = Address.new(args[:address])
     self.data = args[:data]
     self.identifier = args[:primary_identifier]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
@@ -40,8 +41,8 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     append_data
     notice.primary_identifier = "Account ID: #{identifier}"
     notice.primary_fullname = person.full_name.titleize || ""
-    if person.mailing_address
-      append_address(person.mailing_address)
+    if address
+      append_address(address)
     else  
       # @notice.primary_address = nil
       raise 'mailing address not present' 
