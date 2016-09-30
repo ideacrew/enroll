@@ -46,7 +46,7 @@ RSpec.describe "events/census_employee/employer_response.xml.haml.erb" do
         expect(@doc.xpath("//employers/employer").count).to eq 1
       end
 
-      it "has two census_employers" do
+      it "has two census_employees" do
         expect(@doc.xpath("//employers/employer/employer_census_families/employer_census_family").count).to eq 2
       end
     end
