@@ -116,10 +116,12 @@ module Insured::FamiliesHelper
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
-      # 3) qle enrolmlent period check
+      # 3) special enrollment period id not populated for an enrollment
+      # 4) qle enrolmlent period check
 
     return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
     return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.is_special_enrollment? && hbx_enrollment.special_enrollment_period.blank?
     return false if hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record) if hbx_enrollment.is_special_enrollment?
 
     # Disable only  if non of the above conditions match
