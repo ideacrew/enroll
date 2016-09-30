@@ -98,6 +98,10 @@ context "without default_general_agency_profile, not updateable" do
       expect(rendered).to have_selector('td', text: 'Default GA')
     end
 
+    it "should not has btn class for select default ga" do
+      expect(rendered).not_to have_selector('table a.btn.btn-min')
+    end
+
     it "should have hint msg for select default GA" do
       expect(rendered).to have_content("#{broker_agency_profile.legal_name} - this is your default GA, to change your default GA click \"Select Default GA\" under your desired agency")
     end
