@@ -10,5 +10,4 @@ CSV.foreach(filename, headers: true) do |csv_row|
 	elsif hbx_enrollment.benefit_group.plan_year.end_on == end_date
 		hbx_enrollment.expire_coverage!
 	end
-	hbx_enrollment.save!
 end
