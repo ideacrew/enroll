@@ -7,7 +7,7 @@ module PdfTemplates
     attribute :ssn_verified, Boolean, :default => false
     attribute :citizenship_verified, Boolean, :default => false
     attribute :citizen_status, String
-    attribute :household_size, String
+    # attribute :household_size, String
     attribute :projected_amount, String
     attribute :taxhh_count, String
     attribute :tax_status, String
