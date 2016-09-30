@@ -3,7 +3,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateUserEmail < MongoidMigrationTask
 
   def migrate
-    file_path = File.join(Rails.root, 'db', 'seedfiles', "update_user_email2.xlsx") # path of excel file with email and oim_id data
+    file_path = File.join(Rails.root, 'db', 'seedfiles', "update_user_email.xlsx") # path of excel file with email and oim_id data
     if file_path.present?
       result = Roo::Spreadsheet.open(file_path)
       2.upto(result.last_row) do |row_number|
