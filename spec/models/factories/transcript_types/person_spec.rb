@@ -44,7 +44,22 @@ RSpec.describe Factories::TranscriptTypes::Person, type: :model do
         "gender"=>"male",
         "middle_name"=>"",
         "ssn"=>"671126612",
-        "no_dc_address"=>false})
+        "no_dc_address"=>false,
+        "addresses"=>[{
+          "kind"=>"home",
+          "address_1"=>"3312 K St NW",
+          "city"=>"Washington",
+          "state"=>"DC",
+          "zip"=>"20008"
+          }],
+        "phones"=>[{
+            "area_code"=>"202",
+            "kind"=>"home",
+            "full_phone_number"=>"2029866677",
+            "number"=>"9866677",
+          }],
+          "emails"=>[{"kind"=>"home", "address"=>"bruce@gmail.com"}]
+        })
     }
 
     context "#compare" do
@@ -56,7 +71,7 @@ RSpec.describe Factories::TranscriptTypes::Person, type: :model do
 
         expect(person_transcript[:source]).to eq source_record
         expect(person_transcript[:other]).to eq other_record
-        expect(person_transcript[:compare]['update']).to eq({'dob' => Date.new(1975, 6, 1)})
+        expect(person_transcript[:compare][:base]['update']).to eq({'dob' => Date.new(1975, 6, 1)})
       end
     end
   end

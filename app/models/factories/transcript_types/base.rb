@@ -2,7 +2,7 @@ module Factories
   module TranscriptTypes
     class Base
 
-      attr_reader :transcript, :fields_to_ignore
+      attr_reader :transcript, :fields_to_ignore, :associations
 
       def initialize(options = {})
         @transcript = options
@@ -23,36 +23,54 @@ module Factories
         return if @transcript[:source_is_new]
 
         differences     = HashWithIndifferentAccess.new
-        base_record     = @transcript[:source]
-        compare_record  = @transcript[:other]
-        # all_keys        = (base_record.keys + compare_record.keys).uniq!
+        base_record    = @transcript[:source]
 
-        all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
-
-        all_keys.each do |k|
-          next if base_record[k].blank? && compare_record[k].blank?
-
-          if base_record[k].blank?
-            differences[:add] ||= {}
-            differences[:add][k] = compare_record[k]
-          elsif compare_record[k].blank?
-            differences[:remove] ||= {}
-            differences[:remove][k] = base_record[k]
-          elsif base_record[k].is_a?(Array) && compare_record[k].is_a?(Array)
-            differences[:array] ||= {}
-            old_values = base_record[k] - compare_record[k]
-            new_values = compare_record[k] - base_record[k]
-            differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
-            differences[:array][k].blank? ? differences = {} : differences[:array]
-          else
-            if base_record[k] != compare_record[k]
-              differences[:update] ||= {}
-              differences[:update][k] = compare_record[k]
-            end
-          end
+        differences[:base] = key_comparision
+        self.class.associations.each do |association|
+          differences[association] = key_comparision(association)
         end
 
         @transcript[:compare] = differences
+      end
+
+      def key_comparision(assoc =nil)
+        differences     = HashWithIndifferentAccess.new
+
+        if assoc.present?
+          base_record = (@transcript[:source].send(assoc).is_a?(Array) ? @transcript[:source].send(assoc).first : @transcript[:source].send(assoc))
+          compare_record = (@transcript[:other].send(assoc).is_a?(Array) ? @transcript[:other].send(assoc).first : @transcript[:other].send(assoc)) 
+        else
+          base_record     = @transcript[:source]
+          compare_record  = @transcript[:other]
+        end
+     
+        if base_record.present? && compare_record.present?
+          all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
+
+          all_keys.each do |k|
+            next if base_record[k].blank? && compare_record[k].blank?
+
+            if base_record[k].blank?
+              differences[:add] ||= {}
+              differences[:add][k] = compare_record[k]
+            elsif compare_record[k].blank?
+              differences[:remove] ||= {}
+              differences[:remove][k] = base_record[k]
+            elsif base_record[k].is_a?(Array) && compare_record[k].is_a?(Array)
+              differences[:array] ||= {}
+              old_values = base_record[k] - compare_record[k]
+              new_values = compare_record[k] - base_record[k]
+              differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
+              differences[:array][k].blank? ? differences = {} : differences[:array]
+            else
+              if base_record[k] != compare_record[k]
+                differences[:update] ||= {}
+                differences[:update][k] = compare_record[k]
+              end
+            end
+          end
+        end
+        differences
       end
 
       def validate_instance
@@ -93,74 +111,43 @@ module Factories
         }
       end
 
-    def instance_with_all_attributes(class_name)
-      klass.classify.constantize
-      fields = klass.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
-      fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
-      klass.new(fields)
-    end
+      def instance_with_all_attributes(class_name)
+        klass.classify.constantize
+        fields = klass.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
+        fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
+        klass.new(fields)
+      end
 
-    def family_transcript_prototype
-      person = Person.new
-      person.build_consumer_role
+      def family_transcript_prototype
+        person = Person.new.fields.keys
+        consumer_role = ConsumerRole.new.fields.keys
+        person.consumer_role = consumer_role
 
-      family = Family.new
-      family.primary_family_member = person
-      family.latest_household.hbx_enrollments << HbxEnrollment.new
+        family = Family.new.fields.keys
+        family.primary_family_member = person
+        family.latest_household.hbx_enrollments << HbxEnrollment.new.fields.keys
 
-      { family: family.attributes.merge({
-                    family_members: [
-                        family_member: family.family_members.first.attributes
-                      ],
-                    irs_groups: [
-                        irs_group: family.irs_groups.first.attributes
-                      ],
-                    households: [
-                        household: family.households.first.attributes.merge({
-                          hbx_enrollments: [
-                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
-                            ]
-                          })
-                      ]
-                  }),
+        { family: family.attributes.merge({
+          family_members: [
+            family_member: family.family_members.first.attributes
+            ],
+            irs_groups: [
+              irs_group: family.irs_groups.first.attributes
+              ],
+              households: [
+                household: family.households.first.attributes.merge({
+                  hbx_enrollments: [
+                    hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
+                  ]
+                  })
+              ]
+              }),
         people: [
-                    person: person.attributes.merge({
-                        consumer_role: person.consumer_role.attributes
-                      })
-                  ] }
-    end
-
-    
-    def family_transcript_prototype
-      person = Person.new.fields.keys
-      consumer_role = ConsumerRole.new.fields.keys
-      person.consumer_role = consumer_role
-
-      family = Family.new.fields.keys
-      family.primary_family_member = person
-      family.latest_household.hbx_enrollments << HbxEnrollment.new.fields.keys
-
-      { family: family.attributes.merge({
-                    family_members: [
-                        family_member: family.family_members.first.attributes
-                      ],
-                    irs_groups: [
-                        irs_group: family.irs_groups.first.attributes
-                      ],
-                    households: [
-                        household: family.households.first.attributes.merge({
-                          hbx_enrollments: [
-                              hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
-                            ]
-                          })
-                      ]
-                  }),
-        people: [
-                    person: person.attributes.merge({
-                        consumer_role: person.consumer_role.attributes
-                      })
-                  ] }
-    end
+          person: person.attributes.merge({
+            consumer_role: person.consumer_role.attributes
+            })
+          ] }
+      end
     end
   end
 end

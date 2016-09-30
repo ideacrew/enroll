@@ -4,9 +4,21 @@ module Factories
 
     class Person < Factories::TranscriptTypes::Base
 
+
+      def self.associations
+        [
+         "user",
+         "responsible_party",
+         "person_relationships",
+         "addresses",
+         "phones",
+         "emails"
+       ]
+      end
+
       def initialize
         @fields_to_ignore = ['_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn']
-
+        
         super
       end
 
