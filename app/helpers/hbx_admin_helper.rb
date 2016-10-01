@@ -16,6 +16,7 @@ module HbxAdminHelper
   	max_aptc_for_enrollment = 0
   	hbx = HbxEnrollment.find(hbx_id)
   	hbx_enrollment_members = hbx.hbx_enrollment_members
+    binding.pry
   	aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
   	hbx_enrollment_members.each do |hem|
     	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
@@ -43,7 +44,7 @@ module HbxAdminHelper
     ((aptc_applied/max_aptc)*100).round
   end
 
-  def inactive_and_without_aptc_enrollments(family)
+  def inactive_and_without_aptc_enrollments(family, year)
     family.active_household.hbx_enrollments.canceled_and_terminated.with_plan.with_aptc.by_year(TimeKeeper.date_of_record.year) +
     family.active_household.hbx_enrollments.with_plan.without_aptc.by_year(TimeKeeper.date_of_record.year)
   end

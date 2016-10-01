@@ -18,7 +18,7 @@
             </tr>
           </thead>
           <tbody>
-            <% inactive_and_without_aptc_enrollments(@family).each do |hbx|%>
+            <% inactive_and_without_aptc_enrollments(@family, @current_year).each do |hbx|%>
               <tr>
                 <td><%=hbx.try(:plan).try(:name)%></td>
                 <td><%=number_to_currency(hbx.total_premium)%></td>

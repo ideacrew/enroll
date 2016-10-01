@@ -15,7 +15,7 @@
 
       <%= render 'household_level_info.html.erb'%>
 
-      <% if inactive_and_without_aptc_enrollments(@family).present? %>
+      <% if inactive_and_without_aptc_enrollments(@family, @current_year).present? %>
         <div align="right">
            <a data-toggle="modal" href="##terminated-hbx-modal" class="button">View Inactive & non APTC Enrollments</a>
         </div> <br />
