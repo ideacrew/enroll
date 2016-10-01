@@ -128,6 +128,7 @@ class HbxEnrollment
   scope :by_coverage_kind,    ->(kind) { where(coverage_kind: kind)}
   scope :by_kind,             ->(kind) { where(kind: kind)}
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
+  scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }

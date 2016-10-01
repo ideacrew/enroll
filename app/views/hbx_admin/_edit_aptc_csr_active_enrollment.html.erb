@@ -15,9 +15,9 @@
       
       <%= render 'household_level_info.html.erb'%>
 
-      <% if all_canceled_and_terminated_enrollments_with_aptc(@family).present? %>
+      <% if inactive_and_without_aptc_enrollments(@family).present? %>
         <div align="right">
-           <a data-toggle="modal" href="##terminated-hbx-modal" class="button">View Terminated / Cancelled APTC Enrollments</a>
+           <a data-toggle="modal" href="##terminated-hbx-modal" class="button">View Inactive & non APTC Enrollments</a>
         </div> <br />
       <% end %>
       
