@@ -1,6 +1,9 @@
 
 def find_dependent(ssn,dob,first_name,middle_name,last_name)
-	person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).first
+	unless ssn.blank?
+		person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).first
+	end
+
 	if person == nil
 		person = Person.where(first_name: first_name.to_s.strip, middle_name: middle_name.to_s.strip, last_name: last_name.to_s.strip, dob: format_date(dob)).first
 	else
@@ -18,6 +21,10 @@ def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
 end
 
+def find_coverage_household_member(family_member)
+
+end
+
 filename = '8905_dependents_not_imported.csv'
 
 complete_rows = []
@@ -30,6 +37,8 @@ CSV.foreach(filename, headers: :true) do |row|
 	end
 	subscriber = hbx_enrollment.subscriber.person
 	family = subscriber.primary_family
+	household = family.active_household
+	ch = household.immediate_family_coverage_household
 	census_employee = hbx_enrollment.employee_role.census_employee
 	census_dependents = []
 	6.times do |i|
@@ -77,13 +86,13 @@ CSV.foreach(filename, headers: :true) do |row|
               	end
               	
               	begin
-              		family_member.person.save           
+              		family_member.person.save	           
 	              	ch_member = ch.add_coverage_household_member(family_member)
 	              	ch_member.save
 	              	ch.save
 	              	family.save
 	              	if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id) 
-	              		new_hbx_enrollment_member = HbxEnrollmentMember.new_from(ch_member)
+	              		new_hbx_enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: ch_member)
 	              		new_hbx_enrollment_member.eligibility_date = hbx_enrollment.subscriber.eligibility_date
 	              		new_hbx_enrollment_member.coverage_start_on = hbx_enrollment.subscriber.coverage_start_on
 	              		hbx_enrollment.hbx_enrollment_members.push(new_hbx_enrollment_member)
@@ -95,7 +104,20 @@ CSV.foreach(filename, headers: :true) do |row|
               		complete_rows.push(row)
               	end   
               end
-
+            else
+            	family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
+            	ch_member = ch.coverage_household_members.detect{|ch_member| ch_member.family_member_id == family_member._id}
+            	if ch_member.blank?
+            		ch_member = ch.add_coverage_household_member(family_member)
+            	end
+            	if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id) 
+	              	new_hbx_enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: ch_member)
+	              	new_hbx_enrollment_member.eligibility_date = hbx_enrollment.subscriber.eligibility_date
+	              	new_hbx_enrollment_member.coverage_start_on = hbx_enrollment.subscriber.coverage_start_on
+	              	hbx_enrollment.hbx_enrollment_members.push(new_hbx_enrollment_member)
+	              	new_hbx_enrollment_member.save
+	              	hbx_enrollment.save
+	            end
             end
 		end
 	end
