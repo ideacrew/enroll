@@ -18,15 +18,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
             <% all_canceled_and_terminated_enrollments_with_aptc(@family).each do |hbx|%>
-              <td><%=hbx.try(:plan).try(:name)%></td>
-              <td><%=number_to_currency(hbx.total_premium)%></td>
-              <td><%=number_to_currency(hbx.applied_aptc_amount.to_f)%></td>
-              <td><%=hbx.effective_on%></td>
-              <td><%=hbx.terminated_on%></td>
+              <tr>
+                <td><%=hbx.try(:plan).try(:name)%></td>
+                <td><%=number_to_currency(hbx.total_premium)%></td>
+                <td><%=number_to_currency(hbx.applied_aptc_amount.to_f)%></td>
+                <td><%=hbx.effective_on%></td>
+                <td><%=hbx.terminated_on%></td>
+              </tr>
             <%end%>
-            </tr>
           </tbody>
         </table>
       </div>
