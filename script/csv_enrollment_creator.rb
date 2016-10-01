@@ -75,7 +75,10 @@ def create_person_details(subscriber_params)
 end
 
 def find_dependent(ssn,dob,first_name,middle_name,last_name)
-	person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).first
+	unless ssn.blank?
+		person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).first
+	end
+
 	if person == nil
 		person = Person.where(first_name: first_name.to_s.strip, middle_name: middle_name.to_s.strip, last_name: last_name.to_s.strip, dob: format_date(dob)).first
 	else
@@ -273,7 +276,12 @@ CSV.foreach(filename, headers: :true) do |row|
               		complete_rows.push(row)
               	end   
               end
-
+            else
+            	family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
+            	ch_member = ch.coverage_household_members.detect{|ch_member| ch_member.family_member_id == family_member._id}
+            	if ch_member.blank?
+            		ch_member = ch.add_coverage_household_member(family_member)
+            	end
             end
 		end
 	end
