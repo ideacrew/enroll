@@ -18,7 +18,7 @@ def format_date(date)
 	date = Date.strptime(date,'%m/%d/%Y')
 end
 
-filename = ''
+filename = '8905_dependents_not_imported.csv'
 
 complete_rows = []
 
@@ -29,47 +29,48 @@ CSV.foreach(filename, headers: :true) do |row|
 		hbx_enrollment_member_ids.push(hbx_em.person.hbx_id)
 	end
 	subscriber = hbx_enrollment.subscriber.person
+	family = subscriber.primary_family
 	census_employee = hbx_enrollment.employee_role.census_employee
 	census_dependents = []
 	6.times do |i|
-		if data_row["HBX ID (Dep #{i+1})"].present?
+		if row["HBX ID (Dep #{i+1})"].present?
 			census_dependents << CensusDependent.new({
-				first_name: data_row["First Name (Dep #{i+1})"],
-				middle_name: data_row["Middle Name (Dep #{i+1})"],
-				last_name: data_row["Last Name (Dep #{i+1})"],
-				dob: format_date(data_row["DOB (Dep #{i+1})"]),
-				employee_relationship: data_row["Relationship (Dep #{i+1})"].strip == 'child' ? 'child_under_26' : data_row["Relationship (Dep #{i+1})"].strip,
-				gender:  data_row["Gender (Dep #{i+1})"],
-				ssn: data_row["SSN (Dep #{i+1})"].to_s.strip.gsub("-","")
+				first_name: row["First Name (Dep #{i+1})"],
+				middle_name: row["Middle Name (Dep #{i+1})"],
+				last_name: row["Last Name (Dep #{i+1})"],
+				dob: format_date(row["DOB (Dep #{i+1})"]),
+				employee_relationship: row["Relationship (Dep #{i+1})"].strip == 'child' ? 'child_under_26' : row["Relationship (Dep #{i+1})"].strip,
+				gender:  row["Gender (Dep #{i+1})"],
+				ssn: row["SSN (Dep #{i+1})"].to_s.strip.gsub("-","")
 				})
 		end
 	end
 	6.times do |i|
-		if data_row["HBX ID (Dep #{i+1})"] != nil
-			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
-				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
+		if row["HBX ID (Dep #{i+1})"] != nil
+			dependent = find_dependent(row["SSN (Dep #{i+1})"].to_s.gsub("-",""), row["DOB (Dep #{i+1})"],
+				row["First Name (Dep #{i+1})"],row["Middle Name (Dep #{i+1})"],row["Last Name (Dep #{i+1})"])
             if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
             	begin 
             	dependent = OpenStruct.new
-            	dependent.first_name = data_row["First Name (Dep #{i+1})"]
-            	dependent.middle_name = data_row["Middle Name (Dep #{i+1})"]
-            	dependent.last_name = data_row["Last Name (Dep #{i+1})"]
-            	dependent.ssn = data_row["SSN (Dep #{i+1})"].to_s.gsub("-","")
-            	dependent.dob = format_date(data_row["DOB (Dep #{i+1})"]).strftime("%Y-%m-%d")
+            	dependent.first_name = row["First Name (Dep #{i+1})"]
+            	dependent.middle_name = row["Middle Name (Dep #{i+1})"]
+            	dependent.last_name = row["Last Name (Dep #{i+1})"]
+            	dependent.ssn = row["SSN (Dep #{i+1})"].to_s.gsub("-","")
+            	dependent.dob = format_date(row["DOB (Dep #{i+1})"]).strftime("%Y-%m-%d")
             	dependent.employee_relationship = census_employee.census_dependents.where(first_name: dependent.first_name,
             																			  middle_name: dependent.middle_name,
             																			  last_name: dependent.last_name,
             																			  dob: dependent.dob).first.employee_relationship
             	rescue Exception=>e
-            		row["Error Message"] = "Cannot find census dependent #{data_row["First Name (Dep #{i+1})"]} #{data_row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
+            		row["Error Message"] = "Cannot find census dependent #{row["First Name (Dep #{i+1})"]} #{row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
             		complete_rows.push(row)
             	end
               family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
               unless family_member == nil
               	begin
               	family_member.save
-              	family_member.person.gender = data_row["Gender (Dep #{i+1})"]
-              	family_member.person.hbx_id =  data_row["HBX ID (Dep #{i+1})"]
+              	family_member.person.gender = row["Gender (Dep #{i+1})"]
+              	family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
               	rescue Exception=>e
               		row["Error Message"] = "#{e.inspect}"
               		complete_rows.push(row)
