@@ -32,7 +32,7 @@ module HbxAdminHelper
     this_month_date = Date.parse("#{TimeKeeper.date_of_record.year}-#{month_num}-01")
     todays_date = TimeKeeper.date_of_record
     if this_month_date < todays_date
-      td_style = 'historic-aptc-csr-data'
+      td_style = 'past-aptc-csr-data'
     else
       td_style="current-aptc-csr-data"
     end
