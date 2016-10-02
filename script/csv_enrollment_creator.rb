@@ -54,12 +54,11 @@ def find_census_employee(subscriber_params,employer_profile)
 	census_employee = matched_employees.non_terminated.first || matched_employees.first
 
 	if census_employee.blank?
-		census_employee = CensusEmployee.where(first_name: /"#{subscriber_params["first_name"]}"/i,
-											   last_name: /"#{subscriber_params["last_name"]}"/i,
+		census_employee = CensusEmployee.where(first_name: /#{subscriber_params["first_name"]}/i,
+											   last_name: /#{subscriber_params["last_name"]}/i,
 											   dob: subscriber_params["dob"],
 											   employer_profile_id: employer_profile._id).first
 	end
-
 	return census_employee
 end
 
