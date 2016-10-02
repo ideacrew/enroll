@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "Redmine-8905_enrollments.csv"
+filename = "Redmine-8905_missing_migrations.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
 	benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -144,6 +144,7 @@ CSV.foreach(filename, headers: :true) do |row|
 	end
 	census_dependents = []
 	6.times do |i|
+		next unless data_row["Enrollee End Date (Dep #{i+1})"].blank?
 		if data_row["HBX ID (Dep #{i+1})"].present?
 			census_dependents << CensusDependent.new({
 				first_name: data_row["First Name (Dep #{i+1})"],
@@ -235,6 +236,7 @@ CSV.foreach(filename, headers: :true) do |row|
 	ch = hh.immediate_family_coverage_household
 
 	6.times do |i|
+		next unless data_row["Enrollee End Date (Dep #{i+1})"].blank?
 		if data_row["HBX ID (Dep #{i+1})"] != nil
 			dependent = find_dependent(data_row["SSN (Dep #{i+1})"].to_s.gsub("-",""), data_row["DOB (Dep #{i+1})"],
 				data_row["First Name (Dep #{i+1})"],data_row["Middle Name (Dep #{i+1})"],data_row["Last Name (Dep #{i+1})"])
