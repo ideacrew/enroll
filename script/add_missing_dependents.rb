@@ -30,7 +30,11 @@ filename = '8905_dependents_not_imported.csv'
 complete_rows = []
 
 CSV.foreach(filename, headers: :true) do |row|
+  next unless row["Enrollment Group ID"].to_s.strip == '337046'
+
 	hbx_enrollment = HbxEnrollment.by_hbx_id(row["Enrollment Group ID"]).first
+
+
 	hbx_enrollment_member_ids = []
 	hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
 		hbx_enrollment_member_ids.push(hbx_em.person.hbx_id)
@@ -55,70 +59,52 @@ CSV.foreach(filename, headers: :true) do |row|
 		end
 	end
 	6.times do |i|
+
 		if row["HBX ID (Dep #{i+1})"] != nil
-			dependent = find_dependent(row["SSN (Dep #{i+1})"].to_s.gsub("-",""), row["DOB (Dep #{i+1})"],
-				row["First Name (Dep #{i+1})"],row["Middle Name (Dep #{i+1})"],row["Last Name (Dep #{i+1})"])
-            if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
-            	begin 
-            	dependent = OpenStruct.new
-            	dependent.first_name = row["First Name (Dep #{i+1})"]
-            	dependent.middle_name = row["Middle Name (Dep #{i+1})"]
-            	dependent.last_name = row["Last Name (Dep #{i+1})"]
-            	dependent.ssn = row["SSN (Dep #{i+1})"].to_s.gsub("-","")
-            	dependent.dob = format_date(row["DOB (Dep #{i+1})"]).strftime("%Y-%m-%d")
-            	dependent.employee_relationship = census_employee.census_dependents.where(first_name: dependent.first_name,
-            																			  middle_name: dependent.middle_name,
-            																			  last_name: dependent.last_name,
-            																			  dob: dependent.dob).first.employee_relationship
-            	rescue Exception=>e
-            		row["Error Message"] = "Cannot find census dependent #{row["First Name (Dep #{i+1})"]} #{row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
-            		complete_rows.push(row)
-            	end
-              family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
-              unless family_member == nil
-              	begin
-              	family_member.save
-              	family_member.person.gender = row["Gender (Dep #{i+1})"]
-              	family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
-              	rescue Exception=>e
-              		row["Error Message"] = "#{e.inspect}"
-              		complete_rows.push(row)
-              	end
-              	
-              	begin
-              		family_member.person.save	           
-	              	ch_member = ch.add_coverage_household_member(family_member)
-	              	ch_member.save
-	              	ch.save
-	              	family.save
-	              	if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id) 
-	              		new_hbx_enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: ch_member)
-	              		new_hbx_enrollment_member.eligibility_date = hbx_enrollment.subscriber.eligibility_date
-	              		new_hbx_enrollment_member.coverage_start_on = hbx_enrollment.subscriber.coverage_start_on
-	              		hbx_enrollment.hbx_enrollment_members.push(new_hbx_enrollment_member)
-	              		new_hbx_enrollment_member.save
-	              		hbx_enrollment.save
-	              	end
-              	rescue Exception=>e
-              		row["Error Message"] = "#{e.inspect}"
-              		complete_rows.push(row)
-              	end   
-              end
-            else
-            	family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
-            	ch_member = ch.coverage_household_members.detect{|ch_member| ch_member.family_member_id == family_member._id}
-            	if ch_member.blank?
-            		ch_member = ch.add_coverage_household_member(family_member)
-            	end
-            	if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id) 
-	              	new_hbx_enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: ch_member)
-	              	new_hbx_enrollment_member.eligibility_date = hbx_enrollment.subscriber.eligibility_date
-	              	new_hbx_enrollment_member.coverage_start_on = hbx_enrollment.subscriber.coverage_start_on
-	              	hbx_enrollment.hbx_enrollment_members.push(new_hbx_enrollment_member)
-	              	new_hbx_enrollment_member.save
-	              	hbx_enrollment.save
-	            end
-            end
+			dependent = find_dependent(row["SSN (Dep #{i+1})"].to_s.gsub("-",""), row["DOB (Dep #{i+1})"], row["First Name (Dep #{i+1})"],row["Middle Name (Dep #{i+1})"],row["Last Name (Dep #{i+1})"])
+
+      if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
+        begin 
+          dependent = OpenStruct.new
+          dependent.first_name = row["First Name (Dep #{i+1})"]
+          dependent.middle_name = row["Middle Name (Dep #{i+1})"]
+          dependent.last_name = row["Last Name (Dep #{i+1})"]
+          dependent.ssn = row["SSN (Dep #{i+1})"].to_s.gsub("-","")
+          dependent.dob = format_date(row["DOB (Dep #{i+1})"]).strftime("%Y-%m-%d")
+          dependent.employee_relationship = census_employee.census_dependents.where(first_name: dependent.first_name,
+           middle_name: dependent.middle_name,
+           last_name: dependent.last_name,
+           dob: dependent.dob).first.employee_relationship
+
+          family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
+        rescue Exception=>e
+          row["Error Message"] = "Cannot find census dependent #{row["First Name (Dep #{i+1})"]} #{row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
+          complete_rows.push(row)
+        end
+      else
+        family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
+
+        if family_member.present?
+          family.active_household.add_household_coverage_member(family_member)
+        else
+          family.add_family_member(dependent)
+        end
+      end
+
+      family.save
+      family_member.person.gender = row["Gender (Dep #{i+1})"]
+      family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
+      family_member.person.save
+
+      if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id)
+        hbx_enrollment.hbx_enrollment_members.push(HbxEnrollmentMember.new({
+          applicant_id: family_member.id,
+          eligibility_date: hbx_enrollment.subscriber.eligibility_date,
+          coverage_start_on: hbx_enrollment.subscriber.coverage_start_on,
+        }))
+
+        hbx_enrollment.save
+      end
 		end
 	end
 end
