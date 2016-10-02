@@ -5,7 +5,7 @@ def find_dependent(ssn,dob,first_name,middle_name,last_name)
 	end
 
 	if person == nil
-		person = Person.where(first_name: first_name.to_s.strip, middle_name: middle_name.to_s.strip, last_name: last_name.to_s.strip, dob: format_date(dob)).first
+		person = Person.where(first_name: first_name.to_s.strip, last_name: last_name.to_s.strip, dob: format_date(dob)).first
 	else
 		return person
 	end
@@ -30,8 +30,6 @@ filename = '8905_dependents_not_imported.csv'
 complete_rows = []
 
 CSV.foreach(filename, headers: :true) do |row|
-  next unless row["Enrollment Group ID"].to_s.strip == '337046'
-
 	hbx_enrollment = HbxEnrollment.by_hbx_id(row["Enrollment Group ID"]).first
 
 
@@ -62,7 +60,6 @@ CSV.foreach(filename, headers: :true) do |row|
 
 		if row["HBX ID (Dep #{i+1})"] != nil
 			dependent = find_dependent(row["SSN (Dep #{i+1})"].to_s.gsub("-",""), row["DOB (Dep #{i+1})"], row["First Name (Dep #{i+1})"],row["Middle Name (Dep #{i+1})"],row["Last Name (Dep #{i+1})"])
-
       if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
         begin 
           dependent = OpenStruct.new
