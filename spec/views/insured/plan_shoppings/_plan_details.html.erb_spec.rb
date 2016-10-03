@@ -85,6 +85,15 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_selector('a', text:'Summary of Benefits and Coverage')
       expect(rendered).to match(/#{file_param}/)
     end
+
+    it "should have the see details selector" do
+      expect(rendered).to have_selector('a', text: /See Details/)
+    end
+
+    it "should have title text for standard plan " do
+      expect(rendered).to match /Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them./i
+    end
+
   end
 
   context "with aptc" do
