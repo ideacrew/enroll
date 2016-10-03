@@ -391,7 +391,7 @@ class CensusEmployee < CensusMember
      url = cs.generate_url
      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
      notice_trigger = event_kind.notice_triggers.first
-      builder = notice_trigger.notice_builder.camelize.constantize.new(census_employee, {
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
               mpi_indicator: notice_trigger.mpi_indicator,

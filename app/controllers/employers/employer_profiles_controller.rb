@@ -258,10 +258,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def generate_checkbook_urls
-    @census_employees = @employer_profile.census_employees
-    @census_employees.each do |census_employee|
-      census_employee.generate_and_deliver_checkbook_url
-    end
+    @employer_profile.generate_and_deliver_checkbook_urls_for_employees
+    render json: { message: "successfully sent" }
   end
 
   def download_invoice
