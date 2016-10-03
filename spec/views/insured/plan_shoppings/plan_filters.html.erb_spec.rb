@@ -72,21 +72,21 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to match /The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
     end
 
-    # it 'should have title text HMO' do
-    #   expect(rendered).to match /An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers.It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor./i
-    # end
+    it 'should have HMO title text' do
+      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
+    end
 
-    # it 'should have title text PPO' do
-    #   expect(rendered).to match /A PPO (Preferred Provider Organization) plan covers care from in-network and out-of-network providers. You pay less if you use providers that belong to the plan’s network. You can use providers outside of the network for an additional cost./i
-    # end
+    it 'should have PPO title text' do
+      expect(rendered).to match /#{Regexp.escape("A PPO (Preferred Provider Organization) plan covers care from in-network and out-of-network providers. You pay less if you use providers that belong to the plan’s network. You can use providers outside of the network for an additional cost.")}/i
+    end
 
-    # it 'should have title text POS' do
-    #   expect(rendered).to match /A POS (Point-of-Service) plan is a combination of an HMO and a PPO. Typically it has a network that functions like an HMO – you pick a primary care doctor, who manages and coordinates your care within the network. Similar to a PPO, POS plans usually also allow you to use a provider who is not in the network./i
-    # end
+    it 'should have POS title text' do
+      expect(rendered).to match /#{Regexp.escape("A POS (Point-of-Service) plan is a combination of an HMO and a PPO. Typically it has a network that functions like an HMO – you pick a primary care doctor, who manages and coordinates your care within the network. Similar to a PPO, POS plans usually also allow you to use a provider who is not in the network.")}/i
+    end
 
-    # it 'should have title text for Hsa_eligibilty' do
-    #   expect(rendered).to match(/Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them./)
-    # end
+    it 'should have Hsa_eligibilty title text' do
+      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.")}/i)
+    end
 
     it "should have Premium amount search" do
       expect(rendered).to match /Premium Amount/
