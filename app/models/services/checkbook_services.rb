@@ -4,14 +4,17 @@ module CheckbookServices
     
     def initialize(census_employee)
       @census_employee= census_employee
+      @url = "https://staging.checkbookhealth.org/shop/dc/api/"
     end
 
     def generate_url
       begin
-      # Checkbook url is still now working so commented below lines
-      # @result = HTTParty.post(url,
-      #         :body => construct_body
+      # # Checkbook url is still not working so commented below lines
+      # @result = HTTParty.post(@url,
+      #         :body => construct_body,
       #         :headers => { 'Content-Type' => 'application/json' } )
+      # # puts construct_body.to_json
+      # puts @result.parsed_response
         return "http://example.com/dummy_url"
       rescue Exception => e
         puts "Exception #{e}"
@@ -34,7 +37,8 @@ module CheckbookServices
        "domestic_partner":50,
        "child":50
       },
-      "reference_plan": census_employee.benefit_group_assignments.first.benefit_group, #HIOS­generated,
+      # "reference_plan": census_employee.employer_profile.plan_years.first.id.to_s,
+      "reference_plan":census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
       "plans_available": ["21066DC0010009","21066DC0010010","21066DC0010011"]
     }
     end
