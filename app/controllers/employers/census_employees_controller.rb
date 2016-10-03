@@ -211,10 +211,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
-      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
-      @benefit_group = @benefit_group_assignment.benefit_group
-    end
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
     @census_employee.build_address unless @census_employee.address.present?

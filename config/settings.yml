@@ -89,6 +89,7 @@ aca:
     cobra_enrollment_period:
       months: 6
 
+paper_notice: 'paper-notices'
 
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
