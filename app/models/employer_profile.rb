@@ -726,6 +726,12 @@ class EmployerProfile
     self.profile_source == "conversion"
   end
 
+  def generate_and_deliver_checkbook_urls_for_employees
+    census_employees.each do |census_employee|
+      census_employee.generate_and_deliver_checkbook_url
+    end
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)

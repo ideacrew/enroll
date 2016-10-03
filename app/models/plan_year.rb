@@ -906,6 +906,7 @@ private
                                                   :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
                                                   :template => application_event.notice_triggers.first.notice_template})
     shop_notice.deliver
+    employer_profile.generate_and_deliver_checkbook_urls_for_employees
   end
 
   def record_transition
