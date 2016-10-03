@@ -686,8 +686,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -704,8 +704,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
 
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => :trigger_auto_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_auto_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
