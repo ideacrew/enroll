@@ -60,6 +60,8 @@ CSV.foreach(filename, headers: :true) do |row|
 
 		if row["HBX ID (Dep #{i+1})"] != nil
 			dependent = find_dependent(row["SSN (Dep #{i+1})"].to_s.gsub("-",""), row["DOB (Dep #{i+1})"], row["First Name (Dep #{i+1})"],row["Middle Name (Dep #{i+1})"],row["Last Name (Dep #{i+1})"])
+      
+      family_member = nil
       if dependent.blank? || dependent.to_s == "dependent does not exist for provided person details"
         begin 
           dependent = OpenStruct.new
@@ -74,6 +76,9 @@ CSV.foreach(filename, headers: :true) do |row|
            dob: dependent.dob).first.employee_relationship
 
           family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
+          subscriber.save!
+          family_member.save!
+
         rescue Exception=>e
           row["Error Message"] = "Cannot find census dependent #{row["First Name (Dep #{i+1})"]} #{row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
           complete_rows.push(row)
@@ -81,18 +86,18 @@ CSV.foreach(filename, headers: :true) do |row|
       else
         family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
 
-        if family_member.present?
-          family.active_household.add_household_coverage_member(family_member)
-        else
+        if family_member.blank?
           family.add_family_member(dependent)
         end
       end
-
-      family.save
+  
       family_member.person.gender = row["Gender (Dep #{i+1})"]
       family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
       family_member.person.save
 
+      family.active_household.add_household_coverage_member(family_member)
+      family.save(:validate => false)
+    
       if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id)
         hbx_enrollment.hbx_enrollment_members.push(HbxEnrollmentMember.new({
           applicant_id: family_member.id,
