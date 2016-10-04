@@ -727,27 +727,59 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "notice_upload_email" do
-      context "person has chosen to receive electronic communication" do
-        before do
-          consumer_role2.contact_method = "Paper and Electronic communications"
+      context "person has a consumer role" do
+        context "person has chosen to receive electronic communication" do
+          before do
+            consumer_role2.contact_method = "Paper and Electronic communications"
+          end
+
+          it "sends the email" do
+            expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
+          end
+
         end
 
-        it "sends the email" do
-          expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
-        end
+        context "person has chosen not to receive electronic communication" do
+          before do
+            consumer_role2.contact_method = "Only Paper communication"
+          end
 
+          it "should not sent the email" do
+            expect(@controller.send(:notice_upload_email)).to be nil
+          end
+        end
       end
 
-      context "person has chosen not to receive electronic communication" do
+      context "person has a employer role" do
+        let(:employee_role2) { FactoryGirl.create(:employee_role) }
+
         before do
-          consumer_role2.contact_method = "Only Paper communication"
+          person2.consumer_role = nil
+          person2.employee_roles = [employee_role2]
+          person2.save
         end
 
-        it "should not sent the email" do
-          expect(@controller.send(:notice_upload_email)).to be nil
+        context "person has chosen to receive electronic communication" do
+          before do
+            employee_role2.contact_method = "Paper and Electronic communications"
+          end
+
+          it "sends the email" do
+            expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
+          end
+
+        end
+
+        context "person has chosen not to receive electronic communication" do
+          before do
+            employee_role2.contact_method = "Only Paper communication"
+          end
+
+          it "should not sent the email" do
+            expect(@controller.send(:notice_upload_email)).to be nil
+          end
         end
       end
-
     end
   end
 end
