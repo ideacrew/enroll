@@ -22,7 +22,7 @@ RSpec.describe "broker_agencies/profiles/edit.html.erb" do
   it "should have three read only fields refs #9818"  do
     expect(rendered).to have_selector("[readonly='readonly']", count: 3)
   end
-  it "should have a disabled field" do
-    expect(rendered).to have_selector("input[disabled='disabled']", count: 1)
+  it "should have a hidden field refs #6724" do
+    expect(rendered).to have_selector('div.hidden_field', count: 1)
   end
 end
