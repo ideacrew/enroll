@@ -22,6 +22,7 @@ class PlanYear
   field :terminated_on, type: Date
 
   field :imported_plan_year, type: Boolean, default: false
+
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
 
@@ -185,6 +186,13 @@ class PlanYear
   alias_method :effective_date=, :start_on=
   alias_method :effective_date, :start_on
 
+  def terminate_application(termination_date)
+    if coverage_period_contains?(termination_date)
+      self.terminated_on = termination_date
+      terminate
+    end
+  end
+
   def hbx_enrollments
     @hbx_enrollments = [] if benefit_groups.size == 0
     return @hbx_enrollments if defined? @hbx_enrollments
@@ -200,13 +208,15 @@ class PlanYear
     !benefit_groups.any?(&:assigned?)
   end
 
-  def open_enrollment_contains?(date)
-    (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
+  def open_enrollment_contains?(compare_date)
+    (open_enrollment_start_on.beginning_of_day <= compare_date.beginning_of_day) && 
+    (compare_date.end_of_day <= open_enrollment_end_on.end_of_day)
   end
 
-  def coverage_period_contains?(date)
-    return (start_on <= date) if (end_on.blank?)
-    (start_on <= date) && (date <= end_on)
+  def coverage_period_contains?(compare_date)
+    return (start_on <= compare_date) if (end_on.blank?)
+    (start_on.beginning_of_day <= compare_date.beginning_of_day) && 
+    (compare_date.end_of_day <= end_on.end_of_day)
   end
 
   def is_renewing?
@@ -314,6 +324,15 @@ class PlanYear
   # Check plan year for violations of model integrity relative to publishing
   def application_errors
     errors = {}
+
+     # Enrollment period length is within the minimum and maximum system settings
+    if (open_enrollment_end_on - open_enrollment_start_on).to_i < Settings.aca.shop_market.open_enrollment.minimum_length.days
+      errors.merge!({open_enrollment_period: "Open Enrollment period is shorter than minimum (#{Settings.aca.shop_market.open_enrollment.minimum_length.days} days)"})
+    end
+
+    if open_enrollment_end_on > (open_enrollment_start_on + (Settings.aca.shop_market.open_enrollment.maximum_length.months).months) 
+      errors.merge!({open_enrollment_period: "Open Enrollment period is longer than maximum (#{Settings.aca.shop_market.open_enrollment.maximum_length.months} months)"})
+    end
 
     if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
       errors.merge!({benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."})
@@ -472,6 +491,10 @@ class PlanYear
 
   def is_open_enrollment_closed?
     open_enrollment_end_on.end_of_day < TimeKeeper.date_of_record.beginning_of_day
+  end
+
+  def is_application_period_ended?
+    start_on.beginning_of_day <= TimeKeeper.date_of_record.beginning_of_day
   end
 
   # Determine enrollment composition compliance with HBX-defined guards
@@ -651,24 +674,24 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
-    state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage,
-                                                          #   but effective date is in future
-    state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
-
-    state :active         # Published plan year is in-force
+    state :enrolling, :after_enter => :send_employee_invites  # Published plan has entered open enrollment
+    state :enrolled, :after_enter => :ratify_enrollment       # Published plan open enrollment has ended and is eligible for coverage,
+                                                              #   but effective date is in future
+    state :ineligible           # Application is non-compliant for enrollment
+    state :expired              # Non-published plans are expired following their end on date
+    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
+    state :active               # Published plan year is in-force
 
     state :renewing_draft
     state :renewing_published
+    state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled
-    state :renewing_publish_pending
+    state :renewing_ineligible  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
 
-    state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
-    state :terminated     # Coverage under this application is terminated
-    state :ineligible     # Application is non-compliant for enrollment
-    state :expired        # Non-published plans are expired following their end on date
+    state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
+    state :terminated           # Coverage under this application is terminated
     state :conversion_expired # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
@@ -689,10 +712,15 @@ class PlanYear
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
 
-      transitions from: :draft,  to: :renewing_draft,                 :guard  => :is_renewing_event_date_valid?
-      transitions from: :renewing_enrolled,  to: :active,             :guard  => :is_event_date_valid?
-      transitions from: :renewing_published, to: :renewing_enrolling, :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling, to: :renewing_enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :draft,               to: :renewing_draft,      :guard  => :is_renewing_event_date_valid?
+      transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
+      transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+
+      transitions from: :enrolling,           to: :ineligible,          :guard => :is_open_enrollment_closed?
+      transitions from: :ineligible,          to: :expired,             :guard => :is_application_period_ended?
+      transitions from: :renewing_enrolling,  to: :renewing_ineligible, :guard => :is_open_enrollment_closed?
+      transitions from: :renewing_ineligible, to: :renewing_canceled,   :guard => :is_application_period_ended?
 
       transitions from: :enrolling, to: :enrolling # prevents error when plan year is already enrolling
     end
@@ -975,6 +1003,10 @@ private
 
     if end_on != end_on.end_of_month
       errors.add(:end_on, "must be last day of the month")
+    end
+
+    if end_on > start_on.years_since(Settings.aca.shop_market.benefit_period.length_maximum.year)
+      errors.add(:end_on, "benefit period may not exceed #{Settings.aca.shop_market.benefit_period.length_maximum.year} year")
     end
 
     if open_enrollment_end_on > start_on
