@@ -584,6 +584,11 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def coverage_history
+    return [] if employee_role.blank?
+    employee_role.person.primary_family.active_household.hbx_enrollments.enrolled_in_past
+  end
+
   def enrollments_for_display
     enrollments = []
 

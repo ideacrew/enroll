@@ -180,12 +180,9 @@ class Employers::CensusEmployeesController < ApplicationController
     flash.keep(:error)
     flash.keep(:notice)
     render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
-
   end
 
   def show
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
     @status = params[:status] || ''
   end
 
