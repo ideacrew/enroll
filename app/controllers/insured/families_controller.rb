@@ -203,34 +203,35 @@ class Insured::FamiliesController < FamiliesController
   # admin manually uploads a notice for person
   def upload_notice
 
-    if params.permit![:file] && params.permit![:subject]
-      doc_uri = Aws::S3Storage.save(file_path, 'notices')
-
-      if doc_uri.present?
-        notice_document = Document.new({ title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
-                                         format: file_content_type })
-        begin
-          @person.documents << notice_document
-          @person.save!
-
-          send_notice_upload_notifications(notice_document, params.permit![:subject])
-
-          flash[:notice] = "File Saved"
-          redirect_to(:back)
-          return
-        rescue => e
-          flash[:error] = "Could not save file. "
-          redirect_to(:back)
-          return
-        end
-      else
-        flash[:error] = "Could not save file"
-        redirect_to(:back)
-      end
-    else
+    if (!params.permit![:file]) || (!params.permit![:subject])
       flash[:error] = "File or Subject not provided"
       redirect_to(:back)
+      return
+    elsif file_content_type != 'application/pdf'
+      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
+      redirect_to(:back)
+      return
     end
+
+    doc_uri = Aws::S3Storage.save(file_path, 'notices')
+    
+    if doc_uri.present?
+      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+                                      format: file_content_type})
+      begin
+        @person.documents << notice_document
+        @person.save!
+        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        flash[:notice] = "File Saved"
+      rescue => e
+        flash[:error] = "Could not save file."
+      end
+    else
+      flash[:error] = "Could not save file."
+    end
+
+    redirect_to(:back)
+    return
   end
 
   # displays the form to upload a notice for a person
@@ -335,7 +336,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def notice_upload_email
-    UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+    if @person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+    end
   end
 
   def notice_upload_secure_message(notice, subject)
