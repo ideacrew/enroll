@@ -10,7 +10,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled conversion_expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible expired renewing_canceled conversion_expired)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -369,9 +369,9 @@ class PlanYear
       warnings.merge!({primary_office_location: "Primary office must be located in #{Settings.aca.state_name}"})
     end
 
-    # Employer is in ineligible state from prior enrollment activity
-    if aasm_state == "ineligible"
-      warnings.merge!({ineligible: "Employer is under a period of ineligibility for enrollment on the HBX"})
+    # Application is in ineligible state from prior enrollment activity
+    if aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible"
+      warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
     end
 
     # Maximum company size at time of initial registration on the HBX
@@ -663,6 +663,13 @@ class PlanYear
       date = date - 2 if date.sunday?
       date
     end
+
+    def first_banking_date_after(date_value)
+      date = date_value.to_date
+      date = date + 2 if date.saturday?
+      date = date + 1 if date.sunday?
+      date
+    end
   end
 
 
@@ -674,10 +681,10 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites  # Published plan has entered open enrollment
-    state :enrolled, :after_enter => :ratify_enrollment       # Published plan open enrollment has ended and is eligible for coverage,
-                                                              #   but effective date is in future
-    state :ineligible           # Application is non-compliant for enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
+    state :enrolled,  :after_enter => :ratify_enrollment              # Published plan open enrollment has ended and is eligible for coverage,
+                                                                      #   but effective date is in future
+    state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
@@ -687,7 +694,7 @@ class PlanYear
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled
-    state :renewing_ineligible  # Renewal application is non-compliant for enrollment
+    state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
@@ -704,9 +711,10 @@ class PlanYear
 
     # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
-      transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
-      transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
-      transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
+      transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
+      transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -716,13 +724,9 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?
 
-      transitions from: :enrolling,           to: :ineligible,          :guard => :is_open_enrollment_closed?
-      transitions from: :ineligible,          to: :expired,             :guard => :is_application_period_ended?
-      transitions from: :renewing_enrolling,  to: :renewing_ineligible, :guard => :is_open_enrollment_closed?
-      transitions from: :renewing_ineligible, to: :renewing_canceled,   :guard => :is_application_period_ended?
-
-      transitions from: :enrolling, to: :enrolling # prevents error when plan year is already enrolling
+      transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
 
     ## Application eligibility determination process
@@ -800,7 +804,11 @@ class PlanYear
 
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
-      transitions from: [:enrolled, :enrolling, :active, :ineligible, :published_invalid, :eligibility_review, :published, :publish_pending], to: :draft
+      transitions from: [ 
+                            :enrolled, :enrolling, :active, :application_ineligible, 
+                            :renewing_application_ineligible, :published_invalid, 
+                            :eligibility_review, :published, :publish_pending
+                          ], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -810,11 +818,12 @@ class PlanYear
 
     # Admin ability to reset renewing plan year application
     event :revert_renewal, :after => :record_transition do
-      transitions from: [:active, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_draft
+      transitions from: [:active, :renewing_published, :renewing_enrolling, 
+        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_enrolled], to: :renewing_canceled
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled], to: :renewing_canceled
     end
 
     event :conversion_expire, :after => :record_transition do
