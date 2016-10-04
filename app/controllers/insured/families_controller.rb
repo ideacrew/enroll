@@ -336,7 +336,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def notice_upload_email
-    if @person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?
+    if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
+      (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
       UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
     end
   end
