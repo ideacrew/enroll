@@ -24,6 +24,9 @@ Rails.application.routes.draw do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
+    resources :residents do
+      post :match_person, on: :collection
+    end
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
