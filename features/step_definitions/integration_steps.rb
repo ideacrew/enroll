@@ -166,7 +166,7 @@ end
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -235,10 +235,10 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
-  sleep(1)
+
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
-  sleep(1)
+
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   step "I enter office location for #{default_office_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
@@ -396,7 +396,7 @@ When(/^.+ accepts? the matched employer$/) do
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-  sleep 3
+
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax
@@ -408,15 +408,15 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # find('.interaction-click-control-close').click
   screenshot("after modal")
 
-  sleep 3
-  wait_for_ajax
+  expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
+  wait_for_ajax(3)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
   # there is a flickering failure here due to over-lapping modals
   # find("#person_addresses_attributes_0_city").trigger('click')
   # find("#person_addresses_attributes_0_zip").trigger('click')
-  find_by_id("person_phones_attributes_0_full_phone_number")
+  find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
@@ -452,7 +452,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
-  sleep 3
+
   expect(page).to have_content('Confirm Member')
 end
 
@@ -618,6 +618,7 @@ end
 
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  wait_for_ajax
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -694,7 +695,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     all('.compare-selected-plans-link')[1].click
-    sleep 3
+
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')

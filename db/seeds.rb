@@ -152,4 +152,7 @@ puts "importing provider_directory_urls and rx_formulary_urls for plans complete
 puts "*"*80
 
 puts "*"*80
+system "bundle exec rake permissions:initial_hbx"
+
+puts "*"*80
 puts "End of Seed Data"

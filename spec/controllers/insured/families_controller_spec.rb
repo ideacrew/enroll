@@ -104,6 +104,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(family).to receive(:check_for_consumer_role).and_return nil
         sign_in user
         get :home
       end
@@ -144,6 +145,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
         allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(family).to receive(:check_for_consumer_role).and_return true
         sign_in user
         get :home
       end
@@ -206,6 +208,7 @@ RSpec.describe Insured::FamiliesController do
         allow(family).to receive(:enrollments).and_return(enrollments)
         allow(enrollments).to receive(:order).and_return([display_hbx])
         allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
+        allow(family).to receive(:check_for_consumer_role).and_return true
         allow(controller).to receive(:update_changing_hbxs).and_return(true)
       end
 
@@ -452,6 +455,8 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_move_reason' template" do
       xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_move_reason)
+      expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
     end
 
     describe "with valid and invalid params" do
@@ -480,6 +485,7 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_insurance_reason' template" do
       xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_insurance_reason)
     end
 
     describe "with valid and invalid params" do
