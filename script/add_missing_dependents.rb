@@ -20,11 +20,7 @@ def format_date(date)
   date = Date.strptime(date,'%m/%d/%Y')
 end
 
-def find_coverage_household_member(family_member)
-
-end
-
-filename = '8905_dependents_not_migrated_problem_cases.csv'
+filename = '8905_dependents_not_migrated.csv'
 
 complete_rows = []
 
@@ -91,23 +87,19 @@ CSV.foreach(filename, headers: :true) do |row|
         end
       end
 
-      family_member.person.gender = row["Gender (Dep #{i+1})"]
-      family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
-      family_member.person.save
+      # family_member.person.gender = row["Gender (Dep #{i+1})"]
+      # family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
+      # family_member.person.save
 
       family.active_household.add_household_coverage_member(family_member)
-      ch_member = family.active_household.immediate_family_coverage_household.coverage_household_members.where(family_member_id: family_member._id).first
       family.save(:validate => false)
 
       if !hbx_enrollment_member_ids.include?(family_member.person.hbx_id)
-        new_hbx_enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: ch_member)
-        new_hbx_enrollment_member.applicant_id = family_member.id
-        new_hbx_enrollment_member.eligibility_date = hbx_enrollment.subscriber.eligibility_date
-        new_hbx_enrollment_member.coverage_start_on = hbx_enrollment.subscriber.coverage_start_on
-        hbx_enrollment.hbx_enrollment_members.push(new_hbx_enrollment_member)
-        new_hbx_enrollment_member.save
-        hbx_enrollment.save
-        # hbx_enrollment.hbx_enrollment_members.push(HbxEnrollmentMember.new({applicant_id: family_member.id,eligibility_date: hbx_enrollment.subscriber.eligibility_date,coverage_start_on: hbx_enrollment.subscriber.coverage_start_on,}))
+        hbx_enrollment.hbx_enrollment_members.push(HbxEnrollmentMember.new({
+          applicant_id: family_member.id,
+          eligibility_date: hbx_enrollment.subscriber.eligibility_date,
+          coverage_start_on: hbx_enrollment.subscriber.coverage_start_on,
+        }))
 
         hbx_enrollment.save
       end
