@@ -582,18 +582,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
-
-  context "a plan year application is submitted" do
-    before do
-      plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day if plan_year.open_enrollment_start_on = TimeKeeper.date_of_record
-      plan_year.publish!
-    end
-
-    it "should be in published status" do
-      expect(plan_year.aasm_state).to eq "published"
-    end
-  end
-
+  
   context "validation for employment_terminated_on" do
     let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year)}
 
