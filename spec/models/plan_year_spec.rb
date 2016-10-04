@@ -383,7 +383,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it 'should error out' do 
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.open_enrollment_date_errors).to include("open enrollment period is less than minimum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
+        expect(plan_year.open_enrollment_date_errors.values.flatten).to include("Open Enrollment period is shorter than minimum (#{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days)")
       end
     end
 
@@ -393,10 +393,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         plan_year.save(:validate => false) 
       end
 
-      it 'should error out' do 
+      it 'should error out' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.open_enrollment_date_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
+        expect(plan_year.open_enrollment_date_errors.values.flatten).to include("Open Enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
       end
     end
   end
@@ -433,7 +433,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       it "and should provide relevant warnings" do
         expect(plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
-        expect(plan_year_with_benefit_group.application_errors[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+        expect(plan_year_with_benefit_group.application_errors[:publish]).to include(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
       end
 
       it "and plan year should be in publish pending state" do
@@ -476,7 +476,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       it "and should provide relevent warning message" do
         expect(workflow_plan_year.application_errors[:benefit_groups].present?).to be_truthy
-        expect(workflow_plan_year.application_errors[:benefit_groups]).to match(/You must create at least one benefit group/)
+        expect(workflow_plan_year.application_errors[:benefit_groups]).to include(/You must create at least one benefit group/)
       end
 
       it "should be in draft status" do
@@ -508,7 +508,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups]).to match(/Every employee must be assigned to a benefit group/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups]).to include(/Every employee must be assigned to a benefit group/)
         end
       end
 
@@ -543,7 +543,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent error message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to match(/You may only have one published plan year at a time/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to include(/You may only have one published plan year at a time/)
         end
       end
 
@@ -559,7 +559,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile]).to match(/This employer is ineligible to enroll for coverage at this time/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile]).to include(/This employer is ineligible to enroll for coverage at this time/)
         end
       end
 
@@ -612,7 +612,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevant warnings" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to include(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
         end
 
         it "and plan year should be in publish pending state" do

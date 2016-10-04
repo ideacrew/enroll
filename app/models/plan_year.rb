@@ -307,7 +307,7 @@ class PlanYear
     end
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
-      log_message(errors) {{open_enrollment_period: "Open Enrollment period is shorter than minimum (#{Settings.aca.shop_market.open_enrollment.minimum_length.days} days)"}}
+      log_message(errors) {{open_enrollment_period: "Open Enrollment period is shorter than minimum (#{minimum_length} days)"}}
     end
 
     if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
@@ -342,7 +342,7 @@ class PlanYear
     end
 
     if overlapping_published_plan_year?
-      log_message(errors) {{publish: "You may only have one published plan year at a time"}}
+      log_message(errors) {{ publish: "You may only have one published plan year at a time" }}
     end
 
     if !is_publish_date_valid?
@@ -351,6 +351,7 @@ class PlanYear
 
     errors
   end
+
 
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
@@ -383,7 +384,7 @@ class PlanYear
 
   def overlapping_published_plan_year?
     self.employer_profile.plan_years.published_or_renewing_published.any? do |py| 
-      (py.start_on..py.end_on).cover?(self.start_on)
+      (py.start_on..py.end_on).cover?(self.start_on) && (py != self)
     end
   end
 
@@ -1007,6 +1008,9 @@ private
 
   def open_enrollment_date_checks
     return if imported_plan_year
+    if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
+      return false
+    end
 
     if start_on != start_on.beginning_of_month
       errors.add(:start_on, "must be first day of the month")
