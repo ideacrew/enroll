@@ -97,7 +97,7 @@ When(/^.+ visits? invitation url in email for staff$/) do
 end
 
 When(/^.+ registers? with valid information for staff$/) do
-  fill_in "user[email]", with: "jack.martin@example.com"
+  fill_in "user[oim_id]", with: "jack.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
@@ -134,14 +134,14 @@ And(/^.+ enters broker agency information for ga flow$/) do
 end
 
 When(/^.+ registers with valid information for ga flow$/) do
-  fill_in "user[email]", with: "broker.martin@example.com"
+  fill_in "user[oim_id]", with: "broker.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com")
+  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 
@@ -170,7 +170,7 @@ When(/^.+ assign employer to general agency$/) do
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click
-  sleep(1)
+
 end
 
 Then(/^.+ should see assign successful message$/) do

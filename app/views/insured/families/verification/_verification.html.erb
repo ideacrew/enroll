@@ -58,11 +58,11 @@
 </div>
 
 <div class="row">
-  <div class="col-xs-6">
+  <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
         <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
     <% elsif show_send_button_for_consumer? %>
-        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm pull-right", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
     <% end %>
   </div>
   <div class="col-xs-6">

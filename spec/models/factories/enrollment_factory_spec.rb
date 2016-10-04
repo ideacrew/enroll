@@ -159,6 +159,10 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         expect(email.address).to eq @user.email
         expect(email.kind).to eq "home"
       end
+
+      it "should transfer the census_employee address to the person" do
+        expect(@employee_role.person.home_address).to eq census_employee.address
+      end
     end
 
     context "and a prior person exists but is not associated with the user" do
@@ -185,6 +189,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         @person = FactoryGirl.create(:person,
                                      valid_person_params.except(:user).merge(dob: census_employee.dob,
                                                                              ssn: census_employee.ssn))
+        @person.addresses << FactoryGirl.create(:address, person: @person)
         plan_year.update_attributes({:aasm_state => 'published'})
         @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
       end
@@ -203,6 +208,10 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
       it "should link the employee role" do
         expect(@employee_role.census_employee.employee_role_linked?).to be_truthy
+      end
+
+      it "should leave the original address on the person" do
+        expect(@employee_role.person.home_address).to eq @person.home_address
       end
     end
 
@@ -520,6 +529,10 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
           it "should have linked the family" do
             expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+          end
+
+          it "should have work email" do
+            expect(@employee_role.person.work_email.address).to eq @employee_role.census_employee.email_address
           end
         end
       end

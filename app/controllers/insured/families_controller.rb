@@ -2,17 +2,18 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
+  before_action :find_or_build_consumer_role, only: [:home]
 
   def home
     set_flash_by_announcement
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-
+    
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -45,7 +46,8 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab']
+    @tab = params['tab'] 
+    @family_members = @family.active_family_members
     respond_to do |format|
       format.html
     end
@@ -136,16 +138,29 @@ class Insured::FamiliesController < FamiliesController
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
+      @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    if @person.has_active_employee_role?
+    if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
   end
 
+  def check_move_reason
+    calculate_dates
+  end
+
+  def check_insurance_reason
+    calculate_dates
+  end
+
   def purchase
+    if params[:hbx_enrollment_id].present?
+      @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    else
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+    end
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
@@ -172,6 +187,8 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
+      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
       redirect_to :back
@@ -230,8 +247,16 @@ class Insured::FamiliesController < FamiliesController
 
   private
 
+  def updateable?
+    authorize Family, :updateable?
+  end
+
   def check_employee_role
     @employee_role = @person.active_employee_roles.first
+  end
+
+  def find_or_build_consumer_role
+    @family.check_for_consumer_role
   end
 
   def init_qualifying_life_events
@@ -245,17 +270,30 @@ class Insured::FamiliesController < FamiliesController
     end
     @qualifying_life_events = []
     if @person.has_multiple_roles?
-      @multiroles = @person.has_multiple_roles?
-      @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-      @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+      if current_user.has_hbx_staff_role?
+        @multiroles = @person.has_multiple_roles?
+        @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+      else
+        @multiroles = @person.has_multiple_roles?
+        @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+      end
     else
       if @person.active_employee_roles.present?
-        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+        if current_user.has_hbx_staff_role?
+          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+        end
       else @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        if current_user.has_hbx_staff_role?
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        end
       end
     end
-
   end
 
   def check_for_address_info
@@ -307,5 +345,14 @@ class Insured::FamiliesController < FamiliesController
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def calculate_dates
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
 end

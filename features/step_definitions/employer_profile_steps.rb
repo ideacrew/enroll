@@ -29,12 +29,14 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   portal_class = '.interaction-click-control-employer-portal'
   find(portal_class).click
   @pswd = 'aA1!aA1!aA1!'
-  fill_in "user[email]", :with => email
-  find('#user_email').set(email)
+  fill_in "user[oim_id]", :with => email
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
+
+  find(:xpath, '//label[@for="user_email_or_username"]').set(email)
+  # find('#user_email_or_username').set(email)
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[email]", :with => email unless find(:xpath, '//*[@id="user_email"]').value == email
+  fill_in "user[oim_id]", :with => email unless find(:xpath, '//label[@for="user_email_or_username"]').value == email
   find('.interaction-click-control-create-account').click
 end
 
@@ -165,14 +167,17 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   find(tab_class).click
 end
 Given /Admin selects Hannahs company/ do
-
   company = find('a', text: 'Turner Agency, Inc')
   company.click
 end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|
   person = Person.where(first_name: name).first
-  FactoryGirl.create(:hbx_staff_role, person: person)
+  role = FactoryGirl.create(:hbx_staff_role, person: person)
+  Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true)
+  role.update_attributes(permission_id: Permission.hbx_staff.id)
 end
 
 Given /a FEIN for an existing company/ do
