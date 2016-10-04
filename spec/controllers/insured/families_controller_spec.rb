@@ -750,7 +750,7 @@ RSpec.describe Insured::FamiliesController do
         end
       end
 
-      context "person has a employer role" do
+      context "person has a employee role" do
         let(:employee_role2) { FactoryGirl.create(:employee_role) }
 
         before do
