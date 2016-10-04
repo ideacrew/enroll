@@ -25,7 +25,7 @@ def find_coverage_household_member(family_member)
 
 end
 
-filename = '8905_dependents_not_imported.csv'
+filename = '8905_dependents_not_migrated.csv'
 
 complete_rows = []
 
@@ -77,7 +77,7 @@ CSV.foreach(filename, headers: :true) do |row|
 
           family_member = Factories::EnrollmentFactory.initialize_dependent(family,subscriber,dependent)
           subscriber.save!
-          family_member.save!
+          
 
         rescue Exception=>e
           row["Error Message"] = "Cannot find census dependent #{row["First Name (Dep #{i+1})"]} #{row["Last Name (Dep #{i+1})"]} - #{e.inspect}"
@@ -87,10 +87,10 @@ CSV.foreach(filename, headers: :true) do |row|
         family_member = family.family_members.detect{|fm| fm.hbx_id == dependent.hbx_id}
 
         if family_member.blank?
-          family.add_family_member(dependent)
+          family_member = family.add_family_member(dependent)
         end
       end
-  
+  	  family_member.save!
       family_member.person.gender = row["Gender (Dep #{i+1})"]
       family_member.person.hbx_id =  row["HBX ID (Dep #{i+1})"]
       family_member.person.save

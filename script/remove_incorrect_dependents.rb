@@ -63,7 +63,7 @@ def construct_csv_dependent(hbx_id,ssn,dob,first_name,last_name,end_date)
 	return csv_dependent
 end
 
-filename = '8905_wrong_dependents_imported.csv'
+filename = '8905_dependents_incorrectly_migrated.csv'
 
 CSV.foreach(filename,headers: true) do |csv_row|
 	dependents_to_keep = []
