@@ -249,7 +249,7 @@ class ApplicationController < ActionController::Base
         role.try(:save!)
       elsif bookmark_url.match('/families/home') && @person.present?
         @person.consumer_role.update_attribute(:bookmark_url, bookmark_url) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
-        @person.employee_roles.last.update_attribute(:bookmark_url, bookmark_url) if (@person.employee_roles.last.present? && @person.employee_roles.last.bookmark_url != family_account_path)
+        @person.employee_roles.last.update_attribute(:bookmark_url, bookmark_url) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
     def set_bookmark_url(url=nil)
