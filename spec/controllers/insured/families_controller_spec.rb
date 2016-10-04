@@ -669,6 +669,7 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET upload_notice", dbclean: :after_each do
 
+    let(:consumer_role2) { FactoryGirl.create(:consumer_role) }
     let(:person2) { FactoryGirl.create(:person) }
     let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }
     let(:file) { double }
@@ -689,7 +690,7 @@ RSpec.describe Insured::FamiliesController do
       allow(@controller).to receive(:file_name).and_return("sample-filename")
       allow(@controller).to receive(:file_content_type).and_return("application/pdf")
       allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
-      person2.consumer_role =   FactoryGirl.create(:consumer_role)
+      person2.consumer_role = consumer_role2
       person2.consumer_role.gender = 'male'
       person2.save
       request.env["HTTP_REFERER"] = "/insured/families/upload_notice_form"
@@ -723,6 +724,30 @@ RSpec.describe Insured::FamiliesController do
       it "adds a message to person inbox" do
         expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
+    end
+
+    context "notice_upload_email" do
+      context "person has chosen to receive electronic communication" do
+        before do
+          consumer_role2.contact_method = "Paper and Electronic communications"
+        end
+
+        it "sends the email" do
+          expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
+        end
+
+      end
+
+      context "person has chosen not to receive electronic communication" do
+        before do
+          consumer_role2.contact_method = "Only Paper communication"
+        end
+
+        it "should not sent the email" do
+          expect(@controller.send(:notice_upload_email)).to be nil
+        end
+      end
+
     end
   end
 end
