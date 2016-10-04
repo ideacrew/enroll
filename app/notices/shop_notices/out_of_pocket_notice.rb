@@ -21,16 +21,14 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
   end
 
   def build
+    raise "No Active plan year for employer" if @recipient.employer_profile.active_plan_year
     @notice.primary_fullname = @recipient.full_name.titleize
     @notice.start_on= @recipient.employer_profile.plan_years.first.start_on
     @notice.legal_name= @recipient.employer_profile.organization.legal_name
     @notice.benefit_group_package_name= @recipient.employer_profile.plan_years.first.benefit_groups.first.title
     @notice.family_contribution= @recipient.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits
     @notice.reference_plan =@recipient.active_benefit_group.reference_plan
-    @notice.data = {:url => url}
-    
-    ## Build all the data needed here 
-
+    @notice.data = {:url => url}  
   end
 
   # @param recipient is a Person object
