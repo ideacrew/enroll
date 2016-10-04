@@ -245,12 +245,8 @@ class PlanYear
     benefit_groups.flat_map(){ |benefit_group| benefit_group.census_employees.active.non_business_owner }
   end
 
-  def open_to_publish?
-    employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
-  end
-
-  def is_application_eligible?
-    application_eligibility_warnings.blank?
+  def is_application_unpublishable?
+    open_enrollment_date_errors.present? || application_errors.present?
   end
 
   def is_application_valid?
@@ -258,11 +254,11 @@ class PlanYear
   end
 
   def is_application_invalid?
-    !is_application_valid?
+    application_errors.present?
   end
 
-  def is_application_unpublishable?
-    open_enrollment_date_errors.present? || is_application_invalid?
+  def is_application_eligible?
+    application_eligibility_warnings.blank?
   end
 
 
@@ -290,7 +286,7 @@ class PlanYear
   end
 
   def open_enrollment_date_errors
-    errors = []
+    errors = {}
 
     if is_renewing?
       minimum_length = Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
@@ -301,11 +297,11 @@ class PlanYear
     end
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
-      errors.push "open enrollment period is less than minimum: #{minimum_length} days"
+      log_message(errors) {{open_enrollment_period: "open enrollment period is less than minimum: #{minimum_length} days"}}
     end
 
     if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-      errors.push "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"
+      log_message(errors) {{open_enrollment_period: "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"}}
     end
 
     errors
@@ -315,28 +311,28 @@ class PlanYear
   def application_errors
     errors = {}
 
-    if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
-      errors.merge!({benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."})
+    if benefit_groups.any?{|bg| bg.reference_plan_id.blank?}
+      log_message(errors) {{benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."}}
     end
 
-    if benefit_groups.size == 0
-      errors.merge!({benefit_groups: "You must create at least one benefit group to publish a plan year"})
+    if benefit_groups.blank?
+      log_message(errors) {{benefit_groups: "You must create at least one benefit group to publish a plan year"}}
     end
 
     if employer_profile.census_employees.active.to_set != assigned_census_employees.to_set
-      errors.merge!({benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"})
+      log_message(errors) {{benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"}}
     end
 
     if employer_profile.ineligible?
-      errors.merge!({employer_profile: "This employer is ineligible to enroll for coverage at this time"})
+      log_message(errors) {{employer_profile:  "This employer is ineligible to enroll for coverage at this time"}}
     end
 
-    if open_to_publish?
-      errors.merge!({publish: "You may only have one published plan year at a time"})
+    if overlapping_published_plan_year?
+      log_message(errors) {{publish: "You may only have one published plan year at a time"}}
     end
 
     if !is_publish_date_valid?
-      errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
+      log_message(errors) {{publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"}}
     end
 
     errors
@@ -346,29 +342,30 @@ class PlanYear
   def application_eligibility_warnings
     warnings = {}
 
-    unless employer_profile.is_primary_office_local?
-      warnings.merge!({primary_office_location: "Primary office must be located in #{Settings.aca.state_name}"})
-    end
-
-    # Employer is in ineligible state from prior enrollment activity
-    if aasm_state == "ineligible"
-      warnings.merge!({ineligible: "Employer is under a period of ineligibility for enrollment on the HBX"})
+    if !employer_profile.is_primary_office_local?
+      warnings.merge!({ primary_office_location: "Primary office must be located in #{Settings.aca.state_name}" })
     end
 
     # Maximum company size at time of initial registration on the HBX
     if fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
-      warnings.merge!({fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})"})
+      warnings.merge!({ fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})" })
     end
 
     # Exclude Jan 1 effective date from certain checks
     unless effective_date.yday == 1
       # Employer contribution toward employee premium must meet minimum
       if benefit_groups.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
-        warnings.merge!({minimum_employer_contribution: "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)"})
+        warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
       end
     end
 
     warnings
+  end
+
+  def overlapping_published_plan_year?
+    self.employer_profile.plan_years.published_or_renewing_published.any? do |py| 
+      (py.start_on..py.end_on).cover?(self.start_on)
+    end
   end
 
   # All active employees present on the roster with benefit groups belonging to this plan year
@@ -856,6 +853,12 @@ class PlanYear
   end
 
 private
+
+  def log_message(errors)
+    msg = yield.first
+    (errors[msg[0]] ||= []) << msg[1]
+  end
+
   def is_renewing_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
@@ -966,7 +969,6 @@ private
   end
 
   def open_enrollment_date_checks
-    return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
 
     if start_on != start_on.beginning_of_month
@@ -985,7 +987,7 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if open_enrollment_start_on < (start_on - 2.months)
+    if open_enrollment_start_on < (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end
 

@@ -21,7 +21,7 @@ class FixPlanYearsToObeyMinimumOpenEnrollmentPeriod < MongoidMigrationTask
         minimum_length = PlanYear::RENEWING.include?(py.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
           : Settings.aca.shop_market.open_enrollment.minimum_length.days
 
-        if py.open_enrollment_date_errors.include?("open enrollment period is less than minimum: #{minimum_length} days")
+        if py.open_enrollment_date_errors.values.flatten.include?("open enrollment period is less than minimum: #{minimum_length} days")
           py.open_enrollment_start_on = py.open_enrollment_end_on - 4.days # this will make a total of 5 days [start - end] inclusive
           begin
             py.save!
