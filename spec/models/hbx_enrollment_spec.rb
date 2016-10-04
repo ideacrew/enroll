@@ -62,7 +62,6 @@ describe HbxEnrollment do
       expect(employer_profile.census_employees.size).to eq fte_count
     end
 
-
     context "and employees create employee roles and families" do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
