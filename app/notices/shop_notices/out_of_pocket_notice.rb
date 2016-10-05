@@ -29,6 +29,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     @notice.benefit_group_package_name= @recipient.employer_profile.plan_years.first.benefit_groups.first.title
     @notice.family_contribution= @recipient.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits
     @notice.reference_plan =@recipient.active_benefit_group.reference_plan
+    @notice.carrier =@recipient.employer_profile.plan_years.first.benefit_groups.first.reference_plan.carrier_profile.legal_name
     @notice.data = {:url => url}  
   end
 
