@@ -96,6 +96,7 @@ gem 'wicked_pdf', '1.0.6'
 gem "recaptcha", '1.1.0'
 
 gem 'jquery-datatables-rails', '3.4.0'
+gem 'effective_datatables'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
