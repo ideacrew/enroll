@@ -22,6 +22,27 @@ RSpec.describe "events/census_employee/employer_response.xml.haml.erb" do
         expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
     end
+
+    context "census employee has dependents" do
+      let(:census_dependent) { FactoryGirl.build(:census_dependent) }
+      let(:census_dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: 'child_under_26') }
+
+      before(:each) do
+        census_employees.first.census_dependents = [census_dependent, census_dependent2]
+        census_employees.first.save
+        render :template => "events/census_employee/employer_response", :locals => {:census_employees => census_employees}
+        @doc = Nokogiri::XML(rendered)
+        @doc.remove_namespaces!
+      end
+
+      it "generates valid xml" do
+        expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
+      end
+
+      it "adds 2 dependents to xml" do
+        expect(@doc.xpath("//employers/employer/employer_profile/employer_census_families/employer_census_family/dependents/dependent").count).to eq 2
+      end
+    end
   end
 
   context "multiple census employees under one employer" do
@@ -47,7 +68,7 @@ RSpec.describe "events/census_employee/employer_response.xml.haml.erb" do
       end
 
       it "has two census_employees" do
-        expect(@doc.xpath("//employers/employer/employer_census_families/employer_census_family").count).to eq 2
+        expect(@doc.xpath("//employers/employer/employer_profile/employer_census_families/employer_census_family").count).to eq 2
       end
     end
   end
