@@ -18,6 +18,7 @@ module PdfTemplates
     # attribute :spouse_contribution, String
     # attribute :domestic_partner_contribution, String
     # attribute :child_under_26_contribution, String
+    attribute :metal_leval, String
     attribute :generate_url, String
     attribute :reference_plan, Object
     attribute :family_contribution, String
