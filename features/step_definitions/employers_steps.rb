@@ -484,7 +484,7 @@ end
 
 And /^employer clicks on back button$/ do
   expect(page).to have_content "Details"
-  find('.return_to_employee_roster').click
+  find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
 end
 
 Then /^employer should see employee roaster$/ do
