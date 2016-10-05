@@ -57,6 +57,7 @@ describe "insured/families/verification/_verification.html.erb" do
       allow(view).to receive(:verification_needed?).and_return true
       allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return true
       stub_template "insured/families/verification/_verification_docs_table.html.erb" => "content"
+      stub_template "insured/families/verification/_unverified_person.html.erb" => "content"
       render 'insured/families/verification/verification.html.erb'
     end
 
@@ -72,6 +73,7 @@ describe "insured/families/verification/_verification.html.erb" do
       allow(view).to receive(:verification_needed?).and_return true
       allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return true
       stub_template "insured/families/verification/_verification_docs_table.html.erb" => "content"
+      stub_template "insured/families/verification/_unverified_person.html.erb" => "content"
       render 'insured/families/verification/verification.html.erb'
     end
 
