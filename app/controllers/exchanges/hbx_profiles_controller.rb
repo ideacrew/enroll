@@ -173,12 +173,12 @@ def employer_poc
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-    @datatable = Effective::Datatables::Posts.new
-
-    respond_to do |format|
-      format.html
-      format.js
-    end
+    @datatable = Effective::Datatables::ArrayBacked.new
+    render '/exchanges/hbx_profiles/employer_poc'
+ #   respond_to do |format|
+  #    format.html
+   #   format.js
+   # end
   end
 
 
