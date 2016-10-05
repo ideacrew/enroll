@@ -269,9 +269,9 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
-  find('.container .row div div.btn', text: 'Help').click
-
+  find('.help-me-sign-up', :text => 'Help Me Sign Up').click
   wait_for_ajax
+
   click_link "Help from a Customer Service Representative"
 
   expect(page).to have_content "First name"
