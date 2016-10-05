@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
@@ -183,10 +183,43 @@ class Employers::CensusEmployeesController < ApplicationController
 
   end
 
+  def cobra
+    cobra_date = params["cobra_date"]
+    if cobra_date.present?
+      @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
+    else
+      @cobra_date = ""
+    end
+
+    if @cobra_date.present? && @census_employee.can_elect_cobra?
+      if @census_employee.update_for_cobra(@cobra_date)
+        flash[:notice] = "Successfully update Census Employee."
+      else
+        flash[:error] = "Please check cobra date."
+      end
+    else
+      flash[:error] = "Please enter cobra date."
+    end
+  end
+
+  def cobra_reinstate
+    if @census_employee.reinstate_eligibility!
+      flash[:notice] = "Successfully update Census Employee."
+    else
+      flash[:error] = "Unable to update Census Employee."
+    end
+  end
+
   def show
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
+    @census_employee.build_address unless @census_employee.address.present?
+    @census_employee.build_email unless @census_employee.email.present?
+    @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+    @census_employee.census_dependents.build unless @census_employee.census_dependents.present?
+    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
+    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
   def delink
@@ -253,7 +286,7 @@ class Employers::CensusEmployeesController < ApplicationController
 =end
 
     params.require(:census_employee).permit(:id, :employer_profile_id,
-        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,
+        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
         :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [

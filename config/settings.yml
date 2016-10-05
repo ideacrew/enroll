@@ -85,6 +85,10 @@ aca:
         days: 5
       maximum_length:
         months: 2
+
+    cobra_enrollment_period:
+      months: 6
+
 paper_notice: 'paper-notices'
 
 

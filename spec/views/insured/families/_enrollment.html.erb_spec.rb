@@ -56,6 +56,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(TimeKeeper.date_of_record)
+      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
     it "should open the sbc pdf" do
@@ -128,6 +131,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to match /effective date/i
     end
 
+    it "should display market" do
+      expect(rendered).to match /Market/
+    end
+
+    it "should display future_enrollment_termination_date when coverage_termination_pending" do
+      expect(rendered).to match /Future enrollment termination date:/
+    end
   end
 
   context "with consumer_role" do
@@ -152,6 +162,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
+      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(nil)
+      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -193,6 +206,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
+      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(nil)
+      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 

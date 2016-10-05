@@ -216,4 +216,34 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
     end
   end
+
+  context "for cobra" do
+    context "when terminated" do
+      before :each do
+        allow(census_employee).to receive(:aasm_state).and_return 'employment_terminated'
+        allow(census_employee).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
+        render template: "employers/census_employees/show.html.erb"
+      end
+
+      it "should have cobra button" do
+        expect(rendered).to have_selector('span', text: 'COBRA')
+      end
+
+      it "should have cobra confirm area" do
+        expect(rendered).to have_selector('div.cobra_confirm')
+        expect(rendered).to match /Employment Termination Date/
+        expect(rendered).to have_selector('a.cobra_confirm_submit')
+        expect(rendered).to have_selector('span.confirm-cobra-wrapper')
+      end
+
+      it "should have rehire button" do
+        expect(rendered).to have_selector('span', text: 'Rehire')
+      end
+
+      it "should have rehire area" do
+        expect(rendered).to have_selector('div.confirm-terminate-wrapper')
+        expect(rendered).to have_selector('a.rehire_confirm')
+      end
+    end
+  end
 end

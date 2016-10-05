@@ -462,7 +462,7 @@ module ApplicationHelper
 
   def is_readonly(object)
     return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
-    return true if object.try(:employee_role_linked?)  # cannot edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
     return !(object.new_record? or object.try(:eligible?)) # employer census roster
   end
 

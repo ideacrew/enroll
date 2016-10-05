@@ -1830,6 +1830,54 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   end
 end
 
+context "for cobra", :dbclean => :after_each do
+  let(:enrollment) { HbxEnrollment.new }
+
+  context "is_cobra_status?" do
+    it "should return false" do
+      expect(enrollment.is_cobra_status?).to be_falsey
+    end
+
+    it "should return true" do
+      enrollment.kind = 'employer_sponsored_cobra' 
+      expect(enrollment.is_cobra_status?).to be_truthy
+    end
+  end
+
+  context "future_enrollment_termination_date" do
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:coverage_termiante_date) { TimeKeeper.date_of_record + 1.months }
+
+    it "should return blank if not coverage_termination_pending" do
+      expect(enrollment.future_enrollment_termination_date).to eq ""
+    end
+
+    it "should return coverage_termiante_date by census_employee" do
+      census_employee.coverage_terminated_on = coverage_termiante_date
+      employee_role.census_employee = census_employee
+      enrollment.employee_role = employee_role
+      enrollment.aasm_state = "coverage_termination_pending"
+      expect(enrollment.future_enrollment_termination_date).to eq coverage_termiante_date
+    end
+  end
+
+  it "can_select_coverage?" do
+    enrollment.kind = 'employer_sponsored_cobra' 
+    expect(enrollment.can_select_coverage?).to be_truthy
+  end
+
+  context "benefit_package_name" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_package) { BenefitPackage.new(title: 'benefit package title') }
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      enrollment.benefit_group = benefit_group
+      expect(enrollment.benefit_package_name).to eq benefit_group.title
+    end
+  end
+end
+
 context '.process_verification_reminders' do 
   context "when family exists with pending outstanding verifications" do
 
@@ -2066,6 +2114,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
         expect(passive_renewal.coverage_terminated?).to be_truthy
         expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
       end
+    end
+  end
+
+  context "market_name" do
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      expect(enrollment.market_name).to eq 'Employer Sponsored'
+    end
+
+    it "for individual" do
+      enrollment.kind = 'individual'
+      expect(enrollment.market_name).to eq 'Individual'
     end
   end
 end
