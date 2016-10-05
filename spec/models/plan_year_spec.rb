@@ -28,6 +28,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renew_notice).and_return(true)
   end
 
   context ".new" do
