@@ -318,6 +318,9 @@ GEM
       mongoid (~> 5.0)
       rake
       rspec (~> 3.3)
+    mongoid-versioning (2.0.0)
+      activesupport (~> 4.0)
+      mongoid (>= 4.0.0, <= 6.0.0)
     mongoid_userstamp (0.4.0)
       mongoid (>= 3.0.4)
     multi_json (1.12.1)
@@ -586,6 +589,7 @@ DEPENDENCIES
   mongoid-enum
   mongoid-history!
   mongoid-rspec (= 3.0.0)
+  mongoid-versioning
   mongoid_userstamp
   newrelic_rpm
   nokogiri (= 1.6.7.2)
