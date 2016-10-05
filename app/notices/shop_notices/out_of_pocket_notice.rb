@@ -25,6 +25,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     @notice.primary_fullname = @recipient.full_name.titleize
     @notice.start_on= @recipient.employer_profile.plan_years.first.start_on
     @notice.legal_name= @recipient.employer_profile.organization.legal_name
+    @notice.metal_leval= @recipient.employer_profile.plan_years.first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
     @notice.benefit_group_package_name= @recipient.employer_profile.plan_years.first.benefit_groups.first.title
     @notice.family_contribution= @recipient.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits
     @notice.reference_plan =@recipient.active_benefit_group.reference_plan
