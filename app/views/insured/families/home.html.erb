@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
-<%= render 'navigation' %>
+  <%= render 'navigation' %>
 <% end %>
 <div class="col-xs-12">
   <div id="plan-summary"></div>
@@ -16,9 +16,11 @@
     <div class="col-md-8">
       <%= render partial: 'qle_detail' %>
       <%= render partial: 'qle_detail_for_existing_sep' if @active_admin_sep.present?%>
-      <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
+      <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <% if @waived %>
-        <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
+        <div class="waived-coverage">
+          <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        </div>
       <% end %>
       <%= render partial: 'shop_for_plans_widget' %>
       <%= render partial: 'apply_for_medicaid_widget' %>
