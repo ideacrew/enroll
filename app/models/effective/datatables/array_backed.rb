@@ -1,7 +1,6 @@
 
 module Effective
   module Datatables
-    require 'pry'
     class ArrayBacked < Effective::Datatable
       datatable do
 
