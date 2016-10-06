@@ -44,11 +44,14 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-    @organizations= Organization.where(:id.in => params[:employerId]).all
-    @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
-    end
+
+binding.pry
+
+    # @organizations= Organization.where(:id.in => params[:employerId]).all
+    # @organizations.each do |org|
+    #   @employer_invoice = EmployerInvoice.new(org)
+    #   @employer_invoice.save_and_notify_with_clean_up
+    # end
 
     respond_to do |format|
       format.js
@@ -500,7 +503,7 @@ def employer_poc
     else
       begin
         @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-        CensusEmployee.update_census_employee_records(@person, current_user) 
+        CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
         @error_on_save = @person.errors.messages
         @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?

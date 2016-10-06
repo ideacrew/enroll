@@ -4,31 +4,34 @@ module Effective
     require 'pry'
     class ArrayBacked < Effective::Datatable
       datatable do
-        array_column :id
-        array_column :first_name, :width => '25%', :color => 'red'
-        array_column :last_name
-        array_column :updated_at, :proc => Proc.new { |row| row[4].strftime('%m/%d/%YY')}
-        array_column :email
+
+
+        bulk_actions_column do
+           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
+        end
+
+        array_column :legal_name, :width => '25%'
+        array_column :conversion
+        array_column :state
+        array_column :plan_year_state
+        array_column :update_at, :proc => Proc.new { |row| row[5].strftime('%m/%d/%Y')}
+
+
       end
 
       def collection
-        [
-          [1, 'June', 'Huang', 'june@einstein.com'],
-          [2, 'Leo', 'Stubbs', 'leo@einstein.com'],
-          [3, 'Quincy', 'Pompey', 'quincy@einstein.com'],
-          [4, 'Annie', 'Wojcik', 'annie@einstein.com'],
-        ]
-        Organization.all_employer_profiles.limit(5).all.map{|org| 
- 
+        employers = Organization.all_employer_profiles
+        employers.map{|org|
          [
             org.fein,
             org.legal_name,
+            org.employer_profile.is_conversion?,
             org.primary_office_location.address.state,
-            org.employer_profile.active_plan_year &&  org.employer_profile.active_plan_year.aasm_state,
+            org.employer_profile.latest_plan_year.try(:aasm_state),
             org.employer_profile.updated_at
          ]}
       end
 
     end
   end
-end  
+end
