@@ -45,13 +45,12 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def generate_invoice
 
-binding.pry
-
-    # @organizations= Organization.where(:id.in => params[:employerId]).all
-    # @organizations.each do |org|
-    #   @employer_invoice = EmployerInvoice.new(org)
-    #   @employer_invoice.save_and_notify_with_clean_up
-    # end
+    
+    @organizations= Organization.where(:id.in => params[:employerId]).all
+    @organizations.each do |org|
+      @employer_invoice = EmployerInvoice.new(org)
+      @employer_invoice.save_and_notify_with_clean_up
+    end
 
     respond_to do |format|
       format.js
