@@ -21,12 +21,12 @@ module Effective
 
       def collection
         employers = Organization.all_employer_profiles
-        employers.map{|org|
+        employers.limit(50).map{|org|
          [
             org.fein,
             org.legal_name,
             org.employer_profile.is_conversion?,
-            org.primary_office_location.address.state,
+            org.primary_office_location && org.primary_office_location.address.state,
             org.employer_profile.latest_plan_year.try(:aasm_state),
             org.employer_profile.updated_at
          ]}
