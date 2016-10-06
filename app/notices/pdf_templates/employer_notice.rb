@@ -14,10 +14,6 @@ module PdfTemplates
     attribute :start_on, Date
     attribute :legal_name, String
     attribute :benefit_group_package_name, String
-    # attribute :employee_contribution, String
-    # attribute :spouse_contribution, String
-    # attribute :domestic_partner_contribution, String
-    # attribute :child_under_26_contribution, String
     attribute :metal_leval, String
     attribute :carrier, String
     attribute :generate_url, String
