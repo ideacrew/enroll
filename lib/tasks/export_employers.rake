@@ -54,8 +54,7 @@ namespace :employers do
           gap_legal_name = !employer.general_agency_profile.nil? ? employer.general_agency_profile.legal_name : ""
           gap_active_start_on = !employer.active_general_agency_account.nil? ? employer.active_general_agency_account.start_on : "" 
 
-          employer_attributes = []
-          employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, gap_fein, gap_legal_name, gap_active_start_on]
+          employer_attributes = [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, gap_fein, gap_legal_name, gap_active_start_on]
           office_location = get_primary_office_location(employer.organization)
           employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
                                   office_location.address.state, office_location.address.zip]
@@ -93,8 +92,8 @@ namespace :employers do
               #benefit_group.relationship_benefits.each do |relationship_benefit|
                 row = []
 
-                puts employer.legal_name + " - Plan Year " + plan_year.id + " : no workflow state transitions" if plan_year.workflow_state_transitions.size == 0
-                plan_year_transition_at = plan_year.workflow_state_transitions.size > 0 ? plan_year.workflow_state_transitions.last.transition_at : ""
+                puts employer.legal_name + " - Plan Year " + plan_year.id.to_s + " : no workflow state transitions" if plan_year.workflow_state_transitions.size == 0
+                plan_year_transition_at = plan_year.workflow_state_transitions.size > 0 ? plan_year.workflow_state_transitions.order(transition_at: :desc).first : ""
 
                 begin
                   row += [benefit_group.relationship_benefits[0].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[0].offered, benefit_group.relationship_benefits[1].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[1].offered, benefit_group.relationship_benefits[2].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[2].offered, benefit_group.relationship_benefits[3].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[3].offered, benefit_group.relationship_benefits[4].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[4].offered]
