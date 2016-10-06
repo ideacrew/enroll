@@ -848,6 +848,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "generate_and_deliver_checkbook_url" do 
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+    let(:plan){FactoryGirl.create(:plan)}
+
+    before do
+      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+      allow(census_employee).to receive(:employer_profile).and_return(employer_profile)
+      allow(census_employee).to receive_message_chain(:employer_profile,:plan_years).and_return([plan_year])
+      allow(census_employee).to receive_message_chain(:active_benefit_group,:reference_plan).and_return(plan)
+    end
+
+    it "should create a builder and deliver without expection" do
+      expect{census_employee.generate_and_deliver_checkbook_url}.not_to raise_error
+    end
+  end
+
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}
