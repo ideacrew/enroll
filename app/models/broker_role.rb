@@ -235,6 +235,7 @@ class BrokerRole
 
     event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
+      transitions from: :broker_agency_pending, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do
