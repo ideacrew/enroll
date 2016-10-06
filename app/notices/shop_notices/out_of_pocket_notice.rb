@@ -11,7 +11,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     self.url = args[:data]
     super(args)
     # self.data = args[:data]
-    # @to= @recipient.email.address
+    self.to= @recipient.email.address
   end
 
   def deliver
@@ -23,7 +23,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
   def build
     raise "No Active plan year for employer" if @recipient.employer_profile.active_plan_year
     @notice.primary_fullname = @recipient.full_name.titleize
-    @notice.start_on= @recipient.employer_profile.plan_years.first.start_on
+    @notice.start_on= @recipient.try(:employer_profile).try(:plan_years).first.start_on
     @notice.legal_name= @recipient.employer_profile.organization.legal_name
     @notice.metal_leval= @recipient.employer_profile.plan_years.first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
     @notice.benefit_group_package_name= @recipient.employer_profile.plan_years.first.benefit_groups.first.title
