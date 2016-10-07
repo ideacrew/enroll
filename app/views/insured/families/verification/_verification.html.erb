@@ -12,7 +12,6 @@
     </h4>
   </div>
 </div>
-
 <!-- tabs with content -->
 <div class="row">
   <ul class="nav nav-pills">
@@ -21,7 +20,6 @@
       <li><a href="#fedhub-tab-table" data-toggle="tab">FedHub</a></li>
     <% end %>
   </ul>
-
   <div class="tab-content">
     <div class="tab-pane active" id="verification-tab-table">
       <div class="module ivl-documents-table panel">
@@ -32,10 +30,6 @@
               <th>Family Member</th>
               <th>Verification Type</th>
               <th>Status</th>
-
-              <% if current_user && current_user.has_hbx_staff_role? %>
-                  <!--<th>Complete</th>-->
-              <% end %>
               <th>Documents</th>
               <th></th>
             </tr>
@@ -106,8 +100,8 @@
                         <% end %>
                       </td>
                       <td class="hub-trigger">
-                        <%= link_to "Call Hub", fed_hub_request_documents_path(:person_id => member.person.id), class:"btn btn-default btn-xs"%><br><br>
-                        Hub calls: <span class="badge"><%= f_member.consumer_role.hub_retrigger_count %></span>
+                        <%= link_to "Call Hub", fed_hub_request_documents_path(:person_id => f_member.id), class:"btn btn-default btn-xs", remote: true %><br><br>
+                        Hub calls: <span class="badge" id="<%= f_member.id %>"><%= f_member.consumer_role.hub_retrigger_count %></span>
                       </td>
                     </tr>
                 <% end %>
@@ -118,15 +112,9 @@
         </div>
     <% end %>
   </div>
-
-
 </div>
 
-
-
-
 <!-- *** tabs with content -->
-
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>

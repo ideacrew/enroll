@@ -80,7 +80,7 @@ class DocumentsController < ApplicationController
         flash[:success] = "Request was sent to FedHub."
         redirect_to :back
       }
-      format.js
+      format.js { }
     end
   end
 

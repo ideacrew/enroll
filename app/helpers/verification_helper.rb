@@ -140,7 +140,6 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-
   def show_v_type(v_type, person)
     case verification_type_status(v_type, person)
       when "in review"
@@ -192,5 +191,3 @@ module VerificationHelper
     f_member.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last
   end
 end
-
-
