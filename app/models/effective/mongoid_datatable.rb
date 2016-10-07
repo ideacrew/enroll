@@ -1,5 +1,5 @@
 module Effective
-  class MongoidDatatable
+  class MongoidDatatable < Effective::Datatable
     protected
 
     def table_tool 
@@ -7,7 +7,7 @@ module Effective
     end
 
     def active_record_collection?
-      @active_record_collection? ||= true
+      @active_record_collection ||= true
     end
   end
 end
