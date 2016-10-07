@@ -4,14 +4,11 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-  let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'shopping'
-    )
-  }
+  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+                           household: household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           aasm_state: 'shopping') }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -32,11 +29,6 @@ describe Family, "given a primary applicant and a dependent" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
   end
-
-  context "#any_unverified_enrollments?" do
-
-  end
-
 end
 
 describe Family, type: :model, dbclean: :after_each do
@@ -1233,7 +1225,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq nil
   end
- 
+
   it "should build the consumer role for the dependents when primary has a consumer role" do
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
@@ -1251,5 +1243,5 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     expect(family_member_dependent.person.consumer_role).to eq cr
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq cr
-  end  
+  end
 end

@@ -53,15 +53,15 @@ module VerificationHelper
   end
 
   def verification_needed?(person)
-    person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
+    person.primary_family.ivl_unverified_enrollments.any? if person.primary_family
   end
 
   def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
+    if family.ivl_unverified_enrollments.any?
+      if family.ivl_unverified_enrollments.first.special_verification_period
+        family.ivl_unverified_enrollments.first.special_verification_period.to_date
       else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+        family.ivl_unverified_enrollments.first.submitted_at.to_date + 95.days
       end
     else
       TimeKeeper.date_of_record.to_date + 95.days
@@ -88,10 +88,10 @@ module VerificationHelper
   end
 
   def review_button_class(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.review_status == "ready"
+    if family.ivl_unverified_enrollments.any?
+      if family.ivl_unverified_enrollments.first.review_status == "ready"
         "success"
-      elsif family.active_household.hbx_enrollments.verification_needed.first.review_status == "in review"
+      elsif family.ivl_unverified_enrollments.first.review_status == "in review"
         "info"
       else
         "default"
@@ -104,8 +104,8 @@ module VerificationHelper
   end
 
   def hbx_enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
+    if @person.primary_family.ivl_unverified_enrollments.any?
+      @person.primary_family.ivl_unverified_enrollments.first.review_status == "incomplete"
     end
   end
 
@@ -114,13 +114,9 @@ module VerificationHelper
     person.try(:consumer_role).try(:vlp_documents).select{|doc| doc.identifier}.all?{|doc| doc.status == "rejected"}
   end
 
-  def no_enrollments
-    @person.primary_family.active_household.hbx_enrollments.empty?
-  end
-
   def enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
+    if @person.primary_family.ivl_unverified_enrollments.any?
+      @person.primary_family.ivl_unverified_enrollments.first.review_status == "incomplete"
     end
   end
 
@@ -129,8 +125,8 @@ module VerificationHelper
   end
 
   def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
+    if family.ivl_unverified_enrollments.any?
+      family.ivl_unverified_enrollments.first.review_status
     else
       "no enrollment"
     end

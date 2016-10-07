@@ -448,6 +448,11 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def ivl_unverified_enrollments
+    return [] if enrollments.empty?
+    enrollments.individual_market.verification_needed
+  end
+
   class << self
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
