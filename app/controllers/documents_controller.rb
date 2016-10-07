@@ -42,7 +42,7 @@ class DocumentsController < ApplicationController
                                               :update_reason => params[:verification_reason]
                                              } )
     end
-    @person.consumer_role.verify_ivl_by_admin if all_types_verified?(@person)
+    @person.consumer_role.verify_ivl_by_admin if @person.all_types_verified?
     respond_to do |format|
       format.html {
         flash[:notice] = "Verification successfully approved."
@@ -156,21 +156,9 @@ class DocumentsController < ApplicationController
     options
   end
 
-  def all_types_verified?(person)
-    person.verification_types.all?{ |type| is_type_verified?(person, type) }
-  end
-
   def authorized_to_download?(owner, documents, document_id)
     return true
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
-  end
-
-  def is_type_verified?(person, type)
-    if type == 'Social Security Number'
-      person.consumer_role.ssn_verified?
-    elsif type == 'Citizenship' || type == 'Immigration status'
-      person.consumer_role.lawful_presence_verified?
-    end
   end
 
   def set_document

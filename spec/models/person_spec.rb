@@ -870,7 +870,7 @@ describe Person do
 
   describe "verification types" do
     let(:person) {FactoryGirl.create(:person)}
-    context "consumer is us citizen with ssn" do
+    context "consumer is US citizen with ssn" do
       before :each do
         allow(person).to receive(:ssn).and_return("2222222222")
         allow(person).to receive(:us_citizen).and_return(false)
@@ -893,7 +893,7 @@ describe Person do
 
     end
 
-    context "consumer is not us citizen with ssn" do
+    context "consumer is not US citizen with ssn" do
       before :each do
         allow(person).to receive(:ssn).and_return("2222222222")
         allow(person).to receive(:us_citizen).and_return(true)
@@ -917,7 +917,7 @@ describe Person do
 
     end
 
-    context "consumer is us citizen with no ssn" do
+    context "consumer is US citizen with no ssn" do
       before :each do
         allow(person).to receive(:us_citizen).and_return(true)
       end
@@ -931,11 +931,39 @@ describe Person do
       end
 
       it "contains SSN verification type for person" do
-        expect(person.verification_types).not_to include("SSN")
+        expect(person.verification_types).not_to include("Social Security Number")
       end
 
       it "contains Immigration status verification type for person" do
         expect(person.verification_types).to include("Citizenship")
+      end
+    end
+
+    context "consumer is Native American with ssn" do
+      before :each do
+        allow(person).to receive(:ssn).and_return("2222222222")
+        allow(person).to receive(:us_citizen).and_return(false)
+        allow(person).to receive(:citizen_status).and_return("indian_tribe_member")
+      end
+
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with one elements" do
+        expect(person.verification_types.count).to eq(2)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "doesn't have Citizenship verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).not_to include("Citizenship")
       end
     end
   end

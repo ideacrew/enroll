@@ -36,24 +36,80 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    context "Citizenship and Immigration status" do
+    context "Citizenship/Immigration/Native American status" do
       context "lawful presence valid" do
         it "returns verified status" do
           person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
           expect(helper.verification_type_status("Immigration status", person)).to eq "verified"
         end
       end
-      context "lawful presence with uploaded docs" do
-        it "returns in review status" do
-          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
-          expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
+      describe "Citizenship" do
+        context "lawful presence with uploaded docs" do
+          it "returns in review status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Citizenship")
+            expect(helper.verification_type_status("Citizenship", person)).to eq "in review"
+          end
+        end
+        context "lawful presence determination pending" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
+          end
+        end
+        context "lawful presence determination outstanding" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
+          end
         end
       end
-      context "lawful presence determination fails" do
-        it "returns outstanding status" do
-          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-          expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+      describe "Immigration status" do
+        context "lawful presence with uploaded docs" do
+          it "returns in review status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
+            expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
+          end
+        end
+        context "lawful presence determination pending" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+          end
+        end
+        context "lawful presence determination outstanding" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+          end
+        end
+      end
+      describe "American Indian Status" do
+        context "lawful presence with uploaded docs" do
+          it "returns in review status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "American Indian Status")
+            expect(helper.verification_type_status("American Indian Status", person)).to eq "in review"
+          end
+        end
+        context "lawful presence determination pending" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
+          end
+        end
+        context "lawful presence determination outstanding" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
+          end
         end
       end
     end

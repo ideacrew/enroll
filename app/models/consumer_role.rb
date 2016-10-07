@@ -175,7 +175,7 @@ class ConsumerRole
   def is_type_outstanding?(type)
     if type == 'Social Security Number'
       !self.ssn_verified? && !self.has_docs_for_type?(type)
-    elsif type == 'Citizenship' || type == 'Immigration status'
+    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
       !lawful_presence_authorized? && !self.has_docs_for_type?(type)
     end
   end
@@ -643,6 +643,18 @@ class ConsumerRole
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
     (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+  end
+
+  def all_types_verified?
+    person.verification_types.all?{ |type| is_type_verified?(type) }
+  end
+
+  def is_type_verified?(type)
+    if type == 'Social Security Number'
+      ssn_verified?
+    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
+      lawful_presence_verified?
+    end
   end
 
   def record_transition(*args)
