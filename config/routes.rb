@@ -25,9 +25,9 @@ Rails.application.routes.draw do
     end
     resources :agents_inboxes, only: [:show, :destroy]
     resources :residents, only: [:create, :edit, :update] do
-      get :match_person, on: :collection
+      get :search, on: :collection
       post :match, on: :collection
-      get :new_resident_enrollment, on: :collection
+      get :begin_resident_enrollment, on: :collection
     end
     resources :hbx_profiles do
       root 'hbx_profiles#show'
