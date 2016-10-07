@@ -27,19 +27,19 @@ namespace :import do
             result.sheet(sheet_name)
           end
 
+          @header_row = sheet_data.row(1)
+          assign_headers
+
           last_row = sheet_data.last_row
           (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
             row_info = sheet_data.row(row_number)
-            binding.pry
-            if sheet_name == "Dental SHOP"
-              hios_id, provider_directory_url, rx_formulary_url = row_info[2].squish, row_info[6], nil
-            else
-              hios_id, provider_directory_url, rx_formulary_url = row_info[2].squish, row_info[10], row_info[12]
-            end
+            hios_id = row_info[@headers["hios/standard component id"]].squish
+            provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
               if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
+                rx_formulary_url = row_info[@headers["rx formulary url"]]
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               end
               plan.save
@@ -51,5 +51,13 @@ namespace :import do
     puts "*"*80
     puts "import complete"
     puts "*"*80
+  end
+
+  def assign_headers
+    @headers = Hash.new
+    @header_row.each_with_index {|header,i|
+      @headers[header.to_s.underscore] = i
+    }
+    @headers
   end
 end
