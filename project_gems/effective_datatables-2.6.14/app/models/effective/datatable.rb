@@ -168,6 +168,10 @@ module Effective
       @simple == true
     end
 
+    def global_search?
+      false
+    end
+
     protected
 
     def params

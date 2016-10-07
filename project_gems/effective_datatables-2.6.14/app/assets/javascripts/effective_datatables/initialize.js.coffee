@@ -3,6 +3,7 @@ initializeDataTables = ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
+    searching = (datatable.data('searching') == true)
     simple = (datatable.data('simple') == true)
     input_js_options = datatable.data('input-js-options') || {}
 
@@ -12,6 +13,7 @@ initializeDataTables = ->
     init_options =
       ajax: { url: datatable.data('source'), type: 'POST' }
       autoWidth: false
+      searching: searching
       buttons: [
         {
           extend: 'colvis',

@@ -18,6 +18,17 @@ GIT
       ruby-rc4
       ttfunk (~> 1.0.3)
 
+PATH
+  remote: ./project_gems/effective_datatables-2.6.14
+  specs:
+    effective_datatables (2.6.14)
+      coffee-rails
+      haml-rails
+      kaminari
+      rails (>= 3.2.0)
+      sass-rails
+      simple_form
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -190,13 +201,6 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
-    effective_datatables (2.6.14)
-      coffee-rails
-      haml-rails
-      kaminari
-      rails (>= 3.2.0)
-      sass-rails
-      simple_form
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
@@ -570,7 +574,7 @@ DEPENDENCIES
   cucumber-rails (~> 1.4.2)
   database_cleaner (= 1.5.1)
   devise (~> 3.4.1)
-  effective_datatables
+  effective_datatables!
   email_spec (= 2.0.0)
   eye
   factory_girl_rails (= 4.6.0)
