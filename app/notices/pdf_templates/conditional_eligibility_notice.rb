@@ -49,5 +49,13 @@ module PdfTemplates
     def incarcerated
       individuals.select{|individual| individual.incarcerated}
     end
+
+    def health_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "health"}
+    end
+
+    def dental_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental"}
+    end
   end
 end
