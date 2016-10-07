@@ -46,8 +46,8 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
         "ssn"=>"671126610",
         "no_dc_address"=>false,
         "addresses"=>[{
-          "kind"=>"work",
-          "address_1"=>"3312 K St NW",
+          "kind"=>"home",
+          "address_1"=>"3312 K St NE",
           "city"=>"Washington",
           "state"=>"DC",
           "zip"=>"20008"

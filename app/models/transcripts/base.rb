@@ -26,30 +26,6 @@ module Transcripts
       end
     end
 
-    def data_comparision(association)
-      differences = []
-
-      if @transcript[:source].send(assoc).is_a?(Array)
-        source_records = @transcript[:source].send(assoc)
-        other_records  = @transcript[:other].send(assoc)
-        identifier = self.class.identifier_mapping[assoc]
-
-        source_records.each do |source_rec|
-          index = other_records.find_index { |other| other.send(identifier) == source_rec.send(identifier) }
-          compare_record = index.present? ? other_records.delete_at(index) : nil
-
-          # compare_record = other_records.pop{|other| other.send(identifier) == source_rec.send(identifier)}
-          differences << compare_records(base_record: source_rec, compare_record: compare_record)
-        end
-
-        other_records.each {|other| differences << compare_records(base_record: nil, compare_record: other) }
-      else
-        differences = compare_records(base_record: @transcript[:source].send(assoc), compare_record: @transcript[:other].send(assoc))
-      end
-
-      differences
-    end
-
     def compare_instance
       return if @transcript[:other].blank?
       return if @transcript[:source_is_new]
@@ -57,90 +33,51 @@ module Transcripts
       differences    = HashWithIndifferentAccess.new
       base_record    = @transcript[:source]
 
-      differences[:base] = compare_records(base_record: @transcript[:source], compare_record: @transcript[:other])
-     
-      # self.class.enumarated_associations.each do |association|
-        
-      #   enumaration_association = association[:association]
-      #   enumeration_field = association[:enumeration_field]
-      #   cardinality = association[:cardinality]
-      #   enumeration = association[:enumeration]
+      differences[:base] = compare(base_record: @transcript[:source], compare_record: @transcript[:other])
 
-      #   differences[enumaration_association] = []
+      self.class.enumerated_associations.each do |association|
+        enumeration_association = association[:association]         
+        association_differences = []
 
-      #   source_records = @transcript[:source].send(enumaration_association)
-      #   other_records  = @transcript[:other].send(enumaration_association)
-
-      #   if cardinality == 'one'
-
-      #     enumeration.each do |value|
-      #       base_record = source_records.where(enumeration_field => value).first
-      #       compare_record  = other_records.where(enumeration_field => value).first
-      #     end
-      #   end
-
-
-      #   source_records = @transcript[:source].send(enumaration_association)
-
-
-      #   if @transcript[:other].send(association).present?
-      #     differences[association] = data_comparision(association)
-      #   end
-      # end
+        if association[:cardinality] == 'one'
+          association[:enumeration].each do |attr_val|
+            base_record = @transcript[:source].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+            compare_record  = @transcript[:other].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+            if base_record.present? || compare_record.present?
+              association_differences << {
+                attr_val => compare_association(source: base_record, other: compare_record)
+              }
+            end
+          end
+          differences[enumeration_association] = association_differences
+        end
+      end
 
       @transcript[:compare] = differences
     end
 
-
-    def key_comparision(assoc =nil)
+    def compare_association(source:, other:)
       differences     = HashWithIndifferentAccess.new
 
-      if assoc.present?
-        base_record = (@transcript[:source].send(assoc).is_a?(Array) ? @transcript[:source].send(assoc).first : @transcript[:source].send(assoc))
-        compare_record = (@transcript[:other].send(assoc).is_a?(Array) ? @transcript[:other].send(assoc).first : @transcript[:other].send(assoc)) 
-      else
-        base_record     = @transcript[:source]
-        compare_record  = @transcript[:other]
+      if source.blank?
+        differences[:add] = other
+      elsif other.blank?
+        differences[:remove] = source
+      elsif source.present? && other.present?
+        differences[:update] = compare(base_record: source, compare_record: other)
       end
-   
-      if base_record.present? && compare_record.present?
-        all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
-        all_keys.each do |k|
-          next if base_record[k].blank? && compare_record[k].blank?
 
-        
-          if base_record[k].blank?
-            differences[:add] ||= {}
-            differences[:add][k] = compare_record[k]
-          elsif compare_record[k].blank?
-            differences[:remove] ||= {}
-            differences[:remove][k] = base_record[k]
-          elsif base_record[k].is_a?(Array) && compare_record[k].is_a?(Array)
-            differences[:array] ||= {}
-            old_values = base_record[k] - compare_record[k]
-            new_values = compare_record[k] - base_record[k]
-            differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
-            differences[:array][k].blank? ? differences = {} : differences[:array]
-          else
-            if base_record[k] != compare_record[k]
-              differences[:update] ||= {}
-              differences[:update][k] = compare_record[k]
-            end
-          end
-        end
-      end
       differences
     end
 
-    def compare_records(base_record:, compare_record:) 
-      differences = HashWithIndifferentAccess.new
+    def compare(base_record:, compare_record:)
+      differences     = HashWithIndifferentAccess.new
 
       if base_record.present? && compare_record.present?
         all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
-
         all_keys.each do |k|
           next if base_record[k].blank? && compare_record[k].blank?
-
+     
           if base_record[k].blank?
             differences[:add] ||= {}
             differences[:add][k] = compare_record[k]

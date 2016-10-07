@@ -9,7 +9,7 @@ module Transcripts
 
     def initialize
       @transcript = transcript_template
-      @fields_to_ignore ||= ['_id', 'version', 'created_at', 'updated_at']
+      @fields_to_ignore ||= ['_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn']
     end
 
     def find_or_build(person)
@@ -43,7 +43,7 @@ module Transcripts
         ]
       end
 
-      def enumarated_associations
+      def enumerated_associations
         [
           {association: "addresses", enumeration_field: "kind", cardinality: "one", enumeration: ["home", "work", "mailing", "primary"]},
           {association: "addresses", enumeration_field: "kind", cardinality: "many", enumeration: ["branch"]},
