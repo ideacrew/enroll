@@ -334,7 +334,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice - UQHP',
         notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR8',
         notice_trigger_element_group: {
           market_places: ['individual'],
