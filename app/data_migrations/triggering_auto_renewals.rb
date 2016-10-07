@@ -7,7 +7,8 @@ class TriggeringAutoRenewals < MongoidMigrationTask
     count = 0
     Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => plan_year_start_on, :aasm_state => 'renewing_enrolling'}}, :'employer_profile.profile_source' => 'conversion' ).each do |org|
       org.employer_profile.census_employees.each do |ce|
-        enrollments = ce.try(:employee_role).try(:person).try(:primary_family).try(:active_household).try(:hbx_enrollments)
+        person = ce.employee_role.person if ce.employee_role.present?
+        enrollments = person.primary_family.active_household.hbx_enrollments if person.present? && person.primary_family.present? && person.primary_family.active_household.present?
         if enrollments.present? && enrollments.where(aasm_state: "renewing_waived").present?
           count = count+1
           enrollments.where(aasm_state: "renewing_waived").each do |enr|
