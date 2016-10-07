@@ -2,12 +2,12 @@ module Effective
   class MongoidDatatable
     protected
 
-    def array_tool
-      @array_tool ||= MongoidDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] })
+    def table_tool 
+      @table_tool ||= MongoidDatatableTool.new(self, table_columns.reject { |_, col| col[:array_column] })
     end
 
-    def array_collection?
-      true
+    def active_record_collection?
+      @active_record_collection? ||= true
     end
   end
 end
