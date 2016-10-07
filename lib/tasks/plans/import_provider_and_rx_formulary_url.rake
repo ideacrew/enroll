@@ -6,14 +6,15 @@
 
 namespace :import do
   task :provider_and_rx_formulary_url => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml/2017", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
     files.each do |file|
       year = file.split("/")[-2].to_i
       puts "*"*80
       puts "Importing provider and formulary url's from #{file}..."
       if file.present?
         result = Roo::Spreadsheet.open(file)
-        sheets = ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
+        sheets = ["IVL", "SHOP Q1", "Dental SHOP"]
+        sheets << "IVL Dental" if year > 2016
         sheets.each do |sheet_name|
           sheet_data = if year == 2017
             if sheet_name == "IVL"
