@@ -172,6 +172,12 @@ module Effective
       false
     end
 
+    def global_search_string
+      global_search_options = params[:search]
+      return nil if global_search_options.blank?
+      global_search_options[:value]
+    end
+
     protected
 
     def params

@@ -22,6 +22,11 @@ module Effective
         employers = Organization.all_employer_profiles
       end
 
+      def global_search?
+        true
+      end
+
+
     end
   end
 end

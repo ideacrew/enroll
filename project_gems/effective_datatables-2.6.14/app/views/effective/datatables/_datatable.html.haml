@@ -3,7 +3,7 @@
     id: "#{datatable.to_param}-table-#{Time.zone.now.nsec}",
     class: "#{datatable.table_html_class}",
     data: {
-      'searching' => datatable.global_search?,
+      'searching' => datatable.global_search?.to_s,
       'effective-form-inputs' => defined?(EffectiveFormInputs),
       'bulk-actions' => datatable_bulk_actions(datatable),
       'columns' => datatable_columns(datatable),

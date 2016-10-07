@@ -31,6 +31,9 @@ module Effective
     end
 
     def search(collection)
+      if !@datatable.global_search_string.blank?
+        collection = collection.datatable_search(@datatable.global_search_string)
+      end
       search_terms.each do |name, search_term|
         column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:column])
         collection = column_search
