@@ -90,7 +90,7 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
+  accepts_nested_attributes_for :consumer_role, :resident_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
@@ -804,9 +804,9 @@ class Person
     ::MapReduce::FamilySearchForPerson.populate_for(self)
   end
 
-  def resident_role
-      resident_role ||= ResidentRole.new
-  end
+  #def resident_role
+  #    resident_role ||= ResidentRole.new
+  #end
 
   private
   def is_ssn_composition_correct?
