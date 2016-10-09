@@ -45,8 +45,8 @@ module Transcripts
 
       def enumerated_associations
         [
-          {association: "addresses", enumeration_field: "kind", cardinality: "one", enumeration: ["home", "work", "mailing", "primary"]},
           {association: "addresses", enumeration_field: "kind", cardinality: "many", enumeration: ["branch"]},
+          {association: "addresses", enumeration_field: "kind", cardinality: "one", enumeration: ["home", "work", "mailing", "primary"]},
           {association: "person_relationships", enumeration_field: "kind", cardinality: "one", enumeration: ["self", "spouse", "life_partner"]},
           {association: "person_relationships", enumeration_field: "kind", cardinality: "many", enumeration: ["child", "adopted_child", "foster_child", "grandchild", "parent", "grandparent"]},
           {association: "phones", enumeration_field: "kind", cardinality: "one", enumeration: Phone::KINDS },
@@ -54,7 +54,6 @@ module Transcripts
         ]
       end
     end
-
 
     private
 

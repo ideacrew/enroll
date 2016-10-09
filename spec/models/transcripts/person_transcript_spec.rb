@@ -9,6 +9,8 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
 
   describe "instance methods" do
 
+
+
     let!(:source_record) {
       Person.create({ 
         "hbx_id"=>"117966",
@@ -25,15 +27,17 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
           "city"=>"Washington",
           "state"=>"DC",
           "zip"=>"20002"
-          }],
-          "phones"=>[{
-            "area_code"=>"202",
-            "kind"=>"mobile",
-            "full_phone_number"=>"2029867777",
-            "number"=>"9867777",
-            }],
-            "emails"=>[{"kind"=>"home", "address"=>"bruce@gmail.com"}]
-          })
+        }],
+        "phones"=>[{
+          "area_code"=>"202",
+          "kind"=>"mobile",
+          "full_phone_number"=>"2029867777",
+          "number"=>"9867777",
+        }],
+        "emails"=>[{
+          "kind"=>"home", "address"=>"bruce@gmail.com"
+        }]
+      })
     }
 
     let(:other_record) {
@@ -47,19 +51,28 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
         "no_dc_address"=>false,
         "addresses"=>[{
           "kind"=>"home",
-          "address_1"=>"3312 K St NE",
-          "city"=>"Washington",
-          "state"=>"DC",
-          "zip"=>"20008"
-          }],
+          "address_1"=>"3312 Gosnell Rd",
+          "city"=>"Vienna",
+          "state"=>"VA",
+          "zip"=>"22180"
+          },
+          {
+            "kind"=>"work",
+            "address_1"=>"609 L St NW",
+            "city"=>"Washington",
+            "state"=>"DC",
+            "zip"=>"20002"
+        }],
         "phones"=>[{
-            "area_code"=>"202",
-            "kind"=>"home",
-            "full_phone_number"=>"2029866677",
-            "number"=>"9866677",
+          "area_code"=>"202",
+          "kind"=>"home",
+          "full_phone_number"=>"2029866677",
+          "number"=>"9866677"
           }],
-          "emails"=>[{"kind"=>"home", "address"=>"bruce@gmail.com"}]
-        })
+        "emails"=>[{
+          "kind"=>"home", "address"=>"bruce@gmail.com"
+        }]
+      })
     }
 
     context "#compare" do
@@ -69,9 +82,11 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
         builder.find_or_build(other_record)
         person_transcript = builder.transcript
 
-        expect(person_transcript[:source]).to eq source_record
-        expect(person_transcript[:other]).to eq other_record
         expect(person_transcript[:compare][:base]['update']).to eq({'dob' => Date.new(1975, 6, 1)})
+        expect(person_transcript[:compare][:addresses][:update][:home]).to be_present
+        expect(person_transcript[:compare][:addresses][:add][:work]).to be_present
+        expect(person_transcript[:compare][:phones][:add][:home]).to be_present
+        expect(person_transcript[:compare][:phones][:remove][:mobile]).to be_present
       end
     end
   end

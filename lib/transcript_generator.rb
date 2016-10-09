@@ -1,6 +1,6 @@
 class TranscriptGenerator
 
-  attr_accessor :cv_path, :transcripts_path
+  attr_accessor :cv_path, :transcripts_path, :identifier
 
   def execute
     create_directory(@transcripts_path)
@@ -13,9 +13,7 @@ class TranscriptGenerator
       rescue Exception  => e
         puts "failed to process #{file_path}" 
       end
-    end
- 
-    build_transcript(external_obj)
+    end 
   end
 
   def parse_xml(xml_doc)
@@ -26,7 +24,7 @@ class TranscriptGenerator
     person_transcript = PersonTranscript.new
     person_transcript.find_or_build(external_obj)
 
-    File.open("#{@transcripts_path}/#{Time.now.to_i}_#{external_obj.hbx_id}.json", 'w') do |file|
+    File.open("#{@transcripts_path}/#{Time.now.to_i}_#{external_obj.send(@identifier)}.json", 'w') do |file|
       file.write person_transcript.transcript.to_json
     end
   end

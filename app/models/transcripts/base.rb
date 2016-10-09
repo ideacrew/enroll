@@ -36,38 +36,38 @@ module Transcripts
       differences[:base] = compare(base_record: @transcript[:source], compare_record: @transcript[:other])
 
       self.class.enumerated_associations.each do |association|
-        enumeration_association = association[:association]         
-        association_differences = []
-
-        if association[:cardinality] == 'one'
-          association[:enumeration].each do |attr_val|
-            base_record = @transcript[:source].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
-            compare_record  = @transcript[:other].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
-            if base_record.present? || compare_record.present?
-              association_differences << {
-                attr_val => compare_association(source: base_record, other: compare_record)
-              }
-            end
-          end
-          differences[enumeration_association] = association_differences
-        end
+        differences[association[:association]] = compare_association(association)
       end
 
       @transcript[:compare] = differences
-
-      @transcript[:source] = @transcript[:source].serializable_hash
-      @transcript[:other] = @transcript[:other].serializable_hash
+      @transcript[:source]  = @transcript[:source].serializable_hash
+      @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
-    def compare_association(source:, other:)
+    def compare_association(association)
       differences     = HashWithIndifferentAccess.new
 
-      if source.blank?
-        differences[:add] = other.serializable_hash
-      elsif other.blank?
-        differences[:remove] = source.serializable_hash
-      elsif source.present? && other.present?
-        differences[:update] = compare(base_record: source, compare_record: other)
+      enumeration_association = association[:association]         
+      association_differences = []
+
+      if association[:cardinality] == 'one'
+        association[:enumeration].each do |attr_val|
+          source = @transcript[:source].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+          other  = @transcript[:other].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+
+          next if source.blank? && other.blank?
+
+          if source.blank?
+            differences[:add] ||= {}
+            differences[:add][attr_val] = other.serializable_hash
+          elsif other.blank?
+            differences[:remove] ||= {}
+            differences[:remove][attr_val] = source.serializable_hash
+          elsif source.present? && other.present?
+            differences[:update] ||= {}
+            differences[:update][attr_val] = compare(base_record: source, compare_record: other)
+          end
+        end
       end
 
       differences
