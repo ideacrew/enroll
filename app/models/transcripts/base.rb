@@ -54,15 +54,18 @@ module Transcripts
       end
 
       @transcript[:compare] = differences
+
+      @transcript[:source] = @transcript[:source].serializable_hash
+      @transcript[:other] = @transcript[:other].serializable_hash
     end
 
     def compare_association(source:, other:)
       differences     = HashWithIndifferentAccess.new
 
       if source.blank?
-        differences[:add] = other
+        differences[:add] = other.serializable_hash
       elsif other.blank?
-        differences[:remove] = source
+        differences[:remove] = source.serializable_hash
       elsif source.present? && other.present?
         differences[:update] = compare(base_record: source, compare_record: other)
       end
