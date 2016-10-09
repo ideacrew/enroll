@@ -8,6 +8,15 @@ GIT
       bunny (~> 1.7.0)
 
 GIT
+  remote: https://github.com/dchbx/openhbx_cv2.git
+  revision: c8c8cd675366911018db8f6be98830c50a281162
+  branch: master
+  specs:
+    openhbx_cv2 (0.0.1)
+      activesupport (>= 3.2)
+      nokogiri-happymapper (~> 0.5)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -575,6 +584,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  openhbx_cv2!
   parallel_tests
   poltergeist
   prawn!
