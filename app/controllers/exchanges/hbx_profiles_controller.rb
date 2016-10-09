@@ -45,7 +45,6 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def generate_invoice
 
-    
     @organizations= Organization.where(:id.in => params[:employerId]).all
     @organizations.each do |org|
       @employer_invoice = EmployerInvoice.new(org)
@@ -175,7 +174,7 @@ def employer_poc
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-    @datatable = Effective::Datatables::ArrayBacked.new
+    @datatable = Effective::Datatables::ArrayBacked.new(params[:scopes])
     render '/exchanges/hbx_profiles/employer_poc'
  #   respond_to do |format|
   #    format.html
