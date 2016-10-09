@@ -162,22 +162,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
-      context "when open enrollment end date is greater than allowed date" do
-        before do
-          plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 2.days
-        end
-
-        it "should fail validation" do
-          expect(plan_year.valid?).to be_falsey
-          expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
-          expect(plan_year.errors[:open_enrollment_end_on]).to include("open enrollment must end on or before the #{Settings.aca.shop_market.open_enrollment.monthly_end_on.ordinalize} day of the month prior to effective date")
-        end
-      end
-
       context "and the open enrollment period is too long" do
-        let(:invalid_length)  { Settings.aca.shop_market.open_enrollment.maximum_length.months + 1.day }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
-        let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
+        let(:open_enrollment_end_on)    { open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.maximum_length.months.months + 1.day }
 
         before do
           plan_year.open_enrollment_start_on = open_enrollment_start_on
@@ -328,10 +315,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             plan_year.open_enrollment_end_on = open_enrollment_end_on
           end
 
-          it "should fail validation" do
-            expect(plan_year.valid?).to be_falsey
-            expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
-            expect(plan_year.errors[:open_enrollment_end_on].first).to match(/open enrollment must end on or before/)
+          it "should fail validation on publish" do
+            expect(plan_year.enrollment_period_errors.present?).to be_truthy
+            expect(plan_year.enrollment_period_errors.last).to match(/open enrollment must end on or before/)
           end
         end
       end
