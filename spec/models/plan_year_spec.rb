@@ -2325,3 +2325,106 @@ describe PlanYear, "which has the concept of export eligibility" do
     end
   end
 end
+
+#11021 
+describe PlanYear, "plan year schedule changes" do
+
+  context "initial employer plan year" do 
+
+    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+    let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+
+    let(:valid_plan_year_start_on)        { Date.new(2016, 11, 1) }  
+    let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+    let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+    let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 10.days }
+
+    let(:plan_year) do
+      py = PlanYear.new({
+        employer_profile: employer_profile,
+        start_on: valid_plan_year_start_on,
+        end_on: valid_plan_year_end_on,
+        open_enrollment_start_on: valid_open_enrollment_start_on,
+        open_enrollment_end_on: valid_open_enrollment_end_on
+        })
+
+      py.aasm_state = "active"
+      py.benefit_groups = [benefit_group]
+      py.save
+      py
+    end
+
+    it "should be valid" do
+      expect(plan_year.valid?).to be_truthy
+    end
+  end
+
+  context "renewing employer plan year" do 
+
+    let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+
+    let(:plan_year_start_on) { Date.new(2016, 11, 1) }
+    let(:plan_year_end_on) { plan_year_start_on + 1.year - 1.day }
+    let(:open_enrollment_start_on)  { plan_year_start_on.prev_month }
+    let(:open_enrollment_end_on)    { open_enrollment_start_on + 12.days }
+
+    let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'renewing_draft'
+                                                    )
+
+                                                    py.benefit_groups = [FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+    let!(:plan_year)                              { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on - 1.year,
+                                                      end_on: plan_year_end_on - 1.year,
+                                                      open_enrollment_start_on: open_enrollment_start_on - 1.year,
+                                                      open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'active'
+                                                    )
+
+                                                    py.benefit_groups = [FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+    context 'before publish due date' do 
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.publish_due_day_of_month))
+      end
+
+      it 'should be publishable' do
+        expect(renewing_plan_year.renewing_draft?).to be_truthy
+        expect(renewing_plan_year.may_publish?).to be_truthy
+        renewing_plan_year.publish!
+        renewing_plan_year.reload
+        expect(renewing_plan_year.renewing_enrolling?).to be_truthy
+      end
+    end
+
+    context 'on force publish date' do 
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
+      end
+
+      it 'should be force publishable' do 
+        expect(renewing_plan_year.renewing_draft?).to be_truthy
+        expect(renewing_plan_year.may_force_publish?).to be_truthy
+        renewing_plan_year.force_publish!
+        renewing_plan_year.reload
+        expect(renewing_plan_year.renewing_enrolling?).to be_truthy
+        expect(renewing_plan_year.valid?).to be_truthy
+      end
+    end
+  end
+end
