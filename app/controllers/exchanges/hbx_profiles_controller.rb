@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include DataTablesAdapter
   include SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
