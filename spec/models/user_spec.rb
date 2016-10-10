@@ -298,6 +298,10 @@ describe "orphans" do
     let(:person) { create :person }
     let(:user) { create :user, person: person }
 
+    before do
+      User.destroy_all
+    end
+
     context "when users have person associated" do
       it "should return no orphans" do
         user.save!
