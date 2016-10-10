@@ -17,6 +17,9 @@ class TranscriptGenerator
   end
 
   def parse_xml(xml_doc)
+    individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new
+    individual_parser.parse(xml_doc)
+    individual_parser.get_person_object
     # Call xml builder
   end
 

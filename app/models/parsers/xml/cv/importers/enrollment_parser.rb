@@ -45,6 +45,7 @@ module Parsers::Xml::Cv::Importers
 
       people.map do |person|
         nil if person.valid?
+        bubble_address_errors_by_person(person)
         person.errors.full_messages
       end
     end
@@ -57,6 +58,19 @@ module Parsers::Xml::Cv::Importers
       }
 
       response
+    end
+
+    private
+    def bubble_address_errors_by_person(person)
+      addresses = person.addresses.select {|a| !a.valid?}
+      if person.errors.has_key?(:addresses) && addresses.present?
+        addresses.each do |address|
+          address.errors.each do |k, v|
+            person.errors.add("#{address.kind} address: #{k}", v)
+          end
+        end
+        person.errors.delete(:addresses)
+      end
     end
   end
 end
