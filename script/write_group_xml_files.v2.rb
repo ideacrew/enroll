@@ -10,6 +10,45 @@ plan_year = { "start_date":"20160701", "end_date":"20170630" }
 
 XML_NS = "http://openhbx.org/api/terms/1.0"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def write(payload, file_name)
   File.open(File.join("employer_xmls.v2", "#{file_name}.xml"), 'w') do |f|
     f.puts payload
