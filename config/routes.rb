@@ -30,6 +30,7 @@ Rails.application.routes.draw do
 
       collection do
         get :family_index
+        post :families_index_datatable
         get :employer_index
         get :employer_invoice
         post :employer_invoice_datatable
@@ -48,7 +49,7 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        post :verifications_index_datatable
+        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -57,6 +58,7 @@ Rails.application.routes.draw do
         get :update_effective_date
         get :calculate_sep_dates
         get :add_sep_form
+        get :hide_form
         get :show_sep_history
       end
 
