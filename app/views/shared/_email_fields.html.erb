@@ -3,7 +3,7 @@
   <div class="col-md-6 col-sm-6 no-pd">
     <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if kind.eql?('HOME') %>">
 
-      <%= f.hidden_field :kind %>
+      <%= f.email_field :kind %>
       <%= f.email_field :address, placeholder: "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
     </div>
   </div>
