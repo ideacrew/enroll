@@ -1033,7 +1033,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
+    it 'should not have renewal benefit group assignment' do
+      expect(census_employee.benefit_group_assignments.size).to eq 2
+      expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
+      expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
+      expect(census_employee.renewal_benefit_group_assignment).to eq nil
+    end
+
     it 'should have benefit group assignments assigned with both active and renewal plan year' do
+      census_employee.benefit_group_assignments.where(benefit_group_id: renewal_benefit_group.id).first.update_attribute(:aasm_state, "coverage_renewing")
       expect(census_employee.benefit_group_assignments.size).to eq 2
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
@@ -1344,7 +1352,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       BenefitGroupAssignment.create({
         census_employee: census_employee,
         benefit_group: renewing_plan_year.benefit_groups.first,
-        start_on: plan_year_start_on
+        start_on: plan_year_start_on,
+        aasm_state: "coverage_renewing"
       })
     }
 

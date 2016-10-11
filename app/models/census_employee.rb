@@ -284,7 +284,7 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? && assignment.aasm_state == "coverage_renewing"}
   end
 
   def inactive_benefit_group_assignments
