@@ -1,16 +1,12 @@
 require 'rails_helper'
 
 describe Parsers::Xml::Cv::Importers::IndividualParser do
+  let(:subject) { Parsers::Xml::Cv::Importers::IndividualParser.new(xml) }
 
   context "valid verified_family" do
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
-    let(:subject) { Parsers::Xml::Cv::Importers::IndividualParser.new }
 
     context "get_person_object" do
-      before do
-        subject.parse(xml)
-      end
-
       it 'should return the person as an object' do
         expect(subject.get_person_object.class).to eq Person
       end
@@ -30,9 +26,7 @@ describe Parsers::Xml::Cv::Importers::IndividualParser do
     end
 
     context "get_errors_for_person_object" do
-      before do
-        subject.parse(xml)
-      end
+      let(:xml) { File.read(Rails.root.join("spec", "test_data", "individual_person_payloads", "Invalidindividual.xml")) }
 
       it "should return an array" do
         expect(subject.get_errors_for_person_object.class).to eq Array

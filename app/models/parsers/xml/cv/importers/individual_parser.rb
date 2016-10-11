@@ -1,17 +1,13 @@
 module Parsers::Xml::Cv::Importers
   class IndividualParser
-    include HappyMapper
-    include ::Openhbx::Cv2::Namespace
+    attr_reader :person, :person_demographics, :id, :individual
 
-    register_namespace "cv", NS_URI
-    tag 'individual'
-    namespace 'cv'
-
-    element :id, String, tag: "id/cv:id"
-    has_one :person, ::Openhbx::Cv2::Person, tag: "person"
-    has_one :person_demographics, ::Openhbx::Cv2::PersonDemographics, tag: "person_demographics"
-
-    #element :individual, Openhbx::Cv2::Individual
+    def initialize(input_xml)
+      @individual = Openhbx::Cv2::Individual.parse(input_xml, single: true)
+      @id = individual.id
+      @person = individual.person
+      @person_demographics = individual.person_demographics
+    end
 
     def get_person_object
       nil if person.nil? || person_demographics
