@@ -1,21 +1,37 @@
 module Parsers::Xml::Cv::Importers
   class IndividualParser
     include HappyMapper
-    tag "individuals"
+    include ::Openhbx::Cv2::Namespace
 
-    element :individual, Openhbx::Cv2::Individual
+    register_namespace "cv", NS_URI
+    tag 'individual'
+    namespace 'cv'
+
+    element :id, String, tag: "id/cv:id"
+    has_one :person, ::Openhbx::Cv2::Person, tag: "person"
+    has_one :person_demographics, ::Openhbx::Cv2::PersonDemographics, tag: "person_demographics"
+
+    #element :individual, Openhbx::Cv2::Individual
 
     def get_person_object
-      person = individual.person rescue nil
-      nil if person.nil?
+      nil if person.nil? || person_demographics
+
+      gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
+      hbx_id = person.id.match(/hbx_id#(.*)/)[1] rescue ''
 
       person_object = Person.new(
-        id: person.id.match(/people\/(.*)/)[1],
+        hbx_id: hbx_id,
         first_name: person.first_name,
         middle_name: person.middle_name,
         last_name: person.last_name,
         name_pfx: person.name_prefix,
         name_sfx: person.name_suffix,
+        ssn: person_demographics.ssn,
+        dob: person_demographics.birth_date.to_date,
+        gender: gender,
+        ethnicity: [person_demographics.ethnicity],
+        language_code: person_demographics.language_code,
+        race: person_demographics.race,
       )
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'

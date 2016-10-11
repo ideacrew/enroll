@@ -19,7 +19,13 @@ describe Parsers::Xml::Cv::Importers::IndividualParser do
         person = subject.get_person_object
         expect(person.first_name).to eq "Michael"
         expect(person.middle_name).to eq "J"
-        expect(person.last_name).to eq "Hutchins"
+        expect(person.last_name).to eq "Green"
+      end
+
+      it "should get ssn and hbx_id" do
+        person = subject.get_person_object
+        expect(person.ssn).to eq "777669999"
+        expect(person.hbx_id).to eq "10000123"
       end
     end
 
