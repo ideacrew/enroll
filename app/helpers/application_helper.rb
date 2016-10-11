@@ -373,6 +373,7 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
+    return "" if !plan.carrier_profile.extract_value.present?
     hios_id = plan.hios_id[0..6].extract_value
     carrier_name = case hios_id
     when "75753DC"
