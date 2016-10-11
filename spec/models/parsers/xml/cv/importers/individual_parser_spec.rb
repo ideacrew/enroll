@@ -30,6 +30,7 @@ describe Parsers::Xml::Cv::Importers::IndividualParser do
     end
 
     context "get_errors_for_person_object" do
+      let(:xml) { File.read(Rails.root.join("spec", "test_data", "individual_person_payloads", "Invalidindividual.xml")) }
       before do
         subject.parse(xml)
       end

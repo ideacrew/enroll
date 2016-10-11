@@ -40,6 +40,7 @@ module Parsers::Xml::Cv::Importers
           address_2: address.address_line_2,
           city: address.location_city_name,
           location_state_code: address.location_state_code,
+          state: address.location_state_code,
           zip: address.postal_code,
           kind: kind,
         )
