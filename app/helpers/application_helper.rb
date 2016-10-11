@@ -372,11 +372,28 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier_name, options = {:width => 50})
+  def display_carrier_logo(plan, options = {:width => 50})
+    carrier_name = plan.carrier_profile.legal_name.extract_value
     if carrier_name.present?
-      carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
-      image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+      if carrier_name == "United Health Care"
+        map_uhc_logo(plan, options)
+      else
+        image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+      end
     end
+  end
+
+  def map_uhc_logo(plan, options)
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    end
+    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def dob_in_words(age, dob)
