@@ -35,22 +35,41 @@ module Parsers::Xml::Cv::Importers
       )
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
-        addr_object = Address.new(
+        person_object.addresses.build({
           address_1: address.address_line_1,
           address_2: address.address_line_2,
           city: address.location_city_name,
-          location_state_code: address.location_state_code,
+          state: address.location_state_code,
           zip: address.postal_code,
           kind: kind,
-        )
-        person_object.addresses << addr_object
+        })
+      end
+      person.phones.each do |phone|
+        phone_type = phone.type
+        phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
+        if ["home", "work", "mailing"].include?(phone_type_for_enroll)
+          person_object.phones.build({
+            kind: phone_type_for_enroll,
+            full_phone_number: phone.full_phone_number
+          })
+        end
+      end
+      person.emails.each do |email|
+        email_type = email.type
+        email_type_for_enroll = email_type.blank? ? nil : email_type.strip.split("#").last
+        if ["home", "work"].include?(email_type_for_enroll)
+          person_object.emails.build({
+            :kind => email_type_for_enroll,
+            :address => email.email_address
+          })
+        end 
       end
       person_object
     end
 
     def get_errors_for_person_object
       person = get_person_object
-      return nil if person.blank? || person.valid?
+      return [] if person.blank?
       person.errors.full_messages
     end
 
