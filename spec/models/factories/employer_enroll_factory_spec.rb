@@ -91,6 +91,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
       owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
       2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce| 
+        ce.benefit_group_assignments.where(benefit_group_id: renewing_benefit_group.id).first.update_attribute(:aasm_state, "coverage_renewing")
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
@@ -192,6 +193,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
         2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
         employer_profile.census_employees.each do |ce|
+          ce.benefit_group_assignments.where(benefit_group_id: renewing_benefit_group.id).first.update_attribute(:aasm_state, "coverage_renewing")
           person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
           employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
           ce.update_attributes({:employee_role =>  employee_role })
