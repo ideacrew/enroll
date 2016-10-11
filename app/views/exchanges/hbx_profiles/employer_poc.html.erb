@@ -3,3 +3,10 @@
 <h1>Listing Exchanges Hbx Profiles</h1>
 
 <%= render_datatable(@datatable) %>
+
+<script>
+  function extendDatatableServerParams() {
+    console.log("Extending Datatable HTPP params")
+    return {"attributes": {'param1':"some data","param2":"some data1", "other_param" : $('h1').html()}};
+  }
+</script>
