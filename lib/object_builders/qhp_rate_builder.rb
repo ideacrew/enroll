@@ -30,7 +30,8 @@ class QhpRateBuilder
   def calculate_and_build_metlife_premium_tables
     (20..65).each do |metlife_age|
       @metlife_age = metlife_age
-      @results[@rate[:plan_id]] << {
+      key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      @results[key] << {
         age: metlife_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
