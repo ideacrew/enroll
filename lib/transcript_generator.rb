@@ -1,34 +1,70 @@
 class TranscriptGenerator
 
-  attr_accessor :cv_path, :transcripts_path, :identifier
+  attr_accessor :cv_path, :identifier
 
-  def execute
-    create_directory(@transcripts_path)
+  TRANSCRIPT_PATH = "#{Rails.root}/transcript_files/"
 
-    Dir.glob("#{@cv_path}/*.xml").each do |file_path|
-      begin
-        xml_doc = Nokogiri::XML(File.open(file_path))
-        external_obj = parse_xml(xml_doc)
-        build_transcript(external_obj)
-      rescue Exception  => e
-        puts "failed to process #{file_path}" 
-      end
-    end 
+  def initialize
+    @identifier = 'hbx_id'
+    my_logger
   end
 
-  def parse_xml(xml_doc)
-    individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new
-    individual_parser.parse(xml_doc)
-    individual_parser.get_person_object
-    # Call xml builder
+  def my_logger
+    @my_logger ||= Logger.new("#{Rails.root}/log/my.log")
+  end
+
+  def execute
+    create_directory(TRANSCRIPT_PATH)
+
+    Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
+      begin
+        # xml_doc = Nokogiri::XML(File.read(file_path))
+
+        individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
+        build_transcript(individual_parser.get_person_object)
+      rescue Exception  => e
+        my_logger.info("failed to process #{file_path}")
+      end
+    end
   end
 
   def build_transcript(external_obj)
-    person_transcript = PersonTranscript.new
+    person_transcript = Transcripts::PersonTranscript.new
     person_transcript.find_or_build(external_obj)
 
-    File.open("#{@transcripts_path}/#{Time.now.to_i}_#{external_obj.send(@identifier)}.json", 'w') do |file|
-      file.write person_transcript.transcript.to_json
+    File.open("#{TRANSCRIPT_PATH}/#{external_obj.send(@identifier)}_#{Time.now.to_i}.bin", 'wb') do |file|
+      file.write Marshal.dump(person_transcript.transcript)
+    end
+  end
+
+  def display_transcripts
+    count  = 0
+
+    CSV.open('person_change_sets.csv', "w") do |csv|
+      csv << ['HBX ID', 'SSN', 'Last Name', 'First Name', 'Action', 'Section:Attribute', 'Value']
+
+      Dir.glob("#{Rails.root}/transcript_files/*.bin").each do |file_path|
+        begin
+          count += 1
+          rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).csv_row
+          next unless rows.present?
+
+          first_row = rows[0]
+          rows.reject!{|row| row[4] == 'update' && row[6].blank?}
+
+          if rows.empty?
+            csv << (first_row[0..3] + ['match', 'match:ssn'])
+          else
+            rows.each{|row| csv << row}
+          end
+
+          if count % 100 == 0
+            puts "processed #{count}"
+          end
+        rescue Exception => e
+          puts "Failed.....#{file_path}"
+        end
+      end
     end
   end
 

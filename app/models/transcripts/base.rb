@@ -28,9 +28,14 @@ module Transcripts
 
     def compare_instance
       return if @transcript[:other].blank?
-      return if @transcript[:source_is_new]
-
       differences    = HashWithIndifferentAccess.new
+
+      if @transcript[:source_is_new]
+        differences[:new] = {:new => {:ssn => @transcript[:other].ssn}}
+        @transcript[:compare] = differences
+        return
+      end
+
       base_record    = @transcript[:source]
 
       differences[:base] = compare(base_record: @transcript[:source], compare_record: @transcript[:other])
@@ -40,8 +45,6 @@ module Transcripts
       end
 
       @transcript[:compare] = differences
-      @transcript[:source]  = @transcript[:source].serializable_hash
-      @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
     def compare_association(association)
@@ -101,15 +104,30 @@ module Transcripts
           end
         end
       end
+
+      if base_record.attribute_names.include?('encrypted_ssn')
+        if base_record.ssn.present?
+          if compare_record.ssn.blank?
+            differences[:remove] ||= {}
+            differences[:remove][:ssn] = base_record.ssn
+          elsif base_record.ssn != compare_record.ssn
+            differences[:update] ||= {}
+            differences[:update][:ssn] = compare_record.ssn
+          end
+        else
+          differences[:add] ||= {}
+          differences[:add][:ssn] = compare_record.ssn if compare_record.ssn.present?
+        end
+      end
+
       differences
     end
 
     def validate_instance
-      return
-      @transcript[:source].is_valid?
-      @transcript[:other].is_valid?
+      @transcript[:source].valid?
+      @transcript[:other].valid?
       @transcript[:source_errors] = @transcript[:source].errors
-      @transcript[:other_errors] = @transcript[:other].errors
+      @transcript[:other_errors]  = @transcript[:other].errors
     end
 
     # Return model instance using the transcript hash table values

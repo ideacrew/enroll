@@ -3,7 +3,7 @@ module Transcripts
     attr_reader :person, :changeset
 
     EVENT_NAMESPACE_PREFIX  = ""
-    CHANGE_ACTION_KINDS     = %w(add remove update)
+    CHANGE_ACTION_KINDS     = %w(add remove update new)
 
     CHANGE_EVENT_KINDS      = %w(identifier name demographic address communication)
 
@@ -26,8 +26,8 @@ module Transcripts
     PHONES_PATH   = [:phones]
 
     def initialize(person = HashWithIndifferentAccess.new)
-      # @person = person
-      @person = Payload.new().person
+      @person = person
+      # @person = Payload.new().person
       @changeset = @person[:compare]
     end
 
@@ -69,12 +69,31 @@ module Transcripts
     def address_change
     end
 
+    def changeset_value_at(path = [])
+      changeset_content_at(path).values if changeset_content_at(path).present?
+    end
+
     def csv_row
       changeset_sections.reduce([]) do |section_rows, section|
         actions = changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
-          attribute = changeset_section_actions [section, action]
-          rows << [action, "#{section}:#{attribute.first}"]
+          attributes = changeset_content_at [section, action]
+          if @person[:source_is_new]
+            person_details = [@person[:other]['hbx_id'], Person.decrypt_ssn(@person[:other]['encrypted_ssn']), @person[:other]['last_name'], @person[:other]['first_name']]
+          else
+            person_details = [@person[:source]['hbx_id'], Person.decrypt_ssn(@person[:source]['encrypted_ssn']), @person[:source]['last_name'], @person[:source]['first_name']]
+          end
+
+          fields_to_ignore = ['_id', 'updated_by']
+          rows += attributes.collect do |attribute, value|
+
+            if value.is_a?(Hash)
+              fields_to_ignore.each{|key| value.delete(key) }
+              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+            end
+
+            (person_details + [action, "#{section}:#{attribute}", value])
+          end
         end
       end
     end

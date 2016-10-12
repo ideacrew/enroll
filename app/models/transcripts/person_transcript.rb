@@ -9,7 +9,7 @@ module Transcripts
 
     def initialize
       @transcript = transcript_template
-      @fields_to_ignore ||= ['_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn']
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 'updated_by', 'no_ssn']
     end
 
     def find_or_build(person)
@@ -31,6 +31,9 @@ module Transcripts
 
       compare_instance
       validate_instance
+
+      @transcript[:source]  = @transcript[:source].serializable_hash
+      @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
     class << self
