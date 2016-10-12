@@ -123,8 +123,6 @@ module Employers::EmployerHelper
     end
   end
 
-
-
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
