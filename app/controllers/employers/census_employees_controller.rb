@@ -208,7 +208,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
+    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?

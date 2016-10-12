@@ -232,6 +232,44 @@ RSpec.describe Employers::CensusEmployeesController do
       get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(response).to render_template("show")
     end
+
+    context "for past enrollments" do
+      let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
+      let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
+      let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+      let(:person) { FactoryGirl.create(:person, :with_family)}
+      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first)}
+      let!(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first)}
+
+      it "should not have any past enrollments" do
+        hbx_enrollment.update_attribute(:aasm_state, "coverage_canceled")
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect(assigns(:past_enrollments)).to eq []
+      end
+
+      it "should have a past non canceled enrollment" do
+        hbx_enrollment.update_attribute(:aasm_state, "coverage_terminated")
+        hbx_enrollment_two.update_attribute(:aasm_state, "coverage_canceled")
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect(assigns(:past_enrollments)).to eq [hbx_enrollment]
+      end
+
+      it "should consider all the enrollments with terminated statuses" do
+        hbx_enrollment.update_attribute(:aasm_state, "coverage_terminated")
+        hbx_enrollment_two.update_attribute(:aasm_state, "unverified")
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect((assigns(:past_enrollments)).size).to eq 2
+      end
+    end
   end
 
   describe "GET delink" do
