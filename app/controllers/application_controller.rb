@@ -192,6 +192,10 @@ class ApplicationController < ActionController::Base
     def set_current_user
       User.current_user = current_user
       SAVEUSER[:current_user_id] = current_user.try(:id)
+      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
+      unless SessionIdHistory.where(session_id: session_id).present?
+        SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id))
+      end
     end
 
     def clear_current_user
