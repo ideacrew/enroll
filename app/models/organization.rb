@@ -131,6 +131,8 @@ class Organization
       })
   }
   scope :datatable_search, ->(query) { where(legal_name: Regexp.new(Regexp.escape(query), true)) }
+  scope :datatable_search_fein, ->(query) { where(fein: Regexp.new(Regexp.escape(query), true)) }
+  scope :datatable_search_employer_profile_source, ->(query) { where("employer_profile.profile_source" => query) }
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?

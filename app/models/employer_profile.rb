@@ -234,7 +234,8 @@ class EmployerProfile
   end
 
   def latest_plan_year
-    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+    return @latest_plan_year if defined? @latest_plan_year
+    @latest_plan_year = plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def draft_plan_year
