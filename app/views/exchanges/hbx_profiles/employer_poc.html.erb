@@ -1,5 +1,17 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Listing Exchanges Hbx Profiles</h1>
-
 <%= render_datatable(@datatable) %>
+
+<script>
+  function extendDatatableServerParams() {
+    console.log("Extending Datatable HTPP params")
+    return {"attributes": {'param1':"some data","param2":"some data1", "other_param" : $('h1').html()}};
+  }
+  $( document ).ready(function() {   
+    //if ($('.dataTables_length label').children().length > 0) {
+      //var newHtml = $('.dataTables_length label').children();
+      //$('.dataTables_length').html(newHtml);
+      //$('.dataTables_length').append('<div id="per_page">per page</div>');
+    //}
+  });
+</script>
