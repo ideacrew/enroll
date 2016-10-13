@@ -10,12 +10,12 @@ class TerminateCensusEmployee < MongoidMigrationTask
     if censusemployee.present?
       censusemployee.each do |employee|
         employee.terminate_employee_role! if employee.may_terminate_employee_role?
-        puts "updated census employee #{employee.full_name} employment_terminated_on:#{employee.employment_terminated_on} termination status:#{employee.aasm_state}"
+        puts "updated census employee #{employee.full_name} employment_terminated_on:#{employee.employment_terminated_on} termination status:#{employee.aasm_state}" unless Rails.env == 'test'
         count += 1
       end
     else
-      puts "No census employees found"
+      puts "No census employees found" unless Rails.env == 'test'
     end
-    puts "total census employees updated #{count}"
+    puts "total census employees updated #{count}" unless Rails.env == 'test'
   end
 end
