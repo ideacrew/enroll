@@ -23,7 +23,7 @@
   </ul>
 </div>
 
-<div class="collapse" id="AddSEP_<%=family.id%>"> <!--Render the AddSEP partial in this div and pass the ID. -->
+<!-- <div class="collapse" id="AddSEP_<%=family.id%>">
   <div class="well">
      <h1> ADD A SEP for family ID : <%=family.id%> : <%=family.primary_applicant.person.full_name%> </h1>
   </div>
@@ -34,4 +34,35 @@
   <div class="well">
     VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY
   </div>
-</div>
+</div> -->
+
+<script>
+  /* Formatting function for row details - modify as you need */
+  function format ( family ) {
+      // `d` is the original data object for the row
+      return 
+          '<tr>'+
+              '<td colspan = "10">Full name:</td>' +
+          '</tr>';
+  }
+   
+  $(document).ready(function() {
+      // Add event listener for opening and closing details
+      var t = $('.effective-datatable').DataTable();
+      $('body').on('click', '.btn-info', function () {
+        var tr = $(this).closest('TR');
+        window.pranab = tr;
+        alert(tr.toString());
+        table = document.getElementsByClassName('effective-datatable')[0];
+        detail_row  = table.insertRow(tr.index()+1);
+        td_0 = detail_row.insertCell(0);
+        console.log(tr.index())
+        td_0.innerHTML = tr.index()
+        td_1 = detail_row.insertCell(1);
+        td_1.setAttribute('colspan', 10);
+        td_1.innerHTML = '<h1> Here is a widely known Headline </h1>';
+  
+      } );
+  } );
+</script>
+

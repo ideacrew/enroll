@@ -15,7 +15,7 @@ module Queries
 
     def build_scope()
       return Family if @search_string.blank?
-      person_id = Person.search(@search_string).pluck(:_id)
+      person_id = Person.search(@search_string).limit(5000).pluck(:_id)
       family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
       family_scope.order_by(@order_by)
