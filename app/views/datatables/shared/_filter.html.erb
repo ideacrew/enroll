@@ -10,28 +10,28 @@
          line[2] is Link Type (ajax, static or disabled) -->
     <%case line[2]%>
     <%when "disabled"%>
-      <li ><%= link_to line[0], line[1]%></li>
+      <li ><%= link_to line[0], line[1], class: "btn btn-info", disabled: true%></li>
     <%when "static"%>
-      <li><%= link_to line[0], line[1] %></li>
+      <li><%= link_to line[0], line[1], class: "btn btn-info" %></li>
     <%when "ajax"%>  
       <li>
         <%#= link_to line[0], line[1], remote: true%>
-        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#<%=line[0].delete(' ')%>_<%=row.id%>" aria-expanded="false" aria-controls="collapseExample"><%=line[0]%></a>
+        <a class="btn btn-info" role="button" data-toggle="collapse" href="#<%=line[0].delete(' ')%>_<%=family.id%>" aria-expanded="false" aria-controls="collapseExample"><%=line[0]%></a>
       </li>
     <%end%>
   <% end %>
   </ul>
 </div>
 
-<div class="collapse" id="AddSEP_<%=row.id%>"> <!--row.id refers to family ID; Render the AddSEP partial in this div and pass the ID. -->
+<div class="collapse" id="AddSEP_<%=family.id%>"> <!--Render the AddSEP partial in this div and pass the ID. -->
   <div class="well">
-     ADD A SEP 
+     <h1> ADD A SEP for family ID : <%=family.id%> : <%=family.primary_applicant.person.full_name%> </h1>
   </div>
 </div>
 
 
-<div class="collapse" id="ViewSEPHistory_<%=row.id%>">
+<div class="collapse" id="ViewSEPHistory_<%=family.id%>">
   <div class="well">
-    VIEW SEP HISTORY
+    VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY VIEW SEP HISTORY
   </div>
 </div>
