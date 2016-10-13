@@ -33,7 +33,7 @@
               <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
               <br>
               <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
-                <%= link_to "Add Member", new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+                <%= link_to "Add Member", new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
                   &nbsp; &nbsp;
                 <a class="text-center btn btn-success">Continue</a>
               </div>
@@ -45,15 +45,14 @@
         <div class="row no-buffer">
           <ul class="" id="dependent_ul">
             <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-              <%= render "dependent", dependent: dependent, person: @person %>
+              <%= render "resident_dependent", dependent: dependent, person: @person %>
             <% end %>
           </ul>
         </div>
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
-            <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-
+            <%= link_to 'Add Member'.html_safe, new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
@@ -68,20 +67,11 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)%>
-        <% if @change_plan.present? %>
-          <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
-        <% elsif @type == "employee" %>
-          <%= render  partial: 'shared/signup_progress', locals: {
-            step: '4',
-            url: group_selection_url
-          } %>
-        <% else %>
-          <%= render  partial: 'shared/individual_progress', locals: {
+        <% find_sep_url = find_sep_insured_families_path(resident_role_id: @resident_role.try(:id), change_plan: @change_plan)%>
+         <%= render  partial: 'shared/resident_progress', locals: {
             step: '3',
-            url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
-          } %>
-        <% end %>
+            url: (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+        } %>
       </div>
     </div>
   </div>

@@ -167,7 +167,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year) 
+    tax_households = self.tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year
       tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
     end
@@ -227,10 +227,11 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, resident_role: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
+      resident_role: resident_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
       benefit_group_assignment: benefit_group_assignment,

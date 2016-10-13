@@ -25,7 +25,7 @@ class ResidentRole
   end
 
   def families
-    Family.by_consumerRole(self)
+    Family.by_residentRole(self)
   end
 
   def self.find(resident_role_id)
@@ -49,6 +49,10 @@ class ResidentRole
     Email::KINDS.each do |kind|
       person.emails.build(kind: kind) if person.emails.select { |email| email.kind == kind }.blank?
     end
+  end
+
+  def is_active?
+    self.is_active
   end
 
 end
