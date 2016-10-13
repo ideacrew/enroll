@@ -59,16 +59,21 @@
         <type>urn:openhbx:terms:v1:email_type#home</type>
         <email_address>mh@example.com</email_address>
       </email>
+      <email>
+        <type>urn:openhbx:terms:v1:email_type#work</type>
+        <email_address>mhwork@example.com</email_address>
+      </email>
     </emails>
     <phones>
       <phone>
-        <type>urn:openhbx:terms:v1:phone_type#mobile</type>
-        <country_code>1</country_code>
-        <area_code>212</area_code>
-        <phone_number>5551222</phone_number>
-        <full_phone_number/>
-        <extension/>
-        <is_preferred>true</is_preferred>
+        <type>urn:openhbx:terms:v1:phone_type#home</type>
+        <full_phone_number>1111111111</full_phone_number>
+        <is_preferred>false</is_preferred>
+      </phone>
+      <phone>
+        <type>urn:openhbx:terms:v1:phone_type#work</type>
+        <full_phone_number>2222222222</full_phone_number>
+        <is_preferred>false</is_preferred>
       </phone>
     </phones>
     <created_at>2001-12-17T09:30:47Z</created_at>

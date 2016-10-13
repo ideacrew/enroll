@@ -23,6 +23,24 @@ describe Parsers::Xml::Cv::Importers::IndividualParser do
         expect(person.ssn).to eq "777669999"
         expect(person.hbx_id).to eq "10000123"
       end
+
+      it "should get two addresses" do
+        person = subject.get_person_object
+        expect(person.addresses.length).to eq 2
+        expect(person.addresses.map(&:kind)).to eq ['home', 'mailing']
+      end
+
+      it "should get two emails" do
+        person = subject.get_person_object
+        expect(person.emails.length).to eq 2
+        expect(person.emails.map(&:kind)).to eq ['home', 'work']
+      end
+
+      it "should get two phones" do
+        person = subject.get_person_object
+        expect(person.phones.length).to eq 2
+        expect(person.phones.map(&:kind)).to eq ['home', 'work']
+      end
     end
 
     context "get_errors_for_person_object" do

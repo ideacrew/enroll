@@ -43,7 +43,7 @@ module Parsers::Xml::Cv::Importers
       person.phones.each do |phone|
         phone_type = phone.type
         phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
-        if ["home", "work", "mailing"].include?(phone_type_for_enroll)
+        if Phone::KINDS.include?(phone_type_for_enroll)
           person_object.phones.build({
             kind: phone_type_for_enroll,
             full_phone_number: phone.full_phone_number
