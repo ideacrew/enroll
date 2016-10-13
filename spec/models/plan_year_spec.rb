@@ -2211,8 +2211,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                                             plan_year: plan_year) }
 
       let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment,
-                                                            benefit_group: benefit_group,
-                                                            aasm_state: "coverage_renewing") }
+                                                            benefit_group: benefit_group) }
 
       let!(:census_employee) { FactoryGirl.create(:census_employee,
                                                     employer_profile: employer_profile,
