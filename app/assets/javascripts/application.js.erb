@@ -779,3 +779,23 @@ $(document).on('click', '#address_info + span.form-action', function(){
     $('.mailing-div .label-floatlabel').hide();
   }
 });
+
+$(document).ready(function() {
+  // Add event listener for opening and closing details
+  var t = $('.effective-datatable').DataTable();
+  $('tbody').on('click', '.btn-info', function () {
+    var tr = $(this).closest('TR');
+    var button_type = $(this).attr("href");
+    alert("button-type: " + button_type);
+    window.pranab = tr;
+
+    // Remove if any Child Row is Visible.
+    if ( $('tr.child-row:visible').length > 0 ) {
+      $('tr.child-row:visible').remove();
+      $("li>a:contains('Collapse Form')").addClass('disabled');
+    }
+    // Add a new Child Row.
+    tr.after('<tr class="child-row"><td colspan="11"><h1>Something</h1></td></tr>');
+
+  });
+});
