@@ -548,7 +548,7 @@ class Family
       end
     end
   end
-  
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
