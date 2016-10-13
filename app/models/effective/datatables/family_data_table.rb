@@ -16,7 +16,15 @@ module Effective
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
         table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :employee?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|  render partial: 'datatables/shared/dropdown_config', locals:{row: row} } , :filter => false, :sortable => false  # render this partial for each row of the table
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|  
+          dropdown = [
+           ['Add SEP', "/exchanges/hbx_profiles/add_sep_form?family=", 'ajax'],
+           ['View SEP History', "/exchanges/hbx_profiles/show_sep_history?family=", 'ajax'],
+           ['Static Link', '/some-static-link', 'static'],
+           ['Disabled Link','#', 'disabled' ]
+          ]
+          render '/datatables/shared/dropdown', dropdowns: dropdown, family: row
+        }, :filter => false, :sortable => false
       end
 
       scopes do

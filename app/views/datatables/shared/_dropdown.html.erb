@@ -1,0 +1,25 @@
+<div class="dropdown pull-right">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Actions 
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+  <% dropdowns.each do |line| %>
+    <!-- line[0] is Link Name (Eg: Add SEP)
+         line[1] is Link Path
+         line[2] is Link Type (ajax, static or disabled) -->
+    <%case line[2]%>
+    <%when "disabled"%>
+      <li ><%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true%></li>
+    <%when "static"%>
+      <li><%= link_to line[0], line[1], class: "btn btn-info btn-xs" %></li>
+    <%when "ajax"%>  
+      <li>
+        <a class="btn btn-info btn-xs" role="button" data-toggle="collapse" href="<%=line[1]%>" id="<%=family.id%>" aria-expanded="false" aria-controls="collapseExample"> <%=line[0]%> </a>
+      </li>
+    <%end%>
+  <% end %>
+  </ul>
+</div>
+
+

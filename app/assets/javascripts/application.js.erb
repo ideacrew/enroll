@@ -785,17 +785,19 @@ $(document).ready(function() {
   var t = $('.effective-datatable').DataTable();
   $('tbody').on('click', '.btn-info', function () {
     var tr = $(this).closest('TR');
-    var button_type = $(this).attr("href");
-    alert("button-type: " + button_type);
-    window.pranab = tr;
-
+    var partial_href = $(this).attr("href");
+    var id = $(this).attr('id');
     // Remove if any Child Row is Visible.
     if ( $('tr.child-row:visible').length > 0 ) {
       $('tr.child-row:visible').remove();
       $("li>a:contains('Collapse Form')").addClass('disabled');
     }
-    // Add a new Child Row.
-    tr.after('<tr class="child-row"><td colspan="11"><h1>Something</h1></td></tr>');
-
+    url  = partial_href + id
+    $.ajax({
+      url: url,
+      success: function(response) {
+        tr.after(response)
+      }
+    });
   });
 });
