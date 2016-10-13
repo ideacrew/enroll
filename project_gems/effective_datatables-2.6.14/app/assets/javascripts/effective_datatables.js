@@ -37,7 +37,7 @@ $.extend( $.fn.dataTable.defaults, {
             "<'col-sm-12 col-md-12'tr>"+
           ">" + 
           "<'row'" + 
-            "<'col-sm-10 col-md-10'i><'col-sm-2 col-md-2'l>" +
+            "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
           ">" + 
           "<'row'" + 
             "<'col-sm-12 col-md-12'p>" +
