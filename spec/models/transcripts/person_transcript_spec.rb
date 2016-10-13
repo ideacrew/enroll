@@ -9,8 +9,6 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
 
   describe "instance methods" do
 
-
-
     let!(:source_record) {
       Person.create({ 
         "hbx_id"=>"117966",
@@ -82,7 +80,7 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
         builder.find_or_build(other_record)
         person_transcript = builder.transcript
 
-        expect(person_transcript[:compare][:base]['update']).to eq({'dob' => Date.new(1975, 6, 1)})
+        expect(person_transcript[:compare][:base]['update']['dob']).to eq(Date.new(1975, 6, 1))
         expect(person_transcript[:compare][:addresses][:update][:home]).to be_present
         expect(person_transcript[:compare][:addresses][:add][:work]).to be_present
         expect(person_transcript[:compare][:phones][:add][:home]).to be_present

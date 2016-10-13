@@ -9,7 +9,9 @@ module Transcripts
 
     def initialize
       @transcript = transcript_template
-      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 'updated_by', 'no_ssn']
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 
+        'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
+        "no_dc_address_reason", "tribal_id"]
     end
 
     def find_or_build(person)

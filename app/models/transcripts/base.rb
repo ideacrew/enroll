@@ -97,9 +97,17 @@ module Transcripts
             differences[:array][k] = { add: new_values, remove: old_values }.delete_if { |_, vv| vv.blank? }
             differences[:array][k].blank? ? differences = {} : differences[:array]
           else
-            if base_record[k] != compare_record[k]
+            if base_record[k].is_a?(String) || compare_record[k].is_a?(String)
+              base_attr = base_record[k].to_s.downcase.strip
+              compare_attr = compare_record[k].to_s.downcase.strip
+            else
+              base_attr = base_record[k]
+              compare_attr = compare_record[k]
+            end
+
+            if base_attr != compare_attr
               differences[:update] ||= {}
-              differences[:update][k] = compare_record[k]
+              differences[:update][k] = compare_attr
             end
           end
         end
