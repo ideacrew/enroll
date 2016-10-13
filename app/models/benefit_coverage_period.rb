@@ -121,12 +121,17 @@ class BenefitCoveragePeriod
     [effective_date, start_on].max
   end
 
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil)
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, market, tax_household=nil)
+    #binding.pry
     ivl_bgs = []
     benefit_packages.each do |bg|
       satisfied = true
-      hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
+
+      roles = hbx_enrollment_members.map(&:person).map(&:consumer_role)
+      roles = hbx_enrollment_members.map(&:person).map(&:resident_role) if market == 'coverall'
+      roles.each do |role|
+        rule = InsuredEligibleForBenefitRule.new(role, bg, coverage_kind)
+        binding.pry
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied
