@@ -16,6 +16,7 @@ module Effective
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
         table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :employee?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|  render partial: 'datatables/shared/dropdown_config', locals:{row: row} } , :filter => false, :sortable => false  # render this partial for each row of the table
       end
 
       scopes do
