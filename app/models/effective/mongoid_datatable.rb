@@ -1,5 +1,9 @@
 module Effective
   class MongoidDatatable < Effective::Datatable
+    def global_search_method
+      :datatable_search
+    end
+
     protected
 
     def table_tool 

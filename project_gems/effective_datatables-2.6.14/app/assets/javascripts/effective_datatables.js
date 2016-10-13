@@ -20,6 +20,26 @@
 
 //= require effective_datatables/initialize
 
+/*
 $.extend( $.fn.dataTable.defaults, {
   'dom': "<'row'<'col-sm-4'l><'col-sm-8'B>><'row'<'col-sm-4'><'col-sm-8'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'p>>"
+});
+*/
+
+$.extend( $.fn.dataTable.defaults, {
+  'dom': "<'row'" +
+            "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" + 
+          ">" +
+          "<'row'" +
+            "<'col-sm-12 col-md-12'>" + 
+          ">" +
+          "<'row'" + 
+            "<'col-sm-12 col-md-12'tr>"+
+          ">" + 
+          "<'row'" + 
+            "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
+          ">" + 
+          "<'row'" + 
+            "<'col-sm-12 col-md-12'p>" +
+          ">"
 });

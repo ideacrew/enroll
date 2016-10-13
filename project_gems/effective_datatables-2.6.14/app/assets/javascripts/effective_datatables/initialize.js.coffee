@@ -66,6 +66,12 @@ initializeDataTables = ->
         table = this.api()
         table.columns().flatten().each (index) =>
           params['columns'][index]['visible'] = table.column(index).visible()
+
+        if extendDatatableServerParams?()
+          custom_params = extendDatatableServerParams()
+          for key, value of custom_params
+            params[key] = value
+
       serverSide: true
       scrollCollapse: true
       pagingType: 'simple_numbers'
@@ -205,4 +211,3 @@ $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
 $(document).on 'turbolinks:load', -> initializeDataTables()
 $(document).on 'turbolinks:before-cache', -> destroyDataTables()
-
