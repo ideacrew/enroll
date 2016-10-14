@@ -2,9 +2,6 @@
 
 <h1>Listing Exchanges Hbx Profiles</h1>
 
- <%= render partial: '/datatables/shared/filter', locals: {filters:
-     Effective::Datatables::ArrayBacked.new.nested_filter_definition} %>
-
 <%= render_datatable(@datatable) %>
 
 <script>
