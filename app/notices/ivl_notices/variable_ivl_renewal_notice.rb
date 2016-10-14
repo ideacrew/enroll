@@ -29,6 +29,8 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
     enrollments_for_notice = []
     enrollments_for_notice << health_enrollment(hbx_enrollments)
     enrollments_for_notice << dental_enrollment(hbx_enrollments)
+    enrollments_for_notice << renewal_health_enrollment(hbx_enrollments)
+    enrollments_for_notice << renewal_dental_enrollment(hbx_enrollments)
     enrollments_for_notice.compact!
     enrollments_for_notice.each do |hbx_enrollment|
       @notice.enrollments << build_enrollment(hbx_enrollment)
@@ -36,16 +38,20 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   end
 
   def build_enrollment(hbx_enrollment)
-    PdfTemplates::EnrollmentWithPlanData.new({
+    plan_template = PdfTemplates::Plan.new({
+      plan_name: hbx_enrollment.plan.name,
+      metal_level: hbx_enrollment.plan.metal_level,
+      coverage_kind: hbx_enrollment.plan.coverage_kind,
+      plan_carrier: hbx_enrollment.plan.carrier_profile.organization.legal_name,
+      hsa_plan: hbx_enrollment.plan.hsa_plan?,
+      })
+    PdfTemplates::Enrollment.new({
       plan_name: hbx_enrollment.plan.name,
       premium: hbx_enrollment.total_premium,
       phone: hbx_enrollment.phone_number,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
-      metal_level: hbx_enrollment.plan.metal_level,
-      coverage_kind: hbx_enrollment.plan.coverage_kind,
-      plan_carrier: hbx_enrollment.plan.carrier_profile.organization.legal_name,
-      hsa_plan: hbx_enrollment.plan.hsa_plan?,
+      plan: plan_template,
       enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
         names << member.person.full_name.titleize
         end
@@ -53,11 +59,19 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   end
 
   def health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health").sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental").sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+  end
+
+  def renewal_health_enrollment(hbx_enrollments)
+    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+  end
+
+  def renewal_dental_enrollment(hbx_enrollments)
+    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def append_address(primary_address)

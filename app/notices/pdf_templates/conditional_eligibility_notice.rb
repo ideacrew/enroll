@@ -50,12 +50,20 @@ module PdfTemplates
       individuals.select{|individual| individual.incarcerated}
     end
 
-    def health_enrollment
-      enrollments.detect{|enrollment| enrollment.coverage_kind == "health"}
+    def current_health_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == Date.today.year}
     end
 
-    def dental_enrollment
-      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental"}
+    def current_dental_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == Date.today.year}
+    end
+
+    def renewal_health_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == Date.today.next_year.year}
+    end
+
+    def renewal_dental_enrollment
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == Date.today.next_year.year}
     end
   end
 end
