@@ -76,29 +76,4 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
     end.join(' ')
   end
 
-  def filer_type(type)
-    case type
-    when "Filers"
-      "Tax Filer"
-    when "Dependents"
-      "Tax Dependent"
-    when "None"
-      "Does not file taxes"
-    else
-      ""
-    end
-  end
-
-  def citizen_status(status)
-    case status
-    when "US"
-      "US Citizen"
-    when "LP"
-      "Lawfully Present"
-    when "NLP"
-      "Not Lawfully Present"
-    else
-      ""
-    end
-  end
 end
