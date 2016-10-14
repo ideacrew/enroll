@@ -12,26 +12,8 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
     super(args)
   end
 
-  def deliver
-    build
-    generate_pdf_notice
-    attach_blank_page
-    attach_dchl_rights
-    prepend_envelope
-    upload_and_send_secure_message
-
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
-
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
-  end
-
   def build
     family = recipient.primary_family
-    append_data
     append_enrollments(family.all_enrollments)
     notice.primary_identifier = "Account ID: #{identifier}"
     notice.primary_fullname = recipient.full_name.titleize || ""
@@ -40,25 +22,6 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
     else  
       # @notice.primary_address = nil
       raise 'mailing address not present' 
-    end
-  end
-
-  def append_data
-    notice.individuals=data.collect do |datum|
-        
-        # person = Person.where(:hbx_id => datum["hbx_id"]).first
-        PdfTemplates::Individual.new({
-          :full_name => datum["full_name"],
-          :incarcerated=>datum["incarcerated"].try(:upcase) == "N" ? "No" : "",
-          :citizen_status=> citizen_status(datum["citizen_status"]),
-          :residency_verified => datum["resident"].try(:upcase) == "Y"  ? "District of Columbia Resident" : "Not a District of Columbia Resident",
-          :projected_amount => datum["actual_income"],
-          :taxhh_count => datum["taxhhcount"],
-          :uqhp_reason => datum["uqhp_reason"],
-          :tax_status => filer_type(datum["filer_type"]),
-          :mec => datum["mec"].upcase == "N" ? "None" : "Yes"
-
-        })
     end
   end
 
