@@ -32,6 +32,13 @@ module Effective
 
       def collection
         employers = Organization.all_employer_profiles
+
+        if attributes[:enrollment].present? && !['all','date_window','date_cat'].include?(attributes[:enrollment])
+          employers = employers.send(attributes[:enrollment])
+        end
+
+        employers
+
       end
 
       def global_search?
@@ -57,44 +64,56 @@ module Effective
       end
 
       def nested_filter_definition
-        filters = {ivl_category:
+
+        @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
+        @next_60_day = @next_30_day.next_month
+        @next_90_day = @next_60_day.next_month
+
+        filters = {
+        #   ivl_category:
+        #   [
+        #    ['all', 'All', ],
+        #    ['assisted', 'Assisted', ],
+        #    ['unassisted', 'Unassisted', ],
+        #    ['cover_all', 'Cover All', ],
+        #    ['sep_eligible', 'SEP Eligible', ],
+        #   ],
+        # ivl_state:
+        #   [
+        #     ['all', 'All', :ivl_category ],
+        #     ['enrolled', 'Enrolled', :ivl_category],
+        #     ['renewing', 'Renewing', :ivl_category],
+        #     ['waived', 'Waived', :ivl_category],
+        #   ],
+        # ee_category:
+        #   [
+        #     ['all', 'All', :ivl_category ],
+        #     ['active', 'Active', ],
+        #     ['renewing', 'Renewing'],
+        #     ['cobra', 'Cobra'],
+        #     ['terminated', 'Terminated'],
+        #   ],
+        # ee_state:
+        #   [
+        #     ['enrolled', 'Enrolled', :ee_category],
+        #     ['renewing', 'Renewing', :ee_category],
+        #     ['waived', 'Waived'],
+        #     ['terminated', 'Terminated'],
+        #     ['sep_eligible', 'SEP Eligible', :ee_category],
+        #   ],
+        date_window:
           [
-           ['all', 'All', ],
-           ['assisted', 'Assisted', ],
-           ['unassisted', 'Unassisted', ],
-           ['cover_all', 'Cover All', ],
-           ['sep_eligible', 'SEP Eligible', ],
-          ],
-        ivl_state:
-          [
-            ['all', 'All', :ivl_category ],
-            ['enrolled', 'Enrolled', :ivl_category],
-            ['renewing', 'Renewing', :ivl_category],
-            ['waived', 'Waived', :ivl_category],
-          ],
-        ee_category:
-          [
-            ['all', 'All', :ivl_category ],
-            ['active', 'Active', ],
-            ['renewing', 'Renewing'],
-            ['cobra', 'Cobra'],
-            ['terminated', 'Terminated'],
-          ],
-        ee_state:
-          [
-            ['all', 'All', :ee_category],
-            ['enrolled', 'Enrolled', :ee_category],
-            ['renewing', 'Renewing', :ee_category],
-            ['waived', 'Waived'],
-            ['terminated', 'Terminated'],
-            ['sep_eligible', 'SEP Eligible', :ee_category],
+            [@next_30_day,@next_30_day],
+            [@next_60_day,@next_60_day],
+            [@next_90_day,@next_90_day],
           ],
         enrollment:
          [
            ['all', 'All'],
-           ['individual_enrolled', 'Individual Enrolled', :ivl_state],
-           ['employer_sponsored', 'Employer Sponsored Coverage', :ee_state],
-           ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
+           ['all_employers_enrolled', 'Enrolled'],
+           ['employer_profile_initial_coverage', 'Enrolling'],
+           ['all_employers_renewing', 'Renewing'],
+           ['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
         top_scope: :enrollment
         }

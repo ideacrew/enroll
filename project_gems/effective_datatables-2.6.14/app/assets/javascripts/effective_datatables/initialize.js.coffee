@@ -1,4 +1,4 @@
-initializeDataTables = ->
+@initializeDataTables = ->
   $('table.effective-datatable').each ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
