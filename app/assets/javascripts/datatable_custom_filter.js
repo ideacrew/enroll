@@ -1,4 +1,3 @@
-
 DT = ( function() {
   var clear_level = function(level) {
     level_str = String(level)
@@ -33,14 +32,20 @@ DT = ( function() {
       id = $(that).attr('id').substring(4)
       $('.Filter-'+id).removeClass('hide')
     })
+   extendDatatableServerParams = function(){
+    var keys = {}
+    DT.filter_params(keys, 1)
+    var attributes_for_filtering = {"attributes": keys}
+    return attributes_for_filtering;
+   }
   }
-  var filter_params = function(keys, level_str) {
-    var selector = $('.custom_level_' + level_str + ' .clicked')
-    if (typeof(selector) != 'undefined') {
+  var filter_params = function(keys, level) {
+    var selector = $('.custom_level_' + level + ' .clicked')
+    if (typeof(selector) != 'undefined' && selector.size() > 0) {
       keys[selector.parent().attr('data-scope')] =  selector.attr('data-key')
+      filter_params(keys, level+1)
     }
   }
-
   return {
   	filters: filters,
     filter_params: filter_params,
