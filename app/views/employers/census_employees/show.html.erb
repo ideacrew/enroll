@@ -104,6 +104,7 @@
         </div>
       </div>
     </div>
+    <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         Email

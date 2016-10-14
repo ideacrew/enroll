@@ -115,6 +115,25 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
+  context 'with no email linked with census employee' do
+    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+    it "should create a blank email record if there was no email for census employees" do
+      expect(census_employee.email).to eq nil
+      render template: "employers/census_employees/show.html.erb"
+      expect(census_employee.email).not_to eq nil
+      expect(census_employee.email.kind).to eq nil
+      expect(census_employee.email.address).to eq nil
+    end
+
+    it "should return the existing one if email was already present" do
+      census_employee = FactoryGirl.create(:census_employee)
+      address = census_employee.email.address
+      render template: "employers/census_employees/show.html.erb"
+      expect(census_employee.email.kind).to eq 'home'
+      expect(census_employee.email.address).to eq address
+    end
+  end
+
   context 'with a previous coverage waiver' do
     let(:hbx_enrollment_three) do
       FactoryGirl.create :hbx_enrollment, household: household,
