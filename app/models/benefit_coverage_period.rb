@@ -122,7 +122,6 @@ class BenefitCoveragePeriod
   end
 
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, market, tax_household=nil)
-    #binding.pry
     ivl_bgs = []
     benefit_packages.each do |bg|
       satisfied = true
@@ -131,7 +130,6 @@ class BenefitCoveragePeriod
       roles = hbx_enrollment_members.map(&:person).map(&:resident_role) if market == 'coverall'
       roles.each do |role|
         rule = InsuredEligibleForBenefitRule.new(role, bg, coverage_kind)
-        binding.pry
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied

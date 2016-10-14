@@ -80,7 +80,6 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    #binding.pry
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -151,7 +150,6 @@ class Insured::GroupSelectionController < ApplicationController
         coverage_household: @coverage_household,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     when 'coverall'
-      #binding.pry
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
@@ -162,7 +160,6 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   def initialize_common_vars
-    #binding.pry
     person_id = params.require(:person_id)
     @person = Person.find(person_id)
     @family = @person.primary_family

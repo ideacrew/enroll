@@ -30,7 +30,7 @@ def get_all_benefit_groups(organization)
 	return all_benefit_groups
 end
 
-def select_benefit_group_assignment(correct_benefit_group, census_employee)  
+def select_benefit_group_assignment(correct_benefit_group, census_employee)
 
 	if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.benefit_group == correct_benefit_group
 		return census_employee.active_benefit_group_assignment
@@ -51,7 +51,7 @@ end
 def find_census_employee(subscriber_params)
 	census_employee = CensusEmployee.where(encrypted_ssn: CensusMember.encrypt_ssn(subscriber_params["ssn"])).first
 	if census_employee == nil
-		census_employee = CensusEmployee.where(first_name: subscriber_params["first_name"], 
+		census_employee = CensusEmployee.where(first_name: subscriber_params["first_name"],
 											   middle_name: subscriber_params["middle_name"],
 											   last_name: subscriber_params["last_name"],
 											   dob: subscriber_params["dob"]).first
@@ -89,7 +89,7 @@ def select_employee_role(employer_profile_id, employee_roles)
 	return correct_employee_role
 end
 
-## Just for clarification 
+## Just for clarification
 # EnrollmentFactory#construct_consumer_role
 # EnrollmentFactory#initialize_dependent
 # dependent_person.build_consumer_role(is_applicant: false)
@@ -98,7 +98,7 @@ end
 # dependent_person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
 
 CSV.foreach(filename, headers: :true) do |row|
-	
+
 	# begin
 		data_row = row.to_hash
 		subscriber = Person.where(hbx_id: data_row['HBX ID']).first
@@ -131,7 +131,7 @@ CSV.foreach(filename, headers: :true) do |row|
 			end
 		end
 
-    
+
     puts "processing #{census_employee.full_name}"
 
 		if census_employee.census_dependents.blank? && census_dependents.present?
@@ -206,9 +206,7 @@ CSV.foreach(filename, headers: :true) do |row|
 		true
 	# rescue Exception=>e
 	# 	puts e.inspect
-	# 	binding.pry
 	# 	puts "-"*100
 	# 	#puts e.backtrace
 	# end
 end
-
