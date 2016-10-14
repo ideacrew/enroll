@@ -32,13 +32,15 @@ DT = ( function() {
       $('.Filter-'+id).removeClass('hide')
     })
   }
-  var filter_id = function(level_str) {
-    var selector = '.custom_level_' + level_str + ' .clicked'
-    var selected = $(selector).attr('id') || ''
-    return selected.substring(4)
+  var filter_params = function(keys, level_str) {
+    var selector = $('.custom_level_' + level_str + ' .clicked')
+    if (typeof(selector) != 'undefined') {
+      keys[selector.parent().attr('data-scope')] =  selector.attr('data-key')
+    }
   }
+
   return {
   	filters: filters,
-    filter_id: filter_id,
+    filter_params: filter_params,
   }
 })()

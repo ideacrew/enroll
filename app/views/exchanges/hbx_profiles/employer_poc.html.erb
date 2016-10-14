@@ -2,15 +2,19 @@
 
 <h1>Listing Exchanges Hbx Profiles</h1>
 
-<div class='custom_filter'>
- <%= render partial: '/datatables/shared/filter', locals: {filters: Effective::Datatables::ArrayBacked.new.nested_filter_definition} %>
-</div>
+ <%= render partial: '/datatables/shared/filter', locals: {filters:
+     Effective::Datatables::ArrayBacked.new.nested_filter_definition} %>
+
 <%= render_datatable(@datatable) %>
 
 <script>
   function extendDatatableServerParams() {
     console.log("Extending Datatable HTPP params")
-    var attributes_for_filtering = {"attributes": {'level1':DT.filter_id('1') ,"level2": DT.filter_id('2'), "level3" : DT.filter_id('3')}}
+    var keys = {}
+    DT.filter_params(keys, 1)
+    DT.filter_params(keys, 2)
+    DT.filter_params(keys, 3)
+    var attributes_for_filtering = {"attributes": keys}
     return attributes_for_filtering;
   }
 </script>

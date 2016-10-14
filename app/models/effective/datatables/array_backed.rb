@@ -57,45 +57,48 @@ module Effective
       end
 
       def nested_filter_definition
-        ivl_category = 
+        filters = {ivl_category:
           [
            ['all', 'All', ],
            ['assisted', 'Assisted', ],
            ['unassisted', 'Unassisted', ],
            ['cover_all', 'Cover All', ],
            ['sep_eligible', 'SEP Eligible', ],
-          ]
-        ivl_state = 
+          ],
+        ivl_state:
           [
-            ['all', 'All', ivl_category ],
-            ['enrolled', 'Enrolled', ivl_category],
-            ['renewing', 'Renewing', ivl_category],
-            ['waived', 'Waived', ivl_category],
-          ]
-        ee_category = 
+            ['all', 'All', :ivl_category ],
+            ['enrolled', 'Enrolled', :ivl_category],
+            ['renewing', 'Renewing', :ivl_category],
+            ['waived', 'Waived', :ivl_category],
+          ],
+        ee_category:
           [
-            ['all', 'All', ivl_category ],
+            ['all', 'All', :ivl_category ],
             ['active', 'Active', ],
             ['renewing', 'Renewing'],
             ['cobra', 'Cobra'],
             ['terminated', 'Terminated'],
-          ]
-        ee_state = 
+          ],
+        ee_state:
           [
-            ['all', 'All', ee_category],
-            ['enrolled', 'Enrolled', ee_category],
-            ['renewing', 'Renewing', ee_category],
+            ['all', 'All', :ee_category],
+            ['enrolled', 'Enrolled', :ee_category],
+            ['renewing', 'Renewing', :ee_category],
             ['waived', 'Waived'],
             ['terminated', 'Terminated'],
-            ['sep_eligible', 'SEP Eligible', ee_category],
-          ]
-      nested_filter_top_level = 
-       [
-         ['all', 'All'], 
-         ['individual_enrolled', 'Individual Enrolled', ivl_state], 
-         ['employer_sponsored', 'Employer Sponsored Coverage', ee_state],
-         ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
-       ]
+            ['sep_eligible', 'SEP Eligible', :ee_category],
+          ],
+        enrollment:
+         [
+           ['all', 'All'],
+           ['individual_enrolled', 'Individual Enrolled', :ivl_state],
+           ['employer_sponsored', 'Employer Sponsored Coverage', :ee_state],
+           ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
+         ],
+        top_scope: :enrollment
+        }
+
       end
     end
   end
