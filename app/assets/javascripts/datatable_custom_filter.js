@@ -1,9 +1,12 @@
-console.log('hoo')
+
 DT = ( function() {
   var clear_level = function(level) {
     level_str = String(level)
     $('.custom_level_' + level_str).addClass("hide")
     $('.custom_level_' + level_str+ ' .btn-default').removeClass("clicked")
+    if (level < 4) {
+      clear_level(level + 1)
+    }
   }
   var hide_lower_levels = function(button) {
     level = 0
@@ -14,8 +17,6 @@ DT = ( function() {
     var level = parseInt(get_level && get_level[1])
     console.log(level)
     clear_level(level+1)
-    clear_level(level+2)
-    clear_level(level+3)
   }
   var filters= function(){
     $('.custom_level_1').removeClass('hide')
@@ -27,8 +28,9 @@ DT = ( function() {
         $(that).removeClass('clicked')
         return
       }
-      $(this).addClass('clicked')
-      id = $(this).attr('id').substring(4)
+      $(that.parentElement.children).removeClass('clicked')
+      $(that).addClass('clicked')
+      id = $(that).attr('id').substring(4)
       $('.Filter-'+id).removeClass('hide')
     })
   }

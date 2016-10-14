@@ -13,12 +13,10 @@
   <% filters[data_scope].each do |filter| %>
     <div class="btn btn-default" data-key="<%=filter[0]%>"
     id="Tab:<%=filter_group.present? ? [filter_group,filter[0]].join('-') : filter[0] %>">
-      <%=filter[1] + level.to_s%> 
+      <%=filter[1]%>
     </div>
   <% end %>
 </div>
-
-
 
 <% filters[data_scope].each do |filter| %>
   <% new_data_scope = filter[2] %>
