@@ -2,11 +2,19 @@
 
 <h1>Listing Exchanges Hbx Profiles</h1>
 
+<%- render '/insured/families/index_for_hbx_staff_filter.html.erb' %>
+<div class='custom_filter'>
+ <%= render partial: '/datatables/shared/filter', locals: {filters: Effective::Datatables::ArrayBacked.new.nested_filter_definition} %>
+</div>
 <%= render_datatable(@datatable) %>
 
 <script>
   function extendDatatableServerParams() {
     console.log("Extending Datatable HTPP params")
-    return {"attributes": {'param1':"some data","param2":"some data1", "other_param" : $('h1').html()}};
+    var attributes_for_filtering = {"attributes": {'level1':DT.filter_id('1') ,"level2": DT.filter_id('2'), "level3" : DT.filter_id('2')}}
+    return attributes_for_filtering;
   }
 </script>
+
+
+

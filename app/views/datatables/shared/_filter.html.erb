@@ -1,0 +1,23 @@
+<% ancestors = defined?(ancestors) && ancestors || [] %>
+<% level = defined?(level) && level || 1 %>
+<% filter_group = ancestors.join('-')%>
+<br class="hide custom_level_<%=level%> Filter-<%=filter_group%>"/>
+<div class="btn btn-group  hide custom_level_<%=level%> Filter-<%=filter_group%>" role='group'>
+  <% filters.each do |filter| %>
+    <div class="btn btn-default"
+    id="Tab:<%=filter_group.present? ? [filter_group,filter[0]].join('-') : filter[0] %>">
+      <%=filter[1] + level.to_s%> 
+    </div>
+  <% end %>
+</div>
+<% filters.each do |filter| %>
+  <% if filter[2] %>
+    <%= render partial: '/datatables/shared/filter', locals: {filters: filter[2], level: level+1, ancestors: ancestors + [filter[0]]} %>
+    <%end%>
+<% end %>
+
+<% if level==1 %>
+  <script>
+     DT.filters()
+  </script>
+<% end %>
