@@ -12,12 +12,12 @@ RSpec.describe "layouts/_portal_header_helper.erb" do
   	sign_in current_user
   end
   
-  it 'directs Im a Employer to Employer Profile' do
+  it 'checks that a link to Im an Employer is present' do
     allow(person_user).to receive(:employer_staff_roles).and_return(employer_staff_role)
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match('/employers/employer_profiles/')
+    expect(rendered).to match(/I'm an Employer/)
   end
   
 end
