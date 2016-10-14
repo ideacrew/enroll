@@ -6,7 +6,6 @@ module Effective
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
         end
-
         table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
         table_column :name, :proc => Proc.new { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
         table_column :ssn, :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
@@ -18,12 +17,12 @@ module Effective
         table_column :employee?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|  
           dropdown = [
-           ['Add SEP', "/exchanges/hbx_profiles/add_sep_form?family=", 'ajax'],
-           ['View SEP History', "/exchanges/hbx_profiles/show_sep_history?family=", 'ajax'],
+           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Static Link', '/some-static-link', 'static'],
            ['Disabled Link','#', 'disabled' ]
           ]
-          render '/datatables/shared/dropdown', dropdowns: dropdown, family: row
+          render '/datatables/shared/dropdown', dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"
         }, :filter => false, :sortable => false
       end
 

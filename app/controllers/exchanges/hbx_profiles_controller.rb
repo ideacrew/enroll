@@ -402,10 +402,12 @@ def employer_poc
 
   def add_sep_form
     getActionParams
+    @element_to_replace_id = params[:family_actions_id]
   end
 
   def show_sep_history
     getActionParams
+    @element_to_replace_id = params[:family_actions_id]
   end
 
   def update_effective_date
