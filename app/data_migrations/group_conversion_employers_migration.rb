@@ -7,7 +7,7 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
     fein.each do |fein|
       organization = Organization.where(fein: fein)
       if organization.size != 1
-        puts "Issues with organization of fein #{fein}"
+        puts "Issues with organization of fein #{fein}" unless Rails.env.test?
         next
       end
       organization.first.employer_profile.plan_years.each do |plan_year|
@@ -15,7 +15,7 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
           plan_year.migration_expire! if plan_year.may_migration_expire?
         end
       end
-      plan_years = organization.first.employer_profile.plan_years.published + organization.first.employer_profile.plan_years.where(aasm_state: "draft")
+      plan_years = organization.first.employer_profile.plan_years.published + organization.first.employer_profile.plan_years.renewing_published_state + organization.first.employer_profile.plan_years.where(aasm_state: "draft")
       plan_years.each do |plan_year|
         if plan_year.start_on.year == 2016
           plan_year.update_attribute(:aasm_state, "canceled")
@@ -30,7 +30,7 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
         end
       end
       organization.first.employer_profile.revert_application! if organization.first.employer_profile.may_revert_application?
-      puts "Reverting the application for #{organization.first.legal_name}"
+      puts "Reverting the application for #{organization.first.legal_name}" unless Rails.env.test?
     end
   end
 end
