@@ -47,7 +47,7 @@ module Effective
 
     def paginate(collection)
       begin
-        collection.skip((page - 1) * per_page).take(per_page)
+        collection.skip((page - 1) * per_page).limit(per_page)
       rescue
         raise collection.build_scope.explain["queryPlanner"]["winningPlan"].inspect
       end  
