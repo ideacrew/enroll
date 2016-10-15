@@ -36,43 +36,68 @@ module Transcripts
         return
       end
 
-      base_record    = @transcript[:source]
-
       differences[:base] = compare(base_record: @transcript[:source], compare_record: @transcript[:other])
 
       self.class.enumerated_associations.each do |association|
-        differences[association[:association]] = compare_association(association)
+        differences[association[:association]] = build_association_differences(association)
       end
 
       @transcript[:compare] = differences
     end
 
-    def compare_association(association)
+    def build_association_differences(association)
       differences     = HashWithIndifferentAccess.new
 
       enumeration_association = association[:association]         
       association_differences = []
 
       if association[:cardinality] == 'one'
-        association[:enumeration].each do |attr_val|
-          source = @transcript[:source].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
-          other  = @transcript[:other].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+        if association[:enumeration].blank?
 
-          next if source.blank? && other.blank?
+          group_associations_by_enumeration_field(association).each do |association_pair|
+            differences = compare_assocation(association_pair[0], association_pair[1], differences, enumeration_association.singularize)
+          end
+        else
+          association[:enumeration].each do |attr_val|
+            source = @transcript[:source].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
+            other  = @transcript[:other].send(enumeration_association).detect{|assc| assc.send(association[:enumeration_field]) == attr_val }
 
-          if source.blank?
-            differences[:add] ||= {}
-            differences[:add][attr_val] = other.serializable_hash
-          elsif other.blank?
-            differences[:remove] ||= {}
-            differences[:remove][attr_val] = source.serializable_hash
-          elsif source.present? && other.present?
-            differences[:update] ||= {}
-            differences[:update][attr_val] = compare(base_record: source, compare_record: other)
+            differences = compare_assocation(source, other, differences, attr_val)
           end
         end
       end
 
+      differences
+    end
+
+    def group_associations_by_enumeration_field(association)
+      # TODO: Validate for duplicate family member records with same hbx id
+
+      other_assocs = @transcript[:other].send(association[:association]).dup
+
+      source_other_pairs = @transcript[:source].send(association[:association]).map do |source_assoc|
+        enumeration_value = source_assoc.send(association[:enumeration_field])
+        other_assoc = other_assocs.detect{|other_assoc| other_assoc.send(association[:enumeration_field]) == enumeration_value}
+        other_assocs.delete(other_assoc)
+        [source_assoc, other_assoc]
+      end
+    
+      source_other_pairs + other_assocs.map { |other_assoc| [nil, other_assoc] }
+    end
+
+    def compare_assocation(source, other, differences, attr_val)
+      if source.present? || other.present?
+        if source.blank?
+          differences[:add] ||= {}
+          differences[:add][attr_val] = other.serializable_hash
+        elsif other.blank?
+          differences[:remove] ||= {}
+          differences[:remove][attr_val] = source.serializable_hash
+        elsif source.present? && other.present?
+          differences[:update] ||= {}
+          differences[:update][attr_val] = compare(base_record: source, compare_record: other)
+        end
+      end
       differences
     end
 
