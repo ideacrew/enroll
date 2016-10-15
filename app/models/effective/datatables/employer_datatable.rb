@@ -1,7 +1,7 @@
 
 module Effective
   module Datatables
-    class ArrayBacked < Effective::MongoidDatatable
+    class EmployerDatatable < Effective::MongoidDatatable
       datatable do
 
 
