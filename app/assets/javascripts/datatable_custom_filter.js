@@ -29,7 +29,9 @@ DT = ( function() {
       }
       $(that.parentElement.children).removeClass('clicked')
       $(that).addClass('clicked')
-      id = $(that).attr('id').substring(4)
+      id = $(that).attr('id').substring(4).replace(/\//g,'-')
+      //window.id = id
+      //alert('hi')
       $('.Filter-'+id).removeClass('hide')
     })
    extendDatatableServerParams = function(){
