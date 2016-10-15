@@ -15,21 +15,21 @@
       autoWidth: false
       searching: searching
       buttons: [
-        {
-          extend: 'colvis',
-          text: 'Show / hide columns',
-          postfixButtons: [
-            { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
-            { extend: 'colvisRestore', text: 'Show default'}
-          ]
-        },
-        {
-          extend: 'copy',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':not(.col-actions)'
-        },
+        # {
+        #   extend: 'colvis',
+        #   text: 'Show / hide columns',
+        #   postfixButtons: [
+        #     { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
+        #     { extend: 'colvisRestore', text: 'Show default'}
+        #   ]
+        # },
+        # {
+        #   extend: 'copy',
+        #   exportOptions:
+        #     format:
+        #       header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+        #     columns: ':not(.col-actions)'
+        # },
         {
           extend: 'csv',
           exportOptions:
@@ -37,20 +37,20 @@
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
             columns: ':not(.col-actions)'
         },
-        {
-          extend: 'excel',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':not(.col-actions)'
-        },
-        {
-          extend: 'print',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':visible:not(.col-actions)'
-        },
+        # {
+        #   extend: 'excel',
+        #   exportOptions:
+        #     format:
+        #       header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+        #     columns: ':not(.col-actions)'
+        # },
+        # {
+        #   extend: 'print',
+        #   exportOptions:
+        #     format:
+        #       header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+        #     columns: ':visible:not(.col-actions)'
+        # },
       ]
       colReorder: !simple
       columns: datatable.data('columns')

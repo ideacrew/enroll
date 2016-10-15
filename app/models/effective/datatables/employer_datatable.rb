@@ -22,7 +22,7 @@ module Effective
           row.employer_profile.active_general_agency_legal_name.titleize if row.employer_profile.active_general_agency_legal_name.present?
         }, :filter => false
         table_column :conversion, :width => '120px', :proc => Proc.new { |row| boolean_to_glyph(row.employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
-        #table_column :state,:proc => Proc.new { |row| row.primary_office_location.try(:address).try(:state)} , :filter => false
+
         table_column :plan_year_state, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:aasm_state).try(:titleize)}, :filter => false
         table_column :invoiced, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         #table_column :update_at, :proc => Proc.new { |row| row[5].strftime('%m/%d/%Y')}
@@ -33,8 +33,11 @@ module Effective
       def collection
         employers = Organization.all_employer_profiles
 
-        if attributes[:enrollment].present? && !['all','date_window','date_cat'].include?(attributes[:enrollment])
-          employers = employers.send(attributes[:enrollment])
+
+        if attributes[:employers].present? && !['all'].include?(attributes[:employers])
+          employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
+          employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
+          employers = employers.send(attributes[:employers]) if !attributes[:enrolled].present? && !attributes[:enrolling].present?
         end
 
         employers
@@ -85,37 +88,35 @@ module Effective
         #     ['renewing', 'Renewing', :ivl_category],
         #     ['waived', 'Waived', :ivl_category],
         #   ],
-        # ee_category:
-        #   [
-        #     ['all', 'All', :ivl_category ],
-        #     ['active', 'Active', ],
-        #     ['renewing', 'Renewing'],
-        #     ['cobra', 'Cobra'],
-        #     ['terminated', 'Terminated'],
-        #   ],
-        # ee_state:
-        #   [
-        #     ['enrolled', 'Enrolled', :ee_category],
-        #     ['renewing', 'Renewing', :ee_category],
-        #     ['waived', 'Waived'],
-        #     ['terminated', 'Terminated'],
-        #     ['sep_eligible', 'SEP Eligible', :ee_category],
-        #   ],
-        date_window:
+        enrolled:
           [
-            [@next_30_day,@next_30_day],
-            [@next_60_day,@next_60_day],
-            [@next_90_day,@next_90_day],
+            ['employer_profiles_enrolled', 'All' ],
+            ['employer_profiles_suspended', 'Suspended', ],
           ],
-        enrollment:
+        enrolling:
+          [
+            ['employer_profiles_enrolling', 'All'],
+            ['employer_profiles_initial_eligible', 'Initial Eligible'],
+            ['employer_profiles_renewing', 'Renewing'],
+            ['employer_profiles_open_enrollment', 'Open Enrollment'],
+            ['employer_profiles_binder_pending', 'Binder Pending'],
+            ['employer_profiles_binder_paid', 'Binder Paid'],
+          ],
+        # date_window:
+        #   [
+        #     [@next_30_day,@next_30_day],
+        #     [@next_60_day,@next_60_day],
+        #     [@next_90_day,@next_90_day],
+        #   ],
+        employers:
          [
            ['all', 'All'],
-           ['all_employers_enrolled', 'Enrolled'],
-           ['employer_profile_initial_coverage', 'Enrolling'],
-           ['all_employers_renewing', 'Renewing'],
-           ['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
+           ['employer_profiles_enrolling', 'Enrolling', :enrolling],
+           ['employer_profiles_enrolled', 'Enrolled', :enrolled],
+           #['all_employers_renewing', 'Renewing'],
+           #['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
-        top_scope: :enrollment
+        top_scope: :employers
         }
 
       end

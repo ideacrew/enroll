@@ -21,6 +21,7 @@ class EmployerProfile
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
+  ENROLLED_STATE = %w(enrolled suspended)
 
   field :entity_kind, type: String
   field :sic_code, type: String
