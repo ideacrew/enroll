@@ -6,8 +6,8 @@ module Effective
 
 
         bulk_actions_column do
-           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?', no_turbolink: true }
-           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Mark Binder Paid?', no_turbolink: true }
+           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
+           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false

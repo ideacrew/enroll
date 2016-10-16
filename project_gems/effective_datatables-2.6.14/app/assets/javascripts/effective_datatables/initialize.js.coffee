@@ -199,7 +199,7 @@
       $processing.data('timeout', setTimeout( =>
           $processing.html('Processing...').hide()
           $processing.data('bulk-actions-processing', null)
-        , 1500)
+        , 2000)
       )
 
 destroyDataTables = ->
