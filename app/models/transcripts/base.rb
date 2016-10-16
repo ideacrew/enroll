@@ -86,13 +86,19 @@ module Transcripts
     end
 
     def compare_assocation(source, other, differences, attr_val)
+      assoc_class = (source || other).class.to_s
+      if @custom_templates.include?(assoc_class)
+        source = convert(source)
+        other = convert(other)
+      end
+
       if source.present? || other.present?
         if source.blank?
           differences[:add] ||= {}
-          differences[:add][attr_val] = other.serializable_hash
+          differences[:add][attr_val] = (other.is_a?(Hash) ? other : other.serializable_hash)
         elsif other.blank?
           differences[:remove] ||= {}
-          differences[:remove][attr_val] = source.serializable_hash
+          differences[:remove][attr_val] = (source.is_a?(Hash) ? source : source.serializable_hash)
         elsif source.present? && other.present?
           differences[:update] ||= {}
           differences[:update][attr_val] = compare(base_record: source, compare_record: other)
@@ -105,7 +111,9 @@ module Transcripts
       differences     = HashWithIndifferentAccess.new
 
       if base_record.present? && compare_record.present?
-        all_keys = base_record.attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
+        attribute_names = base_record.is_a?(Hash) ? base_record.keys : base_record.attribute_names
+
+        all_keys = attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
         all_keys.each do |k|
           next if base_record[k].blank? && compare_record[k].blank?
      
@@ -136,20 +144,20 @@ module Transcripts
             end
           end
         end
-      end
 
-      if base_record.attribute_names.include?('encrypted_ssn')
-        if base_record.ssn.present?
-          if compare_record.ssn.blank?
-            differences[:remove] ||= {}
-            differences[:remove][:ssn] = base_record.ssn
-          elsif base_record.ssn != compare_record.ssn
-            differences[:update] ||= {}
-            differences[:update][:ssn] = compare_record.ssn
+        if attribute_names.include?('encrypted_ssn')
+          if base_record.ssn.present?
+            if compare_record.ssn.blank?
+              differences[:remove] ||= {}
+              differences[:remove][:ssn] = base_record.ssn
+            elsif base_record.ssn != compare_record.ssn
+              differences[:update] ||= {}
+              differences[:update][:ssn] = compare_record.ssn
+            end
+          else
+            differences[:add] ||= {}
+            differences[:add][:ssn] = compare_record.ssn if compare_record.ssn.present?
           end
-        else
-          differences[:add] ||= {}
-          differences[:add][:ssn] = compare_record.ssn if compare_record.ssn.present?
         end
       end
 

@@ -12,6 +12,8 @@ module Transcripts
       @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 
         'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
         "no_dc_address_reason", "tribal_id"]
+
+      @custom_templates = []
     end
 
     def find_or_build(person)
@@ -38,26 +40,16 @@ module Transcripts
       @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
-    class << self
-      
-      def associations
-        [
-          "user",
-          "responsible_party",
-          "person_relationships"
-        ]
-      end
 
-      def enumerated_associations
-        [
-          {association: "addresses", enumeration_field: "kind", cardinality: "many", enumeration: ["branch"]},
-          {association: "addresses", enumeration_field: "kind", cardinality: "one", enumeration: ["home", "work", "mailing", "primary"]},
-          {association: "person_relationships", enumeration_field: "kind", cardinality: "one", enumeration: ["self", "spouse", "life_partner"]},
-          {association: "person_relationships", enumeration_field: "kind", cardinality: "many", enumeration: ["child", "adopted_child", "foster_child", "grandchild", "parent", "grandparent"]},
-          {association: "phones", enumeration_field: "kind", cardinality: "one", enumeration: Phone::KINDS },
-          {association: "emails", enumeration_field: "kind", cardinality: "one", enumeration: Email::KINDS },
-        ]
-      end
+    def self.enumerated_associations
+      [
+        {association: "addresses", enumeration_field: "kind", cardinality: "many", enumeration: ["branch"]},
+        {association: "addresses", enumeration_field: "kind", cardinality: "one", enumeration: ["home", "work", "mailing", "primary"]},
+        {association: "person_relationships", enumeration_field: "kind", cardinality: "one", enumeration: ["self", "spouse", "life_partner"]},
+        {association: "person_relationships", enumeration_field: "kind", cardinality: "many", enumeration: ["child", "adopted_child", "foster_child", "grandchild", "parent", "grandparent"]},
+        {association: "phones", enumeration_field: "kind", cardinality: "one", enumeration: Phone::KINDS },
+        {association: "emails", enumeration_field: "kind", cardinality: "one", enumeration: Email::KINDS },
+      ]
     end
 
     private

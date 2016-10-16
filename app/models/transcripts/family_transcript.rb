@@ -1,4 +1,4 @@
-module Transcripts
+  module Transcripts
   class FamilyTranscriptError < StandardError; end
 
   class FamilyTranscript
@@ -10,15 +10,20 @@ module Transcripts
       @transcript = transcript_template
 
       @logger = Logger.new("#{Rails.root}/log/family_transcript_logfile.log")
-      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'updated_by', 'updated_by_id']
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'updated_by', 'updated_by_id', 'first_name', 'last_name']
 
-      # @custom_attributes = {
-      #  'family_member' : [
-      #     hbx_id,
-      #     is_primary_applicant,
-      #     relationship
-      #   ]
-      # }
+      @custom_templates = ['FamilyMember']
+    end
+
+    def convert(record)
+      return if record.blank?
+      {
+        :hbx_id => record.hbx_id,
+        :is_primary_applicant => record.is_primary_applicant,
+        :relationship => record.primary_relationship,
+        :first_name => record.person.first_name,
+        :last_name => record.person.last_name
+      }
     end
 
     def find_or_build(family)

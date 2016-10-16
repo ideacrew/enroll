@@ -17,6 +17,8 @@ class FamilyMember
 
   field :is_active, type: Boolean, default: true
 
+  field :hbx_id, type: String
+
   field :person_id, type: BSON::ObjectId
   field :broker_role_id, type: BSON::ObjectId
 
@@ -33,7 +35,7 @@ class FamilyMember
 
   delegate :id, to: :family, prefix: true
 
-  delegate :hbx_id, to: :person, allow_nil: true
+  # delegate :hbx_id, to: :person, allow_nil: true
   delegate :first_name, to: :person, allow_nil: true
   delegate :last_name, to: :person, allow_nil: true
   delegate :middle_name, to: :person, allow_nil: true
@@ -62,6 +64,7 @@ class FamilyMember
 
   after_create :update_family_status_when_create
   after_update :update_family_status_when_destroy
+
 
   def former_family=(new_former_family)
     raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
