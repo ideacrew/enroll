@@ -231,12 +231,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
 
   end
+ 
 
   def generate_checkbook_urls
     @employer_profile.generate_and_deliver_checkbook_urls_for_employees
-    render json: { message: "successfully sent" }
+    flash[:notice] = "Generating and delivering checkbook url's to employees"
   end
-
+  
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
