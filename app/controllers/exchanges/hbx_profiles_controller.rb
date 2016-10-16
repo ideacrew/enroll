@@ -50,7 +50,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations= Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      puts "Generating Invoices"
       @employer_invoice = EmployerInvoice.new(org)
       @employer_invoice.save_and_notify_with_clean_up
     end
@@ -74,7 +73,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @datatable = Effective::Datatables::EmployerDatatable.new
 
     respond_to do |format|
-      format.html
       format.js
     end
   end
