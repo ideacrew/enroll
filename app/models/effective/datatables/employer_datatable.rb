@@ -102,12 +102,15 @@ module Effective
             ['employer_profiles_initial_eligible', 'Initial', :enrolling_initial],
             ['employer_profiles_renewing', 'Renewing / Converting', :enrolling_renewing],
             ['', 'Ineligible', :enrolling_ineligible],
+          ],
         employers:
          [
            ['all', 'All'],
            ['employer_profiles_applicants', 'Applicants'],
            ['employer_profiles_enrolling', 'Enrolling', :enrolling],
            ['employer_profiles_enrolled', 'Enrolled', :enrolled],
+           #['all_employers_renewing', 'Renewing'],
+           #['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
         top_scope: :employers
         }
