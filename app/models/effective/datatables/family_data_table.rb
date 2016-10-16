@@ -21,8 +21,8 @@ module Effective
            ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Edit DOB / SSN', edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-           ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_type(row, current_user)],
-           ['EDIT APTC / CSR', '/aptc-csr-link', 'static']
+           ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
+           ['EDIT APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)]
           ]
           render '/datatables/shared/dropdown', dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"
         }, :filter => false, :sortable => false
@@ -40,11 +40,14 @@ module Effective
         true
       end
 
-      def secure_message_type(family, current_user)
+      def secure_message_link_type(family, current_user)
         person = family.primary_applicant.person
         ((person.user.present? || person.emails.present?) && current_user.person.hbx_staff_role) ? 'ajax' : 'disabled'
       end
 
+      def aptc_csr_link_type(family)
+        family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
+      end
 
     end
   end
