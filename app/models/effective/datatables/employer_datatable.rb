@@ -6,8 +6,8 @@ module Effective
 
 
         bulk_actions_column do
-           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
-           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Mark Binder Paid?' }
+           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?', no_turbolink: true }
+           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false
@@ -73,48 +73,41 @@ module Effective
         @next_90_day = @next_60_day.next_month
 
         filters = {
-        #   ivl_category:
-        #   [
-        #    ['all', 'All', ],
-        #    ['assisted', 'Assisted', ],
-        #    ['unassisted', 'Unassisted', ],
-        #    ['cover_all', 'Cover All', ],
-        #    ['sep_eligible', 'SEP Eligible', ],
-        #   ],
-        # ivl_state:
-        #   [
-        #     ['all', 'All', :ivl_category ],
-        #     ['enrolled', 'Enrolled', :ivl_category],
-        #     ['renewing', 'Renewing', :ivl_category],
-        #     ['waived', 'Waived', :ivl_category],
-        #   ],
+        enrolling_ineligible:
+          [
+           ['', 'Plan Ineligible', ],
+           ['', 'Enrollment Ineligible', ],
+          ],
+        enrolling_renewing:
+          [
+           ['', 'Application Pending', ],
+           ['', 'Open Enrollment', ],
+          ],
+        enrolling_initial:
+          [
+            ['', 'Application Pending'],
+            ['employer_profiles_binder_pending', 'Open Enrollment'],
+            ['', 'Invoice Pending'],
+            ['employer_profiles_binder_pending', 'Binder Pending'],
+            ['employer_profiles_binder_paid', 'Binder Paid'],
+          ],
         enrolled:
           [
             ['employer_profiles_enrolled', 'All' ],
-            ['employer_profiles_suspended', 'Suspended', ],
+            ['employer_profiles_suspended', 'Suspended' ],
           ],
         enrolling:
           [
             ['employer_profiles_enrolling', 'All'],
-            ['employer_profiles_initial_eligible', 'Initial Eligible'],
-            ['employer_profiles_renewing', 'Renewing'],
-            ['employer_profiles_open_enrollment', 'Open Enrollment'],
-            ['employer_profiles_binder_pending', 'Binder Pending'],
-            ['employer_profiles_binder_paid', 'Binder Paid'],
-          ],
-        # date_window:
-        #   [
-        #     [@next_30_day,@next_30_day],
-        #     [@next_60_day,@next_60_day],
-        #     [@next_90_day,@next_90_day],
-        #   ],
+            ['employer_profiles_initial_eligible', 'Initial', :enrolling_initial],
+            ['employer_profiles_renewing', 'Renewing / Converting', :enrolling_renewing],
+            ['', 'Ineligible', :enrolling_ineligible],
         employers:
          [
            ['all', 'All'],
+           ['employer_profiles_applicants', 'Applicants'],
            ['employer_profiles_enrolling', 'Enrolling', :enrolling],
            ['employer_profiles_enrolled', 'Enrolled', :enrolled],
-           #['all_employers_renewing', 'Renewing'],
-           #['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
         top_scope: :employers
         }
