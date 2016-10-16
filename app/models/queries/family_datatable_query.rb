@@ -25,8 +25,8 @@ module Queries
       build_scope.skip(num)
     end
 
-    def take(num)
-      build_scope.take(num)
+    def limit(num)
+      build_scope.limit(num)
     end
 
     def order_by(var)

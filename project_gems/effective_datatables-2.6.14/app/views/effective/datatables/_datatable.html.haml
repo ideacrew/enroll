@@ -16,10 +16,15 @@
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }
+
+- effective_model = effective_datatable_params[:id].split('-table')[0].camelcase
+- effective_model_class = "Effective::Datatables::#{effective_model}"
+- effective_filter = effective_model_class.constantize.new.try(:nested_filter_definition)
+
 .container
+  - if effective_filter
+    = render partial: '/datatables/shared/filter', locals: {filters: effective_filter}
   #effective_datatable_wrapper
-    .row
-      %h1.darkblue.no.buffer FAMILIES
     .row
       %table.effective-datatable{effective_datatable_params}
         %thead

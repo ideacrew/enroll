@@ -46,11 +46,11 @@ module Effective
     end
 
     def paginate(collection)
-      begin
-        collection.skip((page - 1) * per_page).take(per_page)
-      rescue
-        raise collection.build_scope.explain["queryPlanner"]["winningPlan"].inspect
-      end  
+      result_scope = collection.skip((page - 1) * per_page).limit(per_page)
+      unless result_scope.kind_of?(Mongoid::Criteria)
+        raise "Expected a type of Mongoid::Criteria, got #{result_scope.class.name} instead."
+      end
+      result_scope
     end
   end
 end
