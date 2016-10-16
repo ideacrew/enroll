@@ -28,6 +28,8 @@ module Parsers::Xml::Cv::Importers
         ethnicity: [person_demographics.ethnicity],
         language_code: person_demographics.language_code,
         race: person_demographics.race,
+        #created_at: person_demographics.created_at,
+        #updated_at: person_demographics.updated_at, #person_demographics.modified_at
       )
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'

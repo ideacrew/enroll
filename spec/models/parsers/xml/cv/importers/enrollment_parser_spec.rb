@@ -1,38 +1,27 @@
 require 'rails_helper'
 
 describe Parsers::Xml::Cv::Importers::EnrollmentParser do
+  let(:subject) { Parsers::Xml::Cv::Importers::EnrollmentParser.new(xml) }
 
-  context "valid verified_family" do
-    let(:xml) { File.read(Rails.root.join("spec", "test_data", "individual_person_payloads", "IndividualFile.xml")) }
-    let(:subject) { Parsers::Xml::Cv::Importers::EnrollmentParser.new }
+  context "valid verified_policy" do
+    let(:xml) { File.read(Rails.root.join("spec", "test_data", "importer_payloads", "policy.xml")) }
 
-    context "get_person_object" do
-      before do
-        subject.parse(xml)
+    context "get_enrollment_object" do
+      it 'should return the enrollment as an object' do
+        expect(subject.get_enrollment_object.class).to eq HbxEnrollment
       end
 
-      it 'should return the person as an object' do
-        expect(subject.get_person_object.class).to eq Array
-        subject.get_person_object.each do |person|
-          expect(person.class).to eq Person
-        end
+      it "should be individual" do
+        expect(subject.get_enrollment_object.kind).to eq 'individual'
       end
 
-      it "should get person object with actual person info" do
-        people = subject.get_person_object
-        expect(people.first.first_name).to eq "Michael"
-        expect(people.first.middle_name).to eq "J"
-        expect(people.first.last_name).to eq "Hutchins"
-      end
-    end
-
-    context "get_errors_for_person_object" do
-      before do
-        subject.parse(xml)
-      end
-
-      it "the size should equal to get_person_object" do
-        expect(subject.get_errors_for_person_object.count).to eq subject.get_person_object.count
+      it "should get plan" do
+        plan = subject.get_enrollment_object.plan
+        expect(plan.name).to eq "BluePreferred PPO $1,000 100%/80%"
+        expect(plan.active_year).to eq 2016
+        expect(plan.ehb).to eq 91.2
+        expect(plan.metal_level).to eq 'gold'
+        expect(plan.coverage_kind).to eq "health_and_dental"
       end
     end
   end

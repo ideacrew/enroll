@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<family xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://openhbx.org/api/terms/1.0'>
+  <id>
+    <id>100000123</id>
+  </id>
+  <family_members>
+    <family_member>
+      <id>
+        <id>123456789</id>
+      </id>
+      <primary_family_id>
+        <id>123456</id>
+      </primary_family_id>
+      <tax_household_id>
+        <id>123456</id>
+      </tax_household_id>
+      <person>
+        <id>
+          <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#10000123</id>
+        </id>
+        <person_name>
+          <person_surname>Green</person_surname>
+          <person_given_name>Michael</person_given_name>
+          <person_middle_name>J</person_middle_name>
+          <person_full_name>Michael J Green</person_full_name>
+          <person_name_prefix_text>Sir</person_name_prefix_text>
+          <person_name_suffix_text>Sr</person_name_suffix_text>
+          <person_alternate_name/>
+        </person_name>
+        <addresses></addresses>
+      </person>
+      <person_relationships>
+        <person_relationship />
+        <person_relationship />
+      </person_relationships>
+      <person_demographics />
+      <is_primary_applicant>true</is_primary_applicant>
+      <is_coverage_applicant>true</is_coverage_applicant>
+      <employee_roles>
+        <employee_role />
+        <employee_role />
+        <employee_role />
+      </employee_roles>
+    </family_member>
+  </family_members>
+  <primary_family_member_id>
+    <id>123123123123</id>
+  </primary_family_member_id>
+  <e_case_id>abc123xyz2</e_case_id>
+  <households>
+    <household />
+    <household />
+  </households>
+  <irs_groups>
+    <irs_group />
+  </irs_groups>
+</family>
