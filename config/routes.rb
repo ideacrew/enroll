@@ -134,6 +134,7 @@ Rails.application.routes.draw do
       member do
         post 'unblock'
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
