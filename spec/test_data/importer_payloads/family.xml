@@ -30,12 +30,16 @@
         <addresses></addresses>
       </person>
       <person_relationships>
-        <person_relationship />
-        <person_relationship />
+        <person_relationship>
+          <subject_individual>subject individual id</subject_individual>
+          <relationship_uri>parent</relationship_uri>
+          <inverse_relationship_uri>child</inverse_relationship_uri>
+          <object_individual>object individual id</object_individual>
+        </person_relationship>
       </person_relationships>
       <person_demographics />
       <is_primary_applicant>true</is_primary_applicant>
-      <is_coverage_applicant>true</is_coverage_applicant>
+      <is_coverage_applicant>false</is_coverage_applicant>
       <employee_roles>
         <employee_role />
         <employee_role />

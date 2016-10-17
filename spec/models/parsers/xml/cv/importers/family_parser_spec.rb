@@ -19,6 +19,21 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         family = subject.get_family_object
         expect(family.family_members.class).to eq Array
       end
+      
+      it "should get is_primary_applicant by family_members" do
+        family_member = subject.get_family_object.family_members.last
+        expect(family_member.is_primary_applicant).to eq true
+      end
+
+      it "should get is_coverage_applicant by family_member" do
+        family_member = subject.get_family_object.family_members.last
+        expect(family_member.is_coverage_applicant).to eq false
+      end
+
+      it "should get relationship by person" do
+        person = subject.get_family_object.family_members.last.person
+        expect(person.person_relationships.first.kind).to eq 'parent'
+      end
 
       it "should get person info by family_members" do
         person = subject.get_family_object.family_members.first.person
@@ -35,6 +50,16 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
       it "should get irs_groups" do
         family = subject.get_family_object
         expect(family.irs_groups.class).to eq Array
+      end
+
+      it "should get coverage_households by household" do
+        household = subject.get_family_object.households.first
+        expect(household.coverage_households.class).to eq Array
+      end
+
+      it "should get tax_households by household" do
+        household = subject.get_family_object.households.first
+        expect(household.tax_households.class).to eq Array
       end
     end
   end
