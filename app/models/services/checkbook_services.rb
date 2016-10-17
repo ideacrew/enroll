@@ -12,13 +12,14 @@ module CheckbookServices
 
     def generate_url
       begin
-      # # Checkbook url is still not working so commented below lines
+      puts construct_body
+
       @result = HTTParty.post(@url,
               :body => construct_body.to_json,
               :headers => { 'Content-Type' => 'application/json' } )
       @doc=Nokogiri::HTML(@result.parsed_response)
       uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
-      byebug
+      # byebug
       if uri.present?
         return BASE_URL+uri.first.value
       else
@@ -35,67 +36,27 @@ module CheckbookServices
     {
       "remote_access_key": REMOTE_ACCESS_KEY,
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
-      "employer_effective_date": census_employee.benefit_group_assignments.first.try(:start_on),
-      "employee_coverage_date": "2016-11-01", ##TODO 
+      "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on, #"2016-10-01" ,# #census_employee.benefit_group_assignments.first.try(:start_on).strftime,
+      "employee_coverage_date": census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on, #"2016-11-01", ##TODO 
       "employer": {
-        "state": census_employee.employer_profile.organization.primary_office_location.address.state, #TODO Fix these
-        "county": census_employee.employer_profile.organization.primary_office_location.address.state 
+        "state": 11, #census_employee.employer_profile.organization.primary_office_location.address.state, #TODO Fix these
+        "county": 111 #census_employee.employer_profile.organization.primary_office_location.address.state 
       },
-      "family":[build_family
-
-               ],
-      "contribution": {
-       "employee":100,
-       "spouse":50,
-       "domestic_partner":50,
-       "child":50
-      },
-      "reference_plan":  "21066DC0010014",   #census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
+      "family": build_family,
+      "contribution": employer_contributions,
+      "reference_plan": "21066DC0010014",#census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,# "21066DC0010014",
       "plans_available": ["41842DC0040047"]#["21066DC0010009","21066DC0010010","21066DC0010011"]
     }
     end
 
-    # def construct_body
-    #  {
-    #             "remote_access_key": "B48E5D58B6A64B3E93A6BF719647E568",
-    #             "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
-    #             "employer_effective_date": "2016-10-01",
-    #             "employee_coverage_date": "2016-11-01",
-    #             "employer": {
-    #                             "state": 11,
-    #                             "county": 111
-    #             },
-    #             "family": [
-    #                             {
-    #                                             "dob": "1980-04-17",
-    #                                             "relationship": "self"
-    #                             },
-    #                             {
-    #                                             "dob": "1990-08-22",
-    #                                             "relationship": "spouse"
-    #                             },
-    #                             {
-    #                                             "dob": "2011-02-24",
-    #                                             "relationship": "child"
-    #                             },
-    #                             {
-    #                                             "dob": "2012-07-31",
-    #                                             "relationship": "child"
-    #                             }
-    #             ],
-    #             "contribution": {
-    #                             "employee": 50,
-    #                             "spouse": 50,
-    #                             "domestic_partner": 50,
-    #                             "child": 50
-    #             },
-    #             "reference_plan": "573e1753c5231b2f6f00eb9c",
-    #             "plans_available": [
-    #                             "41842DC0040047"
-                           
-    #             ]
-    #   }
-    # end
+    def employer_contributions
+      premium_benefit_contributions = {}
+      census_employee.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits.each do |relationship_benefit| 
+        # next if relationship_benefit.premium_pct.to_i <= 0 
+        premium_benefit_contributions[relationship_benefit.relationship]=relationship_benefit.premium_pct.to_f
+      end
+      premium_benefit_contributions
+    end
 
 
     def build_family
