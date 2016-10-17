@@ -9,7 +9,7 @@
 <br class="hide custom_level_<%=level%> Filter-<%=filter_group%>"/>
 
 
-<div class="btn btn-group  hide custom_level_<%=level%> Filter-<%=filter_group%>" data-scope="<%=data_scope%>"  role='group'>
+<div class="btn btn-group  <%= level > 1 && 'hide sub_level'%> custom_level_<%=level%> Filter-<%=filter_group%>" data-scope="<%=data_scope%>"  role='group'>
   <% filters[data_scope].each do |filter| %>
     <div class="btn btn-default" data-key="<%=filter[0]%>"
     id="Tab:<%=filter_group.present? ? [filter_group,filter[0]].join('-') : filter[0] %>">
@@ -30,9 +30,5 @@
   </div>
   <script>
      DT.filters()
-     $('.custom_filter .btn-default').on('click', function() {
-       console.log('click')
-        $('.effective-datatable').DataTable().draw()
-      })
   </script>
 <% end %>
