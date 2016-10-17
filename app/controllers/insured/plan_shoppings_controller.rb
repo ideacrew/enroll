@@ -69,7 +69,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-
+    #binding.pry
     if @enrollment.is_special_enrollment?
       sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
       @enrollment.update_current(special_enrollment_period_id: sep_id)
