@@ -36,15 +36,15 @@ module CheckbookServices
     {
       "remote_access_key": REMOTE_ACCESS_KEY,
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
-      "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on, #"2016-10-01" ,# #census_employee.benefit_group_assignments.first.try(:start_on).strftime,
-      "employee_coverage_date": census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on, #"2016-11-01", ##TODO 
+      "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on,
+      "employee_coverage_date": census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
       "employer": {
         "state": 11, #census_employee.employer_profile.organization.primary_office_location.address.state, #TODO Fix these
         "county": 111 #census_employee.employer_profile.organization.primary_office_location.address.state 
       },
       "family": build_family,
       "contribution": employer_contributions,
-      "reference_plan": "21066DC0010014",#census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,# "21066DC0010014",
+      "reference_plan": "21066DC0010014",#census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
       "plans_available": ["41842DC0040047"]#["21066DC0010009","21066DC0010010","21066DC0010011"]
     }
     end
