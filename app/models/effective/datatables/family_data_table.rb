@@ -3,9 +3,9 @@ module Effective
   module Datatables
     class FamilyDataTable < Effective::MongoidDatatable
       datatable do
-        # bulk_actions_column do
-        #    bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
-        # end
+        bulk_actions_column do
+           #bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
+        end
 
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
 
