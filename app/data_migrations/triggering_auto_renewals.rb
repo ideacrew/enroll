@@ -16,9 +16,9 @@ class TriggeringAutoRenewals < MongoidMigrationTask
             puts "deleting the renewing waived enrollment for #{ce.first_name} #{ce.last_name} of #{org.legal_name}" unless Rails.env.test?
             enr.delete
           end
-          org.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.trigger_passive_renewals
         end
       end
+      org.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.trigger_passive_renewals
     end
     puts "The total effected ER's count is #{Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => plan_year_start_on, :aasm_state => 'renewing_enrolling'}}, :'employer_profile.profile_source' => 'conversion' ).count}" unless Rails.env.test?
     puts "The total effected EE's count is #{count}" unless Rails.env.test?
