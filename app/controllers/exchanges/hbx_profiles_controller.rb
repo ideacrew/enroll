@@ -19,9 +19,17 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def binder_paid
-    EmployerProfile.update_status_to_binder_paid(params[:ids])
-    flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
-    redirect_to exchanges_hbx_profiles_root_path
+    if params[:ids]
+      begin
+        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
+        render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+      rescue => e
+        render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+      end
+    end
+    # Removed redirect because of Datatables
+    #redirect_to exchanges_hbx_profiles_root_path
   end
 
   def transmit_group_xml
@@ -55,11 +63,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
-    redirect_to exchanges_hbx_profiles_root_path
+    #redirect_to exchanges_hbx_profiles_root_path
 
-    # respond_to do |format|
-    #   format.js
-    # end
+     respond_to do |format|
+       format.js
+     end
   end
 
   def employer_invoice
