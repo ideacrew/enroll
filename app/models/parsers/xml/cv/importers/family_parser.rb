@@ -62,7 +62,7 @@ module Parsers::Xml::Cv::Importers
       person = fm.person
       person_demographics = fm.person_demographics
       person_relationships = fm.person_relationships
-      hbx_id = person.id.match(/hbx_id#(.*)/)[1] rescue ''
+      hbx_id = person.id
       gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
 
       person_object = Person.new(
