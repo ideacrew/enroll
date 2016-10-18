@@ -61,6 +61,32 @@ module Effective
         hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
       end
 
+      def nested_filter_definition
+        {
+        employer_options: [
+          ['all', 'All'],
+          ['enrolled', 'Enrolled'],
+          ['by_enrollment_renewing', 'Renewing'],
+          ['waived', 'Waived'],
+          ['sep_eligible', 'SEP Eligible']
+        ],
+          individual_options: [
+            ['all', 'All'],
+            ['all_assistance_receiving', 'Assisted'],
+            ['unassisted', 'Unassisted'],
+            ['cover_all', 'Cover All'],
+            ['sep_eligible', 'SEP Eligible']
+          ],
+          families:
+            [
+              ['all', 'All'],
+              ['by_enrollment_individual_market', 'Individual Enrolled', :individual_options],
+              ['by_enrollment_shop_market', 'Employer Sponsored Coverage Enrolled', :employer_options],
+              ['non_enrolled', 'Non Enrolled'],
+            ],
+          top_scope: :families
+        }
+      end
     end
   end
 end

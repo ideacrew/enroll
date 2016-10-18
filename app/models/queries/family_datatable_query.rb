@@ -14,13 +14,32 @@ module Queries
     end
 
     def build_scope()
-      return Family if @search_string.blank?
-      person_id = Person.search(@search_string).limit(5000).pluck(:_id)
-      family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
+      #return Family if @search_string.blank?
+      #person_id = Person.search(@search_string).limit(5000).pluck(:_id)
+      #family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
+
+      puts "#{@custom_attributes} are attributes,#{@custom_attributes['aptc']} "
+      family = Family
+      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
+        family = family.all_assistance_receiving
+      end
+      if @custom_attributes['families'] == 'by_enrollment_individual_market'
+        family = family.by_enrollment_individual_market
+      end
+       if @custom_attributes['families'] == 'by_enrollment_shop_market'
+        family = family.by_enrollment_shop_market
+      end
+      if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
+        family = family.by_enrollment_renewing
+      end
+      #add other scopes here
+      return family if @search_string.blank? || @search_string.length < 3
+      person_id = Person.search(@search_string).pluck(:_id)
+      family_scope = family.where('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
       family_scope.order_by(@order_by)
     end
-    
+
     def skip(num)
       build_scope.skip(num)
     end
