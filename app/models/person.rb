@@ -116,7 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
-  after_save :generate_family_search
+  #after_save :generate_family_search
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -247,7 +247,7 @@ class Person
     end
   end
 
-  after_save :update_family_search_collection
+  #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
   def move_encrypted_ssn_errors
@@ -804,6 +804,14 @@ class Person
 
   def generate_family_search
     ::MapReduce::FamilySearchForPerson.populate_for(self)
+  end
+
+  def set_consumer_role_url
+    if consumer_role.present? && user.present?
+      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
+        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
+      end
+    end
   end
 
   private

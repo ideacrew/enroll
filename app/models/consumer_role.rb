@@ -652,6 +652,11 @@ class ConsumerRole
     end
   end
 
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+  end
+
   def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
