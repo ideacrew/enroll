@@ -103,7 +103,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 
-# Http
+# Httparty
 gem 'httparty'
 
 group :development do
