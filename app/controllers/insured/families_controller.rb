@@ -75,6 +75,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
+
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
