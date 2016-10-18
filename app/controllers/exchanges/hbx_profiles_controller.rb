@@ -226,6 +226,10 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def hide_form
+    @element_to_replace_id = params[:family_actions_id]
+  end
+
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]

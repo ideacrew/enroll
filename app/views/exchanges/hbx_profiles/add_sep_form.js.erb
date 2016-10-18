@@ -3,6 +3,7 @@ var $parent_row = containing_row;
 //var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
 if ( $('tr.child-row:visible').length > 0 ) {
   $('tr.child-row:visible').remove();
+  $("li>a:contains('Collapse Form')").addClass('disabled');
 }
 
 if ( $parent_row.next().hasClass('child-row') ) {
@@ -11,6 +12,8 @@ if ( $parent_row.next().hasClass('child-row') ) {
 else {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "sep/approval/admin_detail", 
   f: @family, qle: @qle, formats: [:html] %></td></tr>');
+  $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
+  //$('.dropdown.pull-right').removeClass('open');
 }
 
 $('.sep_link').hide();
