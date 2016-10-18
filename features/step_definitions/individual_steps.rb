@@ -61,6 +61,7 @@ Then(/^user should see heading labeled personal information/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+  wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
   find('.btn', text: 'CONTINUE').click
 end
