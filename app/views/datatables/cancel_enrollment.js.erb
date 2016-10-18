@@ -15,7 +15,7 @@ if ( $('tr.child-row:visible').length > 0 ) {
 }
 
 if ( $parent_row.next().hasClass('child-row') ) {
-//
+// Do Nothing
 }
 else {
  $parent_row.after('<tr class="child-row"><%= j render partial: "datatables/cancel_enrollment" %></tr>');
