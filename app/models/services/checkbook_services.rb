@@ -19,7 +19,6 @@ module CheckbookServices
               :headers => { 'Content-Type' => 'application/json' } )
       @doc=Nokogiri::HTML(@result.parsed_response)
       uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
-      # byebug
       if uri.present?
         return BASE_URL+uri.first.value
       else
@@ -44,8 +43,8 @@ module CheckbookServices
       },
       "family": build_family,
       "contribution": employer_contributions,
-      "reference_plan": "21066DC0010014",#census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
-      "plans_available": ["41842DC0040047"]#["21066DC0010009","21066DC0010010","21066DC0010011"]
+      "reference_plan": census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
+      "plans_available": census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans).map(&:hios_base_id)
     }
     end
 
