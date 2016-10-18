@@ -36,7 +36,13 @@ module Effective
       end
 
       def collection
-        families = Queries::FamilyDatatableQuery.new
+        if  (defined? @families) && @families.present?
+          puts 'there'
+        else
+          @families = Queries::FamilyDatatableQuery.new(attributes)
+          puts 'here'
+        end
+        @families
       end
 
       def global_search?
@@ -52,6 +58,35 @@ module Effective
         family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
       end
 
+      def nested_filter_definition
+        {
+
+
+        employer_options: [
+          ['all', 'All'],
+          ['enrolled', 'Enrolled'],
+          ['renewing', 'Renewing'],
+          ['waived', 'Waived'],
+          ['sep_eligible', 'SEP Eligible']
+        ],
+
+          individual_options: [
+            ['all', 'All'],
+            ['all_assistance_receiving', 'Assisted'],
+            ['unassisted', 'Unassisted'],
+            ['cover_all', 'Cover All'],
+            ['sep_eligible', 'SEP Eligible']
+          ],
+          families:
+            [
+              ['all', 'All'],
+              ['individual_enrolled', 'Individual Enrolled', :individual_options],
+              ['employer_sponsored', 'Employer Sponsored Coverage Enrolled', :employer_options],
+              ['non_enrolled', 'Non Enrolled'],
+            ],
+          top_scope: :families
+        }
+      end
     end
   end
 end
