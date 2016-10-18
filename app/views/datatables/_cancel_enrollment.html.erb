@@ -1,6 +1,6 @@
-<td>
+
   <!-- Plan Name -->
-  <div>
+  <td style="width:200px;">
     <label>
       <strong>
         Plan
@@ -8,9 +8,9 @@
     </label>
     <br/>
     <%= @hbx_enrollment.plan.name %>
-  </div>
+  </td>
   <!-- Effective Date -->
-  <div>
+  <td style="width:200px;">
     <label>
       <strong>
         Effective Date
@@ -18,9 +18,9 @@
     </label>
     <br/>
     <%= @hbx_enrollment.effective_on %>
-  </div>
+  </td>
   <!-- Cancel date set to start date -->
-  <div>
+  <td style="width:200px;">
     <label>
       <strong>
         Cancellation Date
@@ -28,16 +28,14 @@
     </label>
     <br/>
     <%= @hbx_enrollment.effective_on %>
-  </div>
+  </td>
   <!-- EDI Transmission to Carrier -->
   <!-- EDI Transmisison checkbox -->
 
   <%= form_for @hbx_enrollment, :url => { :action => "update_cancel_enrollment"}, :method => :post, :html => { :class => 'vertically-aligned-row' } do |f| %>
 
-  <div>
+  <td class="col-md-3">
     <span class="btn btn-default btn-sm" onclick="EnrollDataTableInitializer.removeRow($(this));">Cancel</span>
     <%= f.submit "Submit", class: 'btn btn-primary btn-sm' %>
-  </div>
+  </td>
   <% end %>
-
-</td>

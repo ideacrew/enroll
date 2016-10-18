@@ -18,5 +18,5 @@ if ( $parent_row.next().hasClass('child-row') ) {
 //
 }
 else {
- $parent_row.after('<tr class="child-row"><td colspan="1"><%= j render partial: "datatables/cancel_enrollment" %></td></tr>');
+ $parent_row.after('<tr class="child-row"><%= j render partial: "datatables/cancel_enrollment" %></tr>');
 }
