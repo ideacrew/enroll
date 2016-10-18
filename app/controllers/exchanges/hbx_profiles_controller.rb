@@ -195,38 +195,12 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
-
-  # def families_index_datatable
-  #   dt_query = extract_datatable_parameters
-  #   families_dt = []
-  #   all_families = Family.all
-  #   if dt_query.search_string.blank?
-  #     families_dt = all_families
-  #   else
-  #     #debugger
-  #     person_ids = Person.search(dt_query.search_string).pluck(:id)
-  #     families_dt = all_families.where({
-  #       "family_members.person_id" => {"$in" => person_ids}
-  #     })
-  #   end
-  #   @draw = dt_query.draw
-  #   @total_records = all_families.count
-  #   @records_filtered = families_dt.count
-
-  #   if families_dt.is_a? Array
-  #     @families = families_dt[dt_query.skip..@total_records.count]
-  #   else
-  #     @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
-  #   end
-  #   render "families_index_datatable"
-  # end
-
-  def add_sep_form
-    getActionParams
+  def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
 
-  def hide_form
+  def add_sep_form
+    getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
 
