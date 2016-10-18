@@ -11,6 +11,7 @@ if ( $parent_row.next().hasClass('child-row') ) {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "sep_history/index", 
   person_id: @family.primary_applicant.person.id, family_id: @family %></td></tr>');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
+  $(".dropdown-menu").eq(containing_row.index()).dropdown("toggle");  //$('.dropdown.pull-right').removeClass('open');
 }
 
 

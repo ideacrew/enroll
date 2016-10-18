@@ -13,7 +13,7 @@ else {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "sep/approval/admin_detail", 
   f: @family, qle: @qle, formats: [:html] %></td></tr>');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
-  //$('.dropdown.pull-right').removeClass('open');
+  $(".dropdown-menu").eq(containing_row.index()).dropdown("toggle");  //$('.dropdown.pull-right').removeClass('open');
 }
 
 $('.sep_link').hide();
