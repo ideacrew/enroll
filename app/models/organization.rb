@@ -129,6 +129,14 @@ class Organization
   # Applicant Scopes
   scope :employer_profiles_applicants,        ->{ where(:"employer_profile.aasm_state" => "applicant") }
 
+  # Open enrollments
+  scope :employer_profiles_renewing_open_enrollment,  -> { where(:"employer_profile.plan_years.aasm_state" => "renewing_enrolling") }
+  scope :employer_profiles_initial_open_enrollment,  -> { where(:"employer_profile.plan_years.aasm_state" => "enrolling") }
+
+  # Applicantion Pending
+  scope :employer_profiles_renewing_application_pending,  -> { where(:"employer_profile.plan_years.aasm_state" => "renewing_publish_pending") }
+  scope :employer_profiles_initial_application_pending,  -> { where(:"employer_profile.plan_years.aasm_state" => "publish_pending") }
+
 
   scope :all_employers_enrolled,              ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
   scope :all_employer_profiles,               ->{ unscoped.exists(employer_profile: true) }

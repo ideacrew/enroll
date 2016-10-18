@@ -1,5 +1,5 @@
 <br/><br/>
-<div class = 'radio_option'>
+<div class='radio_option'>
 	<div class="col-md-2 col-md-offset-1 col-sm-4 content-bottom">
 		<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
 			<div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -15,7 +15,7 @@
 		</div>
 	</div>
 </div>
-<div class = 'add_sep_form'>
+<div class='add_sep_form' id="add_sep">
 	<div class="col-md-10 col-md-offset-1 col-sm-12 content-bottom">
 	 	<div class="row no-buffer"> 
 	 		<div id="personal_info">
@@ -35,7 +35,7 @@
 						</div>
 	          <div class='admin_selected_sep_reason'>
 		        	<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
-		           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'selectric form-control qle_reason_select', required: true, prompt: "SEP REASON" %>
+		           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'form-control', required: true, prompt: "SEP REASON" %>
 		         	</div>
 	         	</div>
 	         	<div class='init_event_date'>
@@ -86,10 +86,10 @@
 					</div>
 					<div class='row row-form-wrapper no-buffer'>
 						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-			    			<%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body custom-textarea", rows: 3, placeholder: "Enter Comments Here"%>
+			    			<%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3, placeholder: "Enter Comments Here"%>
 						</div>
 					</div>
-					<div class="col-md-8 col-md-offset-5 col-sm-6 col-xs-12 form-group form-group-lg no-pd" style="margin-top:10px;">
+					<div class="no-pd" style="margin-top:10px;">
 			 			<%= submit_tag "Submit",  class: "btn btn-primary" %>
 			 		</div>
 					<% end %>

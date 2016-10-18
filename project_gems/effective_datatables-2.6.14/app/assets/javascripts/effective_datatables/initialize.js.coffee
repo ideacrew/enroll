@@ -57,8 +57,8 @@
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
       iDisplayLength: datatable.data('display-entries')
-      language: { 'lengthMenu': 'Show _MENU_ per page'}
-      lengthMenu: [[10, 25, 50, 100], ['10', '25', '50', '100']]
+      language: { 'lengthMenu': '_MENU_ per page'}
+      lengthMenu: [[10, 25, 50, 200], ['10', '25', '50', '200']]
       order: datatable.data('default-order')
       processing: true
       responsive: true

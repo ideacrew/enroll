@@ -8,13 +8,14 @@ module Effective
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
            bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+           #bulk_action 'Transmit Group XML', transmit_group_xml_exchanges_hbx_profiles_path, data: {  confirm: 'Transmit Group XML?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false
         table_column :hbx_id, :width => '100px', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :width => '100px', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
-        # table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
+        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
             row.employer_profile.broker_agency_profile.organization.legal_name.titleize if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
@@ -36,6 +37,9 @@ module Effective
 
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
+          employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial]
+          employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing]
+
           employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
           employers = employers.send(attributes[:employers]) if !attributes[:enrolled].present? && !attributes[:enrolling].present?
         end
@@ -72,7 +76,9 @@ module Effective
         @next_60_day = @next_30_day.next_month
         @next_90_day = @next_60_day.next_month
 
+
         filters = {
+        # Format => 'scope', 'Button Label', 'Category'
         enrolling_ineligible:
           [
            ['', 'Plan Ineligible', ],
@@ -80,14 +86,14 @@ module Effective
           ],
         enrolling_renewing:
           [
-           ['', 'Application Pending', ],
-           ['', 'Open Enrollment', ],
+           ['employer_profiles_renewing_application_pending', 'Application Pending', ],
+           ['employer_profiles_renewing_open_enrollment', 'Open Enrollment', ],
           ],
         enrolling_initial:
           [
-            ['', 'Application Pending'],
-            ['employer_profiles_binder_pending', 'Open Enrollment'],
-            ['', 'Invoice Pending'],
+            ['employer_profiles_initial_application_pending', 'Application Pending'],
+            ['employer_profiles_initial_open_enrollment', 'Open Enrollment'],
+            #['', 'Invoice Pending'],
             ['employer_profiles_binder_pending', 'Binder Pending'],
             ['employer_profiles_binder_paid', 'Binder Paid'],
           ],
@@ -101,7 +107,7 @@ module Effective
             ['employer_profiles_enrolling', 'All'],
             ['employer_profiles_initial_eligible', 'Initial', :enrolling_initial],
             ['employer_profiles_renewing', 'Renewing / Converting', :enrolling_renewing],
-            ['', 'Ineligible', :enrolling_ineligible],
+            #['', 'Ineligible', :enrolling_ineligible],
           ],
         employers:
          [
@@ -109,8 +115,6 @@ module Effective
            ['employer_profiles_applicants', 'Applicants'],
            ['employer_profiles_enrolling', 'Enrolling', :enrolling],
            ['employer_profiles_enrolled', 'Enrolled', :enrolled],
-           #['all_employers_renewing', 'Renewing'],
-           #['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
         top_scope: :employers
         }

@@ -1,19 +1,26 @@
 module Queries
   class FamilyDatatableQuery
 
-    attr_reader :search_string
+    attr_reader :search_string, :custom_attributes
 
     def datatable_search(string)
       @search_string = string
       self
     end
 
-    def count
-      #return Family.count if @search_string.blank?
-      build_scope.count
+    def initialize(attributes)
+      puts "initializing #{attributes}"
+      @custom_attributes = attributes
+    end
+
+    def person_search search_string
+      return Family if search_string.blank?
+
+
     end
 
     def build_scope()
+
       #return Family if @search_string.blank?
       #person_id = Person.search(@search_string).limit(5000).pluck(:_id)
       #family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
@@ -58,7 +65,7 @@ module Queries
     end
 
     def size
-      Family.count
+      build_scope.count
     end
 
   end
