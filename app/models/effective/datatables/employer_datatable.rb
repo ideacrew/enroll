@@ -14,7 +14,7 @@ module Effective
         table_column :hbx_id, :width => '100px', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :width => '100px', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
-        # table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
+        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
             row.employer_profile.broker_agency_profile.organization.legal_name.titleize if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
@@ -72,7 +72,9 @@ module Effective
         @next_60_day = @next_30_day.next_month
         @next_90_day = @next_60_day.next_month
 
+
         filters = {
+        # Format => 'scope', 'Button Label', 'Category'
         enrolling_ineligible:
           [
            ['', 'Plan Ineligible', ],
@@ -81,12 +83,12 @@ module Effective
         enrolling_renewing:
           [
            ['', 'Application Pending', ],
-           ['', 'Open Enrollment', ],
+           ['employer_profiles_open_enrollment', 'Open Enrollment', ],
           ],
         enrolling_initial:
           [
             ['', 'Application Pending'],
-            ['employer_profiles_binder_pending', 'Open Enrollment'],
+            ['employer_profiles_open_enrollment', 'Open Enrollment'],
             ['', 'Invoice Pending'],
             ['employer_profiles_binder_pending', 'Binder Pending'],
             ['employer_profiles_binder_paid', 'Binder Paid'],
@@ -109,8 +111,6 @@ module Effective
            ['employer_profiles_applicants', 'Applicants'],
            ['employer_profiles_enrolling', 'Enrolling', :enrolling],
            ['employer_profiles_enrolled', 'Enrolled', :enrolled],
-           #['all_employers_renewing', 'Renewing'],
-           #['date_cat', 'Upcoming Dates', :date_window]  #maybe no sub menu?
          ],
         top_scope: :employers
         }
