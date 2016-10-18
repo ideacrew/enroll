@@ -60,16 +60,13 @@ module Effective
 
       def nested_filter_definition
         {
-
-
         employer_options: [
           ['all', 'All'],
           ['enrolled', 'Enrolled'],
-          ['renewing', 'Renewing'],
+          ['by_enrollment_renewing', 'Renewing'],
           ['waived', 'Waived'],
           ['sep_eligible', 'SEP Eligible']
         ],
-
           individual_options: [
             ['all', 'All'],
             ['all_assistance_receiving', 'Assisted'],
@@ -80,8 +77,8 @@ module Effective
           families:
             [
               ['all', 'All'],
-              ['individual_enrolled', 'Individual Enrolled', :individual_options],
-              ['employer_sponsored', 'Employer Sponsored Coverage Enrolled', :employer_options],
+              ['by_enrollment_individual_market', 'Individual Enrolled', :individual_options],
+              ['by_enrollment_shop_market', 'Employer Sponsored Coverage Enrolled', :employer_options],
               ['non_enrolled', 'Non Enrolled'],
             ],
           top_scope: :families
