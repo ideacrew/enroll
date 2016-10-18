@@ -609,6 +609,25 @@ class Person
       matches.uniq
     end
 
+    def match_by_id_info_for_conversion(options)
+      ssn_query = options[:ssn]
+      dob_query = options[:dob]
+      last_name = options[:last_name]
+      first_name = options[:first_name]
+
+      raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
+
+      matches = Array.new
+      matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query), dob: dob_query).to_a unless ssn_query.blank?
+      #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
+      if first_name.present? && last_name.present? && dob_query.present?
+        first_exp = /^#{first_name}$/i
+        last_exp = /^#{last_name}$/i
+        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).active.to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+      end
+      matches.uniq
+    end
+
     def brokers_or_agency_staff_with_status(query, status)
       query.and(
                 Person.or(

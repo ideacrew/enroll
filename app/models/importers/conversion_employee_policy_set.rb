@@ -163,7 +163,7 @@ module Importers
       [
       :action,
       :ignore,
-      :ignore,
+      :market,
       :ignore,
       :fein,
       :ignore,
