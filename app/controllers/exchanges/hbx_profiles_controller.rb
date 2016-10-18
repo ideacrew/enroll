@@ -33,7 +33,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def transmit_group_xml
-    HbxProfile.transmit_group_xml(params[:id].split)
+    HbxProfile.transmit_group_xml(params[:ids].split)
     flash["notice"] = "Successfully transmitted the employer group xml."
     redirect_to exchanges_hbx_profiles_root_path
   end
