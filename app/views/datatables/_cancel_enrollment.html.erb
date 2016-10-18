@@ -1,6 +1,7 @@
 
   <!-- Plan Name -->
-  <td style="width:200px;">
+  <td class="col-bulk_actions_column col-bulk_actions"></td>
+  <td class="col-string">
     <label>
       <strong>
         Plan
@@ -10,7 +11,7 @@
     <%= @hbx_enrollment.plan.name %>
   </td>
   <!-- Effective Date -->
-  <td style="width:200px;">
+  <td class="col-string">
     <label>
       <strong>
         Effective Date
@@ -20,7 +21,7 @@
     <%= @hbx_enrollment.effective_on %>
   </td>
   <!-- Cancel date set to start date -->
-  <td style="width:200px;">
+  <td class="col-string">
     <label>
       <strong>
         Cancellation Date
@@ -34,8 +35,10 @@
 
   <%= form_for @hbx_enrollment, :url => { :action => "update_cancel_enrollment"}, :method => :post, :html => { :class => 'vertically-aligned-row' } do |f| %>
 
-  <td class="col-md-3">
-    <span class="btn btn-default btn-sm" onclick="EnrollDataTableInitializer.removeRow($(this));">Cancel</span>
-    <%= f.submit "Submit", class: 'btn btn-primary btn-sm' %>
+  <td style="width:280px !important">
+    <!-- <span class="btn btn-default btn-sm" onclick="$('tr.child-row:visible').remove();">Cancel</span> -->
+    <%= button_to "CANCEL", '', { :onclick => "$('tr.child-row:visible').remove();", :class=>"btn btn-default btn-xs" }%>
+    <%= f.submit "Submit", class: 'btn btn-primary btn-xs' %>
   </td>
   <% end %>
+
