@@ -61,6 +61,11 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         household = subject.get_family_object.households.first
         expect(household.tax_households.class).to eq Array
       end
+
+      it "should get tax_household_members by tax_households" do
+        household = subject.get_family_object.households.first
+        expect(household.tax_households.first.tax_household_members.class).to eq Array
+      end
     end
   end
 end

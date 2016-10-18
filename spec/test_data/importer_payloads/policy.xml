@@ -397,7 +397,7 @@
             </alias_id>
           </alias_ids>
         </id>
-        <name>a</name>
+        <name>CareFirst</name>
         <display_name>String</display_name>
         <is_active>true</is_active>
       </carrier>
@@ -405,20 +405,25 @@
       <coverage_type>urn:openhbx:terms:v1:qhp_benefit_coverage#health_and_dental</coverage_type>
       <ehb_percent>91.2</ehb_percent>
     </plan>
-    <individual_market>
-      <is_carrier_to_bill>true</is_carrier_to_bill>
-      <applied_aptc_amount>0</applied_aptc_amount>
-    </individual_market>
-    <premium_total_amount>777.77</premium_total_amount>
-    <total_responsible_amount>777.77</total_responsible_amount>
+    <shop_market>
+      <employer_link>
+        <id>
+          <id>urn:openhbx:terms:v1:employer:fein#522088262</id>
+        </id>
+        <name>Darryl Carter, Inc.</name>
+      </employer_link>
+      <total_employer_responsible_amount>223.51</total_employer_responsible_amount>
+    </shop_market>
+    <premium_total_amount>447.02</premium_total_amount>
+    <total_responsible_amount>223.51</total_responsible_amount>
     <eligibility_event>
       <event_kind>urn:dc0:terms:v1:qualifying_life_event#marriage</event_kind>
       <event_date>20151202</event_date>
     </eligibility_event>
   </enrollment>
   <policy_state>urn:openhbx:terms:v1:policy_state#submitted</policy_state>
-  <request_submitted_timestamp>2015-12-10T09:30:47Z</request_submitted_timestamp>
-  <is_active>true</is_active>
+  <request_submitted_timestamp>20160901</request_submitted_timestamp>
+  <market>shop</market>
   <created_at>2001-12-17T09:30:47Z</created_at>
   <modified_at>2001-12-17T09:30:47Z</modified_at>
   <version>0</version>

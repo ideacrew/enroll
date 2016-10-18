@@ -52,8 +52,11 @@
   </primary_family_member_id>
   <e_case_id>abc123xyz2</e_case_id>
   <households>
-    <household />
-    <household />
+    <household>
+      <tax_households>
+        <tax_household></tax_household>
+      </tax_households>
+    </household>
   </households>
   <irs_groups>
     <irs_group />

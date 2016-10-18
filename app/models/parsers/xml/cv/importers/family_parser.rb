@@ -42,7 +42,7 @@ module Parsers::Xml::Cv::Importers
       if irs_groups
         irs_groups.each do |irs|
           irs_group_objects << IrsGroup.new(
-            id: irs.id,
+            hbx_assigned_id: irs.id,
             effective_starting_on: irs.effective_start_date,
             effective_ending_on: irs.effective_end_date,
           )
@@ -134,8 +134,17 @@ module Parsers::Xml::Cv::Importers
     def get_tax_households_by_household_xml(household)
       tax_households = []
       household.tax_households.each do |th|
+        tax_household_members = []
+        th.tax_household_members.each do |thm|
+          tax_household_members << TaxHouseholdMember.new(
+            applicant_id: thm.id,
+            is_ia_eligible: thm.is_insurance_assistance_eligible == 'true',
+            is_medicaid_chip_eligible: thm.is_medicaid_chip_eligible == 'true',
+          )
+        end
         tax_households << TaxHousehold.new(
           id: th.id,
+          tax_household_members: tax_household_members,
           effective_starting_on: th.start_date,
           effective_ending_on: th.end_date,
         )

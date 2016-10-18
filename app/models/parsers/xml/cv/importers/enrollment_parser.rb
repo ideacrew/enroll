@@ -12,9 +12,9 @@ module Parsers::Xml::Cv::Importers
       individual_market = @enrollment.individual_market
       elected_aptc_pct = individual_market.present? ? individual_market.elected_aptc_percent.to_f : 0
       applied_aptc_amount = individual_market.present? ? individual_market.applied_aptc_amount.to_f : 0
-      if shop_market = @enrollment.shop_market
+      #if shop_market = @enrollment.shop_market
         #employer = EmployeeRole.new(name: shop_market.employer.name, dba: shop_market.employer.dba)
-      end
+      #end
       if e_plan = enrollment.plan
         metal_level = e_plan.metal_level.strip.split("#").last
         coverage_type = e_plan.coverage_type.strip.split("#").last

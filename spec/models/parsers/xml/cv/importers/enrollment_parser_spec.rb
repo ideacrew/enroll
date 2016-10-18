@@ -11,8 +11,8 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
         expect(subject.get_enrollment_object.class).to eq HbxEnrollment
       end
 
-      it "should be individual" do
-        expect(subject.get_enrollment_object.kind).to eq 'individual'
+      it "should be employer_sponsored" do
+        expect(subject.get_enrollment_object.kind).to eq 'employer_sponsored'
       end
 
       it "should get plan" do
