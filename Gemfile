@@ -100,7 +100,7 @@ gem 'jquery-datatables-rails', '3.4.0'
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 
-# Http
+# Httparty
 gem 'httparty'
 
 group :development do
