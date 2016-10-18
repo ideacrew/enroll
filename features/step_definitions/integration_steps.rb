@@ -707,3 +707,18 @@ And(/I should not see any plan which premium is 0/) do
     expect(premium).not_to have_content("$0.00")
   end
 end
+
+Then(/Devops can verify session logs/) do
+  log_entries = `tail -n 15 log/test.log`.split("\n")
+  #log with a logged out session
+  session_id = log_entries.last.match(/\[([^\]]*)\]/)[1]
+  session_history = SessionIdHistory.where(session_id: session_id).first
+  expect(session_history.present?).to be true
+  expect(session_history.session_user_id).to be nil
+  #earlier in log was logged on
+  logged_on_session = SessionIdHistory.all[-2]
+  user = User.find(logged_on_session.session_user_id)
+  expect(log_entries.first).to match(/#{logged_on_session.session_id}/)
+  #user was a consumer
+  expect(user.person.consumer_role).not_to be nil
+end
