@@ -4,7 +4,7 @@ module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
     REMOTE_ACCESS_KEY = "B48E5D58B6A64B3E93A6BF719647E568"
-    BASE_URL =  "https://staging.checkbookhealth.org/shop/dc/2016/"
+    BASE_URL =  "https://staging.checkbookhealth.org"
     def initialize(census_employee)
       @census_employee= census_employee
       @url = "https://staging.checkbookhealth.org/shop/dc/api/"
@@ -12,7 +12,7 @@ module CheckbookServices
 
     def generate_url
       begin
-      puts construct_body
+      puts construct_body.to_json
 
       @result = HTTParty.post(@url,
               :body => construct_body.to_json,
@@ -32,6 +32,7 @@ module CheckbookServices
 
     private 
     def construct_body
+      # binding.pry
     {
       "remote_access_key": REMOTE_ACCESS_KEY,
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
@@ -51,8 +52,9 @@ module CheckbookServices
     def employer_contributions
       premium_benefit_contributions = {}
       census_employee.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits.each do |relationship_benefit| 
-        # next if relationship_benefit.premium_pct.to_i <= 0 
-        premium_benefit_contributions[relationship_benefit.relationship]=relationship_benefit.premium_pct.to_f
+        next if relationship_benefit.relationship == "child_26_and_over"
+        relationship=  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.relationship
+        premium_benefit_contributions[relationship] = relationship_benefit.premium_pct.to_f
       end
       premium_benefit_contributions
     end
