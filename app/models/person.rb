@@ -371,9 +371,8 @@ class Person
   def verification_types
     verification_types = []
     verification_types << 'Social Security Number' if ssn
-    if citizen_status == "indian_tribe_member"
-      verification_types << 'American Indian Status'
-    elsif self.us_citizen
+    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
+    if self.us_citizen
       verification_types << 'Citizenship'
     else
       verification_types << 'Immigration status'

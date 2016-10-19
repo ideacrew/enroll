@@ -19,6 +19,7 @@ class ConsumerRole
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
+  NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -67,9 +68,12 @@ class ConsumerRole
 
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
+  field :native_validation, type: String, default: "na"
+  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
+  field :native_update_reason, type: String
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -121,7 +125,7 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
 
-  before_validation :ensure_ssn_validation_status
+  before_validation :ensure_ssn_validation_status, :ensure_native_validation
 
   def ivl_coverage_selected
     if unverified?
@@ -173,10 +177,13 @@ class ConsumerRole
 
   #check verification type status
   def is_type_outstanding?(type)
-    if type == 'Social Security Number'
-      !self.ssn_verified? && !self.has_docs_for_type?(type)
-    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
-      !lawful_presence_authorized? && !self.has_docs_for_type?(type)
+    case type
+      when 'Social Security Number'
+        !ssn_verified? && !has_docs_for_type?(type)
+      when 'American Indian Status'
+        !native_verified? && !has_docs_for_type?(type)
+      else
+        !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
   end
 
@@ -358,7 +365,7 @@ class ConsumerRole
     state :fully_verified
     state :verification_period_ended
 
-    before_all_events :ensure_ssn_validation_status
+    before_all_events :ensure_ssn_validation_status, :ensure_native_validation
 
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified
@@ -547,6 +554,13 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  #class methods
+  class << self
+    def advance_day(check_date)
+      #handle all outstanding consumer who is unverified more than 90 days
+    end
+  end
+
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
@@ -588,6 +602,14 @@ class ConsumerRole
 
   def citizenship_verified?
     lawful_presence_authorized?
+  end
+
+  def native_verified?
+    native_validation == "valid"
+  end
+
+  def native_outstanding?
+    native_validation == "outstanding"
   end
 
   def indian_conflict?
@@ -645,10 +667,21 @@ class ConsumerRole
   end
 
   def is_type_verified?(type)
-    if type == 'Social Security Number'
-      ssn_verified?
-    elsif ['Citizenship', 'Immigration status', 'American Indian Status'].include?(type)
-      lawful_presence_verified?
+    case type
+      when 'Social Security Number'
+        ssn_verified?
+      when 'American Indian Status'
+        native_verified?
+      else
+        lawful_presence_verified?
+    end
+  end
+
+  def ensure_native_validation
+    if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
+      self.native_validation = "outstanding" if native_validation == "na"
+    else
+      self.native_validation = "na"
     end
   end
 

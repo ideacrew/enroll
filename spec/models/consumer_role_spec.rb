@@ -207,6 +207,26 @@ context "Verification process and notices" do
     end
   end
 
+  describe "Native American verification" do
+    shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
+      it "#{action} #{state} for #{consumer_kind}" do
+        person.update_attributes!(:citizen_status=>"indian_tribe_member") if tribe
+        person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
+        expect(person.consumer_role.native_validation).to eq(state)
+      end
+    end
+    context "native validation doesn't exist" do
+      it_behaves_like "ensures native american field value", "assigns", "na", "NON native american consumer"
+
+      it_behaves_like "ensures native american field value", "assigns", "outstanding", "native american consumer", "tribe"
+    end
+    context "existing native validation" do
+      it_behaves_like "ensures native american field value", "assigns", "pending", "pending native american consumer", "tribe", "pending"
+      it_behaves_like "ensures native american field value", "doesn't change", "outstanding", "outstanding native american consumer", "tribe", "outstanding"
+      it_behaves_like "ensures native american field value", "assigns", "outstanding", "na native american consumer", "tribe", "na"
+    end
+  end
+
   describe "#is_type_outstanding?" do
     context "Social Security Number" do
       it "returns true for unverified ssn and NO docs uploaded for this type" do
