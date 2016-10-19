@@ -75,7 +75,6 @@ module Effective
       def nested_filter_definition
         {
         employer_options: [
-
           {scope: 'all', label: 'All'},
           {scope: 'enrolled', label: 'Enrolled'},
           {scope: 'by_enrollment_renewing', label: 'Renewing'},
@@ -87,6 +86,8 @@ module Effective
             {scope: 'all_assistance_receiving', label: 'Assisted'},
             {scope: 'all_unassisted', label: 'Unassisted'},
             {scope: 'by_enrollment_cover_all', label: 'Cover All'},
+            {scope: 'unassisted', label: 'Unassisted'},
+            {scope: 'cover_all', label: 'Cover All'},
             {scope: 'sep_eligible', label: 'SEP Eligible'}
           ],
           families:
