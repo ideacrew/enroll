@@ -80,9 +80,10 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
+        relation = relationship.relationship_uri.strip.split("#").last rescue ''
         person_object.person_relationships.build({
           relative_id: relationship.object_individual, #use subject_individual or object_individual
-          kind: relationship.relationship_uri,
+          kind: relation,
         })
       end
       person.addresses.each do |address|
