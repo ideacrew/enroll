@@ -11,6 +11,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     self.url = args[:data]
     super(args)
     # self.data = args[:data]
+    self.subject=  args[:subject] +""+census_employee.id
     self.to= @recipient.email.address
   end
 
