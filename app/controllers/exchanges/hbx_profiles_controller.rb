@@ -251,8 +251,9 @@ def employer_poc
 
 
   def terminate_enrollment
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    @row = params[:row]
+    @hh = Family.find(params[:family]).households.first
+    @hbx_enrollment = @hh.hbx_enrollments.last
+    @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
     end
