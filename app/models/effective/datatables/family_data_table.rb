@@ -83,7 +83,7 @@ module Effective
             ['all', 'All'],
             ['all_assistance_receiving', 'Assisted'],
             ['unassisted', 'Unassisted'],
-            ['cover_all', 'Cover All'],
+            ['by_enrollment_coverall', 'Cover All'],
             ['sep_eligible', 'SEP Eligible']
           ],
           families:

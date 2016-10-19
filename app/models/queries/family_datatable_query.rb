@@ -39,6 +39,9 @@ module Queries
       if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
         family = family.by_enrollment_renewing
       end
+      if @custom_attributes['individual_options'] == 'by_enrollment_coverall'
+        family = family.by_enrollment_coverall_market
+      end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 3
       person_id = Person.search(@search_string).pluck(:_id)
