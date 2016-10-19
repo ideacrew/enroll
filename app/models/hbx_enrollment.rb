@@ -143,7 +143,8 @@ class HbxEnrollment
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
-  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
+  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored").where(:kind.ne => "coverall") }
+  scope :coverall_market,     ->{ where(:kind => "coverall")}
   scope :verification_needed, ->{ where(:aasm_state => "enrolled_contingent").or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }

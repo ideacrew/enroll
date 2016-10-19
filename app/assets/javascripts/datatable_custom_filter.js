@@ -16,6 +16,19 @@ DT = ( function() {
     var level = parseInt(get_level && get_level[1])
     clear_level(level+1)
   }
+  var clear_button_todojf = function() {          // Seriously?
+    setTimeout(
+      function() {
+        $($('.dataTables_filter label')[0]).append("<div class='btn btn-sm btn-default' style='display:inline'><span class='glyphicon glyphicon-remove'></span> </div>")
+        $('.dataTables_filter .glyphicon-remove').on('click', function(){
+          $('input[type=search]').val('').trigger('keyup');
+          $('.effective-datatable').DataTable().draw()
+        })
+
+      },
+      50
+    )
+  }
   var filters = function(){
     $('.custom_level_1').removeClass('hide')
     $('.custom_filter .btn-default').click(function() {
@@ -29,11 +42,9 @@ DT = ( function() {
       $(that).addClass('active')
       id = $(that).attr('id').substring(4).replace(/\//g,'-')
       $('.Filter-'+id).removeClass('hide')
-      // $('.custom_filter .btn-default').on('click', function() {
-      //   $('.effective-datatable').DataTable().draw()
-      // })
       $('.effective-datatable').DataTable().draw()
     })
+    clear_button_todojf()
     extendDatatableServerParams = function(){
       var keys = {}
       DT.filter_params(keys, 1)

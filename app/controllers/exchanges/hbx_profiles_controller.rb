@@ -232,8 +232,11 @@ def employer_poc
   end
 
   def cancel_enrollment
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    @row = params[:row]
+    #binding.pry
+    @hh = Family.find(params[:family]).households.first
+    @hbx_enrollment = @hh.hbx_enrollments.last
+    @row = params[:family_actions_id]
+    #binding.pry
     respond_to do |format|
       format.js { render "datatables/cancel_enrollment" }
     end
@@ -241,7 +244,6 @@ def employer_poc
 
   def update_cancel_enrollment
     @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    # debugger
     if @hbx_enrollment.cancel_coverage!
       redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Cancellation Successful" }
     end
@@ -249,10 +251,23 @@ def employer_poc
 
 
   def terminate_enrollment
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    @row = params[:row]
+    @hh = Family.find(params[:family]).households.first
+    @hbx_enrollment = @hh.hbx_enrollments.last
+    @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
+    end
+  end
+
+  def update_terminate_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    termination_date = Date.strptime(params[:termination_date], "%m/%d/%Y")
+
+    if @hbx_enrollment.kind == "individual"
+      @hbx_enrollment.terminate_coverage!(termination_date)
+      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Termination Successful" }
+    elsif @hbx_enrollment.schedule_coverage_termination!(termination_date)
+      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Termination Successful" }
     end
   end
 
@@ -504,7 +519,7 @@ def employer_poc
       @total = Family.all_active_assistance_receiving_for_current_year.count
     else
       person_ids = Person.search(@q).map(&:_id)
-      
+
       total_families = Family.all_active_assistance_receiving_for_current_year.in("family_members.person_id" => person_ids).entries
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no

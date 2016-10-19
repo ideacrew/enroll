@@ -17,30 +17,29 @@ module Effective
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
         table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :employee?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|  
-            dropdown = [
-             # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-             ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-             ['Edit DOB / SSN', edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-             ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
-             ['EDIT APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)],
-             ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
-            ]
-            render '/datatables/shared/dropdown', dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"
-          }, :filter => false, :sortable => false
-        end
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+          dropdown = [
+           # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), cancel_enrollment_type(row)],
+           ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), terminate_enrollment_type(row)],
+           ['Edit DOB / SSN', edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
+           ['EDIT APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)],
+           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
+          ]
+          render '/datatables/shared/dropdown', dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"
+        }, :filter => false, :sortable => false
+      end
 
       scopes do
          scope :legal_name, "Hello"
       end
 
       def collection
-        if  (defined? @families) && @families.present?
-          puts 'there'
-        else
+        unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
           @families = Queries::FamilyDatatableQuery.new(attributes)
-          puts 'here'
         end
         @families
       end
@@ -58,28 +57,45 @@ module Effective
         family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
       end
 
+      def cancel_enrollment_type(family)
+        hbx_enrollment = family.households.first.hbx_enrollments.last
+        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+      end
+
+      def terminate_enrollment_type(family)
+        hbx_enrollment = family.households.first.hbx_enrollments.last
+        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+      end  
+
+      def edit_dob_link_type(current_user)
+        (current_user.roles.include? "hbx_staff" and Permission.where(name: 'hbx_staff').first.can_update_ssn?) ? 'ajax' : 'disabled'
+
+      end
+
       def nested_filter_definition
         {
         employer_options: [
-          ['all', 'All'],
-          ['enrolled', 'Enrolled'],
-          ['by_enrollment_renewing', 'Renewing'],
-          ['waived', 'Waived'],
-          ['sep_eligible', 'SEP Eligible']
+          {scope: 'all', label: 'All'},
+          {scope: 'enrolled', label: 'Enrolled'},
+          {scope: 'by_enrollment_renewing', label: 'Renewing'},
+          {scope: 'waived', label: 'Waived'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
         ],
           individual_options: [
-            ['all', 'All'],
-            ['all_assistance_receiving', 'Assisted'],
-            ['unassisted', 'Unassisted'],
-            ['cover_all', 'Cover All'],
-            ['sep_eligible', 'SEP Eligible']
+            {scope: 'all', label: 'All'},
+            {scope: 'all_assistance_receiving', label: 'Assisted'},
+            {scope: 'all_unassisted', label: 'Unassisted'},
+            {scope: 'by_enrollment_cover_all', label: 'Cover All'},
+            {scope: 'unassisted', label: 'Unassisted'},
+            {scope: 'cover_all', label: 'Cover All'},
+            {scope: 'sep_eligible', label: 'SEP Eligible'}
           ],
           families:
             [
-              ['all', 'All'],
-              ['by_enrollment_individual_market', 'Individual Enrolled', :individual_options],
-              ['by_enrollment_shop_market', 'Employer Sponsored Coverage Enrolled', :employer_options],
-              ['non_enrolled', 'Non Enrolled'],
+              {scope: 'all', label: 'All'},
+              {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
+              {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
+              {scope: 'non_enrolled', label: 'Non Enrolled'},
             ],
           top_scope: :families
         }
