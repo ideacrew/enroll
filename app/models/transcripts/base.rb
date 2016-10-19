@@ -48,14 +48,15 @@ module Transcripts
     def build_association_differences(association)
       differences     = HashWithIndifferentAccess.new
 
-      enumeration_association = association[:association]         
+      enumeration_association = association[:association]
+      enumeration_field = association[:enumeration_field]      
       association_differences = []
 
       if association[:cardinality] == 'one'
         if association[:enumeration].blank?
 
           group_associations_by_enumeration_field(association).each do |association_pair|
-            differences = compare_assocation(association_pair[0], association_pair[1], differences, enumeration_association.singularize)
+            differences = compare_assocation(association_pair[0], association_pair[1], differences, enumeration_field)
           end
         else
           association[:enumeration].each do |attr_val|
@@ -72,16 +73,15 @@ module Transcripts
 
     def group_associations_by_enumeration_field(association)
       # TODO: Validate for duplicate family member records with same hbx id
-
-      other_assocs = @transcript[:other].send(association[:association]).dup
-
-      source_other_pairs = @transcript[:source].send(association[:association]).map do |source_assoc|
+      other_assocs = @transcript[:other].send(association[:association]).to_a.dup
+      
+      source_other_pairs = @transcript[:source].send(association[:association]).to_a.map do |source_assoc|
         enumeration_value = source_assoc.send(association[:enumeration_field])
         other_assoc = other_assocs.detect{|other_assoc| other_assoc.send(association[:enumeration_field]) == enumeration_value}
         other_assocs.delete(other_assoc)
         [source_assoc, other_assoc]
       end
-    
+
       source_other_pairs + other_assocs.map { |other_assoc| [nil, other_assoc] }
     end
 
@@ -100,8 +100,13 @@ module Transcripts
           differences[:remove] ||= {}
           differences[:remove][attr_val] = (source.is_a?(Hash) ? source : source.serializable_hash)
         elsif source.present? && other.present?
+          if attr_val.to_s.match(/_id$/).present?
+            identifer_val = source[attr_val.to_sym] || other[attr_val.to_sym]
+            key = "#{attr_val}:#{identifer_val}" if identifer_val.present?
+          end
+
           differences[:update] ||= {}
-          differences[:update][attr_val] = compare(base_record: source, compare_record: other)
+          differences[:update][key || attr_val] = compare(base_record: source, compare_record: other)
         end
       end
       differences
@@ -134,8 +139,8 @@ module Transcripts
               base_attr = base_record[k].to_s.downcase.strip
               compare_attr = compare_record[k].to_s.downcase.strip
             else
-              base_attr = base_record[k]
-              compare_attr = compare_record[k]
+              base_attr = (base_record.is_a?(Hash) ? base_record[k] : base_record.send(k))
+              compare_attr = (compare_record.is_a?(Hash) ? compare_record[k] : compare_record.send(k))
             end
 
             if base_attr != compare_attr

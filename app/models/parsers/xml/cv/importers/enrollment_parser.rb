@@ -79,8 +79,7 @@ module Parsers::Xml::Cv::Importers
         member = enrollee.member
         family_members << FamilyMember.new(
           id: member.id,
-          hbx_id: member.id,
-          is_primary_applicant: member.is_primary_applicant == 'true',
+          is_primary_applicant: enrollee.is_subscriber == 'true',
           is_coverage_applicant: member.is_coverage_applicant == 'true',
           person: get_person_object_by_enrollee_member_xml(member),
         )
