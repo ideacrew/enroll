@@ -25,7 +25,7 @@ describe RemoveBenefitPackage do
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with("title").and_return(benefit_group.title)
+      allow(ENV).to receive(:[]).with("id").and_return(benefit_group.id)
     end
     
     it "should remove the benefit package" do
@@ -35,11 +35,12 @@ describe RemoveBenefitPackage do
       expect(plan_year.benefit_groups.size).to eq 0
     end
 
-    it "should remove the enrollments" do
+    it "should remove the benefit group assignments and enrollments" do
       expect(benefit_group.benefit_group_assignments.first.hbx_enrollments.size).to eq 1
+      expect(benefit_group.benefit_group_assignments.size).to eq 1
       subject.migrate
       plan_year.reload
-      expect(benefit_group.benefit_group_assignments.first.hbx_enrollments.size).to eq 0
+      expect(benefit_group.benefit_group_assignments.size).to eq 0
     end
   end
 end
