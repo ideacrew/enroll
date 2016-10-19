@@ -8,7 +8,6 @@ module Effective
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
            bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
-           #bulk_action 'Transmit Group XML', transmit_group_xml_exchanges_hbx_profiles_path, data: {  confirm: 'Transmit Group XML?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false
@@ -26,10 +25,13 @@ module Effective
 
         table_column :plan_year_state, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:aasm_state).try(:titleize)}, :filter => false
         table_column :invoiced, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
-        #table_column :update_at, :proc => Proc.new { |row| row[5].strftime('%m/%d/%Y')}
         table_column :transmit_xml, :proc => Proc.new { |row|
-          #link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), method: :post, data: { confirm: group_xml_transmitted_message(row.employer_profile) })
-          link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), method: :post)
+
+          if row.employer_profile.can_transmit_xml?
+            link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), method: :post)
+          else
+            "Transmit XML Disabled"
+          end
         }
 
       end

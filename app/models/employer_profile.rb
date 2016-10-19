@@ -691,10 +691,11 @@ class EmployerProfile
   #   registered? or published_plan_year.enrolling?
   # end
 
-  def self.update_status_to_binder_paid(employer_profile_ids)
-    employer_profile_ids.each do |id|
-      empr = self.find(id)
-      empr.update_attribute(:aasm_state, "binder_paid")
+  def self.update_status_to_binder_paid(organization_ids)
+    organization_ids.each do |id|
+      if org = Organization.find(id)
+        org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+      end
     end
   end
 
