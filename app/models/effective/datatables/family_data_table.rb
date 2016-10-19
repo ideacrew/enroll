@@ -76,13 +76,13 @@ module Effective
           ['all', 'All'],
           ['enrolled', 'Enrolled'],
           ['by_enrollment_renewing', 'Renewing'],
-          ['waived', 'Waived'],
+          ['coverage_waived', 'Waived'],
           ['sep_eligible', 'SEP Eligible']
         ],
           individual_options: [
             ['all', 'All'],
             ['all_assistance_receiving', 'Assisted'],
-            ['unassisted', 'Unassisted'],
+            ['all_unassisted', 'Unassisted'],
             ['by_enrollment_coverall', 'Cover All'],
             ['sep_eligible', 'SEP Eligible']
           ],

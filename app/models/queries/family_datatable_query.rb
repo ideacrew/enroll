@@ -24,23 +24,38 @@ module Queries
       #return Family if @search_string.blank?
       #person_id = Person.search(@search_string).limit(5000).pluck(:_id)
       #family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
-
-      puts "#{@custom_attributes} are attributes,#{@custom_attributes['aptc']} "
       family = Family
-      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
-        family = family.all_assistance_receiving
-      end
       if @custom_attributes['families'] == 'by_enrollment_individual_market'
+        family = family.all_enrollments
         family = family.by_enrollment_individual_market
       end
-       if @custom_attributes['families'] == 'by_enrollment_shop_market'
+      if @custom_attributes['families'] == 'by_enrollment_shop_market'
+        family = family.all_enrollments
         family = family.by_enrollment_shop_market
+      end
+      if @custom_attributes['families'] == 'non_enrolled'
+        family = family.non_enrolled
       end
       if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
         family = family.by_enrollment_renewing
       end
+      if @custom_attributes['employer_options'] == 'sep_eligible'
+        family = family.sep_eligible
+      end
+      if @custom_attributes['employer_options'] == 'coverage_waived'
+        family = family.coverage_waived
+      end
       if @custom_attributes['individual_options'] == 'by_enrollment_coverall'
         family = family.by_enrollment_coverall_market
+      end
+      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
+        family = family.all_assistance_receiving
+      end
+      if @custom_attributes['individual_options'] == 'sep_eligible'
+        family = family.sep_eligible
+      end
+      if @custom_attributes['individual_options'] == 'all_unassisted'
+        family = family.all_unassisted
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 3
