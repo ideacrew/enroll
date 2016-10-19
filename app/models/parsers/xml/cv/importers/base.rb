@@ -1,7 +1,7 @@
 module Parsers::Xml::Cv::Importers
   module Base
     def get_person_object_by(person, person_demographics, person_relationships)
-      hbx_id = person.id
+      hbx_id = person.id.strip.split('#').last rescue ''
       gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
 
       person_object = Person.new(

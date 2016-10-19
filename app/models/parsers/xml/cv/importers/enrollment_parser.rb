@@ -39,8 +39,9 @@ module Parsers::Xml::Cv::Importers
           #applied_aptc_amount: , # can not find it in xml
         )
       end
+      coverage_type = enrollment.plan.coverage_type.strip.split('#').last rescue ''
       HbxEnrollment.new(
-        #hbx_id: ,
+        hbx_id: policy.id,
         kind: kind,
         elected_aptc_pct: elected_aptc_pct,
         applied_aptc_amount: applied_aptc_amount,
@@ -48,7 +49,7 @@ module Parsers::Xml::Cv::Importers
         carrier_profile_id: enrollment.plan.try(:carrier).try(:id),
         #writing_agent_id: broker_link.id,
         #terminated_on: ,
-        coverage_kind: enrollment.plan.try(:coverage_type),
+        coverage_kind: coverage_type,
         #enrollment_kind: ,
         #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,
