@@ -40,6 +40,7 @@ module Parsers::Xml::Cv::Importers
         )
       end
       coverage_type = enrollment.plan.coverage_type.strip.split('#').last rescue ''
+      effective_on = policy.enrollees.first.benefit.begin_date rescue ''
       HbxEnrollment.new(
         hbx_id: policy.id,
         kind: kind,
@@ -54,6 +55,7 @@ module Parsers::Xml::Cv::Importers
         #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,
         household: get_household_by_policy_xml(policy),
+        effective_on: effective_on,
       )
     end
 
