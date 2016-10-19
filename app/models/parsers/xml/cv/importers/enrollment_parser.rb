@@ -13,7 +13,6 @@ module Parsers::Xml::Cv::Importers
       individual_market = enrollment.individual_market
       elected_aptc_pct = individual_market.present? ? individual_market.elected_aptc_percent.to_f : 0
       applied_aptc_amount = individual_market.present? ? individual_market.applied_aptc_amount.to_f : 0
-      employee_role = get_employee_role_by_shop_market_xml(enrollment.shop_market)
       if e_plan = enrollment.plan
         metal_level = e_plan.metal_level.strip.split("#").last
         coverage_type = e_plan.coverage_type.strip.split("#").last
@@ -56,11 +55,22 @@ module Parsers::Xml::Cv::Importers
         hbx_enrollment_members: hbx_enrollment_members,
         household: get_household_by_policy_xml(policy),
         effective_on: effective_on,
+        employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
       )
     end
 
     def get_employee_role_by_shop_market_xml(shop_market)
-      return nil #if shop_market.blank?
+      return nil if shop_market.blank?
+      employer = shop_market.employer_link
+      fein = employer.id.strip.split('#').last rescue ''
+      org = Organization.new(
+        fein: fein,
+        legal_name: employer.try(:name)
+      )
+      
+      EmployeeRole.new(
+        employer_profile: EmployerProfile.new(organization: org)
+      )
     end
 
     def get_household_by_policy_xml(policy)
@@ -75,9 +85,7 @@ module Parsers::Xml::Cv::Importers
         )
       end
       family = Family.new(family_members: family_members)
-      household = Household.new(family: family)
-
-      household
+      Household.new(family: family)
     end
 
     def get_person_object_by_enrollee_member_xml(member)
