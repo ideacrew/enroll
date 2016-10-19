@@ -1,5 +1,6 @@
 module Parsers::Xml::Cv::Importers
   class EnrollmentParser
+    include Parsers::Xml::Cv::Importers::Base
     attr_reader :policy, :enrollment
 
     def initialize(input_xml)
@@ -30,6 +31,7 @@ module Parsers::Xml::Cv::Importers
       hbx_enrollment_members = []
       policy.enrollees.each do |enrollee|
         hbx_enrollment_members << HbxEnrollmentMember.new(
+          applicant_id: enrollee.member.id,
           is_subscriber: enrollee.is_subscriber == 'true',
           coverage_start_on: enrollee.benefit.begin_date,
           coverage_end_on: enrollee.benefit.end_date,
@@ -50,11 +52,39 @@ module Parsers::Xml::Cv::Importers
         #enrollment_kind: ,
         #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,
+        household: get_household_by_policy_xml(policy),
       )
     end
 
     def get_employee_role_by_shop_market_xml(shop_market)
       return nil #if shop_market.blank?
+    end
+
+    def get_household_by_policy_xml(policy)
+      family_members = []
+      policy.enrollees.each do |enrollee|
+        member = enrollee.member
+        family_members << FamilyMember.new(
+          id: member.id,
+          hbx_id: member.id,
+          is_primary_applicant: member.is_primary_applicant == 'true',
+          is_coverage_applicant: member.is_coverage_applicant == 'true',
+          person: get_person_object_by_enrollee_member_xml(member),
+        )
+      end
+      family = Family.new(family_members: family_members)
+      household = Household.new(family: family)
+
+      household
+    end
+
+    def get_person_object_by_enrollee_member_xml(member)
+      person = member.person
+      person_demographics = member.person_demographics
+      person_relationships = member.person_relationships
+      person_object = get_person_object_by(person, person_demographics, person_relationships)
+
+      person_object
     end
   end
 end
