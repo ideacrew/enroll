@@ -14,6 +14,7 @@ else {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "edit_enrollment"%></td></tr>');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
   $(".dropdown-menu").eq(containing_row.index()).dropdown("toggle");
+  $('.dropdown.pull-right').removeClass('open');
 }
 
 applyJQDatePickers();
