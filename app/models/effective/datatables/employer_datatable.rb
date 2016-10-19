@@ -76,49 +76,37 @@ module Effective
 
       def nested_filter_definition
 
-        @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
-        @next_60_day = @next_30_day.next_month
-        @next_90_day = @next_60_day.next_month
-
-
         filters = {
-        # Format => 'scope', 'Button Label', 'Category'
-        enrolling_ineligible:
-          [
-           ['', 'Plan Ineligible', ],
-           ['', 'Enrollment Ineligible', ],
-          ],
         enrolling_renewing:
           [
-           ['employer_profiles_renewing_application_pending', 'Application Pending', ],
-           ['employer_profiles_renewing_open_enrollment', 'Open Enrollment', ],
+            {scope: 'employer_profiles_renewing_application_pending', label: 'Application Pending'},
+            {scope: 'employer_profiles_renewing_open_enrollment', label: 'Open Enrollment'},
           ],
         enrolling_initial:
           [
-            ['employer_profiles_initial_application_pending', 'Application Pending'],
-            ['employer_profiles_initial_open_enrollment', 'Open Enrollment'],
-            #['', 'Invoice Pending'],
-            ['employer_profiles_binder_pending', 'Binder Pending'],
-            ['employer_profiles_binder_paid', 'Binder Paid'],
+            {scope: 'employer_profiles_initial_application_pending', label: 'Application Pending'},
+            {scope: 'employer_profiles_initial_open_enrollment', label: 'Open Enrollment'},
+            {scope: 'employer_profiles_binder_pending', label: 'Binder Pending'},
+            {scope: 'employer_profiles_binder_paid', label: 'Binder Paid'},
           ],
         enrolled:
           [
-            ['employer_profiles_enrolled', 'All' ],
-            ['employer_profiles_suspended', 'Suspended' ],
+            {scope:'employer_profiles_enrolled', label: 'All' },
+            {scope:'employer_profiles_suspended', label: 'Suspended' },
           ],
         enrolling:
           [
-            ['employer_profiles_enrolling', 'All'],
-            ['employer_profiles_initial_eligible', 'Initial', :enrolling_initial],
-            ['employer_profiles_renewing', 'Renewing / Converting', :enrolling_renewing],
+            {scope:'employer_profiles_enrolling', label: 'All'},
+            {scope:'employer_profiles_initial_eligible', label: 'Initial', subfilter: :enrolling_initial},
+            {scope:'employer_profiles_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
             #['', 'Ineligible', :enrolling_ineligible],
           ],
         employers:
          [
-           ['all', 'All'],
-           ['employer_profiles_applicants', 'Applicants'],
-           ['employer_profiles_enrolling', 'Enrolling', :enrolling],
-           ['employer_profiles_enrolled', 'Enrolled', :enrolled],
+           {scope:'all', label: 'All'},
+           {scope:'employer_profiles_applicants', label: 'Applicants'},
+           {scope:'employer_profiles_enrolling', label: 'Enrolling', subfilter: :enrolling},
+           {scope:'employer_profiles_enrolled', label: 'Enrolled', subfilter: :enrolled},
          ],
         top_scope: :employers
         }

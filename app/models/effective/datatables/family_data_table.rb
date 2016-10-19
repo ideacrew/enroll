@@ -31,14 +31,42 @@ module Effective
       end
 
       def collection
-        families = Queries::FamilyDatatableQuery.new
+        unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
+          @families = Queries::FamilyDatatableQuery.new(attributes)
+        end
+        @families
       end
 
       def global_search?
         true
       end
 
-
+      def nested_filter_definition
+        {
+        employer_options: [
+          {scope: 'all', label: 'All'},
+          {scope: 'enrolled', label: 'Enrolled'},
+          {scope: 'by_enrollment_renewing', label: 'Renewing'},
+          {scope: 'waived', label: 'Waived'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
+        ],
+          individual_options: [
+            {scope: 'all', label: 'All'},
+            {scope: 'all_assistance_receiving', label: 'Assisted'},
+            {scope: 'unassisted', label: 'Unassisted'},
+            {scope: 'cover_all', label: 'Cover All'},
+            {scope: 'sep_eligible', label: 'SEP Eligible'}
+          ],
+          families:
+            [
+              {scope: 'all', label: 'All'},
+              {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
+              {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
+              {scope: 'non_enrolled', label: 'Non Enrolled'},
+            ],
+          top_scope: :families
+        }
+      end
     end
   end
 end
