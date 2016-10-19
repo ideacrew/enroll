@@ -11,18 +11,18 @@
 
 <div class="btn btn-group  <%= level > 1 && 'hide sub_level'%> custom_level_<%=level%> Filter-<%=filter_group%>" data-scope="<%=data_scope%>"  role='group'>
   <% filters[data_scope].each do |filter| %>
-    <div class="btn btn-default" data-key="<%=filter[0]%>"
-    id="Tab:<%=filter_group.present? ? [filter_group,filter[0]].join('-') : filter[0] %>">
-      <%=filter[1]%>
+    <div class="btn btn-default" data-key="<%=filter[:scope]%>"
+    id="Tab:<%=filter_group.present? ? [filter_group,filter[:scope]].join('-') : filter[:scope] %>">
+      <%=filter[:label]%>
     </div>
   <% end %>
 </div>
 
 <% filters[data_scope].each do |filter| %>
-  <% new_data_scope = filter[2] %>
+  <% new_data_scope = filter[:subfilter] %>
   <% if new_data_scope %>
     <%= render partial: '/datatables/shared/filter',
-       locals: {filters: filters, level: level+1, ancestors: ancestors + [filter[0]], data_scope: new_data_scope} %>
+       locals: {filters: filters, level: level+1, ancestors: ancestors + [filter[:scope]], data_scope: new_data_scope} %>
     <%end%>
 <% end %>
 
