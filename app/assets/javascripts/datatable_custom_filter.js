@@ -29,9 +29,8 @@ DT = ( function() {
       $(that).addClass('active')
       id = $(that).attr('id').substring(4).replace(/\//g,'-')
       $('.Filter-'+id).removeClass('hide')
-      // $('.custom_filter .btn-default').on('click', function() {
-      //   $('.effective-datatable').DataTable().draw()
-      // })
+
+      // Redraw Datatable
       $('.effective-datatable').DataTable().draw()
     })
     extendDatatableServerParams = function(){
