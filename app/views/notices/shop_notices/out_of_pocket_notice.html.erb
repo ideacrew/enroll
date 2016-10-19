@@ -9,7 +9,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "for eligible employees of: #{notice.legal_name}. "} %>
+content: "For eligible employees of: #{notice.legal_name}. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Plan year: #{notice.start_on}. "} %>
@@ -31,7 +31,7 @@ content: "The health information you provide is anonymous and is not shared with
 content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Either use this personalized link to have this information pre-completed on your behalf: #{notice.data[:url]}"}%>
+content: "Either use this personalized link to have this information pre-completed on your behalf: <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Or you can enter your employer's plan year information yourself using the details below:" } %>
