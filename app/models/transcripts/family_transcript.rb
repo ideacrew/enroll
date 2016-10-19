@@ -3,7 +3,7 @@
 
   class FamilyTranscript
 
-    attr_accessor :transcript
+    attr_accessor :transcript, :primary_hbx_id
     include Transcripts::Base
 
     def initialize
@@ -21,27 +21,34 @@
         :hbx_id => record.hbx_id,
         :is_primary_applicant => record.is_primary_applicant,
         :relationship => record.primary_relationship,
-        :first_name => record.person.first_name,
-        :last_name => record.person.last_name
+        :first_name => record.first_name,
+        :last_name => record.last_name
       }
     end
 
     def find_or_build(family)
       @transcript[:other] = family
 
-      families = match_instance(family)
+      matched_family = match_instance(family)
 
-      case families.count
-      when 0
+      if family.blank?
         @transcript[:source_is_new] = true
         @transcript[:source] = initialize_family
-      when 1
-        @transcript[:source_is_new] = false
-        @transcript[:source] = families.first
       else
-        message = "Ambiguous family match: more than one family matches criteria"
-        raise Factories::FamilyTranscriptError message
+        @transcript[:source_is_new] = false
+        @transcript[:source] = matched_family
       end
+
+      # case families.count
+      # when 0
+      #   @transcript[:source_is_new] = true
+      #   @transcript[:source] = initialize_family
+      # when 1
+      #   @transcript[:source_is_new] = false
+      #   @transcript[:source] = families.first
+      # else
+      #   raise "Ambiguous family match: more than one family matches criteria"
+      # end
 
       compare_instance
       validate_instance
@@ -69,27 +76,51 @@
       @transcript[:compare] = differences
     end
 
-
     def self.enumerated_associations
       [
         {association: "family_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: [ ]},
-        {association: "irs_groups", enumeration_field: "hbx_assigned_id", cardinality: "one", enumeration: [ ]},
+        {association: "irs_groups", enumeration_field: "hbx_assigned_id", cardinality: "one", enumeration: [ ]}
       ]
     end
 
     private
 
     def match_instance(family)
+      primary = family.primary_applicant
 
-      families = Family.where({"e_case_id" => family.e_case_id})
-      return families if families.present?
-   
-      Family.where(:"family_members" => {
-          :$elemMatch => {
-            :hbx_id => family.primary_applicant.hbx_id
-            # :is_primary_applicant => true
-          }
-      })
+      @primary_hbx_id = primary.person.hbx_id
+      matches = match_person_instance(primary.person)
+
+      if matches.size > 1
+        raise 'found more than 1 primary match'
+      end
+
+      primary_person = primary.person
+      primary_person = matches[0] if matches.present?
+
+      @transcript[:primary_details] = {
+        hbx_id: primary_person.hbx_id,
+        first_name: primary_person.first_name,
+        last_name: primary_person.last_name,
+        ssn: primary_person.ssn
+      }
+
+      return nil if matches.blank?
+      matches[0].primary_family
+    end
+
+     def match_person_instance(person)
+      if person.hbx_id.present?
+        matched_people = ::Person.where(hbx_id: person.hbx_id) || []
+      else
+        matched_people = ::Person.match_by_id_info(
+            ssn: person.ssn,
+            dob: person.dob,
+            last_name: person.last_name,
+            first_name: person.first_name
+          )
+      end
+      matched_people
     end
 
 

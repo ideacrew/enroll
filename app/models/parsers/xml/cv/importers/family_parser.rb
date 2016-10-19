@@ -18,7 +18,7 @@ module Parsers::Xml::Cv::Importers
         family_members.each do |fm|
           family_member_objects << FamilyMember.new(
             id: fm.id,
-            hbx_id: fm.id,
+            # hbx_id: fm.id,
             former_family_id: fm.primary_family_id,
             is_primary_applicant: fm.is_primary_applicant.to_s == 'true', # did not see the real xml  
             is_coverage_applicant: fm.is_coverage_applicant.to_s == 'true', # need to confirm the case sensetive

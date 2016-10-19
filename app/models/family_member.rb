@@ -17,8 +17,6 @@ class FamilyMember
 
   field :is_active, type: Boolean, default: true
 
-  field :hbx_id, type: String
-
   field :person_id, type: BSON::ObjectId
   field :broker_role_id, type: BSON::ObjectId
 
@@ -35,7 +33,7 @@ class FamilyMember
 
   delegate :id, to: :family, prefix: true
 
-  # delegate :hbx_id, to: :person, allow_nil: true
+  delegate :hbx_id, to: :person, allow_nil: true
   delegate :first_name, to: :person, allow_nil: true
   delegate :last_name, to: :person, allow_nil: true
   delegate :middle_name, to: :person, allow_nil: true
