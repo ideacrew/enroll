@@ -24,7 +24,6 @@ DT = ( function() {
           $('input[type=search]').val('').trigger('keyup');
           $('.effective-datatable').DataTable().draw()
         })
-        if($('.buttons-bulk-actions ul li').size() == 0) {$('.buttons-bulk-actions').addClass('hide')}
       },
       50
     )

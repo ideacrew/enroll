@@ -3,12 +3,7 @@ module Effective
   module Datatables
     class FamilyDataTable < Effective::MongoidDatatable
       datatable do
-        bulk_actions_column do
-           #bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { method: :post, confirm: 'Generate Invoices?' }
-        end
-
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
-
         table_column :name, :proc => Proc.new { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
         table_column :ssn, :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
@@ -29,7 +24,7 @@ module Effective
            ['EDIT APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
           ]
-          render '/datatables/shared/dropdown', dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
