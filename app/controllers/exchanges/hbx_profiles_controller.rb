@@ -28,7 +28,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
       end
     end
-    # Removed redirect because of Datatables
+    # Removed redirect because of Datatables. Send Results to Datatable Status
     #redirect_to exchanges_hbx_profiles_root_path
   end
 

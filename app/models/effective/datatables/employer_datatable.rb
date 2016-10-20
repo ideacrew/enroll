@@ -30,27 +30,29 @@ module Effective
           if row.employer_profile.can_transmit_xml?
             link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), method: :post)
           else
-            "Transmit XML Disabled"
+            ""
           end
-        }
+        }, :filter => false
 
       end
 
 
       def collection
+
+        return @employer_collection if defined? @employer_collection
+
         employers = Organization.all_employer_profiles
 
-
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
+          employers = employers.send(attributes[:employers]) if ['employer_profiles_applicants','employer_profiles_enrolling','employer_profiles_enrolled'].include?(attributes[:employers])
           employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
-          employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial]
-          employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing]
+          employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
+          employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
 
           employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          employers = employers.send(attributes[:employers]) if !attributes[:enrolled].present? && !attributes[:enrolling].present?
         end
 
-        employers
+        @employer_collection = employers
 
       end
 
