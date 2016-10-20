@@ -4,26 +4,20 @@
   xsi:schemaLocation='http://openhbx.org/api/terms/1.0 policy.xsd'>
 
   <id>
-    <id>http://openhbx.org/api/v2/api/v2/hbx_enrollments/6011962</id>
+    <id>6011122</id>
     <is_authoritative>true</is_authoritative>
   </id>
   <broker>
     <id>
-      <id>http://openhbx.org/api/v2/api/v2/broker_agencies/1023</id>
-      <is_authoritative>true</is_authoritative>
+      <id>1023</id>
     </id>
-    <name>Acme Broker, Inc</name>
+    <name>Acme Broker</name>
+    <is_active>true</is_active>
     <dba>AB Corp</dba>
     <display_name>Acme Broker Corp</display_name>
     <website>http://www.examplebroker.com/</website>
-    <tpa>
-      <tpa_name>Friendly Agency</tpa_name>
-      <tpa_fein>345092010</tpa_fein>
-    </tpa>
-    <is_active>true</is_active>
     <created_at>2001-12-17T09:30:47Z</created_at>
     <modified_at>2001-12-17T09:30:47Z</modified_at>
-    <version>0</version>
   </broker>
   <enrollees>
     <enrollee>
@@ -44,7 +38,7 @@
         </primary_family_id>
         <person>
           <id>
-            <id>http://openhbx.org/api/v2/people/53e68efeeb899ad9ca00bbbb</id>
+            <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#19801010</id>
             <is_authoritative>true</is_authoritative>
             <alias_ids>
               <alias_id>
@@ -219,7 +213,7 @@
         </primary_family_id>
         <person>
           <id>
-            <id>http://openhbx.org/api/v2/people/53e6a1abeb899ad9ca06dddd</id>
+            <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#19813011</id>
             <is_authoritative>true</is_authoritative>
             <alias_ids>
               <alias_id>
@@ -380,17 +374,9 @@
       <is_dental_only>false</is_dental_only>
       <carrier>
         <id>
-          <id>http://openhbx.org/api/v2/</id>
+          <id>116036</id>
           <is_authoritative>true</is_authoritative>
           <alias_ids>
-            <alias_id>
-              <id>http://openhbx.org/api/v2/</id>
-              <is_authoritative>true</is_authoritative>
-            </alias_id>
-            <alias_id>
-              <id>http://openhbx.org/api/v2/</id>
-              <is_authoritative>true</is_authoritative>
-            </alias_id>
             <alias_id>
               <id>http://openhbx.org/api/v2/</id>
               <is_authoritative>true</is_authoritative>
@@ -408,9 +394,9 @@
     <shop_market>
       <employer_link>
         <id>
-          <id>urn:openhbx:terms:v1:employer:fein#522088262</id>
+          <id>urn:openhbx:terms:v1:employer:fein#555002222</id>
         </id>
-        <name>Darryl Carter, Inc.</name>
+        <name>United States Senate</name>
       </employer_link>
       <total_employer_responsible_amount>223.51</total_employer_responsible_amount>
     </shop_market>

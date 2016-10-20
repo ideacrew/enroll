@@ -5,6 +5,7 @@ module Parsers::Xml::Cv::Importers
       gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
 
       person_object = Person.new(
+        id: hbx_id,
         hbx_id: hbx_id,
         first_name: person.first_name,
         middle_name: person.middle_name,
@@ -19,9 +20,10 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
+        relation = relationship.relationship_uri.strip.split("#").last rescue ''
         person_object.person_relationships.build({
           relative_id: relationship.object_individual, #use subject_individual or object_individual
-          kind: relationship.relationship_uri,
+          kind: relation,
         })
       end
       person.addresses.each do |address|

@@ -16,7 +16,7 @@
       </tax_household_id>
       <person>
         <id>
-          <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#10000123</id>
+          <id>10000123</id>
         </id>
         <person_name>
           <person_surname>Green</person_surname>
@@ -31,10 +31,16 @@
       </person>
       <person_relationships>
         <person_relationship>
-          <subject_individual>subject individual id</subject_individual>
-          <relationship_uri>parent</relationship_uri>
+          <subject_individual><id>10000111</id></subject_individual>
+          <relationship_uri>urn:openhbx:terms:v1:individual_relationship#self</relationship_uri>
           <inverse_relationship_uri>child</inverse_relationship_uri>
-          <object_individual>object individual id</object_individual>
+          <object_individual><id>10000123</id></object_individual>
+        </person_relationship>
+        <person_relationship>
+          <subject_individual><id>10000123</id></subject_individual>
+          <relationship_uri>urn:openhbx:terms:v1:individual_relationship#child</relationship_uri>
+          <inverse_relationship_uri>parent</inverse_relationship_uri>
+          <object_individual><id>10000111</id></object_individual>
         </person_relationship>
       </person_relationships>
       <person_demographics />
@@ -43,6 +49,46 @@
       <employee_roles>
         <employee_role />
         <employee_role />
+        <employee_role />
+      </employee_roles>
+    </family_member>
+    <family_member>
+      <id>
+        <id>123444444</id>
+      </id>
+      <primary_family_id>
+        <id>123456</id>
+      </primary_family_id>
+      <tax_household_id>
+        <id>123456</id>
+      </tax_household_id>
+      <person>
+        <id>
+          <id>10000111</id>
+        </id>
+        <person_name>
+          <person_surname>Green</person_surname>
+          <person_given_name>Jack</person_given_name>
+          <person_middle_name>J</person_middle_name>
+          <person_full_name>Jack J Green</person_full_name>
+          <person_name_prefix_text>Sir</person_name_prefix_text>
+          <person_name_suffix_text>Sr</person_name_suffix_text>
+          <person_alternate_name/>
+        </person_name>
+        <addresses></addresses>
+      </person>
+      <person_relationships>
+        <person_relationship>
+          <subject_individual><id>10000111</id></subject_individual>
+          <relationship_uri>urn:openhbx:terms:v1:individual_relationship#self</relationship_uri>
+          <inverse_relationship_uri>child</inverse_relationship_uri>
+          <object_individual><id>10000123</id></object_individual>
+        </person_relationship>
+      </person_relationships>
+      <person_demographics />
+      <is_primary_applicant>false</is_primary_applicant>
+      <is_coverage_applicant>false</is_coverage_applicant>
+      <employee_roles>
         <employee_role />
       </employee_roles>
     </family_member>

@@ -39,7 +39,9 @@ module Parsers::Xml::Cv::Importers
         )
       end
       coverage_type = enrollment.plan.coverage_type.strip.split('#').last rescue ''
-      effective_on = policy.enrollees.first.benefit.begin_date rescue ''
+      enrollee = policy.enrollees.detect {|enrollee| enrollee.is_subscriber == 'true'}
+      effective_on = enrollee.benefit.begin_date rescue ''
+      terminated_on = enrollee.benefit.end_date rescue ''
       HbxEnrollment.new(
         hbx_id: policy.id,
         kind: kind,
@@ -55,8 +57,39 @@ module Parsers::Xml::Cv::Importers
         hbx_enrollment_members: hbx_enrollment_members,
         household: get_household_by_policy_xml(policy),
         effective_on: effective_on,
+        terminated_on: terminated_on,
         employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
+        writing_agent_id: get_broker_role_by_broker_xml(policy.broker_link),
       )
+    end
+
+    def get_broker_role_object
+      return nil if policy && policy.broker_link.blank?
+      broker = policy.broker_link
+      first_name = broker.name.split(' ').first rescue ''
+      last_name = broker.name.split(' ').last rescue ''
+
+      BrokerRole.new(
+        npn: broker.id,
+        person: Person.new(
+          first_name: first_name,
+          last_name: last_name,
+        )
+      )
+    end
+
+    def get_broker_role_by_broker_xml(broker)
+      return nil if broker.blank?
+      first_name = broker.name.split(' ').first rescue ''
+      last_name = broker.name.split(' ').last rescue ''
+
+      BrokerRole.new(
+        npn: broker.id,
+        person: Person.new(
+          first_name: first_name,
+          last_name: last_name,
+        )
+      ).id
     end
 
     def get_employee_role_by_shop_market_xml(shop_market)
@@ -92,9 +125,8 @@ module Parsers::Xml::Cv::Importers
       person = member.person
       person_demographics = member.person_demographics
       person_relationships = member.person_relationships
-      person_object = get_person_object_by(person, person_demographics, person_relationships)
 
-      person_object
+      get_person_object_by(person, person_demographics, person_relationships)
     end
   end
 end
