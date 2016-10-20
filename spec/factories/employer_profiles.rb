@@ -14,7 +14,7 @@ FactoryGirl.define do
     end
   end
 
-  factory :employer, class: EmployerProfile do
+  factory :registered_employer, class: EmployerProfile do
 
     organization { FactoryGirl.build(:organization) }
     entity_kind "c_corporation"
