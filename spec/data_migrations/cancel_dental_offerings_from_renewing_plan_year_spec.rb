@@ -22,7 +22,7 @@ describe CancelDentalOfferingsFromRenewingPlanYear do
       :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5 }
     let(:active_benefit_group) { FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year }
     let(:renewing_benefit_group) { FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year}
-    let(:census_employee) { 
+    let(:census_employee) {
       ce = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
@@ -57,7 +57,8 @@ describe CancelDentalOfferingsFromRenewingPlanYear do
       enrollment = renewing_plan_year.hbx_enrollments.where(coverage_kind: "dental").first
       expect(enrollment.aasm_state).to eq "coverage_selected"
       subject.migrate
-      enrollment.reload
+      id = enrollment.id
+      enrollment = HbxEnrollment.find(id)
       expect(enrollment.aasm_state).to eq "coverage_canceled"
     end
 
@@ -65,21 +66,24 @@ describe CancelDentalOfferingsFromRenewingPlanYear do
       enrollment = renewing_plan_year.hbx_enrollments.where(coverage_kind: "health").first
       expect(enrollment.aasm_state).to eq "auto_renewing"
       subject.migrate
-      enrollment.reload
+      id = enrollment.id
+      enrollment = HbxEnrollment.find(id)
       expect(enrollment.aasm_state).to eq "auto_renewing"
     end
 
     it "should cancel the dental offerings of the selected benefit group" do
       expect(renewing_benefit_group.dental_reference_plan_id).not_to eq nil
       subject.migrate
-      renewing_benefit_group.reload
+      id = renewing_benefit_group.id
+      renewing_benefit_group = BenefitGroup.find(id)
       expect(renewing_benefit_group.dental_reference_plan_id).to eq nil
     end
 
     it "should not cancel the dental offerings of the active benefit group" do
       expect(active_benefit_group.dental_reference_plan_id).not_to eq nil
       subject.migrate
-      active_benefit_group.reload
+      id = active_benefit_group.id
+      active_benefit_group = BenefitGroup.find(id)
       expect(active_benefit_group.dental_reference_plan_id).not_to eq nil
     end
   end

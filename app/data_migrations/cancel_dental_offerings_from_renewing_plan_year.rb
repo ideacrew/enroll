@@ -10,8 +10,8 @@ class CancelDentalOfferingsFromRenewingPlanYear < MongoidMigrationTask
       return
     end
     organizations.first.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first.hbx_enrollments.each do |enrollment|
-      enrollment.update_attributes(aasm_state: "coverage_canceled") if enrollment.coverage_kind == "dental" 
+      enrollment.update_attributes(aasm_state: "coverage_canceled") if enrollment.coverage_kind == "dental"
     end
-    organizations.first.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first.benefit_groups.where(_id: bg_id).first.update_attributes(dental_reference_plan_id: nil)
+    organizations.first.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first.benefit_groups.where(_id: bg_id).first.unset(:dental_reference_plan_id)
   end
 end
