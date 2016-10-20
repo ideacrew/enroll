@@ -80,4 +80,17 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
       end
     end
   end
+
+  context "valid individual policy" do
+    let(:xml) { File.read(Rails.root.join("spec", "test_data", "importer_payloads", "individual_policy.xml")) }
+
+    it "should be individual" do
+      expect(subject.get_enrollment_object.kind).to eq 'individual'
+    end
+
+    it "should get applied_aptc_amount" do
+      enrollment = subject.get_enrollment_object
+      expect(enrollment.applied_aptc_amount).to eq 194.65
+    end
+  end
 end
