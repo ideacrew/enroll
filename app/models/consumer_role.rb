@@ -68,7 +68,7 @@ class ConsumerRole
 
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
-  field :native_validation, type: String, default: "na"
+  field :native_validation, type: String, default: nil
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   field :ssn_update_reason, type: String
@@ -125,17 +125,11 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
 
-  before_validation :ensure_ssn_validation_status, :ensure_native_validation
+  before_validation :ensure_validation_states, on: [:create, :update]
 
   def ivl_coverage_selected
     if unverified?
       coverage_purchased!
-    end
-  end
-
-  def ensure_ssn_validation_status
-    if self.person && self.person.ssn.blank?
-      self.ssn_validation = "na"
     end
   end
 
@@ -365,7 +359,7 @@ class ConsumerRole
     state :fully_verified
     state :verification_period_ended
 
-    before_all_events :ensure_ssn_validation_status, :ensure_native_validation
+    before_all_events :ensure_validation_states
 
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified
@@ -556,6 +550,7 @@ class ConsumerRole
 
   #class methods
   class << self
+    #this method will be used to check 90 days verification period for outstanding verification
     def advance_day(check_date)
       #handle all outstanding consumer who is unverified more than 90 days
     end
@@ -677,11 +672,22 @@ class ConsumerRole
     end
   end
 
+  def ensure_validation_states
+    ensure_ssn_validation_status
+    ensure_native_validation
+  end
+
   def ensure_native_validation
     if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
       self.native_validation = "outstanding" if native_validation == "na"
     else
       self.native_validation = "na"
+    end
+  end
+
+  def ensure_ssn_validation_status
+    if self.person && self.person.ssn.blank?
+      self.ssn_validation = "na"
     end
   end
 
