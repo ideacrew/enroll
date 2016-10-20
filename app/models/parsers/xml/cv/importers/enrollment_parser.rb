@@ -59,7 +59,7 @@ module Parsers::Xml::Cv::Importers
         effective_on: effective_on,
         terminated_on: terminated_on,
         employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
-        writing_agent_id: get_broker_role_by_broker_xml(policy.broker_link),
+        broker: get_broker_role_by_broker_xml(policy.broker_link),
       )
     end
 
@@ -89,7 +89,7 @@ module Parsers::Xml::Cv::Importers
           first_name: first_name,
           last_name: last_name,
         )
-      ).id
+      )
     end
 
     def get_employee_role_by_shop_market_xml(shop_market)
