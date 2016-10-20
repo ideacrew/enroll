@@ -320,14 +320,6 @@ class HbxEnrollment
         end
       end
     end
-
-    def active_role_enrollments(hbx_enrollments)
-      if hbx_enrollments.present?
-        hbx_enrollments.select{|hbx|
-          hbx.consumer_role.present? || (hbx.employee_role.present? && CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(hbx.employee_role.census_employee.aasm_state))
-        }
-      end
-    end
   end
 
   def evaluate_individual_market_eligiblity

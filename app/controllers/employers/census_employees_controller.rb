@@ -186,8 +186,8 @@ class Employers::CensusEmployeesController < ApplicationController
   def show
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
-        |hbx_enrollment| hbx_enrollment.consumer_role.present? ||
-          (hbx_enrollment.employee_role_id.to_s == @census_employee.employee_role_id.to_s && (past_enrollment_statuses.include? hbx_enrollment.aasm_state))
+        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) &&
+          (hbx_enrollment.consumer_role.present? || ( hbx_enrollment.employee_role_id.to_s == @census_employee.employee_role_id.to_s))
     } if @census_employee.employee_role.present?
     @status = params[:status] || ''
   end
