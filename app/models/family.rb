@@ -531,7 +531,7 @@ class Family
     person.save!
   end
 
-  def check_for_consumer_role
+  def check_for_resident_role
     if primary_applicant.person.resident_role.present?
       active_family_members.each do |family_member|
         build_resident_role(family_member)
