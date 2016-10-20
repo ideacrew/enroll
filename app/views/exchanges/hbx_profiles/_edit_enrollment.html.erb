@@ -5,28 +5,12 @@
     <%end%>
   </div>
 <%end%>
-
 <div id="add_sep">
-
-<div class="bottom-pd">
-    <h3 class="title-inline">Edit DOB / SSN</h3>
-    <br/>  <br/> 
-<!--   <div>
-    <table class="table table-border">
-      <thead></thead>
-      <tbody>
-        <tr>
-        <td><p> <b>Name:</b> <%#=@person.first_name%> <%#=@person.last_name%></p></td>
-        <td><p> <b>HBX ID:</b> <%#=@person.hbx_id%></p></tb>
-      </tr>
-      </tbody>
-    </table>
-  </div> -->
-
-
+  <div class="bottom-pd">
     <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
       <%= f.hidden_field :person_id, value: @person.id %>
       <div class="row no-buffer form-wrapper-buffer">
+        <h3 class="title">Edit DOB / SSN</h3>
           <div class="col-md-12 no-pd col-sm-12 col-xs-12">
             <div class="col-md-3 col-md-offset-3 col-sm-3 col-md-offset-3 col-xs-12 form-group form-group-lg no-pd">
               New DOB 
@@ -42,27 +26,24 @@
             </div>
           </div>
       </div>
-      <div class="row no-buffer">
-          <div class="col-md-12 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <div>
-              <%= link_to "Reset", edit_dob_ssn_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
-              <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%> 
-              
-            </div>
-          </div>
+      <div class="row no-buffer child-row">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">   
+          <%= link_to "Reset", edit_dob_ssn_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
+          <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%> 
+        </div>
       </div>        
-  <% end %>
+    <% end %>
   </div>
-  <%if @premium_implications.present?%> 
-    <div class="alert alert-warning row"> 
-      <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> 
-      <b>Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment(s):</b>
-      <%@premium_implications.each do |key, val|%>
-        <li><%=find_plan_name(key)%></li>
-      <%end%> 
-    </div>
-  <%end%>
 </div>
-</div>
-
+<%if @premium_implications.present?%> 
+  <div class="alert alert-warning row"> 
+    <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> 
+    <b>
+      Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment(s):
+    </b>
+    <%@premium_implications.each do |key, val|%>
+      <li><%=find_plan_name(key)%></li>
+    <%end%> 
+  </div>
+<%end%>
 <%#= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>
