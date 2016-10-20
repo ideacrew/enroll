@@ -65,7 +65,7 @@ module Effective
       def terminate_enrollment_type(family)
         hbx_enrollment = family.households.first.hbx_enrollments.last
         hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
-      end  
+      end
 
       def edit_dob_link_type(current_user)
         (current_user.roles.include? "hbx_staff" and Permission.where(name: 'hbx_staff').first.can_update_ssn?) ? 'ajax' : 'disabled'
@@ -75,28 +75,30 @@ module Effective
       def nested_filter_definition
         {
         employer_options: [
-
           {scope: 'all', label: 'All'},
           {scope: 'enrolled', label: 'Enrolled'},
           {scope: 'by_enrollment_renewing', label: 'Renewing'},
           {scope: 'waived', label: 'Waived'},
           {scope: 'sep_eligible', label: 'SEP Eligible'}
         ],
-          individual_options: [
-            {scope: 'all', label: 'All'},
-            {scope: 'all_assistance_receiving', label: 'Assisted'},
-            {scope: 'all_unassisted', label: 'Unassisted'},
-            {scope: 'by_enrollment_cover_all', label: 'Cover All'},
-            {scope: 'sep_eligible', label: 'SEP Eligible'}
-          ],
-          families:
-            [
-              {scope: 'all', label: 'All'},
-              {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
-              {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
-              {scope: 'non_enrolled', label: 'Non Enrolled'},
-            ],
-          top_scope: :families
+        coverall_options: [
+          {scope: 'all', label: 'All'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
+        ],
+        individual_options: [
+          {scope: 'all', label: 'All'},
+          {scope: 'all_assistance_receiving', label: 'Assisted'},
+          {scope: 'all_unassisted', label: 'Unassisted'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
+        ],
+        families: [
+          {scope: 'all', label: 'All'},
+          {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
+          {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
+          {scope: 'by_enrollment_coverall', label: 'Cover All', subfilter: :coverall_options},
+          {scope: 'non_enrolled', label: 'Non Enrolled'},
+        ],
+        top_scope: :families
         }
       end
     end
