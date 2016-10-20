@@ -108,7 +108,7 @@ describe TerminateCensusEmployee do
       subject.migrate
       census_employee.reload
     end
-    it "census employee termination should be in pending state" do
+    it "census employee should not be terminated" do
       expect(census_employee.employment_terminated_on).to eq nil
       expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
