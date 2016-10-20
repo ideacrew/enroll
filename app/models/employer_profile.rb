@@ -322,8 +322,22 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
-  def can_transmit_xml?
-    !self.renewing_plan_year.present? && !self.binder_paid?
+  def is_transmit_xml_button_disabled?
+    (!self.renewing_plan_year.present? && !self.binder_paid?) || binder_criteria_satisfied?
+  end
+
+  def binder_criteria_satisfied?
+    show_plan_year.present? &&
+    participation_count == 0 &&
+    non_owner_participation_criteria_met?
+  end
+
+  def participation_count
+    show_plan_year.additional_required_participants_count
+  end
+
+  def non_owner_participation_criteria_met?
+    show_plan_year.assigned_census_employees_without_owner.present?
   end
 
   def renewing_plan_year_drafts
