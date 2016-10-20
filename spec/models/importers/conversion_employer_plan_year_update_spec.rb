@@ -83,7 +83,7 @@ RSpec.describe Importers::ConversionEmployerPlanYearUpdate, dbclean: :after_each
       }
 
       it 'should update both current and renewing plan year with new reference plans' do 
-        record = ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs)
+        record = ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => plan_year.start_on}))
         record.save
         plan_year.reload
         renewing_plan_year.reload

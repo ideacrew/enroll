@@ -326,7 +326,7 @@ module Importers
     end
 
     def create_model(record_attrs)
-      puts "processing #{record_attrs[:subscriber_name_first]}--#{record_attrs[:subscriber_name_last]}"
+      # puts "processing #{record_attrs[:subscriber_name_first]}--#{record_attrs[:subscriber_name_last]}"
       the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
       case the_action
       # when "update"

@@ -381,7 +381,7 @@ module Importers
         person = find_person
         return false unless person
 
-        puts '----processing ' + person.full_name
+        # puts '----processing ' + person.full_name
 
         family = person.primary_family
         enrollment = find_current_enrollment(family, employer)

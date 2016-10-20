@@ -40,7 +40,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 
@@ -78,7 +78,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 

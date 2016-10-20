@@ -2,13 +2,13 @@ require "rails_helper"
 
 describe ::Importers::ConversionEmployeeSet do
   let(:out_stream) { StringIO.new }
-  let(:employee_record) { instance_double("::Importers::ConversionEmployee", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
+  let(:employee_record) { instance_double("::Importers::ConversionEmployeeCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
 
   subject { ::Importers::ConversionEmployeeSet.new(file_name, out_stream, Date.new(2015,3,1)) }
   before :each do
-    allow(::Importers::ConversionEmployeeCreate).to receive(:new).with(employee_data).and_return(employee_record)
+    allow(::Importers::ConversionEmployeeAction).to receive(:new).with(employee_data).and_return(employee_record)
     subject.import!
     out_stream.rewind
   end
@@ -39,7 +39,7 @@ describe ::Importers::ConversionEmployeeSet do
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 
@@ -77,7 +77,7 @@ describe ::Importers::ConversionEmployeeSet do
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 

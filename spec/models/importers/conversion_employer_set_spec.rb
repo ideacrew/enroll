@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe ::Importers::ConversionEmployerSet do
   let(:out_stream) { StringIO.new }
-  let(:employer_record) { instance_double("::Importers::ConversionEmployer", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
+  let(:employer_record) { instance_double("::Importers::ConversionEmployerCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
   let(:registered_on) { Date.new(2015,3,1) }
@@ -39,8 +39,8 @@ describe ::Importers::ConversionEmployerSet do
       let(:record_save_result) { false }
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
-      it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+      it "should write the initial data and the results to the output stream" do  
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 
@@ -78,7 +78,7 @@ describe ::Importers::ConversionEmployerSet do
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",import failed,\"{\"\"some_errors\"\":\"\"about_a_thing\"\"}\"\n")
+        expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
 
