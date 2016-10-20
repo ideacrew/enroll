@@ -36,6 +36,10 @@ module Queries
       if @custom_attributes['families'] == 'non_enrolled'
         family = family.non_enrolled
       end
+      if @custom_attributes['families'] == 'by_enrollment_coverall'
+        family = family.all_enrollments
+        family = family.by_enrollment_coverall_market
+      end
       if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
         family = family.by_enrollment_renewing
       end
@@ -45,9 +49,6 @@ module Queries
       if @custom_attributes['employer_options'] == 'coverage_waived'
         family = family.coverage_waived
       end
-      if @custom_attributes['individual_options'] == 'by_enrollment_coverall'
-        family = family.by_enrollment_coverall_market
-      end
       if @custom_attributes['individual_options'] == 'all_assistance_receiving'
         family = family.all_assistance_receiving
       end
@@ -56,6 +57,9 @@ module Queries
       end
       if @custom_attributes['individual_options'] == 'all_unassisted'
         family = family.all_unassisted
+      end
+      if @custom_attributes['coverall_options'] == 'sep_eligible'
+        family = family.sep_eligible
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 3

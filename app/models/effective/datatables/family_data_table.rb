@@ -24,7 +24,7 @@ module Effective
            ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), cancel_enrollment_type(row)],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), terminate_enrollment_type(row)],
-           ['Edit DOB / SSN', edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           [("<div class='" + pundit_class(Family, :can_update_ssn?) + "'> Edit DOB / SSN </div>").html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
            ['EDIT APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
@@ -65,11 +65,6 @@ module Effective
       def terminate_enrollment_type(family)
         hbx_enrollment = family.households.first.hbx_enrollments.last
         hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
-      end  
-
-      def edit_dob_link_type(current_user)
-        (current_user.roles.include? "hbx_staff" and Permission.where(name: 'hbx_staff').first.can_update_ssn?) ? 'ajax' : 'disabled'
-
       end
 
       def nested_filter_definition
@@ -81,23 +76,24 @@ module Effective
           {scope: 'waived', label: 'Waived'},
           {scope: 'sep_eligible', label: 'SEP Eligible'}
         ],
-          individual_options: [
-            {scope: 'all', label: 'All'},
-            {scope: 'all_assistance_receiving', label: 'Assisted'},
-            {scope: 'all_unassisted', label: 'Unassisted'},
-            {scope: 'by_enrollment_cover_all', label: 'Cover All'},
-            {scope: 'unassisted', label: 'Unassisted'},
-            {scope: 'cover_all', label: 'Cover All'},
-            {scope: 'sep_eligible', label: 'SEP Eligible'}
-          ],
-          families:
-            [
-              {scope: 'all', label: 'All'},
-              {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
-              {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
-              {scope: 'non_enrolled', label: 'Non Enrolled'},
-            ],
-          top_scope: :families
+        coverall_options: [
+          {scope: 'all', label: 'All'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
+        ],
+        individual_options: [
+          {scope: 'all', label: 'All'},
+          {scope: 'all_assistance_receiving', label: 'Assisted'},
+          {scope: 'all_unassisted', label: 'Unassisted'},
+          {scope: 'sep_eligible', label: 'SEP Eligible'}
+        ],
+        families: [
+          {scope: 'all', label: 'All'},
+          {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
+          {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
+          {scope: 'by_enrollment_coverall', label: 'Cover All', subfilter: :coverall_options},
+          {scope: 'non_enrolled', label: 'Non Enrolled'},
+        ],
+        top_scope: :families
         }
       end
     end
