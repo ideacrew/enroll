@@ -315,11 +315,11 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  sleep 1 #Four back to back clicks causes intermittent failures.  Make sure the page setup/DOM load is complete
+  wait_for_ajax
   find('.carriers-tab a').click
-  sleep 1 #maybe some work here
+  wait_for_ajax
   find('.reference-plans label').click
-  sleep 1
+  wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
@@ -443,6 +443,64 @@ end
 
 Given /^the employer is logged in$/ do
   login_as owner, scope: :user
+end
+
+And /^clicks on terminate employee$/ do
+  expect(page).to have_content 'Employee Roster'
+  employees.first
+  first(".fa-trash-o").click
+  terminate_date = (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")
+  page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
+  find('.interaction-click-control-terminate-employee').click
+  expect(page).to have_content 'Employee Roster'
+  wait_for_ajax
+end
+
+Then /^employer clicks on terminated filter$/ do
+  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  find('.filter').click
+  wait_for_ajax
+  page.execute_script("$('.filter-options').show();")
+  find("#terminated_yes").trigger('click')
+end
+
+Then /^employer sees termination date column$/ do
+  expect(page).to have_content 'Termination Date'
+end
+
+And /^employer clicks on terminated employee$/ do
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on back button$/ do
+  expect(page).to have_content "Details"
+  find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
+end
+
+Then /^employer should see employee roaster$/ do
+  expect(page).to have_content "Employee Roster"
+end
+And /^employer should also see termination date$/ do
+  expect(page).to have_content "Termination Date"
+end
+
+And /^employer clicks on all employees$/ do
+  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  find('.filter').click
+  wait_for_ajax
+  page.execute_script("$('.filter-options').show();")
+  find("#family_all").trigger('click')
+end
+
+And /^employer clicks on cancel button$/ do
+  expect(page).to have_content "Details"
+  find('.interaction-click-control-cancel').click
+end
+
+Then /^employer should not see termination date column$/ do
+  wait_for_ajax
+  expect(page).not_to have_content "Termination Date"
 end
 
 Then /^they should see that employee's details$/ do
