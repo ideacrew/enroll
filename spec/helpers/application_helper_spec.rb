@@ -61,18 +61,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-<<<<<<< HEAD
-  describe "#participation_rule" do
-    let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
 
-    it "should return correct eligibility criteria" do
-      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Eligible"
-    end
-
-  end
-
-=======
->>>>>>> effective-datatables-base
   describe "#enrollment_progress_bar" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
