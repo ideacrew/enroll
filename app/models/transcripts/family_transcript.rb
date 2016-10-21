@@ -20,10 +20,20 @@
       {
         :hbx_id => record.hbx_id,
         :is_primary_applicant => record.is_primary_applicant,
-        :relationship => record.primary_relationship,
+        :relationship => find_relationship(record),
         :first_name => record.first_name,
         :last_name => record.last_name
       }
+    end
+
+    def find_relationship(family_member)
+      return family_member.primary_relationship if family_member.persisted?
+      
+      if family_member.is_primary_applicant
+        'self'
+      else
+        family_member.person.person_relationships.first.try(:kind)
+      end
     end
 
     def find_or_build(family)
@@ -31,7 +41,7 @@
 
       matched_family = match_instance(family)
 
-      if family.blank?
+      if matched_family.blank?
         @transcript[:source_is_new] = true
         @transcript[:source] = initialize_family
       else
@@ -105,6 +115,8 @@
         ssn: primary_person.ssn
       }
 
+      @transcript[:identifier] = primary_person.hbx_id
+
       return nil if matches.blank?
       matches[0].primary_family
     end
@@ -122,7 +134,6 @@
       end
       matched_people
     end
-
 
     def initialize_family
       fields = ::Family.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }

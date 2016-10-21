@@ -98,6 +98,66 @@ module Transcripts
       end
     end
 
+    def family_csv_row
+      changeset_sections.reduce([]) do |section_rows, section|
+        actions = changeset_section_actions [section]
+        section_rows += actions.reduce([]) do |rows, action|
+          attributes = changeset_content_at [section, action]
+
+          person_details = [
+              @person[:primary_details][:hbx_id],
+              @person[:primary_details][:ssn], 
+              @person[:primary_details][:last_name], 
+              @person[:primary_details][:first_name]
+          ]
+
+          fields_to_ignore = ['_id', 'updated_by']
+          rows += attributes.collect do |attribute, value|
+
+            if value.is_a?(Hash)
+              fields_to_ignore.each{|key| value.delete(key) }
+              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+            end
+
+            (person_details + [action, "#{section}:#{attribute}", value])
+          end
+        end
+      end
+    end
+
+    def enrollment_csv_row
+      changeset_sections.reduce([]) do |section_rows, section|
+        actions = changeset_section_actions [section]
+        section_rows += actions.reduce([]) do |rows, action|
+          attributes = changeset_content_at [section, action]
+
+          person_details = [
+              @person[:primary_details][:hbx_id],
+              @person[:primary_details][:ssn], 
+              @person[:primary_details][:last_name], 
+              @person[:primary_details][:first_name]
+          ]
+
+          fields_to_ignore = ['_id', 'updated_by']
+          rows += attributes.collect do |attribute, value|
+
+            if value.is_a?(Hash)
+              fields_to_ignore.each{|key| value.delete(key) }
+              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+            end
+
+            plan_details = (@person[:plan_details].present? ? @person[:plan_details].values : 4.times.map{nil})
+
+            # employer_details = (@person[:employer_details].present? ? @person[:employer_details].values : 3.times.map{nil})
+            # ([@person[:identifier]] + person_details + plan_details + employer_details + [action, "#{section}:#{attribute}", value])
+
+            ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value])
+          end
+        end
+      end
+    end
+
+
     def csv_header
     end
 

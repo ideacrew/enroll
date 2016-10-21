@@ -74,7 +74,7 @@ module Transcripts
     def group_associations_by_enumeration_field(association)
       # TODO: Validate for duplicate family member records with same hbx id
       other_assocs = @transcript[:other].send(association[:association]).to_a.dup
-      
+
       source_other_pairs = @transcript[:source].send(association[:association]).to_a.map do |source_assoc|
         enumeration_value = source_assoc.send(association[:enumeration_field])
         other_assoc = other_assocs.detect{|other_assoc| other_assoc.send(association[:enumeration_field]) == enumeration_value}
@@ -124,10 +124,10 @@ module Transcripts
      
           if base_record[k].blank?
             differences[:add] ||= {}
-            differences[:add][k] = compare_record[k]
+            differences[:add][k] = (compare_record[k].is_a?(Money) ? compare_record[k].to_f : compare_record[k])
           elsif compare_record[k].blank?
             differences[:remove] ||= {}
-            differences[:remove][k] = base_record[k]
+            differences[:remove][k] = (base_record[k].is_a?(Money) ? base_record[k].to_f : base_record[k])
           elsif base_record[k].is_a?(Array) && compare_record[k].is_a?(Array)
             differences[:array] ||= {}
             old_values = base_record[k] - compare_record[k]
@@ -145,7 +145,7 @@ module Transcripts
 
             if base_attr != compare_attr
               differences[:update] ||= {}
-              differences[:update][k] = compare_attr
+              differences[:update][k] = (compare_attr.is_a?(Money) ? compare_attr.to_f : compare_attr)
             end
           end
         end

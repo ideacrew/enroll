@@ -51,7 +51,10 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model do
         primary = family.family_members.build(is_primary_applicant: true, person: person)
         dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
-        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on })
+        consumer_role = person.build_consumer_role({is_applicant: true})
+        consumer_role.save
+
+        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on, consumer_role_id: consumer_role.id })
         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
         enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
 
