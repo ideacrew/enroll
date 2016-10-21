@@ -583,7 +583,6 @@ module ApplicationHelper
     broker_agency_profile.default_general_agency_profile == general_agency_profile
   end
 
-
   def asset_data_base64(path)
     asset = Rails.application.assets.find_asset(path)
     throw "Could not find asset '#{path}'" if asset.nil?

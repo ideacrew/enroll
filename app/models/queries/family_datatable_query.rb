@@ -62,7 +62,7 @@ module Queries
         family = family.sep_eligible
       end
       #add other scopes here
-      return family if @search_string.blank? || @search_string.length < 3
+      return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
       family_scope = family.where('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
