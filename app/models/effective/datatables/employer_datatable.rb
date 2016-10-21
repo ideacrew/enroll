@@ -34,9 +34,8 @@ module Effective
           waived = census_employees.try(:waived).try(:count).to_i
           enrolled.to_s + "/" + waived.to_s
 
-          }, :filter => false
-
-
+          }, :filter => false, :sortable => false
+        table_column :xml_submitted, :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -45,7 +44,7 @@ module Effective
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
-        table_column :xml_submitted, :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}
+
       end
 
 
