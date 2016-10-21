@@ -16,7 +16,7 @@ DT = ( function() {
     var level = parseInt(get_level && get_level[1])
     clear_level(level+1)
   }
-  var clear_button_todojf = function() {          // Seriously?
+  var clear_button_todojf = function() {          // Need to put this in the base framework
     setTimeout(
       function() {
         $($('.dataTables_filter label')[0]).append("<div class='btn btn-sm btn-default' style='display:inline'><span class='glyphicon glyphicon-remove'></span> </div>")
@@ -24,7 +24,6 @@ DT = ( function() {
           $('input[type=search]').val('').trigger('keyup');
           $('.effective-datatable').DataTable().draw()
         })
-
       },
       50
     )
