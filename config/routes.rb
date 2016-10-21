@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   end
 
   namespace :exchanges do
-    
+
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
@@ -72,6 +72,7 @@ Rails.application.routes.draw do
 
       member do
         post :transmit_group_xml
+        get :transmit_group_xml
         get :home
         get :inbox
       end
