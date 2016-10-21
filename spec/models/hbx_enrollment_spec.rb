@@ -805,7 +805,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
       expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
-    
+
   end
 
   context "can_terminate_coverage?" do
@@ -908,6 +908,10 @@ describe HbxEnrollment, dbclean: :after_each do
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
     allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   context ".effective_date_for_enrollment" do
@@ -1841,7 +1845,7 @@ context "for cobra", :dbclean => :after_each do
     end
 
     it "should return true" do
-      enrollment.kind = 'employer_sponsored_cobra' 
+      enrollment.kind = 'employer_sponsored_cobra'
       expect(enrollment.is_cobra_status?).to be_truthy
     end
   end
@@ -1865,7 +1869,7 @@ context "for cobra", :dbclean => :after_each do
   end
 
   it "can_select_coverage?" do
-    enrollment.kind = 'employer_sponsored_cobra' 
+    enrollment.kind = 'employer_sponsored_cobra'
     expect(enrollment.can_select_coverage?).to be_truthy
   end
 
@@ -1880,7 +1884,7 @@ context "for cobra", :dbclean => :after_each do
   end
 end
 
-context '.process_verification_reminders' do 
+context '.process_verification_reminders' do
   context "when family exists with pending outstanding verifications" do
 
     let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -1908,9 +1912,9 @@ context '.process_verification_reminders' do
       consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
     end
 
-    context 'when first verification due date reached' do 
+    context 'when first verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now)
       end
 
       it 'should trigger first reminder event' do
@@ -1922,7 +1926,7 @@ context '.process_verification_reminders' do
 
     context 'when second verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now)
       end
 
       it 'should trigger second reminder event' do
@@ -1934,7 +1938,7 @@ context '.process_verification_reminders' do
 
     context 'when third verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now)
       end
 
       it 'should trigger third reminder event' do
@@ -1944,10 +1948,10 @@ context '.process_verification_reminders' do
       end
     end
 
-    context 'when fourth verification due date reached' do 
+    context 'when fourth verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now) 
-      end 
+        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now)
+      end
 
       it 'should trigger fourth reminder event' do
         HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
