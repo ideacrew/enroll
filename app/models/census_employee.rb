@@ -584,6 +584,20 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def enrollments_for_display
+    enrollments = []
+
+    coverages_selected = lambda do |benefit_group_assignment|
+      return [] if benefit_group_assignment.blank?
+      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment}
+      [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
+    end
+
+    enrollments += coverages_selected.call(active_benefit_group_assignment)
+    enrollments += coverages_selected.call(renewal_benefit_group_assignment)
+    enrollments.compact.uniq
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
