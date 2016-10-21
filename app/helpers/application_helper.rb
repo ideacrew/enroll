@@ -601,10 +601,6 @@ module ApplicationHelper
     end
   end
 
-  def primary_member(person_id)
-    Person.find(person_id).try(:primary_family).try(:primary_family_member).try(:person) == Person.find(person_id)
-  end
-
   def asset_data_base64(path)
     asset = Rails.application.assets.find_asset(path)
     throw "Could not find asset '#{path}'" if asset.nil?
