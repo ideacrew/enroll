@@ -132,10 +132,10 @@ module Importers
         employer = find_employer
         begin
           employer.update_attributes!(:aasm_state => "enrolled", :profile_source => "conversion")
-          map_employees_to_benefit_groups(employer, record)
         rescue Exception => e
           raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
         end
+        map_employees_to_benefit_groups(employer, record)
       end
       return save_result
     end
@@ -143,8 +143,13 @@ module Importers
     def map_employees_to_benefit_groups(employer, plan_year)
       bg = plan_year.benefit_groups.first
       employer.census_employees.non_terminated.each do |ce|
+        begin
         ce.add_benefit_group_assignment(bg)
         ce.save!
+        rescue Exception => e
+          puts "Issue adding benefit group to employee:"
+          puts "\n#{employer.fein} - #{employer.legal_name} - #{ce.full_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
+        end
       end
     end
 
