@@ -221,8 +221,8 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:hbx_enrollment) { double }
     let(:hbx_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment) }
 
-    let(:person) { FactoryGirl.create(:person,:with_consumer_role,:with_employee_role)}
-    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:person) { FactoryGirl.create(:person)}
+    let(:consumer_role) {FactoryGirl.create(:consumer_role,person: person)}
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
     let(:census_employee1) { FactoryGirl.create(:census_employee, employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id,hired_on: "2014-11-11") }
