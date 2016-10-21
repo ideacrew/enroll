@@ -1,7 +1,10 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCitizenStatus < MongoidMigrationTask
-  ACCEPTABLE_STATES = %w(us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
+  ACCEPTABLE_STATES = ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident", "indian_tribe_member"]
+  STATES_TO_FIX = %w(not_lawfully_present_in_us
+                     non_native_not_lawfully_present_in_us
+                     ssn_pass_citizenship_fails_with_SSA)
   def get_people
     Person.where("versions"=>{"$exists"=> true}).or({"consumer_role.lawful_presence_determination.ssa_responses"=>{"$exists"=> true}},
                                                     {"consumer_role.lawful_presence_determination.vlp_responses"=>{"$exists"=> true}})
@@ -11,7 +14,7 @@ class UpdateCitizenStatus < MongoidMigrationTask
     people = get_people
     people.each do |person|
       begin
-        fix_citizen_status(person) unless ACCEPTABLE_STATES.include? lpd(person).citizen_status
+        fix_citizen_status(person) if STATES_TO_FIX.include? lpd(person).citizen_status
       rescue
         $stderr.puts "Issue migrating person: person #{person.id}, HBX id  #{person.hbx_id}"
       end
@@ -32,7 +35,15 @@ class UpdateCitizenStatus < MongoidMigrationTask
   end
 
   def version_state_reliable?(person_v)
+    authority_acceptable?(person_v) && status_acceptable(person_v)
+  end
+
+  def authority_acceptable?(person_v)
     !lpd(person_v).vlp_authority.present? || lpd(person_v).vlp_authority == "curam"
+  end
+
+  def status_acceptable(person_v)
+    ACCEPTABLE_STATES.include? lpd(person_v).citizen_status
   end
 
   def lpd(person)
