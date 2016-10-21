@@ -23,6 +23,7 @@ describe ChangeEmployerContributions do
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
       allow(ENV).to receive(:[]).with("relationship").and_return(benefit_group.relationship_benefits.first.relationship)
       allow(ENV).to receive(:[]).with("premium").and_return(benefit_group.relationship_benefits.first.premium_pct + 5)
+      allow(ENV).to receive(:[]).with("offered").and_return(benefit_group.relationship_benefits.first.offered)
     end
 
     it "should change the employee contribution" do
@@ -37,6 +38,20 @@ describe ChangeEmployerContributions do
       subject.migrate
       benefit_group.reload
       expect(benefit_group.relationship_benefits[1].premium_pct).to eq 40
+    end
+
+    it "should offer benefits" do
+      benefit_group.relationship_benefits.first.update_attribute(:offered, false)
+      subject.migrate
+      benefit_group.reload
+      expect(benefit_group.relationship_benefits.first.offered).to eq true
+    end
+
+    it "should not offer benefits for other relationships" do
+      benefit_group.relationship_benefits[1].update_attribute(:offered, false)
+      subject.migrate
+      benefit_group.reload
+      expect(benefit_group.relationship_benefits[1].offered).to eq false
     end
   end
 end
