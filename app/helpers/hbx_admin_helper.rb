@@ -48,4 +48,7 @@ module HbxAdminHelper
     family.active_household.hbx_enrollments.with_plan.without_aptc.by_year(TimeKeeper.date_of_record.year)
   end
 
+  def primary_member(person_id)
+    Person.find(person_id).try(:primary_family).try(:primary_family_member).try(:person) == Person.find(person_id)
+  end
 end
