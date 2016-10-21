@@ -27,14 +27,15 @@ module Effective
         table_column :effective_date, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:start_on)}, :filter => false
         table_column :invoiced, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :participation, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:employee_participation_percent)}, :filter => false
-        # table_column :transmit_xml, :proc => Proc.new { |row|
-        #
-        #   unless row.employer_profile.is_transmit_xml_button_disabled?
-        #     link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), method: :post)
-        #   else
-        #     ""
-        #   end
-        # }, :filter => false
+        table_column :enrolled_waived, :title => 'Enrolled/Waived', :proc => Proc.new { |row|
+          plan_year = row.employer_profile.try(:latest_plan_year)
+          census_employees = plan_year.find_census_employees if plan_year.present?
+          enrolled = plan_year.try(:enrolled).try(:count).to_i
+          waived = census_employees.try(:waived).try(:count).to_i
+          enrolled.to_s + "/" + waived.to_s
+
+          }, :filter => false
+
 
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
@@ -44,7 +45,7 @@ module Effective
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
-
+        table_column :xml_submitted, :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}
       end
 
 
