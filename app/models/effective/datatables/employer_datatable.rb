@@ -24,6 +24,7 @@ module Effective
         table_column :conversion, :width => '120px', :proc => Proc.new { |row| boolean_to_glyph(row.employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
         table_column :plan_year_state, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:aasm_state).try(:titleize)}, :filter => false
+        table_column :effective_date, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:start_on)}, :filter => false
         table_column :invoiced, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :transmit_xml, :proc => Proc.new { |row|
 
@@ -50,7 +51,15 @@ module Effective
           employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
 
           employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
+
+          if attributes[:upcoming_dates].present?
+              if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
+                employers = employers.employer_profile_plan_year_start_on(date)
+              end
+          end
+
         end
+
 
         @employer_collection = employers
 
@@ -80,6 +89,10 @@ module Effective
 
       def nested_filter_definition
 
+        @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
+        @next_60_day = @next_30_day.next_month
+        @next_90_day = @next_60_day.next_month
+
         filters = {
         enrolling_renewing:
           [
@@ -98,12 +111,20 @@ module Effective
             {scope:'employer_profiles_enrolled', label: 'All' },
             {scope:'employer_profiles_suspended', label: 'Suspended' },
           ],
+          upcoming_dates:
+            [
+              {scope: @next_30_day, label: @next_30_day },
+              {scope: @next_60_day, label: @next_60_day },
+              {scope: @next_90_day, label: @next_90_day },
+              #{scope: "employer_profile_plan_year_start_on('#{@next_60_day})'", label: @next_60_day },
+              #{scope: "employer_profile_plan_year_start_on('#{@next_90_day})'",  label: @next_90_day },
+            ],
         enrolling:
           [
-            {scope:'employer_profiles_enrolling', label: 'All'},
-            {scope:'employer_profiles_initial_eligible', label: 'Initial', subfilter: :enrolling_initial},
-            {scope:'employer_profiles_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
-            #['', 'Ineligible', :enrolling_ineligible],
+            {scope: 'employer_profiles_enrolling', label: 'All'},
+            {scope: 'employer_profiles_initial_eligible', label: 'Initial', subfilter: :enrolling_initial},
+            {scope: 'employer_profiles_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
+            {scope: 'employer_profiles_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
           ],
         employers:
          [
