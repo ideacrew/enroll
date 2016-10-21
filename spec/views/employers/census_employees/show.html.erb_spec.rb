@@ -69,6 +69,17 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /#{address.zip}/
   end
 
+  it "should show the address feild of census employee if address not present" do
+    allow(census_employee).to receive(:address).and_return([])
+    render template: "employers/census_employees/show.html.erb"
+    expect(rendered).to match /Address/
+    expect(rendered).to match /ADDRESS LINE 2/
+    expect(rendered).to match /ADDRESS LINE 1/
+    expect(rendered).to match /CITY/
+    expect(rendered).to match /SELECT STATE/
+    expect(rendered).to match /ZIP/
+  end
+  
   it "should not show the plan" do
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
     assign(:hbx_enrollments, [])
