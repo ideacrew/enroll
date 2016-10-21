@@ -39,7 +39,7 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), row.employer_profile.is_transmit_xml_button_disabled? ? 'ajax' : 'disabled'],
+           ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), row.employer_profile.is_transmit_xml_button_disabled? ? 'static' : 'disabled'],
            #['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(row.id), 'ajax']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
