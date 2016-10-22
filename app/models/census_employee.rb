@@ -46,7 +46,6 @@ class CensusEmployee < CensusMember
 
   before_save :assign_default_benefit_package
 
-  after_create :generate_and_deliver_checkbook_url
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -343,6 +342,24 @@ class CensusEmployee < CensusMember
     else
       self
     end
+  end
+
+  def generate_and_save_to_temp_folder
+   cs= ::CheckbookServices::PlanComparision.new(self)    
+   url = cs.generate_url
+   begin
+    event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+    notice_trigger = event_kind.notice_triggers.first
+    builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+            template: notice_trigger.notice_template,
+            subject: event_kind.title,
+            mpi_indicator: notice_trigger.mpi_indicator,
+            data: url
+            }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.build_and_save
+   rescue Exception => e
+     Rails.logger.warn("Unable to build checkbook notice for #{e}")
+   end
   end
 
   def generate_and_deliver_checkbook_url    
