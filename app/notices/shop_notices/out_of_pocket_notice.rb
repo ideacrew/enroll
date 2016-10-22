@@ -10,8 +10,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     self.url = args[:data]
     super(args)
-    # self.data = args[:data]
-    self.subject=  args[:subject] +""+census_employee.id
+    self.subject=  "#{args[:subject]}_#{census_employee.first_name}_#{census_employee.last_name}"
     self.to= @recipient.email.address
   end
 
@@ -19,6 +18,17 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     build
     generate_pdf_notice
     send_email_notice
+  end
+
+  def build_and_save
+    build
+    generate_pdf_notice
+    move_to_employer_folder
+  end
+
+  def move_to_employer_folder
+    temp_employer_folder = FileUtils.mkdir_p( Rails.root, "tmp", "#{census_employee.employer_profile.id}")
+    FileUtils.mv(notice_path, temp_employer_folder.join,true)
   end
 
   def build
