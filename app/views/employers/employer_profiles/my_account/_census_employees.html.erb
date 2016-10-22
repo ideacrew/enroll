@@ -37,7 +37,8 @@
         <br/>
         <div class="col-xs-12 row">
           <div class="pull-right">
-           <%= link_to "Generate OOP PDF",generate_checkbook_urls_employers_employer_profile_path(@employer_profile),remote: true, class: "btn btn-default" %>
+          <!--  <%= link_to "Generate OOP PDF",generate_checkbook_urls_employers_employer_profile_path(@employer_profile),remote: true, class: "btn btn-default" %> -->
+           <%= link_to "Generate OOP PDF", "", data: {toggle: "modal", target: "#poc_cal"} %>
           </div>
         </div>
         <div class="col-xs-10">
@@ -129,3 +130,31 @@
   </div>
 </div>
 <div></div>
+
+
+
+<div class="modal fade" id="poc_cal" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <div>
+        <p align="justify"> You are about to generate a custom PDF notice that provides the necessary information for your employees to anonymously view your plan offerings, and the estimated Out-Of-Pocket costs associated with each employee.</p> 
+        </div>
+        <%=form_tag generate_checkbook_urls_employers_employer_profile_path do%>
+          <p>Please choose one of the following below</p>
+           <lable><%=radio_button_tag 'contact_menthod','manual'%>Download a local copy of the PDF notice and distribute to the employees myself.</lable><br>
+           <lable><%=radio_button_tag 'contact_menthod','email'%>Send the PDF notice to every eligible employee\'s email address.</lable><br>
+        </div>
+          <div class="modal-footer">
+            <%= submit_tag "Confirm", class: 'btn btn-primary  mtz' %>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+          </div>
+        <%end%>
+      
+    </div>
+  </div>
+</div>
+
+
+
