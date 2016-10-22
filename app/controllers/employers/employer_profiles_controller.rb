@@ -259,7 +259,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
  
 
   def generate_checkbook_urls
-    @employer_profile.generate_and_deliver_checkbook_urls_for_employees
+    if params[:contact_menthod] == 'manual'
+      outputFile= @employer_profile.generate_checkbook_notices
+      send_file Rails.root.join("tmp","#{@employer_profile.id}.zip")
+    elsif params[:contact_menthod] == 'email'
+      @employer_profile.generate_and_deliver_checkbook_urls_for_employees
+    end
     flash[:notice] = "Generating and delivering checkbook url's to employees"
   end
   

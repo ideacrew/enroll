@@ -824,6 +824,21 @@ class EmployerProfile
     end
   end
 
+  def generate_checkbook_notices
+    census_employees.each do |census_employee|
+      census_employee.generate_and_save_to_temp_folder
+    end
+    begin
+      directoryToZip = Rails.root.join( "tmp", "#{id}").to_s
+      outputFile = Rails.root.join("tmp","#{id}.zip").to_s
+      zf = ZipFileGenerator.new(directoryToZip,outputFile)
+      zf.write()
+      return outputFile
+    rescue Exception => e
+      logger.warn("#{e}")
+    end
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)

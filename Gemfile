@@ -105,6 +105,7 @@ gem 'interactor-rails', '2.0.2'
 
 # Httparty
 gem 'httparty'
+gem 'rubyzip'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
