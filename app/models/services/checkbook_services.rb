@@ -4,9 +4,7 @@ module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
     REMOTE_ACCESS_KEY = "B48E5D58B6A64B3E93A6BF719647E568"
-    # REMOTE_ACCESS_KEY_PROD="E637A0C6161C4680A5E1C348241F2EC5"
     BASE_URL =  "https://staging.checkbookhealth.org"
-    # BASE_URL_PROD = "https://dc.checkbookhealth.org"
     def initialize(census_employee)
       @census_employee= census_employee
       @url = "https://staging.checkbookhealth.org/shop/dc/api/"
