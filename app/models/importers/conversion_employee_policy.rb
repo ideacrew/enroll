@@ -161,8 +161,8 @@ module Importers
                                    employee.dob,
                                    employee.gender)
       begin
-        role, family = Factories::EnrollmentFactory.construct_employee_role(nil, employee, person_data)
-
+        role, family = Factories::EnrollmentFactory.construct_employee_role(nil, employee, person_data, market)
+binding.pry
         if role.nil? && family.nil?
           errors.add(:base, "matching conflict for this personal data")
           return false

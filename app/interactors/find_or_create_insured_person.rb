@@ -3,12 +3,22 @@ class FindOrCreateInsuredPerson
 
   def call
     user = context.user
-    people = Person.match_by_id_info_for_conversion(
-      ssn: context.ssn,
-      dob: context.dob,
-      last_name: context.last_name,
-      first_name: context.first_name
+    market = context.market
+    people = if market == "Shop"
+      Person.match_by_id_info_for_conversion(
+        ssn: context.ssn,
+        dob: context.dob,
+        last_name: context.last_name,
+        first_name: context.first_name
       )
+    else
+      Person.match_by_id_info(
+        ssn: context.ssn,
+        dob: context.dob,
+        last_name: context.last_name,
+        first_name: context.first_name
+      )
+    end
     person, is_new = nil, nil
     case people.count
     when 1
