@@ -56,11 +56,11 @@ module Importers
       non_terminated_employees = candidate_employees.reject do |ce|
         (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
       end
-    
+
       @found_employee = non_terminated_employees.sort_by(&:hired_on).last
     end
 
-    def find_plan 
+    def find_plan
       return @plan unless @plan.nil?
       return nil if hios_id.blank?
       clean_hios = hios_id.strip
@@ -111,7 +111,7 @@ module Importers
     def merge_poc_and_employee_person(poc_person, employee_person, employer)
       return true if poc_person.id == employee_person.id
       staff_role_to_migrate = poc_person.employer_staff_roles.detect do |sr|
-        (sr.employer_profile_id == employer.id) && 
+        (sr.employer_profile_id == employer.id) &&
           (sr.is_active?)
       end
       poc_person.employer_staff_roles.delete(staff_role_to_migrate)
@@ -120,13 +120,13 @@ module Importers
       employee_person.save!
       poc_user = poc_person.user
       emp_user = employee_person.user
-      unless poc_user.nil? 
+      unless poc_user.nil?
         poc_person.unset(:user_id)
         if emp_user.nil?
           employee_person.set(:user_id => poc_user.id)
         else
           poc_user.destroy!
-        end 
+        end
       end
     end
 
