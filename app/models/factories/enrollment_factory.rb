@@ -124,7 +124,7 @@ module Factories
     #   an object that responds to the names and gender methods
     #   census_employee
     #   user
-    def self.construct_employee_role(user, census_employee, person_details, market)
+    def self.construct_employee_role(user, census_employee, person_details, market="Individual")
       person, person_new = initialize_person(
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
@@ -182,7 +182,7 @@ module Factories
       end
     end
 
-    def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on, market)
+    def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on, market="Individual")
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       self.link_census_employee(census_employee, role, employer_profile)
       family, primary_applicant = self.initialize_family(person, census_employee.census_dependents, market)
@@ -210,7 +210,7 @@ module Factories
       return family
     end
 
-    def self.initialize_dependent(family, primary, dependent, market)
+    def self.initialize_dependent(family, primary, dependent, market="Individual")
       person, new_person = initialize_person(nil, nil, dependent.first_name,
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
@@ -265,7 +265,7 @@ module Factories
       end
     end
 
-    def self.initialize_family(person, dependents, market)
+    def self.initialize_family(person, dependents, market="Individual")
       family = person.primary_family
       family ||= Family.new
       applicant = family.primary_applicant
