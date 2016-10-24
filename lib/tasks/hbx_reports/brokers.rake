@@ -18,6 +18,7 @@ namespace :reports do
           Market_kind
           Languages_spoken
           Evening/Weekend_hours
+          Approval_date
           Accept_new_clients
           Address_1
           Address_2
@@ -30,7 +31,7 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/public/brokers.csv"
+      file_name = "#{Rails.root}/brokers_list_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -46,6 +47,7 @@ namespace :reports do
             broker.broker_role.broker_agency_profile.try(:market_kind),
             broker.broker_role.broker_agency_profile.try(:languages_spoken),
             broker.broker_role.broker_agency_profile.try(:working_hours),
+            broker.broker_role.workflow_state_transitions.detect{ |t| t.to_state == "active"}.try(:transition_at).try(:strftime,'%Y-%m-%d'),
             broker.broker_role.broker_agency_profile.try(:accept_new_clients)] +
 
             organization_info(broker) +
