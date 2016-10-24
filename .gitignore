@@ -61,5 +61,5 @@ plan_xmls.zip
 # Ignore .idea
 .idea
 
-# ignore conversion employee and employer folders
-conversion*
+# ignore conversion employee/employer folders
+conversion_employe*
