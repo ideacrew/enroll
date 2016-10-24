@@ -140,7 +140,7 @@
         <div>
         <p style="margin-bottom: 30px;"> You are about to generate a custom PDF notice that provides the necessary information for your employees to anonymously view your plan offerings, and the estimated Out-Of-Pocket costs associated with each plan.</p> 
         </div>
-        <%=form_tag generate_checkbook_urls_employers_employer_profile_path do%>
+        <%=form_tag generate_checkbook_urls_employers_employer_profile_path, remote:true do%>
           <p>Please choose any one of the following below:</p><br>
            <lable><%=radio_button_tag 'contact_menthod','manual'%> <span style="margin-right: 2px;">Download a local copy of the PDF notice and distribute to the employees myself. </span></lable><br><br>
            <lable><%=radio_button_tag 'contact_menthod','email'%> <span style="margin-right: 2px;">Send the PDF notice to every eligible employee's email address.</span></lable><br>

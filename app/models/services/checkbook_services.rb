@@ -6,12 +6,13 @@ module CheckbookServices
     BASE_URL =  Settings.checkbook_services.base_url
     def initialize(census_employee)
       @census_employee= census_employee
-      @url = BASE_URL+"shop/dc/api/"
+      @url = BASE_URL+"/shop/dc/api/"
     end
 
     def generate_url
       begin
       puts construct_body.to_json
+      # byebug
       @result = HTTParty.post(@url,
               :body => construct_body.to_json,
               :headers => { 'Content-Type' => 'application/json' } )
