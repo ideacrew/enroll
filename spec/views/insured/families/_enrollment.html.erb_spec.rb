@@ -278,5 +278,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_text(/Coverage End/)
       expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
     end
+
+    it "should show plan contact information" do
+      expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+    end
+
+    it "should not show carrier contact information" do
+      expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
+    end
+
   end
 end
