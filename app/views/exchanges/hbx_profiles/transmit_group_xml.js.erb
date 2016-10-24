@@ -1,0 +1,18 @@
+// get the row by fein
+var fein = <%=@fein%>
+var fein_selector = 'td.col-fein:contains(' + fein + ')'
+var fein_row = $(fein_selector).parent().index() + 1
+console.log(fein_row)
+
+// set the xml submitted message
+// the nth-child selector starts count at 1, but index() counts from 0
+var xml_column = $("th.col-xml_submitted").index() + 1
+var status_box_selector = 'tbody tr:nth-child(' + fein_row + ') td:nth-child(' + xml_column + ')'
+console.log('status_box_selector', status_box_selector)
+var success = '<div style="background-color: #468847"> Successful<br> Transmit</div>'
+$(status_box_selector).html(success)
+
+// now close the action button dropdown
+var action_column = $("th.col-actions").index() + 1
+var action_selector = 'tbody tr:nth-child(' + fein_row + ') td:nth-child(' + action_column + ')'
+$(action_selector).trigger('click')

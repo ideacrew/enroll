@@ -33,13 +33,12 @@ module Effective
           enrolled = plan_year.try(:enrolled).try(:count).to_i
           waived = census_employees.try(:waived).try(:count).to_i
           enrolled.to_s + "/" + waived.to_s
-
           }, :filter => false, :sortable => false
         table_column :xml_submitted, :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), row.employer_profile.is_transmit_xml_button_disabled? ? 'static' : 'disabled'],
+           ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), row.employer_profile.is_transmit_xml_button_disabled? ? 'ajax' : 'disabled'],
            #['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(row.id), 'ajax']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
@@ -49,11 +48,8 @@ module Effective
 
 
       def collection
-
         return @employer_collection if defined? @employer_collection
-
         employers = Organization.all_employer_profiles
-
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           employers = employers.send(attributes[:employers]) if ['employer_profiles_applicants','employer_profiles_enrolling','employer_profiles_enrolled'].include?(attributes[:employers])
           employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
