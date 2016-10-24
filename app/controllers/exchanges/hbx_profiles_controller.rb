@@ -34,7 +34,9 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
-    @fein=EmployerProfile.find(params[:id]).fein
+    @employer_profile = EmployerProfile.find(params[:id])
+    @fein=@employer_profile.fein
+    @xml_submit_time = @employer_profile.xml_transmitted_timestamp
     #flash["notice"] = "Successfully transmitted the employer group xml."
     #redirect_to exchanges_hbx_profiles_root_path
   end

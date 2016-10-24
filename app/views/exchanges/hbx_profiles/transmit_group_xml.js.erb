@@ -1,3 +1,5 @@
+console.log('hey')
+
 // get the row by fein
 var fein = <%=@fein%>
 var fein_selector = 'td.col-fein:contains(' + fein + ')'
@@ -9,7 +11,9 @@ console.log(fein_row)
 var xml_column = $("th.col-xml_submitted").index() + 1
 var status_box_selector = 'tbody tr:nth-child(' + fein_row + ') td:nth-child(' + xml_column + ')'
 console.log('status_box_selector', status_box_selector)
-var success = '<div style="background-color: #468847"> Successful<br> Transmit</div>'
+var xml =  "<%= format_time_display(@xml_submit_time) %>"
+var success = '<div style="background-color: #92ee88">'  + xml   +    '</div>'
+console.log('success', success)
 $(status_box_selector).html(success)
 
 // now close the action button dropdown
