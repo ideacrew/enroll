@@ -46,7 +46,7 @@
         <thead class="thead-default">
           <tr>
             <th>
-              <%= @folder %>: FROM</th>
+              FROM</th>
             <th>
               Date
             </th>
@@ -58,7 +58,7 @@
         </thead>
         <tbody>
           <%- if @provider.try(:inbox).try(:messages) %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @provider} %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => @provider.inbox.messages.order(created_at: :desc).select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @provider} %>
           <% end %>
         </tbody>
       </table>
