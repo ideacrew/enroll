@@ -23,7 +23,7 @@ module CheckbookServices
         raise "Unable to generate url"
       end
       rescue Exception => e
-        puts "Exception #{e} #{e.backtrace}"
+        puts "Exception #{e}"
       end
     end
 
