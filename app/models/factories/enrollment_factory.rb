@@ -124,26 +124,26 @@ module Factories
     #   an object that responds to the names and gender methods
     #   census_employee
     #   user
-    def self.construct_employee_role(user, census_employee, person_details, market="Individual")
+    def self.construct_employee_role(user, census_employee, person_details)
       person, person_new = initialize_person(
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
         person_details.name_sfx, census_employee.ssn,
-        census_employee.dob, person_details.gender, "employee", market
+        census_employee.dob, person_details.gender, "employee"
         )
       return nil, nil if person.blank? && person_new.blank?
       self.build_employee_role(
         person, person_new, census_employee.employer_profile,
-        census_employee, census_employee.hired_on, market
+        census_employee, census_employee.hired_on
         )
     end
 
     def self.add_employee_role(user: nil, employer_profile:,
           name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
-          ssn:, dob:, gender:, hired_on:, market:
+          ssn:, dob:, gender:, hired_on:
       )
       person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
-                                             last_name, name_sfx, ssn, dob, gender, "employee", market)
+                                             last_name, name_sfx, ssn, dob, gender, "employee")
 
       census_employee = EmployerProfile.find_census_employee_by_person(person).first
 
@@ -151,7 +151,7 @@ module Factories
       raise ArgumentError.new("no census employee for provided employer profile") unless census_employee.employer_profile_id == employer_profile.id
 
       self.build_employee_role(
-        person, person_new, employer_profile, census_employee, hired_on, market
+        person, person_new, employer_profile, census_employee, hired_on
         )
     end
 
@@ -182,10 +182,10 @@ module Factories
       end
     end
 
-    def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on, market="Individual")
+    def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       self.link_census_employee(census_employee, role, employer_profile)
-      family, primary_applicant = self.initialize_family(person, census_employee.census_dependents, market)
+      family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
       family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
@@ -210,11 +210,11 @@ module Factories
       return family
     end
 
-    def self.initialize_dependent(family, primary, dependent, market="Individual")
+    def self.initialize_dependent(family, primary, dependent)
       person, new_person = initialize_person(nil, nil, dependent.first_name,
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
-                                 dependent.dob, dependent.gender, "employee", market)
+                                 dependent.dob, dependent.gender, "employee")
       if person.present?
         relationship = person_relationship_for(dependent.employee_relationship)
         primary.ensure_relationship_with(person, relationship)
@@ -226,7 +226,7 @@ module Factories
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, market)
+                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
         person_attrs = {
           user: user,
           name_pfx: name_pfx,
@@ -238,8 +238,7 @@ module Factories
           dob: dob,
           gender: gender,
           no_ssn: no_ssn,
-          role_type: role_type,
-          market: market
+          role_type: role_type
         }
         result = FindOrCreateInsuredPerson.call(person_attrs)
         return result.person, result.is_new
@@ -265,7 +264,7 @@ module Factories
       end
     end
 
-    def self.initialize_family(person, dependents, market="Individual")
+    def self.initialize_family(person, dependents)
       family = person.primary_family
       family ||= Family.new
       applicant = family.primary_applicant
@@ -274,7 +273,7 @@ module Factories
         family.add_family_member(related_person)
       end
       dependents.each do |dependent|
-        initialize_dependent(family, person, dependent, market)
+        initialize_dependent(family, person, dependent)
       end
       return family, applicant
     end
