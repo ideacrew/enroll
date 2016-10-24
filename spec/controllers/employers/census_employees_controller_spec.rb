@@ -222,17 +222,20 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:hbx_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment) }
 
     let(:person) { FactoryGirl.create(:person)}
-    let(:consumer_role) {FactoryGirl.create(:consumer_role,person: person)}
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-    let(:census_employee1) { FactoryGirl.create(:census_employee, employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id,hired_on: "2014-11-11") }
+    let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee1) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
-    let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
     let(:current_employer_term_enrollment) do
       FactoryGirl.create(:hbx_enrollment,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role1.id,
+                         benefit_group_assignment_id:benefit_group_assignment1.id,
                          aasm_state: 'coverage_terminated'
       )
     end
@@ -241,6 +244,7 @@ RSpec.describe Employers::CensusEmployeesController do
                          household: family.active_household,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role1.id,
+                         benefit_group_assignment_id:benefit_group_assignment1.id,
                          aasm_state: 'coverage_selected'
       )
     end
@@ -248,7 +252,6 @@ RSpec.describe Employers::CensusEmployeesController do
       FactoryGirl.create(:hbx_enrollment,
                          household: family.active_household,
                          kind: "individual",
-                         consumer_role_id: consumer_role.id,
                          aasm_state: 'coverage_terminated'
       )
     end
@@ -256,7 +259,7 @@ RSpec.describe Employers::CensusEmployeesController do
       FactoryGirl.create(:hbx_enrollment,
                          household: family.active_household,
                          kind: "employer_sponsored",
-                         employee_role_id: employee_role.id,
+                         benefit_group_assignment_id:benefit_group_assignment2.id,
                          aasm_state: 'coverage_terminated'
       )
     end
@@ -272,7 +275,7 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(response).to render_template("show")
     end
 
-    it "should return employer_sponsored past enrollment of active employee role" do
+    it "should return employer_sponsored past enrollment matching benefit_group_assignment_id of current employee role " do
       sign_in
       allow(CensusEmployee).to receive(:find).and_return(census_employee1)
       allow(person).to receive(:primary_family).and_return(family)
@@ -282,7 +285,7 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
     end
 
-    it "should not return IVL enrollment in past enrollment of active employee role " do
+    it "should not return IVL enrollment in past enrollment of current employee role " do
       sign_in
       allow(CensusEmployee).to receive(:find).and_return(census_employee1)
       allow(person).to receive(:primary_family).and_return(family)
