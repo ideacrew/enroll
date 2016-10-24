@@ -345,9 +345,9 @@ class CensusEmployee < CensusMember
   end
 
   def generate_and_save_to_temp_folder
-   cs= ::CheckbookServices::PlanComparision.new(self)    
-   url = cs.generate_url
    begin
+    cs= ::CheckbookServices::PlanComparision.new(self)    
+    url = cs.generate_url
     event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
     notice_trigger = event_kind.notice_triggers.first
     builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -363,12 +363,11 @@ class CensusEmployee < CensusMember
   end
 
   def generate_and_deliver_checkbook_url    
-   cs= ::CheckbookServices::PlanComparision.new(self)    
-   url = cs.generate_url
    begin
+    cs= ::CheckbookServices::PlanComparision.new(self)    
+    url = cs.generate_url
     event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
     notice_trigger = event_kind.notice_triggers.first
-    # byebug
     builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
