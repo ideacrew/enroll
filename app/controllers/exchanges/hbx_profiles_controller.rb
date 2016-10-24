@@ -229,9 +229,12 @@ def employer_poc
 
   def add_new_sep
     if params[:qle_id].present?
+      @element_to_replace_id = params[:family_actions_id]
       createSep
+      respond_to do |format|
+        format.js { render :file => "sep/approval/add_sep_result.js.erb", name: @name }
+      end
     end
-    redirect_to exchanges_hbx_profiles_root_path
   end
 
   def cancel_enrollment

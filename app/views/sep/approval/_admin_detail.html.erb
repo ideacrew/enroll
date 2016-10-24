@@ -22,11 +22,12 @@
 	 			<h3 class='title'>Add SEP</h3>
 	  			<div class="col-md-12 no-pd col-sm-12 col-xs-12">
 	 				<% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
-	 				<%= form_tag url, method: http_method, class: 'input' do %> 
+	 				<%= form_tag url, method: http_method, remote: true, class: 'input' do %>
 					<div class="row row-form-wrapper no-buffer">
 						<%= hidden_field_tag "person", f.id %>
 						<%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
 						<%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
+						<%= hidden_field_tag "family_actions_id", "family_actions_#{f.id.to_s}" %>
 						<div class = "qle_market">
 							<%= hidden_field_tag :market_kind, "ivl" %>
 						</div>
