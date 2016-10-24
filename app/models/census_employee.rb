@@ -391,6 +391,7 @@ class CensusEmployee < CensusMember
    begin
     event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
     notice_trigger = event_kind.notice_triggers.first
+    # byebug
     builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
@@ -399,7 +400,7 @@ class CensusEmployee < CensusMember
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
       builder.build_and_save
    rescue Exception => e
-     Rails.logger.warn("Unable to build checkbook notice for #{e}")
+     Rails.logger.warn("Unable to build checkbook notice for #{e} #{e.backtrace}")
    end
   end
 

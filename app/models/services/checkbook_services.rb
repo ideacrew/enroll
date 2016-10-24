@@ -19,6 +19,7 @@ module CheckbookServices
               :headers => { 'Content-Type' => 'application/json' } )
       @doc=Nokogiri::HTML(@result.parsed_response)
       uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
+      # byebug
       if uri.present?
         return BASE_URL+uri.first.value
       else
@@ -39,7 +40,7 @@ module CheckbookServices
       "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on,
       "employee_coverage_date": census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
       "employer": {
-        "state": 11, #census_employee.employer_profile.organization.primary_office_location.address.state, #TODO Fix these
+        "state": 11, #census_employee.employer_profile.organization.primary_office_location.address.state, 
         "county": 111 #census_employee.employer_profile.organization.primary_office_location.address.state 
       },
       "family": build_family,
@@ -53,6 +54,9 @@ module CheckbookServices
       premium_benefit_contributions = {}
       census_employee.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits.each do |relationship_benefit| 
         next if relationship_benefit.relationship == "child_26_and_over"
+        next if relationship_benefit.relationship == "nephew_or_niece"
+        next if relationship_benefit.relationship == "grandchild"
+        next if relationship_benefit.relationship == "child_26_and_over_with_disability"
         relationship=  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.relationship
         premium_benefit_contributions[relationship] = relationship_benefit.premium_pct.to_f
       end
@@ -63,7 +67,8 @@ module CheckbookServices
     def build_family
       family = [{'dob': census_employee.dob,'relationship': 'self'}]
       census_employee.census_dependents.each do |dependent|
-        family << [{'dob': dependent.dob,'relationship': dependent.employee_relationship}]
+        next if dependent.census_dependents == "nephew_or_niece"
+        family << {'dob': dependent.dob,'relationship': dependent.employee_relationship}
       end
       family
     end

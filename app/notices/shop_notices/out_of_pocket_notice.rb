@@ -27,8 +27,8 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
   end
 
   def move_to_employer_folder
-    temp_employer_folder = FileUtils.mkdir_p( Rails.root, "tmp", "#{census_employee.employer_profile.id}")
-    FileUtils.mv(notice_path, temp_employer_folder.join,true)
+    temp_employer_folder = FileUtils.mkdir_p(Rails.root.join("tmp", "#{@recipient.employer_profile.id}"))
+    FileUtils.mv(notice_path, temp_employer_folder.join)
   end
 
   def build
