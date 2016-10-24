@@ -90,7 +90,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
 
   index({"irs_groups.hbx_assigned_id" => 1})
-
+  index({"family_members.person_id" => 1, hbx_assigned_id: 1})
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
@@ -120,10 +120,11 @@ class Family
   scope :by_general_agency_profile_id,         -> (general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
+  scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
 
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
-  
+
   scope :all_active_assistance_receiving_for_current_year, ->{ unscoped.where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                                         :"households.tax_households.eligibility_determinations.determined_at".desc).and(
                                                                         :"households.tax_households.effective_ending_on" => nil ).and(
@@ -146,12 +147,16 @@ class Family
   scope :all_enrollments,                     ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id, ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id, ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".nin => ["employer_sponsored", "employer_sponsored_cobra", "coverall"]) }
   scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :by_enrollment_coverall_market,       ->{ where(:"households.hbx_enrollments.kind" => 'coverall') }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
+  scope :non_enrolled,                        ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :sep_eligible,                        ->{ where(:"active_seps.count".gt => 0) }
+  scope :coverage_waived,                     ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
@@ -336,6 +341,11 @@ class Family
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
+
+  def active_admin_seps
+    special_enrollment_periods.find_all { |sep| sep.is_active? && sep.admin_flag }
+  end
+
 
   # single SEP with latest end date from list of active SEPs
   def current_sep

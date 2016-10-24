@@ -23,6 +23,7 @@ Rails.application.routes.draw do
   end
 
   namespace :exchanges do
+
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
@@ -33,7 +34,11 @@ Rails.application.routes.draw do
 
       collection do
         get :family_index
+        get :family_index_dt
+        post :families_index_datatable
         get :employer_index
+        get :employer_poc
+        post :employer_poc_datatable
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
@@ -53,10 +58,21 @@ Rails.application.routes.draw do
         post :binder_paid
         get :verification_index
         get :verifications_index_datatable
+        get :cancel_enrollment
+        post :update_cancel_enrollment
+        get :terminate_enrollment
+        post :update_terminate_enrollment
+        post :add_new_sep
+        get :update_effective_date
+        get :calculate_sep_dates
+        get :add_sep_form
+        get :hide_form
+        get :show_sep_history
       end
 
       member do
         post :transmit_group_xml
+        get :transmit_group_xml
         get :home
         get :inbox
       end
