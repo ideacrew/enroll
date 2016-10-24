@@ -217,8 +217,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
-    let(:member1) {double(person: double(consumer_role: c1))}
-    let(:member2) {double(person: double(consumer_role: c2))}
+    let(:r1) {FactoryGirl.create(:resident_role)}
+    let(:r2) {FactoryGirl.create(:resident_role)}
+    let(:member1) {double(person: double(consumer_role: c1, resident_role: r1))}
+    let(:member2) {double(person: double(consumer_role: c2, resident_role: r2))}
+
     let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
     let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
     let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
@@ -242,7 +245,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     it "when satisfied" do
       allow(rule).to receive(:satisfied?).and_return [true, 'ok']
       plans = [plan1, plan3]
-      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', 'individual')
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
       expect(elected_plans_by_enrollment_members).to include(plan1)
       expect(elected_plans_by_enrollment_members).to include(plan3)
       expect(elected_plans_by_enrollment_members).not_to include(plan2)
@@ -251,7 +254,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     it "when not satisfied" do
       allow(rule).to receive(:satisfied?).and_return [false, 'ok']
       plans = []
-      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', 'individual')).to eq plans
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
     end
   end
 end
