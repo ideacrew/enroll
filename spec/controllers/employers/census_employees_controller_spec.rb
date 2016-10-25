@@ -294,8 +294,10 @@ RSpec.describe Employers::CensusEmployeesController do
       end
 
       it "should have a past non canceled enrollment" do
-        hbx_enrollment.update_attribute(:aasm_state, "coverage_terminated")
-        hbx_enrollment_two.update_attribute(:aasm_state, "coverage_canceled")
+        census_employee.benefit_group_assignments << benefit_group_assignment1
+        census_employee.benefit_group_assignments << benefit_group_assignment2
+        hbx_enrollment.update_attributes(aasm_state: "coverage_terminated", benefit_group_assignment_id: benefit_group_assignment1.id)
+        hbx_enrollment_two.update_attributes(aasm_state: "coverage_canceled", benefit_group_assignment_id: benefit_group_assignment2.id)
         sign_in
         allow(CensusEmployee).to receive(:find).and_return(census_employee)
         get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
@@ -304,8 +306,10 @@ RSpec.describe Employers::CensusEmployeesController do
       end
 
       it "should consider all the enrollments with terminated statuses" do
-        hbx_enrollment.update_attribute(:aasm_state, "coverage_terminated")
-        hbx_enrollment_two.update_attribute(:aasm_state, "unverified")
+        census_employee.benefit_group_assignments << benefit_group_assignment1
+        census_employee.benefit_group_assignments << benefit_group_assignment2
+        hbx_enrollment.update_attributes(aasm_state: "coverage_terminated", benefit_group_assignment_id: benefit_group_assignment1.id)
+        hbx_enrollment_two.update_attributes(aasm_state: "unverified", benefit_group_assignment_id: benefit_group_assignment2.id)
         sign_in
         allow(CensusEmployee).to receive(:find).and_return(census_employee)
         get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
