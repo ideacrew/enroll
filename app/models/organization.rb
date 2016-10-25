@@ -215,7 +215,7 @@ class Organization
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "notices",file_name)
+      doc_uri = Aws::S3Storage.save(file_path, "invoices",file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
