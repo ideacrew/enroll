@@ -1,3 +1,5 @@
+require 'services/checkbook_services'
+
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
@@ -53,6 +55,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
+
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -357,6 +360,42 @@ class CensusEmployee < CensusMember
       nil
     else
       self
+    end
+  end
+
+  def generate_and_save_to_temp_folder
+    begin
+      cs= ::CheckbookServices::PlanComparision.new(self)    
+      url = cs.generate_url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.build_and_save
+   rescue Exception => e
+     Rails.logger.warn("Unable to build checkbook notice for #{e} #{e.backtrace}")
+   end
+  end
+
+  def generate_and_deliver_checkbook_url
+    begin
+      cs= ::CheckbookServices::PlanComparision.new(self)    
+      url = cs.generate_url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.deliver
+   rescue Exception => e
+      Rails.logger.warn("Unable to deliver checkbook url #{e}")
     end
   end
 

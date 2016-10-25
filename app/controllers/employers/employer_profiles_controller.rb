@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees,:generate_checkbook_urls]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -230,7 +230,19 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def bulk_employee_upload_form
   end
+ 
 
+  def generate_checkbook_urls
+    if params[:contact_menthod] == 'manual'
+      outputFile= @employer_profile.generate_checkbook_notices
+      send_file outputFile
+    elsif params[:contact_menthod] == 'email'
+      @employer_profile.generate_and_deliver_checkbook_urls_for_employees
+    end
+    flash[:notice] = "Generating and delivering checkbook url's to employees"
+    redirect_to action: :show, :tab => :employees
+  end
+  
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
