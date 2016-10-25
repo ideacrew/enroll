@@ -30,7 +30,8 @@ module Effective
         table_column :enrolled_waived, :title => 'Enrolled/Waived', :proc => Proc.new { |row|
           plan_year = row.employer_profile.try(:latest_plan_year)
           census_employees = plan_year.find_census_employees if plan_year.present?
-          enrolled = plan_year.try(:enrolled).try(:count).to_i
+          #enrolled = plan_year.try(:enrolled).try(:count).to_i
+          enrolled = CensusEmployee.enrolled_count(plan_year.try(:benefit_groups).try(:first))
           waived = census_employees.try(:waived).try(:count).to_i
           enrolled.to_s + "/" + waived.to_s
           }, :filter => false, :sortable => false
