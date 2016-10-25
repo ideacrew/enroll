@@ -89,6 +89,9 @@
             <% end %>
           <% end %>
 
+          <% if @employee_role.present? %>
+            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+          <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
               <h3>Benefit Type</h3>

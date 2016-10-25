@@ -262,6 +262,8 @@ describe Person do
         let(:benefit_group) { FactoryGirl.build(:benefit_group)}
         let(:employee_roles) {double(active: true)}
         let(:census_employee) { double }
+        let(:employee_role1) { FactoryGirl.build(:employee_role) }
+        let(:employee_role2) { FactoryGirl.build(:employee_role) }
 
         before do
           allow(employee_roles).to receive(:census_employee).and_return(census_employee)
@@ -286,6 +288,58 @@ describe Person do
           expect(person.has_employer_benefits?).to eq false
         end
 
+        it "should return true when person has multiple employee_roles and one employee_role has benefit_group" do
+          allow(person).to receive(:active_employee_roles).and_return([employee_role1, employee_role2])
+          allow(employee_role1).to receive(:benefit_group).and_return(nil)
+          allow(employee_role2).to receive(:benefit_group).and_return(benefit_group)
+          expect(person.has_employer_benefits?).to be_truthy
+        end
+      end
+
+      context "has_multiple_active_employers?" do
+        let(:person) { FactoryGirl.build(:person) }
+        let(:ce1) { FactoryGirl.build(:census_employee) }
+        let(:ce2) { FactoryGirl.build(:census_employee) }
+
+        it "should return false without census_employees" do
+          allow(person).to receive(:active_census_employees).and_return([])
+          expect(person.has_multiple_active_employers?).to be_falsey
+        end
+
+        it "should return false with only one census_employee" do
+          allow(person).to receive(:active_census_employees).and_return([ce1])
+          expect(person.has_multiple_active_employers?).to be_falsey
+        end
+
+        it "should return true with two census_employees" do
+          allow(person).to receive(:active_census_employees).and_return([ce1, ce2])
+          expect(person.has_multiple_active_employers?).to be_truthy
+        end
+      end
+
+      context "active_census_employees" do
+        let(:person) { FactoryGirl.build(:person) }
+        let(:employee_role) { FactoryGirl.build(:employee_role) }
+        let(:ce1) { FactoryGirl.build(:census_employee) }
+
+        it "should get census_employees by active_employee_roles" do
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employee_role).to receive(:census_employee).and_return(ce1)
+          expect(person.active_census_employees).to eq [ce1]
+        end
+
+        it "should get census_employees by CensusEmployee match" do
+          allow(person).to receive(:active_employee_roles).and_return([])
+          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
+          expect(person.active_census_employees).to eq [ce1]
+        end
+
+        it "should get uniq census_employees" do
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employee_role).to receive(:census_employee).and_return(ce1)
+          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
+          expect(person.active_census_employees).to eq [ce1]
+        end
       end
       
       context "has_active_employee_role?" do
