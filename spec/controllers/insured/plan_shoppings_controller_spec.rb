@@ -354,6 +354,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
         expect(wavied_enrollment.coverage_kind).to eq 'dental'
       end
+
+      it "wavied enrollment coverage kind should be health as waiving hbx_enrollment kind is health" do
+        expect(hbx_enrollment.coverage_kind).to eq 'health'
+        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+      end
     end
   end
 
