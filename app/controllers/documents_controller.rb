@@ -35,6 +35,9 @@ class DocumentsController < ApplicationController
     if v_type == "Social Security Number"
       @person.consumer_role.update_attributes(:ssn_validation => "valid",
                                               :ssn_update_reason => params[:verification_reason])
+    elsif v_type == "American Indian Status"
+      @person.consumer_role.update_attributes(:native_validation => "valid",
+                                              :native_update_reason => params[:verification_reason])
     else
       @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
       @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
