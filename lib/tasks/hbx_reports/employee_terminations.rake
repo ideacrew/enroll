@@ -5,13 +5,8 @@ namespace :reports do
 
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
-      today = TimeKeeper.date_of_record
-      yesterday = today - 1.day
 
-      # find census_employees who terminated by their employer
-      census_employees = CensusEmployee.unscoped.where(:aasm_state.in => ['employee_termination_pending', 'employment_terminated']).
-                          where(:employment_terminated_on.gte => yesterday).
-                          where(:employment_terminated_on.lt => today)
+      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
 
       # find census_employees who terminate their hbx_enrollment by themselves
       families = Family.where(:"households.hbx_enrollments" =>{ :$elemMatch => {:"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
@@ -90,7 +85,7 @@ namespace :reports do
         end
       end
 
-      puts "For period #{yesterday} - #{today}, #{processed_count} employee terminations output to file: #{file_name}"
+      puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end
   end
 end
