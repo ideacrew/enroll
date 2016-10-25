@@ -476,7 +476,7 @@ class CensusEmployee < CensusMember
             "_id" =>  { "bgid" => "$benefit_group_assignments.benefit_group_id",
                         #"state" => "$aasm_state",
                         #{}"active" => "$benefit_group_assignments.is_active",
-                        "bgstate" => "$benefit_group_assignments.aasm_state"
+                        #{}"bgstate" => "$benefit_group_assignments.aasm_state"
                       },
                       "count" => { "$sum" => 1 }
                     }
