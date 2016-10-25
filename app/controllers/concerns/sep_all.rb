@@ -131,11 +131,9 @@ module SepAll
     special_enrollment_period.admin_flag = true
     
     if special_enrollment_period.save
-      flash[:notice] = 'SEP added for ' + @name
+      @message_for_partial = "SEP Added for #{@name}"
     else
-      special_enrollment_period.errors.full_messages.each do |message|
-      flash[:error] = "SEP not saved. " + message
-      end
+        @message_for_partial = "SEP not saved. Error: " + special_enrollment_period.errors.full_messages.to_s
     end
   end
 

@@ -11,8 +11,8 @@ module Effective
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false
-        table_column :hbx_id, :width => '100px', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
-        table_column :fein, :width => '100px', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
+        table_column :hbx_id, :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
+        table_column :fein, :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         #table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
         #table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
@@ -30,7 +30,8 @@ module Effective
         table_column :enrolled_waived, :title => 'Enrolled/Waived', :proc => Proc.new { |row|
           plan_year = row.employer_profile.try(:latest_plan_year)
           census_employees = plan_year.find_census_employees if plan_year.present?
-          enrolled = plan_year.try(:enrolled).try(:count).to_i
+          #enrolled = plan_year.try(:enrolled).try(:count).to_i
+          enrolled = CensusEmployee.enrolled_count(plan_year.try(:benefit_groups).try(:first))
           waived = census_employees.try(:waived).try(:count).to_i
           enrolled.to_s + "/" + waived.to_s
           }, :filter => false, :sortable => false

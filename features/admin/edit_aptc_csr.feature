@@ -7,22 +7,7 @@ Feature: Update APTC and CSR
             When Hbx Admin logs on to the Hbx Portal
             Then Hbx Admin sees Families link
             When Hbx Admin clicks on Families link
-            Then Hbx Admin should see Switch to APTC / CSR Families link
-            When Hbx Admin clicks Switch to APTC / CSR Families link
-            Then Hbx Admin sees Families with APTC enrollments and edit button
-            When Hbx Admin clicks on the Edit button
-            Then Hbx Admin should see the edit APTC / CSR tool for the individual
-            Then Hbx Admin should see a text saying there is no Active Enrollment
+            Then Hbx Admin should see the list of primary applicants and an Action button
+            When Hbx Admin clicks on the Action button
+            Then Hbx Admin should see an Edit APTC / CSR link
 
-
-    Scenario: Admin sees MAX APTC and CSR PERCENTAGE as editable fields when no active enrollment
-        Given Hbx Admin exists
-            When Hbx Admin logs on to the Hbx Portal
-            Then Hbx Admin sees Families link
-            When Hbx Admin clicks on Families link
-            Then Hbx Admin should see Switch to APTC / CSR Families link
-            When Hbx Admin clicks Switch to APTC / CSR Families link
-            Then Hbx Admin sees Families with APTC enrollments and edit button
-            When Hbx Admin clicks on the Edit button
-            Then Hbx Admin should see the edit APTC / CSR tool for the individual
-            Then Hbx Admin should see APTC and CSR as editable fields
