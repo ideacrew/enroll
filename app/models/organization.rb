@@ -212,11 +212,10 @@ class Organization
   end
 
   def self.upload_invoice(file_path,file_name)
-    bucket_name = Settings.paper_notice
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, bucket_name,file_name)
+      doc_uri = Aws::S3Storage.save(file_path, "notices",file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
@@ -230,6 +229,17 @@ class Organization
       end
     else
       logger.warn("Unable to associate invoice #{file_path}")
+    end
+  end
+
+  def self.upload_invoice_to_print_vendor(file_path,file_name)
+    org = by_invoice_filename(file_path) rescue nil
+    return if !org.employer_profile.is_conversion?
+    bucket_name= Settings.paper_notice
+    begin
+      doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
+    rescue Exception => e
+      puts "Unable to upload invoices to paper notices bucket"
     end
   end
 

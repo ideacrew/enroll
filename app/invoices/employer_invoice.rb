@@ -36,6 +36,15 @@ class EmployerInvoice
     end
 	end
 
+  def send_to_print_vendor
+    begin
+      Organization.upload_invoice_to_print_vendor(invoice_absolute_file_path,invoice_file_name)
+    rescue Exception => e
+      @errors << "Unable to send PDF to print vendor for. #{@organization.hbx_id}"
+      Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
+    end
+  end
+
 	def send_email_notice
     subject = "Invoice Now Available"
     body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
@@ -57,6 +66,7 @@ class EmployerInvoice
 	def save_and_notify_with_clean_up
 		save
 		save_to_cloud
+    send_to_print_vendor
 		send_email_notice
 		clear_tmp(invoice_absolute_file_path)
 	end
@@ -64,6 +74,7 @@ class EmployerInvoice
   def save_and_notify
     save
     save_to_cloud
+    send_to_print_vendor
     send_email_notice
   end
 
