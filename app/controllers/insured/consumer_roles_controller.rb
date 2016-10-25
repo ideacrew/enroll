@@ -17,7 +17,7 @@ class Insured::ConsumerRolesController < ApplicationController
     @search_path = {@key => @val}
     if @person.try(:consumer_role?)
       bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
-      redirect_to bookmark_url || family_account_path 
+      redirect_to bookmark_url || family_account_path
     end
   end
 
@@ -223,6 +223,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,

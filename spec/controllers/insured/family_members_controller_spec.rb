@@ -236,6 +236,8 @@ RSpec.describe Insured::FamilyMembersController do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
+      allow(dependent).to receive(:family_id).and_return(test_family.id)
+      allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
       allow(address).to receive(:is_a?).and_return(true)
       allow(dependent).to receive(:same_with_primary=)
       allow(dependent).to receive(:addresses=)

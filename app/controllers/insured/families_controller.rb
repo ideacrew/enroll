@@ -14,7 +14,7 @@ class Insured::FamiliesController < FamiliesController
     @active_admin_sep = @family.active_admin_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-    
+
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -48,24 +48,24 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab'] 
+    @tab = params['tab']
     @family_members = @family.active_family_members
 
     if @employee_role.present?
-      @ce = CensusEmployee.find(@employee_role.census_employee_id)  
+      @ce = CensusEmployee.find(@employee_role.census_employee_id)
     end
     #if @employee_role.present?
      # ce = CensusEmployee.find(@employee_role.census_employee_id)
       # checking for future hire
       #if ce.hired_on > ce.created_at
        # @future_hire = true
-     
+
      # else
-      
-      #  @future_hire = false  
-      
-      #end  
-    #end 
+
+      #  @future_hire = false
+
+      #end
+    #end
     #binding.pry
     respond_to do |format|
       format.html
@@ -97,12 +97,17 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
-
+    @resident_role_id = params[:resident_role_id]
 
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
     @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
+
+    if (params[:resident_role_id].present? && params[:resident_role_id])
+      @market_kind = "coverall"
+    end
+
     render :layout => 'application'
   end
 
@@ -233,7 +238,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     doc_uri = Aws::S3Storage.save(file_path, 'notices')
-    
+
     if doc_uri.present?
       notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
                                       format: file_content_type})
