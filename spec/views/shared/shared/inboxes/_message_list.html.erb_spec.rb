@@ -2,12 +2,12 @@ require 'rails_helper'
 
 describe "shared/inboxes/_message_list.html.erb" do
   let(:shared_message_properties) do
-     {
-      :from => "somebody",
-      :folder => "Inbox",
-      :message_read => false
-     }
-    end
+    {
+        :from => "somebody",
+        :folder => "Inbox",
+        :message_read => false
+    }
+  end
 
   let(:message_1) { instance_double(Message, {:id => "11111", :created_at=>DateTime.new(2016,1,10)}.merge(shared_message_properties)) }
   let(:message_2) { instance_double(Message, {:id => "22222", :created_at=>DateTime.new(2016,11,1)}.merge(shared_message_properties)) }
@@ -28,11 +28,5 @@ describe "shared/inboxes/_message_list.html.erb" do
     expect(rendered).to_not have_content("Inbox: FROM")
   end
 
-  it "should have the latest message listed first" do
-    expect(rendered).to have_selector(:xpath, "//tr[@class=\"msg-inbox-unread\"][1]/td[2]", :text => "11/01/2016")
-  end
 
-  it "should have the older message listed last" do
-    expect(rendered).to have_selector(:xpath, "//tr[@class=\"msg-inbox-unread\"][2]/td[2]", :text => "01/10/2016")
-  end
 end
