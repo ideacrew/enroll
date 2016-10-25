@@ -289,7 +289,17 @@ RSpec.describe Employers::CensusEmployeesController do
       sign_in
       allow(CensusEmployee).to receive(:find).and_return(census_employee1)
       allow(person).to receive(:primary_family).and_return(family)
-      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,individual_term_enrollment,current_employer_active_enrollment,old_employer_term_enrollment])
+      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,individual_term_enrollment,current_employer_active_enrollment])
+      get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
+      expect(response).to render_template("show")
+      expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
+    end
+
+    it "enrollment should not be included in past enrollments that doesn't match's current employee benefit_group_assignment_id " do
+      sign_in
+      allow(CensusEmployee).to receive(:find).and_return(census_employee1)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,current_employer_active_enrollment,old_employer_term_enrollment])
       get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
       expect(response).to render_template("show")
       expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
