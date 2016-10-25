@@ -35,10 +35,10 @@ module CheckbookServices
       "remote_access_key": Settings.checkbook_services.remote_access_key,
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
       "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on,
-      "employee_coverage_date": census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
+      "employee_coverage_date": census_employee.active_benefit_group.plan_year.start_on, #census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
       "employer": {
-        "state": 11, #census_employee.employer_profile.organization.primary_office_location.address.state, 
-        "county": 111 #census_employee.employer_profile.organization.primary_office_location.address.state 
+        "state": 11, 
+        "county": 111 
       },
       "family": build_family,
       "contribution": employer_contributions,
