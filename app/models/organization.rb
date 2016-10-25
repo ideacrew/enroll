@@ -211,11 +211,12 @@ class Organization
     Organization.valid_carrier_names.invert.to_a
   end
 
-  def self.upload_invoice(file_path)
+  def self.upload_invoice(file_path,file_name)
+    bucket_name = Settings.paper_notice
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "invoices")
+      doc_uri = Aws::S3Storage.save(file_path, bucket_name,file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
