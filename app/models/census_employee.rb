@@ -463,20 +463,12 @@ class CensusEmployee < CensusMember
 
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
-      CensusEmployee.terminate_future_scheduled_census_employees(new_date)
     end
 
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
       census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on.lt => as_of_date)
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employment(census_employee.employment_terminated_on)
-      end
-    end
-
-    def terminate_future_scheduled_census_employees(as_of_date)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on => as_of_date)
-      census_employees_for_termination.each do |census_employee|
-        census_employee.terminate_employee_role!
       end
     end
 
