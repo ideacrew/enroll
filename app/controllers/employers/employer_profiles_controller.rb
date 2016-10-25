@@ -266,6 +266,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @employer_profile.generate_and_deliver_checkbook_urls_for_employees
     end
     flash[:notice] = "Generating and delivering checkbook url's to employees"
+    redirect_to action: :show, :tab => :employees
   end
   
   def download_invoice
