@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
+RSpec.describe "insured/group_selection/terminate_confirm.html.erb"  do
   let(:employee_role) { FactoryGirl.build(:employee_role) }
   let(:person) { FactoryGirl.build(:person) }
   let(:plan) { FactoryGirl.build(:plan) }
@@ -16,23 +16,6 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
     assign :family, family
     render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
   end
-
-  it 'should have title' do
-    expect(rendered).to have_selector('h4', text: "#{plan.active_year} #{plan.coverage_kind.capitalize} Coverage DCHL")
-  end
-
-  it "should have the link of terminate" do
-    expect(rendered).to have_selector('a', text: 'Terminate Plan')
-  end
-
-  it "should have terminate date" do
-    expect(rendered).to have_selector('label', text: 'Termination date: ')
-  end
-
-  it "should not have button of change plan" do
-    expect(rendered).not_to have_selector('a', text: 'Change Plan')
-  end
-
   it "should show plan contact information" do
     expect(rendered).to have_selector('div',text: 'Plan Contact Info')
   end
