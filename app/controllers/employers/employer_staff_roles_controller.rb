@@ -42,7 +42,16 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
 
     redirect_to edit_employers_employer_profile_path(employer_profile.organization)
   end
-
+  
+  def make_primary_poc
+    employer_profile_id = params[:emp_id]
+    employer_profile = EmployerProfile.find(employer_profile_id)
+    poc = Person.find(params[:id])
+    poc.make_primary(params[:primary_poc])
+    
+    redirect_to edit_employers_employer_profile_path(employer_profile.organization)
+  end
+  
   private
 
   def updateable?
@@ -54,7 +63,7 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
     policy = ::AccessPolicies::EmployerProfile.new(current_user)
     policy.authorize_edit(employer_profile, self)
   end
-
+  
 end
 
 

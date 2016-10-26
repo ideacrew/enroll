@@ -43,6 +43,7 @@
         <div class='table-responsive col-12' >
           <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
             <thead style='height: 40px;'>
+              <th style='width: 5%; height: 40px; padding: 10px'>Primary POC </th>
              <th style='width: 18%; height: 40px; padding: 10px'>First Name </th>
              <th style='width: 18%'>Last Name    </th>
              <th style='width: 18%'> Email       </th>
@@ -52,6 +53,9 @@
              </thead>
             <% @staff.each do |staff| %>
               <tr style='border: 1px solid #d5d5d5; height: 50px; '>
+                <td style='padding: 10px'><%= check_box_tag('primary_poc', {}, checked = staff.is_primary_poc, data: {id:staff.id, emp_id:@employer_profile.id}) %>
+
+                </td>
                 <td style='padding: 10px'><%= staff.first_name %></td>
                 <td><%= staff.last_name %></td>
                 <td>
@@ -141,3 +145,32 @@
     <% end %>
 
 </div>
+
+<%= render 'employers/employer_profiles/modal' %>
+<script>
+  $( document ).ready(function() {
+    $('input:checkbox:not(:checked)').prop('disabled', true);
+    
+    $('input[type=checkbox]').on('change', function() {
+      var count = $('input:checkbox:checked').length;
+      var check = ($(this).is(':checked'));
+      var id = ($(this)).data('id').replace(/"/g,"");
+      var emp_id = ($(this).data('empId')).replace(/"/g,"");
+      $('input[type="checkbox"]').not(this).prop('checked', false);
+      if (count == 1) {
+        $('input:checkbox:not(:checked)').prop('disabled', true);  
+      }
+      if (count == 0) {
+        $('input:checkbox:not(:checked)').prop('disabled', false);  
+      }
+    
+      $.ajax({
+        type:"PUT",
+        dataType:"script",
+        url:"/employers/employer_staff_roles/"+ id +"/make_primary_poc",
+        data: {emp_id: emp_id, primary_poc: check}
+      });
+    }); 
+  });
+  
+</script>

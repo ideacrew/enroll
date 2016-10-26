@@ -226,6 +226,7 @@ Rails.application.routes.draw do
     resources :employer_staff_roles, :only => [:create, :destroy] do
       member do
         get :approve
+        put :make_primary_poc
       end
     end
 

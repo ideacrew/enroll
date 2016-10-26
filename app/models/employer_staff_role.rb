@@ -11,6 +11,7 @@ class EmployerStaffRole
   field :employer_profile_id, type: BSON::ObjectId
   field :bookmark_url, type: String
   field :is_active, type: Boolean, default: true
+  field :primary_poc, type: Boolean, default: false
   validates_presence_of :employer_profile_id
   field :aasm_state, type: String, default: 'is_active'
   scope :active, ->{ where(aasm_state: :is_active) }
