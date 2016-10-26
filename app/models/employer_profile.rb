@@ -737,11 +737,17 @@ class EmployerProfile
       census_employee.generate_and_save_to_temp_folder
     end
     begin
-      directoryToZip = Rails.root.join( "tmp", "#{id}").to_s
-      outputFile = Rails.root.join("tmp","#{id}.zip").to_s
-      zf = ZipFileGenerator.new(directoryToZip,outputFile)
-      zf.write()
-      return outputFile
+      filename =Rails.root.join( "tmp", "#{id}.pdf").to_s
+      dirname = Rails.root.join( "tmp", "#{id}").to_s
+      entries = Dir.entries(dirname)
+      entries.reject!{|d| ['.','..'].include?(d)}
+      outputfile=nil
+      entries.each do |pdf|
+        outputfile = CombinePDF.new if outputfile.nil?
+        outputfile << CombinePDF.load("#{dirname}/#{pdf}")
+      end
+      outputfile.save filename
+      return filename
     rescue Exception => e
       logger.warn("#{e}")
     end

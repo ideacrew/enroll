@@ -358,7 +358,7 @@ class CensusEmployee < CensusMember
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
       builder.build_and_save
    rescue Exception => e
-     Rails.logger.warn("Unable to build checkbook notice for #{e} #{e.backtrace}")
+     Rails.logger.warn("Unable to build checkbook notice for #{e} " )
    end
   end
 
