@@ -23,8 +23,8 @@ When(/^Hbx Admin enters an invalid SSN and clicks on update$/) do
 end
 
 Then(/^Hbx Admin should see the edit form being rendered again with a validation error message$/) do
-  expect(page).to have_content('EDIT DOB / SSN')
-  expect(page).to have_content('SSN MUST BE 9 DIGITS')
+  expect(page).to have_content(/Edit DOB \/ SSN/i)
+  expect(page).to have_content(/SSN must be 9 digits/i)
 end
 
 When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do
@@ -33,5 +33,5 @@ When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do
 end
 
 Then(/^Hbx Admin should see the update partial rendered with update sucessful message$/) do
-  expect(page).to have_content('DOB / SSN UPDATE SUCCESSFUL')
+  expect(page).to have_content(/DOB \/ SSN Update Successful/i)
 end

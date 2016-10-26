@@ -9,7 +9,6 @@ module Queries
     end
 
     def initialize(attributes)
-      puts "initializing #{attributes}"
       @custom_attributes = attributes
     end
 
