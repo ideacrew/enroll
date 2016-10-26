@@ -5,6 +5,7 @@ FactoryGirl.define do
     gender 'male'
     is_state_resident 'yes'
     is_applicant 'yes'
+    paper_applications {[FactoryGirl.build(:paper_application)]}
     bookmark_url nil
   end
 
