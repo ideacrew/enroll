@@ -16,20 +16,6 @@ DT = ( function() {
     var level = parseInt(get_level && get_level[1])
     clear_level(level+1)
   }
-  // intercept search keystrokes; inject them when there is a pause, check for backspace and enter
-  var _wait_for_typing_to_finish = function(){
-    window.dt_search_string = ''
-    window.dt_search_delayed_draw_event = null
-   $($('input.form-control.input-sm[type=search]')[0]).on('keydown', function(e) {
-      if (e.keyCode == 8) {window.dt_search_string = window.dt_search_string.slice(0,-1)}
-      else if (e.key.length == 1) { window.dt_search_string += e.key}
-      clearTimeout(window.dt_search_delayed_draw_event)
-      window.dt_search_delayed_draw_event = setTimeout(function(){
-        $('input[type=search]').val(window.dt_search_string).trigger('keyup')},
-        350)
-      return false
-    });
-  }
   var clear_button_todojf = function() {          // Need to put this in the base framework
     setTimeout(
       function() {
@@ -38,7 +24,6 @@ DT = ( function() {
           window.dt_search_string = ''
           $('input[type=search]').val(window.dt_search_string).trigger('keyup');
         })
-       _wait_for_typing_to_finish()
       },
       50
     )
