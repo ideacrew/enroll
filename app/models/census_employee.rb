@@ -365,7 +365,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)    
+      cs= ::CheckbookServices::PlanComparision.new(self)
       url = cs.generate_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
@@ -377,13 +377,13 @@ class CensusEmployee < CensusMember
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
       builder.build_and_save
    rescue Exception => e
-     Rails.logger.warn("Unable to build checkbook notice for #{e} #{e.backtrace}")
+     Rails.logger.warn("Unable to build checkbook notice for #{e} " )
    end
   end
 
   def generate_and_deliver_checkbook_url
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)    
+      cs= ::CheckbookServices::PlanComparision.new(self)
       url = cs.generate_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
@@ -499,7 +499,7 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? || (person.present? && 
+    return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
@@ -701,9 +701,9 @@ class CensusEmployee < CensusMember
       transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
 
-    event :reinstate_eligibility, :after => [:record_transition] do 
+    event :reinstate_eligibility, :after => [:record_transition] do
       transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
-      transitions from: :employment_terminated,  to: :eligible 
+      transitions from: :employment_terminated,  to: :eligible
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated,  to: :cobra_eligible
     end

@@ -142,7 +142,7 @@
     <div class="modal-content">
       <div class="modal-header" style="padding:65px;">
         <div>
-        <p style="margin-bottom: 30px;"> You are about to generate a custom PDF notice that provides the necessary information for your employees to anonymously view your plan offerings, and the estimated Out-Of-Pocket costs associated with each plan.</p> 
+        <p style="margin-bottom: 30px;"> You are about to generate a custom PDF notice that provides the necessary information for your employees to anonymously view your plan offerings, and the estimated Out-Of-Pocket costs associated with each plan.</p>
         </div>
         <%=form_tag generate_checkbook_urls_employers_employer_profile_path do%>
           <p>Please choose any one of the following below:</p><br>
@@ -151,10 +151,10 @@
         </div>
           <div class="modal-footer" style="margin-right: 200px;">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">CANCEL</button>
-            <%= submit_tag "Submit", class: 'btn btn-primary  mtz' %>
+            <%= submit_tag "Submit", class: 'btn btn-primary  mtz data-dismiss="modal"'  %>
           </div>
         <%end%>
-      
+
     </div>
   </div>
 </div>

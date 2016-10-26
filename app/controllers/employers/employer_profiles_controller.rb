@@ -230,19 +230,19 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def bulk_employee_upload_form
   end
- 
+
 
   def generate_checkbook_urls
     if params[:contact_menthod] == 'manual'
       outputFile= @employer_profile.generate_checkbook_notices
-      send_file outputFile
+      send_file outputFile , :type => "application/pdf"
     elsif params[:contact_menthod] == 'email'
       @employer_profile.generate_and_deliver_checkbook_urls_for_employees
+      flash[:notice] = "Generating and delivering checkbook url's to employees"
+      redirect_to action: :show, :tab => :employees
     end
-    flash[:notice] = "Generating and delivering checkbook url's to employees"
-    redirect_to action: :show, :tab => :employees
   end
-  
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
