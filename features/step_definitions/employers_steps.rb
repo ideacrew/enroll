@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
