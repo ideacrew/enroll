@@ -89,7 +89,7 @@ class Insured::FamiliesController < FamiliesController
 
   def generate_out_of_pocket_url
     @person = Person.find(params[:id])
-    if @person && @person.active_employee_roles.present?
+    if @person && @person.has_active_employee_role?
       census_employee=@person.active_employee_roles.first.census_employee
       cs= ::CheckbookServices::PlanComparision.new(census_employee)    
       url = cs.generate_url
