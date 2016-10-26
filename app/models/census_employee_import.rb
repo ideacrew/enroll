@@ -7,8 +7,8 @@ class CensusEmployeeImport
 
   validate :check_relationships
 
-  TEMPLATE_DATE = Date.new(2015, 9, 6)
-  TEMPLATE_VERSION = "1.0"
+  TEMPLATE_DATE = Date.new(2016, 10, 26)
+  TEMPLATE_VERSION = "1.1"
   TEMPLATE_DATE_CELL = 7
   TEMPLATE_VERSION_CELL = 13
 
@@ -32,21 +32,22 @@ class CensusEmployeeImport
       plan_year
       kind
       address_1
+      address_2
       city
       state
       zip
     )
 
   CENSUS_MEMBER_RECORD_TITLES = [
-      "Family ID #(to match family members to the EE)",
+      "Family ID #(to match family members to the EE & each household gets a unique number)",
       "Relationship(EE, Spouse, Domestic Partner, or Child)",
       "Last Name",
       "First Name",
       "Middle Name or Initial(optional)",
       "Suffix(optional)",
       "Email Address",
-      "SSN / TIN(Required for EE)",
-      "Date of Birth",
+      "SSN / TIN(Required for EE & enter without dashes)",
+      "Date of Birth(DD/MM/YYYY)",
       "Gender",
       "Date of Hire",
       "Date of Termination(optional)",
@@ -55,6 +56,7 @@ class CensusEmployeeImport
       "Plan Year(Optional)",
       "Address Kind(Optional)",
       "Address Line 1(Optional)",
+      "Address Line 2(Optional)",
       "City(Optional)",
       "State(Optional)",
       "Zip(Optional)"
@@ -87,7 +89,9 @@ class CensusEmployeeImport
     @imported_census_employees ||= load_imported_census_employees
     @imported_census_employees.compact!
     @imported_census_employees.each do |census_employee|
-      census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
+      if census_employee.is_a? CensusEmployee
+        census_employee.errors.add :base, "Email is required" if census_employee.email.blank?
+      end
     end
     @imported_census_employees
   end
@@ -98,7 +102,6 @@ class CensusEmployeeImport
 
     @sheet = @roster.sheet(0)
     @last_ee_member = {}
-
     # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references
     # First three rows are header content
     sheet_header_row = @sheet.row(1)
@@ -113,7 +116,6 @@ class CensusEmployeeImport
     (4..@sheet.last_row).each_with_index.map do |i, index|
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
-
       if record[:termination_date].present?
         census_employee = terminate_employee(record)
       else
@@ -200,11 +202,13 @@ class CensusEmployeeImport
       py.start_on.year.to_s == plan_year
     end
     return if plan_year_found.nil?
+    return if benefit_group.nil?
     benefit_group_found = plan_year_found.benefit_groups.detect do |bg|
       bg.title.casecmp(benefit_group) == 0
     end
     return if benefit_group_found.nil?
     member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id , start_on: plan_year_found.start_on})
+    member.benefit_group_assignments.last.make_active
   end
 
   def parse_row(row)
@@ -225,6 +229,7 @@ class CensusEmployeeImport
     plan_year = parse_text(row["plan_year"])
     kind = parse_text(row["kind"])
     address_1 = parse_text(row["address_1"])
+    address_2 = parse_text(row["address_2"])
     city = parse_text(row["city"])
     state = parse_text(row["state"])
     zip = parse_text(row["zip"])
@@ -322,7 +327,6 @@ class CensusEmployeeImport
   end
 
   def save
-
     if imported_census_employees.map(&:valid?).all?
       if !self.valid?
         return false
