@@ -469,7 +469,7 @@ class CensusEmployee < CensusMember
         {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
         {"$unwind" => "$benefit_group_assignments"},
         {"$match" => {"aasm_state" => { "$in" =>  EMPLOYMENT_ACTIVE_STATES  } }},
-        {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected","coverage_renewing"]} }},
+        {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected"]} }},
         #{"$match" => {"benefit_group_assignments.is_active" => true}},
         {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
         {"$group" => {
