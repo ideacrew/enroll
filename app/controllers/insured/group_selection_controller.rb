@@ -94,7 +94,6 @@ class Insured::GroupSelectionController < ApplicationController
     # Set effective_on if this is a case of QLE with date options available.
     hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
 
-
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan

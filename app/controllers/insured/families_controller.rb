@@ -162,6 +162,10 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @person.primary_family.family_members.active
   end
 
+  def upload_application
+    @family_members = @person.primary_family.family_members.active
+  end
+
   def check_qle_date
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days

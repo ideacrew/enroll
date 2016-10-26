@@ -99,6 +99,7 @@ RSpec.describe Insured::FamiliesController do
       let(:employee_roles) { double }
       let(:employee_role) { FactoryGirl.create(:employee_role, bookmark_url: "/families/home") }
       let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+
       before :each do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
