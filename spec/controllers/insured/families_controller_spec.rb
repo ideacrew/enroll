@@ -104,7 +104,7 @@ RSpec.describe Insured::FamiliesController do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
-        allow(person).to receive(:employee_roles).and_return(employee_role)
+        allow(person).to receive(:employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return nil
