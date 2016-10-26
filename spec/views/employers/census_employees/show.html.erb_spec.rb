@@ -126,6 +126,20 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
+  context  'drop down menu at different cases' do
+    it "should have BENEFIT PACKAGE and benefit plan" do
+      render template: "employers/census_employees/show.html.erb"
+      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: benefit_group.title)
+    end
+    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+    it "should only have BENIFIT PACKAGE and benefit plan" do
+      render template: "employers/census_employees/show.html.erb"
+      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: benefit_group.title)
+    end
+   end
+
   context 'with no email linked with census employee' do
     let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
     it "should create a blank email record if there was no email for census employees" do
@@ -143,6 +157,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       expect(census_employee.email.kind).to eq 'home'
       expect(census_employee.email.address).to eq address
     end
+
+
   end
 
   context 'with a previous coverage waiver' do
