@@ -157,8 +157,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       expect(census_employee.email.kind).to eq 'home'
       expect(census_employee.email.address).to eq address
     end
-
-
   end
 
   context 'with a previous coverage waiver' do
