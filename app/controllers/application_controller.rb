@@ -247,6 +247,9 @@ class ApplicationController < ActionController::Base
       if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
         role.bookmark_url = bookmark_url
         role.try(:save!)
+      elsif bookmark_url.match('/families/home') && @person.present?
+        @person.consumer_role.update_attribute(:bookmark_url, family_account_path) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
+        @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
     def set_bookmark_url(url=nil)
@@ -274,6 +277,14 @@ class ApplicationController < ActionController::Base
       bookmark_url = url || request.original_url
       save_bookmark role, bookmark_url
       session[:last_market_visited] = 'individual'
+    end
+
+    def set_resident_bookmark_url(url=nil)
+      set_current_person
+      role = @person.try(:resident_role)
+      bookmark_url = url || request.original_url
+      save_bookmark role, bookmark_url
+      session[:last_market_visited] = 'resident'
     end
 
     def stashed_user_password
