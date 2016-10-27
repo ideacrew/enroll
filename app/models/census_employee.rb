@@ -43,6 +43,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
+  before_save :allow_nil_ssn
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -682,6 +683,14 @@ class CensusEmployee < CensusMember
       return true
     else
       return false
+    end
+  end
+  
+  def allow_nil_ssn
+    census_dependents.each do |cd|
+      if cd.ssn.blank?
+        cd.update(encrypted_ssn: ' ')
+      end
     end
   end
 
