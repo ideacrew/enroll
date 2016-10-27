@@ -11,8 +11,8 @@ module Effective
         end
 
         table_column :legal_name, :proc => Proc.new { |row| link_to row.legal_name.titleize, employers_employer_profile_path(row.employer_profile, :tab=>'home')}, :sortable => false, :filter => false
-        table_column :hbx_id, :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
-        table_column :fein, :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
+        table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         #table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
         #table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
@@ -25,9 +25,9 @@ module Effective
 
         table_column :plan_year_state, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:aasm_state).try(:titleize)}, :filter => false
         table_column :effective_date, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:start_on)}, :filter => false
-        table_column :invoiced, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
+        table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :participation, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:employee_participation_percent)}, :filter => false
-        table_column :enrolled_waived, :title => 'Enrolled/Waived', :proc => Proc.new { |row|
+        table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
           plan_year = row.employer_profile.try(:latest_plan_year)
           census_employees = plan_year.find_census_employees if plan_year.present?
           #enrolled = plan_year.try(:enrolled).try(:count).to_i
@@ -35,7 +35,7 @@ module Effective
           waived = census_employees.try(:waived).try(:count).to_i
           enrolled.to_s + "/" + waived.to_s
           }, :filter => false, :sortable => false
-        table_column :xml_submitted, :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
+        table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
