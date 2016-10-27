@@ -32,8 +32,9 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
-    if @person.active_employee_roles.count > 1 && @hbx_enrollments.present?
+    if @person.active_employee_roles.count > 1 && (@hbx_enrollments.present? || @waived_hbx_enrollments.present?)
       @hbx_enrollments = @hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
+      @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
     end
 
     # Filter out enrollments for display only
