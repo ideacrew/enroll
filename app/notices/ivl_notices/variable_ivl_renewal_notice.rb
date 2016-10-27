@@ -59,19 +59,19 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   end
 
   def health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def append_address(primary_address)

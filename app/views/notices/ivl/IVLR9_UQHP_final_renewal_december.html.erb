@@ -28,12 +28,21 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "We have enrolled the following people in health insurance coverage beginning January 1, 2017."} %>
 
-<table width=75% align=center>
-    <tr><td>Primary First Primary Last</td><td>P5 First Name P5 Last Name</td></tr>
-    <tr><td>P2 First Name P2 Last Name</td><td>P6 First Name P6 Last Name</td></tr>
-    <tr><td>P3 First Name P3 Last Name</td><td>P7 First Name P7 Last Name</td></tr>
-    <tr><td>P4 First Name P4 Last Name</td><td>P8 First Name P8 Last Name</td></tr>
-</table>
+  <% if notice.renewal_health_enrollment.present? %>   
+    <table width=75% align=center>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[0] %></td><td><%= notice.renewal_health_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[1] %></td><td><%= notice.renewal_health_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[2] %></td><td><%= notice.renewal_health_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[3] %></td><td><%= notice.renewal_health_enrollment.enrollees[7] %></td></tr>
+    </table>  
+  <% elsif notice.renewal_dental_enrollment.present? && notice.renewal_health_enrollment.blank? %>
+    <table width=75% align=center>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[0] %></td><td><%= notice.renewal_dental_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[1] %></td><td><%= notice.renewal_dental_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[2] %></td><td><%= notice.renewal_dental_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[3] %></td><td><%= notice.renewal_dental_enrollment.enrollees[7] %></td></tr>
+    </table>  
+  <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You still must take action to ensure your coverage for 2017 starts.  Please be sure to do the following:",
@@ -51,22 +60,13 @@
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["<span style='text-decoration:underline;'>Health Plan: «M 2017 Health Plan»</span>"],
+ contents: [""],
    heading: '2017 Plan Enrollment', sub_heading: ''} %>
 
-  <table style='margin: 0px auto;' width='80%'>
-    <tr>
-      <td>
-        <strong>Your monthly premium:</strong>
-      </td>
-      <td align=right>
-        <strong>«M 2017 Health Plan Premium»</strong>
-      </td>
-    </tr>
-  </table>
+<% if notice.renewal_health_enrollment.present? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Dental Plan: «M 2017 Dental Plan»</span>"} %>
+  content: "<span style='text-decoration:underline;'>Health Plan: #{notice.renewal_health_enrollment.plan.plan_name}</span>"} %>
 
   <table style='margin: 0px auto;' width='80%'>
     <tr>
@@ -74,10 +74,30 @@
         <strong>Your monthly premium:</strong>
       </td>
       <td align=right>
-        <strong>«M 2017 Dental Plan Premium»</strong>
+        <strong><%= notice.renewal_health_enrollment.premium %></strong>
       </td>
     </tr>
   </table>
+
+<% end %>
+
+<% if notice.renewal_dental_enrollment.present? %>
+
+<% render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.renewal_dental_enrollment.plan.plan_name}</span>"} %>
+
+  <table style='margin: 0px auto;' width='80%'>
+    <tr>
+      <td>
+        <strong>Your monthly premium:</strong>
+      </td>
+      <td align=right>
+        <strong><%= notice.renewal_dental_enrollment.premium %></strong>
+      </td>
+    </tr>
+  </table>
+
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on www.dchealthlink.com or by calling DC Health Link Customer Service toll-free at (855) 532-5465. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end."],
