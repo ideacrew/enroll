@@ -155,7 +155,6 @@ end
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
   wait_for_ajax
-
   within '.modal-dialog' do
     click_link 'Terminate Broker'
   end
