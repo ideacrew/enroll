@@ -220,7 +220,7 @@ Then(/^Broker Assisted is a family$/) do
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  click_link 'Consumer'
+  click_link 'Broker Assisted'
   expect(page).to have_content("My #{Settings.site.short_name}")
 end
 
