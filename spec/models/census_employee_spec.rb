@@ -103,6 +103,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
       end
+      
+      it "allow dependent ssn's to be updated to nil" do
+        expect(initial_census_employee.allow_nil_ssn_updates_dependents).to eq([])
+      end
 
       context "with duplicate ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
@@ -114,7 +118,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
