@@ -4,12 +4,15 @@ module Importers
     def initialize(opts = {})
       super(opts)
     end
-  
+
     def save
       begin
         organization = Organization.where(:fein => fein).first
+        empr = organization.try(:employer_profile)
         if organization.blank?
           errors.add(:fein, "employer don't exists with given fein")
+        elsif empr.present? && empr.updated_at >= empr.created_at
+          errors.add(:base, "import cant be done as employer updated the info on #{empr.updated_at}")
         end
         puts "Processing Update #{fein}---Data Sheet# #{legal_name}---Enroll App# #{organization.legal_name}"
         organization.legal_name = legal_name
