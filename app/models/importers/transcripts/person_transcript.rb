@@ -234,7 +234,6 @@ module Importers::Transcripts
     end
 
     def csv_row
-
       @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
