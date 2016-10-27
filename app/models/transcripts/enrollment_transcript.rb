@@ -18,7 +18,8 @@ module Transcripts
         'original_application_type',
         'terminate_reason',
         'waiver_reason',
-        'writing_agent_id']
+        'writing_agent_id',
+        'coverage_end_on']
 
       @custom_templates = ['HbxEnrollmentMember', 'Plan', 'BrokerRole']
 
@@ -75,7 +76,7 @@ module Transcripts
       end
 
       compare_instance
-      validate_instance
+      # validate_instance
 
       if @transcript[:source].persisted?
         find_duplicate_enrollments(@transcript[:source])
@@ -83,8 +84,8 @@ module Transcripts
 
       add_plan_information
 
-      @transcript[:source]  = (@transcript[:source]).serializable_hash
-      @transcript[:other]   = (@transcript[:other]).serializable_hash
+      @transcript[:source]  = @transcript[:source].serializable_hash
+      @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
     def add_plan_information
@@ -98,12 +99,26 @@ module Transcripts
       end
     end
 
-
     def find_duplicate_enrollments(enrollment)
-      enrollments = enrollment.family.active_household.hbx_enrollments.where(:coverage_kind => enrollment.coverage_kind, 
-        :kind => enrollment.kind, :id.ne => enrollment.id, 
-        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)).select{|e| e.plan.active_year == enrollment.plan.active_year}
+      if @shop
+        assignment = enrollment.benefit_group_assignment
+        id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
 
+        enrollments = enrollment.family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
+          :coverage_kind => enrollment.coverage_kind, 
+          :id.ne => enrollment.id,
+          :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+          })
+
+      else
+        enrollments = enrollment.family.active_household.hbx_enrollments.where({
+          :coverage_kind => enrollment.coverage_kind, 
+          :kind => enrollment.kind, 
+          :id.ne => enrollment.id, 
+          :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+          }).select{|e| e.plan.active_year == enrollment.plan.active_year}
+      end
+     
       return if enrollments.blank?
       @transcript[:compare][:enrollment] ||= {}
       @transcript[:compare][:enrollment][:remove] ||= {}
