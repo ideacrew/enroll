@@ -2,8 +2,10 @@ class TranscriptGenerator
 
   attr_accessor :cv_path, :identifier
 
-  TRANSCRIPT_PATH = "#{Rails.root}/xml_files/ivl_policies_transcript_files/"
-  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_family_transcript_files/"
+  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/ivl_policies_transcript_files/"
+  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
+  TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
+
 
   def initialize(market = 'individual')
     @identifier = 'hbx_id'
@@ -19,7 +21,7 @@ class TranscriptGenerator
     create_directory(TRANSCRIPT_PATH)
 
     @count  = 0
-    Dir.glob("#{Rails.root}/xml_files/ivl_policies_sample_xmls/*.xml").each do |file_path|
+    Dir.glob("#{Rails.root}/xml_files/shop_policies_sample_xmls/*.xml").each do |file_path|
       begin
         @count += 1
 
@@ -36,7 +38,7 @@ class TranscriptGenerator
 
   def build_transcript(external_obj)
     transcript = Transcripts::EnrollmentTranscript.new
-    transcript.shop = false
+    transcript.shop = true
     transcript.find_or_build(external_obj)
 
     File.open("#{TRANSCRIPT_PATH}/#{@count}_#{transcript.transcript[:identifier]}_#{Time.now.to_i}.bin", 'wb') do |file|
@@ -61,15 +63,20 @@ class TranscriptGenerator
           next unless rows.present?
 
           first_row = rows[0]
-          rows.reject!{|row| row[9] == 'update' && row[11].blank?}
+          # rows.reject!{|row| row[9] == 'update' && row[11].blank?}
 
-          # rows.reject!{|row| row[11] == 'update' && row[13].blank?}
+          enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+
+          rows.reject!{|row| row[11] == 'update' && row[13].blank?}
+          rows.reject!{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
 
           if rows.empty?
-            # csv << (first_row[0..10] + ['match', 'match:enrollment'])
-            csv << (first_row[0..8] + ['match', 'match:enrollment'])
+            csv << (first_row[0..10] + ['match', 'match:enrollment'])
+            enrollment_removes.each{|row| csv << row}
+            # csv << (first_row[0..8] + ['match', 'match:enrollment'])
           else
             rows.each{|row| csv << row}
+            enrollment_removes.each{|row| csv << row}
           end
 
           if count % 100 == 0
@@ -118,19 +125,28 @@ class TranscriptGenerator
     count  = 0
 
     CSV.open('person_change_sets.csv', "w") do |csv|
-      csv << ['HBX ID', 'SSN', 'Last Name', 'First Name', 'Action', 'Section:Attribute', 'Value']
+      csv << ['HBX ID', 'SSN', 'Last Name', 'First Name', 'Action', 'Section:Attribute', 'Value', 'Action Taken']
 
-      Dir.glob("#{Rails.root}/transcript_files/*.bin").each do |file_path|
+      Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
         begin
           count += 1
-          rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).csv_row
+
+          # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).csv_row
+
+          person_importer = Importers::Transcripts::PersonTranscript.new
+          person_importer.transcript = Marshal.load(File.open(file_path))
+          person_importer.market = 'individual'
+          person_importer.process
+
+          rows = person_importer.csv_row
+
           next unless rows.present?
 
           first_row = rows[0]
           rows.reject!{|row| row[4] == 'update' && row[6].blank?}
 
           if rows.empty?
-            csv << (first_row[0..3] + ['match', 'match:ssn'])
+            csv << (first_row[0..3] + ['match', 'match:ssn', ''] + ['Matched'])
           else
             rows.each{|row| csv << row}
           end
