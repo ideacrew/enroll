@@ -132,11 +132,18 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
       expect(rendered).to have_selector('div', text: benefit_group.title)
     end
-    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
-    it "should only have BENIFIT PACKAGE and benefit plan" do
-      render template: "employers/census_employees/show.html.erb"
-      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
-      expect(rendered).to have_selector('div', text: benefit_group.title)
+    context "when both ee and er have no benefit group assignment" do
+      #to make sure census_employee.benefit_group_assignments.last
+      let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+      before do
+        # to make sure census_employee.active_benefit_group_assignment = nil
+        allow(census_employee).to receive(:active_benefit_group_assignment).and_return(nil)
+      end
+      it "should only have BENIFIT PACKAGE" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+        expect(rendered).to_not have_selector('div', text: benefit_group.title)
+      end
     end
    end
 
