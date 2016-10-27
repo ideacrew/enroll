@@ -143,7 +143,7 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
-  wait_for_ajax
+  wait_for_ajax(1,0.01)
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
@@ -200,6 +200,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
+  wait_for_ajax
 end
 
 Then(/^.+ sees employer census family created$/) do
