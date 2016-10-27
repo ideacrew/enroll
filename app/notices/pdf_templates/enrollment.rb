@@ -8,6 +8,6 @@ module PdfTemplates
     attribute :phone, String
     attribute :effective_on, Date
     attribute :selected_on, Date
-
+    attribute :plan, PdfTemplates::Plan
   end
 end

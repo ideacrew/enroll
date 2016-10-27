@@ -370,6 +370,16 @@ class Plan
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
+  def hsa_plan?
+    name = self.name
+    regex = name.match("HSA")
+    if regex.present?
+      return true
+    else
+      return false
+    end
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
