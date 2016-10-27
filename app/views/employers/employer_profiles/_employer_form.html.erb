@@ -45,7 +45,7 @@
             <thead style='height: 40px;'>
               <th style='width: 5%; height: 40px; padding: 10px'>Primary POC </th>
              <th style='width: 18%; height: 40px; padding: 10px'>First Name </th>
-             <th style='width: 18%'>Last Name    </th>
+             <th style='width: 18%'>Last Name</th>
              <th style='width: 18%'> Email       </th>
              <th style='width: 18%'> Phone       </th>
              <th style='width: 18%'> Status      </th>
@@ -54,7 +54,6 @@
             <% @staff.each do |staff| %>
               <tr style='border: 1px solid #d5d5d5; height: 50px; '>
                 <td style='padding: 10px'><%= check_box_tag('primary_poc', {}, checked = staff.is_primary_poc, data: {id:staff.id, emp_id:@employer_profile.id}) %>
-
                 </td>
                 <td style='padding: 10px'><%= staff.first_name %></td>
                 <td><%= staff.last_name %></td>
@@ -148,8 +147,17 @@
 
 <script>
   $( document ).ready(function() {
-    $('input:checkbox:not(:checked)').prop('disabled', true);
+    var initCount = $('input:checkbox:not(:checked)').length;
+    var checkedCount = $('input:checkbox:checked').length;
     
+    if (initCount == 0) {
+      $('input:checkbox:not(:checked)').prop('disabled', false);
+    } 
+    
+    if (checkedCount >= 1) {
+      $('input:checkbox:not(:checked)').prop('disabled', true);
+    }
+ 
     $('input[type=checkbox]').on('change', function() {
       var count = $('input:checkbox:checked').length;
       var check = ($(this).is(':checked'));

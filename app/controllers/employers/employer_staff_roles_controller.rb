@@ -46,10 +46,14 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
   def make_primary_poc
     employer_profile_id = params[:emp_id]
     employer_profile = EmployerProfile.find(employer_profile_id)
+    @poc_count = employer_profile.staff_roles.map(&:active_employer_staff_roles).count
     poc = Person.find(params[:id])
     poc.make_primary(params[:primary_poc])
+    flash[:notice] = 'Primary POC Role updated.'
     
-    redirect_to edit_employers_employer_profile_path(employer_profile.organization)
+    respond_to do |format|
+      format.js {render inline: "location.reload();" }
+    end
   end
   
   private
