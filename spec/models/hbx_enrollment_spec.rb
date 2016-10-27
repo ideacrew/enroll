@@ -909,6 +909,10 @@ describe HbxEnrollment, dbclean: :after_each do
     allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
   end
 
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   context ".effective_date_for_enrollment" do
     context 'when new hire' do
 
@@ -1830,7 +1834,7 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   end
 end
 
-context '.process_verification_reminders' do 
+context '.process_verification_reminders' do
   context "when family exists with pending outstanding verifications" do
 
     let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -1858,9 +1862,9 @@ context '.process_verification_reminders' do
       consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
     end
 
-    context 'when first verification due date reached' do 
+    context 'when first verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now)
       end
 
       it 'should trigger first reminder event' do
@@ -1872,7 +1876,7 @@ context '.process_verification_reminders' do
 
     context 'when second verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now)
       end
 
       it 'should trigger second reminder event' do
@@ -1884,7 +1888,7 @@ context '.process_verification_reminders' do
 
     context 'when third verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now)
       end
 
       it 'should trigger third reminder event' do
@@ -1894,10 +1898,10 @@ context '.process_verification_reminders' do
       end
     end
 
-    context 'when fourth verification due date reached' do 
+    context 'when fourth verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now) 
-      end 
+        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now)
+      end
 
       it 'should trigger fourth reminder event' do
         HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
