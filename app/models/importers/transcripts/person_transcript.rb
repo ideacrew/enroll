@@ -315,26 +315,32 @@ module Importers::Transcripts
 
     def validate_timestamp(section)
       if section == :base
-        if (@person.updated_at.to_date > @transcript[:source]['updated_at'].to_date)
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@person.updated_at.strftime('%m/%d/%Y')}"
+        if @person.updated_at.present? && @transcript[:source]['updated_at'].present?
+          if (@person.updated_at.to_date > @transcript[:source]['updated_at'].to_date)
+            raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@person.updated_at.strftime('%m/%d/%Y')}"
+          end
         end
 
-        if (@transcript[:source]['updated_at'].to_date > @transcript[:other]['updated_at'].to_date)
-          raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
+        if @transcript[:source]['updated_at'].present? && @transcript[:other]['updated_at'].present?
+          if (@transcript[:source]['updated_at'].to_date > @transcript[:other]['updated_at'].to_date)
+            raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
+          end
         end
       else
         transcript_source_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
         transcript_other_record = @transcript[:other][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:other][section.to_s].present?
-
         source_record = @person.send(section).sort_by{|x| x.updated_at}.reverse.first if @person.send(section).present?
-        return if transcript_record.blank? || source_record.blank?
 
-        if source_record.updated_at.to_date > transcript_source_record['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
+        if transcript_source_record['updated_at'].present? && source_record.updated_at.present?
+          if source_record.updated_at.to_date > transcript_source_record['updated_at'].to_date
+            raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
+          end
         end
 
-        if (transcript_source_record['updated_at'].to_date > transcript_other_record['updated_at'].to_date)
-          raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
+        if transcript_source_record['updated_at'].present? && transcript_other_record['updated_at'].present?
+          if (transcript_source_record['updated_at'].to_date > transcript_other_record['updated_at'].to_date)
+            raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
+          end
         end
       end
     end
