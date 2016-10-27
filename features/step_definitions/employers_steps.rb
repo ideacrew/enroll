@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
@@ -513,5 +514,6 @@ Then /^employer should not see termination date column$/ do
 end
 
 Then /^they should see that employee's details$/ do
+  wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
