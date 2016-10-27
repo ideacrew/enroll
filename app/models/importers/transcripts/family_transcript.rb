@@ -2,6 +2,7 @@ module Importers::Transcripts
   
   class StaleRecordError < StandardError; end
   class AmbiguousMatchError < StandardError; end
+  class PersonNotFound < StandardError; end
 
   class FamilyTranscript
 
@@ -30,9 +31,9 @@ module Importers::Transcripts
         remove: 'ignore'
       },
       irs_groups: {
-        add: 'edi',
-        update: 'edi',
-        remove: 'edi'
+        add: 'ignore',
+        update: 'ignore',
+        remove: 'ignore'
       }
     }
 
@@ -51,12 +52,7 @@ module Importers::Transcripts
 
           section_rows += actions.reduce([]) do |rows, action|
             attributes = @comparison_result.changeset_content_at [section, action]
-
-            if action == 'add'
-              rows << send(action, section, attributes)
-            else
-              rows
-            end
+            rows << send(action, section, attributes)
           end
         end
       end
@@ -71,13 +67,6 @@ module Importers::Transcripts
       if section == :base
         attributes.each do |field, value|
           if rule == 'edi'
-            begin
-              validate_timestamp(section)
-              @family.update!({field => value})
-              log_success(:add, section, field)
-            rescue Exception => e
-              @updates[:add][section][field] = ["Failed", "#{e.inspect}"]
-            end
           else
             log_ignore(:add, section, field)
           end
@@ -88,14 +77,7 @@ module Importers::Transcripts
         attributes.each do |identifier, association|
           if rule == 'edi'
             begin
-              # validate_timestamp(section)
-              # if match = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
-              #   raise "record already created on #{match.updated_at.strftime('%m/%d/%Y')}"
-              # end
-              # @person.send(section).create(association)
-
               send("add_#{section}", association)
-          
               log_success(:add, section, identifier)
             rescue Exception => e 
               @updates[:add][section][identifier] = ["Failed", "#{e.inspect}"]
@@ -116,13 +98,6 @@ module Importers::Transcripts
       if section == :base
         attributes.each do |field, value|
           if value.present? && (rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi'))
-            begin
-              validate_timestamp(section)
-              @person.update!({field => value})
-              log_success(:update, section, field)
-            rescue Exception => e
-              @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
-            end
           else
             log_ignore(:update, section, field)
           end
@@ -131,27 +106,37 @@ module Importers::Transcripts
         enumerated_association = ENUMERATION_FIELDS[section]
 
         attributes.each do |identifier, value|
-          if rule == 'edi'
 
-            value.each do |key, v|
-              begin
-                validate_timestamp(section)
-                association = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
-                if association.blank?
-                  raise "#{section} #{identifier} record missing!"
+          if rule == 'edi' || (value.values.present? && value.values.first['relationship'].present?)
+            if section == :family_members
+              hbx_id = identifier.split(':')[1]
+              family_member = @family.family_members.detect{|fm| fm.hbx_id == hbx_id}
+              if family_member.blank?
+                raise "#{section} #{identifier} record missing!"
+              end
+
+              value.each do |key, v|
+                if v['relationship'].blank?
+                  log_ignore(:update, section, identifier)
+                  next
                 end
 
-                if key == 'add' || key == 'update'
-                  association.update_attributes(v)
-                elsif key == 'remove'
-                  v.each do |field, val|
-                    association.update!({field => nil})
+                begin
+                  validate_timestamp(section)
+                  relationships = [['child', 'spouse'],['spouse', 'ward']]
+
+                  if (key == 'add' || key == 'update')
+                    if relationships.detect{|pair| pair.include?(v['relationship']) && pair.include?(family_member.relationship)}
+                      @family.primary_applicant.person.ensure_relationship_with(family_member.person, v['relationship'])
+                    else
+                      log_ignore(:update, section, identifier)
+                    end
                   end
-                end
 
-                log_success(:update, section, identifier)
-              rescue Exception => e
-                @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+                  log_success(:update, section, identifier)
+                rescue Exception => e
+                  @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+                end
               end
             end
           else
@@ -169,14 +154,7 @@ module Importers::Transcripts
 
       if section == :base
         attributes.each do |field, value|
-          if rule[field.to_sym] == 'edi'
-            begin
-              validate_timestamp(section)
-              @person.update!({field => nil})
-              log_success(:remove, section, field)
-            rescue Exception => e
-              @updates[:remove][section][field] = ["Failed", "#{e.inspect}"]
-            end
+          if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')
           else
             log_ignore(:remove, section, field)
           end
@@ -185,14 +163,6 @@ module Importers::Transcripts
         enumerated_association = ENUMERATION_FIELDS[section]
         attributes.each do |identifier, value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[identifier.to_sym] == 'edi')
-            begin
-              validate_timestamp(section)
-              association = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
-              association.delete
-              log_success(:remove, section, identifier)
-            rescue Exception => e
-              @updates[:remove][section][identifier] = ["Failed", "#{e.inspect}"]
-            end
           else
             log_ignore(:remove, section, identifier)
           end
@@ -206,11 +176,13 @@ module Importers::Transcripts
         section_rows += actions.reduce([]) do |rows, action|
           attributes = @comparison_result.changeset_content_at [section, action]
 
-          if @transcript[:source_is_new]
-            person_details = [@transcript[:other]['hbx_id'], Person.decrypt_ssn(@transcript[:other]['encrypted_ssn']), @transcript[:other]['last_name'], @transcript[:other]['first_name']]
-          else
-            person_details = [@transcript[:source]['hbx_id'], Person.decrypt_ssn(@transcript[:source]['encrypted_ssn']), @transcript[:source]['last_name'], @transcript[:source]['first_name']]
-          end
+         person_details = [
+              @transcript[:primary_details][:hbx_id],
+              @transcript[:primary_details][:ssn], 
+              @transcript[:primary_details][:last_name], 
+              @transcript[:primary_details][:first_name]
+          ]
+
 
           fields_to_ignore = ['_id', 'updated_by']
 
@@ -252,90 +224,115 @@ module Importers::Transcripts
     end
 
     def find_instance
-      matches = find_primary_matches
-      raise AmbiguousMatchError, "Duplicate Primary Person matches found!" if matches.uniq.size > 1
-      matches[0].primary_family
-    end
-
-    def find_primary_matches
       primary = @other_family.primary_applicant
-      match_person_instance(primary.person)
+      matched_primary = match_person_instance(primary.person)
+      matched_primary.primary_family
     end
 
-    def find_or_create_person(person)
-      matches = match_person_instance(person)
-      if matches.blank?
-        Person.create(person.attributes.except('_id', 'version', 'updated_at', 'created_at', 'updated_by_id'))
-      elsif matches.size > 1
-        raise AmbiguousMatchError, "Duplicate person matches found while building family member"
-      else
-        matches.first
-      end
-    end
+    # def find_or_create_person(person)
+    #   matches = match_person_instance(person)
+    #   # if matches.blank?
+    #   #   Person.create(person.attributes.except('_id', 'version', 'updated_at', 'created_at', 'updated_by_id'))
+    #   if matches.size > 1
+    #     raise AmbiguousMatchError, "Duplicate person matches found while building family member"
+    #   else
+    #     matches.first
+    #   end
+    # end
 
     def create_new_family
       @updates[:new] ||= {}
       @updates[:new][:new] ||= {}
 
+      @updates[:new][:new]['e_case_id'] = ["Ignored", "Ignored per Family update rule set."]
+
+      return
+
       begin
-        matches = find_primary_matches
+        primary = @other_family.primary_applicant
+        primary_person = match_person_instance(primary.person)
 
-        if matches.uniq.size > 1
-          raise StaleRecordError, "Ambiguous primary matches found!"
-        end
-
-        if matches.blank? || matches.first.primary_family.blank?
-
-          family = Family.new({
-              hbx_assigned_id: @other_family.hbx_assigned_id,
-              e_case_id: @other_family.e_case_id
-            })
-
-          @other_family.family_members.each do |family_member|
-            person = find_or_create_person(family_member.person)
-            family.add_family_member(person, is_primary_applicant: family_member.is_primary_applicant)
-            relationship = (family_member.is_primary_applicant ? 'self' : family_member.person.person_relationships.first.try(:kind).to_s)
-            family.relate_new_member(person, relationship)
-          end
-
-          family.save!
-          @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
-        else
+        if primary_person.primary_family.present?
           raise StaleRecordError, "Family recrod created on #{matches.first.primary_family.created_at.strftime('%m/%d/%Y')} after transcript generated"
         end
+
+        family = Family.new({
+          hbx_assigned_id: @other_family.hbx_assigned_id,
+          e_case_id: @other_family.e_case_id
+          })
+
+        @other_family.family_members.each do |family_member|
+          matched_person = match_person_instance(family_member.person)
+          family.add_family_member(matched_person, is_primary_applicant: family_member.is_primary_applicant)
+          relationship = (family_member.is_primary_applicant ? 'self' : family_member.person.person_relationships.first.try(:kind).to_s)
+          family.relate_new_member(matched_person, relationship)
+        end
+
+        binding.pry
+
+        family.save!
+        @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
+
       rescue Exception => e 
-        @updates[:new][:new]['ssn'] = ["Failed", "#{e.inspect}"]
+        @updates[:new][:new]['e_case_id'] = ["Failed", "#{e.inspect}"]
       end
     end
 
     def add_family_members(attributes)
+      if @family.family_members.detect{|fm| fm.hbx_id == attributes['hbx_id']}
+        raise AmbiguousMatchError, "Family member already exists with given hbx_id."
+      end
+
+      matched_people = ::Person.where(hbx_id: attributes['hbx_id'])
+
+      if matched_people.blank?
+        raise PersonNotFound, "Person not found with given family member hbx_id."
+      end
+
+      if matched_people.size > 1
+        raise AmbiguousMatchError, "Ambiguous primary matches found."
+      end
+
+      matched_person = matched_people.first
+      @family.add_family_member(matched_person, is_primary_applicant: attributes['is_primary_applicant'])
+      @family.relate_new_member(matched_person, attributes['relationship'])
+      @family.save!
     end
 
     def add_irs_groups(attributes)
     end
 
     def match_person_instance(person)
-      if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id) || []
-      else
-        matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
+      # if person.hbx_id.present?
+      matched_people = ::Person.where(hbx_id: person.hbx_id) || []
+      # else
+      #   matched_people = ::Person.match_by_id_info(
+      #       ssn: person.ssn,
+      #       dob: person.dob,
+      #       last_name: person.last_name,
+      #       first_name: person.first_name
+      #     )
+      # end
+
+      if matched_people.blank?
+        raise PersonNotFound, "Person record not found."
       end
-      matched_people
+
+      if matched_people.size > 1
+        raise AmbiguousMatchError, "Ambiguous primary matches found."
+      end
+
+      matched_people.first
     end
 
     def validate_timestamp(section)
       if section == :base
-        if @person.updated_at.to_date > @transcript[:source]['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@person.updated_at.strftime('%m/%d/%Y')}"
+        if @family.updated_at.to_date > @transcript[:source]['updated_at'].to_date
+          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@family.updated_at.strftime('%m/%d/%Y')}"
         end
       else
         transcript_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
-        source_record = @person.send(section).sort_by{|x| x.updated_at}.reverse.first if @person.send(section).present?
+        source_record = @family.send(section).sort_by{|x| x.updated_at}.reverse.first if @family.send(section).present?
         return if transcript_record.blank? || source_record.blank?
 
         if source_record.updated_at.to_date > transcript_record['updated_at'].to_date

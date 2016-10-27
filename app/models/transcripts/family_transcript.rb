@@ -38,7 +38,6 @@
 
     def find_or_build(family)
       @transcript[:other] = family
-
       matched_family = match_instance(family)
 
       if matched_family.blank?
@@ -61,7 +60,7 @@
       # end
 
       compare_instance
-      validate_instance
+      # validate_instance
 
       @transcript[:source]  = @transcript[:source].serializable_hash
       @transcript[:other]   = @transcript[:other].serializable_hash
