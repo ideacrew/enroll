@@ -164,10 +164,13 @@ def default_office_location
 end
 
 Given(/^Hbx Admin exists$/) do
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
 end
 
@@ -232,10 +235,10 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
-  sleep(1)
+
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
-  sleep(1)
+
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   step "I enter office location for #{default_office_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
@@ -271,7 +274,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
-  find(:xpath, '//label[@for="radio_male"]').click
+  find('label[for=census_employee_gender_male]').click
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
@@ -351,7 +354,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
 
   person = people[named_person]
 
-  fill_in "user[email]", :with => person[:email]
+  fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
   screenshot("create_account")
@@ -389,11 +392,11 @@ end
 
 When(/^.+ accepts? the matched employer$/) do
   screenshot("update_personal_info")
-  find(:xpath, "//span[contains(., 'CONTINUE')]").click
+  find_by_id('btn-continue').click
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-  sleep 3
+
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax
@@ -405,15 +408,15 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # find('.interaction-click-control-close').click
   screenshot("after modal")
 
-  sleep 3
-  wait_for_ajax
+  expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
+  wait_for_ajax(3)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
   # there is a flickering failure here due to over-lapping modals
   # find("#person_addresses_attributes_0_city").trigger('click')
   # find("#person_addresses_attributes_0_zip").trigger('click')
-  find_by_id("person_phones_attributes_0_full_phone_number")
+  find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
@@ -449,7 +452,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
-  sleep 3
+
   expect(page).to have_content('Confirm Member')
 end
 
@@ -457,7 +460,7 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
@@ -606,6 +609,7 @@ When(/^.+ should see a published success message without employee$/) do
   # TODO: Fix checking for flash messages. We will need to check using
   #       xpath for an element that may not be visible, but has already
   #       been faded away by jQuery.
+  wait_for_ajax
   expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 
@@ -615,6 +619,7 @@ end
 
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  wait_for_ajax
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -654,6 +659,7 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  find(".navbar-brand").click #to stop datepicker blocking shit
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
@@ -662,7 +668,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do
@@ -690,7 +696,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     all('.compare-selected-plans-link')[1].click
-    sleep 3
+
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')
@@ -701,4 +707,19 @@ And(/I should not see any plan which premium is 0/) do
   page.all("h2.plan-premium").each do |premium|
     expect(premium).not_to have_content("$0.00")
   end
+end
+
+Then(/Devops can verify session logs/) do
+  log_entries = `tail -n 15 log/test.log`.split("\n")
+  #log with a logged out session
+  session_id = log_entries.last.match(/\[([^\]]*)\]/)[1]
+  session_history = SessionIdHistory.where(session_id: session_id).first
+  expect(session_history.present?).to be true
+  expect(session_history.session_user_id).to be nil
+  #earlier in log was logged on
+  logged_on_session = SessionIdHistory.all[-2]
+  user = User.find(logged_on_session.session_user_id)
+  expect(log_entries.first).to match(/#{logged_on_session.session_id}/)
+  #user was a consumer
+  expect(user.person.consumer_role).not_to be nil
 end

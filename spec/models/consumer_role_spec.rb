@@ -277,7 +277,7 @@ context "Verification process and notices" do
       it "changes state to outstanding for native consumer with NO ssn without calling hub" do
         person.ssn=nil
         expect(consumer).to transition_from(:unverified).to(:verification_outstanding).on_event(:coverage_purchased)
-        expect(consumer.ssn_validation).to eq("outstanding")
+        expect(consumer.ssn_validation).to eq("na")
         expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
       end
     end
@@ -299,7 +299,7 @@ context "Verification process and notices" do
         expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
-        expect(consumer.lawful_presence_determination.citizenship_result).to eq("ssn_pass_citizenship_fails_with_SSA")
+        expect(consumer.lawful_presence_determination.citizenship_result).to eq("not_lawfully_present_in_us")
       end
     end
 
@@ -391,3 +391,30 @@ context "Verification process and notices" do
   end
 end
 
+RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
+  let(:current_state) { c_state }
+
+  describe "in #{c_state} status" do
+    it "does not invoke coverage_selected!" do
+      expect(subject).not_to receive(:coverage_purchased!)
+      subject.ivl_coverage_selected
+    end
+  end
+end
+
+describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
+  subject { ConsumerRole.new(:aasm_state => current_state) }
+  describe "in unverified status" do
+    let(:current_state) { "unverified" }
+    it "fires coverage_selected!" do
+      expect(subject).to receive(:coverage_purchased!)
+      subject.ivl_coverage_selected
+    end
+  end
+
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :ssa_pending
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :dhs_pending
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+end

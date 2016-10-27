@@ -33,6 +33,9 @@ class ConsumerRole
       indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
+      non_native_not_lawfully_present_in_us
+      ssn_pass_citizenship_fails_with_SSA
+      non_native_citizen
   )
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
@@ -119,6 +122,12 @@ class ConsumerRole
   after_initialize :setup_lawful_determination_instance
 
   before_validation :ensure_ssn_validation_status
+
+  def ivl_coverage_selected
+    if unverified?
+      coverage_purchased!
+    end
+  end
 
   def ensure_ssn_validation_status
     if self.person && self.person.ssn.blank?
@@ -370,7 +379,7 @@ class ConsumerRole
       transitions from: :ssa_pending, to: :verification_outstanding
     end
 
-    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change] do
+    event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
       transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
       transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end
@@ -415,13 +424,33 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_period_ended, to: :ssa_pending, :guard => [:call_ssa?]
     end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
   end
 
-  def invoke_verification!(requested_start_date=requested_coverage_start_date)
+  def invoke_verification!(*args)
     if person.ssn || is_native?
       invoke_ssa
     else
-      invoke_dhs(requested_start_date)
+      invoke_dhs
     end
   end
 
@@ -569,21 +598,25 @@ class ConsumerRole
     lawful_presence_determination.start_ssa_process
   end
 
-  def invoke_dhs(requested_start_date=requested_coverage_start_date)
-    lawful_presence_determination.start_vlp_process(requested_start_date)
+  def invoke_dhs
+    lawful_presence_determination.start_vlp_process(requested_coverage_start_date)
   end
 
   def pass_ssn(*args)
-    self.ssn_validation = "valid"
+    self.update_attributes!(ssn_validation: "valid")
   end
 
   def fail_ssn(*args)
-    self.ssn_validation = "outstanding"
+    self.update_attributes!(
+      ssn_validation: "outstanding"
+    )
   end
 
   def fail_ssa_for_no_ssn(*args)
-    self.ssn_validation = "outstanding"
-    self.ssn_update_reason = "no_ssn_for_native"
+    self.update_attributes!(
+      ssn_validation: "outstanding",
+      ssn_update_reason: "no_ssn_for_native"
+    )
   end
 
   def pass_lawful_presence(*args)
@@ -605,6 +638,11 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+  end
+
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
   end
 
   def record_transition(*args)

@@ -66,7 +66,7 @@ module Insured::FamiliesHelper
     end
 
     plan_details.inject([]) do |data, element|
-      data << "<label>#{element}</label>"
+      data << "#{element}"
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
@@ -109,13 +109,27 @@ module Insured::FamiliesHelper
     employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
   end
 
-  def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  def disable_make_changes_button?(hbx_enrollment)
+    # return false if IVL
+    return false if hbx_enrollment.census_employee.blank?
+
+    # Enable the button under these conditions
+      # 1) plan year under open enrollment period
+      # 2) new hire covered under enrolment period
+      # 3) qle enrolmlent period check
+
+    return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.is_special_enrollment? && hbx_enrollment.special_enrollment_period.present? && hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record)
+
+    # Disable only  if non of the above conditions match
+    return true
   end
 
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
+
 
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
@@ -124,5 +138,5 @@ module Insured::FamiliesHelper
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
     end
   end
-      
+
 end
