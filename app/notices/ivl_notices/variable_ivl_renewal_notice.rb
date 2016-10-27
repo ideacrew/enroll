@@ -47,7 +47,9 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
       })
     PdfTemplates::Enrollment.new({
       plan_name: hbx_enrollment.plan.name,
-      premium: hbx_enrollment.total_premium,
+      premium: hbx_enrollment.total_premium.round(2),
+      aptc_amount: hbx_enrollment.applied_aptc_amount.round(2),
+      responsible_amount: (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f).round(2),
       phone: hbx_enrollment.phone_number,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
@@ -59,19 +61,19 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   end
 
   def health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:start_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def append_address(primary_address)
