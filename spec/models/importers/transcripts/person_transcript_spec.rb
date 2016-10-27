@@ -81,18 +81,21 @@ RSpec.describe Importers::Transcripts::PersonTranscript, type: :model do
         builder.find_or_build(other_record)
         person_transcript = builder.transcript
 
+        expect(source_record.dob).to be_nil
+        expect(source_record.ssn).to eq "671126612"
+        expect(source_record.home_phone).to be_nil
+        expect(source_record.home_address.address_1).to eq "3312 H St NW"
+
         person_importer = Importers::Transcripts::PersonTranscript.new
         person_importer.transcript = person_transcript
         person_importer.process
 
-        person_importer.csv_row
+        source_record.reload
 
-
-        # expect(person_transcript[:compare][:base]['update']['dob']).to eq(Date.new(1975, 6, 1))
-        # expect(person_transcript[:compare][:addresses][:update][:home]).to be_present
-        # expect(person_transcript[:compare][:addresses][:add][:work]).to be_present
-        # expect(person_transcript[:compare][:phones][:add][:home]).to be_present
-        # expect(person_transcript[:compare][:phones][:remove][:mobile]).to be_present
+        expect(source_record.dob).to eq Date.new(1975, 6, 1)
+        expect(source_record.ssn).to eq "671126610"
+        expect(source_record.home_phone).to be_present
+        expect(source_record.home_address.address_1).to eq "3312 gosnell rd"
       end
     end
   end
