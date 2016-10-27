@@ -47,7 +47,9 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
       })
     PdfTemplates::Enrollment.new({
       plan_name: hbx_enrollment.plan.name,
-      premium: hbx_enrollment.total_premium,
+      premium: hbx_enrollment.total_premium.round(2),
+      aptc_amount: hbx_enrollment.applied_aptc_amount.round(2),
+      responsible_amount: (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f).round(2),
       phone: hbx_enrollment.phone_number,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
