@@ -69,6 +69,17 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /#{address.zip}/
   end
 
+  it "should show the address feild of census employee if address not present" do
+    allow(census_employee).to receive(:address).and_return([])
+    render template: "employers/census_employees/show.html.erb"
+    expect(rendered).to match /Address/
+    expect(rendered).to match /ADDRESS LINE 2/
+    expect(rendered).to match /ADDRESS LINE 1/
+    expect(rendered).to match /CITY/
+    expect(rendered).to match /SELECT STATE/
+    expect(rendered).to match /ZIP/
+  end
+  
   it "should not show the plan" do
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
     assign(:hbx_enrollments, [])
@@ -113,6 +124,25 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
+  end
+
+  context 'with no email linked with census employee' do
+    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+    it "should create a blank email record if there was no email for census employees" do
+      expect(census_employee.email).to eq nil
+      render template: "employers/census_employees/show.html.erb"
+      expect(census_employee.email).not_to eq nil
+      expect(census_employee.email.kind).to eq nil
+      expect(census_employee.email.address).to eq nil
+    end
+
+    it "should return the existing one if email was already present" do
+      census_employee = FactoryGirl.create(:census_employee)
+      address = census_employee.email.address
+      render template: "employers/census_employees/show.html.erb"
+      expect(census_employee.email.kind).to eq 'home'
+      expect(census_employee.email.address).to eq address
+    end
   end
 
   context 'with a previous coverage waiver' do
