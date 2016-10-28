@@ -17,11 +17,12 @@ module Parsers::Xml::Cv::Importers
       family_member_objects = []
       if family_members
         family_members.each do |fm|
+          is_primary_applicant = primary_family_member_id == fm.id || fm.is_primary_applicant.to_s == 'true'
           family_member_objects << FamilyMember.new(
             id: fm.id,
             # hbx_id: fm.id,
             former_family_id: fm.primary_family_id,
-            is_primary_applicant: fm.is_primary_applicant.to_s == 'true', # did not see the real xml  
+            is_primary_applicant: is_primary_applicant, # did not see the real xml  
             is_coverage_applicant: fm.is_coverage_applicant.to_s == 'true', # need to confirm the case sensetive
             person: get_person_object_by_family_member_xml(fm),
           )

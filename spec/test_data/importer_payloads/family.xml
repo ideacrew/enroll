@@ -44,7 +44,7 @@
         </person_relationship>
       </person_relationships>
       <person_demographics />
-      <is_primary_applicant>true</is_primary_applicant>
+      <is_primary_applicant>false</is_primary_applicant>
       <is_coverage_applicant>false</is_coverage_applicant>
       <employee_roles>
         <employee_role />
@@ -94,7 +94,7 @@
     </family_member>
   </family_members>
   <primary_family_member_id>
-    <id>123123123123</id>
+    <id>123456789</id>
   </primary_family_member_id>
   <e_case_id>abc123xyz2</e_case_id>
   <households>

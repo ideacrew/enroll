@@ -72,6 +72,18 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         family_members = subject.get_family_object.family_members
         expect(family_members.map(&:primary_relationship)).to eq ['self', 'child']
       end
+
+      it "person should have relationships" do
+        family_members = subject.get_family_object.family_members
+        family_members.each do |fm|
+          expect(fm.person.person_relationships.length).to be > 0
+        end
+      end
+
+      it "should get person_relationships by primary_applicant" do
+        person = subject.get_family_object.primary_applicant.person
+        expect(person.person_relationships.length).to eq 2
+      end
     end
   end
 end
