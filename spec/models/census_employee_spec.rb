@@ -95,6 +95,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with all required attributes" do
       let(:params)                  { valid_params }
       let(:initial_census_employee) { CensusEmployee.new(**params) }
+      let(:dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "") }
+      let(:dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
 
       it "should be valid" do
         expect(initial_census_employee.valid?).to be_truthy
@@ -105,7 +107,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
       
       it "allow dependent ssn's to be updated to nil" do
-        expect(initial_census_employee.allow_nil_ssn_updates_dependents).to eq([])
+        initial_census_employee.census_dependents = [dependent]
+        expect(initial_census_employee.allow_nil_ssn_updates_dependents.first.ssn).to match(nil)
+      end
+      
+      it "ignores depepent ssn's if ssn not nil" do
+        initial_census_employee.census_dependents = [dependent2]
+        expect(initial_census_employee.allow_nil_ssn_updates_dependents.first.ssn).to match("333333333")
       end
 
       context "with duplicate ssn's on dependents" do
