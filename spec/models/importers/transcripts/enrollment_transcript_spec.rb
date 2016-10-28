@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Transcripts::EnrollmentTranscript, type: :model do
+RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model do
 
   describe "find_or_build_family" do
 
@@ -54,7 +54,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model do
         consumer_role = person.build_consumer_role({is_applicant: true})
         consumer_role.save
 
-        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on, consumer_role_id: consumer_role.id })
+        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on, terminated_on: source_effective_on.end_of_month, consumer_role_id: consumer_role.id })
         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
         enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
 
@@ -76,14 +76,9 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model do
         it 'should have differences on hbx enrollment member and plan' do
           transcript = build_transcript
 
-          expect(transcript[:compare]['hbx_enrollment_members']['add']).to be_present
-          expect(transcript[:compare]['hbx_enrollment_members']['add']['hbx_id']['hbx_id']).to eq dependent2.hbx_id
-          # expect(transcript[:compare]['hbx_enrollment_members']['remove']).to be_present
-          # expect(transcript[:compare]['hbx_enrollment_members']['remove']['hbx_id']['hbx_id']).to eq spouse.hbx_id
-
-          expect(transcript[:compare]['plan']['add']['hios_id']['hios_id']).to eq other_plan.hios_id
-          # expect(transcript[:compare]['plan']['remove']).to be_present
-          # expect(transcript[:compare]['plan']['remove']['hios_id']['hios_id']).to eq source_plan.hios_id
+          importer = Importers::Transcripts::EnrollmentTranscript.new
+          importer.transcript = transcript
+          importer.process
         end
       end
 

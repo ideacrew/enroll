@@ -139,8 +139,8 @@ module Transcripts
           ]
 
           fields_to_ignore = ['_id', 'updated_by']
-          rows += attributes.collect do |attribute, value|
-
+          rows = []
+          attributes.each do |attribute, value|
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
               value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
@@ -148,11 +148,24 @@ module Transcripts
 
             plan_details = (@person[:plan_details].present? ? @person[:plan_details].values : 4.times.map{nil})
 
+            # ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value])
             # employer_details = (@person[:employer_details].present? ? @person[:employer_details].values : 3.times.map{nil})
-            # ([@person[:identifier]] + person_details + plan_details + employer_details + [action, "#{section}:#{attribute}", value])
 
-            ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value])
+            # if value.is_a?(Array)
+            #   value.each{|val| rows << ([@person[:identifier]] + person_details + plan_details + employer_details + [action, "#{section}:#{attribute}", val]) }
+            # else
+            #   rows << ([@person[:identifier]] + person_details + plan_details + employer_details + [action, "#{section}:#{attribute}", value])
+            # end
+
+
+            if value.is_a?(Array)
+              value.each{|val| rows << ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", val]) }
+            else
+              rows << ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value])
+            end   
           end
+
+          rows
         end
       end
     end

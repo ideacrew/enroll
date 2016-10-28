@@ -53,8 +53,8 @@ module Transcripts
           :hbx_id => record.family_member.hbx_id,
           :is_subscriber => record.is_subscriber,
           :coverage_start_on => record.coverage_start_on,
-          :coverage_end_on => record.coverage_end_on,
-          :premium_amount => (record.persisted? ? record.hbx_enrollment.premium_for(record) : record.premium_amount.to_f)
+          :coverage_end_on => record.coverage_end_on
+          # :premium_amount => (record.persisted? ? record.hbx_enrollment.premium_for(record) : record.premium_amount.to_f)
           # :applied_aptc_amount => record.applied_aptc_amount
         }
       end
@@ -62,24 +62,23 @@ module Transcripts
 
     def find_or_build(enrollment)
       @transcript[:other] = enrollment
-      enrollments = match_instance(enrollment)
+      match_instance(enrollment)
 
-      case enrollments.count
-      when 0
+      if @enrollment.present?
+        @transcript[:source_is_new] = false
+        @transcript[:source] = @enrollment
+      else
         @transcript[:source_is_new] = true
         @transcript[:source] = initialize_enrollment
-      when 1
-        @transcript[:source_is_new] = false
-        @transcript[:source] = enrollments.first
-      else
-        raise "Ambiguous enrollment match: more than one family matches criteria"
       end
 
       compare_instance
       # validate_instance
 
-      if @transcript[:source].persisted?
-        find_duplicate_enrollments(@transcript[:source])
+      if @duplicate_coverages.present?
+        @transcript[:compare][:enrollment] ||= {}
+        @transcript[:compare][:enrollment][:remove] ||= {}
+        @transcript[:compare][:enrollment][:remove][:hbx_id] = @duplicate_coverages.map{|e| enrollment_hash(e)}
       end
 
       add_plan_information
@@ -97,32 +96,6 @@ module Transcripts
           name: plan.name
         }
       end
-    end
-
-    def find_duplicate_enrollments(enrollment)
-      if @shop
-        assignment = enrollment.benefit_group_assignment
-        id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
-
-        enrollments = enrollment.family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
-          :coverage_kind => enrollment.coverage_kind, 
-          :id.ne => enrollment.id,
-          :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-          })
-
-      else
-        enrollments = enrollment.family.active_household.hbx_enrollments.where({
-          :coverage_kind => enrollment.coverage_kind, 
-          :kind => enrollment.kind, 
-          :id.ne => enrollment.id, 
-          :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-          }).select{|e| e.plan.active_year == enrollment.plan.active_year}
-      end
-     
-      return if enrollments.blank?
-      @transcript[:compare][:enrollment] ||= {}
-      @transcript[:compare][:enrollment][:remove] ||= {}
-      @transcript[:compare][:enrollment][:remove][:hbx_id] = enrollments.map{|e| enrollment_hash(e)}
     end
 
     def enrollment_hash(enrollment)
@@ -209,22 +182,80 @@ module Transcripts
 
     private
 
+    # 1) Match by hbx_id
+    #   Match found: 
+    #     - Verify active state
+    #       - True
+    #          - Compare 
+    #            (if multiple active enrollments present with primary_applicant, make them as enrollment:remove )
+    #            # (if multiple active responsible party enrollments with same subscriber, mark them as enrollment:remove)
+    #       - False
+    #          - Look for active enrollments with same coverage_kind & market, coverage year.
+    #             - Found 
+    #               (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
+    #               - Compare
+    #             - New Enrollment
+    #   Match not found:
+    #     - Look for active enrollments with same coverage_kind & market, coverage year.
+    #       - Found 
+    #         (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
+    #         - Compare
+    #       - New Enrollment
+
+    def match_enrollment(enrollment)
+      match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
+
+      if match.blank?
+        @enrollment = nil
+        @duplicate_coverages = []
+      else
+        enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
+        if (match.coverage_terminated? || match.coverage_canceled? || match.shopping?)
+          @enrollment = enrollments.pop
+          @duplicate_coverages = enrollments
+        else
+          primary = match.family.primary_applicant
+          @enrollment = match
+          @duplicate_coverages = enrollments.select{|e| e.hbx_enrollment_members.any?{|em| em.applicant_id == primary.id} && e != match }
+        end
+      end
+    end
+
+    def matching_ivl_coverages(enrollment)
+      enrollment.family.active_household.hbx_enrollments.where({
+        :coverage_kind => enrollment.coverage_kind, 
+        :kind => enrollment.kind, 
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+        }).order_by(:effective_on.asc).select{|e| e.plan.active_year == enrollment.plan.active_year}
+    end
+
+    def matching_shop_coverages(enrollment)
+      assignment = enrollment.benefit_group_assignment
+      id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+
+      enrollment.family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
+        :coverage_kind => enrollment.coverage_kind, 
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+        }).order_by(:effective_on.asc)
+    end
+
     def match_instance(enrollment)
       primary = enrollment.family.primary_applicant
-      enrollments = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s)
-      primary = enrollments.first.family.primary_applicant if enrollments.present?
+      match_enrollment(enrollment)
+
+      primary = @enrollment.family.primary_applicant if @enrollment
 
       @transcript[:identifier] = enrollment.hbx_id
 
-      if enrollments.present?
+      if @enrollment.present?
         @transcript[:plan_details] = {
-          plan_name: "#{enrollments.first.plan.hios_id}:#{enrollments.first.plan.name}",
-          effective_on:  enrollments.first.effective_on.strftime("%m/%d/%Y"),
-          aasm_state: enrollments.first.aasm_state.camelcase,
-          terminated_on: (enrollments.first.terminated_on.blank? ? nil : enrollments.first.terminated_on.strftime("%m/%d/%Y")),
+          plan_name: "#{@enrollment.plan.hios_id}:#{@enrollment.plan.name}",
+          effective_on:  @enrollment.effective_on.strftime("%m/%d/%Y"),
+          aasm_state: @enrollment.aasm_state.camelcase,
+          terminated_on: (@enrollment.terminated_on.blank? ? nil : @enrollment.terminated_on.strftime("%m/%d/%Y")),
         }
 
-        if @shop && employer = enrollments.first.employer_profile
+        if @shop && employer = @enrollment.employer_profile
           @transcript[:employer_details] = {
             fein: employer.fein,
             legal_name:  employer.legal_name
@@ -238,8 +269,6 @@ module Transcripts
         last_name: primary.person.last_name,
         ssn: primary.person.ssn
       }
-
-      enrollments
     end
 
     def initialize_enrollment
