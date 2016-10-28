@@ -154,6 +154,7 @@ end
 
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
+  find('.interaction-click-control-change-broker').click #WAT?
   wait_for_ajax
   within '.modal-dialog' do
     click_link 'Terminate Broker'
@@ -192,7 +193,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
   find('.carriers-tab a').click
-  wait_for_ajax(10)
+  wait_for_ajax(10,2)
   find('.reference-plan label').click
   wait_for_ajax(10)
   find('.interaction-click-control-create-plan-year').trigger('click')
