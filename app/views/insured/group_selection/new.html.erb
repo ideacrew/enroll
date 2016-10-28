@@ -101,6 +101,9 @@
             </div>
           <% end %>
 
+          <% if @employee_role.present? %>
+            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+          <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
               <h3>Benefit Type</h3>
@@ -146,7 +149,7 @@
 
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
-            <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%> 
+            <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
             <br/>
             <h3>What would you like to do?</h3>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
