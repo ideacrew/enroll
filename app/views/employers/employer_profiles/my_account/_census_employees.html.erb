@@ -146,11 +146,12 @@
         <%=form_tag generate_checkbook_urls_employers_employer_profile_path do%>
           <p>Please choose any one of the following below:</p><br>
            <lable><%=radio_button_tag 'contact_menthod','manual',:checked => true %> <span style="margin-right: 2px;">Download a local copy of the PDF notice and distribute to the employees myself. </span></lable><br><br>
-           <lable><%=radio_button_tag 'contact_menthod','email'%> <span style="margin-right: 2px;">Send the PDF notice to every eligible employee's email address.</span></lable><br>
+           <!-- Will revisit in phase2 
+           <lable><%=radio_button_tag 'contact_menthod','email'%> <span style="margin-right: 2px;">Send the PDF notice to every eligible employee's email address.</span></lable><br> -->
         </div>
           <div class="modal-footer" style="margin-right: 200px;">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">CANCEL</button>
-            <%= submit_tag "Submit", class: 'btn btn-primary mtz', onclick: "$('#poc_cal').modal('hide')"%>
+            <%= submit_tag "Submit", class: 'btn btn-primary mtz'%>
           </div>
         <%end%>
       
