@@ -5,3 +5,4 @@
     - if !broker_agency_account.broker_agency_profile.dba.blank?
       %dba= broker_agency_account.broker_agency_profile.dba
     %dislay_name= broker_agency_account.broker_agency_profile.legal_name
+    %is_active= broker_agency_account.broker_agency_profile.is_active?
