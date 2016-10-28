@@ -463,7 +463,7 @@ And /^clicks on terminate employee$/ do
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
   find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax
+  wait_for_ajax(2,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
