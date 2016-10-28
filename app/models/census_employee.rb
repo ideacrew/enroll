@@ -43,6 +43,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
+  before_save :allow_nil_ssn_updates_dependents
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -105,6 +106,14 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
+  
+  def allow_nil_ssn_updates_dependents
+    census_dependents.each do |cd|
+      if cd.ssn.blank?
+        cd.update(encrypted_ssn:"")
+      end
+    end
+  end
 
   def initialize(*args)
     super(*args)
@@ -597,7 +606,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-
+  
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -684,7 +693,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-
+  
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
