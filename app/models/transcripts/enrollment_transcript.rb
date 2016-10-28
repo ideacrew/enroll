@@ -206,8 +206,18 @@ module Transcripts
       match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
 
       if match.blank?
-        @enrollment = nil
-        @duplicate_coverages = []
+        matched_people = match_person_instance(enrollment.family.primary_applicant.person)
+        if matched_people.present?       
+          raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
+          matched_person = matched_people.first
+
+          if family = matched_person.families.first
+            raise 'matched person has multiple families' if matched_person.families.size > 1
+            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
+            @enrollment = enrollments.pop
+            @duplicate_coverages = enrollments
+          end
+        end
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
         if (match.coverage_terminated? || match.coverage_canceled? || match.shopping?)
@@ -219,21 +229,36 @@ module Transcripts
           @duplicate_coverages = enrollments.select{|e| e.hbx_enrollment_members.any?{|em| em.applicant_id == primary.id} && e != match }
         end
       end
+
+      @enrollment ||= nil
+      @duplicate_coverages ||= []
     end
 
-    def matching_ivl_coverages(enrollment)
-      enrollment.family.active_household.hbx_enrollments.where({
+    def match_person_instance(person)
+      ::Person.match_by_id_info(
+        ssn: person.ssn,
+        dob: person.dob,
+        last_name: person.last_name,
+        first_name: person.first_name
+        )
+    end
+
+    def matching_ivl_coverages(enrollment, family=nil)
+      family ||= enrollment.family
+
+      family.active_household.hbx_enrollments.where({
         :coverage_kind => enrollment.coverage_kind, 
         :kind => enrollment.kind, 
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
         }).order_by(:effective_on.asc).select{|e| e.plan.active_year == enrollment.plan.active_year}
     end
 
-    def matching_shop_coverages(enrollment)
+    def matching_shop_coverages(enrollment, family=nil)
       assignment = enrollment.benefit_group_assignment
       id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+      family ||= enrollment.family
 
-      enrollment.family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
+      family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
         :coverage_kind => enrollment.coverage_kind, 
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
         }).order_by(:effective_on.asc)
