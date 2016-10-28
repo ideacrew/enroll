@@ -1,0 +1,13 @@
+!!! XML
+%enrollment_event
+  %header
+    %hbx_id= hbx_enrollment.household.family.hbx_assigned_id
+    %submitted_timestamp= hbx_enrollment.submitted_at.strftime('%Y%m%d%H%M%S')
+  %event
+    %body
+      %enrollment_event_body
+        %transaction_id
+          %id= hbx_enrollment._id
+        %is_trading_partner_publishable= hbx_enrollment.valid?
+        %enrollment
+          = render "events/hbx_enrollment/policy", :formats => ["xml"], :hbx_enrollment => hbx_enrollment
