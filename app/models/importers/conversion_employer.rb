@@ -131,7 +131,7 @@ module Importers
           :kind => "work",
           :full_phone_number => contact_phone
         }),
-        :is_primary => true 
+        :is_primary => true
       })
       locations << main_location
       if !mailing_address.blank?
@@ -152,11 +152,11 @@ module Importers
           @#{item}_location_zip = nil
           return val
         else
-          if val.strip.length == 9 
+          if val.strip.length == 9
             @#{item}_location_zip = val[0..4]
           else
             @#{item}_location_zip = val.strip.rjust(5, "0")
-          end 
+          end
         end
       end
       RUBY_CODE
@@ -173,7 +173,7 @@ module Importers
             broker_agency_profile_id: br.broker_agency_profile_id
           })
         end
-      end 
+      end
       broker_agency_accounts
     end
 
@@ -200,8 +200,8 @@ module Importers
 
     def update_poc(emp)
       return true if contact_first_name.blank? || contact_last_name.blank?
-      
-      matching_staff_role = emp.staff_roles.detect{|staff| 
+
+      matching_staff_role = emp.staff_roles.detect{|staff|
         staff.first_name.match(/#{contact_first_name}/i) && staff.last_name.match(/#{contact_last_name}/i)
       }
 

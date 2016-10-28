@@ -5,15 +5,49 @@ module Importers
       super(opts)
     end
 
+    def has_not_changed_since_import
+      has_organization_info_changed?
+      has_employer_info_changed?
+      has_office_locations_changed?
+    end
+
+    def has_organization_info_changed?
+      organization = find_organization
+      if organization.present? && organization.updated_at > organization.created_at
+        errors.add(:base, "import cannot be done as organization info was updated on #{organization.updated_at}")
+      end
+    end
+
+    def has_employer_info_changed?
+      employer_profile = find_organization.try(:employer_profile)
+      if employer_profile.present? && employer_profile.updated_at > employer_profile.created_at
+        errors.add(:base, "import cannot be done as employer updated the info on #{employer_profile.updated_at}")
+      end
+    end
+
+    def has_office_locations_changed?
+      organization = find_organization
+      organization.office_locations.each do |office_location|
+        address = office_location.try(:address)
+        binding.pry
+        if address.present? && address.updated_at.present? && address.created_at.present? && address.updated_at > address.created_at
+          errors.add(:base, "import cannot be done as office location was updated on #{address.updated_at}.")
+        end
+      end
+    end
+
+    def find_organization
+      return nil if fein.blank?
+      Organization.where(:fein => fein).first
+    end
+
     def save
       begin
-        organization = Organization.where(:fein => fein).first
-        empr = organization.try(:employer_profile)
+        organization = find_organization
         if organization.blank?
           errors.add(:fein, "employer don't exists with given fein")
-        elsif empr.present? && empr.updated_at >= empr.created_at
-          errors.add(:base, "import cant be done as employer updated the info on #{empr.updated_at}")
         end
+        has_not_changed_since_import
         puts "Processing Update #{fein}---Data Sheet# #{legal_name}---Enroll App# #{organization.legal_name}"
         organization.legal_name = legal_name
         organization.dba = dba
@@ -31,7 +65,7 @@ module Importers
         general_agency = find_ga
 
         if broker.present? && general_agency.present?
-      
+
           general_agency_account = organization.employer_profile.general_agency_accounts.where({
             :general_agency_profile_id => general_agency.id,
             :broker_role_id => broker.id
@@ -42,7 +76,7 @@ module Importers
             organization.employer_profile.general_agency_accounts.each do |account|
               if (account.id != general_agency_account.id && account.active?)
                 account.terminate! if account.may_terminate?
-              end            
+              end
             end
 
             general_agency_account.update_attributes(:aasm_state => 'active') if general_agency_account.inactive?
@@ -54,12 +88,12 @@ module Importers
           end
         end
 
-        update_result = organization.save
+        update_result = errors.empty? && organization.save
       rescue Mongoid::Errors::UnknownAttribute
         organization.employer_profile.plan_years.each do |py|
           py.benefit_groups.each{|bg| bg.unset(:_type) }
         end
-        update_result = organization.save
+        update_result = errors.empty? && organization.save
       rescue Exception => e
         puts "FAILED.....#{e.to_s}"
       end
