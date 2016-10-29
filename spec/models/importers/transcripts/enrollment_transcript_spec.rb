@@ -55,25 +55,28 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     let(:primary) { source_family.primary_applicant }
     let(:dependent) { source_family.family_members.detect{|fm| !fm.is_primary_applicant }}
 
-    let!(:source_enrollment_1) {
-      enrollment = source_family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected'})
-      enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-      enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-      enrollment.save
-      enrollment
-    }
-
-    let!(:source_enrollment_2) {
-      enrollment = source_family.active_household.hbx_enrollments.build({ hbx_id: '1000002', kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 1.month), aasm_state: 'coverage_selected'})
-      enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
-      enrollment.save
-      enrollment
-    }
-
     let(:factory) { Transcripts::EnrollmentTranscript.new }
     let(:importer) { Importers::Transcripts::EnrollmentTranscript.new }
 
     context ".add" do
+
+
+      let!(:source_enrollment_1) {
+        enrollment = source_family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected'})
+        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
+        enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
+        enrollment.save
+        enrollment
+      }
+
+      let!(:source_enrollment_2) {
+        enrollment = source_family.active_household.hbx_enrollments.build({ hbx_id: '1000002', kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 1.month), aasm_state: 'coverage_selected'})
+        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
+        enrollment.save
+        enrollment
+      }
+
+
       before do 
         factory.find_or_build(other_enrollment)
         transcript = factory.transcript
@@ -143,6 +146,24 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     #   it 'should ignore dependent' do
     #   end
     # end
+
+    context '.new' do
+
+      it 'should import enrollment' do 
+
+        expect(source_family.active_household.hbx_enrollments).to be_empty
+        factory.find_or_build(other_enrollment)
+        transcript = factory.transcript
+        
+        importer.transcript = transcript
+        importer.other_enrollment = other_enrollment
+        importer.process
+        source_family.reload
+
+        expect(source_family.active_household.hbx_enrollments.first.hbx_id).to eq other_enrollment.hbx_id
+        expect(importer.updates[:new][:new]['hbx_id']).to eq ["Success", "Enrollment added successfully using EDI source"]
+      end
+    end
   end
 end
 
