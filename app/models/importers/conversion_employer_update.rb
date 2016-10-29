@@ -9,10 +9,10 @@ module Importers
 # if broker is hired/terminated, then updated_at column in employer_profile model is changed.
 # if office locations is updated, then updated_at column in organization model is changed.
 # if employer info is updated, then updated_at column in employer_profile model is changed.
-    def has_data_changed_since_import?
-      has_organization_info_changed? ||
-      has_employer_info_changed? ||
-      has_office_locations_changed? ||
+    def has_data_not_changed_since_import
+      has_organization_info_changed?
+      has_employer_info_changed?
+      has_office_locations_changed?
       has_broker_agency_profile_info_changed?
     end
 
@@ -78,7 +78,8 @@ module Importers
         if organization.blank?
           errors.add(:fein, "employer don't exists with given fein")
         end
-        if has_data_changed_since_import?
+        has_data_not_changed_since_import
+        if errors.empty?
           puts "Processing Update #{fein}---Data Sheet# #{legal_name}---Enroll App# #{organization.legal_name}"
           organization.legal_name = legal_name
           organization.dba = dba
