@@ -55,10 +55,11 @@ module Transcripts
     private
 
     def match_instance(person)
-
       if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id) || []
-      else
+        matched_people = ::Person.where(hbx_id: person.hbx_id)
+      end
+      
+      if matched_people.blank?
         matched_people = ::Person.match_by_id_info(
             ssn: person.ssn,
             dob: person.dob,
@@ -66,6 +67,7 @@ module Transcripts
             first_name: person.first_name
           )
       end
+
       matched_people
     end
 

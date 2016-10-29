@@ -3,6 +3,7 @@ module Importers::Transcripts
   class StaleRecordError < StandardError; end
   class AmbiguousMatchError < StandardError; end
   class PersonNotFound < StandardError; end
+  class FamilyMissingError < StandardError; end
 
   class FamilyTranscript
 
@@ -224,9 +225,7 @@ module Importers::Transcripts
     end
 
     def find_instance
-      primary = @other_family.primary_applicant
-      matched_primary = match_person_instance(primary.person)
-      matched_primary.primary_family
+      ::Family.find(@transcript[:source]['_id'])
     end
 
     # def find_or_create_person(person)
@@ -246,36 +245,32 @@ module Importers::Transcripts
 
       @updates[:new][:new]['e_case_id'] = ["Ignored", "Ignored per Family update rule set."]
 
-      return
+      # begin
+      #   primary = @other_family.primary_applicant
+      #   primary_person = match_person_instance(primary.person)
 
-      begin
-        primary = @other_family.primary_applicant
-        primary_person = match_person_instance(primary.person)
+      #   if primary_person.primary_family.present?
+      #     raise StaleRecordError, "Family recrod created on #{matches.first.primary_family.created_at.strftime('%m/%d/%Y')} after transcript generated"
+      #   end
 
-        if primary_person.primary_family.present?
-          raise StaleRecordError, "Family recrod created on #{matches.first.primary_family.created_at.strftime('%m/%d/%Y')} after transcript generated"
-        end
+      #   family = Family.new({
+      #     hbx_assigned_id: @other_family.hbx_assigned_id,
+      #     e_case_id: @other_family.e_case_id
+      #     })
 
-        family = Family.new({
-          hbx_assigned_id: @other_family.hbx_assigned_id,
-          e_case_id: @other_family.e_case_id
-          })
+      #   @other_family.family_members.each do |family_member|
+      #     matched_person = match_person_instance(family_member.person)
+      #     family.add_family_member(matched_person, is_primary_applicant: family_member.is_primary_applicant)
+      #     relationship = (family_member.is_primary_applicant ? 'self' : family_member.person.person_relationships.first.try(:kind).to_s)
+      #     family.relate_new_member(matched_person, relationship)
+      #   end
 
-        @other_family.family_members.each do |family_member|
-          matched_person = match_person_instance(family_member.person)
-          family.add_family_member(matched_person, is_primary_applicant: family_member.is_primary_applicant)
-          relationship = (family_member.is_primary_applicant ? 'self' : family_member.person.person_relationships.first.try(:kind).to_s)
-          family.relate_new_member(matched_person, relationship)
-        end
+      #   family.save!
+      #   @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
 
-        binding.pry
-
-        family.save!
-        @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
-
-      rescue Exception => e 
-        @updates[:new][:new]['e_case_id'] = ["Failed", "#{e.inspect}"]
-      end
+      # rescue Exception => e 
+      #   @updates[:new][:new]['e_case_id'] = ["Failed", "#{e.inspect}"]
+      # end
     end
 
     def add_family_members(attributes)

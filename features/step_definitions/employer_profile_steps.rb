@@ -117,8 +117,7 @@ Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
 end
 
 Then /Point of Contact count is (\d+)/ do |count|
-  rows = page.all('tr').count - 1
-  expect(rows).to eq(count.to_i)
+  expect(page.all('tr').count - 1).to eq(count.to_i)
 end
 
 Then /Hannah cannot remove EmployerStaffRole from Hannah/ do

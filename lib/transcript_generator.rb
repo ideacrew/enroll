@@ -2,7 +2,7 @@ class TranscriptGenerator
 
   attr_accessor :cv_path, :identifier
 
-  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/ivl_policies_transcript_files/"
+  TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_enrollment_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
   TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
 
@@ -21,11 +21,13 @@ class TranscriptGenerator
     create_directory(TRANSCRIPT_PATH)
 
     @count  = 0
-    Dir.glob("#{Rails.root}/xml_files/shop_policies_sample_xmls/*.xml").each do |file_path|
+    Dir.glob("#{Rails.root}/xml_files_10_27/ivl_policy_xmls/*.xml").each do |file_path|
       begin
         @count += 1
 
-        individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
+        next if @count > 100
+
+        individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
         # individual_parser = Parsers::Xml::Cv::Importers::FamilyParser.new(File.read(file_path))
 
         build_transcript(individual_parser.get_enrollment_object)
@@ -37,8 +39,8 @@ class TranscriptGenerator
   end
 
   def build_transcript(external_obj)
-    transcript = Transcripts::EnrollmentTranscript.new
-    transcript.shop = true
+    transcript = Transcripts::PersonTranscript.new
+    # transcript.shop = false
     transcript.find_or_build(external_obj)
 
     File.open("#{TRANSCRIPT_PATH}/#{@count}_#{transcript.transcript[:identifier]}_#{Time.now.to_i}.bin", 'wb') do |file|
@@ -63,17 +65,20 @@ class TranscriptGenerator
           next unless rows.present?
 
           first_row = rows[0]
-          # rows.reject!{|row| row[9] == 'update' && row[11].blank?}
 
-          enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+          enrollment_removes = rows.select{|row| row[9] == 'remove' && row[10] == 'enrollment:hbx_id'}
 
-          rows.reject!{|row| row[11] == 'update' && row[13].blank?}
-          rows.reject!{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+          rows.reject!{|row| row[9] == 'update' && row[11].blank?}
+          rows.reject!{|row| row[9] == 'remove' && row[10] == 'enrollment:hbx_id'}
+
+          # enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+          # rows.reject!{|row| row[11] == 'update' && row[13].blank?}
+          # rows.reject!{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
 
           if rows.empty?
-            csv << (first_row[0..10] + ['match', 'match:enrollment'])
+            # csv << (first_row[0..10] + ['match', 'match:enrollment'])
+            csv << (first_row[0..8] + ['match', 'match:enrollment'])
             enrollment_removes.each{|row| csv << row}
-            # csv << (first_row[0..8] + ['match', 'match:enrollment'])
           else
             rows.each{|row| csv << row}
             enrollment_removes.each{|row| csv << row}
@@ -94,12 +99,27 @@ class TranscriptGenerator
     count  = 0
 
     CSV.open('family_change_sets.csv', "w") do |csv|
-      csv << ['Subscriber HBX ID', 'SSN', 'Last Name', 'First Name', 'Action', 'Section:Attribute', 'Value']
+      csv << ['Subscriber HBX ID', 'SSN', 'Last Name', 'First Name', 'Action', 'Section:Attribute', 'Value', 'Action Taken']
 
-      Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
+      # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
+      Dir.glob("#{Rails.root}/xml_files/ivl_family_sample_xmls/*.xml").each do |file_path|
         begin
           count += 1
-          rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).family_csv_row
+          # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).family_csv_row
+
+          individual_parser = Parsers::Xml::Cv::Importers::FamilyParser.new(File.read(file_path))
+          other_family = individual_parser.get_family_object
+          transcript = Transcripts::FamilyTranscript.new
+          transcript.find_or_build(other_family)
+
+          family_importer = Importers::Transcripts::FamilyTranscript.new
+          family_importer.transcript = transcript.transcript
+          family_importer.market = 'individual'
+          family_importer.other_family = other_family
+          family_importer.process
+
+          rows = family_importer.csv_row
+
           next unless rows.present?
 
           first_row = rows[0]
