@@ -2,7 +2,7 @@
   %id
     %id= hbx_enrollment.hbx_id
   - if hbx_enrollment.broker_agency_account
-    = render :partial => "events/shared/broker", :object => hbx_enrollment.broker_agency_account, as: :broker_agency_account
+    = render :partial => "events/shared/broker", :object => hbx_enrollment, as: :hbx_enrollment
   %enrollees
     = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
   %enrollment
