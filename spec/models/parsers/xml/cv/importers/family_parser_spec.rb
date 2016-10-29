@@ -33,7 +33,7 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
 
       it "should get relationship by person" do
         person = subject.get_family_object.family_members.last.person
-        expect(person.person_relationships.first.kind).to eq 'self'
+        expect(person.person_relationships.first.kind).to eq 'child'
       end
 
       it "should get person info by family_members" do
@@ -82,7 +82,13 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
 
       it "should get person_relationships by primary_applicant" do
         person = subject.get_family_object.primary_applicant.person
-        expect(person.person_relationships.length).to eq 2
+        expect(person.person_relationships.length).to eq 1
+      end
+
+      it "should get timestamps" do
+        family = subject.get_family_object
+        expect(family.created_at.present?).to eq true
+        expect(family.updated_at.present?).to eq true
       end
     end
   end

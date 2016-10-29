@@ -27,6 +27,7 @@ module Parsers::Xml::Cv::Importers
             person: get_person_object_by_family_member_xml(fm),
           )
         end
+        generate_person_relationships_for_primary_applicant(family_member_objects)
       end
       household_objects = []
       if households
@@ -57,6 +58,8 @@ module Parsers::Xml::Cv::Importers
         family_members: family_member_objects,
         households: household_objects,
         irs_groups: irs_group_objects,
+        created_at: family.created_at,
+        updated_at: family.modified_at,
       )
     end
 
@@ -100,6 +103,13 @@ module Parsers::Xml::Cv::Importers
       end
 
       tax_households
+    end
+
+    def generate_person_relationships_for_primary_applicant(family_member_objects)
+      primary_applicant_person = family_member_objects.detect{|f| f.is_primary_applicant}.person rescue nil
+      return if primary_applicant_person.blank?
+
+      primary_applicant_person.person_relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
     end
   end
 end

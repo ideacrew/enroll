@@ -41,6 +41,12 @@ describe Parsers::Xml::Cv::Importers::IndividualParser do
         expect(person.phones.length).to eq 2
         expect(person.phones.map(&:kind)).to eq ['home', 'work']
       end
+
+      it "should get timestamps" do
+        person = subject.get_person_object
+        expect(person.created_at.present?).to eq true
+        expect(person.updated_at.present?).to eq true
+      end
     end
 
     context "get_errors_for_person_object" do
