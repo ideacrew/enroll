@@ -55,7 +55,7 @@ gem 'symmetric-encryption', '~> 3.6.0'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
-gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'fixed_time'
+gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
