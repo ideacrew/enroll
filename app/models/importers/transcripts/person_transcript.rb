@@ -316,7 +316,7 @@ module Importers::Transcripts
 
     def validate_timestamp(section)
 
-      if section == :base
+      # if section == :base
         if @transcript[:source]['updated_at'].present?
           if @last_updated_at > @transcript[:source]['updated_at']
             raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}"
@@ -328,7 +328,7 @@ module Importers::Transcripts
             end
           end
         end
-      end
+      # end
 
       # if section == :base
       # else
