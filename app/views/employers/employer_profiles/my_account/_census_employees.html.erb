@@ -39,7 +39,7 @@
           <div class="pull-right">
           <!--  <%= link_to "Generate OOP PDF",generate_checkbook_urls_employers_employer_profile_path(@employer_profile),remote: true, class: "btn btn-default" %> -->
 
-           <% if @employer_profile.show_plan_year.published? || @employer_profile.show_plan_year.enrolling? %>
+           <% if @employer_profile.try(:show_plan_year).try(:published?) || @employer_profile.try(:show_plan_year).try(:enrolling?) %>
            <%= link_to "Generate OOP PDF", "", data: {toggle: "modal", target: "#poc_cal"} %>
            <% end %>
           </div>
