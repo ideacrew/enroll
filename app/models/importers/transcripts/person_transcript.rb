@@ -86,6 +86,7 @@ module Importers::Transcripts
         create_new_person_record
       else
         @person = find_instance
+        @last_updated_at = @person.updated_at
 
         @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
           actions = @comparison_result.changeset_section_actions [section]
@@ -306,7 +307,7 @@ module Importers::Transcripts
           Person.new(@transcript[:other]).save!
           @updates[:new][:new]['ssn'] = ["Success", "Created new person record"]
         else
-          raise StaleRecordError, "Person record created on #{match_person.created_at.strftime('%m/%d/%Y')} after transcript generated"
+          raise StaleRecordError, "Person already exists with Hbx ID #{match_person.hbx_id} and created on #{match_person.created_at.strftime('%m/%d/%Y')}"
         end
       rescue Exception => e 
         @updates[:new][:new]['ssn'] = ["Failed", "#{e.inspect}"]
@@ -314,39 +315,41 @@ module Importers::Transcripts
     end
 
     def validate_timestamp(section)
-      if section == :base
-        if @person.updated_at.present? && @transcript[:source]['updated_at'].present?
-          if (@person.updated_at.to_date > @transcript[:source]['updated_at'].to_date)
-            raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@person.updated_at.strftime('%m/%d/%Y')}"
-          end
+
+      if @transcript[:source]['updated_at'].present?
+        if @last_updated_at > @transcript[:source]['updated_at']
+          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}"
         end
 
-        if @transcript[:source]['updated_at'].present? && @transcript[:other]['updated_at'].present?
-          if (@transcript[:source]['updated_at'].to_date > @transcript[:other]['updated_at'].to_date)
+        if @transcript[:other]['updated_at'].present?
+          if @transcript[:source]['updated_at'] > @transcript[:other]['updated_at']
             raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
           end
         end
-      else
-        transcript_source_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
-        transcript_other_record = @transcript[:other][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:other][section.to_s].present?
-        source_record = @person.send(section).sort_by{|x| x.updated_at}.reverse.first if @person.send(section).present?
-
-
-        if transcript_source_record.present?
-
-          if transcript_source_record['updated_at'].present? && source_record && source_record.updated_at.present?
-            if source_record.updated_at.to_date > transcript_source_record['updated_at'].to_date
-              raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
-            end
-          end
-
-          if transcript_source_record['updated_at'].present? && transcript_other_record && transcript_other_record['updated_at'].present?
-            if (transcript_source_record['updated_at'].to_date > transcript_other_record['updated_at'].to_date)
-              raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
-            end
-          end
-        end
       end
+
+      # if section == :base
+      # else
+      #   transcript_source_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
+      #   transcript_other_record = @transcript[:other][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:other][section.to_s].present?
+      #   source_record = @person.send(section).sort_by{|x| x.updated_at}.reverse.first if @person.send(section).present?
+
+
+      #   if transcript_source_record.present?
+
+      #     if transcript_source_record['updated_at'].present? && source_record && source_record.updated_at.present?
+      #       if source_record.updated_at.to_date > transcript_source_record['updated_at'].to_date
+      #         raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
+      #       end
+      #     end
+
+      #     if transcript_source_record['updated_at'].present? && transcript_other_record && transcript_other_record['updated_at'].present?
+      #       if (transcript_source_record['updated_at'].to_date > transcript_other_record['updated_at'].to_date)
+      #         raise StaleRecordError, "Change set unprocessed, source record has later updated date #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}"
+      #       end
+      #     end
+      #   end
+      # end
     end
   end
 end
