@@ -18,6 +18,7 @@ module Transcripts
 
     def find_or_build(person)
       @transcript[:other] = person
+      @transcript[:identifier] = person.hbx_id
 
       people = match_instance(person)
 
@@ -34,7 +35,7 @@ module Transcripts
       end
 
       compare_instance
-      validate_instance
+      # validate_instance
 
       @transcript[:source]  = @transcript[:source].serializable_hash
       @transcript[:other]   = @transcript[:other].serializable_hash
@@ -58,7 +59,7 @@ module Transcripts
       if person.hbx_id.present?
         matched_people = ::Person.where(hbx_id: person.hbx_id)
       end
-      
+
       if matched_people.blank?
         matched_people = ::Person.match_by_id_info(
             ssn: person.ssn,

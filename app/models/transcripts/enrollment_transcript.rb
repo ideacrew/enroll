@@ -21,7 +21,7 @@ module Transcripts
         'writing_agent_id',
         'coverage_end_on']
 
-      @custom_templates = ['HbxEnrollmentMember', 'Plan', 'BrokerRole']
+      @custom_templates = ['HbxEnrollmentMember', 'Plan']
 
       if @shop
         @fields_to_ignore << 'applied_aptc_amount'
@@ -42,12 +42,12 @@ module Transcripts
           :fein => record.fein,
           :legal_name => record.legal_name
         }
-      elsif record.class.to_s == 'BrokerRole'
-         {
-          :npn => record.npn,
-          :first_name => record.person.first_name,
-          :last_name => record.person.last_name
-        }
+      # elsif record.class.to_s == 'BrokerRole'
+      #    {
+      #     :npn => record.npn,
+      #     :first_name => record.person.first_name,
+      #     :last_name => record.person.last_name
+      #   }
       else
         {
           :hbx_id => record.family_member.hbx_id,
@@ -172,8 +172,8 @@ module Transcripts
     def self.enumerated_associations
       associations = [
         {association: "plan", enumeration_field: "hios_id", cardinality: "one", enumeration: [ ]},
-        {association: "hbx_enrollment_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: [ ]},
-        {association: "broker", enumeration_field: "npn", cardinality: "one", enumeration: [ ]}
+        {association: "hbx_enrollment_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: [ ]}
+        # {association: "broker", enumeration_field: "npn", cardinality: "one", enumeration: [ ]}
       ]
 
       associations << {association: "employer_profile", enumeration_field: "fein", cardinality: "one", enumeration: [ ]} if @shop
