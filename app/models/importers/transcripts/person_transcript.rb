@@ -323,8 +323,8 @@ module Importers::Transcripts
           end
 
           if @transcript[:other]['updated_at'].present?
-            if @transcript[:source]['updated_at'] > @transcript[:other]['updated_at']
-              raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@transcript[:source]['updated_at'].strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
+            if @last_updated_at > @transcript[:other]['updated_at']
+              raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
             end
           end
         end
