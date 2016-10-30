@@ -94,17 +94,24 @@ module Transcripts
 
       if source.present? || other.present?
         if source.blank?
+          if attr_val.to_s.match(/_id$/).present?
+            identifer_val = other[attr_val.to_sym]
+            key = "#{attr_val}:#{identifer_val}" if identifer_val.present?
+          end
           differences[:add] ||= {}
-          differences[:add][attr_val] = (other.is_a?(Hash) ? other : other.serializable_hash)
+          differences[:add][key || attr_val] = (other.is_a?(Hash) ? other : other.serializable_hash)
         elsif other.blank?
+          if attr_val.to_s.match(/_id$/).present?
+            identifer_val = source[attr_val.to_sym]
+            key = "#{attr_val}:#{identifer_val}" if identifer_val.present?
+          end
           differences[:remove] ||= {}
-          differences[:remove][attr_val] = (source.is_a?(Hash) ? source : source.serializable_hash)
+          differences[:remove][key || attr_val] = (source.is_a?(Hash) ? source : source.serializable_hash)
         elsif source.present? && other.present?
           if attr_val.to_s.match(/_id$/).present?
             identifer_val = source[attr_val.to_sym] || other[attr_val.to_sym]
             key = "#{attr_val}:#{identifer_val}" if identifer_val.present?
           end
-
           differences[:update] ||= {}
           differences[:update][key || attr_val] = compare(base_record: source, compare_record: other)
         end
