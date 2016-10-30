@@ -167,8 +167,13 @@ module Importers::Transcripts
     end
 
     def add_terminated_on(termination_date)
+      if termination_date > TimeKeeper.date_of_record
+        enrolllment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
+      else
+        @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
+      end
+
       @enrollment.update!({:terminated_on => termination_date})
-      @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
     end
 
     def add_plan(association)
@@ -409,7 +414,10 @@ module Importers::Transcripts
           applied_aptc_amount: @other_enrollment.applied_aptc_amount,
           coverage_kind: @other_enrollment.coverage_kind, 
           effective_on: @other_enrollment.effective_on,
-          terminated_on: @other_enrollment.terminated_on
+          terminated_on: @other_enrollment.terminated_on,
+          submitted_at: TimeKeeper.date_of_record,
+          created_at: TimeKeeper.date_of_record,
+          udpated_at: TimeKeeper.date_of_record
         })
 
         hbx_enrollment.plan= ea_plan
@@ -435,6 +443,7 @@ module Importers::Transcripts
         end
 
         family.save!
+
         @updates[:new][:new]['hbx_id'] = ["Success", "Enrollment added successfully using EDI source"]
       rescue Exception => e
         @updates[:new][:new]['hbx_id'] = ["Failed", "#{e.inspect}"]
