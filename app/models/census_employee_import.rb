@@ -47,7 +47,7 @@ class CensusEmployeeImport
       "Suffix(optional)",
       "Email Address",
       "SSN / TIN(Required for EE & enter without dashes)",
-      "Date of Birth(DD/MM/YYYY)",
+      "Date of Birth(MM/DD/YYYY)",
       "Gender",
       "Date of Hire",
       "Date of Termination(optional)",
