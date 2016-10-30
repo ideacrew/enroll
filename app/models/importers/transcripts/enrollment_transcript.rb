@@ -54,13 +54,13 @@ module Importers::Transcripts
 
     def process
       @updates = {}
+      @people_cache = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
 
       if @transcript[:source_is_new]
         create_new_enrollment
       else
         @enrollment = find_instance
-
         begin
           validate_update
 
@@ -203,7 +203,7 @@ module Importers::Transcripts
       @enrollment.update!({:effective_on => value})
     end
 
-    def update_effective_on(value)
+    def update_terminated_on(value)
       @enrollment.update!({:terminated_on => value})
     end
 
@@ -285,6 +285,9 @@ module Importers::Transcripts
     end
 
     def csv_row
+      @people_cache = {}
+      @plan = nil
+
       @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
@@ -355,6 +358,8 @@ module Importers::Transcripts
     end
 
     def find_matching_person(person)
+      return @people_cache[person.hbx_id] if @people_cache[person.hbx_id].present?
+
       if person.hbx_id.present?
         matched_people = ::Person.where(hbx_id: person.hbx_id)
       end
@@ -368,6 +373,7 @@ module Importers::Transcripts
           )
       end
 
+      @people_cache[person.hbx_id] = matched_people
       matched_people
     end
 
@@ -377,9 +383,7 @@ module Importers::Transcripts
 
       begin
         primary_applicant = @other_enrollment.family.primary_applicant
-        person = primary_applicant.person
-
-        matched_people = find_matching_person(person)
+        matched_people = find_matching_person(primary_applicant.person)
 
         if matched_people.size > 1
           raise AmbiguousMatchError, 'Found multiple people in EA with given subscriber.'
@@ -390,6 +394,10 @@ module Importers::Transcripts
         end
 
         matched_person = matched_people.first
+
+        if matched_person.consumer_role.blank?
+          raise PersonMissingError, 'Consumer role missing.'
+        end
 
         if matched_person.families.size > 1
           raise AmbiguousMatchError, 'Found multiple families in EA for the given subscriber.'
@@ -410,6 +418,7 @@ module Importers::Transcripts
         hbx_enrollment = family.active_household.hbx_enrollments.build({
           hbx_id: @other_enrollment.hbx_id,
           kind: @other_enrollment.kind,
+          consumer_role_id: matched_person.consumer_role.id,
           elected_aptc_pct: @other_enrollment.elected_aptc_pct,
           applied_aptc_amount: @other_enrollment.applied_aptc_amount,
           coverage_kind: @other_enrollment.coverage_kind, 
@@ -417,7 +426,7 @@ module Importers::Transcripts
           terminated_on: @other_enrollment.terminated_on,
           submitted_at: TimeKeeper.datetime_of_record,
           created_at: TimeKeeper.datetime_of_record,
-          udpated_at: TimeKeeper.datetime_of_record
+          updated_at: TimeKeeper.datetime_of_record
         })
 
         hbx_enrollment.plan= ea_plan
@@ -439,7 +448,7 @@ module Importers::Transcripts
             eligibility_date: member.coverage_start_on,
             coverage_start_on: member.coverage_start_on,
             coverage_end_on: member.coverage_end_on
-            })
+          })
         end
 
         family.save!
