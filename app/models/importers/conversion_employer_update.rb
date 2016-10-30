@@ -22,12 +22,8 @@ module Importers
       Organization.where(:fein => fein).first
     end
 
-    def organization
-      find_organization
-    end
-
     def employer_profile
-      organization.try(:employer_profile)
+      find_organization.try(:employer_profile)
     end
 
     def broker_agency_profile
@@ -35,45 +31,36 @@ module Importers
     end
 
     def has_organization_info_changed?
-      flag = false
+      organization = find_organization
       if organization.present? && organization.updated_at > organization.created_at
-        flag = true
         errors.add(:organization, "import cannot be done as organization info was updated on #{organization.updated_at}")
       end
-      flag
     end
 
     def has_employer_info_changed?
-      flag = false
       if employer_profile.present? && employer_profile.updated_at > employer_profile.created_at
-        flag = true
         errors.add(:employer_profile, "import cannot be done as employer updated the info on #{employer_profile.updated_at}")
       end
-      flag
     end
 
     def has_broker_agency_profile_info_changed?
-      flag = false
       if broker_agency_profile.present? && broker_agency_profile.updated_at > broker_agency_profile.created_at
-        flag = true
         errors.add(:broker_agency_profile, "import cannot be done as broker agency profile was updated on #{employer_profile.updated_at}")
       end
-      flag
     end
 
     def has_office_locations_changed?
-      flag = false
+      organization = find_organization
       organization.office_locations.each do |office_location|
         address = office_location.try(:address)
         if address.present? && address.updated_at.present? && address.created_at.present? && address.updated_at > address.created_at
-          flag = true
           errors.add(:organization, "import cannot be done as office location was updated on #{address.updated_at}.")
         end
       end
-      flag
     end
 
     def save
+      organization = find_organization
       begin
         if organization.blank?
           errors.add(:fein, "employer don't exists with given fein")
@@ -132,7 +119,6 @@ module Importers
       rescue Exception => e
         puts "FAILED.....#{e.to_s}"
       end
-
       begin
         if update_result
           update_poc(organization.employer_profile)
