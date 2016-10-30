@@ -2,7 +2,7 @@ module Importers::Transcripts
   
   class StaleRecordError < StandardError; end
   class AmbiguousMatchError < StandardError; end
-  class EnrollmentMissingError < StandardError; end
+  class PersonMissingError < StandardError; end
 
   class EnrollmentTranscript
 
@@ -15,6 +15,7 @@ module Importers::Transcripts
     }
 
     SUBSCRIBER_SOURCE_RULE_MAP = {
+
     }
 
     SOURCE_RULE_MAP = {
@@ -59,18 +60,75 @@ module Importers::Transcripts
         create_new_enrollment
       else
         @enrollment = find_instance
-        raise EnrollmentMissingError, "Enrollment match not found!" if @enrollment.blank?
 
-        @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
-          actions = @comparison_result.changeset_section_actions [section]
+        begin
+          validate_update
 
-          section_rows += actions.reduce([]) do |rows, action|
-            attributes = @comparison_result.changeset_content_at [section, action]
-            # if section != :enrollment
-              rows << send(action, section, attributes)
-            # else
-            #   rows
-            # end
+          @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+            actions = @comparison_result.changeset_section_actions [section]
+
+            section_rows += actions.reduce([]) do |rows, action|
+              attributes = @comparison_result.changeset_content_at [section, action]
+              if section != :enrollment
+                rows << send(action, section, attributes)
+              else
+                log_ignore(action.to_sym, section, 'hbx_id')
+                rows
+              end
+            end
+          end
+        rescue Exception => e
+          @updates[:update_failed] = ['Merge Failed', e.to_s]
+        end
+      end
+    end
+
+    def validate_update
+      # action section atribute value
+
+      @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+        actions = @comparison_result.changeset_section_actions [section]
+        actions.each do |action|
+          attributes = @comparison_result.changeset_content_at [section, action]
+
+          attributes.each do |attribute, value|
+
+            if section == :base
+              if action == 'update' ||  action == 'add'
+                if attribute == 'effective_on'
+                  if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
+                    raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
+                  end
+                end
+              end
+            end
+
+            if section == :plan && action == 'add'
+              plan = Plan.where(hios_id: other_enrollment.plan.hios_id, active_year: other_enrollment.plan.active_year).first
+              if plan.blank?
+                raise "Plan not found with HIOS ID #{association['hios_id']} for year #{association['active_year']}."
+              end
+            end
+
+            if section == :hbx_enrollment_members
+              if action != 'remove'
+                
+                hbx_id = (action == 'add' ? value["hbx_id"] : attribute.split(':')[1])            
+                enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|em| em.hbx_id == hbx_id}
+                matched_people = find_matching_person(enrollment_member.person)
+
+                if matched_people.blank?
+                  raise PersonMissingError, 'Hbx Enrollment member person record missing in EA.'
+                end
+
+                if matched_people.size > 1
+                  raise AmbiguousMatchError, 'Hbx Enrollment member matched with multiple people in EA.'
+                end
+              end
+            end
+
+            if section == :enrollment
+            end
           end
         end
       end
@@ -115,25 +173,12 @@ module Importers::Transcripts
 
     def add_plan(association)
       plan = Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
-      if plan.blank?
-        raise "Plan not found with #{association['hios_id']} for coverage year #{association['active_year']}"
-      end
       @enrollment.update_attributes({ plan_id: plan.id, carrier_profile_id: plan.carrier_profile_id })
     end
 
     def add_hbx_enrollment_members(association)
       other_enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|member| member.family_member.hbx_id == association['hbx_id']}
-      matched_people = find_matching_person(other_enrollment_member.family_member.person)
-
-      if matched_people.blank?
-        raise 'Unable to match person in EA'
-      end
-
-      if matched_people.size > 1
-        raise 'Matched multiple people in EA'
-      end
-
-      matching_person = matched_people.first
+      matching_person = find_matching_person(other_enrollment_member.family_member.person).first
 
       family = @enrollment.family
       family_member = family.add_family_member(matching_person, is_primary_applicant: false)
@@ -148,12 +193,8 @@ module Importers::Transcripts
 
       family.save!
     end
-
  
     def update_effective_on(value)
-      if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
-        raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
-      end
       @enrollment.update!({:effective_on => value})
     end
 
@@ -256,13 +297,14 @@ module Importers::Transcripts
             end
 
             plan_details = (@transcript[:plan_details].present? ? @transcript[:plan_details].values : 4.times.map{nil})
+            action_taken = (@updates[:update_failed].present? ? @updates[:update_failed] : @updates[action.to_sym][section][attribute])
 
             if value.is_a?(Array)
               value.each do |val|
-                rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", val] + (@updates[action.to_sym][section][attribute] || []))
+                rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", val] + (action_taken || []))
               end
             else
-              rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value] + (@updates[action.to_sym][section][attribute] || []))
+              rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value] + (action_taken || []))
             end   
           end
 
@@ -286,6 +328,8 @@ module Importers::Transcripts
     end
 
     def log_ignore(action, section, field)
+      @updates[action] ||= {}
+      @updates[action][section] ||= {}
       @updates[action][section][field] = ["Ignored", "Ignored per Enrollment update rule set."]
     end
 
@@ -301,7 +345,7 @@ module Importers::Transcripts
       ::HbxEnrollment.find(@transcript[:source]['_id'])
     end
 
-       def find_matching_person(person)
+    def find_matching_person(person)
       ::Person.match_by_id_info(
         ssn: person.ssn,
         dob: person.dob,
@@ -309,7 +353,6 @@ module Importers::Transcripts
         first_name: person.first_name
       )
     end
-
 
     def create_new_enrollment
       @updates[:new] ||= {} 
@@ -326,7 +369,7 @@ module Importers::Transcripts
         end
 
         if matched_people.size == 0
-          raise 'Matching person not found.'
+          raise PersonMissingError, 'Matching person not found.'
         end
 
         matched_person = matched_people.first
@@ -366,7 +409,7 @@ module Importers::Transcripts
           end
 
           if matched_people.size == 0
-            raise 'Matching person not found for #{member.family_member.person.first_name} #{member.family_member.person.last_name}.'
+            raise PersonMissingError, 'Matching person not found for #{member.family_member.person.first_name} #{member.family_member.person.last_name}.'
           end
 
           family_member = family.add_family_member(matched_people.first, is_primary_applicant: false)
