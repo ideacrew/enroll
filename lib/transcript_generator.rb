@@ -2,10 +2,10 @@ class TranscriptGenerator
 
   attr_accessor :cv_path, :identifier
 
-  TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
+  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
-  # TRANSCRIPT_PATH = "#{Rails.root}/ivl_transcript_batch/"
+  TRANSCRIPT_PATH = "#{Rails.root}/ivl_transcript_batch/"
 
   def initialize(market = 'individual')
     @identifier = 'hbx_id'
@@ -21,15 +21,13 @@ class TranscriptGenerator
     create_directory(TRANSCRIPT_PATH)
 
     @count  = 0
-    Dir.glob("#{Rails.root}/xml_files_10_27/ivl_policy_xmls/*.xml").each do |file_path|
+    Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
       begin
         @count += 1
 
-        next if @count > 100
-
-        # individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
-        individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
-        build_transcript(individual_parser.get_enrollment_object)
+        individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
+        # individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
+        build_transcript(individual_parser.get_person_object)
 
       rescue Exception  => e
         my_logger.info("failed to process #{file_path}---#{e.to_s}")
@@ -38,8 +36,8 @@ class TranscriptGenerator
   end
 
   def build_transcript(external_obj)
-    transcript = Transcripts::EnrollmentTranscript.new
-    transcript.shop = false
+    transcript = Transcripts::PersonTranscript.new
+    # transcript.shop = false
     transcript.find_or_build(external_obj)
 
     File.open("#{TRANSCRIPT_PATH}/#{@count}_#{transcript.transcript[:identifier]}_#{Time.now.to_i}.bin", 'wb') do |file|
@@ -62,8 +60,6 @@ class TranscriptGenerator
         begin
           count += 1
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
-
-          next if count > 2000
 
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
           other_enrollment = individual_parser.get_enrollment_object
