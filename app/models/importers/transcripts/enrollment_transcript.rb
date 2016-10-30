@@ -198,6 +198,10 @@ module Importers::Transcripts
       @enrollment.update!({:effective_on => value})
     end
 
+    def update_effective_on(value)
+      @enrollment.update!({:terminated_on => value})
+    end
+
     def update_applied_aptc_amount(value)
       @enrollment.update!({:applied_aptc_amount => value})
     end
@@ -346,12 +350,20 @@ module Importers::Transcripts
     end
 
     def find_matching_person(person)
-      ::Person.match_by_id_info(
-        ssn: person.ssn,
-        dob: person.dob,
-        last_name: person.last_name,
-        first_name: person.first_name
-      )
+      if person.hbx_id.present?
+        matched_people = ::Person.where(hbx_id: person.hbx_id)
+      end
+
+      if matched_people.blank?
+        matched_people = ::Person.match_by_id_info(
+            ssn: person.ssn,
+            dob: person.dob,
+            last_name: person.last_name,
+            first_name: person.first_name
+          )
+      end
+
+      matched_people
     end
 
     def create_new_enrollment
@@ -397,8 +409,8 @@ module Importers::Transcripts
           applied_aptc_amount: @other_enrollment.applied_aptc_amount,
           coverage_kind: @other_enrollment.coverage_kind, 
           effective_on: @other_enrollment.effective_on,
-          terminated_on: @other_enrollment.terminated_on,
-          })
+          terminated_on: @other_enrollment.terminated_on
+        })
 
         hbx_enrollment.plan= ea_plan
 

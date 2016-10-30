@@ -235,12 +235,20 @@ module Transcripts
     end
 
     def match_person_instance(person)
-      ::Person.match_by_id_info(
-        ssn: person.ssn,
-        dob: person.dob,
-        last_name: person.last_name,
-        first_name: person.first_name
-        )
+      if person.hbx_id.present?
+        matched_people = ::Person.where(hbx_id: person.hbx_id)
+      end
+
+      if matched_people.blank?
+        matched_people = ::Person.match_by_id_info(
+            ssn: person.ssn,
+            dob: person.dob,
+            last_name: person.last_name,
+            first_name: person.first_name
+          )
+      end
+
+      matched_people
     end
 
     def matching_ivl_coverages(enrollment, family=nil)
@@ -248,8 +256,8 @@ module Transcripts
 
       family.active_household.hbx_enrollments.where({
         :coverage_kind => enrollment.coverage_kind, 
-        :kind => enrollment.kind, 
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+        :kind => enrollment.kind,
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc).select{|e| e.plan.active_year == enrollment.plan.active_year}
     end
 
@@ -260,7 +268,7 @@ module Transcripts
 
       family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
         :coverage_kind => enrollment.coverage_kind, 
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc)
     end
 
