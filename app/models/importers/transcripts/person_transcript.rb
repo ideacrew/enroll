@@ -4,13 +4,47 @@ module Importers::Transcripts
 
   class PersonTranscript
 
-    attr_accessor :transcript, :updates, :market
+    attr_accessor :transcript, :updates, :market, :is_subscriber
 
 
     ENUMERATION_FIELDS = {
       addresses: { enumeration_field: "kind", enumeration: ["home", "work", "mailing", "primary"] },
       phones: { enumeration_field: "kind", enumeration: Phone::KINDS },
       emails: { enumeration_field: "kind", enumeration: Email::KINDS },
+    }
+
+
+    DEPENDENT_SOURCE_RULE_MAP = {
+      base: {
+        add: 'edi', # middle name EA should be the source
+        update: {
+          first_name: 'ea',
+          middle_name: 'ea', 
+          last_name: 'ea',
+          name_sfx: 'edi',
+          gender: 'edi',
+          dob: 'edi',
+          ssn: 'edi'
+        },
+        remove: 'edi' 
+      },
+      addresses: {
+        add: 'edi',
+        update: 'edi',
+        remove: 'ea'
+      },
+      phones: {
+        add: 'edi',
+        update: 'edi',
+        remove: {
+          fax: 'edi'
+        }
+      },
+      emails: {
+        add: 'edi',
+        update: 'edi',
+        remove: 'ea'
+      }
     }
 
     SUBSCRIBER_SOURCE_RULE_MAP = {
@@ -20,7 +54,7 @@ module Importers::Transcripts
           first_name: 'edi',
           middle_name: 'edi', 
           last_name: 'edi',
-          name_suffix: 'edi',
+          name_sfx: 'edi',
           gender: 'ea',
           dob: 'ea',
           ssn: 'ea'
@@ -38,7 +72,7 @@ module Importers::Transcripts
         add: 'edi',
         update: 'edi',
         remove: {
-          kind: { fax: 'edi'}
+          fax: 'edi'
         }
       },
       emails: {
@@ -85,7 +119,7 @@ module Importers::Transcripts
       if @transcript[:source_is_new]
         create_new_person_record
       else
-        @person = find_instance
+        find_instance
         @last_updated_at = @person.updated_at
 
         @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
@@ -108,7 +142,7 @@ module Importers::Transcripts
 
       if section == :base
         attributes.each do |field, value|
-          if rule == 'edi'
+          if rule == 'edi' || (@market == 'shop' && !@is_subscriber && field.to_s == 'middle_name')
             begin
               # validate_timestamp(section)
               @person.update!({field => value})
@@ -203,7 +237,8 @@ module Importers::Transcripts
 
       if section == :base
         attributes.each do |field, value|
-          if rule[field.to_sym] == 'edi'
+          dependent_fields_ignore = ['is_incarcerated','no_dc_address','no_dc_address_reason']
+          if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi') || (@market == 'shop' && !@is_subscriber && dependent_fields_ignore.include?(field.to_s))
             begin
               validate_timestamp(section)
               @person.update!({field => nil})
@@ -259,7 +294,7 @@ module Importers::Transcripts
       end
 
       if results.empty?
-        [person_details]
+        [person_details + ['update']]
       else
         results
       end
@@ -285,14 +320,29 @@ module Importers::Transcripts
 
     def find_rule_set(section, action)
       if @market == 'shop'
-        SUBSCRIBER_SOURCE_RULE_MAP[section][action]
+        @is_subscriber ? SUBSCRIBER_SOURCE_RULE_MAP[section][action] : DEPENDENT_SOURCE_RULE_MAP[section][action]
       else
         SOURCE_RULE_MAP[section][action]
       end
     end
 
+    def check_if_subscriber
+      @is_subscriber = true if @person.primary_family.present?
+      if family = @person.families.first
+        enrollment = family.active_household.hbx_enrollments.enrolled_and_renewing.detect{|e| 
+          e.subscriber.hbx_id == @person.hbx_id
+        }
+        @is_subscriber = true if enrollment.present?
+      end
+      @is_subscriber ||= false
+    end
+
     def find_instance
-      Person.find(@transcript[:source]['_id'])
+      @person = Person.find(@transcript[:source]['_id'])
+
+      if @market == 'shop'
+        check_if_subscriber
+      end
     end
 
     def match_person
@@ -310,7 +360,11 @@ module Importers::Transcripts
 
       begin
         if match_person.blank?
-          Person.new(@transcript[:other]).save!
+          person = Person.new(@transcript[:other])
+          person.created_at = TimeKeeper.datetime_of_record
+          person.updated_at = TimeKeeper.datetime_of_record
+          person.save!
+
           @updates[:new][:new]['ssn'] = ["Success", "Created new person record"]
         else
           raise StaleRecordError, "Person already exists with Hbx ID #{match_person.hbx_id} and created on #{match_person.created_at.strftime('%m/%d/%Y')}"
