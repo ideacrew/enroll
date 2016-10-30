@@ -104,8 +104,8 @@ module Importers::Transcripts
             end
 
             if section == :plan && action == 'add'
-              plan = Plan.where(hios_id: other_enrollment.plan.hios_id, active_year: other_enrollment.plan.active_year).first
-              if plan.blank?
+              @plan = Plan.where(hios_id: other_enrollment.plan.hios_id, active_year: other_enrollment.plan.active_year).first
+              if @plan.blank?
                 raise "Plan not found with HIOS ID #{association['hios_id']} for year #{association['active_year']}."
               end
             end
@@ -177,8 +177,8 @@ module Importers::Transcripts
     end
 
     def add_plan(association)
-      plan = Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
-      @enrollment.update_attributes({ plan_id: plan.id, carrier_profile_id: plan.carrier_profile_id })
+      @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
+      @enrollment.update_attributes({ plan_id: @plan.id, carrier_profile_id: @plan.carrier_profile_id })
     end
 
     def add_hbx_enrollment_members(association)
@@ -415,9 +415,9 @@ module Importers::Transcripts
           coverage_kind: @other_enrollment.coverage_kind, 
           effective_on: @other_enrollment.effective_on,
           terminated_on: @other_enrollment.terminated_on,
-          submitted_at: TimeKeeper.date_of_record,
-          created_at: TimeKeeper.date_of_record,
-          udpated_at: TimeKeeper.date_of_record
+          submitted_at: TimeKeeper.datetime_of_record,
+          created_at: TimeKeeper.datetime_of_record,
+          udpated_at: TimeKeeper.datetime_of_record
         })
 
         hbx_enrollment.plan= ea_plan
