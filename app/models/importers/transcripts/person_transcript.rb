@@ -235,17 +235,17 @@ module Importers::Transcripts
     end
 
     def csv_row
-      @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+      if @transcript[:source_is_new]
+        person_details = [@transcript[:other]['hbx_id'], Person.decrypt_ssn(@transcript[:other]['encrypted_ssn']), @transcript[:other]['last_name'], @transcript[:other]['first_name']]
+      else
+        person_details = [@transcript[:source]['hbx_id'], Person.decrypt_ssn(@transcript[:source]['encrypted_ssn']), @transcript[:source]['last_name'], @transcript[:source]['first_name']]
+      end
+
+      results = @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
+
         section_rows += actions.reduce([]) do |rows, action|
           attributes = @comparison_result.changeset_content_at [section, action]
-
-          if @transcript[:source_is_new]
-            person_details = [@transcript[:other]['hbx_id'], Person.decrypt_ssn(@transcript[:other]['encrypted_ssn']), @transcript[:other]['last_name'], @transcript[:other]['first_name']]
-          else
-            person_details = [@transcript[:source]['hbx_id'], Person.decrypt_ssn(@transcript[:source]['encrypted_ssn']), @transcript[:source]['last_name'], @transcript[:source]['first_name']]
-          end
-
           fields_to_ignore = ['_id', 'updated_by']
 
           rows += attributes.collect do |attribute, value|
@@ -256,6 +256,12 @@ module Importers::Transcripts
             (person_details + [action, "#{section}:#{attribute}", value] + (@updates[action.to_sym][section][attribute] || []))
           end
         end
+      end
+
+      if results.empty?
+        [person_details]
+      else
+        results
       end
     end
 

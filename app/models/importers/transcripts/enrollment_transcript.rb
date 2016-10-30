@@ -288,17 +288,18 @@ module Importers::Transcripts
       @people_cache = {}
       @plan = nil
 
-      @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+      plan_details = (@transcript[:plan_details].present? ? @transcript[:plan_details].values : 4.times.map{nil})
+      person_details = [
+        @transcript[:primary_details][:hbx_id],
+        @transcript[:primary_details][:ssn], 
+        @transcript[:primary_details][:last_name], 
+        @transcript[:primary_details][:first_name]
+      ]
+
+      results = @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
           attributes = @comparison_result.changeset_content_at [section, action]
-
-          person_details = [
-            @transcript[:primary_details][:hbx_id],
-            @transcript[:primary_details][:ssn], 
-            @transcript[:primary_details][:last_name], 
-            @transcript[:primary_details][:first_name]
-          ]
 
           fields_to_ignore = ['_id', 'updated_by']
           rows = []
@@ -308,7 +309,6 @@ module Importers::Transcripts
               value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
 
-            plan_details = (@transcript[:plan_details].present? ? @transcript[:plan_details].values : 4.times.map{nil})
             action_taken = (@updates[:update_failed].present? ? @updates[:update_failed] : @updates[action.to_sym][section][attribute])
 
             if value.is_a?(Array)
@@ -319,9 +319,14 @@ module Importers::Transcripts
               rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value] + (action_taken || []))
             end   
           end
-
           rows
         end
+      end
+
+      if results.empty?
+        ([[@transcript[:identifier]] + person_details + plan_details + ['update']])
+      else
+        results
       end
     end
 

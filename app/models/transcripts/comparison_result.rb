@@ -74,19 +74,19 @@ module Transcripts
     end
 
     def csv_row
-      changeset_sections.reduce([]) do |section_rows, section|
+      if @person[:source_is_new]
+        person_details = [@person[:other]['hbx_id'], Person.decrypt_ssn(@person[:other]['encrypted_ssn']), @person[:other]['last_name'], @person[:other]['first_name']]
+      else
+        person_details = [@person[:source]['hbx_id'], Person.decrypt_ssn(@person[:source]['encrypted_ssn']), @person[:source]['last_name'], @person[:source]['first_name']]
+      end
+
+      results = changeset_sections.reduce([]) do |section_rows, section|
         actions = changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
           attributes = changeset_content_at [section, action]
-          if @person[:source_is_new]
-            person_details = [@person[:other]['hbx_id'], Person.decrypt_ssn(@person[:other]['encrypted_ssn']), @person[:other]['last_name'], @person[:other]['first_name']]
-          else
-            person_details = [@person[:source]['hbx_id'], Person.decrypt_ssn(@person[:source]['encrypted_ssn']), @person[:source]['last_name'], @person[:source]['first_name']]
-          end
-
+    
           fields_to_ignore = ['_id', 'updated_by']
           rows += attributes.collect do |attribute, value|
-
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
               value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
@@ -95,6 +95,12 @@ module Transcripts
             (person_details + [action, "#{section}:#{attribute}", value])
           end
         end
+      end
+
+      if results.blank?
+        [person_details + ['update']]
+      else
+        results
       end
     end
 

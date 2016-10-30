@@ -74,11 +74,7 @@ class TranscriptGenerator
           enrollment_transcript.process
 
           rows = enrollment_transcript.csv_row
-
-          next unless rows.present?
-
           first_row = rows[0]
-
           enrollment_removes = rows.select{|row| row[9] == 'remove' && row[10] == 'enrollment:hbx_id'}
 
           rows.reject!{|row| row[9] == 'update' && row[11].blank?}
@@ -174,8 +170,6 @@ class TranscriptGenerator
           person_importer.process
 
           rows = person_importer.csv_row
-
-          next unless rows.present?
 
           first_row = rows[0]
           rows.reject!{|row| row[4] == 'update' && row[6].blank?}
