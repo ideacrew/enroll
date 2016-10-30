@@ -33,14 +33,14 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
 
       context "and the Family with both active Individual Market Health and Dental plan Enrollments is renewed" do
         it "should create a new Health enrollment"
-        it "the new enrollment should have a Health plan valid for the upcoming calendar year"
-        it "the new enrollment should have a Jan 1 of next calendar year effective date"
+        it "the new enrollment's health plan should be valid for the upcoming calendar year"
+        it "the new enrollment's effective date should be Jan 1 of next calendar year"
         it "the new enrollment should include all the enrollees from the current plan year"
-        it "the new enrollment should have a calculatable premium"
+        it "the new enrollment should successfully calculate premium"
 
         it "should create a new Dental plan enrollment"
-        it "the new enrollment should have a Dental plan valid for the upcoming calendar year"
-        it "the new enrollment should have a Jan 1 of next calendar year effective date"
+        it "the new enrollment's dental plan should be valid for the upcoming calendar year"
+        it "the new enrollment's effective date should be Jan 1 of next calendar year"
         it "the new enrollment should include all the enrollees from the current plan year"
         it "the new enrollment should have a calculatable premium"
 
@@ -60,14 +60,23 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
       end
 
       context "and the Family with an active 'Assisted Individual Market Health plan Enrollment only' is renewed" do
-        it "the renewed enrollment should have the same APTC percentage as the base enrollment"
 
-        context "and there is a financial assistance redetermination valid for the new plan year" do
-          it "the Family's TaxHousehold should have a financial assistance redetermination valid for the new plan year"
-        end
+        context "and a financial eligibility determination is found" do
+          context "and the determination end date is earlier than Jan 1 of the next calendar year" do
+            it "the renewed enrollment should have $0 APTC for the new plan year"
 
-        context "and there is not a financial assistance redetermination valid for the new plan year" do
-          it "the renewed enrollment should have $0 APTC for the new plan year"
+            context "and the renewed enrollment is a silver plan" do
+              it "the renewed plan should not have a CSR variant"
+            end
+          end
+
+          context "and the financial assistance redetermination has no end date" do
+            it "the renewed enrollment should have the same APTC percentage as the current enrollment"
+
+            context "and the renewed enrollment is a silver plan" do
+              it "the renewed plan should not have the CSR variant from the financial redetermination"
+            end
+          end
         end
       end
 
