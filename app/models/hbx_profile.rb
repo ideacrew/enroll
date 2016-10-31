@@ -116,9 +116,7 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  # IndividualEnrollmentDueDayOfMonth = 15
-  # Temporary change for Dec 2015 extension
-  IndividualEnrollmentDueDayOfMonth = 18
+  IndividualEnrollmentDueDayOfMonth = 15
   IndividualEnrollmentTerminationMinimum = 14.days
 
   ## Carriers
