@@ -13,7 +13,6 @@ module Aws
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
       begin
         object = get_object(bucket_name, key)
-        byebug
         if object.upload_file(file_path, :server_side_encryption => 'AES256')
           uri
         else
