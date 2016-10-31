@@ -5,9 +5,8 @@ namespace :reports do
 
     desc "Report of all people records associated with email address ending in @advita.com"
     task :people_with_email_advita_list => :environment do
-       #need to check person with email: @advita.com
-      people = Person.where()
-
+      people=Person.where(:'emails.address'=>/@advita.com$/i)
+      #people=Person.where(:'emails.address'=>/@/i)
       field_names  = %w(
           hbx_id
           first_name
@@ -17,8 +16,6 @@ namespace :reports do
           created_at(date/time)
         )
       processed_count = 0
-
-
       file_name = "#{Rails.root}/people_with_email_advita_list.csv"
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -26,17 +23,12 @@ namespace :reports do
         people.each do |p|
 
           csv << [
-
-
-          created_at(date/time)
               p.hbx_id,
               p.first_name,
               p.last_name,
               p.try(:emails).try(:address),
               p.try(:phones).try(:full_phone_number),
               p.created_at
-
-
           ]
         end
         processed_count += 1
