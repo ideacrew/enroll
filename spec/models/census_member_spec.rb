@@ -7,6 +7,7 @@ RSpec.describe CensusMember, :dbclean => :after_each do
   
   let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let(:email) {census_employee.email}
 
   it "sets gender" do
     census_employee.gender = "MALE"
@@ -59,6 +60,18 @@ RSpec.describe CensusMember, :dbclean => :after_each do
       census_employee.gender = nil
       expect(census_employee.valid?).to eq false
       expect(census_employee).to have_errors_on(:gender)
+    end
+  end
+  
+  context "allow email adress to be updated to nil" do
+    it "should have email present" do
+      expect(census_employee.email).to eq email
+    end
+    
+    it "email should be updated to nil" do 
+      census_employee.email.update(address:'', kind:'')
+      expect(census_employee.email.address).to eq ""
+      expect(census_employee.email.kind).to eq ""
     end
   end
 end
