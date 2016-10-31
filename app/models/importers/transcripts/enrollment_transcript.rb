@@ -7,15 +7,12 @@ module Importers::Transcripts
   class EnrollmentTranscript
 
     attr_accessor :transcript, :updates, :market, :other_enrollment
+    include Transcripts::EnrollmentCommon
 
     ENUMERATION_FIELDS = {
       plan: { enumeration_field: "hios_id", enumeration: [ ]},
       hbx_enrollment_members: { enumeration_field: "hbx_id", enumeration: [ ]},
       broker: { enumeration_field: "npn", enumeration: [ ]}
-    }
-
-    SUBSCRIBER_SOURCE_RULE_MAP = {
-
     }
 
     SOURCE_RULE_MAP = {
@@ -54,7 +51,6 @@ module Importers::Transcripts
 
     def process
       @updates = {}
-      @people_cache = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
 
       if @transcript[:source_is_new]
@@ -83,6 +79,19 @@ module Importers::Transcripts
       end
     end
 
+    def find_exact_enrollment_matches(enrollments)
+      enrollment_hbx_ids = @enrollment.hbx_enrollment_members.map(&:hbx_id)
+
+      enrollments.reject! do |en|
+        en_hbx_ids = en.hbx_enrollment_members.map(&:hbx_id)
+        en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
+      end
+
+      enrollments.reject!{|en| (en.plan_id != @enrollment.plan_id)}
+      enrollments.reject!{|en| (en.effective_on != @enrollment.effective_on)}
+      enrollments
+    end
+
     def validate_update
       # action section atribute value
 
@@ -94,11 +103,27 @@ module Importers::Transcripts
           attributes.each do |attribute, value|
 
             if section == :base
-              if action == 'update' ||  action == 'add'
+              if action == 'update'
                 if attribute == 'effective_on'
                   if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
                     raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
                   end
+                end
+              elsif action == 'add'
+                if attribute == 'terminated_on'
+                  enrollments = (@market == 'shop' ? matching_shop_coverages(@enrollment) : matching_ivl_coverages(@enrollment))
+                  enrollments.reject!{|e| e == @enrollment}
+
+                  @exact_enrollment_matches = find_exact_enrollment_matches(enrollments)
+                  other_coverages = enrollments - @exact_enrollment_matches
+
+                  if other_coverages.any?
+                    message = "Enrollment can't be termed."
+                    message += "Found other active coverages #{other_coverages.map(&:hbx_id).join(',')}."
+                    message += "Found duplicate coverages #{@exact_enrollment_matches.map(&:hbx_id).join(',')}." if @exact_enrollment_matches.any?
+                    raise message
+                  end
+
                 end
               end
             end
@@ -115,7 +140,7 @@ module Importers::Transcripts
                 
                 hbx_id = (action == 'add' ? value["hbx_id"] : attribute.split(':')[1])            
                 enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|em| em.hbx_id == hbx_id}
-                matched_people = find_matching_person(enrollment_member.person)
+                matched_people = match_person_instance(enrollment_member.person)
 
                 if matched_people.blank?
                   raise PersonMissingError, 'Hbx Enrollment member person record missing in EA.'
@@ -142,8 +167,13 @@ module Importers::Transcripts
 
       if section == :base
         attributes.each do |field, value|
-          if rule == 'edi'
-            send("add_#{field}", value)
+          if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')
+            begin
+              send("add_#{field}", value)
+              log_success(:add, section, field)
+            rescue Exception => e
+              @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
+            end
           else
             log_ignore(:add, section, field)
           end
@@ -168,7 +198,7 @@ module Importers::Transcripts
 
     def add_terminated_on(termination_date)
       if termination_date > TimeKeeper.date_of_record
-        enrolllment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
+        @enrollment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
       else
         @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
       end
@@ -183,7 +213,7 @@ module Importers::Transcripts
 
     def add_hbx_enrollment_members(association)
       other_enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|member| member.family_member.hbx_id == association['hbx_id']}
-      matching_person = find_matching_person(other_enrollment_member.family_member.person).first
+      matching_person = match_person_instance(other_enrollment_member.family_member.person).first
 
       family = @enrollment.family
       family_member = family.add_family_member(matching_person, is_primary_applicant: false)
@@ -351,35 +381,11 @@ module Importers::Transcripts
     end
 
     def find_rule_set(section, action)
-      if @market == 'shop'
-        SUBSCRIBER_SOURCE_RULE_MAP[section][action]
-      else
-        SOURCE_RULE_MAP[section][action]
-      end
+      SOURCE_RULE_MAP[section][action]
     end
 
     def find_instance
       ::HbxEnrollment.find(@transcript[:source]['_id'])
-    end
-
-    def find_matching_person(person)
-      return @people_cache[person.hbx_id] if @people_cache[person.hbx_id].present?
-
-      if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id)
-      end
-
-      if matched_people.blank?
-        matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
-      end
-
-      @people_cache[person.hbx_id] = matched_people
-      matched_people
     end
 
     def create_new_enrollment
@@ -388,7 +394,7 @@ module Importers::Transcripts
 
       begin
         primary_applicant = @other_enrollment.family.primary_applicant
-        matched_people = find_matching_person(primary_applicant.person)
+        matched_people = match_person_instance(primary_applicant.person)
 
         if matched_people.size > 1
           raise AmbiguousMatchError, 'Found multiple people in EA with given subscriber.'
@@ -437,7 +443,7 @@ module Importers::Transcripts
         hbx_enrollment.plan= ea_plan
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
-          matched_people = find_matching_person(member.family_member.person)
+          matched_people = match_person_instance(member.family_member.person)
           if matched_people.size > 1
             raise AmbiguousMatchError, "Found multiple people matches for #{member.family_member.person.first_name} #{member.family_member.person.last_name}."
           end
