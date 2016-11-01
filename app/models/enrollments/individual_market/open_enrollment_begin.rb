@@ -22,7 +22,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     def query_criteria
       {
         :kind => 'individual',
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"],
+        :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS
         # :effective_on.gte => HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on
       }
     end
@@ -48,14 +49,15 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
       count = 0
       families.each do |family|
-        HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
           # begin
-            enrollments = family.active_household.hbx_enrollments.where(query_criteria.merge({coverage_kind: coverage_kind})).order(:"effective_on".desc)
-            enrollments.reject!{|en| !HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
+            enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
+            enrollments = enrollments.select{|en| HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
+            # hbxe = enrollments.reduce([]) { |list, en| list << en if HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
 
             enrollments.each do |enrollment|
               next if has_catastrophic_plan?(enrollment) || is_individual_assisted?(enrollment)
 
+              puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
               count += 1
 
               if count % 100 == 0
@@ -73,7 +75,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           # rescue Exception => e 
           #   @logger.info "Failed #{family.e_case_id} Exception: #{e.inspect}"
           # end
-        end
       end
       puts count
     end
