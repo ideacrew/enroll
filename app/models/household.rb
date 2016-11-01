@@ -73,7 +73,7 @@ class Household
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
-        end_date: verified_tax_household.end_date,
+        curam_import_end_date: verified_tax_household.end_date,
         is_eligibility_determined: true,
         submitted_at: verified_tax_household.submitted_at
       )

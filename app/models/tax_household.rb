@@ -21,7 +21,7 @@ class TaxHousehold
 
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
-  field :end_date, type: Date
+  field :curam_import_end_date, type: Date
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members
