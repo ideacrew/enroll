@@ -52,20 +52,20 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
 
     if @employee_role.present?
-      @ce = CensusEmployee.find(@employee_role.census_employee_id)  
+      @ce = CensusEmployee.find(@employee_role.census_employee_id)
     end
     #if @employee_role.present?
      # ce = CensusEmployee.find(@employee_role.census_employee_id)
       # checking for future hire
       #if ce.hired_on > ce.created_at
        # @future_hire = true
-     
+
      # else
-      
-      #  @future_hire = false  
-      
-      #end  
-    #end 
+
+      #  @future_hire = false
+
+      #end
+    #end
     #binding.pry
     respond_to do |format|
       format.html
@@ -76,6 +76,7 @@ class Insured::FamiliesController < FamiliesController
 
     set_bookmark_url
     @family_members = @family.active_family_members
+    @resident = @person.has_active_resident_role?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -133,6 +134,8 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
+    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
+    @resident = @person.resident_role.present?
     respond_to do |format|
       format.html
     end
@@ -240,7 +243,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     doc_uri = Aws::S3Storage.save(file_path, 'notices')
-    
+
     if doc_uri.present?
       notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
                                       format: file_content_type})
