@@ -78,12 +78,16 @@ module Importers::Transcripts
       @updates = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
 
+      @enrollment = find_instance
+
       if @transcript[:source_is_new]
         if valid_new_request
           create_new_enrollment
+          @enrollment ||= @new_enrollment
         end
-      else
-        @enrollment = find_instance
+      end
+
+      if true
         begin
           validate_update
 
@@ -93,9 +97,9 @@ module Importers::Transcripts
             section_rows += actions.reduce([]) do |rows, action|
               attributes = @comparison_result.changeset_content_at [section, action]
 
-              if section != :enrollment
+              if section != :enrollment && section != :new
                 rows << send(action, section, attributes)
-              else
+              elsif section == :enrollment
                 if action == 'remove'
                   @updates[:remove] ||={}
                   @updates[:remove][:enrollment] ||={}
@@ -103,6 +107,8 @@ module Importers::Transcripts
                 else
                   log_ignore(action.to_sym, section, 'hbx_id')
                 end
+                rows
+              else
                 rows
               end
             end
@@ -114,11 +120,19 @@ module Importers::Transcripts
     end
 
     def process_enrollment_remove(attributes)
-      family = @enrollment.family
+      if @enrollment.blank?
+        subscriber = @other_enrollment.family.primary_applicant
+        matched_people = match_person_instance(subscriber.person)
+        matched_person = matched_people.first
+        family= Family.find_all_by_person(matched_person).first
+      else
+        family = @enrollment.family
+      end
+
       enrollments = attributes['hbx_id']
       enrollments.each do |enrollment_hash|
         enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-        if enrollment.effective_on == @enrollment.effective_on && (enrollment.terminated_on.present? && enrollment.effective_on >= enrollment.terminated_on)
+        if (@enrollment.present? && enrollment.effective_on == @enrollment.effective_on) && (enrollment.terminated_on.present? && enrollment.effective_on >= enrollment.terminated_on)
           enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
            @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment canceled successfully"]
         else
@@ -620,7 +634,7 @@ module Importers::Transcripts
         end
 
         family.save!
-
+        @new_enrollment = hbx_enrollment
         @updates[:new][:new]['hbx_id'] = ["Success", "Enrollment added successfully using EDI source"]
       rescue Exception => e
         @updates[:new][:new]['hbx_id'] = ["Failed", "#{e.inspect}"]
