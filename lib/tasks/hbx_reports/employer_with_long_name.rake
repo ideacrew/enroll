@@ -20,7 +20,7 @@ namespace :reports do
         csv << field_names
         organizations.each do |o|
           e=o.employer_profile
-          if (e.legal_name.length>=60)||(e.dba.length>=60)
+          if (!e.legal_name.blank? && e.legal_name.length>=60)||(!e.dba.blank? && e.dba.length>=60)
             if o.employer_profile.profile_source.downcase == 'conversion'
               conversion=true
             else
