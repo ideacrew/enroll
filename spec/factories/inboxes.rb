@@ -5,8 +5,5 @@ FactoryGirl.define do
         create_list(:message, 2, inbox: i)
       end
     end
-
   end
 end
-
-
