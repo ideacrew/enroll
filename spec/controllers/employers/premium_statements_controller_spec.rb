@@ -29,8 +29,6 @@ RSpec.describe Employers::PremiumStatementsController do
   let(:census_employee) {
     double("CensusEmployee",
       full_name: "my full name",
-      first_name: "my first name",
-      last_name: "my last name",
       ssn: "my ssn",
       dob: "my dob",
       hired_on: "my hired_on",
