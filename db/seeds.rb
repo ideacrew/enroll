@@ -103,7 +103,7 @@ if missing_plan_dumps
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
 
   puts "*"*80
-  system "bundle exec rake update:cat_age_off_renewal_plan"
+  system "bundle exec rake migrations:cat_age_off_renewal_plan"
   puts "*"*80
 
   require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
