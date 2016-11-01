@@ -92,6 +92,7 @@ paper_notice: 'paper-notices'
 checkbook_services: 
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://staging.checkbookhealth.org"
+    url: "https://staging.checkbookhealth.org/shop/dc/"
 
 
 
