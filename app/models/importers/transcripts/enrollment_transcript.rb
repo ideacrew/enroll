@@ -27,7 +27,9 @@ module Importers::Transcripts
           hbx_id: 'edi',
           effective_on: 'edi'
         },
-        remove: 'ignore'
+        remove: {
+          terminated_on: 'edi'
+        }
       },
       plan: {
         add: 'ignore',
@@ -239,7 +241,7 @@ module Importers::Transcripts
               send("add_#{field}", value)
               log_success(:add, section, field)
             rescue Exception => e
-              @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
+              @updates[:add][section][field] = ["Failed", "#{e.inspect}"]
             end
           else
             log_ignore(:add, section, field)
@@ -307,6 +309,15 @@ module Importers::Transcripts
         @enrollment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
       else
         @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
+      end
+    end
+
+    def remove_terminated_on(value)
+      @enrollment.update!({:terminated_on => nil})
+      @enrollment.update!({:aasm_state => 'coverage_selected'})
+
+      @enrollment.hbx_enrollment_members.each do |member|
+        member.update!({coverage_end_on: nil})
       end
     end
 
@@ -407,6 +418,12 @@ module Importers::Transcripts
       if section == :base
         attributes.each do |field, value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')
+            begin
+              send("remove_#{field}", value)
+              log_success(:remove, section, field)
+            rescue Exception => e
+              @updates[:remove][section][field] = ["Failed", "#{e.inspect}"]
+            end
           else
             log_ignore(:remove, section, field)
           end
@@ -417,9 +434,9 @@ module Importers::Transcripts
           if rule == 'edi' || (rule.is_a?(Hash) && rule[identifier.to_sym] == 'edi')
             begin
               send("#{section}_#{identifier}_remove", value)
-              log_success(:update, section, identifier)
+              log_success(:remove, section, identifier)
             rescue Exception => e
-              @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+              @updates[:remove][section][identifier] = ["Failed", "#{e.inspect}"]
             end
           else
             log_ignore(:remove, section, identifier)
