@@ -1,6 +1,6 @@
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
-  attr_accessor :enrollment
+  attr_accessor :enrollment, :renewal_benefit_coverage_period
 
   def initialize
     @logger = Logger.new("#{Rails.root}/log/ivl_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
@@ -21,7 +21,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment = @enrollment.family.active_household.hbx_enrollments.new
 
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
-    renewal_enrollment.effective_on = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on
+    renewal_enrollment.effective_on = @renewal_benefit_coverage_period.start_on
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = "individual"
@@ -65,8 +65,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     eligible_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       members << HbxEnrollmentMember.new({
         applicant_id: hbx_enrollment_member.applicant_id,
-        eligibility_date: HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on,
-        coverage_start_on: HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on,
+        eligibility_date: @renewal_benefit_coverage_period.start_on,
+        coverage_start_on: @renewal_benefit_coverage_period.start_on,
         is_subscriber: hbx_enrollment_member.is_subscriber
       })
     end

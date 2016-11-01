@@ -47,11 +47,14 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
     def process
 
+      current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
       count = 0
       families.each do |family|
           # begin
             enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
-            enrollments = enrollments.select{|en| HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
+            enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
             # hbxe = enrollments.reduce([]) { |list, en| list << en if HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
 
             enrollments.each do |enrollment|
@@ -70,6 +73,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
               enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
               enrollment_renewal.enrollment = enrollment
+              enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
               enrollment_renewal.renew
             end
           # rescue Exception => e 
