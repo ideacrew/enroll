@@ -579,6 +579,7 @@ module Importers::Transcripts
         })
 
         hbx_enrollment.plan= ea_plan
+        hbx_enrollment.select_coverage
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
