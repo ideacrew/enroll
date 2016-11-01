@@ -27,7 +27,6 @@ FactoryGirl.define do
         premium_tables_count 48
       end
 
-
       after(:create) do |plan, evaluator|
         create_list(:premium_table, evaluator.premium_tables_count, plan: plan)
       end
@@ -85,7 +84,6 @@ FactoryGirl.define do
       metal_level "dental"
       dental_level "high"
     end
-
 
     trait :ivl_dental do
       market "individual"
