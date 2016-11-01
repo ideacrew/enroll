@@ -2,6 +2,14 @@
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
+<style type="text/css" media="screen,print"> 
+.break{ 
+   display: block;
+   clear: both;
+   page-break-after: always;
+}
+</style>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -18,21 +26,52 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Open enrollment for health and/or dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+<% if notice.current_health_enrollment.present? %>
+
+<% if (notice.current_health_enrollment.plan.hsa_plan == true) && (notice.current_health_enrollment.plan.plan_carrier == "CareFirst") %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "During open enrollment you can shop for new coverage.  Last open enrollment, our customers who shopped saved an average of 5% on their premiums.  We have new online tools powered by Consumers’ CHECKBOOK.  The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate.  New for 2017, Plan Match shows you how each plan covers your prescription medication.  If you’d like in person help, DC Health Link certified insurance experts are ready to assist you."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Remember if you do not select a new plan, we will automatically renew your current coverage or renew you into the most comparable 2017 coverage."} %>
+  content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "<strong>TIPS:</strong>",
-  listings: ["<strong>Shop and save during open enrollment:</strong> Open enrollment begins November 1, 2016 and ends January 31, 2017. To make sure your new plan is active by January 1, 2017, you must complete your plan selection no later than December 15, 2016. If you do not select a new plan, we will renew your coverage in the same plan or a similar one for 2017.","<strong>Pay your premiums: </strong> You must continue to pay your premiums for your 2016 plan on time to have your coverage renewed for 2017. You must also make sure to update any auto-payment arrangements you have made either directly with your insurance company or with your bank to make sure the new 2017 premium is being paid. <u>If you do not do so, and do not make payments through another method, your 2017 plan will be terminated.</u>"]} %>
+  previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
+  listings: ["Shopping is even more important this year because CareFirst BlueCross BlueShield is ending the plan in which you are currently enrolled and not offering other HSA plans.","Kaiser Permanente is offering HSA compatible plans. We are working on expanding access to HSA qualified plans for 2018.","People currently in the plan being discontinued will be automatically renewed into the most comparable CareFirst plan for 2017, unless they choose a new plan during open enrollment.","CareFirst has increased its premiums for 2017. The premium for the most similar CareFirst plan into which you will be renewed is indicated in the “Choose Your 2017 Plan” section of this notice."]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "The rest of this notice has important information to ensure you are successfully enrolled into health and/or dental coverage in 2017."} %>
+  content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, DC Health Link certified insurance experts are ready to assist you."} %>
+
+<% elsif (notice.current_health_enrollment.plan.hsa_plan == false) && (notice.current_health_enrollment.plan.plan_carrier == "CareFirst") %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
+  listings: ["Shopping is even more important this year because CareFirst BlueCross BlueShield is ending the plan in which you are currently enrolled.","People currently in the plan being discontinued will be automatically renewed into the most comparable CareFirst plan for 2017, unless they choose a new plan during open enrollment.","CareFirst has increased its premiums for 2017. The premium for the most similar CareFirst plan into which you will be renewed is indicated in the “Choose Your 2017 Plan” section of this notice."]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, DC Health Link certified insurance experts are ready to assist you."} %>
+
+<% elsif (notice.current_health_enrollment.plan.plan_carrier == "Kaiser") %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
+  listings: ["Shopping is even more important this year because #{notice.current_health_enrollment.plan_carrier} has increased its premiums for 2017. The premium for the <health insurance company> plan into which you will be renewed is indicted in the “Choose Your 2017 Plan” section of this notice."]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, DC Health Link certified insurance experts are ready to assist you."} %>
+
+<% end %>
+
+<% elsif (notice.current_health_enrollment.blank?) && (notice.current_dental_enrollment.present?) %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link. During open enrollment you can shop for new coverage."} %>
+
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You can review your plan options, search for plans that include your doctors and prescriptions, and get annual out-of-pocket estimates on www.dchealthlink.com. If you would like a different plan for 2017, you must choose it during open enrollment. The date your new plan will start depends on when you finish shopping for your new plan:"],
@@ -47,33 +86,41 @@ content: "After January 31, 2017, you won’t be able to sign up for a plan or c
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>If you do not select a different plan, you will be automatically enrolled in these plans starting January 1, 2017 and your premiums each month will be as follows:</strong>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Health Plan: «M 2017 Health Plan»</span>"} %>
-
-  <table style='margin: 0px auto;' width='80%'>
-    <tr>
-      <td>
-        <strong>Your monthly premium:</strong>
-      </td>
-      <td align=right>
-        <strong>«M 2017 Health Plan Premium»</strong>
-      </td>
-    </tr>
-  </table>
+<% if notice.renewal_health_enrollment.present? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Dental Plan: «M 2017 Dental Plan»</span>"} %>
+  content: "<span style='text-decoration:underline;'>Health Plan: #{notice.renewal_health_enrollment.plan.plan_name}</span>"} %>
 
-  <table style='margin: 0px auto;' width='80%'>
-    <tr>
-      <td>
-        <strong>Your monthly premium:</strong>
-      </td>
-      <td align=right>
-        <strong>«M 2017 Dental Plan Premium»</strong>
-      </td>
-    </tr>
-  </table>
+<table style='margin: 0px auto;' width='80%'>
+  <tr>
+    <td>
+      <strong>Your monthly premium:</strong>
+    </td>
+    <td align=right>
+      <strong><%= notice.renewal_health_enrollment.premium %></strong>
+    </td>
+  </tr>
+</table>
+
+<% end %>
+
+<% if notice.renewal_dental_enrollment.present? %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.renewal_dental_enrollment.plan.plan_name}</span>"} %>
+
+<table style='margin: 0px auto;' width='80%'>
+  <tr>
+    <td>
+      <strong>Your monthly premium:</strong>
+    </td>
+    <td align=right>
+      <strong><%= notice.renewal_dental_enrollment.premium %></strong>
+    </td>
+  </tr>
+</table>
+
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Remember, our customers who shopped last open enrollment saved on average 5% on their premiums.  If you do not shop or select a new plan, we will automatically renew your coverage in these plans for 2017.</strong>"} %>
