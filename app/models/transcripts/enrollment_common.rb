@@ -13,7 +13,9 @@ module Transcripts
         :coverage_kind => enrollment.coverage_kind, 
         :kind => enrollment.kind,
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-        }).order_by(:effective_on.asc).select{|e| e.plan.active_year == enrollment.plan.active_year}
+        }).order_by(:effective_on.asc)
+        .select{|e| e.plan.active_year == enrollment.plan.active_year}
+        .reject{|en| en.subscriber.hbx_id != enrollment.subscriber.hbx_id}
     end
 
     def matching_shop_coverages(enrollment, family=nil)
@@ -25,6 +27,7 @@ module Transcripts
         :coverage_kind => enrollment.coverage_kind, 
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc)
+        .reject{|en| en.subscriber.hbx_id != enrollment.subscriber.hbx_id}
     end
 
     def match_person_instance(person)

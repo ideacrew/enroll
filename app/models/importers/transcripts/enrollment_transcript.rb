@@ -49,6 +49,27 @@ module Importers::Transcripts
       }
     }
 
+    def initialize
+      @other_enrollment = HbxEnrollment.new(transcript[:other])
+    end
+
+
+ def fix_enrollment_coverage_start(enrollment)
+      maximum_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
+      maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
+      if maximum_end_date.present?
+        enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
+      else
+        enrollment.effective_on = maximum_start_date
+      end
+
+      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
+      enrollment.hbx_enrollment_members.each do |member| 
+        member.coverage_start_on = enrollment.effective_on
+      end
+      enrollment
+    end
+
     def process
       @updates = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
@@ -393,8 +414,8 @@ module Importers::Transcripts
       @updates[:new][:new] ||= {} 
 
       begin
-        primary_applicant = @other_enrollment.family.primary_applicant
-        matched_people = match_person_instance(primary_applicant.person)
+        subscriber = @other_enrollment.family.primary_applicant
+        matched_people = match_person_instance(subscriber.person)
 
         if matched_people.size > 1
           raise AmbiguousMatchError, 'Found multiple people in EA with given subscriber.'
@@ -405,20 +426,21 @@ module Importers::Transcripts
         end
 
         matched_person = matched_people.first
+        families = Family.find_all_by_person(matched_person)
 
-        if matched_person.consumer_role.blank?
-          raise PersonMissingError, 'Consumer role missing.'
+        if families.empty?
+          if matched_person.age_on(@other_enrollment.effective_on) < 18
+            raise 'Unknown primary member -- subscriber is < 18 years old'
+          end
+
+          role = Factories::EnrollmentFactory.build_consumer_role(matched_person, false)
+          if matched_person.save
+            role.save
+          else
+            raise "unable to update person"
+          end
         end
 
-        if matched_person.families.size > 1
-          raise AmbiguousMatchError, 'Found multiple families in EA for the given subscriber.'
-        end
-
-        if matched_person.families.size == 0
-          raise "Families don't exist for the given subscriber in EA."
-        end
-
-        family = matched_person.families.first
         plan = @other_enrollment.plan
         ea_plan = Plan.where(hios_id: plan.hios_id, active_year: plan.active_year).first
 

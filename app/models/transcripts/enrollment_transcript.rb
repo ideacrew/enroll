@@ -61,9 +61,46 @@ module Transcripts
       end
     end
 
+    def fix_enrollment_coverage_start(enrollment)
+      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
+
+      if enrollment.hbx_enrollment_members.any?{|member| member.coverage_end_on.blank?}
+
+        maximum_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
+        maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
+
+        if maximum_end_date.present?
+          enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
+        else
+          enrollment.effective_on = maximum_start_date
+        end
+
+        enrollment.hbx_enrollment_members.each do |member| 
+          member.coverage_start_on = enrollment.effective_on
+        end
+      end
+
+      enrollment
+    end
+
+    def enrollment_members_not_matched?(enrollment)      
+      # enrollment_hbx_ids = @enrollment.hbx_enrollment_members.map(&:hbx_id)
+      # en_hbx_ids = enrollment.hbx_enrollment_members.map(&:hbx_id)
+      # en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
+
+      (@enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) != 0 ? true : false
+    end
+
     def find_or_build(enrollment)
+      enrollment = fix_enrollment_coverage_start(enrollment)
       @transcript[:other] = enrollment
+
       match_instance(enrollment)
+
+      if @enrollment.present? && (enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on)
+        @duplicate_coverages << @enrollment
+        @enrollment = nil
+      end
 
       if @enrollment.present?
         @transcript[:source_is_new] = false
@@ -120,7 +157,6 @@ module Transcripts
         @transcript[:compare] = differences
         return
       end
-
       differences[:base] = compare(base_record: @transcript[:source], compare_record: @transcript[:other])
 
       self.class.enumerated_associations.each do |association|
@@ -129,7 +165,6 @@ module Transcripts
 
       @transcript[:compare] = differences
     end
-
 
     def compare_assocation(source, other, differences, attr_val)
       assoc_class = (source || other).class.to_s
@@ -214,38 +249,52 @@ module Transcripts
 
           if family = matched_person.families.first
             raise 'matched person has multiple families' if matched_person.families.size > 1
-            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
-            @enrollment = enrollments.pop
+            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))            
+            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
+            enrollments.reject!{|en| en == exact_match}
+
+            @enrollment = exact_match
             @duplicate_coverages = enrollments
           end
         end
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
-        if (match.coverage_terminated? || match.coverage_canceled? || match.shopping?)
-          @enrollment = enrollments.pop
-          @duplicate_coverages = enrollments
-        else
-          primary = match.family.primary_applicant
-          @enrollment = match
-          @duplicate_coverages = enrollments.select{|e| e.hbx_enrollment_members.any?{|em| em.applicant_id == primary.id} && e != match }
-        end
+        exact_matches = find_exact_enrollment_matches(enrollment, enrollments.dup)
+        exact_match = exact_matches.detect{|matched| matched.hbx_id == enrollment.hbx_id }
+        exact_match = (exact_matches.first || enrollments.last)
+        enrollments.reject!{|en| en == exact_match}
+
+        @enrollment = exact_match
+        @duplicate_coverages = enrollments
       end
 
       @enrollment ||= nil
       @duplicate_coverages ||= []
     end
 
+    def find_exact_enrollment_matches(enrollment, enrollments)
+      enrollment_hbx_ids = enrollment.hbx_enrollment_members.map(&:hbx_id)
+
+      enrollments.reject! do |en|
+        en_hbx_ids = en.hbx_enrollment_members.map(&:hbx_id)
+        en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
+      end
+
+      enrollments.reject!{|en| (en.plan.hios_id != enrollment.plan.hios_id)}
+      enrollments.reject!{|en| (en.effective_on != enrollment.effective_on)}
+      enrollments
+    end
+
     def match_instance(enrollment)
       primary = enrollment.family.primary_applicant
       match_enrollment(enrollment)
-
       primary = @enrollment.family.primary_applicant if @enrollment
-
       @transcript[:identifier] = enrollment.hbx_id
 
       if @enrollment.present?
         @transcript[:plan_details] = {
           plan_name: "#{@enrollment.plan.hios_id}:#{@enrollment.plan.name}",
+          other_effective_on: enrollment.effective_on.strftime("%m/%d/%Y"),
           effective_on:  @enrollment.effective_on.strftime("%m/%d/%Y"),
           aasm_state: @enrollment.aasm_state.camelcase,
           terminated_on: (@enrollment.terminated_on.blank? ? nil : @enrollment.terminated_on.strftime("%m/%d/%Y")),
