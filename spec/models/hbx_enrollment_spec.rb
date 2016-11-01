@@ -835,6 +835,20 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "cancel_coverage!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
 end
 
 describe HbxEnrollment, dbclean: :after_each do
