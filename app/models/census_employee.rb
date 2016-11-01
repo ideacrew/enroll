@@ -346,8 +346,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)    
-      url = cs.generate_url
+      url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -356,6 +355,7 @@ class CensusEmployee < CensusMember
         mpi_indicator: notice_trigger.mpi_indicator,
         data: url
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+
       builder.build_and_save
    rescue Exception => e
      Rails.logger.warn("Unable to build checkbook notice for #{e} " )
@@ -364,8 +364,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_deliver_checkbook_url
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)    
-      url = cs.generate_url
+      url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
