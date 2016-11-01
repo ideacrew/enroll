@@ -57,24 +57,24 @@ class TranscriptGenerator
       end
 
       starting = TimeKeeper.datetime_of_record.to_i
-      Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
-      # Dir.glob("#{Rails.root}/xml_files_10_27/ivl_policy_xmls/*.xml").each do |file_path|
+      # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
+      Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
         begin
           count += 1
-          rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
+          # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
 
-          # individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
-          # other_enrollment = individual_parser.get_enrollment_object
-          # transcript = Transcripts::EnrollmentTranscript.new
-          # transcript.find_or_build(other_enrollment)
+          individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
+          other_enrollment = individual_parser.get_enrollment_object
+          transcript = Transcripts::EnrollmentTranscript.new
+          transcript.find_or_build(other_enrollment)
 
-          # enrollment_transcript = Importers::Transcripts::EnrollmentTranscript.new
-          # enrollment_transcript.transcript = transcript.transcript
-          # enrollment_transcript.other_enrollment = other_enrollment
-          # enrollment_transcript.market = 'individual'
-          # enrollment_transcript.process
+          enrollment_transcript = Importers::Transcripts::EnrollmentTranscript.new
+          enrollment_transcript.transcript = transcript.transcript
+          enrollment_transcript.other_enrollment = other_enrollment
+          enrollment_transcript.market = 'individual'
+          enrollment_transcript.process
 
-          # rows = enrollment_transcript.csv_row
+          rows = enrollment_transcript.csv_row
           first_row = rows[0]
           enrollment_removes = rows.select{|row| row[9] == 'remove' && row[10] == 'enrollment:hbx_id'}
 

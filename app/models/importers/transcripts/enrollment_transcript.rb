@@ -21,23 +21,25 @@ module Importers::Transcripts
           terminated_on: 'edi'
         },
         update: {
-          applied_aptc_amount: 'edi',
+          applied_aptc_amount: 'ignore',
           terminated_on: 'edi',
           coverage_kind: 'ignore',
-          hbx_id: 'ignore',
+          hbx_id: 'edi',
           effective_on: 'edi'
         },
         remove: 'ignore'
       },
       plan: {
-        add: 'edi',
+        add: 'ignore',
         update: 'ignore',
         remove: 'ignore'
       },
       hbx_enrollment_members: {
-        add: 'edi',
+        add: 'ignore',
         update: 'edi',
-        remove: 'ignore'
+        remove: {
+          hbx_id: 'edi'
+        }
       },
       broker: {
         add: 'ignore',
@@ -88,16 +90,38 @@ module Importers::Transcripts
 
             section_rows += actions.reduce([]) do |rows, action|
               attributes = @comparison_result.changeset_content_at [section, action]
+
               if section != :enrollment
                 rows << send(action, section, attributes)
               else
-                log_ignore(action.to_sym, section, 'hbx_id')
+                if action == 'remove'
+                  @updates[:remove] ||={}
+                  @updates[:remove][:enrollment] ||={}
+                  send("process_enrollment_#{action}", attributes)
+                else
+                  log_ignore(action.to_sym, section, 'hbx_id')
+                end
                 rows
               end
             end
           end
         rescue Exception => e
           @updates[:update_failed] = ['Merge Failed', e.to_s]
+        end
+      end
+    end
+
+    def process_enrollment_remove(attributes)
+      family = @enrollment.family
+      enrollments = attributes['hbx_id']
+      enrollments.each do |enrollment_hash|
+        enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
+        if enrollment.effective_on == @enrollment.effective_on &&  enrollment.effective_on >= enrollment.terminated_on
+          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+           @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment canceled successfully"]
+        else
+          enrollment.terminate_coverage! if enrollment.may_terminate_coverage?
+          @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment terminated successfully"]
         end
       end
     end
@@ -154,21 +178,20 @@ module Importers::Transcripts
                   end
                 end
               elsif action == 'add'
-                if attribute == 'terminated_on'
-                  enrollments = (@market == 'shop' ? matching_shop_coverages(@enrollment) : matching_ivl_coverages(@enrollment))
-                  enrollments.reject!{|e| e == @enrollment}
+                # if attribute == 'terminated_on'
+                #   enrollments = (@market == 'shop' ? matching_shop_coverages(@enrollment) : matching_ivl_coverages(@enrollment))
+                #   enrollments.reject!{|e| e == @enrollment}
 
-                  @exact_enrollment_matches = find_exact_enrollment_matches(enrollments)
-                  other_coverages = enrollments - @exact_enrollment_matches
+                #   @exact_enrollment_matches = find_exact_enrollment_matches(enrollments)
+                #   other_coverages = enrollments - @exact_enrollment_matches
 
-                  if other_coverages.any?
-                    message = "Enrollment can't be termed."
-                    message += "Found other active coverages #{other_coverages.map(&:hbx_id).join(',')}."
-                    message += "Found duplicate coverages #{@exact_enrollment_matches.map(&:hbx_id).join(',')}." if @exact_enrollment_matches.any?
-                    raise message
-                  end
-
-                end
+                #   if other_coverages.any?
+                #     message = "Enrollment can't be termed."
+                #     message += "Found other active coverages #{other_coverages.map(&:hbx_id).join(',')}."
+                #     message += "Found duplicate coverages #{@exact_enrollment_matches.map(&:hbx_id).join(',')}." if @exact_enrollment_matches.any?
+                #     raise message
+                #   end
+                # end
               end
             end
 
@@ -279,6 +302,20 @@ module Importers::Transcripts
 
     def update_terminated_on(value)
       @enrollment.update!({:terminated_on => value})
+
+      if value > TimeKeeper.date_of_record
+        @enrollment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
+      else
+        @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
+      end
+    end
+
+    def update_hbx_id(hbx_id)
+      if HbxEnrollment.by_hbx_id(hbx_id).blank?
+        @enrollment.update!({:hbx_id => hbx_id})
+      else
+        @updates[:update][:base]['hbx_id'] = ["Success", "Add EDI DB foreign key #{@enrollment.hbx_id}"]
+      end
     end
 
     def update_applied_aptc_amount(value)
@@ -297,7 +334,7 @@ module Importers::Transcripts
             begin
               # validate_timestamp(section)
               send("update_#{field}", value)
-              log_success(:update, section, field)
+              log_success(:update, section, field) if @updates[:update][section][field].blank?
             rescue Exception => e
               @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
             end
@@ -310,19 +347,22 @@ module Importers::Transcripts
 
         attributes.each do |identifier, value|
           if rule == 'edi'
+
             value.each do |key, v|
               if (key == 'add' || key == 'update') && section == :hbx_enrollment_members
+
                 begin
                   member_hbx_id = identifier.split(':')[1]
-                  member = @enrollment.hbx_enrollment_members.detect{|e| e.family_member.hbx_id == member_hbx_id}
+                  member = @enrollment.hbx_enrollment_members.detect{|e| e.hbx_id == member_hbx_id}
                   if member.blank?
                     raise "Family member with hbx id #{member_hbx_id} missing."
                   end
                   member.update_attributes(v)
                   log_success(:update, section, identifier)
                 rescue Exception => e
-                  @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
+                  @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
                 end
+
               else
                 log_ignore(:update, section, identifier)
               end
@@ -332,6 +372,30 @@ module Importers::Transcripts
           end
         end
       end
+    end
+
+    def hbx_enrollment_members_hbx_id_remove(value)
+      family = @enrollment.family
+
+      hbx_enrollment = family.active_household.hbx_enrollments.build({
+        kind: @enrollment.kind,
+        consumer_role_id: @enrollment.consumer_role.id,
+        elected_aptc_pct: @enrollment.elected_aptc_pct,
+        applied_aptc_amount: @enrollment.applied_aptc_amount,
+        coverage_kind: @enrollment.coverage_kind,
+        effective_on: @other_enrollment.effective_on,
+        submitted_at: TimeKeeper.datetime_of_record,
+        created_at: TimeKeeper.datetime_of_record,
+        updated_at: TimeKeeper.datetime_of_record
+      })
+
+      hbx_enrollment.plan= @enrollment.plan
+      hbx_enrollment.hbx_enrollment_members.each do |member| 
+        next if member.hbx_id == value['hbx_id']
+        hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
+      end
+
+      hbx_enrollment.save!
     end
 
     def remove(section, attributes)
@@ -351,6 +415,12 @@ module Importers::Transcripts
         enumerated_association = ENUMERATION_FIELDS[section]
         attributes.each do |identifier, value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[identifier.to_sym] == 'edi')
+            begin
+              send("#{section}_#{identifier}_remove", value)
+              log_success(:update, section, identifier)
+            rescue Exception => e
+              @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+            end
           else
             log_ignore(:remove, section, identifier)
           end
@@ -539,20 +609,20 @@ module Importers::Transcripts
       end
     end
 
-    def validate_timestamp(section)
-      if section == :base
-        if @enrollment.updated_at.to_date > @transcript[:source]['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@enrollment.updated_at.strftime('%m/%d/%Y')}"
-        end
-      else
-        transcript_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
-        source_record = @enrollment.send(section).sort_by{|x| x.updated_at}.reverse.first if @enrollment.send(section).present?
-        return if transcript_record.blank? || source_record.blank?
+    # def validate_timestamp(section)
+    #   if section == :base
+    #     if @enrollment.updated_at.to_date > @transcript[:source]['updated_at'].to_date
+    #       raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@enrollment.updated_at.strftime('%m/%d/%Y')}"
+    #     end
+    #   else
+    #     transcript_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
+    #     source_record = @enrollment.send(section).sort_by{|x| x.updated_at}.reverse.first if @enrollment.send(section).present?
+    #     return if transcript_record.blank? || source_record.blank?
+    #     if source_record.updated_at.to_date > transcript_record['updated_at'].to_date
+    #       raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
+    #     end
+    #   end
+    # end
 
-        if source_record.updated_at.to_date > transcript_record['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
-        end
-      end
-    end
   end
 end
