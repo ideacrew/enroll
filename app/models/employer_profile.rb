@@ -825,18 +825,20 @@ class EmployerProfile
   end
 
   def generate_checkbook_notices
+    s3urls = []
     census_employees.each do |census_employee|
-      census_employee.generate_and_save_to_temp_folder
+      s3urls << census_employee.generate_and_save_to_temp_folder
     end
     begin
-      filename =Rails.root.join( "tmp", "#{id}.pdf").to_s
-      dirname = Rails.root.join( "tmp", "#{id}").to_s
-      entries = Dir.entries(dirname)
-      entries.reject!{|d| ['.','..'].include?(d)}
       outputfile=nil
-      entries.each do |pdf|
+      filename =Rails.root.join( "tmp", "#{id}.pdf").to_s
+      s3urls.each do |s3url| 
+        pdf= Aws::S3Storage.find(s3url)
+        temp_file = Tempfile.new(s3url)
+        temp_file.write(pdf)
+        temp_file.close
         outputfile = CombinePDF.new if outputfile.nil?
-        outputfile << CombinePDF.load("#{dirname}/#{pdf}")
+        outputfile << CombinePDF.load(temp_file.path)
       end
       outputfile.save filename
       return filename

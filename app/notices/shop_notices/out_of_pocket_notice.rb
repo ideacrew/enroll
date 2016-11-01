@@ -24,7 +24,6 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     build
     generate_pdf_notice
     upload_to_amazonS3
-    # byebug
   end
 
   def move_to_employer_folder
