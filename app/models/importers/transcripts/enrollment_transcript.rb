@@ -7,7 +7,7 @@ module Importers::Transcripts
   class EnrollmentTranscript
 
     attr_accessor :transcript, :updates, :market, :other_enrollment
-    include Transcripts::EnrollmentCommon
+    include ::Transcripts::EnrollmentCommon
 
     ENUMERATION_FIELDS = {
       plan: { enumeration_field: "hios_id", enumeration: [ ]},
@@ -49,33 +49,35 @@ module Importers::Transcripts
       }
     }
 
-    def initialize
-      @other_enrollment = HbxEnrollment.new(transcript[:other])
-    end
+    def fix_enrollment_coverage_start
+     @other_enrollment.hbx_enrollment_members = @other_enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
 
+      if @other_enrollment.hbx_enrollment_members.any?{|member| member.coverage_end_on.blank?}
 
- def fix_enrollment_coverage_start(enrollment)
-      maximum_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
-      maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
-      if maximum_end_date.present?
-        enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
-      else
-        enrollment.effective_on = maximum_start_date
+        maximum_end_date = @other_enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
+        maximum_start_date = @other_enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
+
+        if maximum_end_date.present?
+          @other_enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
+        else
+          @other_enrollment.effective_on = maximum_start_date
+        end
+
+        @other_enrollment.hbx_enrollment_members.each do |member| 
+          member.coverage_start_on = @other_enrollment.effective_on
+        end
       end
-
-      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
-      enrollment.hbx_enrollment_members.each do |member| 
-        member.coverage_start_on = enrollment.effective_on
-      end
-      enrollment
     end
 
     def process
+      fix_enrollment_coverage_start
       @updates = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
 
       if @transcript[:source_is_new]
-        create_new_enrollment
+        if valid_new_request
+          create_new_enrollment
+        end
       else
         @enrollment = find_instance
         begin
@@ -111,6 +113,27 @@ module Importers::Transcripts
       enrollments.reject!{|en| (en.plan_id != @enrollment.plan_id)}
       enrollments.reject!{|en| (en.effective_on != @enrollment.effective_on)}
       enrollments
+    end
+
+    def valid_new_request
+      begin
+        @other_enrollment.hbx_enrollment_members.each do |member| 
+          matched_people = match_person_instance(member.family_member.person)
+
+          if matched_people.size > 1
+            raise AmbiguousMatchError, "Found multiple people matches for #{member.family_member.person.first_name} #{member.family_member.person.last_name}."
+          end
+
+          if matched_people.size == 0
+            raise PersonMissingError, "Matching person not found for #{member.family_member.person.first_name} #{member.family_member.person.last_name}."
+          end
+        end
+
+        true
+      rescue Exception => e
+        @updates[:update_failed] = ['Merge Failed', e.to_s]
+        return false
+      end
     end
 
     def validate_update
@@ -436,20 +459,26 @@ module Importers::Transcripts
           role = Factories::EnrollmentFactory.build_consumer_role(matched_person, false)
           if matched_person.save
             role.save
+            matched_person.reload
+            family = matched_person.primary_family
           else
             raise "unable to update person"
           end
+        else
+          family = families.first
         end
 
         plan = @other_enrollment.plan
-        ea_plan = Plan.where(hios_id: plan.hios_id, active_year: plan.active_year).first
 
+        ea_plan = Plan.where(hios_id: plan.hios_id, active_year: plan.active_year).first
         if ea_plan.blank?
           raise "Plan with hios_id #{plan.hios_id} not found in EA."
         end
 
+        hbx_id = HbxEnrollment.by_hbx_id(@other_enrollment.hbx_id).present? ? nil : @other_enrollment.hbx_id
+
         hbx_enrollment = family.active_household.hbx_enrollments.build({
-          hbx_id: @other_enrollment.hbx_id,
+          hbx_id: hbx_id,
           kind: @other_enrollment.kind,
           consumer_role_id: matched_person.consumer_role.id,
           elected_aptc_pct: @other_enrollment.elected_aptc_pct,
@@ -466,12 +495,30 @@ module Importers::Transcripts
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
+
           if matched_people.size > 1
             raise AmbiguousMatchError, "Found multiple people matches for #{member.family_member.person.first_name} #{member.family_member.person.last_name}."
           end
 
           if matched_people.size == 0
-            raise PersonMissingError, 'Matching person not found for #{member.family_member.person.first_name} #{member.family_member.person.last_name}.'
+            raise PersonMissingError, "Matching person not found for #{member.family_member.person.first_name} #{member.family_member.person.last_name}."
+          end
+
+          matched_person = matched_people.first
+
+          if matched_person.consumer_role.blank?
+            consumer_role = person.build_consumer_role(ssn: matched_person.ssn,
+             dob: matched_person.dob,
+             gender: matched_person.gender,
+             is_incarcerated: matched_person.is_incarcerated,
+             is_applicant: matched_person.is_applicant,
+             )
+
+            if person.save
+              consumer_role.save
+            else
+              raise "unable to update person"
+            end
           end
 
           family_member = family.add_family_member(matched_people.first, is_primary_applicant: false)

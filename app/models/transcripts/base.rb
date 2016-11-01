@@ -73,7 +73,12 @@ module Transcripts
 
     def group_associations_by_enumeration_field(association)
       # TODO: Validate for duplicate family member records with same hbx id
-      other_assocs = @transcript[:other].send(association[:association]).to_a.dup
+
+      if association[:association] == 'hbx_enrollment_members'
+        other_assocs = @transcript[:other].send(association[:association]).reject{|member| member.coverage_end_on.present? && member.coverage_end_on <= member.coverage_start_on}
+      else
+        other_assocs = @transcript[:other].send(association[:association]).to_a.dup
+      end
 
       source_other_pairs = @transcript[:source].send(association[:association]).to_a.map do |source_assoc|
         enumeration_value = source_assoc.send(association[:enumeration_field])
