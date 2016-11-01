@@ -118,7 +118,7 @@ module Importers::Transcripts
       enrollments = attributes['hbx_id']
       enrollments.each do |enrollment_hash|
         enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-        if enrollment.effective_on == @enrollment.effective_on &&  enrollment.effective_on >= enrollment.terminated_on
+        if enrollment.effective_on == @enrollment.effective_on && (enrollment.terminated_on.present? && enrollment.effective_on >= enrollment.terminated_on)
           enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
            @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment canceled successfully"]
         else
@@ -563,11 +563,11 @@ module Importers::Transcripts
         end
 
         hbx_id = HbxEnrollment.by_hbx_id(@other_enrollment.hbx_id).present? ? nil : @other_enrollment.hbx_id
-
+        
         hbx_enrollment = family.active_household.hbx_enrollments.build({
           hbx_id: hbx_id,
           kind: @other_enrollment.kind,
-          consumer_role_id: matched_person.consumer_role.id,
+          consumer_role_id: matched_person.consumer_role.try(:id),
           elected_aptc_pct: @other_enrollment.elected_aptc_pct,
           applied_aptc_amount: @other_enrollment.applied_aptc_amount,
           coverage_kind: @other_enrollment.coverage_kind, 
@@ -595,21 +595,21 @@ module Importers::Transcripts
           matched_person = matched_people.first
 
           if matched_person.consumer_role.blank?
-            consumer_role = person.build_consumer_role(ssn: matched_person.ssn,
+            consumer_role = matched_person.build_consumer_role(ssn: matched_person.ssn,
              dob: matched_person.dob,
              gender: matched_person.gender,
              is_incarcerated: matched_person.is_incarcerated,
-             is_applicant: matched_person.is_applicant,
-             )
+             is_applicant: member.is_subscriber
+            )
 
-            if person.save
+            if matched_person.save
               consumer_role.save
             else
               raise "unable to update person"
             end
           end
 
-          family_member = family.add_family_member(matched_people.first, is_primary_applicant: false)
+          family_member = family.add_family_member(matched_person, is_primary_applicant: false)
           hbx_enrollment.hbx_enrollment_members.build({
             applicant_id: family_member.id,
             is_subscriber: member.is_subscriber,
