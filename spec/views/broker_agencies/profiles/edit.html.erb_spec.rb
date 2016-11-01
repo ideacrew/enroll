@@ -19,7 +19,7 @@ RSpec.describe "broker_agencies/profiles/edit.html.erb" do
   it "should block the market kind dropdown refs #9818" do
     expect(rendered).to have_selector('.broker-agency-info.read_only_dropdown')
   end
-  it "should have four read only fields refs #9818"  do
+  it "should have three read only fields refs #9818"  do
     expect(rendered).to have_selector("[readonly='readonly']", count: 3)
   end
 end
