@@ -23,13 +23,20 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
   def build_and_save
     build
     generate_pdf_notice
-    move_to_employer_folder
+    upload_to_amazonS3
   end
 
   def move_to_employer_folder
     temp_employer_folder = FileUtils.mkdir_p(Rails.root.join("tmp", "#{@recipient.employer_profile.id}"))
     FileUtils.mv(notice_path, temp_employer_folder.join)
   end
+
+  def upload_to_amazonS3
+    Aws::S3Storage.save(notice_path, 'notices')
+  rescue => e
+    raise "unable to upload to amazon #{e}"
+  end
+
 
   def build
     raise "No Active plan year for employer" if @recipient.employer_profile.active_plan_year

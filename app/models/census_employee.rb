@@ -122,7 +122,7 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
-  
+
   def allow_nil_ssn_updates_dependents
     census_dependents.each do |cd|
       if cd.ssn.blank?
@@ -374,8 +374,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)
-      url = cs.generate_url
+      url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -384,6 +383,7 @@ class CensusEmployee < CensusMember
         mpi_indicator: notice_trigger.mpi_indicator,
         data: url
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+
       builder.build_and_save
    rescue Exception => e
      Rails.logger.warn("Unable to build checkbook notice for #{e} " )
@@ -392,8 +392,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_deliver_checkbook_url
     begin
-      cs= ::CheckbookServices::PlanComparision.new(self)
-      url = cs.generate_url
+      url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -815,7 +814,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-  
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -910,7 +909,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-  
+
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
