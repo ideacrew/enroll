@@ -52,7 +52,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
       count = 0
       families.each do |family|
-          # begin
+          begin
             enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
             enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
             # hbxe = enrollments.reduce([]) { |list, en| list << en if HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
@@ -76,43 +76,64 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
               enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
               enrollment_renewal.renew
             end
-          # rescue Exception => e 
-          #   @logger.info "Failed #{family.e_case_id} Exception: #{e.inspect}"
-          # end
+          rescue Exception => e 
+            @logger.info "Failed #{family.e_case_id} Exception: #{e.inspect}"
+          end
       end
       puts count
     end
 
-    # valid_enrollments = enrollments_for_renewal(enrollments)
-    # def enrollments_for_renewal(enrollments)
-    #   # Multiple or Single of Same coverage kind
-    #   enrollments
-    #   # matched_enrollments = []
-    #   # enrollments_to_renew = []
 
-    #   # while (enrollments - matched_enrollments).any? do
-    #   #   enrollment, matched_enrollments = filter_exact_matches((enrollments - matched_enrollments))
-    #   #   enrollments_to_renew << enrollment
-    #   # end
-    #   # enrollments_to_renew
-    # end
+    def process_enrollment_renewal(enrollment, renewal_benefit_coverage_period)
+      puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
 
-    # def find_exact_matches(enrollments)
-    #   enrollment = enrollments.first
-    #   enrollment_hbx_ids = enrollment.hbx_enrollment_members.map(&:hbx_id)
+      enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+      enrollment_renewal.enrollment = enrollment
+      enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
+      enrollment_renewal.renew
+    end
 
-    #   enrollments.reject! do |en|
-    #     en_hbx_ids = en.hbx_enrollment_members.map(&:hbx_id)
-    #     en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
-    #   end
+    def process_from_sheet
+      count = 0
 
-    #   enrollment <=> 
+      CSV.open("#{Rails.root}/IVL_Enrollment_Renewals.csv", "w") do |csv|
 
-    #   # enrollments.reject!{|en| (en.plan_id != enrollment.plan_id)}
-    #   # enrollments.reject!{|en| (en.effective_on != enrollment.effective_on)}
-    #   enrollments
+        csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
+          "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
 
-    #   [enrollment, enrollments]
-    # end
-  # end
+        renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+        CSV.foreach("#{Rails.root}/PositiveMatchesToBeRenewed-1101.csv", headers: true, :encoding => 'utf-8') do |row|
+          count += 1
+
+          if count % 100 == 0
+            puts "Found #{count} enrollments"
+          end
+
+          hbx_enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBX ID"]).first
+
+          status = if hbx_enrollment.blank?
+            count += 1
+            ["Renewal Failed: Unable to find matching enrollment."]
+          elsif !HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state.to_s)
+            ["Renewal Failed: Enrollment in #{hbx_enrollment.aasm_state} state."]
+          elsif has_catastrophic_plan?(hbx_enrollment)
+            ["Renewal Failed: Catastrophic plan found."]
+          elsif is_individual_assisted?(hbx_enrollment)
+            ["Renewal Failed: Assisted Enrollment."]
+          else
+            begin
+              process_enrollment_renewal(hbx_enrollment, renewal_benefit_coverage_period)
+              ["Renewal Successful."]
+            rescue Exception => e
+              ["Renewal Failed: #{e.tos}."]
+            end
+          end
+
+          csv << (row.to_h.values + status)
+        end
+
+        puts count
+      end
+    end
 end
