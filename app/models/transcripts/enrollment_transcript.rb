@@ -97,9 +97,11 @@ module Transcripts
 
       match_instance(enrollment)
 
-      if @enrollment.present? && (enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on)
-        @duplicate_coverages << @enrollment
-        @enrollment = nil
+      if @enrollment.present?
+        if (enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on)
+          @duplicate_coverages << @enrollment
+          @enrollment = nil
+        end
       end
 
       if @enrollment.present?
@@ -261,7 +263,7 @@ module Transcripts
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
         exact_matches = find_exact_enrollment_matches(enrollment, enrollments.dup)
         exact_match = exact_matches.detect{|matched| matched.hbx_id == enrollment.hbx_id }
-        exact_match = (exact_matches.first || enrollments.last)
+        exact_match ||= (exact_matches.first || enrollments.last)
         enrollments.reject!{|en| en == exact_match}
 
         @enrollment = exact_match

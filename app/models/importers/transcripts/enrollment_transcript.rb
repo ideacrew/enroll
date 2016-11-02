@@ -629,7 +629,7 @@ module Importers::Transcripts
         if @market == 'individual'
           hbx_enrollment.consumer_role_id =  matched_person.consumer_role.try(:id)
         else
-          benefit_group, benefit_group_assignment = HbxEnrollment.employee_current_benefit_group(employee_role, hbx_enrollment, false)
+          benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, hbx_enrollment)
           if benefit_group.blank? || benefit_group_assignment.blank?
             raise 'unable to find employer sponsored benefits for the employee'
           end
@@ -639,7 +639,7 @@ module Importers::Transcripts
         end
 
         hbx_enrollment.plan = ea_plan
-        hbx_enrollment.select_coverage
+        hbx_enrollment.aasm_state = 'coverage_selected'
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
@@ -679,7 +679,7 @@ module Importers::Transcripts
             coverage_end_on: member.coverage_end_on
           })
         end
-        
+
         family.save!
         @new_enrollment = hbx_enrollment
         @updates[:new][:new]['hbx_id'] = ["Success", "Enrollment added successfully using EDI source"]
@@ -687,6 +687,30 @@ module Importers::Transcripts
         @updates[:new][:new]['hbx_id'] = ["Failed", "#{e.inspect}"]
       end
     end
+
+    def employee_current_benefit_group(employee_role, hbx_enrollment)
+      effective_date = hbx_enrollment.effective_on
+      if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+
+        if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
+          raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
+        end
+
+        census_employee = employee_role.census_employee
+        benefit_group_assignment = census_employee.active_benefit_group_assignment
+
+        if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+          census_employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
+          census_employee.save!
+          benefit_group_assignment = census_employee.active_benefit_group_assignment
+        end
+
+        return benefit_group_assignment.benefit_group, benefit_group_assignment
+      else
+        raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
+      end
+    end
+
 
     # def validate_timestamp(section)
     #   if section == :base
