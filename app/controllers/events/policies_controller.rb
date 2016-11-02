@@ -12,8 +12,6 @@ module Events
           response_payload = render_to_string "events/enrollment_event", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
           reply_with(connection, reply_to, policy_id, "200", response_payload, policy.eligibility_event_kind)
         rescue Exception => e
-          puts e.inspect
-          binding.pry
           reply_with(
             connection,
             reply_to,
