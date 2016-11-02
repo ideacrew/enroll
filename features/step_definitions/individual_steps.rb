@@ -319,6 +319,7 @@ Then(/Individual asks for help$/) do
   find('.container .row div div.btn', text: 'Help').click
   wait_for_ajax
   click_link "Help from a Customer Service Representative"
+  wait_for_ajax
   expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
