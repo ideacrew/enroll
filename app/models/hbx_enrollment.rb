@@ -410,14 +410,6 @@ class HbxEnrollment
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
     update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
     propogate_waiver
-    hbxs = HbxEnrollment.find_by_benefit_group_assignments([benefit_group_assignment])
-    return if hbxs.blank?
-    hbxs.each do |hbx|
-      if hbx.may_waive_coverage?
-        hbx.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-        hbx.propogate_waiver
-      end
-    end
   end
 
   def cancel_previous(year)
