@@ -63,7 +63,7 @@ class TranscriptGenerator
       starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
       Dir.glob("#{Rails.root}/shop_12_1_policy_xmls/*.xml").each do |file_path|
-        # begin
+        begin
           count += 1
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
@@ -110,9 +110,9 @@ class TranscriptGenerator
             puts "processed #{count}--time lapse #{ending - starting}"
             starting = TimeKeeper.datetime_of_record.to_i
           end
-        # rescue Exception => e
-        #   puts "Failed.....#{file_path}"
-        # end
+        rescue Exception => e
+          puts "Failed.....#{file_path}"
+        end
       end
     end
   end
