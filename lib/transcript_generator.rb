@@ -62,7 +62,7 @@ class TranscriptGenerator
 
       starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
-      Dir.glob("#{Rails.root}/LatestXmlFiles/shop_12_1_policy_xmls/*.xml").each do |file_path|
+      Dir.glob("#{Rails.root}/shop_12_1_policy_xmls/*.xml").each do |file_path|
         # begin
           count += 1
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
