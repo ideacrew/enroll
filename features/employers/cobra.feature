@@ -73,17 +73,16 @@ Feature: COBRA basic
     When Jack Doe terminate one employee
     Then Employer should see terminate successful msg
     When Employer click all employee filter
-# another TEMP FOR STAGE
-    # Then Employer should see the status of Employment terminated
-    # When Employer cobra one employee
-    # Then Employer should see cobra successful msg
-    # When Employer click all employee filter
-    # Then Employer should only see the status of Cobra Linked
-    # Then Employer logs out
+    Then Employer should see the status of Employment terminated
+    When Employer cobra one employee
+    Then Employer should see cobra successful msg
+    When Employer click all employee filter
+    Then Employer should only see the status of Cobra Linked
+    Then Employer logs out
 
-    # When Jack Employee visits the employee portal
-    # And Jack Employee login in for employee
-    # Then Jack Employee should see my account page
+    When Jack Employee visits the employee portal
+    And Jack Employee login in for employee
+    Then Jack Employee should see my account page
     # TEMP FOR STAGE
     # Then Jack Employee should see cobra enrollment on my account page
     # Then Jack Employee should see market type on my account page
