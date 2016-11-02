@@ -11,7 +11,11 @@ module PortalHeaderHelper
     elsif current_user.person && current_user.person.active_employee_roles.any?
       link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe, family_account_path, class: "portal"
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
-      link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"
+      if params[:action] == "ridp_agreement" || controller_path.include?("interactive_identity_verifications")
+        "<a class='portal'>#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family</a>".html_safe
+      else
+        link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"
+      end
     elsif current_user.try(:has_broker_agency_staff_role?)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:has_employer_staff_role?)
