@@ -57,20 +57,22 @@ class TranscriptGenerator
       if @market == 'individual'
         csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Action', 'Section:Attribute', 'Value']
       else
-        csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName','Effective On', 'AASM State', 'Terminated On', 'Employer FEIN', 'Employer Legalname', 'Action', 'Section:Attribute', 'Value']
+        csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Employer FEIN', 'Employer Legalname', 'Action', 'Section:Attribute', 'Value']
       end
 
       starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
-      Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
-        begin
+      Dir.glob("#{Rails.root}/LatestXmlFiles/shop_12_1_policy_xmls/*.xml").each do |file_path|
+        # begin
           count += 1
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
-
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
           other_enrollment = individual_parser.get_enrollment_object
           transcript = Transcripts::EnrollmentTranscript.new
+          transcript.shop = (@market == 'shop')
           transcript.find_or_build(other_enrollment)
+
+          # rows = Transcripts::ComparisonResult.new(transcript.transcript).enrollment_csv_row
 
           enrollment_transcript = Importers::Transcripts::EnrollmentTranscript.new
           enrollment_transcript.transcript = transcript.transcript
@@ -80,18 +82,23 @@ class TranscriptGenerator
 
           rows = enrollment_transcript.csv_row
           first_row = rows[0]
-          enrollment_removes = rows.select{|row| row[9] == 'remove' && row[10] == 'enrollment:hbx_id'}
 
-          rows.reject!{|row| row[10] == 'update' && row[12].blank?}
-          rows.reject!{|row| row[10] == 'remove' && row[11] == 'enrollment:hbx_id'}
-
-          # enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
-          # rows.reject!{|row| row[11] == 'update' && row[13].blank?}
-          # rows.reject!{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+          if @market == 'individual'
+            enrollment_removes = rows.select{|row| row[10] == 'remove' && row[11] == 'enrollment:hbx_id'}
+            rows.reject!{|row| row[10] == 'update' && row[12].blank?}
+            rows.reject!{|row| row[10] == 'remove' && row[11] == 'enrollment:hbx_id'}
+          else
+            enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
+            rows.reject!{|row| row[12] == 'update' && row[14].blank?}
+            rows.reject!{|row| row[12] == 'remove' && row[13] == 'enrollment:hbx_id'}
+          end
 
           if rows.empty?
-            # csv << (first_row[0..10] + ['match', 'match:enrollment'])
-            csv << (first_row[0..9] + ['match', 'match:enrollment'])
+            if @market == 'individual'
+              csv << (first_row[0..10] + ['match', 'match:enrollment'])
+            else
+              csv << (first_row[0..11] + ['match', 'match:enrollment'])
+            end
             enrollment_removes.each{|row| csv << row}
           else
             rows.each{|row| csv << row}
@@ -103,9 +110,9 @@ class TranscriptGenerator
             puts "processed #{count}--time lapse #{ending - starting}"
             starting = TimeKeeper.datetime_of_record.to_i
           end
-        rescue Exception => e
-          puts "Failed.....#{file_path}"
-        end
+        # rescue Exception => e
+        #   puts "Failed.....#{file_path}"
+        # end
       end
     end
   end

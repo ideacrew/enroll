@@ -404,7 +404,6 @@ module Importers::Transcripts
 
       hbx_enrollment = family.active_household.hbx_enrollments.build({
         kind: @enrollment.kind,
-        consumer_role_id: @enrollment.consumer_role.id,
         elected_aptc_pct: @enrollment.elected_aptc_pct,
         applied_aptc_amount: @enrollment.applied_aptc_amount,
         coverage_kind: @enrollment.coverage_kind,
@@ -414,8 +413,16 @@ module Importers::Transcripts
         updated_at: TimeKeeper.datetime_of_record
       })
 
-      hbx_enrollment.plan= @enrollment.plan
-      hbx_enrollment.hbx_enrollment_members.each do |member| 
+      if @market == 'shop'
+        hbx_enrollment.benefit_group_id = @enrollment.benefit_group_id
+        hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
+        hbx_enrollment.employee_role_id = @enrollment.employee_role_id
+      else
+        hbx_enrollment.consumer_role_id = @enrollment.consumer_role.id
+      end
+
+      hbx_enrollment.plan = @enrollment.plan
+      @enrollment.hbx_enrollment_members.each do |member| 
         next if member.hbx_id == value['hbx_id']
         hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
       end
@@ -471,6 +478,12 @@ module Importers::Transcripts
         @transcript[:primary_details][:first_name]
       ]
 
+      details = person_details + plan_details
+      if @market == 'shop'
+        employer_details = (@transcript[:employer_details].present? ? @transcript[:employer_details].values : 3.times.map{nil})
+        details += employer_details     
+      end
+
       results = @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
@@ -488,10 +501,10 @@ module Importers::Transcripts
 
             if value.is_a?(Array)
               value.each do |val|
-                rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", val] + (action_taken || []))
+                rows << ([@transcript[:identifier]] + details + [action, "#{section}:#{attribute}", val] + (action_taken || []))
               end
             else
-              rows << ([@transcript[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value] + (action_taken || []))
+              rows << ([@transcript[:identifier]] + details + [action, "#{section}:#{attribute}", value] + (action_taken || []))
             end   
           end
           rows
@@ -499,7 +512,7 @@ module Importers::Transcripts
       end
 
       if results.empty?
-        ([[@transcript[:identifier]] + person_details + plan_details + ['update']])
+        ([[@transcript[:identifier]] + details + ['update']])
       else
         results
       end
@@ -550,38 +563,53 @@ module Importers::Transcripts
         end
 
         matched_person = matched_people.first
-        families = Family.find_all_by_person(matched_person)
+        if @market == 'individual'
+          families = Family.find_all_by_person(matched_person)
 
-        if families.empty?
-          if matched_person.age_on(@other_enrollment.effective_on) < 18
-            raise 'Unknown primary member -- subscriber is < 18 years old'
-          end
-
-          role = Factories::EnrollmentFactory.build_consumer_role(matched_person, false)
-          if matched_person.save
-            role.save
-            matched_person.reload
-            family = matched_person.primary_family
+          if families.empty?
+            if matched_person.age_on(@other_enrollment.effective_on) < 18
+              raise 'Unknown primary member -- subscriber is < 18 years old'
+            end
+            role = Factories::EnrollmentFactory.build_consumer_role(matched_person, false)
+            if matched_person.save
+              role.save
+              matched_person.reload
+              family = matched_person.primary_family
+            else
+              raise "unable to update person"
+            end
           else
-            raise "unable to update person"
+            family = families.first
           end
         else
-          family = families.first
+          employer_profile = EmployerProfile.find_by_fein(@other_enrollment.employer_profile.fein)
+          employee_role = matched_person.employee_roles.detect{|e_role| e_role.employer_profile == employer_profile}
+          if employee_role.present?
+            census_employee = employee_role.census_employee
+          else
+            census_employee = employer_profile.census_employees.by_ssn(matched_person.ssn).first
+            if census_employee.blank?
+              census_employe = employer_profile.census_employees.where({ first_name: /#{matched_person.first_name}/i, last_name: /#{matched_person.last_name}/i, dob: matched_person.dob }).first
+            end
+
+            if census_employee.blank?
+              raise 'unable to find census employee record'
+            end
+          end
+          employee_role, family = Factories::EnrollmentFactory.build_employee_role(matched_person, false, @other_enrollment.employer_profile, census_employee, census_employee.hired_on)
         end
 
         plan = @other_enrollment.plan
-
         ea_plan = Plan.where(hios_id: plan.hios_id, active_year: plan.active_year).first
         if ea_plan.blank?
           raise "Plan with hios_id #{plan.hios_id} not found in EA."
         end
 
         hbx_id = HbxEnrollment.by_hbx_id(@other_enrollment.hbx_id).present? ? nil : @other_enrollment.hbx_id
-        
+
         hbx_enrollment = family.active_household.hbx_enrollments.build({
           hbx_id: hbx_id,
           kind: @other_enrollment.kind,
-          consumer_role_id: matched_person.consumer_role.try(:id),
           elected_aptc_pct: @other_enrollment.elected_aptc_pct,
           applied_aptc_amount: @other_enrollment.applied_aptc_amount,
           coverage_kind: @other_enrollment.coverage_kind, 
@@ -592,7 +620,19 @@ module Importers::Transcripts
           updated_at: TimeKeeper.datetime_of_record
         })
 
-        hbx_enrollment.plan= ea_plan
+        if @market == 'individual'
+          hbx_enrollment.consumer_role_id =  matched_person.consumer_role.try(:id)
+        else
+          benefit_group, benefit_group_assignment = HbxEnrollment.employee_current_benefit_group(employee_role, hbx_enrollment, false)
+          if benefit_group.blank? || benefit_group_assignment.blank?
+            raise 'unable to find employer sponsored benefits for the employee'
+          end
+          hbx_enrollment.benefit_group_id = benefit_group.id
+          hbx_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+          hbx_enrollment.employee_role_id = employee_role.id
+        end
+
+        hbx_enrollment.plan = ea_plan
         hbx_enrollment.select_coverage
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
@@ -607,19 +647,20 @@ module Importers::Transcripts
           end
 
           matched_person = matched_people.first
+          if @market == 'individual'
+            if matched_person.consumer_role.blank?
+              consumer_role = matched_person.build_consumer_role(ssn: matched_person.ssn,
+               dob: matched_person.dob,
+               gender: matched_person.gender,
+               is_incarcerated: matched_person.is_incarcerated,
+               is_applicant: member.is_subscriber
+               )
 
-          if matched_person.consumer_role.blank?
-            consumer_role = matched_person.build_consumer_role(ssn: matched_person.ssn,
-             dob: matched_person.dob,
-             gender: matched_person.gender,
-             is_incarcerated: matched_person.is_incarcerated,
-             is_applicant: member.is_subscriber
-            )
-
-            if matched_person.save
-              consumer_role.save
-            else
-              raise "unable to update person"
+              if matched_person.save
+                consumer_role.save
+              else
+                raise "unable to update person"
+              end
             end
           end
 

@@ -19,9 +19,18 @@ module Transcripts
     end
 
     def matching_shop_coverages(enrollment, family=nil)
-      assignment = enrollment.benefit_group_assignment
-      id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+
+      if enrollment.persisted?
+        assignment = enrollment.benefit_group_assignment
+        id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+      else
+        # TODO: Fix this for Conversion ER
+        plan_year = enrollment.employer_profile.find_plan_year_by_effective_date(enrollment.effective_on)
+        id_list = plan_year.benefit_groups.collect(&:_id).uniq if plan_year.present?
+      end
+
       family ||= enrollment.family
+      return [] if family.blank? || id_list.blank?
 
       family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
         :coverage_kind => enrollment.coverage_kind, 
