@@ -614,6 +614,10 @@ class HbxEnrollment
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
   end
 
+  def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)
+    self.terminated_on = coverage_terminated_on
+  end
+
   def select_applicable_broker_account(broker_accounts)
     last_broker_before_purchase = broker_accounts.select do |baa|
       (baa.start_on < self.time_of_purchase)# &&
@@ -1119,10 +1123,12 @@ class HbxEnrollment
     # end
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+      transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled, :renewing_waived, :inactive], to: :coverage_canceled
+      transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :terminate_coverage, :after => :record_transition do
