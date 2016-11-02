@@ -5,7 +5,7 @@ class TranscriptGenerator
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
-  TRANSCRIPT_PATH = "#{Rails.root}/ivl_policy_transcript_batch/"
+  TRANSCRIPT_PATH = "#{Rails.root}/shop_12_1_people_transcripts"
 
 
   def initialize(market = 'individual')
@@ -22,13 +22,17 @@ class TranscriptGenerator
     create_directory(TRANSCRIPT_PATH)
 
     @count  = 0
-    Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
+    Dir.glob("#{Rails.root}/shop_12_1_people_xmls/*.xml").each do |file_path|
       begin
         @count += 1
 
-        individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
+        if @count % 100 == 0
+          puts "------#{@count}"
+        end
+
+        individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
         # individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
-        build_transcript(individual_parser.get_enrollment_object)
+        build_transcript(individual_parser.get_person_object)
 
       rescue Exception  => e
         my_logger.info("failed to process #{file_path}---#{e.to_s}")
@@ -37,7 +41,7 @@ class TranscriptGenerator
   end
 
   def build_transcript(external_obj)
-    transcript = Transcripts::EnrollmentTranscript.new
+    transcript = Transcripts::PersonTranscript.new
     # transcript.shop = false
     transcript.find_or_build(external_obj)
 
@@ -71,7 +75,7 @@ class TranscriptGenerator
           enrollment_transcript = Importers::Transcripts::EnrollmentTranscript.new
           enrollment_transcript.transcript = transcript.transcript
           enrollment_transcript.other_enrollment = other_enrollment
-          enrollment_transcript.market = 'individual'
+          enrollment_transcript.market = @market
           enrollment_transcript.process
 
           rows = enrollment_transcript.csv_row
@@ -106,7 +110,6 @@ class TranscriptGenerator
     end
   end
 
-
   def display_family_transcripts
     count  = 0
 
@@ -126,7 +129,7 @@ class TranscriptGenerator
 
           family_importer = Importers::Transcripts::FamilyTranscript.new
           family_importer.transcript = transcript.transcript
-          family_importer.market = 'individual'
+          family_importer.market = @market
           family_importer.other_family = other_family
           family_importer.process
 
@@ -167,7 +170,7 @@ class TranscriptGenerator
 
           person_importer = Importers::Transcripts::PersonTranscript.new
           person_importer.transcript = Marshal.load(File.open(file_path))
-          person_importer.market = 'shop'
+          person_importer.market = @market
           person_importer.process
 
           rows = person_importer.csv_row
