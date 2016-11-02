@@ -583,6 +583,10 @@ module Importers::Transcripts
           end
         else
           employer_profile = EmployerProfile.find_by_fein(@other_enrollment.employer_profile.fein)
+          if employer_profile.blank?
+            raise 'EmployerProfile missing!'
+          end
+
           employee_role = matched_person.employee_roles.detect{|e_role| e_role.employer_profile == employer_profile}
           if employee_role.present?
             census_employee = employee_role.census_employee
@@ -596,7 +600,9 @@ module Importers::Transcripts
               raise 'unable to find census employee record'
             end
           end
-          employee_role, family = Factories::EnrollmentFactory.build_employee_role(matched_person, false, @other_enrollment.employer_profile, census_employee, census_employee.hired_on)
+
+          role, family = Factories::EnrollmentFactory.build_employee_role(matched_person, false, employer_profile, census_employee, census_employee.hired_on)
+          employee_role ||= role
         end
 
         plan = @other_enrollment.plan
@@ -673,7 +679,7 @@ module Importers::Transcripts
             coverage_end_on: member.coverage_end_on
           })
         end
-
+        
         family.save!
         @new_enrollment = hbx_enrollment
         @updates[:new][:new]['hbx_id'] = ["Success", "Enrollment added successfully using EDI source"]
