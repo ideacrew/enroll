@@ -409,7 +409,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   screenshot("after modal")
 
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
-  wait_for_ajax(3)
+  wait_for_ajax(3,2)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
@@ -420,6 +420,9 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
+  wait_for_ajax
+  fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone] #because why not...
+  expect(page).to have_field("HOME PHONE", with: "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}") if person[:home_phone].present?
   find("#btn-continue").click
 end
 
@@ -609,6 +612,7 @@ When(/^.+ should see a published success message without employee$/) do
   # TODO: Fix checking for flash messages. We will need to check using
   #       xpath for an element that may not be visible, but has already
   #       been faded away by jQuery.
+  wait_for_ajax
   expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 
