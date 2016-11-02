@@ -45,13 +45,16 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'ajax'],
-           #['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(row.id), 'ajax']
+           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
 
       end
 
+      def generate_invoice_link_type(row)
+        row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
+      end
 
       def collection
         return @employer_collection if defined? @employer_collection
