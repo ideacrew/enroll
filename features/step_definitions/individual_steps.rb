@@ -316,8 +316,10 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
+  expect(page).to have_content "Help"
   find('.container .row div div.btn', text: 'Help').click
   wait_for_ajax
+  expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
   wait_for_ajax
   expect(page).to have_content "First name"
