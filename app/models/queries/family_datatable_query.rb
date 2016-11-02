@@ -38,7 +38,7 @@ module Queries
       end
       if @custom_attributes['families'] == 'by_enrollment_coverall'
         resident_ids = Person.all_resident_roles.pluck(:_id)
-        family = Family.where('family_members.person_id' => {"$in" => resident_ids})
+        family = family.where('family_members.person_id' => {"$in" => resident_ids})
       end
       if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
         family = family.by_enrollment_renewing
@@ -64,7 +64,7 @@ module Queries
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
-      family_scope = family.where('family_members.person_id' => {"$in" => person_id})
+      family_scope = family.and('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
       family_scope.order_by(@order_by)
     end
