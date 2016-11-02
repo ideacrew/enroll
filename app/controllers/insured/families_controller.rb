@@ -66,7 +66,6 @@ class Insured::FamiliesController < FamiliesController
 
       #end
     #end
-    #binding.pry
     respond_to do |format|
       format.html
     end

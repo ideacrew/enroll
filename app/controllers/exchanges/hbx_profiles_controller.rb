@@ -238,11 +238,9 @@ def employer_poc
   end
 
   def cancel_enrollment
-    #binding.pry
     @hh = Family.find(params[:family]).households.first
     @hbx_enrollment = @hh.hbx_enrollments.last
     @row = params[:family_actions_id]
-    #binding.pry
     respond_to do |format|
       format.js { render "datatables/cancel_enrollment" }
     end

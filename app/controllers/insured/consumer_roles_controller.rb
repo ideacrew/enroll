@@ -84,7 +84,6 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-          #binding.pry
           #@resident_candidate = Forms::ResidentCandidate.new(@person_params)
           #if @resident_candidate.valid?
           #  found_resident = @resident_candidate.match_person
