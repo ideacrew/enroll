@@ -1072,7 +1072,6 @@ class HbxEnrollment
 
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled, :renewing_waived, :inactive], to: :coverage_canceled
-      transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :terminate_coverage, :after => :record_transition do
