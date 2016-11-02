@@ -71,6 +71,7 @@ require 'csv'
           rescue
             puts "Bad Person record with id: #{person.id}"
           end
+        end
       end
       puts "Total person's count in enroll database till #{today} is #{count}"
      end
