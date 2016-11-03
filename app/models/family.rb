@@ -120,7 +120,10 @@ class Family
   scope :by_general_agency_profile_id,         -> (general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
+
   scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
+
+  scope :all_eligible_for_assistance,   ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
 
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }

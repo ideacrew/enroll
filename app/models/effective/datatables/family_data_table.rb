@@ -91,7 +91,7 @@ module Effective
         ],
         individual_options: [
           {scope: 'all', label: 'All'},
-          {scope: 'all_assistance_receiving', label: 'Assisted'},
+          {scope: 'all_eligible_for_assistance', label: 'Assisted'},
           {scope: 'all_unassisted', label: 'Unassisted'},
           {scope: 'sep_eligible', label: 'SEP Eligible'}
         ],
