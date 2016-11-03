@@ -67,8 +67,7 @@ module Effective
       end
 
       def cancel_enrollment_type(family)
-        hbx_enrollment = family.households.first.hbx_enrollments.last
-        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+        family.all_enrollments.cancel_eligible.present? ? 'ajax' : 'disabled'
       end
 
       def terminate_enrollment_type(family)
