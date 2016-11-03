@@ -65,8 +65,8 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3A',
-    title: 'Renewal/Conversion Employer Publishes Plan',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'PlanYear Renewal Notice(3A)',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3a',
     notice_triggers: [
@@ -86,8 +86,8 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3B',
-    title: 'Renewal/Conversion Employer Auto-Published',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'PlanYear Renewal Notice(3B)',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3b',
     notice_triggers: [

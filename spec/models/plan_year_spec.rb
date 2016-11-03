@@ -2423,6 +2423,7 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
+        allow_any_instance_of(PlanYear).to receive(:trigger_auto_renew_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 

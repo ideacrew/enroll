@@ -888,17 +888,13 @@ private
   end
 
   def trigger_renew_notice
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
-                                                  :subject => "PlanYear Renewal Notice(3A)",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
+    subscriber = Subscribers::NotificationSubscriber.new
+    subscriber.call("acapi.info.events.employer.planyear_renewal_3a", "e_start", "e_end", "msg_id",{"employer_id" => employer_profile.hbx_id })
   end
 
   def trigger_auto_renew_notice
     application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
+    shop_notice =ShopNotices::EmployerNotice.new(employer_profile,{
                                                   :subject => "PlanYear Renewal Notice(3B)",
                                                   :trigger_type => "auto",
                                                   :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
