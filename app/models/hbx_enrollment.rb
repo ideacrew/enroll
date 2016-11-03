@@ -115,6 +115,7 @@ class HbxEnrollment
   field :external_enrollment, type: Boolean, default: false
 
   #field :is_cobra, type: Boolean, default: false
+  field :is_tranding_partner_transmittable, type: Boolean, default: false
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"

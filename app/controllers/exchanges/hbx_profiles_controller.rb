@@ -238,8 +238,7 @@ def employer_poc
   end
 
   def cancel_enrollment
-    @hh = Family.find(params[:family]).households.first
-    @hbx_enrollment = @hh.hbx_enrollments.last
+    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/cancel_enrollment" }
@@ -247,12 +246,29 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    if @hbx_enrollment.cancel_coverage!
-      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Cancellation Successful" }
+    @result = {success: [], failure: []}
+    @row = params[:family_actions_id]
+    @family_id = params[:family_id]
+    params.each do |key, value|
+      if key.to_s[/cancel_hbx_.*/]
+        hbx = HbxEnrollment.find(params[key.to_s])
+        begin
+          hbx.cancel_coverage! if hbx.may_cancel_coverage?
+          @result[:success] << hbx
+        rescue
+          @result[:error] << hbx
+        end
+      end
+      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
+    end
+    respond_to do |format|
+      format.js { render :file => "datatables/cancel_enrollment_result.js.erb"}
     end
   end
 
+  def set_transmit_flag(hbx_id)
+    HbxEnrollment.find(hbx_id).update_attributes!(is_tranding_partner_transmittable: true)
+  end
 
   def terminate_enrollment
     @hh = Family.find(params[:family]).households.first
