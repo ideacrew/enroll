@@ -126,7 +126,7 @@ class CensusEmployee < CensusMember
   def allow_nil_ssn_updates_dependents
     census_dependents.each do |cd|
       if cd.ssn.blank?
-        cd.update(encrypted_ssn:"")
+        cd.unset(:encrypted_ssn)
       end
     end
   end
