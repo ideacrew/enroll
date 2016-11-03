@@ -28,7 +28,7 @@ def update_aptc(row)
   @pdc+=1
 
   th.eligibility_determinations.build(
-    e_pdc_id: "9_2_2016LOADING" + @pdc.to_s,
+    e_pdc_id: "MANUALLY_9_2_2016LOADING" + @pdc.to_s,
     benchmark_plan_id: @slcsp,
     max_aptc: row[1],
     csr_percent_as_integer: row[2],
@@ -51,5 +51,11 @@ def update_aptc(row)
 end
 
 CSV.foreach("spec/test_data/cne.csv") do |row|
+  update_aptc(row)
+end
+
+CSV.foreach("spec/test_data/cne2.csv") do |row_with_ssn|
+  hbx_id = Person.by_ssn(row_with_ssn.first).first.hbx_id
+  row=[hbx_id, row_with_ssn[1], row_with_ssn[2]]
   update_aptc(row)
 end
