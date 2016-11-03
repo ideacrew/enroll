@@ -777,3 +777,10 @@ $(document).on('click', '#address_info + span.form-action', function(){
     $('.mailing-div .label-floatlabel').hide();
   }
 });
+
+$(document).on('click', '#ivl_insured_button', function(){
+    var pathname = window.location.pathname;
+    if((pathname.indexOf("ridp_agreement") != -1) || (pathname.indexOf("interactive_identity_verifications") != -1)){
+        return false
+    }
+});
