@@ -403,6 +403,25 @@ class PlanYear
 #    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
+  def enrolled_by_bga
+    benefit_group_ids = self.benefit_groups.map(&:id).compact.uniq
+    candidate_benefit_group_assignments = eligible_to_enroll.select do |ce|
+        enrolled_bga_for_ce ce
+    end
+    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+    bgas = candidate_benefit_group_assignments.select do |bga|
+      enrolled_benefit_group_assignment_ids.include?(bga.id)
+    end
+  end
+
+  # TODO Get definition of enrolled count from @dan/@ram/@hannah
+  def enrolled_bga_for_ce ce
+    bg_assignment = ce.benefit_group_assignments.detect{|assignment|
+      renewing = is_renewing? && !(assignment.initialized?) && !(assignment.coverage_terminated?)
+      renewing || assignment.is_active?
+    }
+  end
+
   def calc_active_health_assignments_for(employee_pool)
     benefit_group_ids = self.benefit_groups.map(&:id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
@@ -424,7 +443,8 @@ class PlanYear
 
   def total_enrolled_count
     if self.employer_profile.census_employees.count < 100
-      enrolled.count
+      #enrolled.count
+      enrolled_by_bga.count
     else
       0
     end
