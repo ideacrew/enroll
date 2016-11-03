@@ -49,8 +49,8 @@ module Queries
       if @custom_attributes['employer_options'] == 'coverage_waived'
         family = family.coverage_waived
       end
-      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
-        family = family.all_assistance_receiving
+      if @custom_attributes['individual_options'] == 'all_eligible_for_assistance'
+        family = family.all_eligible_for_assistance
       end
       if @custom_attributes['individual_options'] == 'sep_eligible'
         family = family.sep_eligible
@@ -64,6 +64,8 @@ module Queries
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
+      #Caution Mongo optimization on chained "$in" statements with same field
+      #is to do a union, not an interaction
       family_scope = family.and('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
       family_scope.order_by(@order_by)
