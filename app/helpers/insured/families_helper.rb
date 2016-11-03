@@ -153,8 +153,12 @@ module Insured::FamiliesHelper
     return member_names.join(", ")
   end
 
-  def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  def has_writing_agent?(employee_role_or_person)
+    if employee_role_or_person.is_a?(EmployeeRole)
+      employee_role_or_person.employer_profile.active_broker_agency_account.writing_agent rescue false
+    elsif employee_role_or_person.is_a?(Person)
+       employee_role_or_person.primary_family.current_broker_agency.writing_agent.present? rescue false
+    end
   end
 
 
@@ -171,16 +175,16 @@ module Insured::FamiliesHelper
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
     if qle.date_options_available
       # Take to the QLE like flow of choosing Option dates if available
-       qle_link_generator_for_an_existing_qle(qle, link_title) 
+       qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
       link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
     end
   end
-  
+
   def find_qle_for_sep(sep)
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
-  end  
+  end
 
   def dual_role_without_shop_sep?
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
