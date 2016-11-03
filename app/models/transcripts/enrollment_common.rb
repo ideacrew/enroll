@@ -22,7 +22,12 @@ module Transcripts
 
       if enrollment.persisted?
         assignment = enrollment.benefit_group_assignment
-        id_list = assignment.benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+        benefit_group = (assignment.present? ? assignment.benefit_group : enrollment.benefit_group)
+        if benefit_group.blank?
+          id_list = []
+        else
+          id_list = benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+        end
       else
         # TODO: Fix this for Conversion ER
         plan_year = enrollment.employer_profile.find_plan_year_by_effective_date(enrollment.effective_on)
