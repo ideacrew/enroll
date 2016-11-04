@@ -2,6 +2,7 @@ require 'csv'
 
 @pdc = 0
 @slcsp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.slcsp_id
+@wrong_ssn_counter = 0
 
 def update_aptc(row)
   person = Person.by_hbx_id(row[0]).first
@@ -55,7 +56,15 @@ CSV.foreach("spec/test_data/cne.csv") do |row|
 end
 
 CSV.foreach("spec/test_data/cne2.csv") do |row_with_ssn|
-  hbx_id = Person.by_ssn(row_with_ssn.first).first.hbx_id
-  row=[hbx_id, row_with_ssn[1], row_with_ssn[2]]
-  update_aptc(row)
+  person = Person.by_ssn(row_with_ssn.first).first
+  if person
+    hbx_id = person.hbx_id
+    row=[hbx_id, row_with_ssn[1], row_with_ssn[2]]
+    update_aptc(row)
+  else
+    @wrong_ssn_counter += 1
+    puts "Person with ssn: #{row_with_ssn.first} can't be found."
+  end
 end
+
+puts "#{@wrong_ssn_counter} people can't be found by SSN" if @wrong_ssn_counter > 0
