@@ -36,8 +36,8 @@ class PlanYear
   field :msp_count, type: Integer, default: 0
 
   # Calculated Fields for DataTable
-  field :enrolled_count, type: Integer, default: 0
-  field :waived_count, type: Integer, default: 0
+  field :enrolled_summary, type: Integer, default: 0
+  field :waived_summary, type: Integer, default: 0
 
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
