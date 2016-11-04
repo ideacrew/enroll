@@ -9,7 +9,7 @@
       <thead>
         <th>Legal Name</th>
         <th>dba</th>
-        <% if (@broker_agency_profile.organization.is_fake_fein? && !current_user.has_broker_agency_staff_role?) || (@broker_agency_profile.organization.is_fake_fein? && current_user.has_hbx_staff_role?) || !@broker_agency_profile.organization.is_fake_fein? %>
+        <% if fein_display(@broker_agency_profile) %>
           <th>Fein </th>
         <%end%>
         <th>Market Kind</th>
@@ -17,7 +17,7 @@
       <tbody>
         <td><%= @broker_agency_profile.legal_name %></td>
         <td><%= @broker_agency_profile.dba %></td>
-        <% if (@broker_agency_profile.organization.is_fake_fein? && !current_user.has_broker_agency_staff_role?) || (@broker_agency_profile.organization.is_fake_fein? && current_user.has_hbx_staff_role?) || !@broker_agency_profile.organization.is_fake_fein? %>
+        <% if fein_display(@broker_agency_profile) %>
           <td><%= @broker_agency_profile.fein %></td>
         <% end %>
         <td><%= @broker_agency_profile.market_kind.titleize %></td>
