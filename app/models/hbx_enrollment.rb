@@ -1028,6 +1028,7 @@ class HbxEnrollment
     state :coverage_expired
 
     state :inactive   # :after_enter inform census_employee
+    state :void
 
     state :auto_renewing
     state :renewing_waived
@@ -1101,6 +1102,10 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
+    event :void_coverage, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :coverage_selected, :enrolled_contingent, :unverified, :coverage_enrolled, :coverage_terminated], to: :void
+    end
+
     event :move_to_enrolled!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
@@ -1144,6 +1149,9 @@ class HbxEnrollment
     event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
     end
+
+
+    
   end
 
 
