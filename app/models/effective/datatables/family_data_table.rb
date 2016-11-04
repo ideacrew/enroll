@@ -71,8 +71,7 @@ module Effective
       end
 
       def terminate_enrollment_type(family)
-        hbx_enrollment = family.households.first.hbx_enrollments.last
-        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+        family.all_enrollments.can_terminate.present? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
