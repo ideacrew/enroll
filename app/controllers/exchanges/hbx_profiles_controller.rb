@@ -271,23 +271,33 @@ def employer_poc
   end
 
   def terminate_enrollment
-    @hh = Family.find(params[:family]).households.first
-    @hbx_enrollment = @hh.hbx_enrollments.last
+    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
     end
+
   end
 
   def update_terminate_enrollment
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
-    termination_date = Date.strptime(params[:termination_date], "%m/%d/%Y")
-
-    if @hbx_enrollment.kind == "individual"
-      @hbx_enrollment.terminate_coverage!(termination_date)
-      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Termination Successful" }
-    elsif @hbx_enrollment.schedule_coverage_termination!(termination_date)
-      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Termination Successful" }
+    @result = {success: [], failure: []}
+    @row = params[:family_actions_id]
+    @family_id = params[:family_id]
+    params.each do |key, value|
+      if key.to_s[/terminate_hbx_.*/]
+        hbx = HbxEnrollment.find(params[key.to_s])
+        begin
+          termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
+          hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
+          @result[:success] << hbx
+        rescue
+          @result[:error] << hbx
+        end
+      end
+      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
+    end
+    respond_to do |format|
+      format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
     end
   end
 

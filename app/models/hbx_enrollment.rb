@@ -35,6 +35,16 @@ class HbxEnrollment
       "unverified"
     ]
 
+  CAN_TERMINATE_ENROLLMENTS = [
+    "coverage_termination_pending",
+    "coverage_selected",
+    "auto_renewing",
+    "renewing_coverage_selected",
+    "enrolled_contingent",
+    "unverified",
+    "coverage_enrolled"
+  ]
+
   SELECTED_AND_WAIVED = ["coverage_selected", "inactive"]
 
   TERMINATED_STATUSES = ["coverage_terminated", "unverified"]
@@ -135,6 +145,7 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
