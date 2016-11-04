@@ -26,7 +26,7 @@ module Importers::Transcripts
           dob: 'edi',
           ssn: 'edi'
         },
-        remove: 'edi' 
+        remove: 'ea'
       },
       addresses: {
         add: 'edi',
