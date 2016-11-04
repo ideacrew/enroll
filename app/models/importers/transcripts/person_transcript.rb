@@ -13,25 +13,33 @@ module Importers::Transcripts
       emails: { enumeration_field: "kind", enumeration: Email::KINDS },
     }
 
-
     DEPENDENT_SOURCE_RULE_MAP = {
       base: {
-        add: 'edi', # middle name EA should be the source
-        update: {
-          first_name: 'ea',
-          middle_name: 'ea', 
-          last_name: 'ea',
+        add: {
+          first_name: 'edi',
+          last_name: 'edi',
           name_sfx: 'edi',
           gender: 'edi',
           dob: 'edi',
-          ssn: 'edi'
+          ssn: 'edi',
+          middle_name: 'ignore'
+        } 
+        update: {
+          hbx_id: 'edi',
+          name_sfx: 'edi',
+          gender: 'edi',
+          dob: 'edi',
+          ssn: 'edi',
+          first_name: 'ignore',
+          last_name: 'ignore',
+          middle_name: 'ignore'
         },
-        remove: 'ea'
+        remove: 'ignore'
       },
       addresses: {
         add: 'edi',
         update: 'edi',
-        remove: 'ea'
+        remove: 'ignore'
       },
       phones: {
         add: 'edi',
@@ -43,7 +51,7 @@ module Importers::Transcripts
       emails: {
         add: 'edi',
         update: 'edi',
-        remove: 'ea'
+        remove: 'ignore'
       }
     }
 
@@ -51,13 +59,14 @@ module Importers::Transcripts
       base: {
         add: 'edi',
         update: {
+          hbx_id: 'edi',
           first_name: 'edi',
           middle_name: 'edi', 
           last_name: 'edi',
           name_sfx: 'edi',
-          gender: 'ea',
-          dob: 'ea',
-          ssn: 'ea'
+          dob: 'ignore',
+          ssn: 'ignore',
+          gender: 'ignore'
         },
         remove: {
           middle_name: 'edi'
@@ -66,7 +75,7 @@ module Importers::Transcripts
       addresses: {
         add: 'edi',
         update: 'edi',
-        remove: 'ea'
+        remove: 'ignore'
       },
       phones: {
         add: 'edi',
@@ -78,7 +87,7 @@ module Importers::Transcripts
       emails: {
         add: 'edi',
         update: 'edi',
-        remove: 'ea'
+        remove: 'ignore'
       }
     }
 
