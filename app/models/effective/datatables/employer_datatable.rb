@@ -16,9 +16,9 @@ module Effective
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         #table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
         #table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
-        # table_column :broker, :proc => Proc.new { |row|
-        #     row.employer_profile.broker_agency_profile.organization.legal_name.titleize if row.employer_profile.broker_agency_profile.present?
-        #   }, :filter => false
+        table_column :broker, :proc => Proc.new { |row|
+            row.employer_profile.broker_agency_profile.organization.legal_name.titleize if row.employer_profile.broker_agency_profile.present?
+          }, :filter => false
         # table_column :general_agency, :proc => Proc.new { |row|
         #   row.employer_profile.active_general_agency_legal_name.titleize if row.employer_profile.active_general_agency_legal_name.present?
         # }, :filter => false
