@@ -19,9 +19,9 @@ module Effective
         # table_column :broker, :proc => Proc.new { |row|
         #     @employer_profile.try(:broker_agency_profile).try(:organization).try(:legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
         #   }, :filter => false
-        # table_column :general_agency, :proc => Proc.new { |row|
-        #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
-        # }, :filter => false
+        table_column :general_agency, :proc => Proc.new { |row|
+          @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
+        }, :filter => false
         table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
         table_column :plan_year_state, :proc => Proc.new { |row|

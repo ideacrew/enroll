@@ -181,7 +181,7 @@ class EmployerProfile
 
   def active_general_agency_legal_name
     if active_general_agency_account
-      active_general_agency_account.legal_name
+      active_general_agency_account.ga_name
     end
   end
 
