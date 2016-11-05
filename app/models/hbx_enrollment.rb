@@ -413,7 +413,6 @@ class HbxEnrollment
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
-    perform_employer_plan_year_count
   end
 
   def propogate_waiver
@@ -1071,7 +1070,7 @@ class HbxEnrollment
     state :unverified
     state :enrolled_contingent
 
-    after_all_events :perform_employer_plan_year_count
+    after_all_transactions :perform_employer_plan_year_count
 
     event :advance_date, :after => :record_transition do
     end
