@@ -1070,7 +1070,7 @@ class HbxEnrollment
     state :unverified
     state :enrolled_contingent
 
-    after_all_transactions :perform_employer_plan_year_count
+    after_all_transitions :perform_employer_plan_year_count
 
     event :advance_date, :after => :record_transition do
     end
