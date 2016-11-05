@@ -16,9 +16,9 @@ module Effective
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         #table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
-        # table_column :broker, :proc => Proc.new { |row|
-        #     @employer_profile.try(:broker_agency_profile).try(:organization).try(:legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
-        #   }, :filter => false
+        table_column :broker, :proc => Proc.new { |row|
+            @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
+          }, :filter => false
         table_column :general_agency, :proc => Proc.new { |row|
           @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
         }, :filter => false

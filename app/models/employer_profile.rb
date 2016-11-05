@@ -166,6 +166,12 @@ class EmployerProfile
     end
   end
 
+  def active_broker_agency_legal_name
+    if active_broker_agency_account
+      active_broker_agency_account.ba_name
+    end
+  end
+
   def memoize_active_broker active_broker_memo
     return unless account = active_broker_agency_account
     if memo = active_broker_memo[account.broker_agency_profile_id] then return memo end
