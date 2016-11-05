@@ -62,6 +62,7 @@
       order: datatable.data('default-order')
       processing: true
       responsive: true
+      searchDelay: 500
       serverParams: (params) ->
         table = this.api()
         table.columns().flatten().each (index) =>
