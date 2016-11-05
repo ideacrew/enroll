@@ -201,7 +201,8 @@ class PlanYear
 
   def employee_participation_percent
     return "-" if eligible_to_enroll_count == 0
-    "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
+    #{}"#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
+    "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
   end
 
   def editable?
