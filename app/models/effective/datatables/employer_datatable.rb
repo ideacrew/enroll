@@ -15,27 +15,24 @@ module Effective
           link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')}, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
-        #table_column :plan_year_status, :width => '120px', :proc => Proc.new { |row| row.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New'}, :filter => false
         #table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(row.employer_profile) }, :filter => false
-        table_column :broker, :proc => Proc.new { |row|
-            @employer_profile.try(:broker_agency_profile).try(:organization).try(:legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
-          }, :filter => false
-        table_column :general_agency, :proc => Proc.new { |row|
-          @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
-        }, :filter => false
+        # table_column :broker, :proc => Proc.new { |row|
+        #     @employer_profile.try(:broker_agency_profile).try(:organization).try(:legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
+        #   }, :filter => false
+        # table_column :general_agency, :proc => Proc.new { |row|
+        #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
+        # }, :filter => false
         table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
           @latest_plan_year = @employer_profile.try(:latest_plan_year)
           @latest_plan_year.try(:aasm_state).try(:titleize)}, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
-          #row.employer_profile.try(:latest_plan_year).try(:start_on)
           @latest_plan_year.try(:start_on)
           }, :filter => false
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
         table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
-          #plan_year = row.employer_profile.try(:latest_plan_year)
 
           enrolled = @latest_plan_year.try(:enrolled_summary)
           waived = @latest_plan_year.try(:waived_summary)
