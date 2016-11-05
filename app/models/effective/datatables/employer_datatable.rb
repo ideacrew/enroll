@@ -29,10 +29,12 @@ module Effective
         table_column :participation, :proc => Proc.new { |row| row.employer_profile.try(:latest_plan_year).try(:employee_participation_percent)}, :filter => false
         table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
           plan_year = row.employer_profile.try(:latest_plan_year)
-          census_employees = plan_year.find_census_employees if plan_year.present?
+          #census_employees = plan_year.find_census_employees if plan_year.present?
           #enrolled = plan_year.try(:enrolled).try(:count).to_i
-          enrolled = CensusEmployee.enrolled_count(plan_year.try(:benefit_groups).try(:first))
-          waived = census_employees.try(:waived).try(:count).to_i
+          #enrolled = CensusEmployee.enrolled_count(plan_year.try(:benefit_groups).try(:first))
+          #waived = census_employees.try(:waived).try(:count).to_i
+          enrolled = plan_year.try(:enrolled_summary)
+          waived = plan_year.try(:waived_summary)
           enrolled.to_s + "/" + waived.to_s
           }, :filter => false, :sortable => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(row.employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
