@@ -413,6 +413,7 @@ class HbxEnrollment
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
+    perform_employer_plan_year_count
   end
 
   def propogate_waiver
