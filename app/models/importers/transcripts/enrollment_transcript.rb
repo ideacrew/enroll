@@ -8,6 +8,7 @@ module Importers::Transcripts
 
     attr_accessor :transcript, :updates, :market, :other_enrollment
     include ::Transcripts::EnrollmentCommon
+    include ::Importers::Transcripts::EnrollmentActions
 
     ENUMERATION_FIELDS = {
       plan: { enumeration_field: "hios_id", enumeration: [ ]},
@@ -53,8 +54,8 @@ module Importers::Transcripts
       }
     }
 
-    def fix_enrollment_coverage_start
-     @other_enrollment.hbx_enrollment_members = @other_enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
+    def calculate_coverage_begin
+      @other_enrollment.hbx_enrollment_members = @other_enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
 
       if @other_enrollment.hbx_enrollment_members.any?{|member| member.coverage_end_on.blank?}
 
@@ -74,14 +75,15 @@ module Importers::Transcripts
     end
 
     def process
-      fix_enrollment_coverage_start
+      calculate_coverage_begin
+      
       @updates = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
 
       @enrollment = find_instance
 
       if @transcript[:source_is_new]
-        if valid_new_request
+        if valid_new_request?
           create_new_enrollment
           @enrollment ||= @new_enrollment
         end
@@ -119,43 +121,7 @@ module Importers::Transcripts
       end
     end
 
-    def process_enrollment_remove(attributes)
-      if @enrollment.blank?
-        subscriber = @other_enrollment.family.primary_applicant
-        matched_people = match_person_instance(subscriber.person)
-        matched_person = matched_people.first
-        family= Family.find_all_by_person(matched_person).first
-      else
-        family = @enrollment.family
-      end
-
-      enrollments = attributes['hbx_id']
-      enrollments.each do |enrollment_hash|
-        enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-        if (@enrollment.present? && enrollment.effective_on == @enrollment.effective_on) && (enrollment.terminated_on.present? && enrollment.effective_on >= enrollment.terminated_on)
-          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-           @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment canceled successfully"]
-        else
-          enrollment.terminate_coverage! if enrollment.may_terminate_coverage?
-          @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment terminated successfully"]
-        end
-      end
-    end
-
-    def find_exact_enrollment_matches(enrollments)
-      enrollment_hbx_ids = @enrollment.hbx_enrollment_members.map(&:hbx_id)
-
-      enrollments.reject! do |en|
-        en_hbx_ids = en.hbx_enrollment_members.map(&:hbx_id)
-        en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
-      end
-
-      enrollments.reject!{|en| (en.plan_id != @enrollment.plan_id)}
-      enrollments.reject!{|en| (en.effective_on != @enrollment.effective_on)}
-      enrollments
-    end
-
-    def valid_new_request
+    def valid_new_request?
       begin
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
@@ -177,37 +143,16 @@ module Importers::Transcripts
     end
 
     def validate_update
-      # action section atribute value
-
       @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
         actions.each do |action|
           attributes = @comparison_result.changeset_content_at [section, action]
 
           attributes.each do |attribute, value|
-
-            if section == :base
-              if action == 'update'
-                if attribute == 'effective_on'
-                  if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
-                    raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
-                  end
-                end
-              elsif action == 'add'
-                # if attribute == 'terminated_on'
-                #   enrollments = (@market == 'shop' ? matching_shop_coverages(@enrollment) : matching_ivl_coverages(@enrollment))
-                #   enrollments.reject!{|e| e == @enrollment}
-
-                #   @exact_enrollment_matches = find_exact_enrollment_matches(enrollments)
-                #   other_coverages = enrollments - @exact_enrollment_matches
-
-                #   if other_coverages.any?
-                #     message = "Enrollment can't be termed."
-                #     message += "Found other active coverages #{other_coverages.map(&:hbx_id).join(',')}."
-                #     message += "Found duplicate coverages #{@exact_enrollment_matches.map(&:hbx_id).join(',')}." if @exact_enrollment_matches.any?
-                #     raise message
-                #   end
-                # end
+            # TODO: should we ignore this
+            if section == :base && action == 'update' && attribute == 'effective_on'
+              if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
+                raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
               end
             end
 
@@ -220,7 +165,6 @@ module Importers::Transcripts
 
             if section == :hbx_enrollment_members
               if action != 'remove'
-                
                 hbx_id = (action == 'add' ? value["hbx_id"] : attribute.split(':')[1])            
                 enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|em| em.hbx_id == hbx_id}
                 matched_people = match_person_instance(enrollment_member.person)
@@ -279,74 +223,6 @@ module Importers::Transcripts
       end
     end
 
-    def add_terminated_on(termination_date)
-      if termination_date > TimeKeeper.date_of_record
-        @enrollment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
-      else
-        @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
-      end
-
-      @enrollment.update!({:terminated_on => termination_date})
-    end
-
-    def add_plan(association)
-      @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
-      @enrollment.update_attributes({ plan_id: @plan.id, carrier_profile_id: @plan.carrier_profile_id })
-    end
-
-    def add_hbx_enrollment_members(association)
-      other_enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|member| member.family_member.hbx_id == association['hbx_id']}
-      matching_person = match_person_instance(other_enrollment_member.family_member.person).first
-
-      family = @enrollment.family
-      family_member = family.add_family_member(matching_person, is_primary_applicant: false)
-
-      @enrollment.hbx_enrollment_members.build({
-        applicant_id: family_member.id,
-        is_subscriber: other_enrollment_member.is_subscriber,
-        eligibility_date: other_enrollment_member.coverage_start_on,
-        coverage_start_on: other_enrollment_member.coverage_start_on,
-        coverage_end_on: other_enrollment_member.coverage_end_on
-      })
-
-      family.save!
-    end
- 
-    def update_effective_on(value)
-      @enrollment.update!({:effective_on => value})
-    end
-
-    def update_terminated_on(value)
-      @enrollment.update!({:terminated_on => value})
-
-      if value > TimeKeeper.date_of_record
-        @enrollment.schedule_coverage_termination! if @enrollment.may_schedule_coverage_termination?
-      else
-        @enrollment.terminate_coverage! if @enrollment.may_terminate_coverage?
-      end
-    end
-
-    def remove_terminated_on(value)
-      @enrollment.update!({:terminated_on => nil})
-      @enrollment.update!({:aasm_state => 'coverage_selected'})
-
-      @enrollment.hbx_enrollment_members.each do |member|
-        member.update!({coverage_end_on: nil})
-      end
-    end
-
-    def update_hbx_id(hbx_id)
-      if HbxEnrollment.by_hbx_id(hbx_id).blank?
-        @enrollment.update!({:hbx_id => hbx_id})
-      else
-        @updates[:update][:base]['hbx_id'] = ["Success", "Add EDI DB foreign key #{@enrollment.hbx_id}"]
-      end
-    end
-
-    def update_applied_aptc_amount(value)
-      @enrollment.update!({:applied_aptc_amount => value})
-    end
-
     def update(section, attributes)
       rule = find_rule_set(section, :update)
 
@@ -357,7 +233,6 @@ module Importers::Transcripts
         attributes.each do |field, value|
           if value.present? && (rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi'))
             begin
-              # validate_timestamp(section)
               send("update_#{field}", value)
               log_success(:update, section, field) if @updates[:update][section][field].blank?
             rescue Exception => e
@@ -399,37 +274,6 @@ module Importers::Transcripts
       end
     end
 
-    def hbx_enrollment_members_hbx_id_remove(value)
-      family = @enrollment.family
-
-      hbx_enrollment = family.active_household.hbx_enrollments.build({
-        kind: @enrollment.kind,
-        elected_aptc_pct: @enrollment.elected_aptc_pct,
-        applied_aptc_amount: @enrollment.applied_aptc_amount,
-        coverage_kind: @enrollment.coverage_kind,
-        effective_on: @other_enrollment.effective_on,
-        submitted_at: TimeKeeper.datetime_of_record,
-        created_at: TimeKeeper.datetime_of_record,
-        updated_at: TimeKeeper.datetime_of_record
-      })
-
-      if @market == 'shop'
-        hbx_enrollment.benefit_group_id = @enrollment.benefit_group_id
-        hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
-        hbx_enrollment.employee_role_id = @enrollment.employee_role_id
-      else
-        hbx_enrollment.consumer_role_id = @enrollment.consumer_role.id
-      end
-
-      hbx_enrollment.plan = @enrollment.plan
-      @enrollment.hbx_enrollment_members.each do |member| 
-        next if member.hbx_id == value['hbx_id']
-        hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
-      end
-
-      hbx_enrollment.save!
-    end
-
     def remove(section, attributes)
       rule = find_rule_set(section, :remove)
 
@@ -463,58 +307,6 @@ module Importers::Transcripts
             log_ignore(:remove, section, identifier)
           end
         end
-      end
-    end
-
-    def csv_row
-      @people_cache = {}
-      @plan = nil
-
-      plan_details = (@transcript[:plan_details].present? ? @transcript[:plan_details].values : 4.times.map{nil})
-      person_details = [
-        @transcript[:primary_details][:hbx_id],
-        @transcript[:primary_details][:ssn], 
-        @transcript[:primary_details][:last_name], 
-        @transcript[:primary_details][:first_name]
-      ]
-
-      details = person_details + plan_details
-      if @market == 'shop'
-        employer_details = (@transcript[:employer_details].present? ? @transcript[:employer_details].values : 3.times.map{nil})
-        details += employer_details     
-      end
-
-      results = @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
-        actions = @comparison_result.changeset_section_actions [section]
-        section_rows += actions.reduce([]) do |rows, action|
-          attributes = @comparison_result.changeset_content_at [section, action]
-
-          fields_to_ignore = ['_id', 'updated_by']
-          rows = []
-          attributes.each do |attribute, value|
-            if value.is_a?(Hash)
-              fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
-            end
-
-            action_taken = (@updates[:update_failed].present? ? @updates[:update_failed] : @updates[action.to_sym][section][attribute])
-
-            if value.is_a?(Array)
-              value.each do |val|
-                rows << ([@transcript[:identifier]] + details + [action, "#{section}:#{attribute}", val] + (action_taken || []))
-              end
-            else
-              rows << ([@transcript[:identifier]] + details + [action, "#{section}:#{attribute}", value] + (action_taken || []))
-            end   
-          end
-          rows
-        end
-      end
-
-      if results.empty?
-        ([[@transcript[:identifier]] + details + ['update']])
-      else
-        results
       end
     end
 
@@ -566,7 +358,17 @@ module Importers::Transcripts
         if @market == 'individual'
           families = Family.find_all_by_person(matched_person)
 
-          if families.empty?
+          if families.present?
+            if families.size  == 1
+              family = families.first 
+            else
+              # TODO: pick the family where matched person is primary
+              # if they're not primary(Responsible party), lookup other members on the enrollment with families.
+              # if other mmembers match, pick that family. If they don't create a new family
+            end
+          end
+
+          if family.blank?
             if matched_person.age_on(@other_enrollment.effective_on) < 18
               raise 'Unknown primary member -- subscriber is < 18 years old'
             end
@@ -577,9 +379,7 @@ module Importers::Transcripts
               family = matched_person.primary_family
             else
               raise "unable to update person"
-            end
-          else
-            family = families.first
+            end      
           end
         else
           employer_profile = EmployerProfile.find_by_fein(@other_enrollment.employer_profile.fein)
@@ -710,22 +510,5 @@ module Importers::Transcripts
         raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
       end
     end
-
-
-    # def validate_timestamp(section)
-    #   if section == :base
-    #     if @enrollment.updated_at.to_date > @transcript[:source]['updated_at'].to_date
-    #       raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@enrollment.updated_at.strftime('%m/%d/%Y')}"
-    #     end
-    #   else
-    #     transcript_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
-    #     source_record = @enrollment.send(section).sort_by{|x| x.updated_at}.reverse.first if @enrollment.send(section).present?
-    #     return if transcript_record.blank? || source_record.blank?
-    #     if source_record.updated_at.to_date > transcript_record['updated_at'].to_date
-    #       raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
-    #     end
-    #   end
-    # end
-
   end
 end

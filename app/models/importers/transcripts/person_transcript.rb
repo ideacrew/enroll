@@ -23,7 +23,7 @@ module Importers::Transcripts
           dob: 'edi',
           ssn: 'edi',
           middle_name: 'ignore'
-        } 
+        },
         update: {
           hbx_id: 'edi',
           name_sfx: 'edi',
@@ -157,10 +157,10 @@ module Importers::Transcripts
 
       @updates[:add] ||= {} 
       @updates[:add][section] ||= {} 
-
+ 
       if section == :base
         attributes.each do |field, value|
-          if rule == 'edi' || (@market == 'shop' && !@is_subscriber && field.to_s == 'middle_name')
+          if rule == 'edi' || (rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')) || (@market == 'shop' && !@is_subscriber && field.to_s == 'middle_name')
             begin
               # validate_timestamp(section)
               @person.update!({field => value})
