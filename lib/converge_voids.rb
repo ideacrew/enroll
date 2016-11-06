@@ -39,7 +39,7 @@ class ConvergeVoids
         # TODO: Check about enrolled contingent
         if exact_match.coverage_selected?
           terminated_enrollment.update_attributes({aasm_state: 'coverage_selected', terminated_on: nil})
-          exact_match.void_coverage!
+          exact_match.invalidate_enrollment!
         end
 
         data << exact_match
@@ -53,7 +53,7 @@ class ConvergeVoids
   # Void non matching hbx_ids
   def void_hbx_ids(enrollments, terminated_enrollments)
     terminated_enrollments.inject([]) do |data, terminated_enrollment|
-      terminated_enrollment.void_coverage!
+      terminated_enrollment.invalidate_enrollment!
       terminated_enrollment.update!(terminated_on: nil)
       data << terminated_enrollment
     end

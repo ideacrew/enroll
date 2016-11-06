@@ -561,8 +561,8 @@ class HbxEnrollment
   end
 
   def <=>(other)
-    other_members = other.hbx_enrollment_members - other.terminated_members
-    [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
+    other_members = other.hbx_enrollment_members # - other.terminated_members
+    [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
   end
 
   def terminated_members
@@ -1102,8 +1102,15 @@ class HbxEnrollment
       transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
-    event :void_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :enrolled_contingent, :unverified, :coverage_enrolled, :coverage_terminated], to: :void
+    event :invalidate_enrollment, :after => :record_transition do
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled,
+        :coverage_termination_pending, :coverage_canceled, :coverage_terminated,
+        :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
+        :auto_renewing, :renewing_waived, :renewing_coverage_selected, 
+        :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, 
+        :auto_renewing_contingent, :renewing_contingent_selected, 
+        :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled],
+        to:  :void
     end
 
     event :move_to_enrolled!, :after => :record_transition do
@@ -1149,9 +1156,6 @@ class HbxEnrollment
     event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
     end
-
-
-    
   end
 
 
