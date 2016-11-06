@@ -94,7 +94,16 @@ module Importers::Transcripts
 
     SOURCE_RULE_MAP = {
       base: {
-        add: 'edi',
+        add: {
+          hbx_id: 'edi',
+          first_name: 'edi',
+          middle_name: 'edi', 
+          last_name: 'edi',
+          name_sfx: 'edi',
+          dob: 'edi',
+          ssn: 'edi',
+          gender: 'ignore'
+        },
         update: 'edi',
         remove: {
           no_dc_address: 'ignore',
