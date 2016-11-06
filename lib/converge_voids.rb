@@ -1,6 +1,6 @@
 class ConvergeVoids
 
-  FILE_PATH= "#{Rails.root}/LatestXmlFiles/ivl_policy_xmls"
+  FILE_PATH= "#{Rails.root}/sample_xmls"
 
   def initialize(action)
     @action = action

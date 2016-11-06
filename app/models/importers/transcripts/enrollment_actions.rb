@@ -14,12 +14,25 @@ module Importers::Transcripts
 
     def add_plan(association)
       @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
-      @enrollment.update_attributes({ plan_id: @plan.id, carrier_profile_id: @plan.carrier_profile_id })
+
+      build_new_hbx_enrollment
+      @enrollment.plan = @plan
+      @enrollment.save!
+    end
+
+    def update_plan(association)
+      @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
+      
+      build_new_hbx_enrollment
+      @enrollment.plan = @plan
+      @enrollment.save!
     end
 
     def add_hbx_enrollment_members(association)
       other_enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|member| member.family_member.hbx_id == association['hbx_id']}
       matching_person = match_person_instance(other_enrollment_member.family_member.person).first
+
+      build_new_hbx_enrollment
 
       family = @enrollment.family
       family_member = family.add_family_member(matching_person, is_primary_applicant: false)
@@ -30,9 +43,53 @@ module Importers::Transcripts
         eligibility_date: other_enrollment_member.coverage_start_on,
         coverage_start_on: other_enrollment_member.coverage_start_on,
         coverage_end_on: other_enrollment_member.coverage_end_on
-        })
+      })
 
       family.save!
+    end
+
+    def build_new_hbx_enrollment
+      family = @enrollment.family
+
+      hbx_enrollment = family.active_household.hbx_enrollments.build({
+        kind: @enrollment.kind,
+        elected_aptc_pct: @enrollment.elected_aptc_pct,
+        applied_aptc_amount: @enrollment.applied_aptc_amount,
+        coverage_kind: @enrollment.coverage_kind,
+        effective_on: @other_enrollment.effective_on,
+        terminated_on: @other_enrollment.terminated_on,
+        submitted_at: TimeKeeper.datetime_of_record,
+        created_at: TimeKeeper.datetime_of_record,
+        updated_at: TimeKeeper.datetime_of_record
+      })
+
+      if @market == 'shop'
+        hbx_enrollment.benefit_group_id = @enrollment.benefit_group_id
+        hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
+        hbx_enrollment.employee_role_id = @enrollment.employee_role_id
+      else
+        hbx_enrollment.consumer_role_id = @enrollment.consumer_role.id
+      end
+
+      @enrollment.hbx_enrollment_members.each do |member| 
+        hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
+      end
+
+      hbx_enrollment.plan = @enrollment.plan
+      hbx_enrollment.save!
+      hbx_enrollment.reload
+
+      hbx_enrollment.select_coverage!
+
+      if @other_enrollment.terminated_on.present?
+        hbx_enrollment.update!(terminated_on: @other_enrollment.terminated_on)
+        hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
+      end
+
+      if @enrollment.may_invalidate_enrollment?
+        @enrollment.invalidate_enrollment!
+        @enrollment = hbx_enrollment
+      end
     end
 
     def update_effective_on(value)
@@ -71,42 +128,8 @@ module Importers::Transcripts
     end
 
     def hbx_enrollment_members_hbx_id_remove(value)
-      family = @enrollment.family
-
-      hbx_enrollment = family.active_household.hbx_enrollments.build({
-        kind: @enrollment.kind,
-        elected_aptc_pct: @enrollment.elected_aptc_pct,
-        applied_aptc_amount: @enrollment.applied_aptc_amount,
-        coverage_kind: @enrollment.coverage_kind,
-        effective_on: @other_enrollment.effective_on,
-        terminated_on: @other_enrollment.terminated_on,
-        submitted_at: TimeKeeper.datetime_of_record,
-        created_at: TimeKeeper.datetime_of_record,
-        updated_at: TimeKeeper.datetime_of_record
-      })
-
-      if @market == 'shop'
-        hbx_enrollment.benefit_group_id = @enrollment.benefit_group_id
-        hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
-        hbx_enrollment.employee_role_id = @enrollment.employee_role_id
-      else
-        hbx_enrollment.consumer_role_id = @enrollment.consumer_role.id
-      end
-
-      hbx_enrollment.select_coverage
-      @enrollment.hbx_enrollment_members.each do |member| 
-        next if member.hbx_id == value['hbx_id']
-        hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
-      end
-
-      hbx_enrollment.plan = @enrollment.plan
-      hbx_enrollment.save!
-      hbx_enrollment.reload
-
-      hbx_enrollment.terminate_coverage! if @other_enrollment.terminated_on.present?
-      @enrollment.invalidate_enrollment! if @enrollment.may_invalidate_enrollment?
-
-      # TODO: cancel/terminated @enrollment
+      build_new_hbx_enrollment
+      @enrollment.hbx_enrollment_members.delect{|member| member.hbx_id == value['hbx_id'] }.delete
     end
 
     def process_enrollment_remove(attributes)
@@ -114,18 +137,23 @@ module Importers::Transcripts
         subscriber = @other_enrollment.family.primary_applicant
         matched_people = match_person_instance(subscriber.person)
         matched_person = matched_people.first
-        family= Family.find_all_by_person(matched_person).first
+        family = Family.find_all_by_person(matched_person).first
       else
         family = @enrollment.family
       end
 
-      enrollments = attributes['hbx_id']
-      enrollments.each do |enrollment_hash|        
+      attributes['hbx_id'].each do |enrollment_hash|
         if enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-          enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
-
-          # TODO: Fix messages...to display multiple rows in CSV
-          @updates[:remove][:enrollment]['hbx_id'] = ["Success", "Enrollment canceled successfully"]
+          if (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)
+            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Ignored", "Enrollment already in #{enrollment.aasm_state}."]
+          elsif enrollment.effective_on < @other_enrollment.effective_on
+            enrollment.update!(terminated_on: (@other_enrollment.effective_on - 1.day))
+            enrollment.terminate_coverage!
+            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment terminated successfully"]
+          else
+            enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
+            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment voided successfully"]
+          end
         end
       end
     end

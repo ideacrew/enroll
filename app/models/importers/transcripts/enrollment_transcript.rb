@@ -33,8 +33,8 @@ module Importers::Transcripts
         }
       },
       plan: {
-        add: 'ignore',
-        update: 'ignore',
+        add: 'edi',
+        update: 'edi',
         remove: 'ignore'
       },
       hbx_enrollment_members: {
@@ -54,28 +54,8 @@ module Importers::Transcripts
       }
     }
 
-    def calculate_coverage_begin
-      @other_enrollment.hbx_enrollment_members = @other_enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
-
-      if @other_enrollment.hbx_enrollment_members.any?{|member| member.coverage_end_on.blank?}
-
-        maximum_end_date = @other_enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
-        maximum_start_date = @other_enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
-
-        if maximum_end_date.present?
-          @other_enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
-        else
-          @other_enrollment.effective_on = maximum_start_date
-        end
-
-        @other_enrollment.hbx_enrollment_members.each do |member| 
-          member.coverage_start_on = @other_enrollment.effective_on
-        end
-      end
-    end
-
     def process
-      calculate_coverage_begin
+      @other_enrollment = fix_enrollment_coverage_start(@other_enrollment)
       
       @updates = {}
       @comparison_result = ::Transcripts::ComparisonResult.new(@transcript)
@@ -93,14 +73,13 @@ module Importers::Transcripts
         begin
           validate_update
 
-          @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+          @comparison_result.changeset_sections.each do |section|
             actions = @comparison_result.changeset_section_actions [section]
-
-            section_rows += actions.reduce([]) do |rows, action|
+            actions.each do |action|
               attributes = @comparison_result.changeset_content_at [section, action]
 
               if section != :enrollment && section != :new
-                rows << send(action, section, attributes)
+                send(action, section, attributes)
               elsif section == :enrollment
                 if action == 'remove'
                   @updates[:remove] ||={}
@@ -109,9 +88,6 @@ module Importers::Transcripts
                 else
                   log_ignore(action.to_sym, section, 'hbx_id')
                 end
-                rows
-              else
-                rows
               end
             end
           end
@@ -143,7 +119,7 @@ module Importers::Transcripts
     end
 
     def validate_update
-      @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
+      @comparison_result.changeset_sections.each do |section|
         actions = @comparison_result.changeset_section_actions [section]
         actions.each do |action|
           attributes = @comparison_result.changeset_content_at [section, action]
@@ -481,6 +457,12 @@ module Importers::Transcripts
         end
 
         family.save!
+
+        if @other_enrollment.terminated_on.present?
+          hbx_enrollment.update!(terminated_on: @other_enrollment.terminated_on)
+          hbx_enrollment.terminate_coverage!
+        end
+
         @new_enrollment = hbx_enrollment
         @updates[:new][:new]['hbx_id'] = ["Success", "Enrollment added successfully using EDI source"]
       rescue Exception => e

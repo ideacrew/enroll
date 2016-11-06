@@ -1,9 +1,33 @@
 module Transcripts
   module EnrollmentCommon
 
-   
+
     def self.included(base)
       base.extend ClassMethods
+    end
+   
+    def fix_enrollment_coverage_start(enrollment)
+      if enrollment.subscriber.coverage_end_on.blank?
+        members_with_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present? }
+        maximum_end_date = members_with_end_date.sort_by{|member| member.coverage_end_on}.reverse.first.try(:coverage_end_on)
+        maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
+
+        if maximum_end_date.present?
+          enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
+        else
+          enrollment.effective_on = maximum_start_date
+        end
+
+        enrollment.hbx_enrollment_members.each do |member| 
+          member.coverage_start_on = enrollment.effective_on
+        end
+
+        enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present?}
+      else
+        enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on != enrollment.subscriber.coverage_end_on}
+      end
+      
+      enrollment
     end
 
     def matching_ivl_coverages(enrollment, family=nil)

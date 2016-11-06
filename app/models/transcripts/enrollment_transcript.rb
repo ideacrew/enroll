@@ -28,6 +28,9 @@ module Transcripts
         @fields_to_ignore << 'applied_aptc_amount'
         @custom_templates << 'EmployerProfile'
       end
+
+      @enrollment = nil
+      @duplicate_coverages = []
     end
 
     def convert(record)
@@ -61,33 +64,7 @@ module Transcripts
       end
     end
 
-    def fix_enrollment_coverage_start(enrollment)
-      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present? && !member.is_subscriber}
-
-      if enrollment.hbx_enrollment_members.any?{|member| member.coverage_end_on.blank?}
-
-        maximum_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present?}.sort_by{|member| member.coverage_end_on}.reverse.try(:first).try(:coverage_end_on)
-        maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
-
-        if maximum_end_date.present?
-          enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
-        else
-          enrollment.effective_on = maximum_start_date
-        end
-
-        enrollment.hbx_enrollment_members.each do |member| 
-          member.coverage_start_on = enrollment.effective_on
-        end
-      end
-
-      enrollment
-    end
-
-    def enrollment_members_not_matched?(enrollment)      
-      # enrollment_hbx_ids = @enrollment.hbx_enrollment_members.map(&:hbx_id)
-      # en_hbx_ids = enrollment.hbx_enrollment_members.map(&:hbx_id)
-      # en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
-
+    def enrollment_members_not_matched?(enrollment)
       (@enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) != 0 ? true : false
     end
 
@@ -123,8 +100,11 @@ module Transcripts
 
       add_plan_information
 
-      @transcript[:source]  = @transcript[:source].serializable_hash
-      @transcript[:other]   = @transcript[:other].serializable_hash
+      @transcript[:source]  = {'_id' => @transcript[:source].id} 
+      @transcript[:other]   = nil
+
+      # @transcript[:source].serializable_hash
+      # @transcript[:other].serializable_hash
     end
 
     def add_plan_information
@@ -206,7 +186,6 @@ module Transcripts
       differences
     end
 
-
     def self.enumerated_associations
       associations = [
         {association: "plan", enumeration_field: "hios_id", cardinality: "one", enumeration: [ ]},
@@ -219,73 +198,6 @@ module Transcripts
     end
 
     private
-
-    # 1) Match by hbx_id
-    #   Match found: 
-    #     - Verify active state
-    #       - True
-    #          - Compare 
-    #            (if multiple active enrollments present with primary_applicant, make them as enrollment:remove )
-    #            # (if multiple active responsible party enrollments with same subscriber, mark them as enrollment:remove)
-    #       - False
-    #          - Look for active enrollments with same coverage_kind & market, coverage year.
-    #             - Found 
-    #               (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
-    #               - Compare
-    #             - New Enrollment
-    #   Match not found:
-    #     - Look for active enrollments with same coverage_kind & market, coverage year.
-    #       - Found 
-    #         (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
-    #         - Compare
-    #       - New Enrollment
-
-    def match_enrollment(enrollment)
-      match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
-
-      if match.blank?
-        matched_people = match_person_instance(enrollment.family.primary_applicant.person)
-        if matched_people.present?       
-          raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
-          matched_person = matched_people.first
-
-          if family = matched_person.families.first
-            raise 'matched person has multiple families' if matched_person.families.size > 1
-            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))            
-            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
-            enrollments.reject!{|en| en == exact_match}
-
-            @enrollment = exact_match
-            @duplicate_coverages = enrollments
-          end
-        end
-      else
-        enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
-        exact_matches = find_exact_enrollment_matches(enrollment, enrollments.dup)
-        exact_match = exact_matches.detect{|matched| matched.hbx_id == enrollment.hbx_id }
-        exact_match ||= (exact_matches.first || enrollments.last)
-        enrollments.reject!{|en| en == exact_match}
-
-        @enrollment = exact_match
-        @duplicate_coverages = enrollments
-      end
-
-      @enrollment ||= nil
-      @duplicate_coverages ||= []
-    end
-
-    def find_exact_enrollment_matches(enrollment, enrollments)
-      enrollment_hbx_ids = enrollment.hbx_enrollment_members.map(&:hbx_id)
-
-      enrollments.reject! do |en|
-        en_hbx_ids = en.hbx_enrollment_members.map(&:hbx_id)
-        en_hbx_ids.any?{|z| !enrollment_hbx_ids.include?(z)} || enrollment_hbx_ids.any?{|z| !en_hbx_ids.include?(z)}
-      end
-
-      enrollments.reject!{|en| (en.plan.hios_id != enrollment.plan.hios_id)}
-      enrollments.reject!{|en| (en.effective_on != enrollment.effective_on)}
-      enrollments
-    end
 
     def match_instance(enrollment)
       primary = enrollment.family.primary_applicant
@@ -318,11 +230,68 @@ module Transcripts
       }
     end
 
+    # 1) Match by hbx_id
+    #   Match found: 
+    #     - Verify active state
+    #       - True
+    #          - Compare 
+    #            (if multiple active enrollments present with primary_applicant, make them as enrollment:remove )
+    #            # (if multiple active responsible party enrollments with same subscriber, mark them as enrollment:remove)
+    #       - False
+    #          - Look for active enrollments with same coverage_kind & market, coverage year.
+    #             - Found 
+    #               (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
+    #               - Compare
+    #             - New Enrollment
+    #   Match not found:
+    #     - Look for active enrollments with same coverage_kind & market, coverage year.
+    #       - Found 
+    #         (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
+    #         - Compare
+    #       - New Enrollment
+
+    def match_enrollment(enrollment)
+      match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
+
+      if match.blank?
+        matched_people = match_person_instance(enrollment.family.primary_applicant.person)
+        if matched_people.present?       
+          raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
+          matched_person = matched_people.first
+
+          if family = matched_person.families.first
+            raise 'matched person has multiple families' if matched_person.families.size > 1
+            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))          
+            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
+            enrollments.reject!{|en| en == exact_match}
+            @enrollment = exact_match
+            @duplicate_coverages = enrollments
+          end
+        end
+      else
+        enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
+        exact_matches = find_exact_enrollment_matches(enrollment, enrollments.dup)
+
+        if exact_matches.present?
+          exact_match = exact_matches.detect{|en| en.hbx_id = match.hbx_id } || exact_matches.first
+        else
+          exact_match = ((enrollments.last.effective_on == match.effective_on) ? match : enrollments.last)
+        end
+
+        enrollments.reject!{|en| en == exact_match}
+        @enrollment = exact_match
+        @duplicate_coverages = enrollments
+      end
+    end
+
+    def find_exact_enrollment_matches(enrollment, enrollments)
+      enrollments.select{|en| (en <=> enrollment) == 0}
+    end
+
     def initialize_enrollment
       fields = ::HbxEnrollment.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
       fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
       ::HbxEnrollment.new(fields)
     end
-
   end
 end

@@ -104,7 +104,16 @@ module Importers::Transcripts
           ssn: 'edi',
           gender: 'ignore'
         },
-        update: 'edi',
+        update: {
+          hbx_id: 'edi',
+          first_name: 'edi',
+          middle_name: 'edi', 
+          last_name: 'edi',
+          name_sfx: 'edi',
+          dob: 'edi',
+          ssn: 'edi',
+          gender: 'ignore'  
+        },
         remove: {
           no_dc_address: 'ignore',
           no_dc_address_reason: 'ignore',
@@ -203,7 +212,7 @@ module Importers::Transcripts
         attributes.each do |field, value|
           if value.present? && (rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi'))
             begin
-              validate_timestamp(section)
+              validate_timestamp(section) unless field.to_s == 'hbx_id'
               @person.update!({field => value})
               log_success(:update, section, field)
             rescue Exception => e
@@ -393,7 +402,6 @@ module Importers::Transcripts
     end
 
     def validate_timestamp(section)
-
       # if section == :base
         if @transcript[:source]['updated_at'].present?
           if @last_updated_at > @transcript[:source]['updated_at']
