@@ -68,7 +68,7 @@ module Importers::Transcripts
         hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
         hbx_enrollment.employee_role_id = @enrollment.employee_role_id
       else
-        hbx_enrollment.consumer_role_id = @enrollment.consumer_role.id
+        hbx_enrollment.consumer_role_id = @enrollment.consumer_role_id
       end
 
       @enrollment.hbx_enrollment_members.each do |member| 
@@ -87,7 +87,7 @@ module Importers::Transcripts
       end
 
       if @enrollment.may_invalidate_enrollment?
-        @enrollment.invalidate_enrollment!
+        @enrollment.invalidate_enrollment! 
         @enrollment = hbx_enrollment
       end
     end
@@ -129,7 +129,7 @@ module Importers::Transcripts
 
     def hbx_enrollment_members_hbx_id_remove(value)
       build_new_hbx_enrollment
-      @enrollment.hbx_enrollment_members.delect{|member| member.hbx_id == value['hbx_id'] }.delete
+      @enrollment.hbx_enrollment_members.detect{|member| member.hbx_id == value['hbx_id'] }.delete
     end
 
     def process_enrollment_remove(attributes)

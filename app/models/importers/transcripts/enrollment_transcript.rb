@@ -38,7 +38,7 @@ module Importers::Transcripts
         remove: 'ignore'
       },
       hbx_enrollment_members: {
-        add: 'ignore',
+        add: 'edi',
         update: 'edi',
         remove: {
           hbx_id: 'edi'
@@ -143,6 +143,7 @@ module Importers::Transcripts
               if action != 'remove'
                 hbx_id = (action == 'add' ? value["hbx_id"] : attribute.split(':')[1])            
                 enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|em| em.hbx_id == hbx_id}
+
                 matched_people = match_person_instance(enrollment_member.person)
 
                 if matched_people.blank?
