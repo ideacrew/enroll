@@ -54,12 +54,12 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
          primary = family.family_members.build(is_primary_applicant: true, person: person)
          dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected' })
+         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
          enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
          enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
          enrollment.save!
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 1.month), aasm_state: 'coverage_selected'})
+         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
          enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
          family.save
          family
@@ -71,9 +71,9 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
         it 'should have differences on hbx enrollment member and plan' do
           source_family
 
-         factory = Transcripts::EnrollmentTranscript.new
-         factory.find_or_build(other_enrollment)
-         transcript = factory.transcript
+          factory = Transcripts::EnrollmentTranscript.new
+          factory.find_or_build(other_enrollment)
+          transcript = factory.transcript
 
           expect(transcript[:compare]['hbx_enrollment_members']['add']).to be_present
           expect(transcript[:compare]['hbx_enrollment_members']['add']['hbx_id']['hbx_id']).to eq dependent2.hbx_id
@@ -85,7 +85,6 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
           expect(transcript[:compare]['plan']['remove']['hios_id']['hios_id']).to eq source_plan.hios_id
         end
       end
-
 
       context 'other enrollement not matching with the source enrollment hbx_id' do 
         let(:source_enrollment_hbx_id1) { '1000003' }
