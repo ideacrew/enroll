@@ -69,6 +69,10 @@ module Transcripts
     end
 
     def find_or_build(enrollment)
+      if enrollment.plan.active_year != TimeKeeper.date_of_record.year
+        raise "enrollment has #{enrollment.plan.active_year} plan."
+      end
+
       enrollment = fix_enrollment_coverage_start(enrollment)
       @transcript[:other] = enrollment
 
@@ -252,8 +256,8 @@ module Transcripts
 
     def match_enrollment(enrollment)
       match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
-      
-      if match.blank? || match.hbx_enrollment_members.blank?
+
+      if match.blank? || !(HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(match.aasm_state) ||  match.hbx_enrollment_members.blank?      
         matched_people = match_person_instance(enrollment.family.primary_applicant.person)
         if matched_people.present?       
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
