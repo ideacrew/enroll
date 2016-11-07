@@ -369,7 +369,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
           source_enrollment_4.reload
 
           expect(source_enrollment_2.coverage_terminated?).to be_truthy
-          expect(source_enrollment_3.coverage_terminated?).to be_truthy
+          expect(source_enrollment_3.void?).to be_truthy
           expect(source_enrollment_4.void?).to be_truthy
         end
       end
