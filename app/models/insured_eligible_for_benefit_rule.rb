@@ -81,6 +81,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_family_relationships_satisfied?
+    return true unless relation_ship_with_primary_applicant == 'child'
     age = age_on_next_effective_date(@role.dob)
     relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
   end
