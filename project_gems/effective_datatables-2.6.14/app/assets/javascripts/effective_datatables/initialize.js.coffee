@@ -61,7 +61,8 @@
       lengthMenu: [[10, 25, 50, 100], ['10', '25', '50', '100']]
       order: datatable.data('default-order')
       processing: true
-      responsive: true
+      responsive: false
+      searchDelay: 500
       serverParams: (params) ->
         table = this.api()
         table.columns().flatten().each (index) =>

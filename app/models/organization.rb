@@ -98,6 +98,10 @@ class Organization
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
          { name: "active_broker_accounts_writing_agent" })
+
+
+  index({"employer_profile.general_agency_accounts._id" => 1})
+
   before_save :generate_hbx_id
 
   default_scope                               ->{ order("legal_name ASC") }

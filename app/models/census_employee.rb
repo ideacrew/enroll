@@ -245,6 +245,16 @@ class CensusEmployee < CensusMember
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
+  # This performs employee summary count for waived and enrolled in the latest plan year
+  def perform_employer_plan_year_count
+    if plan_year = self.employer_profile.latest_plan_year
+      plan_year.enrolled_summary = plan_year.total_enrolled_count
+      plan_year.waived_summary = plan_year.waived_count
+      plan_year.save!
+    end
+  end
+
+
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
@@ -427,6 +437,7 @@ class CensusEmployee < CensusMember
 
         end
         terminate_employee_role!
+        perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
