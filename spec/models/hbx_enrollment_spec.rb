@@ -424,12 +424,12 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(@enrollment4.waiver_reason).to eq "start a new job"
       end
 
-      it "enrollment5 should be inactive" do
-        expect(@enrollment5.aasm_state).to eq "inactive"
+      it "enrollment5 should not be waived" do
+        expect(@enrollment5.aasm_state).to eq "shopping"
       end
 
-      it "enrollment5 should get waiver_reason" do
-        expect(@enrollment5.waiver_reason).to eq "start a new job"
+      it "enrollment5 should not have waiver_reason" do
+        expect(@enrollment5.waiver_reason).to eq nil
       end
     end
 
@@ -835,6 +835,20 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "cancel_coverage!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
 end
 
 describe HbxEnrollment, dbclean: :after_each do
