@@ -252,8 +252,8 @@ module Transcripts
 
     def match_enrollment(enrollment)
       match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
-
-      if match.blank?
+      
+      if match.blank? || match.hbx_enrollment_members.blank?
         matched_people = match_person_instance(enrollment.family.primary_applicant.person)
         if matched_people.present?       
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1

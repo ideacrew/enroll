@@ -39,7 +39,7 @@ module Transcripts
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc)
         .select{|e| e.plan.active_year == enrollment.plan.active_year}
-        .reject{|en| en.subscriber.present? && (en.subscriber.hbx_id != enrollment.subscriber.hbx_id)}
+        .reject{|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id != enrollment.subscriber.hbx_id)}
     end
 
     def matching_shop_coverages(enrollment, family=nil)
