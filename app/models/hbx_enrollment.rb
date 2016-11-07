@@ -1084,11 +1084,11 @@ class HbxEnrollment
     #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     # end
     event :schedule_coverage_termination, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled, after: :set_coverage_termination_date
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled
       transitions from: :renewing_waived, to: :inactive
     end
 
