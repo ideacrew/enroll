@@ -102,7 +102,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     #   redirect_to new_broker_agencies_profile_path
     #   return
     # end
-
     total_families = @broker_agency_profile.families
     @total = total_families.count
     @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
