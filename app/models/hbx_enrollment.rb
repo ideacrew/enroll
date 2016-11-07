@@ -576,6 +576,7 @@ class HbxEnrollment
   # This performs employee summary count for waived and enrolled in the latest plan year
   def perform_employer_plan_year_count
     if is_shop?
+      return if self.employer_profile.nil? || self.employer_profile.latest_plan_year.nil?
       plan_year = self.employer_profile.latest_plan_year
       plan_year.enrolled_summary = plan_year.total_enrolled_count
       plan_year.waived_summary = plan_year.waived_count
@@ -887,7 +888,6 @@ class HbxEnrollment
       enrollment.consumer_role = consumer_role
       enrollment.kind = "individual"
       enrollment.benefit_package_id = benefit_package.try(:id)
-
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
       if qle && enrollment.family.is_under_special_enrollment_period?
@@ -899,9 +899,13 @@ class HbxEnrollment
       else
         raise "You may not enroll until you're eligible under an enrollment period"
       end
+
     when resident_role.present?
       enrollment.kind = "coverall"
       enrollment.resident_role = resident_role
+      enrollment.benefit_package_id = benefit_package.try(:id)
+      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      
       if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
