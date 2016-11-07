@@ -576,6 +576,7 @@ class HbxEnrollment
   # This performs employee summary count for waived and enrolled in the latest plan year
   def perform_employer_plan_year_count
     if is_shop?
+      return if self.employer_profile.nil? || self.employer_profile.latest_plan_year.nil?
       plan_year = self.employer_profile.latest_plan_year
       plan_year.enrolled_summary = plan_year.total_enrolled_count
       plan_year.waived_summary = plan_year.waived_count
