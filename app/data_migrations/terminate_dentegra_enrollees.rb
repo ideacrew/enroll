@@ -12,7 +12,6 @@ class TerminateDentegraEnrollees < MongoidMigrationTask
           if enrollments.present?
             enrollments.each do |enrollment|
               if enrollment.present? && enrollment.effective_on.year == 2016 && enrollment.plan.carrier_profile_id.to_s == "53e67210eb899a4603000013"
-                results1 << person.id
                 termination_date = "2016-12-31".to_date
                 enrollment.set_coverage_termination_date(termination_date)
                 enrollment.schedule_coverage_termination
