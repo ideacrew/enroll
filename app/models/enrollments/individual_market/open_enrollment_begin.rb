@@ -22,7 +22,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     def query_criteria
       {
         :kind => 'individual',
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"],
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
         :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS
         # :effective_on.gte => HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on
       }
@@ -32,10 +32,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
     end
 
-    def has_catastrophic_plan?(enrollment)
-      enrollment.plan.metal_level == 'catastrophic'       
-    end
-
+  
     def is_individual_assisted?(enrollment)
       enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
     end
@@ -58,7 +55,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
             # hbxe = enrollments.reduce([]) { |list, en| list << en if HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
 
             enrollments.each do |enrollment|
-              next if has_catastrophic_plan?(enrollment) || is_individual_assisted?(enrollment)
+              next if is_individual_assisted?(enrollment)
 
               puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
               count += 1

@@ -42,11 +42,29 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # Cat plan ageoff
   # Eligibility determination CSR change
   def renewal_plan
-    renewal_plan = @enrollment.plan.renewal_plan
-    if renewal_plan.blank?
-      raise "2017 renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
+    if has_catastrophic_plan? && is_cat_plan_ineligible?
+      renewal_plan = @enrollment.plan.cat_age_off_renewal_plan
+       if renewal_plan.blank?
+        raise "2017 Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
+      end
+    else
+      renewal_plan = @enrollment.plan.renewal_plan
+      if renewal_plan.blank?
+        raise "2017 renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
+      end
     end
+
     renewal_plan
+  end
+
+  def has_catastrophic_plan?
+    @enrollment.plan.metal_level == 'catastrophic'       
+  end
+
+  def is_cat_plan_ineligible?
+    @enrollment.hbx_enrollment_members.any? do |member| 
+      member.person.age_on(HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on) > 29
+    end
   end
 
   def eligible_to_get_covered?(person)
