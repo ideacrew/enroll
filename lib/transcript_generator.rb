@@ -5,7 +5,7 @@ class TranscriptGenerator
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
   # TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
-  TRANSCRIPT_PATH = "#{Rails.root}/shop_12_1_people_transcripts"
+  TRANSCRIPT_PATH = "#{Rails.root}/person_transcripts"
 
 
   def initialize(market = 'individual')
@@ -22,9 +22,11 @@ class TranscriptGenerator
     create_directory(TRANSCRIPT_PATH)
 
     @count  = 0
-    Dir.glob("#{Rails.root}/shop_12_1_people_xmls/*.xml").each do |file_path|
+    Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
       begin
         @count += 1
+
+        next if @count > 2000
 
         if @count % 100 == 0
           puts "------#{@count}"
@@ -33,7 +35,7 @@ class TranscriptGenerator
         individual_parser = Parsers::Xml::Cv::Importers::IndividualParser.new(File.read(file_path))
         # individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
         build_transcript(individual_parser.get_person_object)
-
+        # build_transcript(individual_parser.get_enrollment_object)
       rescue Exception  => e
         my_logger.info("failed to process #{file_path}---#{e.to_s}")
       end
@@ -62,17 +64,19 @@ class TranscriptGenerator
 
       starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
-      Dir.glob("#{Rails.root}/shop_12_1_policy_xmls/*.xml").each do |file_path|
+      Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
         begin
           count += 1
+
+          next if count > 5000
+
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
+
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
           other_enrollment = individual_parser.get_enrollment_object
           transcript = Transcripts::EnrollmentTranscript.new
           transcript.shop = (@market == 'shop')
           transcript.find_or_build(other_enrollment)
-
-          # rows = Transcripts::ComparisonResult.new(transcript.transcript).enrollment_csv_row
 
           enrollment_transcript = Importers::Transcripts::EnrollmentTranscript.new
           enrollment_transcript.transcript = transcript.transcript
@@ -95,9 +99,9 @@ class TranscriptGenerator
 
           if rows.empty?
             if @market == 'individual'
-              csv << (first_row[0..10] + ['match', 'match:enrollment'])
+              csv << (first_row[0..9] + ['match', 'match:enrollment'])
             else
-              csv << (first_row[0..11] + ['match', 'match:enrollment'])
+              csv << (first_row[0..10] + ['match', 'match:enrollment'])
             end
             enrollment_removes.each{|row| csv << row}
           else
@@ -111,7 +115,7 @@ class TranscriptGenerator
             starting = TimeKeeper.datetime_of_record.to_i
           end
         rescue Exception => e
-          puts "Failed.....#{file_path}"
+          puts "Failed.....#{file_path}--#{e.inspect}"
         end
       end
     end

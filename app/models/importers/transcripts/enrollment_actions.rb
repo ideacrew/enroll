@@ -187,7 +187,15 @@ module Importers::Transcripts
               value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
 
-            action_taken = (@updates[:update_failed].present? ? @updates[:update_failed] : @updates[action.to_sym][section][attribute])
+            if @updates[:update_failed].present?
+              action_taken = @updates[:update_failed]
+            else
+              if action.to_sym == :remove && section == :enrollment
+                action_taken = ["Success", @updates[:remove][:enrollment].to_json]
+              else
+                action_taken = @updates[action.to_sym][section][attribute]
+              end
+            end
 
             if value.is_a?(Array)
               value.each do |val|
