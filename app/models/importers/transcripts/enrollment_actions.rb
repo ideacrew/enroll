@@ -86,10 +86,8 @@ module Importers::Transcripts
         hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
       end
 
-      if @enrollment.may_invalidate_enrollment?
-        @enrollment.invalidate_enrollment! 
-        @enrollment = hbx_enrollment
-      end
+      @enrollment.invalidate_enrollment! if @enrollment.may_invalidate_enrollment?
+      @enrollment = hbx_enrollment
     end
 
     def update_effective_on(value)
@@ -144,15 +142,15 @@ module Importers::Transcripts
 
       attributes['hbx_id'].each do |enrollment_hash|
         if enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-          if (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)
+          if (enrollment.effective_on >= @other_enrollment.effective_on) || ((@other_enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) == 0)
+            enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
+            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment voided successfully"]
+          elsif (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)
             @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Ignored", "Enrollment already in #{enrollment.aasm_state}."]
-          elsif enrollment.effective_on < @other_enrollment.effective_on
+          else enrollment.effective_on < @other_enrollment.effective_on
             enrollment.update!(terminated_on: (@other_enrollment.effective_on - 1.day))
             enrollment.terminate_coverage!
             @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment terminated successfully"]
-          else
-            enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
-            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment voided successfully"]
           end
         end
       end
