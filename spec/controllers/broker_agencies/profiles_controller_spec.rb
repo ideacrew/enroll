@@ -30,7 +30,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       sign_in(user)
-
       get :show, id: broker_agency_profile.id
     end
 
@@ -197,7 +196,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "family_index" do
-
     before :all do
       org = FactoryGirl.create(:organization)
       @broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org,aasm_state:'active')
