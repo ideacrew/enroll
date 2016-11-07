@@ -81,7 +81,9 @@ module Importers::Transcripts
 
       hbx_enrollment.select_coverage!
 
-      if @other_enrollment.terminated_on.present?
+      if @canceled
+        hbx_enrollment.invalidate_enrollment! if hbx_enrollment.may_invalidate_enrollment?
+      elsif @other_enrollment.terminated_on.present?
         hbx_enrollment.update!(terminated_on: @other_enrollment.terminated_on)
         hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
       end
@@ -142,7 +144,7 @@ module Importers::Transcripts
 
       attributes['hbx_id'].each do |enrollment_hash|
         if enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-          if (enrollment.effective_on >= @other_enrollment.effective_on) || ((@other_enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) == 0)
+          if @canceled || (enrollment.effective_on >= @other_enrollment.effective_on) || ((@other_enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) == 0)
             enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
             @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment voided successfully"]
           elsif (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)

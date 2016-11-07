@@ -55,6 +55,9 @@ module Importers::Transcripts
     }
 
     def process
+      @canceled = false
+      @canceled = true if @other_enrollment.subscriber.coverage_end_on.present? && (@other_enrollment.subscriber.coverage_start_on >= @other_enrollment.subscriber.coverage_end_on)
+
       @other_enrollment = fix_enrollment_coverage_start(@other_enrollment)
       
       @updates = {}
@@ -91,6 +94,10 @@ module Importers::Transcripts
               end
             end
           end
+
+          if @canceled
+            @enrollment.invalidate_enrollment! if @enrollment.present? && @enrollment.may_invalidate_enrollment?
+          end
         rescue Exception => e
           @updates[:update_failed] = ['Merge Failed', e.to_s]
         end
@@ -101,6 +108,10 @@ module Importers::Transcripts
       begin
         if @other_enrollment.hbx_enrollment_members.empty?
           raise "Hbx Enrollment members missing."
+        end
+
+        if @other_enrollment.subscriber.blank?
+          raise "subscriber missing."
         end
         
         @other_enrollment.hbx_enrollment_members.each do |member| 
@@ -125,6 +136,10 @@ module Importers::Transcripts
     def validate_update
       if @other_enrollment.hbx_enrollment_members.empty?
         raise "Hbx Enrollment members missing."
+      end
+
+      if @other_enrollment.subscriber.blank?
+        raise "subscriber missing."
       end
 
       @comparison_result.changeset_sections.each do |section|
@@ -467,7 +482,9 @@ module Importers::Transcripts
 
         family.save!
 
-        if @other_enrollment.terminated_on.present?
+        if @canceled
+          hbx_enrollment.invalidate_enrollment! if hbx_enrollment.may_invalidate_enrollment?
+        elsif @other_enrollment.terminated_on.present?
           hbx_enrollment.update!(terminated_on: @other_enrollment.terminated_on)
           hbx_enrollment.terminate_coverage!
         end
