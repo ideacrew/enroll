@@ -99,6 +99,10 @@ module Importers::Transcripts
 
     def valid_new_request?
       begin
+        if @other_enrollment.hbx_enrollment_members.empty?
+          raise "Hbx Enrollment members missing."
+        end
+        
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
 
@@ -119,6 +123,10 @@ module Importers::Transcripts
     end
 
     def validate_update
+      if @other_enrollment.hbx_enrollment_members.empty?
+        raise "Hbx Enrollment members missing."
+      end
+
       @comparison_result.changeset_sections.each do |section|
         actions = @comparison_result.changeset_section_actions [section]
         actions.each do |action|
@@ -133,7 +141,7 @@ module Importers::Transcripts
             end
 
             if section == :plan && action == 'add'
-              @plan = Plan.where(hios_id: other_enrollment.plan.hios_id, active_year: other_enrollment.plan.active_year).first
+              @plan = Plan.where(hios_id: @other_enrollment.plan.hios_id, active_year: @other_enrollment.plan.active_year).first
               if @plan.blank?
                 raise "Plan not found with HIOS ID #{association['hios_id']} for year #{association['active_year']}."
               end
