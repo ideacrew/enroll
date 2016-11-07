@@ -597,4 +597,48 @@ module ApplicationHelper
   def has_new_hire_enrollment_period?(census_employee)
     census_employee.new_hire_enrollment_period.present?
   end
+
+  def eligibility_criteria(employer)
+    if employer.show_plan_year.present?
+      participation_rule_text = participation_rule(employer)
+      non_owner_participation_rule_text = non_owner_participation_rule(employer)
+      text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
+      eligibility_text = ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      if text == "Yes"
+        "Eligible"
+      else
+        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+      end
+    else
+      "Ineligible"
+    end
+  end
+
+  def eligibility_criteria_for_export(employer)
+    if employer.show_plan_year.present?
+      @participation_count == 0 && @non_owner_participation_rule == true ? "Eligible" : "Ineligible"
+    else
+      "Ineligible"
+    end
+  end
+
+  def participation_rule(employer)
+    @participation_count = employer.show_plan_year.additional_required_participants_count
+    if @participation_count == 0
+      "1. 2/3 Rule Met? : Yes"
+    else
+      "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
+    end
+  end
+
+  def non_owner_participation_rule(employer)
+    @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
+    if @non_owner_participation_rule == true
+      "2. Non-Owner exists on the roster for the employer"
+    else
+      "2. You have 0 non-owner employees on your roster"
+    end
+  end
+
+
 end

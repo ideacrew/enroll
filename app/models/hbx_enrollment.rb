@@ -35,6 +35,16 @@ class HbxEnrollment
       "unverified"
     ]
 
+  CAN_TERMINATE_ENROLLMENTS = [
+    "coverage_termination_pending",
+    "coverage_selected",
+    "auto_renewing",
+    "renewing_coverage_selected",
+    "enrolled_contingent",
+    "unverified",
+    "coverage_enrolled"
+  ]
+
   SELECTED_AND_WAIVED = ["coverage_selected", "inactive"]
 
   TERMINATED_STATUSES = ["coverage_terminated", "unverified"]
@@ -112,6 +122,8 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
+  field :is_tranding_partner_transmittable, type: Boolean, default: false
+
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
@@ -133,6 +145,7 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
@@ -557,6 +570,16 @@ class HbxEnrollment
       self.benefit_group.employer_profile
     else
       nil
+    end
+  end
+
+  # This performs employee summary count for waived and enrolled in the latest plan year
+  def perform_employer_plan_year_count
+    if is_shop?
+      plan_year = self.employer_profile.latest_plan_year
+      plan_year.enrolled_summary = plan_year.total_enrolled_count
+      plan_year.waived_summary = plan_year.waived_count
+      plan_year.save!
     end
   end
 
@@ -1050,6 +1073,8 @@ class HbxEnrollment
     state :unverified
     state :enrolled_contingent
 
+    after_all_transitions :perform_employer_plan_year_count
+
     event :advance_date, :after => :record_transition do
     end
 
@@ -1095,11 +1120,11 @@ class HbxEnrollment
     # end
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+      transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled, after: :set_coverage_termination_date
-      transitions from: :renewing_waived, to: :inactive
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled, :renewing_waived, :inactive], to: :coverage_canceled
     end
 
     event :terminate_coverage, :after => :record_transition do

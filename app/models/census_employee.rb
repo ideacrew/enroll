@@ -106,11 +106,11 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
-  
+
   def allow_nil_ssn_updates_dependents
     census_dependents.each do |cd|
       if cd.ssn.blank?
-        cd.update(encrypted_ssn:"")
+        cd.unset(:encrypted_ssn)
       end
     end
   end
@@ -222,6 +222,16 @@ class CensusEmployee < CensusMember
     return @employer_profile if defined? @employer_profile
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
+
+  # This performs employee summary count for waived and enrolled in the latest plan year
+  def perform_employer_plan_year_count
+    if plan_year = self.employer_profile.latest_plan_year
+      plan_year.enrolled_summary = plan_year.total_enrolled_count
+      plan_year.waived_summary = plan_year.waived_count
+      plan_year.save!
+    end
+  end
+
 
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
@@ -343,8 +353,9 @@ class CensusEmployee < CensusMember
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
-    rescue
-      nil
+    rescue => e
+      Rails.logger.error { e }
+      false
     else
       self
     end
@@ -358,7 +369,6 @@ class CensusEmployee < CensusMember
 
         unless employee_termination_pending?
 
-
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
@@ -370,6 +380,7 @@ class CensusEmployee < CensusMember
 
         end
         terminate_employee_role!
+        perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
@@ -389,7 +400,7 @@ class CensusEmployee < CensusMember
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
-  end
+    end
 
     self
   end
@@ -639,7 +650,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-  
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -726,7 +737,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-  
+
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))

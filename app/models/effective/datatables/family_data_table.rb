@@ -67,13 +67,11 @@ module Effective
       end
 
       def cancel_enrollment_type(family)
-        hbx_enrollment = family.households.first.hbx_enrollments.last
-        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+        family.all_enrollments.cancel_eligible.present? ? 'ajax' : 'disabled'
       end
 
       def terminate_enrollment_type(family)
-        hbx_enrollment = family.households.first.hbx_enrollments.last
-        hbx_enrollment.nil? ? 'disabled' : (hbx_enrollment.coverage_selected? ? 'ajax' : 'disabled')
+        family.all_enrollments.can_terminate.present? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
@@ -91,7 +89,7 @@ module Effective
         ],
         individual_options: [
           {scope: 'all', label: 'All'},
-          {scope: 'all_eligible_for_assistance', label: 'Assisted'},
+          {scope: 'all_assistance_receiving', label: 'Assisted'},
           {scope: 'all_unassisted', label: 'Unassisted'},
           {scope: 'sep_eligible', label: 'SEP Eligible'}
         ],

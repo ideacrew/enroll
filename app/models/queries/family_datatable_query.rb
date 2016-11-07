@@ -49,8 +49,8 @@ module Queries
       if @custom_attributes['employer_options'] == 'coverage_waived'
         family = family.coverage_waived
       end
-      if @custom_attributes['individual_options'] == 'all_eligible_for_assistance'
-        family = family.all_eligible_for_assistance
+      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
+        family = family.all_assistance_receiving
       end
       if @custom_attributes['individual_options'] == 'sep_eligible'
         family = family.sep_eligible
