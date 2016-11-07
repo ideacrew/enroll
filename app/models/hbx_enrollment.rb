@@ -1176,8 +1176,7 @@ class HbxEnrollment
   end
 
   def termination_attributes_cleared?
-    self.terminated_on = nil
-    self.terminate_reason = nil
+    update_attributes({terminated_on: nil, terminate_reason: nil})
     (terminated_on == nil) && (terminate_reason == nil)
   end
 
