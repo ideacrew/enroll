@@ -144,15 +144,15 @@ module Importers::Transcripts
 
       attributes['hbx_id'].each do |enrollment_hash|
         if enrollment = family.active_household.hbx_enrollments.where(:hbx_id => enrollment_hash['hbx_id']).first
-          if @canceled || (enrollment.effective_on >= @other_enrollment.effective_on) || ((@other_enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) == 0)
+          if (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)
+            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Ignored", "Enrollment already in #{enrollment.aasm_state}."]
+          # elsif (enrollment.effective_on < @other_enrollment.effective_on) && (((@other_enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) != 0) || (@other_enrollment.plan.id != enrollment.plan.id))
+          #   enrollment.update!(terminated_on: (@other_enrollment.effective_on - 1.day))
+          #   enrollment.terminate_coverage!
+          #   @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment terminated successfully"]
+          else (enrollment.effective_on <= @other_enrollment.effective_on)
             enrollment.invalidate_enrollment! if enrollment.may_invalidate_enrollment?
             @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment voided successfully"]
-          elsif (HbxEnrollment::TERMINATED_STATUSES).include?(enrollment.aasm_state.to_s)
-            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Ignored", "Enrollment already in #{enrollment.aasm_state}."]
-          else enrollment.effective_on < @other_enrollment.effective_on
-            enrollment.update!(terminated_on: (@other_enrollment.effective_on - 1.day))
-            enrollment.terminate_coverage!
-            @updates[:remove][:enrollment]["hbx_id:#{enrollment_hash['hbx_id']}"] = ["Success", "Enrollment terminated successfully"]
           end
         end
       end
