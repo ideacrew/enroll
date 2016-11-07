@@ -15,6 +15,7 @@ class TerminateDentegraEnrollees < MongoidMigrationTask
                 termination_date = "2016-12-31".to_date
                 enrollment.set_coverage_termination_date(termination_date)
                 enrollment.schedule_coverage_termination
+                puts "person #{person.full_name} enrollment terminated." unless Rails.env.test?
               end
             end
           end
