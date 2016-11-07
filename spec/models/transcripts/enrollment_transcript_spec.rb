@@ -67,7 +67,6 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
 
       context "and enrollment member missing & plan hios is different" do
 
-
         it 'should have differences on hbx enrollment member and plan' do
           source_family
 
@@ -96,7 +95,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
           factory.find_or_build(other_enrollment)
           transcript = factory.transcript
 
-          expect(transcript[:compare]['enrollment']['remove']['hbx_id'][0]['hbx_id']).to eq source_enrollment_hbx_id1
+          expect(transcript[:compare]['enrollment']['remove']['hbx_id'][0]['hbx_id']).to eq source_enrollment_hbx_id2
         end
       end
     end
