@@ -106,13 +106,7 @@ module Importers::Transcripts
 
     def valid_new_request?
       begin
-        if @other_enrollment.hbx_enrollment_members.empty?
-          raise "Hbx Enrollment members missing."
-        end
-
-        if @other_enrollment.subscriber.blank?
-          raise "subscriber missing."
-        end
+        validate_other_enrollment
         
         @other_enrollment.hbx_enrollment_members.each do |member| 
           matched_people = match_person_instance(member.family_member.person)
@@ -133,14 +127,23 @@ module Importers::Transcripts
       end
     end
 
-    def validate_update
+    def validate_other_enrollment
       if @other_enrollment.hbx_enrollment_members.empty?
-        raise "Hbx Enrollment members missing."
+        raise "EDI policy missing enrollees."
       end
 
       if @other_enrollment.subscriber.blank?
-        raise "subscriber missing."
+        raise "EDI policy missing subscriber."
       end
+
+      active_year = @other_enrollment.plan.active_year
+      if  active_year != 2016
+        raise "EDI policy has  #{active_year} plan."
+      end
+    end
+
+    def validate_update
+      validate_other_enrollment
 
       @comparison_result.changeset_sections.each do |section|
         actions = @comparison_result.changeset_section_actions [section]
