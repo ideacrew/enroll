@@ -8,7 +8,7 @@ def check
   not_run = []
   CSV.foreach("spec/test_data/cne.csv") do |row|
     person = Person.by_hbx_id(row[0]).first
-    deter = person.families.first.households.first.tax_households.where(effective_ending_on: nil).select{|x| x.effective_starting_on.year == 2017 }.first.try(:eligibility_determinations).try(:first)
+    deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).latest_eligibility_determination
     if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
       ran << row[0]
     else
@@ -26,7 +26,7 @@ def check_and_run
   CSV.foreach("spec/test_data/cne2.csv") do |row_with_ssn|
     person = Person.by_ssn(row_with_ssn.first).first
     if person
-      deter = person.families.first.households.first.tax_households.where(effective_ending_on: nil).select{|x| x.effective_starting_on.year == 2017 }.first.try(:eligibility_determinations).try(:first)
+      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).latest_eligibility_determination
       if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
         ran << row_with_ssn.first
       else
@@ -51,8 +51,8 @@ def update_aptc(row)
   @household = person.primary_family.active_household
 
   if @household.tax_households.present?
-    latest_tax_household = @household.tax_households.where(effective_ending_on: nil).last
-    latest_tax_household.update_attributes(effective_ending_on: Date.new(2016,12,31)) if latest_tax_household
+    active_tax_households = @household.tax_households.active_tax_household
+    active_tax_households.update_all(effective_ending_on: Date.new(2016,12,31)) if active_tax_households
   end
 
   th = @household.tax_households.build(
