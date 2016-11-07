@@ -68,8 +68,6 @@ class TranscriptGenerator
         begin
           count += 1
 
-          next if count > 5000
-
           # rows = Transcripts::ComparisonResult.new(Marshal.load(File.open(file_path))).enrollment_csv_row
 
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
