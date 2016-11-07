@@ -5,20 +5,66 @@ require 'csv'
 
 def check
   ran = []
-  not_run = []
+  running = []
   CSV.foreach("spec/test_data/cne.csv") do |row|
     person = Person.by_hbx_id(row[0]).first
-    deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).latest_eligibility_determination
+    deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
     if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
       ran << row[0]
+      print 'r'
     else
-      not_run << row[0]
+      update_aptc(row)
+      running << row[0]
+      print 'i'
     end
   end
-  [ran, not_run]
+  [ran: {count: ran.count, rs: ran},
+   running: {count: running.count, rs: running}]
 end
 
-def check_and_run
+def check3_and_run
+  ran = []
+  not_run = []
+  running = []
+
+  CSV.foreach("spec/test_data/cne3.csv") do |row_with_ssn|
+    ssn, hbx_id, aptc, csr = row_with_ssn
+    if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
+      person = Person.by_ssn(ssn).first rescue nil
+    end
+
+    unless person
+      person = Person.by_hbx_id(hbx_id).first rescue nil
+    end
+
+    if person
+      unless person.primary_family
+        not_run << {no_family: ssn}
+        puts "Person with ssn: #{ssn} has no family."
+        next
+      end
+      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
+      if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
+        ran << person.hbx_id
+        print 'r'
+      else
+        row=[person.hbx_id, aptc, csr]
+        update_aptc(row)
+        running << person.hbx_id
+        print '#'
+      end
+    else
+      not_run << {not_found: ssn}
+      puts "Person with ssn: #{ssn} can't be found."
+    end
+  end
+
+  [ran: {count: ran.count, rs: ran},
+   not_run: {count: not_run.count, rs: not_run},
+   running: {count: running.count, rs: running}]
+end
+
+def check2_and_run
   ran = []
   not_run = []
   running = []
@@ -26,22 +72,32 @@ def check_and_run
   CSV.foreach("spec/test_data/cne2.csv") do |row_with_ssn|
     person = Person.by_ssn(row_with_ssn.first).first
     if person
-      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).latest_eligibility_determination
+      unless person.primary_family
+        not_run << row_with_ssn.first
+        print 'n'
+        next
+      end
+      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
       if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
         ran << row_with_ssn.first
+        print 'r'
       else
         hbx_id = person.hbx_id
         row=[hbx_id, row_with_ssn[1], row_with_ssn[2]]
         update_aptc(row)
         running << row_with_ssn.first
+        print 'i'
       end
     else
       not_run << row_with_ssn.first
-      puts "Person with ssn: #{row_with_ssn.first} can't be found."
+      print 'n'
+      #puts "Person with ssn: #{row_with_ssn.first} can't be found."
     end
   end
 
-  [ran, not_run, running]
+  [ran: {count: ran.count, rs: ran},
+   not_run: {count: not_run.count, rs: not_run},
+   running: {count: running.count, rs: running}]
 end
 
 
@@ -90,7 +146,7 @@ def update_aptc(row)
     th.save!
   end
 
-  puts person.primary_family.active_household.tax_households.last.eligibility_determinations.inspect
+  #puts person.primary_family.active_household.tax_households.last.eligibility_determinations.inspect
 end
 
 def run
