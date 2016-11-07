@@ -46,13 +46,12 @@ class Insured::GroupSelectionController < ApplicationController
       family: @family,
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)) 
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
     @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
-
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
