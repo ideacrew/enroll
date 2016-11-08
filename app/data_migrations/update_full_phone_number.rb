@@ -22,7 +22,7 @@ class UpdateFullPhoneNumber < MongoidMigrationTask
       phone.set(full_phone_number: phone.to_s)
       count += 1
     end
-    puts "updated #{person_phones.count} full phone number for persons"
-    puts "updated #{office_phones.count} full phone number for office locations"
+    # puts "updated #{person_phones.count} full phone number for persons"
+    # puts "updated #{office_phones.count} full phone number for office locations"
   end
 end

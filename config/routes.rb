@@ -125,6 +125,8 @@ Rails.application.routes.draw do
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
+        get 'check_move_reason'
+        get 'check_insurance_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -242,7 +244,6 @@ Rails.application.routes.draw do
         get :terminate
         get :rehire
         get :benefit_group, on: :member
-        patch :assignment_benefit_group, on: :member
       end
     end
   end
@@ -362,6 +363,10 @@ Rails.application.routes.draw do
   end
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
+
+  match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
+  match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
