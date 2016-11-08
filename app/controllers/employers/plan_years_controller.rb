@@ -340,7 +340,7 @@ class Employers::PlanYearsController < ApplicationController
           flash[:error] = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
         end
       else
-        errors = @plan_year.application_errors.try(:values)
+        errors = @plan_year.application_errors.try(:values) + @plan_year.enrollment_period_errors
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
@@ -389,7 +389,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
-
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
@@ -403,8 +402,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def updateable?
     authorize EmployerProfile, :updateable?
-  end  
-
+  end
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan
