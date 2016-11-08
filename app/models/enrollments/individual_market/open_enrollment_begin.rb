@@ -32,14 +32,14 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
     end
 
-    # def is_individual_assisted?(enrollment)
-    #   enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
-    # end
+    def is_individual_assisted?(enrollment)
+      enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
+    end
 
-    # def is_csr?(enrollment)
-    #   csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
-    #   (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
-    # end
+    def is_csr?(enrollment)
+      csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
+      (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
+    end
 
     # def eligible_to_get_assistance?(enrollment)
     #   if @assisted_individuals[enrollment.subscriber.hbx_id]
@@ -108,6 +108,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
           enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
           enrollments.each do |enrollment|
+
+            next if is_individual_assisted?(enrollment)
        
             if can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
               count += 1
