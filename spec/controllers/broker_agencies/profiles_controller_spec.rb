@@ -250,7 +250,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'jones3'
+      xhr :get, :family_index, id: @broker_agency_profile1.id, q: 'jones3'
       expect(assigns(:families).count).to eq(1)
     end
   end
