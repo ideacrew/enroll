@@ -189,8 +189,8 @@ class CensusEmployeeImport
     member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
     member.employer_profile = @employer_profile
     assign_benefit_group(member, record[:benefit_group], record[:plan_year])
-    address = Address.new({kind:record[:kind], address_1: record[:address_1], city: record[:city],
-                           state: record[:state], zip: record[:zip] })
+    address = Address.new({kind:'home', address_1: record[:address_1], city: record[:city],
+      state: record[:state], zip: record[:zip] })
     member.address = address if address.valid?
     member
   end
