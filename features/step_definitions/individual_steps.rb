@@ -61,6 +61,7 @@ Then(/^user should see heading labeled personal information/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+  wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
   find('.btn', text: 'CONTINUE').click
 end
@@ -315,9 +316,12 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
+  expect(page).to have_content "Help"
   find('.container .row div div.btn', text: 'Help').click
   wait_for_ajax
+  expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
+  wait_for_ajax
   expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
