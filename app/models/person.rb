@@ -208,6 +208,11 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :all_types_verified?, :to => :consumer_role
+
+
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
@@ -270,10 +275,6 @@ class Person
     end
     true
   end
-
-  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -385,7 +386,8 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Social Security Number' if self.ssn
+    verification_types << 'Social Security Number' if ssn
+    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
