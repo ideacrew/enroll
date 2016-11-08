@@ -18,9 +18,12 @@ class User
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
   validate :oim_id_rules
+  validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
+  validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+  
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -55,11 +58,21 @@ class User
     !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
+  def valid_attribute?(attribute_name)
+    self.valid?
+    self.errors[attribute_name].blank?
+  end
+
+  def self.password_invalid?(password)
+    user = User.new(oim_id: 'example1', password: password)
+    !user.valid_attribute?('password')
+  end
+
   def self.generate_valid_password
     password = Devise.friendly_token.first(16)
     password = password + "aA1!"
     password = password.squeeze
-    if password.length < 8
+    if password_invalid?(password)
       password = generate_valid_password
     else
       password
@@ -319,8 +332,8 @@ class User
   # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
   #   ID in a has_one association
   def self.orphans
-    user_ids=Person.where(:user_id=>{"$ne"=>nil}).pluck(:user_id)
-    User.where("_id"=>{"$nin"=>user_ids}).entries
+    user_ids = Person.where(:user_id => { "$ne" => nil }).pluck(:user_id)
+    User.where("_id" => { "$nin" => user_ids }).order(email: :asc).entries
   end
 
   def self.send_reset_password_instructions(attributes={})

@@ -488,6 +488,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(plan_year_proxy).to receive(:renewing_published?).and_return(false)
         allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
         allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
+        allow(plan_year_proxy).to receive(:application_errors).and_return({:values => []})
+        allow(plan_year_proxy).to receive(:enrollment_period_errors).and_return([])
       end
 
       it "should redirect with errors" do
@@ -631,7 +633,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
       let(:plan_year)         do
         py = FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group])
-        py.open_enrollment_end_on = py.open_enrollment_start_on + 1.day
+        py.open_enrollment_end_on = py.open_enrollment_start_on - 1.day
         py
       end
       let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
@@ -642,7 +644,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
       before do
         employer_profile.save(:validate => false)
-         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in user
       end
 
