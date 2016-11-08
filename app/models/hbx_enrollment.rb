@@ -557,10 +557,6 @@ class HbxEnrollment
     [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
   end
 
-  def terminated_members
-    hbx_enrollment_members.select{|member| member.coverage_end_on.present? }
-  end
-
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
   end
