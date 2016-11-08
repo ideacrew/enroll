@@ -32,14 +32,65 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
     end
 
-  
-    def is_individual_assisted?(enrollment)
-      enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
-    end
+    # def is_individual_assisted?(enrollment)
+    #   enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
+    # end
 
-    def is_csr?(enrollment)
-      csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
-      (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
+    # def is_csr?(enrollment)
+    #   csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
+    #   (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
+    # end
+
+    # def eligible_to_get_assistance?(enrollment)
+    #   if @assisted_individuals[enrollment.subscriber.hbx_id]
+
+    #   end
+    # end
+
+    def get_assisted_enrollments
+
+      current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
+      aptc_reader.call
+      @assisted_individuals = aptc_reader.assisted_individuals
+
+      count  = 0
+      @assisted_individuals.each do |hbx_id, aptc_values|
+
+        next unless hbx_id == "18770628"
+        
+        person = Person.by_hbx_id(hbx_id).first
+        family = person.primary_family
+
+        next if family.blank?
+        next if family.active_household.blank?
+
+        enrollments = family.active_household.hbx_enrollments.where({
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
+          :kind => 'individual',
+          :coverage_kind => 'health'
+          }).order(:"effective_on".desc).select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
+
+        enrollment = enrollments.detect{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
+
+        if enrollment.present?
+          count += 1
+    
+          if count % 100 == 0
+            puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
+          end
+
+          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+          enrollment_renewal.enrollment = enrollment
+          enrollment_renewal.assisted = true
+          enrollment_renewal.aptc_values = aptc_values
+          enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
+          enrollment_renewal.renew
+        end
+      end
+      puts count
     end
 
     def process
@@ -55,8 +106,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
             # hbxe = enrollments.reduce([]) { |list, en| list << en if HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.contains?(en.effective_on)}
 
             enrollments.each do |enrollment|
-              next if is_individual_assisted?(enrollment)
-
               puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
               count += 1
 

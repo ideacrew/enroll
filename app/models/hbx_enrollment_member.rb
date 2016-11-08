@@ -47,6 +47,10 @@ class HbxEnrollmentMember
     @primary_relationship = family_member.primary_relationship
   end
 
+  def hbx_id
+    person.hbx_id
+  end
+
   def person
     return @person unless @person.blank?
     @person = family_member.person
