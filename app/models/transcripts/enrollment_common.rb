@@ -18,9 +18,9 @@ module Transcripts
           enrollment.effective_on = maximum_start_date
         end
 
-        enrollment.hbx_enrollment_members.each do |member| 
-          member.coverage_start_on = enrollment.effective_on
-        end
+        # enrollment.hbx_enrollment_members.each do |member| 
+        #   member.coverage_start_on = enrollment.effective_on
+        # end
 
         enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present?}
       else
