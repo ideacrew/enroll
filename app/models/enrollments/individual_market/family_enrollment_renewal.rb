@@ -7,14 +7,15 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def renew
-    # begin
+    begin
       renewal_enrollment = clone_enrollment
       renewal_enrollment.renew_enrollment
       renewal_enrollment.decorated_hbx_enrollment
       save_renewal_enrollment(renewal_enrollment)
-    # rescue Exception => e
-    #   @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
-    # end
+    rescue Exception => e
+      puts "#{enrollment.hbx_id}---#{e.inspect}"
+      # @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
+    end
   end
 
   def clone_enrollment
@@ -68,16 +69,17 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_renewal_plan
+
     if is_csr? 
       if @aptc_values[:csr_amt] == '0'
-        csr_variant = '00'
+        csr_variant = '01'
       else
         csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
       end
 
       Plan.where({ 
         :active_year => @renewal_benefit_coverage_period.start_on.year, 
-        :hios_id => "#{@enrollment.plan.hios_base_id}-#{csr_variant}"
+        :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
       }).first
     else
       @enrollment.plan.renewal_plan

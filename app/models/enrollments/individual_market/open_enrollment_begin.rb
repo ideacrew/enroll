@@ -58,8 +58,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
       count  = 0
       @assisted_individuals.each do |hbx_id, aptc_values|
-
-        next unless hbx_id == "18770628"
         
         person = Person.by_hbx_id(hbx_id).first
         family = person.primary_family
@@ -76,11 +74,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         enrollment = enrollments.detect{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
         if enrollment.present?
-          count += 1
-    
-          if count % 100 == 0
-            puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
-          end
+          count += 1    
+          puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
 
           enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
           enrollment_renewal.enrollment = enrollment
