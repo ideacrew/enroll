@@ -171,6 +171,7 @@ context "with tax household and eligibility determination of csr_94" do
     assign(:carrier_names_map, {})
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
+    allow(view).to receive(:params).and_return :market_kind => 'individual'
       family = person.primary_family
       active_household = family.households.first
       tax_household = FactoryGirl.create(:tax_household, household: active_household )
