@@ -68,7 +68,7 @@
                   <%end%>
                 </td>
                 <td>
-                  <%= link_to raw('<i class="fa fa-pencil fa-lg" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, staff.employee_roles.first.census_employee.id, tab: 'employees') if staff.employee_roles.first.census_employee.id.present? %>
+                  <%= link_to raw('<i class="fa fa-pencil fa-lg" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, staff.employee_roles.first.census_employee.id, tab: 'employees') if staff.employee_roles.present? %>
                 </td>
               </tr>
             <% end if @staff%>
