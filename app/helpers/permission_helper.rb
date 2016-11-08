@@ -8,14 +8,12 @@ module PermissionHelper
   end
 
   def pundit_span pundit_object, pundit_method
-    result = policy_helper(pundit_object).send(pundit_method) ? '<span class="no-op">' : ' <span class="blocking" >' 
+    result = policy_helper(pundit_object).send(pundit_method) ? '<span class="no-op">' : ' <span class="blocking" >'
     raw result
   end
 
   def pundit_class pundit_object, pundit_method
-    result = policy_helper(pundit_object).send(pundit_method) ? ' no-op ' : '  blocking ' 
+    result = policy_helper(pundit_object).send(pundit_method) ? ' no-op ' : '  blocking '
     raw result
   end
-
-
-end  
+end
