@@ -32,8 +32,12 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
     end
 
-    def is_individual_assisted?(enrollment)
-      enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
+    def is_individual_assisted?(enrollment)      
+      # reader.all_assisted_individuals.keys
+
+      # enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
+      
+      @all_assisted_individuals.include?(enrollment.subscriber.hbx_id)
     end
 
     def is_csr?(enrollment)
@@ -101,6 +105,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     def process
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
+      aptc_reader.call
+      @all_assisted_individuals = aptc_reader.all_assisted_individuals.keys
 
       count = 0
       families.each do |family|
