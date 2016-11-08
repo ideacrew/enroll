@@ -161,7 +161,6 @@ module Insured::FamiliesHelper
     end
   end
 
-
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
