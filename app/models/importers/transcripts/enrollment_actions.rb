@@ -46,9 +46,11 @@ module Importers::Transcripts
       })
 
       family.save!
+      @member_changed = true
     end
 
     def build_new_hbx_enrollment
+      return if @member_changed
       family = @enrollment.family
 
       hbx_enrollment = family.active_household.hbx_enrollments.build({
@@ -76,10 +78,9 @@ module Importers::Transcripts
       end
 
       hbx_enrollment.plan = @enrollment.plan
+      hbx_enrollment.aasm_state = 'coverage_selected'
       hbx_enrollment.save!
       hbx_enrollment.reload
-
-      hbx_enrollment.select_coverage!
 
       if @canceled
         hbx_enrollment.invalidate_enrollment! if hbx_enrollment.may_invalidate_enrollment?
@@ -130,6 +131,7 @@ module Importers::Transcripts
     def hbx_enrollment_members_hbx_id_remove(value)
       build_new_hbx_enrollment
       @enrollment.hbx_enrollment_members.detect{|member| member.hbx_id == value['hbx_id'] }.delete
+      @member_changed = true
     end
 
     def process_enrollment_remove(attributes)

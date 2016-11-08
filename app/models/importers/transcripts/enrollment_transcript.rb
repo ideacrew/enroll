@@ -56,6 +56,7 @@ module Importers::Transcripts
 
     def process
       @canceled = false
+      @member_changed = false
       @canceled = true if @other_enrollment.subscriber.coverage_end_on.present? && (@other_enrollment.subscriber.coverage_start_on >= @other_enrollment.subscriber.coverage_end_on)
 
       @other_enrollment = fix_enrollment_coverage_start(@other_enrollment)

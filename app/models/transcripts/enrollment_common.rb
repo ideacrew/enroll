@@ -38,12 +38,11 @@ module Transcripts
         :kind => enrollment.kind,
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc)
-        .select{|e| e.plan.active_year == enrollment.plan.active_year}
+        .select{|e| e.plan.active_year == enrollment.plan.active_year}.reject{|en| en.void?}
         .reject{|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id != enrollment.subscriber.hbx_id)}
     end
 
     def matching_shop_coverages(enrollment, family=nil)
-
       if enrollment.persisted?
         assignment = enrollment.benefit_group_assignment
         benefit_group = (assignment.present? ? assignment.benefit_group : enrollment.benefit_group)
@@ -64,7 +63,7 @@ module Transcripts
       family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
         :coverage_kind => enrollment.coverage_kind, 
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-        }).order_by(:effective_on.asc)
+        }).order_by(:effective_on.asc).reject{|en| en.void?}
         .reject{|en| en.subscriber.hbx_id != enrollment.subscriber.hbx_id}
     end
 

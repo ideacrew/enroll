@@ -25,7 +25,7 @@ class HbxEnrollment
   COVERAGE_KINDS      = %w(health dental)
 
   ENROLLED_STATUSES   = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending
-                              enrolled_contingent unverified
+                              enrolled_contingent unverified coverage_enrolled
                             )
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
@@ -1135,7 +1135,7 @@ class HbxEnrollment
                     to: :void, 
                  guard: :termination_attributes_cleared?
 
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled,
+      transitions from: [:shopping, :coverage_selected, :coverage_enrolled, :transmitted_to_carrier, :coverage_enrolled,
                           :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
                           :auto_renewing, :renewing_waived, :renewing_coverage_selected, 
                           :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, 
