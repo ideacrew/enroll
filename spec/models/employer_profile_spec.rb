@@ -32,8 +32,8 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
-  after do
-    TimeKeeper.set_date_of_record(TimeKeeper.date_of_record)
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   it { should validate_presence_of :entity_kind }
@@ -143,11 +143,10 @@ describe EmployerProfile, dbclean: :after_each do
         plan_year = employer_profile.plan_years.first
         plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
         plan_year.open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
-        plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 10.days
+        plan_year.open_enrollment_end_on = plan_year.open_enrollment_start_on + 9.days
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
 
         TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month - 1)
-
         plan_year.publish!
       end
 
@@ -272,7 +271,13 @@ describe EmployerProfile, dbclean: :after_each do
     }
 
     before do
-      employer_profile.save!
+      #patchy 1st of month spec fix
+      if employer_profile.plan_years.last.valid?
+        employer_profile.save!
+      else
+        employer_profile.plan_years.last.open_enrollment_start_on += 1.day
+        employer_profile.save!
+      end
     end
 
     context 'when upcoming month plan year present' do
