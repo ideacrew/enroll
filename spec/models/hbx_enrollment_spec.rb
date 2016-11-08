@@ -800,11 +800,12 @@ describe HbxProfile, "class methods", type: :model do
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
       hbx_enrollment1.effective_on = TimeKeeper.date_of_record - 10.days
-
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_terminated?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
+      expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
+    
   end
 
   context "can_terminate_coverage?" do
