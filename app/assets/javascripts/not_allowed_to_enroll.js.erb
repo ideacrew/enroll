@@ -26,7 +26,7 @@ function ineligible_alert(){
 $(document).on('click', '.consumer_roles .edit_person .right-section .btn', function(){
   var valid_form = $('form')[0].checkValidity()
   if (valid_form) {
-    if (ineligible_immigration() || ineligible_incarcerated())  ineligible_alert()
+    //if (ineligible_immigration() || ineligible_incarcerated())  ineligible_alert()
   }
   return true
 })
