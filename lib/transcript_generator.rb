@@ -26,8 +26,6 @@ class TranscriptGenerator
       begin
         @count += 1
 
-        next if @count > 2000
-
         if @count % 100 == 0
           puts "------#{@count}"
         end
