@@ -99,6 +99,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
+      assign(:market_kind, 'individual')
       assign(:tax_household, true)
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
