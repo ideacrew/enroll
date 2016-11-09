@@ -27,7 +27,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end
 
-    context "triggering a new enrollment" do
+    context "triggering a new enrollment", dbclean: :after_each do
 
       let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,1,1), plan: plan)}
       let(:renewal_plan) { FactoryGirl.create(:plan)}
@@ -55,7 +55,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         expect(household.hbx_enrollments.where(aasm_state: "renewing_waived").size).to eq 1
       end
 
-      it "should not trigger an enrollment if we already have an enrollment with an effective date > renewing plan year start date", dbclean: :after_each do
+      it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
+        hbx_enrollment.update_attributes(:benefit_group_id => organization.employer_profile.renewing_plan_year.benefit_groups.first.id, :benefit_group_assignment => census_employee.renewal_benefit_group_assignment)
         hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on + 1.month)
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
