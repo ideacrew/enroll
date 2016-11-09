@@ -70,12 +70,14 @@ module Transcripts
 
     def find_or_build(enrollment)
 
-      if !(TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).cover?(enrollment.effective_on)
-        raise "enrollment has #{enrollment.effective_on} effective date."
-      end
+      if !@shop
+        if !(TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).cover?(enrollment.effective_on)
+          raise "enrollment has #{enrollment.effective_on} effective date."
+        end
 
-      if enrollment.plan.active_year != TimeKeeper.date_of_record.year
-        raise "enrollment has #{enrollment.plan.active_year} plan."
+        if enrollment.plan.active_year != TimeKeeper.date_of_record.year
+          raise "enrollment has #{enrollment.plan.active_year} plan."
+        end
       end
 
       enrollment = fix_enrollment_coverage_start(enrollment)

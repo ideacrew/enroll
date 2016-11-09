@@ -137,9 +137,11 @@ module Importers::Transcripts
         raise "EDI policy missing subscriber."
       end
 
-      active_year = @other_enrollment.plan.active_year
-      if  active_year != 2016
-        raise "EDI policy has  #{active_year} plan."
+      if @market != 'shop'
+        active_year = @other_enrollment.plan.active_year
+        if  active_year != TimeKeeper.datetime_of_record.year
+          raise "EDI policy has  #{active_year} plan."
+        end
       end
     end
 
