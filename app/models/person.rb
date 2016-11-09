@@ -880,7 +880,11 @@ class Person
   end
   
   def is_primary_poc
-    active_employer_staff_roles.first.primary_poc
+    if active_employer_staff_roles.present?
+      active_employer_staff_roles.first.primary_poc
+    else
+      employer_staff_roles.first.primary_poc
+    end
   end
 
   private
