@@ -51,10 +51,12 @@ module Importers
 
     def has_office_locations_changed?
       organization = find_organization
-      organization.office_locations.each do |office_location|
-        address = office_location.try(:address)
-        if address.present? && address.updated_at.present? && address.created_at.present? && address.updated_at > address.created_at
-          errors.add(:organization, "import cannot be done as office location was updated on #{address.updated_at}.")
+      if organization.present?
+        organization.office_locations.each do |office_location|
+          address = office_location.try(:address)
+          if address.present? && address.updated_at.present? && address.created_at.present? && address.updated_at > address.created_at
+            errors.add(:organization, "import cannot be done as office location was updated on #{address.updated_at}.")
+          end
         end
       end
     end
