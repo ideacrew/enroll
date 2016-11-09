@@ -112,6 +112,7 @@ class Notice
   def upload_and_send_secure_message
     doc_uri = upload_to_amazonS3
     notice  = create_recipient_document(doc_uri)
+    # byebug
     create_secure_inbox_message(notice)
   end
   

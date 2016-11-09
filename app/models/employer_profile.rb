@@ -733,26 +733,14 @@ class EmployerProfile
   end
 
   def generate_checkbook_notices
-    s3urls = []
-    census_employees.each do |census_employee|
-      s3urls << census_employee.generate_and_save_to_temp_folder
-    end
-    begin
-      outputfile=nil
-      filename =Rails.root.join( "tmp", "#{id}.pdf").to_s
-      s3urls.each do |s3url| 
-        pdf= Aws::S3Storage.find(s3url)
-        temp_file = Tempfile.new(s3url)
-        temp_file.write(pdf)
-        temp_file.close
-        outputfile = CombinePDF.new if outputfile.nil?
-        outputfile << CombinePDF.load(temp_file.path)
-      end
-      outputfile.save filename
-      return filename
-    rescue Exception => e
-      logger.warn("#{e}")
-    end
+    ## Background job to invoke Notice
+    event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+    notice_trigger = event_kind.notice_triggers.first
+    builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+              template: notice_trigger.notice_template,
+              subject: event_kind.title,
+              mpi_indicator: notice_trigger.mpi_indicator,
+              }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
   end
 
 private
