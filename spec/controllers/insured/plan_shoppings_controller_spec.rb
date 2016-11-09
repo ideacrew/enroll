@@ -469,6 +469,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
