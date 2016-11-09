@@ -6,6 +6,9 @@
   %event
     %body
       %enrollment_event_body
+      - if affected_members.present? && affected_members.size > 0
+        %affected_members
+          = render :partial => "events/shared/enrollee", :collection => affected_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
         %transaction_id
           %id= hbx_enrollment._id
         %is_trading_partner_publishable= hbx_enrollment.valid?
