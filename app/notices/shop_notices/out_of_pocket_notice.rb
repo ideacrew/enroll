@@ -18,23 +18,10 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     upload_and_send_secure_message
   end
 
-  # def build_and_save
-  #   build
-  #   generate_pdf_notice
-  #   upload_to_amazonS3
-  # end
-
   def move_to_employer_folder
     temp_employer_folder = FileUtils.mkdir_p(Rails.root.join("tmp", "#{@recipient.employer_profile.id}"))
     FileUtils.mv(notice_path, temp_employer_folder.join)
   end
-
-  # def upload_to_amazonS3
-  #   Aws::S3Storage.save(notice_path, 'notices')
-  # rescue => e
-  #   raise "unable to upload to amazon #{e}"
-  # end
-
 
   def build
       @notice.start_on= @recipient.try(:plan_years).first.start_on
