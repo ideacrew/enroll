@@ -469,9 +469,9 @@ private
     self.default = true
 
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 462.30 if employee_max_amt == 0
-    self.first_dependent_max_amt = 998.88 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1058.42 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 480.29 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1030.8 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)
