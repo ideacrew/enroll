@@ -19,7 +19,7 @@ module Aws
           nil
         end
       rescue Exception => e
-        nil
+        # puts "Exception #{e}  #{e.backtrace}"
       end
     end
 
