@@ -888,8 +888,9 @@ private
   end
 
   def trigger_renew_notice
-    subscriber = Subscribers::NotificationSubscriber.new
-    subscriber.call("acapi.info.events.employer.planyear_renewal_3a", "e_start", "e_end", "msg_id",{"employer_id" => employer_profile.hbx_id })
+    resource_mapping = ApplicationEventMapper.map_resource(self.employer_profile.class)
+    event_name = "acapi.info.events.employer.planyear_renewal_3a"
+    notify(event_name, {resource_mapping.identifier_key => self.employer_profile.class.send(resource_mapping.identifier_method).to_s})
   end
 
   def trigger_auto_renew_notice
