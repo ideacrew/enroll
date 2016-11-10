@@ -13,7 +13,6 @@ class Email
   field :kind, type: String
   field :address, type: String
 
-  validates :address, :email => true, :allow_blank => true
   validates_presence_of  :kind, message: "Choose a type"
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid email type"
 
