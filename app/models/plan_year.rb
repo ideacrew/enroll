@@ -890,7 +890,7 @@ private
   def trigger_renew_notice
     resource_mapping = ApplicationEventMapper.map_resource(self.employer_profile.class)
     event_name = "acapi.info.events.employer.planyear_renewal_3a"
-    notify(event_name, {resource_mapping.identifier_key => self.employer_profile.class.send(resource_mapping.identifier_method).to_s})
+    notify(event_name, {resource_mapping.identifier_key => self.employer_profile.send(resource_mapping.identifier_method).to_s})
   end
 
   def trigger_auto_renew_notice
