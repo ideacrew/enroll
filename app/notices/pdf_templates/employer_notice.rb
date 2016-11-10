@@ -20,11 +20,13 @@ module PdfTemplates
     attribute :reference_plan, Object
     attribute :family_contribution, String
     attribute :data, Hash
+    attribute :plan_year, String
     attribute :coverage_end_on, Date
     attribute :coverage_start_on, Date
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
     attribute :trigger_type, String
+    attribute :census_employees, Array
 
     def shop?
       return true
