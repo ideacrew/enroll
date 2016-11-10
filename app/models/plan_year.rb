@@ -3,6 +3,7 @@ class PlanYear
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :employer_profile
 
