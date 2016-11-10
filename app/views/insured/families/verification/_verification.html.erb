@@ -36,21 +36,20 @@
             </thead>
             <tbody>
             <% @family_members.each do |member|%>
-                <% f_member = member.person %>
                 <tr class="<%= cycle("odd top", "even top") %>">
-                  <td><%= f_member.first_name.capitalize %>
-                    <%= f_member.last_name.capitalize %></td>
+                  <td>
+                    <%= member.person.first_name.capitalize %>
+                    <%= member.person.last_name.capitalize %>
+                  </td>
                   <td colspan="3">
-                    <% if unverified?(f_member) %>
-                        <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
-                    <% end %>
+                    <%= render partial: 'insured/families/verification/verification_types', locals: {member: member} %>
                   </td>
                   <td class="table-functions">
                     <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
-                        <% if member_has_uploaded_docs(f_member) %>
-                    <span data-toggle="tooltip" title="View Documents" class="function-text">
-                      <i class="fa fa-caret-down fa-2x"></i>
-                    </span>
+                        <% if member_has_uploaded_docs(member) %>
+                            <span data-toggle="tooltip" title="View Documents" class="function-text">
+                              <i class="fa fa-caret-down fa-2x"></i>
+                            </span>
                         <% end %>
                     <% end %>
                   </td>
