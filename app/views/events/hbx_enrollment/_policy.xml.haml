@@ -14,6 +14,9 @@
           %id
             %id= "urn:openhbx:terms:v1:employer:fein##{employer.fein}"
           %name= employer.legal_name
+          - unless employer.dba.blank?
+            %dba= employer.dba
+          %fein= employer.fein
         %total_employer_responsible_amount=(hbx_enrollment.total_employer_contribution).round(2)
     - else
       %individual_market
