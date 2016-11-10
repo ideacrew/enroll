@@ -5,7 +5,7 @@ class ExtendingOpenEnrollmentEndDateForEmployers < MongoidMigrationTask
   def migrate
     plan_year_start_on = Date.strptime((ENV['py_start_on']).to_s, "%m/%d/%Y")
     new_open_enrollment_end_on_date = Date.strptime((ENV['new_oe_end_date']).to_s, "%m/%d/%Y")
-    organizations = (Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => plan_year_start_on, :aasm_state.in => PlanYear::RENEWING}}) + Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => plan_year_start_on}}, :"employer_profile.profile_source" => "conversion")).uniq
+    organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => plan_year_start_on, :aasm_state.in => PlanYear::RENEWING}})
     count = 0
     organizations.each do |org|
       org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first.update_attribute(:open_enrollment_end_on, new_open_enrollment_end_on_date)
