@@ -238,6 +238,7 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
+      get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
@@ -332,6 +333,50 @@ Rails.application.routes.draw do
       end
       member do
         get :favorite
+      end
+    end
+
+
+    resources :broker_roles do
+
+      resources :quotes do
+        root 'quotes#index'
+        collection do
+          post :quotes_index_datatable
+          get :new_household, :format => "js"
+          post :update_benefits
+          post :publish_quote
+          get :get_quote_info
+          get :copy
+          get :set_plan
+          get :publish
+          get :criteria
+          get :plan_comparison
+          get :health_cost_comparison
+          get :dental_cost_comparison
+          get 'published_quote/:id', to: 'quotes#view_published_quote'
+          get :export_to_pdf
+          get :download_pdf
+          get :dental_plans_data
+          get :my_quotes
+        end
+        member do
+          get :upload_employee_roster
+          post :build_employee_roster
+          delete :delete_quote
+          get :download_employee_roster
+          post :delete_member
+          delete :delete_household
+          post :delete_benefit_group
+          get :delete_quote_modal
+        end
+
+        resources :quote_benefit_groups do
+          get :criteria
+          get :get_quote_info
+          post :update_benefits
+          get :plan_comparison
+        end
       end
     end
   end
