@@ -6,7 +6,7 @@
           <%=v_type%>&nbsp;
         </td>
         <td style="<% if text_center(v_type, person) %>
-                        text-align: center;
+                     text-align: center;
                    <% end %>">
           <span class="label label-<%=verification_type_class(v_type, person)%>">
             <%= show_v_type(v_type, person) %>

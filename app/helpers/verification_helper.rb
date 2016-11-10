@@ -82,7 +82,7 @@ module VerificationHelper
   end
 
   def member_has_uploaded_docs(member)
-    true if member.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
+    true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
   end
 
   def member_has_uploaded_paper_applications(member)
