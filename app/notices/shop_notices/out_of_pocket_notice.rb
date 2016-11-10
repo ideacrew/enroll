@@ -39,7 +39,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
     "https://staging.checkbookhealth.org/shop/dc/"
   end
 
-  # @param recipient is a Person object
+  #TODO remove of not used
   def send_email_notice
     attachments={"#{subject}": notice_path}
     UserMailer.generic_notice_alert(@notice.primary_fullname,subject,to,attachments).deliver_now
