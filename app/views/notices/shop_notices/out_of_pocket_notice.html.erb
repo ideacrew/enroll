@@ -44,7 +44,7 @@
   content: "2.Your employer's plan offerings  : #{notice.metal_leval.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums  :  #{notice.plan_year} & #{notice.carrier} "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums  : #{notice.carrier} - #{notice.plan_year} "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
