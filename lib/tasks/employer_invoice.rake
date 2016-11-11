@@ -24,13 +24,13 @@ namespace :employer_invoice do
     new_employers = Organization.where({
       :'employer_profile.plan_years' => { 
        :$elemMatch => {
-         :start_on =>  { "$eq" => DateTime.parse("2016-08-01" ) },
+         :start_on =>  { "$eq" => DateTime.parse("2016-12-01" ) },
          :"aasm_state".in => PlanYear::PUBLISHED
        }}
     })
 
-    generate_invoices(conversion_employers, false)
-    # generate_invoices(new_employers, true)
+    # generate_invoices(conversion_employers, false)
+    generate_invoices(new_employers, true)
    
     #Create a tar file 
     puts "creating a tar file now"
