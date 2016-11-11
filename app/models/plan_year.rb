@@ -889,19 +889,11 @@ private
   end
 
   def trigger_renew_notice
-    resource_mapping = ApplicationEventMapper.map_resource(self.employer_profile.class)
-    event_name = "acapi.info.events.employer.planyear_renewal_3a"
-    notify(event_name, {resource_mapping.identifier_key => self.employer_profile.send(resource_mapping.identifier_method).to_s})
+    self.employer_profile.trigger_notices("planyear_renewal_3a")
   end
 
   def trigger_auto_renew_notice
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
-    shop_notice =ShopNotices::EmployerNotice.new(employer_profile,{
-                                                  :subject => "PlanYear Renewal Notice(3B)",
-                                                  :trigger_type => "auto",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
+    self.employer_profile.trigger_notices("planyear_renewal_3b")
   end
 
   def record_transition

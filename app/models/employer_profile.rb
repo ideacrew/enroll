@@ -726,6 +726,12 @@ class EmployerProfile
     self.profile_source == "conversion"
   end
 
+  def trigger_notices(event)
+    resource_mapping = ApplicationEventMapper.map_resource(self.class)
+    event_name = "acapi.info.events.employer.#{event}"
+    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
