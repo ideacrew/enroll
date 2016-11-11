@@ -1,5 +1,5 @@
 %carrier
   %id
-    %id= "urn:dc0:terms:v1:issuer_names##{carrier.legal_name.split(" ").join("_").downcase}"
+    %id= carrier.hbx_carrier_id
   %name= carrier.legal_name
   %display_name= carrier.legal_name
