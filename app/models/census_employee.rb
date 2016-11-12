@@ -64,9 +64,12 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
 
-  scope :active,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
-  scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
-  scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_terminated,    ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
+  scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
+  scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -110,6 +113,10 @@ class CensusEmployee < CensusMember
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
   
+  def initialize(*args)
+    super(*args)
+    write_attribute(:employee_relationship, "self")
+  end
 
   def is_linked?
     LINKED_STATES.include?(aasm_state)
@@ -125,11 +132,6 @@ class CensusEmployee < CensusMember
         cd.unset(:encrypted_ssn)
       end
     end
-  end
-
-  def initialize(*args)
-    super(*args)
-    write_attribute(:employee_relationship, "self")
   end
 
   def assign_default_benefit_package
@@ -502,10 +504,11 @@ class CensusEmployee < CensusMember
     end
 
     def rebase_newly_designated_employees
-      return unless Date.today.yday == 1
+      return unless TimeKeeper.date_of_record.yday == 1
       CensusEmployee.where(:"aasm_state".in => NEWLY_DESIGNATED_STATES).each do |employee|
-        employee.rebase_new_designates! if employee.may_rebase_new_designates?
+        employee.rebase_new_designee! if employee.may_rebase_new_designee?
       end
+      # binding.pry
     end
 
     def find_all_by_employer_profile(employer_profile)
@@ -567,7 +570,7 @@ class CensusEmployee < CensusMember
       transitions from: :eligible, to: :newly_designated_eligible
     end
 
-    event :rebase_new_designates, :after => :record_transition do
+    event :rebase_new_designee, :after => :record_transition do
       transitions from: :newly_designated_eligible, to: :eligible
       transitions from: :newly_designated_linked, to: :employee_role_linked
     end
@@ -684,7 +687,6 @@ class CensusEmployee < CensusMember
       end
     end
   end
-
 
   def no_duplicate_census_dependent_ssns
     dependents_ssn = census_dependents.map(&:ssn).select(&:present?)
