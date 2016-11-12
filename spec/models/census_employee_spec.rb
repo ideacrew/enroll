@@ -1248,4 +1248,29 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
   end
+
+  context "congressional newly designated employee" do
+    let(:employer_profile_congressional)  { FactoryGirl.create(:employer_profile_congress) }
+    let(:civil_servant)                   { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+    let(:eligible_state)                  { "newly_designated_eligible" }
+    let(:linked_state)                    { "newly_designated_linked" }
+
+    specify { expect(civil_servant).to be_eligible }
+
+    it "should transition to newly designated eligible state" do
+      expect { civil_servant.newly_designate! }.to change(civil_servant, :aasm_state).to eq eligible_state
+    end
+
+    context "and the census employee is associated with an employee role" do
+      before do
+        civil_servant.newly_designate!
+      end
+
+      it "should transition to newly designated linked state" do
+        binding.pry
+        expect { civil_servant.link_employee_role! }.to change(civil_servant, :aasm_state).to eq linked_state
+      end
+    end
+
+  end
 end
