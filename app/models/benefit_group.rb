@@ -435,12 +435,12 @@ class BenefitGroup
       if effective_on_offset == 1
         date_of_hire.end_of_month + 1.day
       else
-      if (date_of_hire + effective_on_offset.days).day == 1
-        (date_of_hire + effective_on_offset.days)
-      else
-        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        if (date_of_hire + effective_on_offset.days).day == 1
+          (date_of_hire + effective_on_offset.days)
+        else
+          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        end
       end
-    end
     end
   end
 
