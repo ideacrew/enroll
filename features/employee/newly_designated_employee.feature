@@ -4,6 +4,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 
   Scenario: Newly designated should not get effective date before renewing plan year start date
     Given Congressional Employer for Soren White exists with active and renewing plan year
+      And Soren White is newly designated
       And Employee has current hired on date
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
@@ -16,6 +17,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 
   Scenario: Newly designated can't buy coverage before open enrollment of renewing plan year through Shop for Plans
     Given Congressional Employer for Soren White exists with active and renewing plan year
+      And Soren White is newly designated
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal
       When Employee clicks "Shop for Plans" on my account page
@@ -24,6 +26,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 
   Scenario: Newly designated can't buy coverage before open enrollment of renewing plan year through New Hire badge
     Given Congressional Employer for Soren White exists with active and renewing plan year
+      And Soren White is newly designated
       And Employer for Soren White published renewing plan year
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal
@@ -33,6 +36,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 
   Scenario: Newly designated can't buy coverage under previous year plan year using QLE
     Given Congressional Employer for Soren White exists with active and renewing plan year
+      And Soren White is newly designated
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal
       When Employee click the "Married" in qle carousel
@@ -45,6 +49,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
           
   Scenario: Newly designated can buy coverage during open enrollment of renewing plan year
     Given Congressional Employer for Soren White exists with active and renewing plan year
+      And Soren White is newly designated
       And Employer for Soren White is under open enrollment
       And Employee has current hired on date
       And Soren White already matched and logged into employee portal

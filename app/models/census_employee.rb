@@ -212,12 +212,13 @@ class CensusEmployee < CensusMember
   def earliest_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
     if benefit_group_assignment
-      if newly_designated_eligible? || newly_designated_linked?
-        benefit_group_assignment.benefit_group.start_on 
-      else
-        benefit_group_assignment.benefit_group.eligible_on(hired_on) 
-      end
+      benefit_group_assignment.benefit_group.eligible_on(hired_on) 
     end
+  end
+
+  def newly_eligible_earlist_eligble_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    benefit_group_assignment.benefit_group.start_on 
   end
 
   # def first_name=(new_first_name)
