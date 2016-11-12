@@ -468,6 +468,7 @@ private
     self.plan_option_kind = "metal_level"
     self.default = true
 
+    # 2017 contribution schedule
     self.contribution_pct_as_int   = 75
     self.employee_max_amt = 480.29 if employee_max_amt == 0
     self.first_dependent_max_amt = 1030.8 if first_dependent_max_amt == 0
