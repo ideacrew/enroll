@@ -393,18 +393,22 @@ module Importers::Transcripts
             raise 'EmployerProfile missing!'
           end
 
-          employee_role = matched_person.employee_roles.detect{|e_role| e_role.employer_profile == employer_profile}
+          employee_role = matched_person.active_employee_roles.detect{|e_role| e_role.employer_profile == employer_profile}
           if employee_role.present?
             census_employee = employee_role.census_employee
           else
-            census_employee = employer_profile.census_employees.by_ssn(matched_person.ssn).first
-            if census_employee.blank?
-              census_employe = employer_profile.census_employees.where({ first_name: /#{matched_person.first_name}/i, last_name: /#{matched_person.last_name}/i, dob: matched_person.dob }).first
+            census_employees = CensusEmployee.matchable(matched_person.ssn, matched_person.dob).to_a + CensusEmployee.unclaimed_matchable(matched_person.ssn, matched_person.dob).to_a
+            census_employees = census_employees.collect{|ce| ce.employer_profile == employer_profile}
+
+            if census_employees.size > 1
+              raise "found multiple roster entrees for #{matched_person.full_name}"
             end
 
-            if census_employee.blank?
-              raise 'unable to find census employee record'
+            if census_employees.blank?
+              raise "unable to find census employee record"
             end
+
+            census_employee = census_employees.first
           end
 
           role, family = Factories::EnrollmentFactory.build_employee_role(matched_person, false, employer_profile, census_employee, census_employee.hired_on)
