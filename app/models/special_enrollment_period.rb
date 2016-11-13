@@ -67,7 +67,9 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind
     return @qualifying_life_event_kind if defined? @qualifying_life_event_kind
-    @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
+    if self.qualifying_life_event_kind_id.present?
+      @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
+    end
   end
 
   def qle_on=(new_qle_date)
