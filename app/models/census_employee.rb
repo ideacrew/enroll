@@ -568,6 +568,7 @@ class CensusEmployee < CensusMember
 
     event :newly_designate, :after => :record_transition do
       transitions from: :eligible, to: :newly_designated_eligible
+      transitions from: :employee_role_linked, to: :newly_designated_linked
     end
 
     event :rebase_new_designee, :after => :record_transition do
