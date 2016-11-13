@@ -218,7 +218,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def newly_eligible_earlist_eligble_date
+  def newly_eligible_earlist_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
     benefit_group_assignment.benefit_group.start_on 
   end
