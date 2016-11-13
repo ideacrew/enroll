@@ -916,6 +916,7 @@ private
   end
 
   def send_employee_invites
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|
