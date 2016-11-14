@@ -363,7 +363,7 @@ Rails.application.routes.draw do
         member do
           get :upload_employee_roster
           post :build_employee_roster
-          delete :delete_quote
+          get :delete_quote #fits with our dropdown ajax pattern
           get :download_employee_roster
           post :delete_member
           delete :delete_household

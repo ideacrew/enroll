@@ -456,7 +456,6 @@ class BrokerAgencies::QuotesController < ApplicationController
   def copy
     @q = Quote.find(params[:quote_id])
     @q.clone
-    redirect_to my_quotes_broker_agencies_broker_role_quotes_path(@broker)
   end
 
   def publish

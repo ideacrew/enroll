@@ -45,10 +45,7 @@ class Quote
   index({ broker_role_id: 1, aasm_state: 1 })
   index({"quote_benefit_groups._id" => 1}, { unique: true })
 
-  scope :all_broker_quotes,                  -> (broker_role_id) { where(broker_role_id: broker_role_id) }
-  scope :draft_quotes,                       -> { where("aasm_state" => 'draft') }
-  scope :published_quotes,                   -> { where("aasm_state" => 'published') }
-  scope :claimed_quotes,                   -> { where("aasm_state" => 'claimed') }
+  scope :datatable_search, ->(query) { where(quote_name: Regexp.new(Regexp.escape(query), true)) }
 
   after_create :update_default_benefit_group
 
