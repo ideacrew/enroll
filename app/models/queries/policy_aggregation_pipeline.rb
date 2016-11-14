@@ -202,6 +202,7 @@ module Queries
     end
 
     def filter_criteria_expression
+        project_property("hbx_enrollment_members", "$households.hbx_enrollments.hbx_enrollment_members") +
         project_property("policy_start_on", "$households.hbx_enrollments.effective_on") +
         project_property("policy_end_on", "$households.hbx_enrollments.terminated_on") +
         project_property("family_created_at", "$created_at") +
@@ -293,7 +294,8 @@ module Queries
           last("plan_id") +
           last("aasm_state") +
           last("enrollment_kind") +
-          last("family_created_at")
+          last("family_created_at") +
+          last("hbx_enrollment_members")
         ))
       @pipeline = @pipeline + flow.to_pipeline
       self
