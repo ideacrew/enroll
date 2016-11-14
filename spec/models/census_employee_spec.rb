@@ -1248,4 +1248,89 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
   end
+
+  context "and congressional newly designated employees are added" do
+    let(:employer_profile_congressional)  { plan_year.employer_profile }
+    let(:plan_year)                       { FactoryGirl.create(:next_month_plan_year, :with_benefit_group_congress) }
+    let(:benefit_group)                   { plan_year.benefit_groups.first }
+    let(:benefit_group_assignment)        { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: civil_servant) }
+    let(:civil_servant)                   { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+    let(:initial_state)                   { "eligible" }
+    let(:eligible_state)                  { "newly_designated_eligible" }
+    let(:linked_state)                    { "newly_designated_linked" }
+    let(:employee_linked_state)           { "employee_role_linked" }
+
+    specify { expect(civil_servant.aasm_state).to eq initial_state }
+
+    it "should transition to newly designated eligible state" do
+      expect { civil_servant.newly_designate! }.to change(civil_servant, :aasm_state).to eq eligible_state
+    end
+
+    context "and the census employee is associated with an employee role" do
+      before do
+        civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        civil_servant.newly_designate
+      end
+
+      it "should transition to newly designated linked state" do
+        expect { civil_servant.link_employee_role! }.to change(civil_servant, :aasm_state).to eq linked_state
+      end
+
+      context "and the link to employee role is removed" do
+        before do
+          civil_servant.benefit_group_assignments = [benefit_group_assignment]
+          civil_servant.aasm_state = linked_state
+          civil_servant.save!
+        end
+
+        it "should revert to 'newly designated eligible' state" do
+          expect { civil_servant.delink_employee_role! }.to change(civil_servant, :aasm_state).to eq eligible_state
+        end
+      end
+    end
+
+    context "and multiple newly designated employees are present in database" do
+      let(:second_civil_servant)  { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+
+      before do
+        civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        civil_servant.newly_designate!
+
+        second_civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        second_civil_servant.save!
+        second_civil_servant.newly_designate!
+        second_civil_servant.link_employee_role!
+      end
+
+      it "the scope should find them all" do
+        expect(CensusEmployee.newly_designated.size).to eq 2
+      end
+
+      it "the scope should find the eligible census employees" do
+        expect(CensusEmployee.eligible.size).to eq 1
+      end
+
+      it "the scope should find the linked census employees" do
+        expect(CensusEmployee.linked.size).to eq 1
+      end
+
+      context "and new plan year begins, ending 'newly designated' status" do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
+          TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
+        end
+
+        it "should transition 'newly designated eligible' status to initial state" do
+          expect(civil_servant.aasm_state).to eq eligible_state
+        end
+
+        xit "should transition 'newly designated linked' status to linked state" do
+          expect(second_civil_servant.aasm_state).to eq employee_linked_state
+        end
+      end
+
+    end
+
+
+  end
 end
