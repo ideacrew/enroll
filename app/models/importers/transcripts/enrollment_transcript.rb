@@ -398,7 +398,7 @@ module Importers::Transcripts
             census_employee = employee_role.census_employee
           else
             census_employees = CensusEmployee.matchable(matched_person.ssn, matched_person.dob).to_a + CensusEmployee.unclaimed_matchable(matched_person.ssn, matched_person.dob).to_a
-            census_employees = census_employees.collect{|ce| ce.employer_profile == employer_profile}
+            census_employees = census_employees.select{|ce| ce.employer_profile == employer_profile}
 
             if census_employees.size > 1
               raise "found multiple roster entrees for #{matched_person.full_name}"
