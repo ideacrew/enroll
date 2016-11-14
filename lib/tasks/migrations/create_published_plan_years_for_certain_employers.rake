@@ -7,7 +7,7 @@ namespace :migrations do
     plan_year = employer_profile.plan_years.build(
       start_on: Date.new(2016,12,1),
       end_on: Date.new(2017,11,30),
-      open_enrollment_start_on: Date.new(2016,11,14),
+      open_enrollment_start_on: Date.new(2016,10,13),
       open_enrollment_end_on: Date.new(2016,11,15)
     )
 
@@ -42,7 +42,7 @@ namespace :migrations do
       plan_year = employer_profile.plan_years.build(
         start_on: Date.new(2016,12,1),
         end_on: Date.new(2017,11,30),
-        open_enrollment_start_on: Date.new(2016,11,14),
+        open_enrollment_start_on: Date.new(2016,10,13),
         open_enrollment_end_on: Date.new(2016,11,15)
       )
 
