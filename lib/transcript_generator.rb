@@ -97,7 +97,7 @@ class TranscriptGenerator
             if @market == 'individual'
               csv << (first_row[0..9] + ['match', 'match:enrollment'])
             else
-              csv << (first_row[0..10] + ['match', 'match:enrollment'])
+              csv << (first_row[0..11] + ['match', 'match:enrollment'])
             end
             enrollment_removes.each{|row| csv << row}
           else
