@@ -27,6 +27,8 @@ RSpec.describe Insured::FamilyMembersController do
 
 
   describe "GET index" do
+    let(:census_employee) { double(earliest_eligible_date: TimeKeeper.date_of_record) }
+
     context 'normal' do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
@@ -78,6 +80,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(person).to receive(:broker_role).and_return(nil)
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:save!).and_return(true)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
 
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user
