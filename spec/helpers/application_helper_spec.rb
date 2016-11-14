@@ -154,24 +154,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   end
 
-  describe "#is_readonly" do
+  describe "#may_update_census_employee?" do
     let(:user) { double("User") }
-    let(:census_employee) { double("CensusEmployee") }
+    let(:census_employee) { double("CensusEmployee", new_record?: false, is_eligible?: false) }
+
     before do
       expect(helper).to receive(:current_user).and_return(user)
     end
+
     it "census_employee can edit if it is new record" do
       expect(user).to receive(:roles).and_return(["employee"])
-      expect(helper.is_readonly(CensusEmployee.new)).to eq false # readonly -> false
+      expect(helper.may_update_census_employee?(CensusEmployee.new)).to eq true # readonly -> false
     end
+
     it "census_employee cannot edit if linked to an employer" do
       expect(user).to receive(:roles).and_return(["employee"])
-      expect(census_employee).to receive(:employee_role_linked?).and_return(true)
-      expect(helper.is_readonly(census_employee)).to eq true # readonly -> true
+      expect(helper.may_update_census_employee?(census_employee)).to eq false # readonly -> true
     end
+
     it "hbx admin edit " do
       expect(user).to receive(:roles).and_return(["hbx_staff"])
-      expect(helper.is_readonly(CensusEmployee.new)).to eq false # readonly -> false
+      expect(helper.may_update_census_employee?(CensusEmployee.new)).to eq true # readonly -> false
     end
   end
 
