@@ -174,6 +174,8 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    @current_max_aptc = @tax_household.current_max_aptc
+    #@init_max_aptc = @person.primary_family.active_household.latest_active_tax_household_with_year(TimeKeeper.datetime_of_record.year).latest_eligibility_determination.max_aptc.to_f
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
