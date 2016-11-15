@@ -10,29 +10,29 @@ namespace :employer_invoice do
      "541873351", "521145355", "530071995", "521449994"]
 
     @folder_name="DCEXCHANGE_#{TimeKeeper.date_of_record.strftime("%Y%m%d")}"
-    
+
   	conversion_employers= Organization.where({
     :'employer_profile.profile_source' => 'conversion',
-    :'employer_profile.plan_years' => { 
+    :'employer_profile.plan_years' => {
       :$elemMatch => {
           :"start_on" => { "$eq" => DateTime.parse("2016-10-01" ) } ,
-          :"aasm_state".in =>  PlanYear::RENEWING_PUBLISHED_STATE 
+          :"aasm_state".in =>  PlanYear::RENEWING_PUBLISHED_STATE
         }
       }
     })
 
     new_employers = Organization.where({
-      :'employer_profile.plan_years' => { 
+      :'employer_profile.plan_years' => {
        :$elemMatch => {
-         :start_on =>  { "$eq" => DateTime.parse("2016-10-01" ) },
+         :start_on =>  { "$eq" => DateTime.parse("2016-12-01" ) },
          :"aasm_state".in => PlanYear::PUBLISHED
        }}
     })
 
     # generate_invoices(conversion_employers, false)
     generate_invoices(new_employers, true)
-   
-    #Create a tar file 
+
+    #Create a tar file
     puts "creating a tar file now"
     	system("tar -zcvf #{@folder_name}.tar.gz #{@folder_name}")
     puts "Folder created!"
@@ -58,11 +58,15 @@ namespace :employer_invoice do
 
     @folder_name="DCEXCHANGE_#{TimeKeeper.date_of_record.strftime("%Y%m%d")}"
 
-    INVOICE_LIST_BY_FEIN = ["812650064", "813667301", "274892867", "811988420", "472077927", "473481455", "522056857",
-  "530196528", "460558330", "813468876", "473824624", "720921017", "530196592", "520901863", "521580305",
-  "272630177", "743218001", "521403822", "474322713", "541697040", "472698509", "811380216", "620913689",
-  "530208367", "474796144", "813260391", "522192070", "371831137", "364750789", "800934649", "473665266",
-  "451236176", "530209637", "474020173", "464641685", "475239611", "813422012"]
+    INVOICE_LIST_BY_FEIN = ["473216629", "475087382", "366110249", "202240552", "262226795", "471971506",
+      "462036141", "272160999", "521854751", "204622047", "813521916", "383926625", "473186202", "743093659",
+      "810814802", "464255260", "452915255", "521247182", "521038849", "812811250", "471465883", "000000083",
+      "812982877", "522337206", "462691197", "811868912", "521250621", "473374252", "811512150", "311577362",
+      "475557729", "522239757", "813257447", "274442154", "462311826", "263262732", "263311586", "530239116",
+      "201347118", "813899317", "520913158", "475148006", "521195632", "463804477", "521009116", "454125843",
+      "474206800", "461431787", "383890618", "611718234", "474145602", "462997613", "473752174", "810983298",
+      "520972043", "870772231", "384013966", "471587361", "521361024", "463184561", "264392915", "810887188",
+      "474934008", "811405300", "521457836", "260564431", "134256302"]
 
     organizations = Organization.where(:"fein".in => INVOICE_LIST_BY_FEIN)
     organizations.each do |org|
