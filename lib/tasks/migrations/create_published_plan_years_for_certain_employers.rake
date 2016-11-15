@@ -17,7 +17,10 @@ namespace :migrations do
       plan_option_kind: "single_carrier",
       carrier_for_elected_plan: "53e67210eb899a4603000004",
       reference_plan_id: reference_plan.id,
-      elected_plans: elected_plans
+      elected_plans: elected_plans,
+      effective_on_offset: 0,
+      effective_on_kind: "first_of_month",
+      terminate_on_kind: "end_of_month"
     )
 
     rbs = benefit_group.build_relationship_benefits
@@ -52,7 +55,10 @@ namespace :migrations do
         plan_option_kind: "single_plan",
         carrier_for_elected_plan: "53e67210eb899a4603000004",
         reference_plan_id: reference_plan.id,
-        elected_plans: elected_plans
+        elected_plans: elected_plans,
+        effective_on_offset: 0,
+        effective_on_kind: "first_of_month",
+        terminate_on_kind: "end_of_month"
       )
 
       rbs = benefit_group.build_relationship_benefits
