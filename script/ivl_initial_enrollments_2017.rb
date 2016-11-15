@@ -22,7 +22,7 @@ active_selection_families.each do |fam|
     (pol.effective_on <=  Date.new(2016,12,31)) &&
       (pol.effective_on >  Date.new(2015,12,31))
   end
-  if found_a_2016
+  if !found_a_2016
     puts policy_for_2017.hbx_id
   end
 end
