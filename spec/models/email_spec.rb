@@ -11,6 +11,8 @@ describe Email, :dbclean => :after_each do
   end
 
   describe 'validations' do
+    it { should validate_presence_of :address }
+    it { should validate_presence_of :kind }
 
     describe 'email type' do
 
@@ -45,6 +47,15 @@ describe Email, :dbclean => :after_each do
     end
 
     describe "address" do
+
+      context "when empty" do
+        let(:params){valid_params.deep_merge!({address: ""})}
+        it "should give an error" do
+          record = Email.create(**params)
+          expect(record.errors[:address].any?).to be_truthy
+          expect(record.errors[:address]).to eq ["is not valid", "can't be blank"]
+        end
+      end
 
       context "when invalid" do
         let(:params){valid_params.deep_merge!({address: "something invalid"})}
