@@ -150,8 +150,7 @@
         <br/>
           <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
-
-        <div class="col-xs-3 right-section pull-right">
+      <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank?  && @market_kind == "individual" %>
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
