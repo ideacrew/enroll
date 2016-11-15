@@ -247,7 +247,13 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.nil?
       @enrolled_hbx_enrollment_plan_ids = []
     else
-      @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.effective_on)} if @person.active_employee_roles.first.present?
+      if @person.primary_family.try(:current_sep).try(:effective_on_kind) == "date_of_event" && covered_plan_year.present? && @person.primary_family.current_sep.effective_on < @person.active_employee_roles.first.employer_profile.active_plan_year.start_on
+        id_list = covered_plan_year.benefit_groups.map(&:id)
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+      else
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      end
     end
 
     Caches::MongoidCache.allocate(CarrierProfile)

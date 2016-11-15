@@ -35,6 +35,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(person).to receive(:active_employee_roles).and_return [employee_role]
+    allow(person).to receive(:has_active_employee_role?).and_return true
+    allow(employee_role).to receive(:benefit_group).and_return benefit_package
   end
 
   context "GET new" do

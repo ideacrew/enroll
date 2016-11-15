@@ -785,7 +785,7 @@ class HbxEnrollment
     end
 
     if qle
-      return hbx_enrollment.family.earliest_effective_shop_sep.effective_on
+      return hbx_enrollment.family.current_sep.effective_on
     end
 
     active_plan_year = employee_role.employer_profile.show_plan_year
@@ -802,7 +802,7 @@ class HbxEnrollment
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    if plan_year = hbx_enrollment.plan_year_check(employee_role) ? hbx_enrollment.covered_plan_year(employee_role) : employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
 
       if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
         raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -839,12 +839,10 @@ class HbxEnrollment
       enrollment.employee_role = employee_role
 
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
-        person = enrollment.family.primary_applicant.person if enrollment.family.present?
-        employee_role = person.active_employee_roles.first if person.present?
-        employer_profile = employee_role.employer_profile if employee_role.present?
-        if enrollment.family.current_sep.effective_on_kind == "date_of_event" && employer_profile.plan_years.where(aasm_state: "expired").present?
-          enrollment.effective_on =  enrollment.family.current_sep.effective_on 
+        if enrollment.plan_year_check(employee_role)
+          enrollment.effective_on =  enrollment.family.current_sep.effective_on
+        else
+          enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
         end
         enrollment.enrollment_kind = "special_enrollment"
       else
@@ -1287,6 +1285,14 @@ class HbxEnrollment
    end
  end
 
+ def plan_year_check(employee_role)
+  family.current_sep.effective_on_kind == "date_of_event" && covered_plan_year(employee_role).present? && family.current_sep.effective_on < employee_role.employer_profile.active_plan_year.start_on
+ end
+
+ def covered_plan_year(employee_role)
+    employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.effective_on)}
+ end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
@@ -1295,7 +1301,7 @@ class HbxEnrollment
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    plan_year = plan_year_check(employee_role) ? covered_plan_year(employee_role) : employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else

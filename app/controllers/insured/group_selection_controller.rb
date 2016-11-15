@@ -172,8 +172,11 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def insure_hbx_enrollment_for_shop_qle_flow
+    # Need to FIX
     if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      py = @employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@family.current_sep.effective_on)}
+      id_list = py.benefit_groups.map(&:id) if py.present?
+      @hbx_enrollment =  Insured::GroupSelectionHelper.flag(@person, @family, @employee_role) ? @family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.try(:first) : @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
     end
   end
 
