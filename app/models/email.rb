@@ -17,6 +17,9 @@ class Email
   validates_presence_of  :kind, message: "Choose a type"
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid email type"
 
+  validates :address,
+    presence: false
+
   def blank?
     address.blank?
   end
