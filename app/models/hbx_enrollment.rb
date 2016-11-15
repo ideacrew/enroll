@@ -839,12 +839,10 @@ class HbxEnrollment
       enrollment.employee_role = employee_role
 
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
-        person = enrollment.family.primary_applicant.person if enrollment.family.present?
-        employee_role = person.active_employee_roles.first if person.present?
-        employer_profile = employee_role.employer_profile if employee_role.present?
-        if enrollment.family.current_sep.effective_on_kind == "date_of_event" && employer_profile.plan_years.where(aasm_state: "expired").present?
-          enrollment.effective_on =  enrollment.family.current_sep.effective_on 
+        if enrollment.family.current_sep.effective_on_kind == "date_of_event" && employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(enrollment.family.current_sep.effective_on)}.present?
+          enrollment.effective_on =  enrollment.family.current_sep.effective_on
+        else
+          enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
         end
         enrollment.enrollment_kind = "special_enrollment"
       else
