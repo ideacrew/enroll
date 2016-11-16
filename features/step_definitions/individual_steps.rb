@@ -321,7 +321,7 @@ Then(/Individual asks for help$/) do
   wait_for_ajax
   expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
-  wait_for_ajax
+  wait_for_ajax(5)
   expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"

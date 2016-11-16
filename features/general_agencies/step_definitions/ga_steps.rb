@@ -201,7 +201,7 @@ When /^the employer login in$/ do
   visit '/'
   portal_uri = find("a.interaction-click-control-employer-portal")["href"]
   click_link 'Employer Portal'
-  find('.interaction-click-control-sign-in-existing-account').click
+  find('.interaction-click-control-sign-in-existing-account', wait: 10).click
 
   fill_in "user[login]", with: "employer1@dc.gov"
   find('#user_login').set("employer1@dc.gov")
