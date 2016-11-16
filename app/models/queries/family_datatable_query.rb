@@ -54,9 +54,6 @@ module Queries
       if @custom_attributes['individual_options'] == 'all_unassisted'
         family = family.all_unassisted
       end
-      if @custom_attributes['coverall_options'] == 'sep_eligible'
-        family = family.sep_eligible
-      end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
