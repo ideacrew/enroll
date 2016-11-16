@@ -127,7 +127,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
-          #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
           post :match, :person => person_parameters
         end
