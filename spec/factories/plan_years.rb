@@ -18,6 +18,15 @@ FactoryGirl.define do
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "published"
     fte_count { 5 }
+
+    trait :with_benefit_group_congress do
+      benefit_groups { [FactoryGirl.build(:benefit_group_congress)] }
+    end
+
+    trait :with_benefit_group do
+      benefit_groups { [FactoryGirl.build(:benefit_group, effective_on_kind: "first_of_month")] }
+    end
+
   end
 
   factory :renewing_plan_year, class: PlanYear do

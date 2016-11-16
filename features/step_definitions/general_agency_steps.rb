@@ -1,6 +1,6 @@
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
-  find(".interaction-click-control-general-agency-registration").click
+  find(".interaction-click-control-general-agency-registration", wait: 10).click
 end
 
 Then(/^.+ should see the New General Agency form/) do
@@ -124,7 +124,8 @@ end
 And(/^.+ enters broker agency information for ga flow$/) do
   fill_in 'organization[legal_name]', with: "CareFirst Inc"
   fill_in 'organization[dba]', with: "CareFirst Inc"
-  fill_in 'organization[fein]', with: "890222111"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890222111"
 
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
@@ -170,7 +171,7 @@ When(/^.+ assign employer to general agency$/) do
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click
-  sleep(1)
+
 end
 
 Then(/^.+ should see assign successful message$/) do
