@@ -29,15 +29,7 @@ Rails.application.routes.draw do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
-    resources :residents, only: [:create, :edit, :update] do
-      get :search, on: :collection
-      post :match, on: :collection
-      post :build, on: :collection
-      get :begin_resident_enrollment, on: :collection
-      get :resume_resident_enrollment, on: :collection
-      get :ridp_bypass, on: :collection
-      get :find_sep, on: :collection
-    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -120,9 +112,6 @@ Rails.application.routes.draw do
     get 'verification_documents/upload', to: 'verification_documents#upload'
     post 'verification_documents/upload', to: 'verification_documents#upload'
     get 'verification_documents/download/:key', to: 'verification_documents#download'
-    get 'paper_applications/upload', to: 'paper_applications#upload'
-    post 'paper_applications/upload', to: 'paper_applications#upload'
-    get 'paper_applications/download/:key', to: 'paper_applications#download'
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -155,7 +144,6 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'brokers'
         get 'verification'
-        get 'upload_application'
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
@@ -199,12 +187,8 @@ Rails.application.routes.draw do
 
     root 'families#home'
 
-    resources :family_members do
-      get :resident_index, on: :collection
-      get :new_resident_dependent, on: :collection
-      get :edit_resident_dependent, on: :member
-      get :show_resident_dependent, on: :member
-    end
+    resources :family_members
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -239,6 +223,7 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
+      get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
@@ -338,6 +323,50 @@ Rails.application.routes.draw do
         get :favorite
       end
     end
+
+
+    resources :broker_roles do
+
+      resources :quotes do
+        root 'quotes#index'
+        collection do
+          post :quotes_index_datatable
+          get :new_household, :format => "js"
+          post :update_benefits
+          post :publish_quote
+          get :get_quote_info
+          get :copy
+          get :set_plan
+          get :publish
+          get :criteria
+          get :plan_comparison
+          get :health_cost_comparison
+          get :dental_cost_comparison
+          get 'published_quote/:id', to: 'quotes#view_published_quote'
+          get :export_to_pdf
+          get :download_pdf
+          get :dental_plans_data
+          get :my_quotes
+        end
+        member do
+          get :upload_employee_roster
+          post :build_employee_roster
+          get :delete_quote #fits with our dropdown ajax pattern
+          get :download_employee_roster
+          post :delete_member
+          delete :delete_household
+          post :delete_benefit_group
+          get :delete_quote_modal
+        end
+
+        resources :quote_benefit_groups do
+          get :criteria
+          get :get_quote_info
+          post :update_benefits
+          get :plan_comparison
+        end
+      end
+    end
   end
 
   match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
@@ -410,9 +439,6 @@ Rails.application.routes.draw do
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
-  match "hbx_profiles/edit_dob" => "exchanges/hbx_profiles#edit_dob", as: :edit_dob, via: [:get, :post]
-  match "hbx_profiles/update_dob" => "exchanges/hbx_profiles#update_dob", as: :update_dob, via: [:get, :post]
-  match "hbx_profiles/verify_dob_change_coverall" => "exchanges/hbx_profiles#verify_dob_change_coverall", as: :verify_dob_change_coverall, via: [:get], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection

@@ -18,7 +18,7 @@
 </div>
 <% else %>
   <% action_path = find_sep_insured_families_path  %>
-  <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? || @person.resident_role.present? %>
+  <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? %>
     <% action_path = new_insured_group_selection_path %>
   <% end %>
 
@@ -66,7 +66,7 @@
         </button>
         <div class="row">
           <div class="col-sm-12">
-            <% if @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
+            <% if @person.consumer_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
               <% options = {shop_for_plan: 'shop_for_plan'}
                 options.merge!(person_id: @person.id) if @person.present?
                 options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?

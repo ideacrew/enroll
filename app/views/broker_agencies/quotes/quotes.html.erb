@@ -1,0 +1,9 @@
+<div class='container'>
+<h1> Quote Management
+  <%= link_to "New Quote", new_broker_agencies_broker_role_quote_path, method: :get, class: 'btn btn-lg btn-primary', style: 'float: right' %>
+</h1>
+<%= render_datatable(@datatable) %>
+</div>
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+</script

@@ -386,6 +386,10 @@ class Plan
     end
   end
 
+  def deductible_integer
+    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
@@ -435,6 +439,71 @@ class Plan
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year).with_premium_tables
         end
       end
+    end
+
+    def shop_plans coverage_kind, year
+      if coverage_kind == 'health'
+        shop_health_plans year
+      else
+        shop_dental_plans year
+      end
+    end
+
+    def shop_health_plans year
+      Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
+        Plan.valid_shop_health_plans('metal_level', metal_level, year)
+      end.flatten
+    end
+
+    def shop_dental_plans year
+      shop_dental_by_active_year year
+    end
+
+    def build_plan_selectors market_kind, coverage_kind, year
+      plans = shop_plans coverage_kind, year
+      selectors = {}
+      if coverage_kind == 'dental'
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.append('any')
+      else
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.append('any')
+      end
+      selectors[:carriers] = plans.map{|p|
+        id = p.carrier_profile_id
+        carrier_profile = CarrierProfile.find(id)
+        [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
+        }.uniq.append(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.append('any')
+      selectors[:dc_network] =  ['true', 'false', 'any']
+      selectors[:nationwide] =  ['true', 'false', 'any']
+      selectors
+    end
+
+    def build_plan_features market_kind, coverage_kind, year
+      plans = shop_plans coverage_kind, year
+      feature_array = []
+      plans.each{|plan|
+
+        characteristics = {}
+        characteristics['plan_id'] = plan.id.to_s
+        if coverage_kind == 'dental'
+          characteristics['dental_level'] = plan.dental_level
+        else
+          characteristics['metal'] = plan.metal_level
+        end
+        characteristics['carrier'] = plan.carrier_profile.organization.legal_name
+        characteristics['plan_type'] = plan.plan_type
+        characteristics['deductible'] = plan.deductible_integer
+        characteristics['carrier_abbrev'] = plan.carrier_profile.abbrev
+        characteristics['nationwide'] = plan.nationwide
+        characteristics['dc_in_network'] = plan.dc_in_network
+
+        if plan.deductible_integer.present?
+          feature_array << characteristics
+        else
+          log("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}", {:severity => "error"})
+        end
+      }
+      feature_array
     end
   end
 end
