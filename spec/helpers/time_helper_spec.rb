@@ -10,7 +10,7 @@ RSpec.describe TimeHelper, :type => :helper do
   end
 
   describe "time remaining in words" do
-    it "counts 90 days from user creating date" do
+    it "counts 95 days from user created date" do
       expect(helper.time_remaining_in_words(person.created_at)).to eq("95 days")
     end
   end
