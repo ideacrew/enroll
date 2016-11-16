@@ -81,6 +81,15 @@ module Effective
         true
       end
 
+      def global_search_method
+        val = params[:search][:value]
+        if val.match(/\d{9}/)
+          :datatable_search_fein
+        else
+          :datatable_search
+        end
+      end
+
       def search_column(collection, table_column, search_term, sql_column)
         if table_column[:name] == 'legal_name'
           collection.datatable_search(search_term)
