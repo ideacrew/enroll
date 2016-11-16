@@ -15,7 +15,7 @@ end
 # Gimme all the 2017s
 qs = Queries::PolicyAggregationPipeline.new
 
-qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
+qs.filter_to_individual.filter_to_active.dental.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
 
 qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => Time.mktime(2016,10,25,0,0,0)}}})
 
@@ -31,7 +31,7 @@ puts "2017 Enrollment Count: #{all_ivl_count}"
 # Select 2017 enrollments in the "auto_renewing" state
 qs = Queries::PolicyAggregationPipeline.new
 
-qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
+qs.filter_to_individual.filter_to_active.dental.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
 
 qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => Time.mktime(2016,10,25,0,0,0)}}})
 
@@ -69,7 +69,7 @@ active_selection_families.each do |fam|
       ((pol.effective_on <=  Date.new(2016,12,31)) &&
         (pol.effective_on >  Date.new(2015,12,31))) &&
       ((pol.terminated_on.blank?) || (!(pol.terminated_on < Date.new(2015,12,31)))) &&
-      ((!pol.plan_id.blank?) && (pol.coverage_kind == policy_for_2017.coverage_kind)) &&
+      ((!pol.plan_id.blank?) && (pol.coverage_kind == "health")) &&
       (pol.is_shop? == policy_for_2017.is_shop?)
     end
     if !found_a_2016

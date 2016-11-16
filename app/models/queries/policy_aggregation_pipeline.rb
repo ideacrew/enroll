@@ -83,13 +83,14 @@ module Queries
       self
     end
 
+    # TODO: Fix me to use the master list of statuses
     def filter_to_active
       add({
         "$match" => {
           "households.hbx_enrollments.plan_id" => { "$ne" => nil},
-          "households.hbx_enrollments.aasm_state" => { "$nin" => [
-            "shopping", "inactive", "coverage_canceled", "coverage_terminated"
-          ]}
+          "households.hbx_enrollments.aasm_state" => { "$in" => 
+            (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES)
+          }
         }
       })
       self
