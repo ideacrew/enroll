@@ -6,9 +6,9 @@ class RemoveInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
     feins=ENV['fein'].split(",")
     feins.each do |fein|
       organization = Organization.where(fein: fein)
-      if organization.size ==1 && !organization.first.employer_profile.present?
+      if organization.size != 1 || !organization.first.employer_profile.present?
          puts "*************Issues with the fein=#{fein}*******************" and return
-      elsif organization.first.employer_profile.present?
+      else
         organization.first.employer_profile.census_employees.each do |ce|
           ce.benefit_group_assignments.select { |bga| bga.hbx_enrollments.blank? && bga.benefit_group.blank? }.each do |bga|
             bga.delete
