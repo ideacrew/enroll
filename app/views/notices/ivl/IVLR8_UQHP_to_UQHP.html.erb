@@ -31,7 +31,7 @@
 <% if (notice.current_health_enrollment.plan.hsa_plan == true) && (notice.current_health_enrollment.plan.plan_carrier == "CareFirst") %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+  content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
@@ -43,7 +43,7 @@
 <% elsif (notice.current_health_enrollment.plan.hsa_plan == false) && (notice.current_health_enrollment.plan.plan_carrier == "CareFirst") %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
@@ -55,7 +55,7 @@ content: "To assist you in figuring out what plan best meets your needs, we have
 <% elsif (notice.current_health_enrollment.plan.plan_carrier == "Kaiser") %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
+content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
@@ -69,7 +69,7 @@ content: "To assist you in figuring out what plan best meets your needs, we have
 <% elsif (notice.current_health_enrollment.blank?) && (notice.current_dental_enrollment.present?) %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Open enrollment for health and dental insurance plans for 2017 begins on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link. During open enrollment you can shop for new coverage."} %>
+content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through DC Health Link. During open enrollment you can shop for new coverage."} %>
 
 <% end %>
 
@@ -84,7 +84,7 @@ content: "Open enrollment for health and dental insurance plans for 2017 begins 
 content: "After January 31, 2017, you won’t be able to sign up for a plan or change to a different plan until the next open enrollment period starting late in 2017 unless you experience a major life change like getting married or having a baby."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you do not select a different plan, you will be automatically enrolled in these plans starting January 1, 2017 and your premiums each month will be as follows:</strong>"} %>
+content: "<strong>If you have not already selected a new plan and do not select a different plan, you will be automatically enrolled in these plans starting January 1, 2017 and your premiums each month will be as follows:</strong>"} %>
 
 <% if notice.renewal_health_enrollment.present? %>
 
