@@ -1,3 +1,4 @@
+# Given enrollment IDs, count heads
 def count_members_for_hbx_ids(hbx_ids)
   auto_renew_member_count = Family.collection.aggregate([
     {"$match" => {"households.hbx_enrollments.hbx_id" => {"$in" => hbx_ids}}},
@@ -11,7 +12,7 @@ def count_members_for_hbx_ids(hbx_ids)
   auto_renew_member_count.first['total_members']
 end
 
-
+# Gimme all the 2017s
 qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
@@ -27,6 +28,7 @@ end
 all_ivl_count = enroll_pol_ids.count
 puts "2017 Active Enrollment Count: #{all_ivl_count}"
 
+# Select my auto renewals
 qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
@@ -47,6 +49,7 @@ puts "Auto Renewed Enrollment Count: #{auto_renew_count}"
 auto_renew_member_count = count_members_for_hbx_ids(auto_renew_pol_ids)
 puts "Total passively renewed covered lives: #{auto_renew_member_count}"
 
+# Select all the active selections
 all_active_selections = enroll_pol_ids - auto_renew_pol_ids
 
 puts "Total actively selected 2017 enrollments: #{all_active_selections.length}"
@@ -54,6 +57,7 @@ puts "Total actively selected 2017 enrollments: #{all_active_selections.length}"
 active_selection_member_count = count_members_for_hbx_ids(all_active_selections)
 puts "Total actively selected covered lives: #{active_selection_member_count}"
 
+# Select all the new renewals
 active_selection_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => all_active_selections})
 
 active_selection_new_enrollments = []
