@@ -16,16 +16,7 @@
     - else
       %person_relationships
         = render :partial => "events/individuals/person_relationship", :object => hbx_enrollment.family.primary_family_member.person.person_relationship_for(hbx_enrollment_member.person)
-    %person_demographics
-      %ssn= hbx_enrollment_member.person.ssn
-      %sex= "urn:openhbx:terms:v1:gender##{hbx_enrollment_member.person.gender}"
-      %birth_date= simple_date_for(hbx_enrollment_member.person.dob)
-      - if !hbx_enrollment_member.person.is_incarcerated.present?
-        %is_incarcerated= "false"
-      - else
-        %is_incarcerated= hbx_enrollment_member.person.is_incarcerated.to_s
-      - if !hbx_enrollment_member.person.race.blank?
-        %race= hbx_enrollment_member.person.race
+    = render :partial => "events/individuals/person_demographics", :object => hbx_enrollment_member.person, as: :person_demographics
     - unless hbx_enrollment_member.family_member.is_primary_applicant.blank?
       %is_primary_applicant= hbx_enrollment_member.family_member.is_primary_applicant
     - unless hbx_enrollment_member.family_member.is_coverage_applicant.blank?
