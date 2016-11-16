@@ -161,18 +161,14 @@
       <div class="aptc">
         <hr />
         <div class="row">
-          <div class="col-xs-7">
-            <strong>MAX APTC</strong>
-          </div>
-          <div class="col-xs-5">
-            <%= number_to_currency(@current_max_aptc, precision: 2)%>  
+          <div class="col-xs-12"; style="margin-bottom:10px">
+            <strong>MAX APTC:</strong><span style="margin-left:10px"><%= number_to_currency(@current_max_aptc, precision: 2)%> </span>
           </div>
         </div>
-        <p></p>
         <div class="row">
           <div class="col-xs-6">
             <p class='title'>Available</p>
-            $<%= text_field_tag 'available_aptc',  number_to_currency(@max_aptc, precision: 2).remove("$"), disabled: true%>
+            <p>$ <%= text_field_tag 'available_aptc',  number_to_currency(@max_aptc, precision: 2).remove("$"), disabled: true%></p>
           </div>
           <div class="col-xs-6">
             <p class='title'>Used</p>
