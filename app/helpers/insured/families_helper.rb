@@ -16,8 +16,6 @@ module Insured::FamiliesHelper
   def current_premium hbx_enrollment
     if hbx_enrollment.kind == 'employer_sponsored'
       hbx_enrollment.total_employee_cost
-    elsif hbx_enrollment.kind == 'coverall'
-      hbx_enrollment.total_premium
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
     end
@@ -174,16 +172,16 @@ module Insured::FamiliesHelper
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
     if qle.date_options_available
       # Take to the QLE like flow of choosing Option dates if available
-       qle_link_generator_for_an_existing_qle(qle, link_title) 
+       qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
       link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
     end
   end
-  
+
   def find_qle_for_sep(sep)
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
-  end  
+  end
 
   def dual_role_without_shop_sep?
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?

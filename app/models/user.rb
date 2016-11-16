@@ -248,10 +248,6 @@ class User
     person && person.consumer_role
   end
 
-  def has_resident_role?
-    person && person.resident_role
-  end
-
   def has_employer_staff_role?
     person && person.has_active_employer_staff_role?
   end

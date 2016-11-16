@@ -417,30 +417,12 @@ def employer_poc
     end
   end
 
-  def edit_dob
-    authorize Family, :can_update_ssn?
-    @person = Person.find(params[:id])
-    @element_to_replace_id = params[:family_actions_id]
-    respond_to do |format|
-      format.js { render "edit_coverall_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
-    end
-  end
-
   def verify_dob_change
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => params[:new_dob],  :family_actions_id => params[:family_actions_id]}
-    end
-  end
-
-  def verify_dob_change_coverall
-    @person = Person.find(params[:person_id])
-    @element_to_replace_id = params[:family_actions_id]
-    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
-    respond_to do |format|
-      format.js { render "edit_coverall_enrollment", person: @person, :new_dob => params[:new_dob],  :family_actions_id => params[:family_actions_id]}
     end
   end
 
@@ -464,24 +446,6 @@ def employer_poc
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
       format.js { render "update_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id] }
-    end
-  end
-
-  def update_dob
-    authorize  Family, :can_update_ssn?
-    @element_to_replace_id = params[:person][:family_actions_id]
-    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
-
-    begin
-      @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-      CensusEmployee.update_census_employee_records(@person, current_user)
-    rescue Exception => e
-        @error_on_save = @person.errors.messages
-        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
-    end
-    respond_to do |format|
-      format.js { render "edit_coverall_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
-      format.js { render "update_coverall_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id] }
     end
   end
 
