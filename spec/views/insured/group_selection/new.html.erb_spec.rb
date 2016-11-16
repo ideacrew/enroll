@@ -531,12 +531,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "shouldn't see waiver button" do
-      #render file: "insured/group_selection/new.html.erb"
-      #expect(rendered).to have_selector('#coverage_kind_dental')
-      #need to render the page and see no waiver button shown
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_text('Waiver Coverage')
     end
-
-
   end
 
 
