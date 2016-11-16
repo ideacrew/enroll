@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe "employers/broker_agency/_active_broker.html.erb" do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile) }
+  let(:employer_profile) { broker_agency_account.employer_profile }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
