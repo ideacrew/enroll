@@ -9,4 +9,4 @@ namespace :count_enrollments do
 end
 
 
-#rake enrollments_count:get_counts
+#RAILS_ENV=production rake count_enrollments:get_counts
