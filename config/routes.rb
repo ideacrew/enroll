@@ -187,7 +187,7 @@ Rails.application.routes.draw do
     root 'families#home'
 
     resources :family_members
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -435,9 +435,6 @@ Rails.application.routes.draw do
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
-  match "hbx_profiles/edit_dob" => "exchanges/hbx_profiles#edit_dob", as: :edit_dob, via: [:get, :post]
-  match "hbx_profiles/update_dob" => "exchanges/hbx_profiles#update_dob", as: :update_dob, via: [:get, :post]
-  match "hbx_profiles/verify_dob_change_coverall" => "exchanges/hbx_profiles#verify_dob_change_coverall", as: :verify_dob_change_coverall, via: [:get], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
