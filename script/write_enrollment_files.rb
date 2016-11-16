@@ -19,6 +19,10 @@ ConnectionSlug = Struct.new(:policy_id) do
       File.open(File.join("policy_cvs", "#{policy_id}.xml"), 'w') do |f|
         f.puts payload
       end
+    else
+      File.open(File.join("policy_cvs", "#ERROR_#{policy_id}.xml"), 'w') do |f|
+        f.puts payload
+      end
     end
   end
 end
