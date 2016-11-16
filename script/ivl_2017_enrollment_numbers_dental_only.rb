@@ -6,7 +6,7 @@ def count_members_for_hbx_ids(hbx_ids)
     {"$unwind" => "$households.hbx_enrollments"},
     {"$match" => {"households.hbx_enrollments.hbx_id" => {"$in" => hbx_ids}, "households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}}},
     {"$unwind" => "$households.hbx_enrollments.hbx_enrollment_members"},
-    {"$group" => {"_id" => "$households.hbx_enrollments.hbx_enrollment_members.applicant_id"}}
+    {"$group" => {"_id" => {"applicant_id" => "$households.hbx_enrollments.hbx_enrollment_members.applicant_id", "coverage_kind" => "$households.hbx_enrollments.coverage_kind"}}}
   ])
 
   auto_renew_member_count.count
@@ -73,7 +73,13 @@ active_selection_families.each do |fam|
   end
 end
 
+
 puts "Total new 2017 enrollments: #{active_selection_new_enrollments.length}"
 
 new_members_count = count_members_for_hbx_ids(active_selection_new_enrollments)
 puts "Total new covered lives: #{new_members_count}"
+
+active_renewals = customer_purchased_enrollments - active_selection_new_enrollments
+puts "Total Active Renewal 2017 enrollments: #{active_renewals.length}"
+active_renewal_members = count_members_for_hbx_ids(active_renewals)
+puts "Total actively renewed covered lives: #{active_renewal_members}"
