@@ -295,6 +295,7 @@ module Queries
           last("plan_id") +
           last("aasm_state") +
           last("enrollment_kind") +
+          last("coverage_kind") +
           last("family_created_at") +
           last("hbx_enrollment_members")
         ))
