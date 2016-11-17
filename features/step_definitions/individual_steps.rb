@@ -98,9 +98,7 @@ Then (/Individual sees previously saved address/) do
 end
 
 When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
-  find('#ivl_insured_button', text: 'Individual and Family').click
-  page.has_link? "ivl_insured_button"
-  click_link "Individual and Family"
+  find('.interaction-click-control-individual-and-family').click
   expect(page).to have_content('Authorization and Consent')
 end
 
@@ -111,9 +109,7 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
 end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
-  find('#ivl_insured_button', text: 'Individual and Family').click
-  page.has_link? "ivl_insured_button"
-  click_link "Individual and Family"
+  find('.interaction-click-control-individual-and-family').click
   expect(page).to have_content('Verify Identity')
 end
 
