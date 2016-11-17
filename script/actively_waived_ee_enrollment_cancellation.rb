@@ -35,12 +35,13 @@ CSV.open("#{Rails.root}/Actively_Waived_Employee_Renewals_Cancellation.csv", "w"
 orgs.each do |org|
   counter += 1
 
+  puts "---#{counter}"
+
   renewal_plan_year = org.employer_profile.renewing_published_plan_year
   next if renewal_plan_year.blank?
   id_list = renewal_plan_year.benefit_groups.collect(&:_id).uniq
 
-  families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-  families.each do |family|
+  Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list).each do |family|
     waived = family.active_household.hbx_enrollments.where({ 
       :aasm_state => 'inactive',
       :coverage_kind => 'health',

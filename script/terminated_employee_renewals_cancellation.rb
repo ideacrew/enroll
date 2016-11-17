@@ -55,8 +55,7 @@ CSV.open("#{Rails.root}/Terminated_EE_Enrollment_Cancellation_Report.csv", "w", 
 
     id_list = renewal_plan_year.benefit_groups.collect(&:_id).uniq
 
-    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    families.each do |family|
+    Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list).each do |family|
 
       family.active_household.hbx_enrollments.where({ 
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),

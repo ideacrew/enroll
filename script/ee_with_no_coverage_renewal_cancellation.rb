@@ -47,8 +47,7 @@ CSV.open("#{Rails.root}/EEs_Renewed_without_active_coverage.csv", "w", force_quo
       active_id_list = active_plan_year.benefit_groups.collect(&:_id).uniq
       id_list = renewal_plan_year.benefit_groups.collect(&:_id).uniq
 
-      families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-      families.each do |family|
+      Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list).each do |family|
 
         renewals = family.active_household.hbx_enrollments.where({ 
           :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES,

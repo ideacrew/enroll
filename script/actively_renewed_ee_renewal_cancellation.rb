@@ -38,8 +38,8 @@ orgs.each do |org|
   people = []
   id_list = renewal_plan_year.benefit_groups.collect(&:_id).uniq
 
-  families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-  families.each do |family|
+  Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list).each do |family|
+    
     enrolled = family.active_household.hbx_enrollments.where({ 
       :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
       :coverage_kind => 'health',
