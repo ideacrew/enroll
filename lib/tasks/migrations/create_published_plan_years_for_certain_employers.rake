@@ -1,5 +1,5 @@
 namespace :migrations do
-  task :create_published_plan_years => :environment do
+  task :create_published_plan_year_for_sae => :environment do
     organization = Organization.where(fein: /133798158/).last
     employer_profile = organization.employer_profile
     reference_plan = Plan.where(active_year: 2016, hios_id: /86052DC0440013-01/).last
@@ -33,9 +33,10 @@ namespace :migrations do
       census_employee.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group.id , start_on: plan_year.start_on})
     end
     plan_year.force_publish!
+  end
 
 
-    "***********"
+  task :create_published_plan_year_for_iron_vine => :environment do
 
     org = Organization.where(fein: /262316330/).last
     empr = org.employer_profile
