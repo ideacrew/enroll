@@ -97,10 +97,20 @@ Then (/Individual sees previously saved address/) do
   find('.btn', text: 'CONTINUE').click
 end
 
+When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
+  find('.interaction-click-control-individual-and-family').click
+  expect(page).to have_content('Authorization and Consent')
+end
+
 Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+end
+
+When /^Individual clicks on Individual and Family link should be on verification page/ do
+  find('.interaction-click-control-individual-and-family').click
+  expect(page).to have_content('Verify Identity')
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
