@@ -42,12 +42,13 @@ namespace :migrations do
     empr = org.employer_profile
     if org.present?
       rp = Plan.where(active_year: 2016, hios_id: /78079DC0220022-01/).last
-      eps = Plan.valid_shop_health_plans("carrier", "53e67210eb899a4603000004", 2016)
+      eps = [rp]
       py = empr.plan_years.build(
         start_on: Date.new(2016,12,1),
         end_on: Date.new(2017,11,30),
         open_enrollment_start_on: Date.new(2016,10,13),
-        open_enrollment_end_on: Date.new(2016,11,15)
+        open_enrollment_end_on: Date.new(2016,11,15),
+        fte_count: 31
       )
 
       bg = py.benefit_groups.build(
