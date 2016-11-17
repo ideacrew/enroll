@@ -476,6 +476,36 @@ describe HbxEnrollment, dbclean: :after_all do
 
     end
 
+    context "should cancel previous auto renewing enrollment" do
+      before :all do
+        @enrollment6 = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment6.effective_on=TimeKeeper.date_of_record + 1.days
+        @enrollment6.aasm_state = "auto_renewing"
+        @enrollment6.save
+        @enrollment7 = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment7.save
+        @enrollment7.cancel_previous(2016)
+      end
+
+      it "should cancel an auto renewing enrollment" do
+        expect(@enrollment6.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should not cancel current shopping enrollment" do
+        expect(@enrollment7.aasm_state).to eq "shopping"
+      end
+    end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
