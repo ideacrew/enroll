@@ -15,7 +15,6 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   def build
     family = recipient.primary_family
     append_enrollments(family.all_enrollments)
-    notice.primary_identifier = "Account ID: #{identifier}"
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
