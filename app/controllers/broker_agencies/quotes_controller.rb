@@ -32,27 +32,6 @@ class BrokerAgencies::QuotesController < ApplicationController
     end
   end
 
-  def quotes_index_datatable
-    dt_query = extract_datatable_parameters
-    quotes = []
-    all_quotes = Quote.where("broker_role_id" => @broker.id)
-    if dt_query.search_string.blank?
-      collection = all_quotes
-    else
-      quote_ids = Quote.search(dt_query.search_string).pluck(:id)
-      collection = all_quotes.where({
-        "id" => {"$in" => quote_ids}
-      })
-    end
-    collection = apply_sort_or_filter(collection, dt_query.skip, dt_query.take)
-    @draw = dt_query.draw
-    @total_records = all_quotes.count
-    @records_filtered = collection.count
-    @quotes = collection.skip(dt_query.skip).limit(dt_query.take)
-    render "datatables/quotes_index_datatable"
-
-  end
-
   def show 
     @q = Quote.find(params[:id])
     @benefit_groups = @q.quote_benefit_groups
