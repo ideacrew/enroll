@@ -97,7 +97,7 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind"
     }
 
-  # validates :dental_reference_plan_id, presence: true, if: :has_elected_dental_plan_ids?
+  validates :dental_reference_plan_id, presence: true, if: :has_elected_dental_plan_ids?
 
   validate :plan_integrity
   validate :check_employer_contribution_for_employee

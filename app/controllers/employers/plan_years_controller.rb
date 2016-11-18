@@ -128,26 +128,28 @@ class Employers::PlanYearsController < ApplicationController
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
-    @plan_year.benefit_groups.each_with_index do |benefit_group, i|
-
+    @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
-        if i == 0
-          ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
-        else
-          @time = benefit_group.dental_relationship_benefits_attributes_time
-          ids = params["plan_year"]["benefit_groups_attributes"]["#{@time}"]["elected_dental_reference_plan_ids"]
-        end
-        Plan.where(:id.in=> ids)
-      else
-        benefit_group.elected_dental_plans_by_option_kind
-      end
     end
 
+      #benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+      #benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
+        #if i == 0
+          #ids = params["plan_year"]["benefit_groups_attributes"]["0"]["elected_dental_reference_plan_ids"]
+          #else
+          #@time = benefit_group.dental_relationship_benefits_attributes_time
+          #ids = params["plan_year"]["benefit_groups_attributes"]["#{@time}"]["elected_dental_reference_plan_ids"]
+          #end
+        #Plan.where(:id.in=> ids)
+        #else
+        #benefit_group.elected_dental_plans_by_option_kind
+        #end
+    end
     if @employer_profile.default_benefit_group.blank?
       @plan_year.benefit_groups[0].default= true
     end
-
+    
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
@@ -389,7 +391,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
-
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
@@ -403,8 +404,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def updateable?
     authorize EmployerProfile, :updateable?
-  end  
-
+  end
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan
