@@ -44,6 +44,7 @@ namespace :reports do
           offset=offset+step
         end
       end
+      puts "The report has been generated as #{file_name}"
       end
     end
 end
