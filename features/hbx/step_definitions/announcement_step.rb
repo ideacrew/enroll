@@ -14,7 +14,8 @@ When(/Hbx admin enter announcement info$/) do
   fill_in 'announcement[content]', with: 'announcement for current'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record - 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
-  find('#announcement_audiences_ivl').click
+  find('#announcement_audiences_ivl').trigger('click')
+  expect(page).to have_content "Announcements"
   find('.interaction-click-control-create-announcement').click
 end
 
@@ -22,7 +23,8 @@ When(/^Hbx admin enter announcement info with future date$/) do
   fill_in 'announcement[content]', with: 'announcement for future'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 15.days).to_s
-  find('#announcement_audiences_ivl').click
+  find('#announcement_audiences_ivl').trigger('click')
+  expect(page).to have_content "Announcements"
   find('.interaction-click-control-create-announcement').click
 end
 
