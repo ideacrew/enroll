@@ -98,7 +98,8 @@ Then (/Individual sees previously saved address/) do
 end
 
 When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
-  find('.interaction-click-control-individual-and-family').click
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
   expect(page).to have_content('Authorization and Consent')
 end
 
@@ -109,7 +110,8 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
 end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
-  find('.interaction-click-control-individual-and-family').click
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
   expect(page).to have_content('Verify Identity')
 end
 
