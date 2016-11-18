@@ -274,24 +274,22 @@ module Transcripts
             raise 'matched person has multiple families' if matched_person.families.size > 1
             enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))          
             exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
-            enrollments.reject!{|en| en == exact_match}
+            enrollments = enrollments.select{|en| en.hbx_id != exact_match.hbx_id}
             @enrollment = exact_match
-            @duplicate_coverages = enrollments
+            @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
           end
         end
       else
-        enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match))
-        exact_matches = find_exact_enrollment_matches(enrollment, enrollments.dup)
-
+        enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match)).uniq
+        exact_matches = find_exact_enrollment_matches(enrollment, enrollments)
         if exact_matches.present?
           exact_match = exact_matches.detect{|en| en.hbx_id = match.hbx_id } || exact_matches.first
         else
           exact_match = ((enrollments.last.effective_on == match.effective_on) ? match : enrollments.last)
         end
-
-        enrollments.reject!{|en| en == exact_match}
+        enrollments = enrollments.select{|en| en.hbx_id != exact_match.hbx_id}
         @enrollment = exact_match
-        @duplicate_coverages = enrollments
+        @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
       end
     end
 

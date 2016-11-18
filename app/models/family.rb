@@ -76,6 +76,13 @@ class Family
          },
          {name: "kind_and_state_and_created_and_terminated"})
 
+  index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.coverage_kind" => 1,
+         "households.hbx_enrollments.effective_on" => 1
+         },
+         {name: "kind_and_state_and_coverage_kind_effective_date"})
+
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
