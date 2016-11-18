@@ -44,7 +44,7 @@ namespace :reports do
           offset=offset+step
         end
       end
-      puts "The report has been generated as #{file_name}"
+      puts "The report has been generated as #{file_name}" unless Rails.env.test?
       end
     end
 end
