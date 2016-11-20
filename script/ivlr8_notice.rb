@@ -2,11 +2,11 @@
   enrollment_group_ids = []
   plans_2016 = {}
   begin
-    csv = CSV.open('11455_report.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
+    csv = CSV.open('sample_for_zoheb.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
     @data= csv.to_a
     @data.each do |d|
         enrollment_group_ids << d["policy.eg_id"]
-        plans_2016[d["policy.eg_id"]] = d["2016_plan_hios"]
+        plans_2016[d["policy.eg_id"]] = d["2016_hios_id"]
     end
   rescue Exception => e
     puts "Unable to open file #{e}"
