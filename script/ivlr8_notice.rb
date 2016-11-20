@@ -31,7 +31,6 @@
     families.each do |fam|
       begin
         primary_member = fam.primary_applicant.person
-        # person = Person.where(:hbx_id => primary_member["person.authority_member_id"]).first
         consumer_role =primary_member.consumer_role
         if consumer_role.present?
             builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -48,10 +47,10 @@
               primary_member.full_name
             ]
         else
-          puts "Unable to send notice to family_id : #{fam.id.to_s}"
+          puts "Unable to send notice to person : #{primary_member.hbx_id} #{e.backtrace}"
         end
       rescue Exception => e
-        puts "Unable to deliver to #{fam.id.to_s} for the following error #{e.backtrace}"
+        puts "Unable to deliver to #{primary_member.hbx_id} for the following error #{e.backtrace}"
         next
       end
     end
