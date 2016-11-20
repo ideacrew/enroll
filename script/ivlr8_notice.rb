@@ -1,22 +1,19 @@
 
-  families = []
   enrollment_group_ids = []
+  plans_2016 = {}
   begin
-    csv = CSV.open('test.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
+    csv = CSV.open('11455_report.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
     @data= csv.to_a
     @data.each do |d|
-      hbx_en = HbxEnrollment.by_hbx_id(d["policy.eg_id"]).first
-      unless hbx_en.blank?
-        families << hbx_en.household.family
-        enrollment_group_ids << hbx_en.hbx_id
-      end
+        enrollment_group_ids << d["policy.eg_id"]
+        plans_2016[d["policy.eg_id"]] = d["2016_plan_hios"]
     end
   rescue Exception => e
     puts "Unable to open file #{e}"
   end
 
-  families.uniq!
   enrollment_group_ids.uniq!
+  families = Family.where("households.hbx_enrollments" => {"$exists" => true}, "households.hbx_enrollments.hbx_id" => {"$in" => enrollment_group_ids})
 
   field_names  = %w(
           person.hbx_id
@@ -41,6 +38,8 @@
                   template: notice_trigger.notice_template,
                   subject: event_kind.title,
                   mpi_indicator: notice_trigger.mpi_indicator,
+                  enrollment_group_ids: enrollment_group_ids,
+                  plan_data_2016: plans_2016
                   }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
                   )
             builder.deliver
