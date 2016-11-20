@@ -3,7 +3,6 @@ module PdfTemplates
     include Virtus.model
 
     attribute :enrollees, Array[String]
-    attribute :plan_name, String
     attribute :premium, String
     attribute :phone, String
     attribute :effective_on, Date
