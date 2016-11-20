@@ -50,7 +50,8 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
     hbx_enrollment = OpenStruct.new
     plan = Plan.where(:hios_id => plan_hios_id, :active_year => 2016).first
     hbx_enrollment.plan = plan
-    hbx_enrollment.premium = 0.00.to_d
+    hbx_enrollment.total_premium = 0.00.to_d
+    hbx_enrollment.applied_aptc_amount = 0.00.to_d
     hbx_enrollment.responsible_amount = 0.00.to_d
     hbx_enrollment.phone = enrollment_2017.phone_number
     hbx_enrollment.effective_on = Date.new(2016,1,1)
@@ -83,19 +84,19 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
   end
 
   def health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_kind == "health" && hbx_enrollment.effective_on < Date.new(2017,1,1)}.sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$lt" => Date.new(2017,1,1)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_kind == "dental" && hbx_enrollment.effective_on < Date.new(2017,1,1)}.sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_health_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "health",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_kind == "health" && hbx_enrollment.effective_on >= Date.new(2017,1,1)}.sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
   end
 
   def renewal_dental_enrollment(hbx_enrollments)
-    return hbx_enrollments.where(coverage_kind: "dental",:effective_on => {"$gt" => Date.new(2016,12,31)}).sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last
+    return hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_kind == "dental" && hbx_enrollment.effective_on >= Date.new(2017,1,1)}.sort_by{|hbx_enrollment| hbx_enrollment.effective_on}.last    
   end
 
   def append_address(primary_address)
