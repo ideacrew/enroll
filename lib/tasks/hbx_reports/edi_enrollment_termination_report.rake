@@ -1,13 +1,18 @@
-# Daily Report: Rake task to find census employee's who terminated their hbx_enrollment on previous date
-# To Run Rake Task: RAILS_ENV=production rake reports:census_employee:termination_submitted_on
+# Daily Report: Rake task to find terminated hbx_enrollment
+# To Run Rake Task without custom dates: RAILS_ENV=production rake reports:enrollment_termination_on
+# To Run Rake Task with custom dates: RAILS_ENV=production rake reports:enrollment_termination_on[Y-m-d, Y-m-d]
+# example for running Rake Task with custom dates: bundle exec rake reports:enrollment_termination_on[2016-6-29,2016-8-30]
 require 'csv'
 
 namespace :reports do
   desc "List of people with terminated hbx_enrollment"
-  task :enrollment_termination_on => :environment do
-
-    date_of_termination=Date.yesterday.beginning_of_day..Date.yesterday.end_of_day
-    find families who terminated their hbx_enrollments
+  task :enrollment_termination_on, [:start_date, :end_date] => :environment do |t, args|
+    if args[:start_date] && args[:end_date]
+      date_of_termination=Date.strptime(args[:start_date], '%Y-%m-%d').beginning_of_day..Date.strptime(args[:end_date], '%Y-%m-%d').end_of_day
+    else
+      date_of_termination=Date.yesterday.beginning_of_day..Date.yesterday.end_of_day
+    end
+    #find families who terminated their hbx_enrollments
     families = Family.where(:"households.hbx_enrollments" =>
                                 {:$elemMatch =>
                                      {'$or'=>
@@ -44,7 +49,6 @@ namespace :reports do
       csv << field_names
       families.each do |family|
         if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role)
-          # find hbx_enrollments who's aasm state=coverage_terminated and termination_submitted_on == yesterday day
           hbx_enrollments = family.active_household.hbx_enrollments.select{|hbx| (hbx.coverage_terminated? || hbx.coverage_termination_pending?) && hbx.termination_submitted_on.try(:strftime, '%Y-%m-%d') == Date.yesterday.strftime('%Y-%m-%d')}
           hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
           hbx_enrollment_members.each do |hbx_enrollment_member|
