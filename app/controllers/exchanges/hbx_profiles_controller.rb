@@ -216,7 +216,7 @@ def employer_poc
     respond_to do |format|
       format.js {}
     end
-    @effective_kinds = @qle.effective_on_kinds.map{|t| t.humanize}
+    calculate_rule
   end
 
   def calculate_sep_dates
