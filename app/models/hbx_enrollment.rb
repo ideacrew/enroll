@@ -17,7 +17,7 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-  Kinds               = %w(individual employer_sponsored unassisted_qhp insurance_assisted_qhp streamlined_medicaid 
+  Kinds               = %w(individual employer_sponsored unassisted_qhp insurance_assisted_qhp streamlined_medicaid
                               emergency_medicaid hcr_chip
                             )
 
@@ -31,7 +31,7 @@ class HbxEnrollment
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
   CANCELED_STATUSES   = %w(coverage_canceled)
   RENEWAL_STATUSES    = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-                              auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier 
+                              auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
                               renewing_contingent_enrolled
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
@@ -1040,11 +1040,11 @@ class HbxEnrollment
     end
 
     event :select_coverage, :after => :record_transition do
-      transitions from: :shopping, 
+      transitions from: :shopping,
                     to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
-      transitions from: :auto_renewing, 
+      transitions from: :auto_renewing,
                     to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
-      transitions from: :auto_renewing_contingent, 
+      transitions from: :auto_renewing_contingent,
                     to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
 
@@ -1062,22 +1062,22 @@ class HbxEnrollment
     end
 
     event :waive_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], 
+      transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
                     to: :inactive, after: :propogate_waiver
     end
 
     event :begin_coverage, :after => :record_transition do
-      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, 
-                         :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, 
-                         :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, 
-                         :coverage_renewed, :enrolled_contingent, :unverified], 
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier,
+                         :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier,
+                         :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
+                         :coverage_renewed, :enrolled_contingent, :unverified],
                     to: :coverage_enrolled
 
       transitions from: :renewing_waived, to: :inactive
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :enrolled_contingent, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled], 
+      transitions from: [:shopping, :enrolled_contingent, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
                     to: :coverage_expired, :guard  => :can_be_expired?
     end
 
@@ -1094,48 +1094,48 @@ class HbxEnrollment
     #   transitions from: [:coverage_selected, :renewing_coverage_selected], to: :coverage_canceled
     # end
     event :schedule_coverage_termination, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, 
-                         :enrolled_contingent, :coverage_enrolled], 
+      transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing,
+                         :enrolled_contingent, :coverage_enrolled],
                     to: :coverage_termination_pending, after: :set_coverage_termination_date
 
       transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, 
-                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, 
-                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, 
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
+                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
                     to: :coverage_canceled
     end
 
     event :terminate_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected], 
+      transitions from: [:coverage_termination_pending, :coverage_selected],
                     to: :coverage_terminated, after: :propogate_terminate
 
-      transitions from: [:auto_renewing, :renewing_coverage_selected], 
+      transitions from: [:auto_renewing, :renewing_coverage_selected],
                     to: :coverage_terminated, after: :propogate_terminate
 
       transitions from: [:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled],
                     to: :coverage_terminated, after: :propogate_terminate
 
-      transitions from: [:enrolled_contingent, :unverified], 
+      transitions from: [:enrolled_contingent, :unverified],
                     to: :coverage_terminated, after: :propogate_terminate
 
       transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
     event :invalidate_enrollment, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_canceled, :coverage_terminated], 
-                    to: :void, 
+      transitions from: [:coverage_termination_pending, :coverage_canceled, :coverage_terminated],
+                    to: :void,
                  guard: :termination_attributes_cleared?
 
       transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled,
                           :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
-                          :auto_renewing, :renewing_waived, :renewing_coverage_selected, 
-                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, 
-                          :auto_renewing_contingent, :renewing_contingent_selected, 
+                          :auto_renewing, :renewing_waived, :renewing_coverage_selected,
+                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled,
+                          :auto_renewing_contingent, :renewing_contingent_selected,
                           :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled],
                     to:  :void
     end
