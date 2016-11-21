@@ -2,7 +2,7 @@
   enrollment_group_ids = []
   plans_2016 = {}
   begin
-    csv = CSV.open('sample_for_zoheb.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
+    csv = CSV.open('11455_final_report.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
     @data= csv.to_a
     @data.each do |d|
         enrollment_group_ids << d["policy.eg_id"]
