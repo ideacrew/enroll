@@ -11,5 +11,6 @@ module PdfTemplates
     attribute :coverage_kind, String
     attribute :plan_carrier, String
     attribute :hsa_plan, Boolean
+    attribute :renewal_plan_type, String
   end
 end

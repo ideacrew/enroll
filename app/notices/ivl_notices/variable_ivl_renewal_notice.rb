@@ -68,6 +68,7 @@ class IvlNotices::VariableIvlRenewalNotice < IvlNotice
       coverage_kind: hbx_enrollment.plan.coverage_kind,
       plan_carrier: hbx_enrollment.plan.carrier_profile.organization.legal_name,
       hsa_plan: hbx_enrollment.plan.hsa_plan?,
+      renewal_plan_type: hbx_enrollment.plan.renewal_plan_type
       })
     PdfTemplates::Enrollment.new({
       premium: hbx_enrollment.total_premium.round(2),
