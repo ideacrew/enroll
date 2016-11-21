@@ -1,14 +1,15 @@
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
-  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual") #pull out for sep
+  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
 
