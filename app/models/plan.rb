@@ -386,6 +386,23 @@ class Plan
     end
   end
 
+  def renewal_plan_type
+    hios = self.hios_base_id
+    kp = %w(94506DC0390001 94506DC0390002 94506DC0390003 94506DC0390004 94506DC0390005 94506DC0390006 94506DC0390007 94506DC0390008 94506DC0390009 94506DC0390010 94506DC0390011)
+    cf_nonhsa = %w(78079DC0160001 78079DC0160002 86052DC0400003)
+    cf_reg = %w(86052DC0400001 86052DC0400002 86052DC0400004 86052DC0400007 86052DC0400008 78079DC0210001 78079DC0210002 78079DC0210003 78079DC0210004)
+    cf_hsa = %w(86052DC0400005 86052DC0400006 86052DC0400009)    
+    if kp.include?(hios)
+      return "KP"
+    elsif cf_nonhsa.include?(hios)
+      return "CFNONHSA"
+    elsif cf_reg.include?(hios)
+      return "CFREG"
+    elsif cf_hsa.include?(hios)
+      return "CFHSA"
+    end
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
