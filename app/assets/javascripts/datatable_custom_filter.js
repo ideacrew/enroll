@@ -47,6 +47,7 @@ DT = ( function() {
     extendDatatableServerParams = function(){
       var keys = {}
       DT.filter_params(keys, 1)
+      keys["collection_scope"] = $('#collection_scope').html()
       var attributes_for_filtering = {"attributes": keys}
       return attributes_for_filtering;
     }

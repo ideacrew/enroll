@@ -490,7 +490,7 @@ class Plan
         if plan.deductible_integer.present?
           feature_array << characteristics
         else
-          log("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}", {:severity => "error"})
+          Rails.logger.error("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}")
         end
       }
       feature_array
