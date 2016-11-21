@@ -1,5 +1,5 @@
 %eligibility_event
-  - if eligiblity_event.eligibility_event_kind == 'relocate'
+  - if eligibility_event.eligibility_event_kind == 'relocate'
     %event_kind= "urn:dc0:terms:v1:qualifying_life_event#location_change"
   - else
     %event_kind= "urn:dc0:terms:v1:qualifying_life_event#" + eligibility_event.eligibility_event_kind
