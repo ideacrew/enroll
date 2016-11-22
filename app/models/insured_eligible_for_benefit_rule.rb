@@ -11,11 +11,12 @@ class InsuredEligibleForBenefitRule
   #     lawful_permanent_resident
   # )
 
-  def initialize(role, benefit_package, coverage_kind='health',enrollment_kind)
+  def initialize(role, benefit_package, options={})
     @role = role
     @benefit_package = benefit_package
-    @coverage_kind = coverage_kind
-    @enrollment_kind = enrollment_kind
+    @coverage_kind = options[:coverage_kind]
+    @enrollment_kind = options[:enrollment_kind]
+
   end
 
   def setup
