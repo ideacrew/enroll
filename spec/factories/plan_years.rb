@@ -29,7 +29,6 @@ FactoryGirl.define do
 
   end
 
-# Plan year that starts 2 months ahead
   factory :future_plan_year, class: PlanYear do
     employer_profile
     start_on { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
