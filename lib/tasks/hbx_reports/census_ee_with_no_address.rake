@@ -30,6 +30,7 @@ namespace :reports do
               ces= census_employees.limit(step).offset(total_records)
           end
           ces.each do |ce|
+            unless ce.employee_role.nil?
             unless ce.employee_role.person.addresses.exists?
               csv << [
                   ce.employee_role.person.hbx_id,
@@ -39,6 +40,7 @@ namespace :reports do
                   ce.employer_profile.organization.fein
               ]
               processed_count += 1
+            end
             end
           end
           offset=offset+step
