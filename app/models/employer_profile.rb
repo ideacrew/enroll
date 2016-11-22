@@ -353,7 +353,7 @@ class EmployerProfile
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -840,7 +840,11 @@ class EmployerProfile
     notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
   end
 
-
+  def trigger_notices(event)
+    resource_mapping = ApplicationEventMapper.map_resource(self.class)
+    event_name = "acapi.info.events.employer.#{event}"
+    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
+  end
 
 private
   def has_ineligible_period_expired?

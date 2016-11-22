@@ -65,14 +65,14 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3A',
-    title: 'Renewal/Conversion Employer Publishes Plan',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'PlanYear Renewal Notice(3A)',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3a',
     notice_triggers: [
       {
         name: 'PlanYear Renewal',
-        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+        notice_template: 'notices/shop_notices/3a_employer_plan_year_renewal',
         notice_builder: 'ShopNotices::EmployerNotice',
         mpi_indicator: 'MPI_SHOPRA',
         notice_trigger_element_group: {
@@ -86,14 +86,14 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3B',
-    title: 'Renewal/Conversion Employer Auto-Published',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'PlanYear Renewal Notice(3B)',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3b',
     notice_triggers: [
       {
         name: 'PlanYear Renewal Auto-Published',
-        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+        notice_template: 'notices/shop_notices/3b_employer_plan_year_renewal',
         notice_builder: 'ShopNotices::EmployerNotice',
         mpi_indicator: 'MPI_SHOPRB',
         notice_trigger_element_group: {
