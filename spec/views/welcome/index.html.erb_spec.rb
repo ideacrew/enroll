@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe "welcome/index.html.erb", :type => :view do
-  it "should has current_user email" do
-    user = FactoryGirl.create(:user, email: "test@enroll.com")
+  it "should has current_user oim_id" do
+    user = FactoryGirl.create(:user, oim_id: "test@enroll.com")
     sign_in user
     render
 
-    expect(rendered).to match /#{user.email}/
+    expect(rendered).to match /#{user.oim_id}/
   end
 end

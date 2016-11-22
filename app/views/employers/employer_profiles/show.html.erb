@@ -15,6 +15,7 @@
 <%- elsif @tab == 'brokers' %>
 <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
 <%- elsif @tab == 'inbox' %>
+  <h1 class="darkblue no-buffer">Messages</h1>
 <%= render :partial => 'shared/inboxes/messages_list' %>
 <%- elsif @tab == 'documents' %>
 
@@ -29,95 +30,14 @@
 
 <%- if @tab == 'home' %>
 <% if @current_plan_year.present? %>
-<aside class="col-xs-4">
+<aside class="col-xs-4 employer-right-column module">
   <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
-    <section class="row">
-      <article class="col-xs-12">
-        <div class="row">
-          <div class="col-xs-4">
-            <figure>
-              <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip">
-                <figcaption>
-                  <h2>
-                    <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
-                      <%= (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i %>
-                      <% else %>
-                      0
-                    <% end %>
-                  </h2>
-                  <span>
-                    Days
-                  </span>
-              </figcaption>
-            </span>
-            </figure>
-          </div>
-          <div class="col-xs-8">
-            <h3>Until Open Enrollment Ends</h3>
-            <span><%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %></span>
-          </div>
-        </div>
-      </article>
-    </section>
+    <%= render partial: 'open_enrollment_ends_panel' %>
   <% end %>
-  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
-  <section class="row" style="background-color: #fff;">
-    <article class="col-xs-12">
-    <% plan_year, billing_date = @employer_profile.billing_plan_year %>
-      <% if billing_date.present? %>
-
-      <h3>Enrollment Report</h3>
-      <span><%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></span>
-        <br/>
-        <br/>
-        <table>
-          <tr>
-            <td style="padding-right: 10px;">Total Premium:</td>
-            <td><%= number_to_currency(@premium_amt_total || 0)%></td>
-          </tr>
-          <tr>
-            <td style="padding-right: 10px;">Employee Contributions:</td>
-            <td><%= number_to_currency(@employee_cost_total || 0) %></td>
-          </tr>
-          <tr>
-            <td style="padding-right: 10px;">Employer Contributions:</td>
-            <td><%= number_to_currency(@employer_contribution_total || 0) %></td>
-          </tr>
-        </table>
-        <br/>
-    </article>
-    <% end %>
-  </section>
-  <br/>
-  <% end %>
-
-
-  <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
-    <article>
-      <figure>
-        <%= image_tag('images/didyouknow_288.png') %>
-      </figure>
-      <figcaption>
-        <h5>Did you know?</h5>
-        You can always get help from a broker <strong>at no cost</strong> to you.
-      </figcaption>
-    </article>
-  </section>
+  <%= render partial: 'enrollment_report_widget' %>
+  <%= render partial: 'employer_broker_widget' %>
 </aside>
 <% else %>
-<aside class="col-xs-4">
-  <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
-    <article>
-      <figure>
-        <%= image_tag('images/didyouknow_288.png') %>
-      </figure>
-      <figcaption>
-        <h5>Did you know?</h5>
-        You can always get help from a broker <strong>at no cost</strong> to you.
-      </figcaption>
-    </article>
-  </section>
-</aside>
 
 <% end %>
 <% end %>

@@ -1,3 +1,4 @@
+@import "variables";
 // employer portal
 #home {
   nav {
@@ -218,7 +219,7 @@
       }
     }
   }
-  .planyear-add-tab, .employee-add-tab, .employer-edit-tab, #add_employee_action {
+  .planyear-add-tab, .employer-edit-tab, #add_employee_action {
     padding-bottom: 45px;
     h3 {
       &:first-of-type {
@@ -237,14 +238,6 @@
     }
     .plan-title {
       border-bottom: none;
-    }
-    .row-form-wrapper {
-      &:first-of-type {
-        border-top: 1px solid #b5b5b5;
-      }
-      &:last-of-type {
-        border-bottom: 1px solid #b5b5b5;
-      }
     }
 
     .recommend {
@@ -308,7 +301,7 @@
   .planyear-add-tab {
     .row-form-wrapper {
 
-        border-top: 1px solid #b5b5b5;
+        border-top: 1px solid #ddd;
 
     }
   }
@@ -340,7 +333,7 @@
     }
   }
 
-  .benefits-tab, .home-tab, .my-broker {
+  .benefits-tab, .home-tab {
 
     .benefit-package {
       position: relative;
@@ -395,14 +388,11 @@
       }
     }
     .package-offering {
-      border: solid 1px #b7b7b7;
 
       background-color: #ffffff;
       padding: 10px 0 20px;
-      border-bottom: solid 1px #b7b7b7;
 
     table {
-      width: 96%;
       padding: 0 2%;
       margin: auto;
       table-layout: fixed;
@@ -1044,9 +1034,23 @@
 
   }
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
-  .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
-   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab,
-    .waived-coverage, .my-broker {
+  .planyear-add-tab, .employer-tab, .employer-edit-tab,
+   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
+    .btn-primary {
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      margin-top: 5px;
+      margin-right: 5px;
+      &.mtz {
+        margin-top: 0;
+      }
+    }
     .starter {
       max-width: 660px;
     }
@@ -1104,32 +1108,20 @@
           border-radius: 0;
           background-image: none;
           background-color: #ffffff;
-          border-bottom: none;
-          padding: 15px 15px 0px;
-          margin: 0;
-          border-bottom: solid 1px #d5d5d5;
           h3 {
             font-size: 18px;
-            padding: 0;
             margin-top: 0;
             i {
               color: #007bc4;
             }
           }
           .progress, .progress-wrapper {
-            height: 8px;
-            border: solid 1px #d5d5d5;
-            border-radius: 0;
+            max-width: 90%;
+            height: 16px;
+            border-radius: 4px;
             margin-bottom: 12px;
             &+.information {
               padding-bottom: 15px;
-            }
-          }
-        }
-        .panel-body {
-          i {
-            &:first-of-type {
-              margin-right: 10px;
             }
           }
         }
@@ -1197,13 +1189,11 @@
               }
             }
             td {
-              &:first-of-type {
                 header {
                   text-transform: uppercase;
                   color: #9b9b9b;
                   font-size: 12px;
                 }
-              }
               &:last-of-type {
                 padding-right: 15px;
                 h3 {
@@ -1218,108 +1208,6 @@
               }
             }
           }
-        }
-      }
-    }
-    aside {
-      &:first-of-type {
-        section {
-          margin-left: 5px;
-          border: solid 1px #b7b7b7;
-          &:first-of-type, &:last-of-type {
-            margin-bottom: 20px;
-            article {
-              background-color: #ffffff;
-              padding-top: 10px;
-              margin-top: 0;
-              padding-bottom: 10px;
-              &:last-of-type {
-                //border-top: solid 1px #b7b7b7;
-                figure {
-                  padding: 0;
-                  height: 78px;
-                }
-              }
-              figure {
-                position: relative;
-                span {
-                  display: inline-block;
-                  figcaption {
-                    color: #007bc4;
-                    text-transform: uppercase;
-                    font-size: 12px;
-                    position: relative;
-                    text-align: center;
-                    top: -5px;
-                    h2 {
-                      font-weight: bold;
-
-                    }
-                    span {
-                      position: relative;
-                      top:-20px;
-                      display: block;
-                    }
-
-                  }
-                }
-              }
-              h3 {
-                font-size: 18px;
-                margin: 0;
-                line-height: 130%;
-                padding-bottom: 5px;
-              }
-              span {
-                color: #007bc4;
-                text-transform: uppercase;
-                font-size: 14px;
-              }
-              .col-xs-8 {
-                &:last-of-type {
-                  a {
-                    &.btn {
-                      background-color: #007bc4;
-                      color: #ffffff;
-                      border-radius: 4px;
-                      border-bottom: solid 2px #004872;
-                      margin-top: 10px;
-                      text-transform: uppercase;
-                      font-size: 16px;
-                      max-width: 130px;
-                    }
-                  }
-                }
-              }
-            }
-          }
-          &:last-of-type {
-            article {
-              padding-top: 0;
-              cursor: pointer;
-
-              figure {
-                img {
-                  width: 100%;
-                }
-              }
-              figcaption {
-                padding: 0 10px 10px;
-                text-align: center;
-                font-size: 16px;
-                h5 {
-                  color: #69a30d;
-                  font-weight: normal;
-                  text-transform: uppercase;
-                  font-size: 16px;
-                  padding: 0;
-                  margin-bottom: 0;
-                  border-bottom: none;
-                }
-              }
-            }
-          }
-
         }
       }
     }
@@ -1513,9 +1401,7 @@
   }
   .dental-benefits-fields {
     background-color: #ffffff;
-    border-left: solid 1px #d5d5d5;
-    border-right: solid 1px #d5d5d5;
-    border-bottom: solid 1px #d5d5d5;
+    border: solid 1px #d5d5d5;
     .slider {
       .slider-selection {
          background: #9C9C9C;

@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
-
+  post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -30,20 +30,28 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_invoice
+        post :employer_invoice_datatable
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
         get :product_index
         get :configuration
         post :set_date
+        post :update_setting
         get :staff_index
         get :assister_index
         get :request_help
+        get :binder_index
+        get :binder_index_datatable
+        post :binder_paid
         get :verification_index
         get :verifications_index_datatable
       end
 
       member do
+        post :transmit_group_xml
         get :home
         get :inbox
       end
@@ -117,8 +125,12 @@ Rails.application.routes.draw do
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
+        get 'check_move_reason'
+        get 'check_insurance_reason'
         get 'purchase'
         get 'family'
+        get 'upload_notice_form'
+        post 'upload_notice'
       end
 
       resources :people do
@@ -144,8 +156,9 @@ Rails.application.routes.draw do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
         post :match
-        get 'welcome'
         get 'search'
+        get 'privacy'
+        get 'welcome'
       end
     end
 
@@ -187,8 +200,12 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      member do
+        get "download_invoice"
+      end
       collection do
         get 'welcome'
         get 'search'
@@ -227,7 +244,6 @@ Rails.application.routes.draw do
         get :terminate
         get :rehire
         get :benefit_group, on: :member
-        patch :assignment_benefit_group, on: :member
       end
     end
   end
@@ -348,6 +364,10 @@ Rails.application.routes.draw do
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
 
+  match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
+  match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
 
@@ -370,12 +390,13 @@ Rails.application.routes.draw do
   resources :office_locations, only: [:new]
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
+  get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+
 
   resources :documents, only: [:update, :destroy, :update] do
     collection do
       put :change_person_aasm_state
       get :show_docs
-      get :update_individual
       put :update_verification_type
       get :enrollment_verification
       put :enrollment_docs_state

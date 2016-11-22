@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   # for current_user
   before_action :set_current_user
 
-  rescue_from Pundit::NotAuthorizedError, with: :access_denied
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   rescue_from ActionController::InvalidCrossOriginRequest do |exception|
     error_message = {
@@ -47,6 +47,17 @@ class ApplicationController < ActionController::Base
     render file: 'public/403.html', status: 403
   end
 
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+
+    flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
+      respond_to do |format|
+      format.json { render nothing: true, status: :forbidden }
+      format.html { redirect_to(request.referrer || root_path)}
+      format.js   { render nothing: true, status: :forbidden }
+    end
+  end
+
   def authenticate_me!
     # Skip auth if you are trying to log in
     return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
@@ -55,7 +66,7 @@ class ApplicationController < ActionController::Base
 
   def create_sso_account(user, personish, timeout, account_role = "individual")
     if !user.idp_verified?
-      IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+      IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
       user.switch_to_idp!
@@ -139,7 +150,7 @@ class ApplicationController < ActionController::Base
       message[:message] = "Application Exception - #{e.message}"
       message[:session_person_id] = session[:person_id] if session[:person_id]
       message[:user_id] = current_user.id if current_user
-      message[:email] = current_user.email if current_user
+      message[:oim_id] = current_user.oim_id if current_user
       message[:url] = request.original_url
       message[:params] = params if params
       log(message, :severity=>'error')
@@ -181,6 +192,10 @@ class ApplicationController < ActionController::Base
     def set_current_user
       User.current_user = current_user
       SAVEUSER[:current_user_id] = current_user.try(:id)
+      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
+      unless SessionIdHistory.where(session_id: session_id).present?
+        SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id))
+      end
     end
 
     def clear_current_user
@@ -205,7 +220,7 @@ class ApplicationController < ActionController::Base
       message[:message] = 'Application Exception - person required'
       message[:session_person_id] = session[:person_id]
       message[:user_id] = current_user.id
-      message[:email] = current_user.email
+      message[:oim_id] = current_user.oim_id
       message[:url] = request.original_url
       log(message, :severity=>'error')
       return false
@@ -232,6 +247,9 @@ class ApplicationController < ActionController::Base
       if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
         role.bookmark_url = bookmark_url
         role.try(:save!)
+      elsif bookmark_url.match('/families/home') && @person.present?
+        @person.consumer_role.update_attribute(:bookmark_url, family_account_path) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
+        @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
     def set_bookmark_url(url=nil)

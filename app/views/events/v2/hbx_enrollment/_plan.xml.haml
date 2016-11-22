@@ -1,0 +1,10 @@
+%plan
+  %id
+    %id= hbx_enrollment.plan.hios_id
+  %name= hbx_enrollment.plan.name
+  %active_year= hbx_enrollment.plan.active_year
+  %is_dental_only= hbx_enrollment.plan.is_dental_only?
+  = render :partial=> "events/v2/shared/carrier", :object=> hbx_enrollment.plan.carrier_profile, as: :carrier
+  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{hbx_enrollment.plan.metal_level}"
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{hbx_enrollment.plan.coverage_kind}"
+  %ehb_percent= hbx_enrollment.plan.ehb*100

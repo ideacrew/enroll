@@ -4,7 +4,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def new_broker
     @broker_candidate = Forms::BrokerCandidate.new
-
+    @organization = Forms::BrokerAgencyProfile.new
     respond_to do |format|
       format.html { render 'new' }
       format.js
@@ -55,11 +55,12 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def create
     # failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
+    notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
     if params[:person].present?
       @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @filter = params[:person][:broker_applicant_type]
@@ -70,7 +71,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
       # if verify_recaptcha(model: @organization, message: failed_recaptcha_message) && @organization.save
       if @organization.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @agency_type = 'new'
@@ -88,13 +89,13 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def assign_filter_and_agency_type
     @filter = params[:filter] || 'broker'
-    @agency_type = params[:agency_type] || 'existing'
+    @agency_type = params[:agency_type] || 'new'
   end
 
   def primary_broker_role_params
     params.require(:organization).permit(
       :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba,
-      :fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
+      :fein, :is_fake_fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
@@ -104,6 +105,8 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def applicant_params
-    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type, :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients, :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
+    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type,
+     :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients, 
+     :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
   end
 end

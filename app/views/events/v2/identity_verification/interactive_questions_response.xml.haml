@@ -1,0 +1,10 @@
+!!! XML
+%interactive_verification_question_response{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %session_id= session.session_id
+  %transaction_id= session.transaction_id
+  - session.questions.each do |q|
+    %question_response
+      %question_id= q.question_id
+      %answer
+        %response_id= q.answer.response_id
+        %response_text= q.answer.response_text

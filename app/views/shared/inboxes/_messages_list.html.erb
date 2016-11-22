@@ -1,38 +1,65 @@
-<div class="bottom-pd messages-tab" id='inbox-messages'>
-  <div class="no_margin">
-    <h1>Messages</h1>
-  </div>
-
-  <div class="no_margin">
-    <div id="inbox_form" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 no-pd">
-      <ul class="list-group">
-        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox'), remote: true) do%>
-        <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= @employer_profile.inbox.unread_messages.size %></span></li>
+<div class="module inbox">
+  <div class="row">
+    <div class="inboxes col-xs-12" id="inbox_form">
+      <div class="pull-right">
+        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true, class: 'pull-right') do%>
+        <% if @folder == 'Deleted' %>
+        <strong>
+          Deleted
+        </strong>
+        <% else %>
+        Deleted
         <% end %>
-        <% if @sent_box == true %>
-          <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true) do%>
-            <li class="list-group-item">Sent</li>
-          <% end %>
         <% end %>
-        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true) do%>
-          <li class="list-group-item">Deleted</li>
+        <span class="pull-right">
+          &nbsp;|&nbsp;
+        </span>
+        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox'), remote: true, class: 'pull-right') do %>
+        <% if @folder == 'Inbox' %>
+        <strong>
+          Inbox
+        </strong>
+        <% else %>
+        Inbox
         <% end %>
-      </ul>
+        <span class="badge message-badge"><%= @employer_profile.inbox.unread_messages.size %></span>
+        <% end %>
+        <%- if @sent_box == true %>
+        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true, class: 'pull-right') do%>
+        <% if @folder == 'Sent' %>
+        <strong>
+          Sent
+        </strong>
+        <% else %>
+        Sent
+        <% end %>
+        <% end %>
+        <% end %>
+      </div>
     </div>
-   <% @folder = (@folder||'Inbox').capitalize %>
-    <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12 table-responsive" id="message_list_form">
-      <table class="table table-hover">
-        <thead>
+  </div>
+  <div class="row">
+    <%- @folder = (@folder||'Inbox').capitalize %>
+    <div class="table-responsive col-xs-12" id="message_list_form">
+      <table class="table table-striped table-hover table-sm">
+        <thead class="thead-default">
           <tr>
-            <th> <%= @folder %>: FROM</th>
-            <th> Date  </th>
+            <th>
+              From
+            </th>
+            <th>
+              Date
+            </th>
             <th>Subject</th>
+            <%- if @folder != 'Deleted' %>
+            <th></th>
+            <%- end %>
           </tr>
         </thead>
-
         <tbody>
           <% if @employer_profile.inbox && @employer_profile.inbox.messages %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => @employer_profile.inbox.messages.select{|m| @folder.capitalize == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @employer_profile} %>
+          <% sorted_inbox_messages = @employer_profile.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: @employer_profile} %>
           <% end %>
         </tbody>
       </table>

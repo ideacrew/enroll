@@ -1,17 +1,31 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
-
+  before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show]
+  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
+  layout 'single_column'
+
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
+  end
+
+  def binder_paid
+    EmployerProfile.update_status_to_binder_paid(params[:employer_profile_ids])
+    flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
+  def transmit_group_xml
+    HbxProfile.transmit_group_xml(params[:id].split)
+    flash["notice"] = "Successfully transmitted the employer group xml."
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   def employer_index
@@ -27,6 +41,129 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.html { render "employers/employer_profiles/index" }
       format.js {}
     end
+  end
+
+  def generate_invoice
+    @organizations= Organization.where(:id.in => params[:employerId]).all
+    @organizations.each do |org|
+      @employer_invoice = EmployerInvoice.new(org)
+      @employer_invoice.save_and_notify_with_clean_up
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def employer_invoice
+
+    # Dynamic Filter values for upcoming 30, 60, 90 days renewals
+    @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
+    @next_60_day = @next_30_day.next_month
+    @next_90_day = @next_60_day.next_month
+
+
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+
+  # This method provides the jquery datatable payload for the ajax call
+  def employer_invoice_datatable
+
+    invoice_state = params[:invoice_date_criteria].to_s.split(":")[1].to_s
+    date_string   = params[:invoice_date_criteria].to_s.split(":")[0]
+    cursor        = params[:start]  || 0
+    page_size     = params[:length] || 10
+
+    if date_string.present? && date_string.downcase != "all"
+      date_filter = Date.strptime(date_string, "%m/%d/%Y")
+    else
+      date_filter = nil
+    end
+
+    dt_query = extract_datatable_parameters
+    cursor = dt_query.skip.to_i
+
+    employers = Organization.all_employer_profiles.invoice_view_all
+    total_employer_count = employers.length
+
+    if invoice_state.downcase == "r"
+      employers = Organization.employer_profile_renewing_starting_on(date_filter).offset(cursor).limit(page_size)
+      is_search = true
+    elsif invoice_state.downcase == "i"
+      employers = Organization.employer_profile_initial_starting_on(date_filter).offset(cursor).limit(page_size)
+      is_search = true
+    else
+      # datatable records with no filter should default to scope "invoice_view_all"
+      employers = employers.offset(cursor).limit(page_size)
+      is_search = false
+    end
+
+    if params[:search][:value].present?
+      # employers = Organization.where(legal_name: /.*#{params[:search][:value]}.*/i)
+      employer_ids = Organization.where(legal_name: /.*#{dt_query.search_string}.*/i).pluck(:id)
+      employers = employers.where({:id => {"$in" => employer_ids}})
+      is_search = true
+    end
+
+    # TODO: Add field sorting and query ordering
+
+    #order records by plan_year.start_on and by legal_name
+    # employers = employers.er_invoice_data_table_order
+
+    # datatable_payload = employers.map { |er|
+    #   {
+    #     :invoice_id => ('<input type="checkbox" name="employerId[]" value="' + er.id.to_s + '">'),
+    #     # :fein => view_context.number_to_obscured_fein(er.fein),
+    #     :fein => er.fein,
+    #     :legal_name => (view_context.link_to er.legal_name, employers_employer_profile_path(er.employer_profile)+"?tab=home"),
+    #     :is_conversion => view_context.boolean_to_glyph(er.employer_profile.is_conversion?),
+    #     :state => er.employer_profile.aasm_state.humanize,
+    #     :plan_year => er.employer_profile.latest_plan_year.try(:effective_date).to_s,
+    #     :is_current_month_invoice_generated => view_context.boolean_to_glyph(er.current_month_invoice.present?),
+    #     :enrolled => er.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i.to_s + "/" + er.employer_profile.try(:latest_plan_year).try(:waived_count).to_i.to_s,
+    #     :remaining => er.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i - er.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count).to_i,
+    #     :eligible => er.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count).to_i,
+    #     :enrollment_ratio => (er.employer_profile.try(:latest_plan_year).try(:enrollment_ratio).to_f * 100).to_i
+    #   }
+    # }
+
+
+    datatable_payload = employers.map { |er|
+      plan_year = er.employer_profile.latest_plan_year
+      census_employees = plan_year.find_census_employees
+      enrolled = plan_year.try(:enrolled).try(:count).to_i
+      eligible_to_enroll_count = census_employees.try(:active).try(:count).to_i
+      waived = census_employees.try(:waived).try(:count).to_i
+
+      {
+
+        :invoice_id => ('<input type="checkbox" name="employerId[]" value="' + er.id.to_s + '">'),
+        :fein => er.fein,
+        :legal_name => (view_context.link_to er.legal_name, employers_employer_profile_path(er.employer_profile)+"?tab=home"),
+        :is_conversion => view_context.boolean_to_glyph(er.employer_profile.is_conversion?),
+        :state => er.employer_profile.aasm_state.humanize,
+        :plan_year => plan_year.try(:effective_date).to_s,
+        :is_current_month_invoice_generated => view_context.boolean_to_glyph(er.current_month_invoice.present?),
+        :enrolled => enrolled.to_s + "/" + waived.to_s,
+        :remaining => eligible_to_enroll_count - enrolled.to_i,
+        :eligible => eligible_to_enroll_count,
+        #:enrollment_ratio => (plan_year.try(:enrollment_ratio).to_f * 100).to_i
+        :enrollment_ratio => ((enrolled / eligible_to_enroll_count * 100).to_i rescue 0)
+      }
+    }
+
+    #records_filtered is for datatable required so it knows how many records were filtered
+
+    @records_filtered = is_search ? employers.length : total_employer_count
+    @total_records = total_employer_count
+
+    @draw = dt_query.draw
+    @payload = datatable_payload
+    render
   end
 
   def staff_index
@@ -84,7 +221,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
     if role
-      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
+      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
       if find_email(agent, role)
         agent_assistance_messages(params,agent,role)
       else
@@ -130,13 +267,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     page_string = params.permit(:gas_page)[:gas_page]
     page_no = page_string.blank? ? nil : page_string.to_i
 
-    @people = Person.exists(general_agency_staff_roles: true)
-
     status_params = params.permit(:status)
-    @status = status_params[:status] || 'applicant'
-    @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
-
-    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.map(&:general_agency_profile) }.flatten.uniq rescue []
+    @status = status_params[:status] || 'is_applicant'
+    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
@@ -155,10 +288,43 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def verification_index
+    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
     respond_to do |format|
       format.html { render partial: "index_verification" }
       format.js {}
     end
+  end
+
+  def binder_index
+    @organizations = Organization.retrieve_employers_eligible_for_binder_paid
+
+    respond_to do |format|
+      format.html { render "employers/employer_profiles/binder_index" }
+      format.js {}
+    end
+  end
+
+  def binder_index_datatable
+    dt_query = extract_datatable_parameters
+    organizations = []
+
+    all_organizations = Organization.retrieve_employers_eligible_for_binder_paid
+
+    organizations = if dt_query.search_string.blank?
+      all_organizations
+    else
+      org_ids = Organization.search(dt_query.search_string).pluck(:id)
+      all_organizations.where({
+        "id" => {"$in" => org_ids}
+      })
+    end
+
+    @draw = dt_query.draw
+    @total_records = all_organizations.count
+    @records_filtered = organizations.count
+    @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
+    render
+
   end
 
   def verifications_index_datatable
@@ -177,7 +343,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render 
+    render
   end
 
   def product_index
@@ -196,13 +362,51 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def edit_dob_ssn
+    authorize Family, :can_update_ssn?
+    @person = Person.find(params[:id])
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
+    end
+  end
+
+  def verify_dob_change
+    @person = Person.find(params[:person_id])
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
+    respond_to do |format|
+      format.js { render "edit_enrollment", :new_ssn => params[:new_ssn], :new_dob => params[:new_dob] }
+    end
+  end
+
+  def update_dob_ssn
+    authorize  Family, :can_update_ssn?
+    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+
+    if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
+      @dont_allow_change = true
+    else
+      begin
+        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        CensusEmployee.update_census_employee_records(@person, current_user) 
+      rescue Exception => e
+        @error_on_save = @person.errors.messages
+        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
+      end
+    end
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person } if @error_on_save
+      format.js { render "update_enrollment", person: @person}
+    end
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
     if current_user.has_csr_role? || current_user.try(:has_assister_role?)
       redirect_to home_exchanges_agents_path
       return
-    else 
+    else
       unless current_user.has_hbx_staff_role?
         redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
         return
@@ -272,6 +476,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def set_date
+    authorize HbxProfile, :modify_admin_tabs?
     forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
@@ -282,7 +487,32 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def update_setting
+    authorize HbxProfile, :modify_admin_tabs?
+    setting_record = Setting.where(name: setting_params[:name]).last
+
+    begin
+      setting_record.update(value: setting_params[:value]) if setting_record.present?
+    rescue Exception=>e
+      flash[:error] = "Failed to update setting, " + e.message
+    end
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
 private
+
+   def modify_admin_tabs?
+     authorize HbxProfile, :modify_admin_tabs?
+   end
+
+   def view_admin_tabs?
+     authorize HbxProfile, :view_admin_tabs?
+   end
+
+  def setting_params
+    params.require(:setting).permit(:name, :value)
+  end
+
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
       insured = Person.find(params[:person])
@@ -291,15 +521,15 @@ private
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-      body = 
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
+      body =
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
         "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
         "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
-        "<a href='" + root+"phone'>Assist Customer</a>  <br>" 
+        "<a href='" + root+"phone'>Assist Customer</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
-      name = first_name.to_s + ' ' + last_name.to_s 
+      name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
       body =  "Please contact #{first_name} #{last_name}. <br/>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
@@ -320,7 +550,7 @@ private
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
     result.deliver_now
     puts result.to_s if Rails.env.development?
-   end  
+   end
 
   def find_hbx_profile
     @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
@@ -353,7 +583,7 @@ private
   end
 
   def authorize_for_instance
-    authorize @hbx_profile, "#{action_name}?".to_sym 
+    authorize @hbx_profile, "#{action_name}?".to_sym
   end
 
   def call_customer_service(first_name, last_name)

@@ -1,35 +1,90 @@
 class User
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
+  MIN_USERNAME_LENGTH = 8
+  MAX_USERNAME_LENGTH = 60
+  MAX_SAME_CHAR_LIMIT = 4
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
 
+  attr_accessor :login
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+         :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
-
+  validates_presence_of :oim_id
+  validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
+  validate :oim_id_rules
+  validates_uniqueness_of :email,:case_sensitive => false
+  validates_presence_of     :password, if: :password_required?
+  validates_confirmation_of :password, if: :password_required?
+  validates_length_of       :password, within: Devise.password_length, allow_blank: true
+  validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+  
+
+  def oim_id_rules
+    if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
+      errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
+    elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
+      errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
+    elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
+      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
+    end
+  end
 
   def password_complexity
-    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
-      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
-    elsif password.present? and password.include? email
-      errors.add :password, "password cannot contain username"
+    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
+      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
+    elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
+      errors.add :password, "cannot contain username"
+    elsif password.present? and password_repeated_chars_limit(password)
+      errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
     elsif password.present? and password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
+    elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
+      errors.add :password, "must have at least 4 alphabetical characters"
     end
+  end
+
+  def password_repeated_chars_limit(password)
+    return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+    false
+  end
+
+  def password_required?
+    !persisted? || !password.nil? || !password_confirmation.nil?
+  end
+
+  def valid_attribute?(attribute_name)
+    self.valid?
+    self.errors[attribute_name].blank?
+  end
+
+  def self.password_invalid?(password)
+    user = User.new(oim_id: 'example1', password: password)
+    !user.valid_attribute?('password')
   end
 
   def self.generate_valid_password
     password = Devise.friendly_token.first(16)
     password = password + "aA1!"
     password = password.squeeze
-    if password.length < 8
+    if password_invalid?(password)
       password = generate_valid_password
     else
       password
+    end
+  end
+
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    if login = conditions.delete(:login).downcase
+      where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+    else
+      where(conditions).first
     end
   end
 
@@ -50,6 +105,7 @@ class User
     end
   end
 
+  field :hints, type: Boolean, default: true
   # for i18L
   field :preferred_language, type: String, default: "en"
 
@@ -238,9 +294,9 @@ class User
   end
 
   def can_change_broker?
-    if has_employer_staff_role? || has_hbx_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+    if has_employer_staff_role? || has_hbx_staff_role?
       true
-    elsif has_general_agency_staff_role?
+    elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
       false
     end
   end
@@ -255,6 +311,10 @@ class User
         "Customer Service Representative (CSR)"
       end
     end
+  end
+
+  def is_active_broker?(employer_profile)
+    person == employer_profile.active_broker if employer_profile.active_broker
   end
 
   def ensure_authentication_token
@@ -272,9 +332,9 @@ class User
   # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
   #   ID in a has_one association
   def self.orphans
-    all.order(:"email".asc).select() {|u| u.person.blank?}
+    user_ids = Person.where(:user_id => { "$ne" => nil }).pluck(:user_id)
+    User.where("_id" => { "$nin" => user_ids }).order(email: :asc).entries
   end
-
 
   def self.send_reset_password_instructions(attributes={})
     recoverable = find_or_initialize_with_errors(reset_password_keys, attributes, :not_found)
@@ -323,13 +383,16 @@ class User
     self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
     self.identity_response_description_text = "curam payload"
     self.identity_verified_date = TimeKeeper.date_of_record
+    unless self.oim_id.present?
+      self.oim_id = self.email
+    end
     self.save!
   end
 
   def get_announcements_by_roles_and_portal(portal_path="")
     announcements = []
 
-    case 
+    case
     when portal_path.include?("employers/employer_profiles")
       announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
     when portal_path.include?("families/home")

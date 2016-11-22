@@ -1,41 +1,43 @@
-<br>
-<div class="container">
-  <div class="row no-buffer">
-    <h3 class="title-inline">Enrollment Report
-    <% if @current_plan_year.present? %>
-      <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h3>
-    <% end %>
-    <a href="#" class="btn btn-danger return_to_home pull-right bottom-mgn-xs"><i class="fa fa-times"></i> Cancel</a>
-  </div>
+<% if @hbx_enrollments.present? %>
+<div class="row no-buffer">
+  <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
+  <div class="text-danger">This is not an invoice.</div>
+</div>
 
-  <div class="row no-buffer table-responsive">
-    <table class="table table-bg-white table-employee-2">
-      <thead>
-        <tr>
-          <th>Employee</th>
+<div class="row no-buffer table-responsive">
+  <table>
+    <thead>
+      <tr>
+        <th>Employee Profile</th>
+        <th>Benefit Package</th>
+        <th>Insurance Coverage</th>
+        <th>Cost</th>
+
+          <!-- <th>Employee</th>
           <th>SSN</th>
           <th>DOB</th>
           <th>Hired</th>
           <th>Benefit Group</th>
           <th>Type</th>
-          <th>Name</th>
+          <th>Plan Name</th>
           <th>Issuer</th>
-          <th style="text-align: center;">Covered Ct</th>
-          <th style="text-align: center;">Employer Contribution</th>
-          <th style="text-align: center;">Employee Contribution</th>
-          <th style="text-align: center;">Total Premium</th>
+          <th>Covered Ct</th>
+          <th>Employer Contribution</th>
+          <th>Employee Premium</th>
+          <th>Total Premium</th> -->
         </tr>
       </thead>
       <tbody>
-        <% if @hbx_enrollments.present? %>
-          <% @hbx_enrollments.each do |hbx_enrollment| %>
-            <%= render "employee_line_item", census_employee: hbx_enrollment.try(:subscriber).try(:person).try(:employee_roles).try(:first).try(:census_employee), enrollment: hbx_enrollment %>
-          <% end %>
-        <% else %>
-          <tr> <td> No employees enrolled.</td></tr>
+        <% @hbx_enrollments.each do |hbx_enrollment| %>
+        <%= render "employee_line_item", census_employee: hbx_enrollment.census_employee, enrollment: hbx_enrollment %>
         <% end %>
       </tbody>
     </table>
   </div>
-  <%= button_to 'Download CSV', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, class: 'btn btn-default btn-sm'%>
+<% else %>
+<div class="row no-buffer">
+  <div class="col-xs-4">No employees enrolled.</div>
 </div>
+<% end %>
+
+<%= render "download_csv_modal" %>

@@ -1,2 +1,3 @@
 $("#inbox_form, #message_list_form").hide();
 $('#inbox').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
+location.reload();

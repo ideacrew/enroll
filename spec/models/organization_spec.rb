@@ -9,6 +9,10 @@ RSpec.describe Organization, dbclean: :after_each do
   let(:fein) {"065872626"}
   let(:bad_fein) {"123123"}
   let(:office_locations) {FactoryGirl.build(:office_locations)}
+  let(:invoice) { FactoryGirl.create(:document) }
+  let(:org) { FactoryGirl.create(:organization) }
+  let(:file_path){ "test/hbxid_01012001_invoice_R.pdf"}
+  let(:valid_file_names){ ["hbxid_01012001_invoice_R.pdf","hbxid_04012014_invoice_R.pdf","hbxid_10102001_invoice_R.pdf"] }
 
   let(:fein_error_message) {"#{bad_fein} is not a valid FEIN"}
 
@@ -127,16 +131,56 @@ RSpec.describe Organization, dbclean: :after_each do
       Rails.cache.clear
     end
 
-    it "valid_carrier_names" do
-      carrier_names = {}
-      carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-      carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-      expect(Organization.valid_carrier_names).to eq carrier_names
+    context "carrier_names" do
+
+      it "valid_carrier_names" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+        expect(Organization.valid_carrier_names).to eq carrier_names
+      end
+
+      it "valid_carrier_names_for_options" do
+        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
+        expect(Organization.valid_carrier_names_for_options).to eq carriers
+      end
     end
 
-    it "valid_carrier_names_for_options" do
-      carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
-      expect(Organization.valid_carrier_names_for_options).to eq carriers
+    context "binder_paid" do
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+      let(:office_location) { OfficeLocation.new(
+          is_primary: true,
+          address: address,
+          phone: phone
+        )
+      }
+      let(:organization) { Organization.create(
+        legal_name: "Sail Adventures, Inc",
+        dba: "Sail Away",
+        fein: "001223833",
+        office_locations: [office_location]
+        )
+      }
+      let(:valid_params) do
+        {
+          organization: organization,
+          entity_kind: "partnership"
+        }
+      end
+      let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
+      let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+      let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
+      let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
+
+      before do
+        renewing_employer.save!
+        new_employer.save!
+      end
+
+      it "should return correct number of records" do
+       expect(Organization.retrieve_employers_eligible_for_binder_paid.size).to eq 1
+     end
     end
   end
 
@@ -343,6 +387,50 @@ RSpec.describe Organization, dbclean: :after_each do
     it "should save success with one primary office_location" do
       organization.office_locations = [office_location]
       expect(organization.save).to eq true
+    end
+  end
+
+  context "Invoice Upload" do
+    let(:organization) {FactoryGirl.build(:organization, :hbx_id => 'hbxid')}
+    before do
+      allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoices:asdds123123")
+      allow(Organization).to receive(:by_invoice_filename).and_return(organization)
+    end
+
+    context "with valid arguments" do
+      before do
+        Organization.upload_invoice(file_path,valid_file_names.first)
+      end
+       it "should upload invoice to the organization" do
+        expect(organization.documents.size).to eq 1
+      end
+    end
+    context "with duplicate files" do
+
+       it "should upload invoice to the organization only once" do
+        Organization.upload_invoice(file_path,valid_file_names.first)
+        Organization.upload_invoice(file_path,valid_file_names.first)
+        expect(organization.documents.size).to eq 1
+      end
+    end
+
+    context "without date in file name" do
+      before do
+        Organization.upload_invoice("test/hbxid_invoice_R.pdf",'dummyfile.pdf')
+      end
+       it "should Not Upload invoice" do
+        expect(organization.documents.size).to eq 0
+      end
+    end
+  end
+
+  context "invoice_date" do 
+    context "with valid date in the file name" do
+      it "should parse the date" do
+        valid_file_names.each do | file_name |
+          expect(Organization.invoice_date(file_name)).to be_an_instance_of(Date)
+        end
+      end
     end
   end
 end

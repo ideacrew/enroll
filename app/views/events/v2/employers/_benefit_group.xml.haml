@@ -1,0 +1,7 @@
+%benefit_group
+  %name= benefit_group.title
+  %elected_plans
+    = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
+  -#%federal_contributions= " " field not available in benefit group modal
+  %relationship_benefits
+    = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits

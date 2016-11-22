@@ -7,27 +7,28 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you
     to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong> "],
-    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> 42 CFR 435.952(c)(2), 45 CFR §155.315(f)(2).</span>', sub_heading: ''} %>
+    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> 45 CFR §155.315(f)(2)</span>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Here is the information that we need:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[PICK one or multiple of the following, based on which persons have inconsistencies and which areas are
   inconsistent]</span>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could
   not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
 
+<% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "[SSN Inconsistent First Name 1] [SSN Inconsistent Last Name 1]<br>
-  <span #{@style_color_text}>[IF Multiple SSN Inconsistencies]</span><SSN Inconsistent First Name N> <SSN Inconsistent Last Name N><br>
-  [Repeat for as many member as is necessary]"} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents Showing Social Security Number</strong></i></div>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
-  of every person who is applying for Medicaid and #{Settings.site.short_name}. We will only use your Social Security Number to verify the
+  content: "Under federal law 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
+  of every person who is applying for #{Settings.site.short_name}. We will only use your Social Security Number to verify the
   information you told us on your application or renewal form. We will check your information in the #{Settings.aca.state_name} and Federal databases,
   and the databases of other #{Settings.aca.state_name}, Federal agencies, and a consumer reporting agency."} %>
 
@@ -36,15 +37,13 @@
   Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a
   Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact
   #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.  "} %>
+<% end %>
 
+<% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span>
-  <strong><i>Documents of Citizenship or Immigration Status.</i></strong>
-  We need proof of your U.S. citizenship or immigration status for the following applicant household members:<br>
-  [Citizenship/Immigration Inconsistent First Name 1] [Citizenship/Immigration Inconsistent Last Name 1]
-  <span #{@style_color_text}>[IF Multiple Citizenship/Immigration Inconsistencies]</span>
-  [Citizenship/Immigration Inconsistent First Name N] [Citizenship/Immigration Inconsistent Last Name N]
-  "} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents of Citizenship or Immigration Status</strong></i></div>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_underline}>How to Prove US Citizenship</span><br>
@@ -52,9 +51,9 @@
   If you provide primary documentation, no other documents are required. If you provide secondary documentation, other
   identification (ID) is required for verification. Secondary documentation must be accompanied with an identification
   card containing a recent photo and other identifying information."} %>
-
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+<% end %>
+  <br>
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
     listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
     "Certificate of Citizenship", "Consular report of Birth Abroad of U.S. Citizen", "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security
@@ -62,6 +61,18 @@
     ["Identify the Tribe issuing the document;", "Identify the individual by name; and", "Confirm the individual’s enrollment in or affiliation with the Tribe.",
       "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]
     } %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "<u>Primary documentation</u>:  (Only One (1) is needed) ",
+  listings: [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
+    "Certificate of Naturalization", 
+    "Certificate of Citizenship",
+    "Consular report of Birth Abroad of U.S. Citizen",
+    "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license.",
+    ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
+        ["Identify the Tribe issuing the document;",
+          "Identify the individual by name; and",
+          "Confirm the individual’s enrollment in or affiliation with the Tribe.",
+          "<strong>Examples</strong>: tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
@@ -80,74 +91,53 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_underline}>Needed Information to Verify Immigration Status</span>"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong>"} %>
 
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Permanent Resident Card (I-551, also known as Green Card)",
-    listings: ["Alien registration number",
-               "Card number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Temporary I-551 Stamp (on passport or I-94, I-94A)",
-    listings: ["Alien registration number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Immigrant Visa (with temporary I-551 language)",
-    listings: ["Alien registration number", "Passport number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Employment Authorization Card (EAD or I-766)",
-    listings: ["Alien registration number", "Card number", "Expiration date", "Category code"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Arrival/Departure Record (I-94 or I-94A)",
-    listings: ["I-94 number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Arrival/Departure Record in foreign passport (I-94)",
-    listings: ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Foreign passport",
-    listings: ["Passport number", "Expiration date"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Country of issuance Reentry Permit (I-327)",
-    listings: ["Alien registration number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Refugee travel document (I-571)",
-    listings: ["Alien registration number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)",
-    listings: ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)",
-    listings: ["SEVIS ID"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Notice of Action (I-797)",
-    listings: ["Alien registration number or an I-94 number"]
-    } %>
-
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Other",
-    listings: ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+    previous: "<span class='mar20'><strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong></span>",
+    listings: [
+      ["Permanent Resident Card (I-551, also known as Green Card)", 
+        ["Alien registration number", "Card number"]
+      ], 
+      ["Temporary I-551 Stamp (on passport or I-94, I-94A)", 
+        ["Alien registration number"]
+      ], 
+      ["Immigrant Visa (with temporary I-551 language)", 
+        ["Alien registration number", "Passport number"]
+      ], 
+      ["Employment Authorization Card (EAD or I-766)", 
+        ["Alien registration number", "Card number", "Expiration date", "Category code"]
+      ], 
+      ["Arrival/Departure Record (I-94 or I-94A)", 
+        ["I-94 number"]
+      ], 
+      ["Arrival/Departure Record in foreign passport (I-94)", 
+        ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
+      ], 
+      ["Foreign passport", 
+        ["Passport number", "Expiration date"]
+      ], 
+      ["Country of issuance Reentry Permit (I-327)", 
+        ["Alien registration number"]
+      ],
+      ["Refugee travel document (I-571)", 
+        ["Alien registration number"]
+      ],     
+      ["Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ],
+      ["Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)", 
+        ["SEVIS ID"]
+      ],
+      ["Notice of Action (I-797)", 
+        ["Alien registration number or an I-94 number"]
+      ], 
+      ["Other", 
+        ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
+      ]
+    ]
     } %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -162,7 +152,7 @@
                 "Cuban/Haitian entrant", "Resident of American Samoa"]
     } %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_color_text}>[IF Income Unverified]</span> <strong><i>Documents Showing Household Income.</i></strong>
     We need proof of income for [First Inconsistent First  Name][First Inconsistent Last Name],
     [Second First Name of First Inconsistent member’s household]
@@ -172,7 +162,7 @@
     [Last First Name of First Inconsistent member’s household][Last Name of First Inconsistent member’s household]."} %>
 
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "These documents can include:",
     listings: ["Copies of the most recent paystubs. If you think this income is going to change over the year, we also need an explanation in writing of the change; ",
                 "A copy of your most recent tax filing, if you don’t expect a change from last year’s income; ",
@@ -185,16 +175,16 @@
                  health savings account deductions, and moving expenses."]
     } %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_color_text}>[IF Residency Unverified]</span> <strong><i>Documents Showing D.C. Residency.</i></strong>
     A document that shows that the following household members live in the #{Settings.aca.state_name}:"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "[Residency Inconsistent First Name 1][Residency Inconsistent Last Name 1]
     <span #{@style_color_text}>[IF Multiple Residency Inconsistencies]</span>[Residency Inconsistent First Name N][Residency Inconsistent Last Name N]
     [Repeat for as many member as is necessary]"} %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "This can include any of the following:",
     listings: ["A copy of an active lease agreement , certified deed, or mortgage statement with D.C address in their name,",
                "A phone or utility bill from within the past two months,",
@@ -208,41 +198,41 @@
     } %>
 
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_color_text}>[IF MEC Conflict]</span><br> <strong><i>Access to Other Insurance Coverage.</i></strong>
     Our records indicate that the following individual(s) have access to [MEC Data Match]."} %>
 
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%#= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_text_indent}>[MEC Type 1 Inconsistent First Name 1] [MEC Type 1 Inconsistent Last Name 1]</span><br>
    <span #{@style_color_indent}>[IF Multiple MEC Inconsistency Type 1]</span> [MEC Type 1 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
    <span #{@style_text_indent}>[Repeat for as many member as is necessary]</span>"} %>
 
- <%= render partial: 'notices/shared/paragraph', :locals => {
+ <%#= render partial: 'notices/shared/paragraph', :locals => {
    content: "<span #{@style_color_text}>[IF Additional MEC Conflict (repeat as necessary)]</span> Our records indicate that the following individual(s)
    have access to [MEC Data Match]. "} %>
 
 
- <%= render partial: 'notices/shared/paragraph', :locals => {
+ <%#= render partial: 'notices/shared/paragraph', :locals => {
    content: "<span #{@style_text_indent}>[MEC Type 2 Inconsistent First Name 1] [MEC Type 2 Inconsistent Last Name 1]</span><br>
   <span #{@style_color_indent}>[IF Multiple MEC Inconsistency Type 2]</span> [MEC Type 2 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
   <span #{@style_text_indent}>[Repeat for as many member as is necessary]</span>"} %>
 
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "This would make you ineligible for tax credits.  Please provide documentation that this coverage has been cancelled."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Indian Inconsistency]</span> American Indian Status. On your application or renewal form, you indicated that the following individual(s) were American Indian. "} %>
 
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "[Indian Inconsistent First Name 1] [Indian Inconsistent Last Name 1]<br>
   <span #{@style_color_text}>[IF Multiple Indian Inconsistencies]</span>[Indian Inconsistent First Name N] [Indian Inconsistent Last Name N]<br>
   [Repeat for as many member as is necessary]"} %>
 
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
+<%#= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please provide one of the following documents to confirm this status.",
   listings: [["Any formal documentation from a tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status.
              Examples of such verifications include, but are not limited to the following:", ["A document issued by a federally-recognized American Indian/Alaska Native tribe, such as an enrollment
@@ -256,31 +246,111 @@
   } %>
 
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Household Unverified (Duplicate Claiming)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether [Conflicting HH First Name]
   [Conflicting HH Last Name] is a member of [First Inconsistent First Name] [First Inconsistent Last Name]’s tax household. To resolve this conflict, you must submit documentation
   that First Inconsistent First Name] [First Inconsistent Last Name] can claim [Conflicting HH First Name] [Conflicting HH Last Name] as a dependent for federal tax purposes.
   IRS Form 8332 or Form 2120 that applies to the tax year at issue will be sufficient evidence."} %>
 
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Household Unverified (Duplicate Living With)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether
   [Conflicting HH First Name][Conflicting HH Last Name] is a member of [First Inconsistent First Name][First Inconsistent Last Name]’s household. To resolve this conflict,
   you must submit documents showing that [Conflicting HH First Name][Conflicting HH Last Name] lives with [First Inconsistent First Name][First Inconsistent Last Name]."} %>
 
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Please provide one of the following documents to confirm this status.",
     listings: ["School or medical records", "Child care records", "Statements from non-relatives", "Leases", "Mail to or regarding the child or adult dependent", "Religious or recreational activity records", "Custody order"]
   } %>
 
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "We need your documents above by <strong>#{notice.due_date}</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
+    heading: 'How to Submit Your Documents', sub_heading: ''} %>
+
+<%#= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document."]
+} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="fssizeuser">
+        <td>
+          <div class='display:block; page-break-inside: avoid;'>
+            <ul style='list-style: circle solid;'>
+              <li>
+                <span style="width: 300px;">
+                 <span style="float: left; width: 95px;"><strong>U.S. Postal Mail:</strong></span>
+                 <span style="float: left; width: 205px;">
+                  DC Health Link Exchange Contact Center<br>
+                  PO Box 44018<br>
+                  Washington, DC 20026<br><br>
+                </span>
+              </span>    
+            </li>
+           </ul></div>
+        </td>
+      </tr>   
+    </tbody>
+  </table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office (call the <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> for locations).
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<%#= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: [""]
+} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
+    heading: 'Your Secure User Account', sub_heading: ''} %>
+
+
+
+<%#= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
     heading: 'How to Send Your Documents', sub_heading: ''} %>
 
 
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
+<%#= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can send the necessary documents either online, through U.S. Postal mail, or in-person.",
   listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.",
              "U.S. Postal Mail: <span style='margin-left: 10px;'>#{Settings.site.short_name}</span><br>
@@ -292,13 +362,13 @@
             (call the #{Settings.contact_center.name} at #{Settings.contact_center.phone_number} for locations)."]
 } %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%#= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already,
     you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling
     #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%#= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["If you disagree with any determination about the amount or type of health care coverage benefits you or
     any of the other person(s) in your household was found eligible for, you have the right to appeal the determination(s).
     You may request an appeal by phone, in person, online, and by mail. You must request an appeal within the 95 days following
@@ -307,8 +377,7 @@
     heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
 
 
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2015 has already been cancelled or
   terminated, you must go to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a> during open enrollment to re-enroll for 2016.
   Your coverage will not be automatically renewed.</strong>".html_safe} %>

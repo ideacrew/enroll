@@ -23,6 +23,12 @@ module Forms
 
     class OrganizationAlreadyMatched < StandardError; end
 
+    def initialize(attrs = {})
+      self.fein = Organization.generate_fein
+      self.is_fake_fein=true
+      super(attrs)
+    end
+
     def self.model_name
       ::BrokerAgencyProfile.model_name
     end
@@ -55,6 +61,7 @@ module Forms
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.save!
       person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
+      UserMailer.broker_application_confirmation(person).deliver_now
       # person.update_attributes({ broker_agency_staff_roles: [::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)]})
       true
     end
@@ -101,6 +108,7 @@ module Forms
           :fein => fein,
           :legal_name => legal_name,
           :dba => dba,
+          :is_fake_fein => is_fake_fein,
           :broker_agency_profile => ::BrokerAgencyProfile.new({
             :entity_kind => entity_kind,
             :home_page => home_page,

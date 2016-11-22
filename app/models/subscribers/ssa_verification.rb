@@ -24,11 +24,12 @@ module Subscribers
         consumer_role = person.consumer_role
         consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: xml})
 
+        #TODO change response handler
         if "503" == return_status.to_s
           args = OpenStruct.new
           args.determined_at = Time.now
           args.vlp_authority = 'ssa'
-          consumer_role.deny_lawful_presence!(args)
+          consumer_role.ssn_invalid!(args)
           consumer_role.save
           return
         end
@@ -52,19 +53,18 @@ module Subscribers
       if xml_hash[:ssn_verification_failed].eql?("true")
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
-        consumer_role.deny_lawful_presence!(args)
+        consumer_role.ssn_invalid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         args.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
-        consumer_role.authorize_lawful_presence!(args)
+        consumer_role.ssn_valid_citizenship_valid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("false")
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-        consumer_role.deny_lawful_presence!(args)
+        consumer_role.ssn_valid_citizenship_invalid!(args)
       end
-
       consumer_role.save
     end
 

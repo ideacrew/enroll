@@ -1,10 +1,14 @@
 require 'csv'
+require 'prawn/table'
 class Employers::PremiumStatementsController < ApplicationController
   layout "two_column", only: [:show]
+  include Employers::PremiumStatementHelper
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
-    @hbx_enrollments = @employer_profile.enrollments_for_billing
+    authorize @employer_profile, :list_enrollments?
+    set_billing_date
+    @hbx_enrollments = @employer_profile.enrollments_for_billing(@billing_date)
 
     respond_to do |format|
       format.html
@@ -52,4 +56,11 @@ class Employers::PremiumStatementsController < ApplicationController
     end
   end
 
+  def set_billing_date
+    if params[:billing_date].present?
+      @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y")
+    else
+      @billing_date = billing_period_options.first[1]
+    end
+  end
 end

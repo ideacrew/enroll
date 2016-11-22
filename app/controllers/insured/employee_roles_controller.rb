@@ -1,10 +1,13 @@
 class Insured::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :welcome, :search]
+  before_action :check_employee_role, only: [:new, :privacy, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
   include ErrorBubble
 
   def welcome
+  end
+
+  def privacy
   end
 
   def search
@@ -45,7 +48,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
+    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do
@@ -65,12 +68,6 @@ class Insured::EmployeeRolesController < ApplicationController
     set_employee_bookmark_url
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
-      @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
-      if @employee_role.new_census_employee.email.present?
-        new_employee_email = @employee_role.new_census_employee.email
-        email_kind = new_employee_email.kind.present? ? new_employee_email.kind : "home"
-        @person.emails = [Email.new(kind: email_kind, address: new_employee_email.address)]
-      end
       @family = @person.primary_family
       build_nested_models
     end
@@ -175,7 +172,7 @@ class Insured::EmployeeRolesController < ApplicationController
     #PATH REACHED FOR UNKNOWN REASONS, POSSIBLY DUPLICATE PERSONS SO USER, URL ARE LOGGED
     message={}
     message[:message] ="insured/employee_role/show is not a valid route, "
-    message[:user] = current_user.email
+    message[:user] = current_user.oim_id
     message[:url] = request.original_url
     log(message, severity: 'error')
 

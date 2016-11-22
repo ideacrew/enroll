@@ -1,0 +1,37 @@
+%broker_account
+  %broker_agency
+    %id
+      %id= broker_agency_account.broker_agency_profile.organization.hbx_id
+    %name= broker_agency_account.broker_agency_profile.legal_name
+    %display_name= ""  #field not available
+    %fein= broker_agency_account.broker_agency_profile.fein
+    %npn= broker_agency_account.broker_agency_profile.corporate_npn
+  %writing_agent
+    %id
+      %id= broker_agency_account.writing_agent.hbx_id
+    %person
+      %id
+        %id= broker_agency_account.writing_agent.hbx_id
+      = render :partial => "events/v2/shared/person_name", :object => broker_agency_account.writing_agent.person
+      -if !broker_agency_account.writing_agent.person.hbx_staff_role.blank?
+        %job_title= broker_agency_account.writing_agent.person.hbx_staff_role.job_title
+        %department= broker_agency_account.writing_agent.person.hbx_staff_role.department
+      - if broker_agency_account.writing_agent.person.addresses.present?
+        %addresses
+          = render partial: 'events/v2/addresses/address', collection: broker_agency_account.writing_agent.person.addresses
+      - if broker_agency_account.writing_agent.person.emails.present?
+        %emails
+          = render partial: "events/v2/emails/email", :locals => { email:broker_agency_account.writing_agent.person.work_email_or_best }
+      - if broker_agency_account.writing_agent.person.phones.present?
+        %phones
+          = render partial: "events/v2/phones/phone", collection: broker_agency_account.writing_agent.person.phones
+    %npn= broker_agency_account.writing_agent.npn
+  %start_on= simple_date_for(broker_agency_account.start_on)
+  - if !broker_agency_account.end_on.blank?
+    %end_on= simple_date_for(broker_agency_account.end_on)
+  - if defined?(employer_profile)
+    - ga_accounts = employer_profile.general_agency_accounts.select { |gaa| gaa.for_broker_agency_account?(broker_agency_account) }
+    - if ga_accounts.any?
+      %ga_assignments
+        = render :partial => "events/employers/general_agency_assignment", :collection => ga_accounts
+

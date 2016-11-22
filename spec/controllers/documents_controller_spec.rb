@@ -12,23 +12,6 @@ RSpec.describe DocumentsController, :type => :controller do
     sign_in user
   end
 
-  describe "PUT update individual" do
-    before :each do
-      request.env["HTTP_REFERER"] = "http://test.com"
-    end
-
-    it "redirect_to back" do
-      post :update_individual, person_id: person.id
-      expect(response).to redirect_to :back
-    end
-
-    it "transfers the current state" do
-      post :update_individual, person_id: person.id
-      person.reload
-      expect(person.consumer_role.aasm_state).to eq("fully_verified")
-    end
-  end
-
   describe "destroy" do
     before :each do
       person.consumer_role.vlp_documents = [document]
@@ -105,6 +88,20 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
 
+    context "American Indian Status verification type" do
+      before do
+        person.consumer_role.update_attributes!(citizen_status: "indian_tribe_member")
+      end
+      it "should update attributes" do
+        post :update_verification_type, { person_id: person.id,
+                                          verification_type: "American Indian Status",
+                                          verification_reason: "document_in_Enroll_app"}
+        person.reload
+        expect(person.consumer_role.native_validation).to eq("valid")
+        expect(person.consumer_role.native_update_reason).to eq("document_in_Enroll_app")
+      end
+    end
+
     context "Citizenship verification type" do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
@@ -132,14 +129,7 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should redirect to back" do
         post :update_verification_type, person_id: person.id
         expect(response).to redirect_to :back
-        expect(flash[:notice]).to eq("Verification type successfully approved.")
-      end
-
-      it "should redirect to back" do
-        allow_any_instance_of(DocumentsController).to receive(:all_types_verified?).and_return(true)
-        post :update_verification_type, person_id: person.id
-        expect(response).to redirect_to(update_individual_documents_path(:person_id => person.id))
-        expect(flash[:notice]).to eq("Individual verification status was completely approved.")
+        expect(flash[:notice]).to eq("Verification successfully approved.")
       end
     end
   end

@@ -1,31 +1,3 @@
-Given(/Conversion Employer for (.*) exists with active and renewing plan year/) do |named_person|
-  person = people[named_person]
-  organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
-  employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source:'conversion', registered_on: TimeKeeper.date_of_record
-  owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-  employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
-    first_name: person[:first_name],
-    last_name: person[:last_name],
-    ssn: person[:ssn],
-    dob: person[:dob_date]
-
-  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
-  open_enrollment_end_on = open_enrollment_start_on.next_month + 12.days
-  start_on = open_enrollment_start_on + 2.months
-  end_on = start_on + 1.year - 1.day
-
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
-
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
-  employee.add_renew_benefit_group_assignment benefit_group
-
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
-  Caches::PlanDetails.load_record_cache!
-end
-
 Then(/Employee (.*) should see renewing plan year start date as earliest effective date/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
@@ -58,7 +30,13 @@ end
 And(/Employer for (.*) is under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => TimeKeeper.date_of_record)
+
+  open_enrollment_start_on = TimeKeeper.date_of_record
+  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 12.days
+  start_on = open_enrollment_start_on.end_of_month + 1.day + 1.month
+  end_on = start_on + 1.year - 1.day
+  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => open_enrollment_start_on,
+    :open_enrollment_end_on => open_enrollment_end_on, :start_on => start_on, :end_on => end_on)
 end
 
 When(/Employee clicks on New Hire Badge/) do
@@ -86,7 +64,7 @@ end
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
   expect(page).to have_content('Enrollment Submitted')
   step "#{named_person} should get plan year start date as coverage effective date"
-  
+
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
   else
@@ -110,11 +88,11 @@ end
 Then(/Employee should see confirmation and clicks continue/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "Household Info: Family Members" 
+  expect(page).to have_content "Household Info: Family Members"
   within '#dependent_buttons' do
     click_link "Continue"
   end

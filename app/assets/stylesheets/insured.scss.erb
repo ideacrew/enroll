@@ -1,11 +1,107 @@
-
-$primary-blue: #007bc4;
-$primary-green: #69A30D;
-$primary-color: #007bc4;
-$primay-active-button-text-color: #ffffff;
-$primary-bold: 600;
-
+@import "variables";
 .module {
+  &.broker {
+    .panel-heading {
+      background-image: none;
+      background-color: $primary-white;
+      h3 {
+        color: $primary-green;
+        font-weight: $primary-bold;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+    }
+    .panel-footer {
+      background-color: $primary-white;
+    }
+  }
+  &.consumer-broker-widget, &.employee-broker-widget, &.employer-broker-widget {
+    .panel-heading {
+      background-image: none;
+      background-color: transparent;
+      .panel-title {
+        color: $primary-blue;
+      }
+    }
+    .panel-body {
+      display: table;
+      width: 100%;
+      .fa {
+        color: $primary-blue;
+      }
+      > * {
+        display: table-cell;
+        vertical-align: middle;
+        &.text-center {
+          width: 25%;
+        }
+        &.text-left {
+          padding-left: 7.5%;
+        }
+      }
+      small {
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-top: 10%;
+        a {
+          color: $primary-gray;
+        }
+      }
+    }
+  }
+  &.past-enrollments {
+    th, td {
+      vertical-align: middle;
+    }
+  }
+  &.hbx-enrollment-panel {
+    .panel-heading {
+      background-color: transparent;
+      background-image: none;
+      h3 {
+        color: $primary-green;
+        font-weight: $primary-bold;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+    }
+    .panel-body {
+      padding-bottom: 15px;
+      .vertically-aligned-row:first-of-type {
+        margin-bottom: 2.5%;
+        table-layout: auto;
+        vertical-align: middle;
+        div {
+          img {
+          }
+        }
+        h3 {
+          width: 77.5%;
+          line-height: 1.2;
+        }
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        vertical-align: top;
+      }
+      .table {
+        margin-bottom: 0;
+      }
+    }
+    .panel-footer {
+      padding-top: 0;
+      background-color: transparent;
+      border-top: 0;
+      > .vertically-aligned-row {
+        table-layout: fixed;
+      }
+    }
+  }
+  &.inbox {
+    .fa {
+      color: $primary-blue;
+    }
+  }
   &#qle-details {
     .error-info {
       margin-top: 0;
@@ -21,45 +117,9 @@ $primary-bold: 600;
     }
   }
 }
-.brokers-widget {
-  .col-xs-8 {
-    padding-top: 10px;
-    h4 {
-      padding: 15px 0 0 0;
-      margin: 0;
-      font-weight: 600;
-    }
-
-  h4, .fa {
-    color: $primary-color;
-  }
-
-    .col-xs-4 {
-      cursor: pointer;
-      &:hover {
-        * {
-          color: #23527c;
-        }
-      }
-      h2 {
-        margin-bottom: 0;
-        margin-top: 25px;
-        img {
-          width: 85%;
-        }
-      }
-      span {
-        color: #007bc4;
-      }
-    }
-    span {
-      color: $primary-color;
-    }
-  }
-}
 .help-signup {
   h4 {
-    color: $primary-color;
+    color: $primary-blue;
     margin-bottom: 0;
     font-weight: 600;
     &+small {
@@ -81,7 +141,7 @@ $primary-bold: 600;
   }
   i {
     text-align: center;
-    color: $primary-color;
+    color: $primary-blue;
     display: block;
   }
   .fa-phone {
@@ -98,7 +158,7 @@ $primary-bold: 600;
   padding-top: 4.45%;
 }
 .fa-icon-link, .fa-icon-label, a {
-  color: $primary-color;
+  color: $primary-blue;
   cursor: pointer;
   &:hover {
     color: #23527c;
@@ -112,7 +172,7 @@ $primary-bold: 600;
 
   .benefits-tab, .home-tab, .hbx-enrollment-panel {
     .fa {
-      color: $primary-color;
+      color: $primary-blue;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
         color: #FFD700;
@@ -150,6 +210,14 @@ $primary-bold: 600;
           }
           .info p {
             margin: 0;
+          }
+        }
+        &.waived-coverage {
+          .status {
+            color: $primary-gray;
+          }
+          table {
+            width: 100%;
           }
         }
   }
@@ -423,22 +491,6 @@ $primary-bold: 600;
             }
           }
         }
-      }
-    }
-  }
-  &.plan-row {
-    .sbc_link {
-      margin-top: 6px;
-    }
-  }
-  .sbc_link {
-    display: inline-block;
-    &.dental {
-      position: relative;
-      span {
-        position: absolute;
-        margin-top: 10px !important;
-        white-space: nowrap;
       }
     }
   }

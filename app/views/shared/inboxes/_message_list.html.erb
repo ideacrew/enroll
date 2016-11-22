@@ -1,44 +1,79 @@
-<div class="container bottom-pd" id='inbox-messages'>
-  <div class="row no_margin">
+<div class="bottom-pd" id='inbox-messages'>
+  <div class="no_margin">
     <div class="col-xs-12 no-pd">
-    <h3 class="title-inline">Messages</h3>
+      <h3 class="title-inline">Messages</h3>
+    </div>
   </div>
-  </div>
-
-  <div class="row no_margin">
-    <div id="inbox_form" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 no-pd">
-      <ul class="list-group">
-        <%= link_to(retrieve_inbox_path(provider), remote: true) do%>
-        <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
-        <% end %>
-        <%- if @sent_box == true %>
+  <div class="module inbox col-xs-12">
+    <div class="row">
+      <div class="col-xs-12 inboxes" id="inbox_form">
+        <div class="pull-right">
+          <%= link_to(retrieve_inbox_path(provider), remote: true) do %>
+            <% if @folder == 'Inbox' %>
+            <strong>
+              Inbox
+            </strong>
+            <% else %>
+            Inbox
+            <% end %>
+          <span class="badge message-badge"><%= provider.inbox.unread_messages.size %></span>
+          <% end %>
+          <span class="">
+            &nbsp;|&nbsp;
+          </span>
+          <%- if @sent_box == true %>
           <%= link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do%>
-            <li class="list-group-item">Sent</li>
+          <% if @folder == 'Sent' %>
+          <strong>
+            Sent
+          </strong>
+          <% else %>
+          Sent
           <% end %>
-        <% end %>
-        <%= link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do%>
-          <li class="list-group-item">Deleted</li>
-        <% end %>
-      </ul>
-    </div>
-   <%- @folder = (@folder||'Inbox').capitalize %>
-    <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12 table-responsive" id="message_list_form">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th> <%= @folder %></th>
-            <th> Date  </th>
-            <th>Subject</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <%- if provider.try(:inbox).try(:messages) %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: provider} %>
           <% end %>
-        </tbody>
-      </table>
+          <span class="">
+            &nbsp;|&nbsp;
+          </span>
+          <%= link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do%>
+          <% if @folder == 'Deleted' %>
+          <strong>
+            Deleted
+          </strong>
+          <% else %>
+          Deleted
+          <% end %>
+          <% end %>
+          <% end %>
+        </div>
+      </div>
     </div>
-    <div id="show_message_form"></div>
+    <div class="row">
+      <%- @folder = (@folder||'Inbox').capitalize %>
+      <div class="table-responsive" id="message_list_form">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-default">
+            <tr>
+              <th>
+                From
+              </th>
+              <th>
+                Date
+              </th>
+              <th>Subject</th>
+              <%- if @folder != 'Deleted' %>
+              <th></th>
+              <%- end %>
+            </tr>
+          </thead>
+          <tbody>
+            <%- if provider.try(:inbox).try(:messages) %>
+            <% sorted_inbox_messages = provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+            <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: provider} %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div id="show_message_form"></div>
+    </div>
   </div>
 </div>

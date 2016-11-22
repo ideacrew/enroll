@@ -39,6 +39,14 @@ module Enroll
     config.i18n.fallbacks = {'es' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
+
+    #Thanks to Wojtek Kruszewski: https://gist.github.com/WojtekKruszewski
+    config.log_tags = [    #'-anything',
+      ->(req){
+        SessionTaggedLogger.extract_session_id_from_request(req)
+      }
+    ]
+
     unless Rails.env.test?
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
@@ -48,6 +56,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LawfulPresence")
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
+      config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
     end
   end

@@ -1,6 +1,6 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
-  before_action :check_access_to_employer_profile
+  before_action :check_access_to_employer_profile,:updateable?
 
   def create
 
@@ -32,7 +32,8 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
     employer_profile_id = params[:id]
     employer_profile = EmployerProfile.find(employer_profile_id)
     staff_id = params[:staff_id]
-    if Person.staff_for_employer(employer_profile).count <= 1
+    staff_list =Person.staff_for_employer(employer_profile).map(&:id)
+    if staff_list.count == 1 && staff_list.first.to_s == staff_id
       flash[:error] = 'Please add another staff role before deleting this role'
     else
       @status, @result = Person.deactivate_employer_staff_role(staff_id, employer_profile_id)
@@ -43,6 +44,10 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
   end
 
   private
+
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
   # Check to see if current_user is authorized to access the submitted employer profile
   def check_access_to_employer_profile
     employer_profile = EmployerProfile.find(params[:id])
