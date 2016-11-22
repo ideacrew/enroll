@@ -9,7 +9,7 @@ class RemoveInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
       if organization.size == 1 && organization.first.employer_profile.present?
         organization.first.employer_profile.census_employees.each do |ce|
           ce.benefit_group_assignments.select { |bga| bga.hbx_enrollments.blank? && bga.benefit_group.blank? }.each do |bga|
-            bga.delete
+            bga.delete if bga.present?
             puts "Deleting invalid benefit group assignments for #{ce.first_name} #{ce.last_name} " unless Rails.env.test?
           end
         end
