@@ -21,7 +21,13 @@
             <td class="text-center"><%=f.title %></td>
 
             <% if f.effective_on_kind.present? %>
-              <td class="text-center"><%=f.effective_on_kind.humanize %></td>
+              <% if f.effective_on_kind == 'first_of_month' %>
+                <td class="text-center">15th of month</td>
+              <% elsif f.effective_on_kind == 'first_of_next_month' %>
+                <td class="text-center">End of Month</td>
+              <% else %>
+                <td class="text-center"><%=f.effective_on_kind.humanize %></td>
+              <% end %>
             <% else %>
               <td class="text-center">N/A</td>
             <% end %>

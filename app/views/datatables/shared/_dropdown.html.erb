@@ -14,6 +14,8 @@
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true%>
       <%when "static"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs" %>
+      <%when "post_ajax"%>
+        <%= link_to line[0], line[1], method: :post, class: "btn btn-info btn-xs",remote: true  %>
       <%when "ajax"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true %>
       <%end%>

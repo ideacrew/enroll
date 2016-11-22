@@ -468,9 +468,14 @@ class Plan
     end
 
     def shop_health_plans year
-      Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
-        Plan.valid_shop_health_plans('metal_level', metal_level, year)
-      end.flatten
+      $shop_plan_cache = {} unless defined? $shop_plan_cache
+      if $shop_plan_cache[year].nil?
+        $shop_plan_cache[year] =
+          Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
+            Plan.valid_shop_health_plans('metal_level', metal_level, year)
+        end.flatten
+      end
+      $shop_plan_cache[year]
     end
 
     def shop_dental_plans year
@@ -518,7 +523,7 @@ class Plan
         if plan.deductible_integer.present?
           feature_array << characteristics
         else
-          log("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}", {:severity => "error"})
+          Rails.logger.error("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}")
         end
       }
       feature_array

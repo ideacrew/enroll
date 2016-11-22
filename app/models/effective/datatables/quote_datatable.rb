@@ -24,7 +24,8 @@ module Effective
       
       def collection
         state = attributes['states']
-        quotes = Quote.where(broker_role_id: QuoteDatatable.broker_role_id)
+        broker_role_id = attributes["collection_scope"] || QuoteDatatable.broker_role_id.to_s
+        quotes = Quote.where('broker_role_id'.to_s => broker_role_id.strip)
         quotes = quotes.where(aasm_state: state) if ['draft', 'published', 'claimed'].include?(state)
         quotes
       end
