@@ -502,4 +502,16 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(response).to render_template("benefit_group")
     end
   end
+  
+  describe "Update census member email" do
+    it "expect census employee to have a email present" do 
+      expect(census_employee.email.present?).to eq true
+    end
+    
+    it "should allow emails to be updated to nil" do
+      census_employee.email.update(address:'', kind:'')
+      expect(census_employee.email.kind).to eq ''
+      expect(census_employee.email.address).to eq ''
+    end
+  end
 end

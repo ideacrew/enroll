@@ -1,6 +1,6 @@
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
-  find(".interaction-click-control-general-agency-registration").click
+  find(".interaction-click-control-general-agency-registration", wait: 10).click
 end
 
 Then(/^.+ should see the New General Agency form/) do

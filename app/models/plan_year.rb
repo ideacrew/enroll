@@ -889,10 +889,12 @@ private
   end
 
   def trigger_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("planyear_renewal_3a")
   end
 
   def trigger_auto_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("planyear_renewal_3b")
   end
 
@@ -904,6 +906,7 @@ private
   end
 
   def send_employee_invites
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|

@@ -506,6 +506,37 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
 
+
+
+
+  context "change plan with ee role" do
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'shop'
+      assign :change_plan, 'change_by_qle'
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    end
+
+    it "shouldn't see waiver button" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_text('Waiver Coverage')
+    end
+  end
+
+
   context "change plan with both roles" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
     let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
