@@ -6,8 +6,8 @@ RSpec.describe QuoteBenefitGroup do
   let(:quote_family) {FactoryGirl.create(:quote, :with_two_families, start_on: TimeKeeper.date_of_record.beginning_of_month)}
   let(:quote_next_year) {FactoryGirl.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month + 1.year)}
 
-  context 'benefit group calculations', dbclean: :after_each do
-  	before :each do
+  context 'benefit group calculations', dbclean: :before_all do
+  	before :all do
       @plan_silver = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'silver')
       @plan_gold = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'gold')
       @dental_this_year = FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables)
@@ -16,11 +16,13 @@ RSpec.describe QuoteBenefitGroup do
       Caches::PlanDetails.load_record_cache!
       @current_year = TimeKeeper.date_of_record.year
       @next_year = @current_year + 1
+      Plan.shop_health_plans @current_year
+      Plan.shop_health_plans @current_year + 1
     end
     describe 'access to plans CACHED methods works' do
       it 'should have two current year health plans' do
         plans = Plan.shop_plans('health', @current_year) #Hack to wake up the Plan cache, otherwise flickering on line 23
-      	expect(Plan.shop_plans('health', @current_year).count).to eq(2)
+        expect(Plan.shop_plans('health', @current_year).count).to eq(2)
       end
       it 'should have one current year dental plans' do
         expect(Plan.shop_plans('dental', @current_year).count).to eq(1)
@@ -82,9 +84,9 @@ RSpec.describe QuoteBenefitGroup do
       end
       describe 'one household, one employee' do
         let(:bg) { quote.quote_benefit_groups.first}
-        it 'should reference all three health plans' do
+        it 'should reference both health plans' do
           plans_cost_by_relationship = bg.roster_cost_all_plans
-          expect(plans_cost_by_relationship.size).to eq(3)
+          expect(plans_cost_by_relationship.size).to eq(2)
           expect(plans_cost_by_relationship[@plan_silver.id.to_s]['employee']).to eq(silver_age_29) 
         end
       end

@@ -440,9 +440,14 @@ class Plan
     end
 
     def shop_health_plans year
-      Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
-        Plan.valid_shop_health_plans('metal_level', metal_level, year)
-      end.flatten
+      $shop_plan_cache = {} unless defined? $shop_plan_cache
+      if $shop_plan_cache[year].nil?
+        $shop_plan_cache[year] =
+          Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
+            Plan.valid_shop_health_plans('metal_level', metal_level, year)
+        end.flatten
+      end
+      $shop_plan_cache[year]
     end
 
     def shop_dental_plans year
