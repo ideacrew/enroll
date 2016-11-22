@@ -9,7 +9,7 @@ module Events
       policy = HbxEnrollment.by_hbx_id(policy_id).first
       if !policy.nil?
         begin
-          raise "This policy has no subscriber." if policy.subscriber.blank?
+#          raise "This policy has no subscriber." if policy.subscriber.blank?
           response_payload = render_to_string "events/enrollment_event", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
           reply_with(connection, reply_to, policy_id, "200", response_payload, policy.eligibility_event_kind)
         rescue Exception => e
