@@ -2,7 +2,8 @@
   enrollment_group_ids = []
   plans_2016 = {}
   begin
-    csv = CSV.open('11455_final_report.csv',"r",:headers =>true,:encoding => 'ISO-8859-1')
+    file = ARGV[0]
+    csv = CSV.open(file,"r",:headers =>true)
     @data= csv.to_a
     @data.each do |d|
         enrollment_group_ids << d["policy.eg_id"]
@@ -25,10 +26,10 @@
     csv << field_names
 
     event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_8').first
-
     notice_trigger = event_kind.notice_triggers.first
 
     families.each do |fam|
+      puts "#{families.count}"
       primary_member = fam.primary_applicant.person
       consumer_role =primary_member.consumer_role
       if consumer_role.present?
