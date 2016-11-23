@@ -38,7 +38,7 @@ Feature: Create Employee Roster
     Then the broker should see a successful message
     And the broker clicks on Back to Quotes button
     Then the broker clicks Actions dropdown
-    When the broker clicks delete
+    #When the broker clicks delete
     #Then the broker sees the confirmation
     And the broker clicks Delete Quote
     Then the quote should be deleted
@@ -54,26 +54,6 @@ Feature: Create Employee Roster
     And adds a new benefit group
     Then the broker assigns the benefit group to the family
     And the broker saves the quote
-    And Broker logs out
-
-  Scenario: Broker should be able to create a quote
-    Given that a broker exists
-    And the Plans exist
-    And the broker is signed in
-    When he visits the Roster Quoting tool
-    And click on the New Quote button
-    Then the broker enters the quote effective date
-    And broker enters valid information
-    When the broker clicks on the Save Changes button
-    Then the broker should see a successful message
-    And the broker clicks on Back to Quotes button
-    When the broker clicks on quote
-    Then the broker enters Employer Contribution percentages for health plan
-    And the broker filters health plans
-    Then the broker clicks Compare Costs for health plans
-    When the broker selects the Reference Health Plan
-    Then the broker clicks Publish Quote button
-    And the broker sees that the Quote is published
     And Broker logs out
 
   Scenario: Broker should create a quote with health and dental plans
