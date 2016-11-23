@@ -24,7 +24,7 @@
           <tr>
             <td width="140px;" ><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
             <% @household_info[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
-              <td class="<%=aptc_csr_data_type(month)%>"> 
+              <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
                 <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
               </td>
             <%end%>

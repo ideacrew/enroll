@@ -200,6 +200,10 @@ class Household
     end
   end
 
+  def latest_tax_household_with_year(year)
+    tax_households.tax_household_with_year(year).try(:last)
+  end
+
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -309,8 +313,16 @@ class Household
     hbx_enrollments.enrolled
   end
 
-  def hbx_enrollments_with_aptc_by_year(year)
+  def active_hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
+  end
+
+  def hbx_enrollments_with_aptc_by_date(date)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(date.year).gte(effective_on: date)
+  end
+
+  def hbx_enrollments_with_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
   def all_eligibility_determinations
