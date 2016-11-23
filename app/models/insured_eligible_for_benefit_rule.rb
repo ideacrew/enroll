@@ -84,7 +84,7 @@ class InsuredEligibleForBenefitRule
 
   def is_family_relationships_satisfied?
     return true unless relation_ship_with_primary_applicant == 'child'
-    age=TimeKeeper.date_of_record.year - @role.dob.year
+    age=(TimeKeeper.date_of_record.year - @role.dob.year)
     if ((relation_ship_with_primary_applicant == 'child' && age <= 25) ||
         ((age == 26 && @role.person.dob.year+26==TimeKeeper.date_of_record.year) && (@enrollment_kind=='sep' &&
         @role.person.families.first.special_enrollment_periods.last.effective_on.year==TimeKeeper.date_of_record.year)))
