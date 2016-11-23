@@ -469,6 +469,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
@@ -511,6 +512,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         end
 
         it "should get default selected_aptc" do
+          expect(session[:elected_aptc]).to eq 0
+        end
+      end
+
+      context "with tax_household and plan shopping in shop market" do
+        before :each do
+          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(hbx_enrollment).to receive(:kind).and_return 'shop'
+          get :show, id: "hbx_id"
+        end
+
+        it "should get max_aptc" do
+          expect(session[:max_aptc]).to eq 0
+        end
+
+        it "should get default selected_aptc_pct" do
           expect(session[:elected_aptc]).to eq 0
         end
       end

@@ -177,7 +177,7 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5)
     cucumber-wire (0.0.1)
-    database_cleaner (1.5.1)
+    database_cleaner (1.5.3)
     debug_inspector (0.0.2)
     deep_merge (1.0.1)
     descendants_tracker (0.0.4)
@@ -537,7 +537,7 @@ DEPENDENCIES
   combine_pdf
   config (~> 1.0.0)
   cucumber-rails (~> 1.4.2)
-  database_cleaner (= 1.5.1)
+  database_cleaner (= 1.5.3)
   devise (~> 3.4.1)
   email_spec (= 2.0.0)
   eye
