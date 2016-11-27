@@ -1,6 +1,5 @@
+# Embedded model that stores a location address
 class Address
-  # Embedded model that stores an address location
-
   include Mongoid::Document
   include Mongoid::Timestamps
 
