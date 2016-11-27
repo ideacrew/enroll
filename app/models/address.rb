@@ -56,7 +56,7 @@ class Address
     nil #todo
   end
 
-  # Determine if an address is empty
+  # Determine if an address instance is empty 
   #
   # @example Is the address blank?
   #   model.blank?
@@ -184,8 +184,10 @@ class Address
   #
   # Sets the new five or nine digit postal zip code value
   #
-  # @example model.zip = "20002"
-  # @example model.zip = "20002-0001"
+  # @example Set five digit postal zip code
+  #   model.zip = "20002"
+  # @example Set nine digit postal zip code
+  #   model.zip = "20002-0001"
   #
   # @param new_zip [String] the new zip code 
   def zip=(new_zip)
