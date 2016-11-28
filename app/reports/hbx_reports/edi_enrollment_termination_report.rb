@@ -33,8 +33,8 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
         CSV.open(file_name, "w", force_quotes: true) do |csv|
           csv << field_names
           families.each do |family|
-            if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role)
-              hbx_enrollments = family.active_household.hbx_enrollments.select{|hbx| (hbx.coverage_terminated? || hbx.coverage_termination_pending?) && (date_of_termination).cover?(hbx.termination_submitted_on.try(:strftime, '%Y-%m-%d'))}
+            if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role).try(:present?)
+              hbx_enrollments = family.active_household.hbx_enrollments.select{|enrollment| enrollment_for_report?(enrollment) }
               hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
               hbx_enrollment_members.each do |hbx_enrollment_member|
                 if hbx_enrollment_member
@@ -80,12 +80,24 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                           {'$or'=>
                                [{:"aasm_state" => "coverage_terminated"},
                                 {:"aasm_state" => "coverage_termination_pending"}],
-                           :"termination_submitted_on" => date_of_termination}})
+                           "workflow_state_transitions.transition_at" => date_of_termination}})
   end
 
   def date_of_termination
     start_date = ENV['start_date'] ? Date.strptime(ENV['start_date'], '%Y-%m-%d').beginning_of_day : Date.yesterday.beginning_of_day
     end_date = ENV['end_date'] ? Date.strptime(ENV['end_date'], '%Y-%m-%d').beginning_of_day : Date.yesterday.end_of_day
     start_date..end_date
+  end
+
+  def enrollment_for_report?(enrollment)
+    enrollment_state?(enrollment) && enrollment_date?(enrollment)
+  end
+
+  def enrollment_state?(enrollment)
+    enrollment.coverage_terminated? || enrollment.coverage_termination_pending?
+  end
+
+  def enrollment_date?(enrollment)
+    (date_of_termination).cover?(enrollment.workflow_state_transitions.order_by(:transition_at=>"DESC").first.try(:transition_at).try(:strftime, '%Y-%m-%d'))
   end
 end
