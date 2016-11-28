@@ -3,7 +3,7 @@
   plans_2016 = {}
   begin
     file = ARGV[0]
-    csv = CSV.open(file,"r",:headers =>true)
+    csv = CSV.open(file,"r",:headers =>true, :encoding => 'ISO-8859-1')
     @data= csv.to_a
     @data.each do |d|
         enrollment_group_ids << d["policy.eg_id"]
