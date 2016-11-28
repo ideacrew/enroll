@@ -93,7 +93,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_child_26_with_sep_satisfied?
-    (@role.person.dob.year+26 == TimeKeeper.date_of_record.year && @enrollment_kind=='sep' && @role.person.families.first.special_enrollment_periods.last.effective_on.year==TimeKeeper.date_of_record.year) ? true : false
+    (relation_ship_with_primary_applicant == 'child' && @role.dob.year+26 == TimeKeeper.date_of_record.year && @enrollment_kind =='sep' && @role.person.families.first.special_enrollment_periods.last.effective_on.year == TimeKeeper.date_of_record.year) ? true : false
   end
 
   def is_benefit_categories_satisfied?
