@@ -85,7 +85,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
 
   def date_of_termination
     start_date = ENV['start_date'] ? Date.strptime(ENV['start_date'], '%Y-%m-%d').beginning_of_day : Date.yesterday.beginning_of_day
-    end_date = ENV['end_date'] ? Date.strptime(ENV['end_date'], '%Y-%m-%d').beginning_of_day : Date.yesterday.end_of_day
+    end_date = ENV['end_date'] ? Date.strptime(ENV['end_date'], '%Y-%m-%d').end_of_day : Date.yesterday.end_of_day
     start_date..end_date
   end
 
