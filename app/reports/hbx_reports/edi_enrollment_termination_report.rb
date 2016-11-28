@@ -63,7 +63,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                       enrollment.effective_on,
                       enrollment.terminated_on,
                       primary_person.find_relationship_with(person),
-                      enrollment.termination_submitted_on
+                      transition_date(enrollment)
                   ]
                 end
                 processed_count += 1
@@ -98,6 +98,10 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
   end
 
   def enrollment_date?(enrollment)
-    (date_of_termination).cover?(enrollment.workflow_state_transitions.order_by(:transition_at=>"DESC").first.try(:transition_at).try(:strftime, '%Y-%m-%d'))
+    (date_of_termination).cover?(transition_date(enrollment).try(:strftime, '%Y-%m-%d'))
+  end
+
+  def transition_date(enrollment)
+    enrollment.workflow_state_transitions.try(:first).try(:transition_at)
   end
 end
