@@ -138,7 +138,7 @@ group :test do
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'poltergeist'
   gem 'capybara-screenshot'
-  gem 'database_cleaner', '1.5.1'
+  gem 'database_cleaner', '1.5.3'
   gem 'shoulda-matchers', '3.1.1'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
@@ -156,5 +156,5 @@ group :production do
 end
 
 gem 'aws-sdk', '2.2.4'
-gem 'ruby-saml', '~> 1.0.0'
+gem 'ruby-saml', '~> 1.3.0'
 gem 'combine_pdf'

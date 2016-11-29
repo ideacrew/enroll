@@ -7,14 +7,16 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending cobra_eligible cobra_linked cobra_termination_pending)
-  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
+  NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
+  LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
-
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -53,6 +55,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
+  before_save :allow_nil_ssn_updates_dependents
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -69,13 +72,15 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
 
-
-  scope :active,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
-  scope :without_cobra, -> { not_in(aasm_state: COBRA_STATES) }
-  scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
-  scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
-  scope :by_cobra,    ->{ any_in(aasm_state: COBRA_STATES) }
-  scope :pending,  ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_terminated,    ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
+  scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
+  scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
+  scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
+  scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
+  scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -106,7 +111,7 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
-    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['eligible', 'cobra_eligible']})
+    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
@@ -114,14 +119,30 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['employee_role_linked', 'cobra_linked']})
+   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
-
+  
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
+  end
+
+  def is_linked?
+    LINKED_STATES.include?(aasm_state)
+  end
+
+  def is_eligible?
+    ELIGIBLE_STATES.include?(aasm_state)
+  end
+
+  def allow_nil_ssn_updates_dependents
+    census_dependents.each do |cd|
+      if cd.ssn.blank?
+        cd.unset(:encrypted_ssn)
+      end
+    end
   end
 
   def assign_default_benefit_package
@@ -209,7 +230,14 @@ class CensusEmployee < CensusMember
   # TODO: eligibility rule different for active and renewal plan years
   def earliest_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
-    benefit_group_assignment.benefit_group.eligible_on(hired_on) if benefit_group_assignment
+    if benefit_group_assignment
+      benefit_group_assignment.benefit_group.eligible_on(hired_on) 
+    end
+  end
+
+  def newly_eligible_earlist_eligible_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    benefit_group_assignment.benefit_group.start_on 
   end
 
   # def first_name=(new_first_name)
@@ -284,7 +312,7 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
@@ -353,8 +381,9 @@ class CensusEmployee < CensusMember
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
-    rescue
-      nil
+    rescue => e
+      Rails.logger.error { e }
+      false
     else
       self
     end
@@ -367,7 +396,6 @@ class CensusEmployee < CensusMember
       if may_terminate_employee_role?
 
         unless employee_termination_pending?
-
 
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -399,7 +427,7 @@ class CensusEmployee < CensusMember
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
-  end
+    end
 
     self
   end
@@ -525,6 +553,7 @@ class CensusEmployee < CensusMember
 
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
+      CensusEmployee.rebase_newly_designated_employees
     end
 
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
@@ -532,6 +561,14 @@ class CensusEmployee < CensusMember
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employment(census_employee.employment_terminated_on)
       end
+    end
+
+    def rebase_newly_designated_employees
+      return unless TimeKeeper.date_of_record.yday == 1
+      CensusEmployee.where(:"aasm_state".in => NEWLY_DESIGNATED_STATES).each do |employee|
+        employee.rebase_new_designee! if employee.may_rebase_new_designee?
+      end
+      # binding.pry
     end
 
     def find_all_by_employer_profile(employer_profile)
@@ -583,6 +620,8 @@ class CensusEmployee < CensusMember
   aasm do
     state :eligible, initial: true
     state :cobra_eligible
+    state :newly_designated_eligible    # congressional employee state with certain new hire rules 
+    state :newly_designated_linked
     state :employee_role_linked
     state :cobra_linked
     state :employee_termination_pending
@@ -591,32 +630,44 @@ class CensusEmployee < CensusMember
     state :cobra_terminated
     state :rehired
 
+    event :newly_designate, :after => :record_transition do
+      transitions from: :eligible, to: :newly_designated_eligible
+      transitions from: :employee_role_linked, to: :newly_designated_linked
+    end
+
+    event :rebase_new_designee, :after => :record_transition do
+      transitions from: :newly_designated_eligible, to: :eligible
+      transitions from: :newly_designated_linked, to: :employee_role_linked
+    end
+
     event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated, :cobra_eligible, :cobra_linked, :cobra_terminated], to: :rehired
     end
 
     event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
       transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
-      transitions from: :employment_terminated,  to: :cobra_eligible
+      transitions from: :employment_terminated, to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
       transitions from: :cobra_eligible, to: :cobra_linked, guard: :has_benefit_group_assignment?
+      transitions from: :newly_designated_eligible, to: :newly_designated_linked, :guard => :has_benefit_group_assignment?
     end
 
     event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
+      transitions from: :newly_designated_linked, to: :newly_designated_eligible, :after => :clear_employee_role
       transitions from: :cobra_linked, to: :cobra_eligible, after: :clear_employee_role
     end
 
     event :schedule_employee_termination, :after => :record_transition do
-      transitions from: [:employee_termination_pending, :eligible, :employee_role_linked], to: :employee_termination_pending
+      transitions from: [:employee_termination_pending, :eligible, :employee_role_linked, :newly_designated_eligible, :newly_designated_linked], to: :employee_termination_pending
       transitions from: [:cobra_termination_pending, :cobra_eligible, :cobra_linked],  to: :cobra_termination_pending
     end
 
     event :terminate_employee_role, :after => :record_transition do
-      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
+      transitions from: [:eligible, :employee_role_linked, :employee_termination_pending, :newly_designated_eligible, :newly_designated_linked], to: :employment_terminated
       transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
 
@@ -624,7 +675,7 @@ class CensusEmployee < CensusMember
       transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
       transitions from: :employment_terminated,  to: :eligible 
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
-      transitions from: :cobra_terminated,  to: :cobra_eligible
+      transitions from: :cobra_terminated, to: :cobra_eligible
     end
 
   end
@@ -675,10 +726,6 @@ class CensusEmployee < CensusMember
     self.aasm_state = 'cobra_eligible' if cobra == 'true'
   end
 
-  def linked?
-    employee_role_linked? || cobra_linked?
-  end
-
   def is_cobra_status?
     existing_cobra
   end
@@ -725,7 +772,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-
+  
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -772,7 +819,6 @@ class CensusEmployee < CensusMember
     end
   end
 
-
   def no_duplicate_census_dependent_ssns
     dependents_ssn = census_dependents.map(&:ssn).select(&:present?)
     if dependents_ssn.uniq.length != dependents_ssn.length ||
@@ -801,7 +847,7 @@ class CensusEmployee < CensusMember
 
   # SSN and DOB values may be edited only in pre-linked status
   def allow_id_info_changes_only_in_eligible_state
-    if (ssn_changed? || dob_changed?) && (aasm_state != "eligible" && aasm_state != 'cobra_eligible')
+    if (ssn_changed? || dob_changed?) && !ELIGIBLE_STATES.include?(aasm_state)
       message = "An employee's identifying information may change only when in 'eligible' status. "
       errors.add(:base, message)
     end
@@ -820,7 +866,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-
+  
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))

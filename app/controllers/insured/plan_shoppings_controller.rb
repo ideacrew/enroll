@@ -116,7 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
       employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
       coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
       waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-
+      waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
       waived_enrollment.generate_hbx_signature
 
       if waived_enrollment.save!
@@ -163,8 +163,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health"
+    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc

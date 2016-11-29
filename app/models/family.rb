@@ -180,7 +180,6 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
-
   end
 
   def primary_family_member
@@ -445,6 +444,10 @@ class Family
     broker_agency_accounts.detect { |account| account.is_active? }
   end
 
+  def any_unverified_enrollments?
+    enrollments.verification_needed.any?
+  end
+
   class << self
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
@@ -586,6 +589,7 @@ class Family
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
@@ -623,6 +627,7 @@ class Family
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
+
 private
   def build_household
     if households.size == 0

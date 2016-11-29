@@ -372,11 +372,20 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier_name, options = {:width => 50})
-    if carrier_name.present?
-      carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
-      image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  def display_carrier_logo(plan, options = {:width => 50})
+    return "" if !plan.carrier_profile.extract_value.present?
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    else
+      plan.carrier_profile.legal_name.extract_value
     end
+    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def dob_in_words(age, dob)
@@ -464,6 +473,14 @@ module ApplicationHelper
     return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
     return true if object.try(:linked?)  # cannot edit, employer census roster
     return !(object.new_record? or object.try(:eligible?)) # employer census roster
+  end
+
+  def may_update_census_employee?(census_employee)
+    if current_user.roles.include?("hbx_staff") || census_employee.new_record? || census_employee.is_eligible?
+      true
+    else
+      false
+    end
   end
 
   def calculate_participation_minimum
