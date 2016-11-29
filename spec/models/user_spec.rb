@@ -247,10 +247,11 @@ describe User do
 end
 
 describe User do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
   context "get_announcements_by_roles_and_portal" do
-    before :each do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+
+    before do
       Announcement.destroy_all
       Announcement::AUDIENCE_KINDS.each do |kind|
         FactoryGirl.create(:announcement, content: "msg for #{kind}", audiences: [kind])
@@ -318,76 +319,79 @@ describe User do
       end
     end
   end
+end
 
 describe "orphans" do
-    let(:person) { create :person }
-    let(:user) { create :user, person: person }
+  let(:person) { create :person }
+  let(:user) { create :user, person: person }
 
-    before do
-      User.destroy_all
-    end
+  before do
+    User.destroy_all
+  end
 
-    context "when users have person associated" do
-      it "should return no orphans" do
-        user.save!
-        expect(User.orphans).to eq []
-      end
-    end
-
-    context "when a user does NOT have a person associated", dbclean: :after_each do
-      let(:orphaned_user) { FactoryGirl.create(:user) }
-
-      it "should return the orphaned user" do
-        orphaned_user.save!
-        expect(User.orphans).to eq [orphaned_user]
-      end
-    end
-
-    context "when more than one user does not have a person associated", dbclean: :after_each do
-      let(:orphaned_user1) { FactoryGirl.create(:user, email: "zzz@mail.com") }
-      let(:orphaned_user2) { FactoryGirl.create(:user, email: "aaa@mail.com") }
-      let(:orphaned_users) { [orphaned_user1, orphaned_user2] }
-
-      before do
-        orphaned_users
-      end
-
-      it "should return the orphaned user" do
-        expect(User.orphans).to eq orphaned_users.reverse
-      end
-
-      it "should return orphans with email ASC" do
-        expect(User.orphans.first.email).to eq orphaned_user2.email
-      end
+  context "when users have person associated" do
+    it "should return no orphans" do
+      user.save!
+      expect(User.orphans).to eq []
     end
   end
 
-  describe "can_change_broker?" do
-    context "with user" do
-      it "should return true when hbx staff" do
-        user.roles = ['hbx_staff']
-        expect(user.can_change_broker?).to eq true
-      end
+  context "when a user does NOT have a person associated", dbclean: :after_each do
+    let(:orphaned_user) { FactoryGirl.create(:user) }
 
-      it "should return true when employer staff" do
-        allow(person).to receive(:has_active_employer_staff_role?).and_return true
-        expect(user.can_change_broker?).to eq true
-      end
+    it "should return the orphaned user" do
+      orphaned_user.save!
+      expect(User.orphans).to eq [orphaned_user]
+    end
+  end
 
-      it "should return false when broker role" do
-        user.roles = ['broker']
-        expect(user.can_change_broker?).to eq false
-      end
+  context "when more than one user does not have a person associated", dbclean: :after_each do
+    let(:orphaned_user1) { FactoryGirl.create(:user, email: "zzz@mail.com") }
+    let(:orphaned_user2) { FactoryGirl.create(:user, email: "aaa@mail.com") }
+    let(:orphaned_users) { [orphaned_user1, orphaned_user2] }
 
-      it "should return false when broker agency staff" do
-        user.roles = ['broker_agency_staff']
-        expect(user.can_change_broker?).to eq false
-      end
+    before do
+      orphaned_users
+    end
 
-      it "should return false when general agency staff" do
-        user.roles = ['general_agency_staff']
-        expect(user.can_change_broker?).to eq false
-      end
+    it "should return the orphaned user" do
+      expect(User.orphans).to eq orphaned_users.reverse
+    end
+
+    it "should return orphans with email ASC" do
+      expect(User.orphans.first.email).to eq orphaned_user2.email
+    end
+  end
+end
+
+describe "can_change_broker?" do
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+
+  context "with user" do
+    it "should return true when hbx staff" do
+      user.roles = ['hbx_staff']
+      expect(user.can_change_broker?).to eq true
+    end
+
+    it "should return true when employer staff" do
+      allow(person).to receive(:has_active_employer_staff_role?).and_return true
+      expect(user.can_change_broker?).to eq true
+    end
+
+    it "should return false when broker role" do
+      user.roles = ['broker']
+      expect(user.can_change_broker?).to eq false
+    end
+
+    it "should return false when broker agency staff" do
+      user.roles = ['broker_agency_staff']
+      expect(user.can_change_broker?).to eq false
+    end
+
+    it "should return false when general agency staff" do
+      user.roles = ['general_agency_staff']
+      expect(user.can_change_broker?).to eq false
     end
   end
 end

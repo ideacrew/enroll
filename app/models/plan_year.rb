@@ -922,6 +922,7 @@ private
   end
 
   def trigger_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
     shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
                                                   :subject => "PlanYear Renewal Notice(3A)",
@@ -931,6 +932,7 @@ private
   end
 
   def trigger_auto_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
     shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
                                                   :subject => "PlanYear Renewal Notice(3B)",
@@ -948,6 +950,7 @@ private
   end
 
   def send_employee_invites
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|
