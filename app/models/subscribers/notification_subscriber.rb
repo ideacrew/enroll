@@ -11,9 +11,11 @@ module Subscribers
       log("NOTICE EVENT: #{event_name} #{payload}", {:severity => 'info'})
       application_event_kinds.each do |aek|
         begin
+          log("strating to execute_notices")
           aek.execute_notices(event_name, payload)
-        rescue
-          # ADD LOGGING AND HANDLING
+          log("execute_notices finished")
+        rescue => e
+          log("Failied to execute_notices #{e} #{e.backtrace}")
         end
       end
     end
