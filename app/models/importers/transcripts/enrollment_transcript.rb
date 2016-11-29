@@ -96,8 +96,28 @@ module Importers::Transcripts
             end
           end
 
-          if @canceled
-            @enrollment.invalidate_enrollment! if @enrollment.present? && @enrollment.may_invalidate_enrollment?
+          if @enrollment.present?
+            if !@transcript[:source_is_new] && @enrollment.updated_at <= Date.new(2016,11,9)
+              if @canceled
+                @enrollment.invalidate_enrollment! if @enrollment.may_invalidate_enrollment?
+              elsif @other_enrollment.terminated_on.present? 
+                if HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state)
+                  puts "should be termed #{@enrollment.hbx_id}"
+                  if @enrollment.may_terminate_coverage?
+                    @enrollment.update!(terminated_on: @other_enrollment.terminated_on)
+                    @enrollment.terminate_coverage!
+                    @updates['match:enrollment'] = ["Success", "Terminated #{@enrollment.hbx_id}."]
+                  else
+                    @updates['match:enrollment'] = ["Failed", "Terminated #{@enrollment.hbx_id}."]
+                  end
+                end
+              elsif HbxEnrollment::TERMINATED_STATUSES.include?(@enrollment.aasm_state)
+                puts "should be active #{@enrollment.hbx_id}"
+                @enrollment.update!(terminated_on: nil)
+                @enrollment.update!(aasm_state: 'coverage_selected')
+                @updates['match:enrollment'] = ["Success", "Made #{@enrollment.hbx_id} coverage selected."]
+              end
+            end
           end
         rescue Exception => e
           @updates[:update_failed] = ['Merge Failed', e.to_s]
@@ -155,11 +175,11 @@ module Importers::Transcripts
 
           attributes.each do |attribute, value|
             # TODO: should we ignore this
-            if section == :base && action == 'update' && attribute == 'effective_on'
-              if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
-                raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
-              end
-            end
+            # if section == :base && action == 'update' && attribute == 'effective_on'
+            #   if @enrollment.coverage_terminated? || @enrollment.coverage_canceled?
+            #     raise "Update failed. Enrollment is in #{@enrollment.aasm_state.camelcase} state."
+            #   end
+            # end
 
             if section == :plan && action == 'add'
               @plan = Plan.where(hios_id: @other_enrollment.plan.hios_id, active_year: @other_enrollment.plan.active_year).first
@@ -170,6 +190,11 @@ module Importers::Transcripts
 
             if section == :hbx_enrollment_members
               if action != 'remove'
+
+                if @enrollment.updated_at > Date.new(2016,11,9)
+                  raise "Enrollment last updated on #{@enrollment.updated_at.strftime('%m/%d/%Y')}."
+                end
+
                 hbx_id = (action == 'add' ? value["hbx_id"] : attribute.split(':')[1])            
                 enrollment_member = @other_enrollment.hbx_enrollment_members.detect{|em| em.hbx_id == hbx_id}
 
@@ -452,6 +477,7 @@ module Importers::Transcripts
         hbx_enrollment.aasm_state = 'coverage_selected'
 
         @other_enrollment.hbx_enrollment_members.each do |member| 
+
           matched_people = match_person_instance(member.family_member.person)
 
           if matched_people.size > 1

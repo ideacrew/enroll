@@ -56,8 +56,8 @@ module Transcripts
         {
           :hbx_id => record.family_member.hbx_id,
           :is_subscriber => record.is_subscriber,
-          :coverage_start_on => record.coverage_start_on,
-          :coverage_end_on => record.coverage_end_on
+          :coverage_start_on => record.coverage_start_on
+          # :coverage_end_on => record.coverage_end_on
           # :premium_amount => (record.persisted? ? record.hbx_enrollment.premium_for(record) : record.premium_amount.to_f)
           # :applied_aptc_amount => record.applied_aptc_amount
         }
@@ -87,7 +87,7 @@ module Transcripts
 
       if @enrollment.present?
         if (enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on)
-          @duplicate_coverages << @enrollment
+          @duplicate_coverages << @enrollment if (HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state) || @enrollment.coverage_terminated?)
           @enrollment = nil
         end
       end

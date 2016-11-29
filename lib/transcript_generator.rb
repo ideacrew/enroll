@@ -53,7 +53,7 @@ class TranscriptGenerator
   def display_enrollment_transcripts
     count  = 0
 
-    CSV.open("#{@market}_enrollment_change_sets.csv", "w") do |csv|
+    CSV.open("#{@market}_enrollment_change_sets_#{Time.now.strftime("%m_%d_%Y_%H_%M")}.csv", "w") do |csv|
       if @market == 'individual'
         csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Action', 'Section:Attribute', 'Value']
       else
@@ -63,6 +63,10 @@ class TranscriptGenerator
       starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
       Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
+
+      # CSV.foreach("enrollments_edi_active_missing_in_EA.csv", headers: :true) do |row|
+      #   file_path = "#{Rails.root}/LatestXmlFiles/ivl_final/#{row["Enrollment HBX ID"].strip}.xml"
+
         begin
           count += 1
 
@@ -70,7 +74,7 @@ class TranscriptGenerator
 
           individual_parser = Parsers::Xml::Cv::Importers::EnrollmentParser.new(File.read(file_path))
           other_enrollment = individual_parser.get_enrollment_object
-          transcript = Transcripts::EnrollmentTranscript.new
+          transcript = Transcripts::EnrollmentTranscript.new          
           transcript.shop = (@market == 'shop')
           transcript.find_or_build(other_enrollment)
 
@@ -95,7 +99,7 @@ class TranscriptGenerator
 
           if rows.empty?
             if @market == 'individual'
-              csv << (first_row[0..9] + ['match', 'match:enrollment'])
+              csv << (first_row[0..9] + ['match', 'match:enrollment'] + [''] + enrollment_transcript.updates['match:enrollment'])
             else
               csv << (first_row[0..11] + ['match', 'match:enrollment'])
             end

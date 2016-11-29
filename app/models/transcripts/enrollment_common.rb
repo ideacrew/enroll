@@ -38,7 +38,7 @@ module Transcripts
         :kind => enrollment.kind,
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
         }).order_by(:effective_on.asc)
-        .select{|e| e.plan.active_year == enrollment.plan.active_year}.reject{|en| en.void?}
+        .select{|e| e.plan.active_year == enrollment.plan.active_year} #.reject{|en| en.void?}
         .reject{|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id != enrollment.subscriber.hbx_id)}
     end
 
