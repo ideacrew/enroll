@@ -469,6 +469,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(person).to receive(:active_employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -485,6 +486,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -501,6 +503,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
