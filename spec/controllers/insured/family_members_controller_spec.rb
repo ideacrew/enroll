@@ -1,16 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController do
-  let(:family) { double }
-  let(:published_plan_year) { double}
-  let(:user) { instance_double("User", :primary_family => family, :person => person) }
-  let(:person) { double(:employee_roles => [], :primary_family => family) }
-  let(:employee_role_id) { "2343" }
-  let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
-  let(:fm) { FactoryGirl.build(:family, :with_primary_family_member) }
-  let(:employee_role){ double("EmployeeRole", id: double("id")) }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
@@ -78,9 +68,7 @@ RSpec.describe Insured::FamilyMembersController do
     it "with qle_id" do
       allow(person).to receive(:primary_family).and_return(test_family)
       allow(person).to receive(:broker_role).and_return(nil)
-      allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:save!).and_return(true)
-      allow(employee_role).to receive(:census_employee).and_return(census_employee)
 
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user

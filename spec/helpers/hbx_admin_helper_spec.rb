@@ -23,13 +23,14 @@ RSpec.describe HbxAdminHelper, :type => :helper do
     context "returns the correct class for td styling for current and past " do
       let(:past_month) {TimeKeeper.date_of_record.month - 1}
       let(:current_month) {TimeKeeper.date_of_record.month}
+      let(:current_year) {TimeKeeper.date_of_record.year}
 
       it "returns the past-aptc-csr-data class for past_month" do
-        expect(helper.aptc_csr_data_type(past_month)).to eq "past-aptc-csr-data"
+        expect(helper.aptc_csr_data_type(current_year, past_month)).to eq "past-aptc-csr-data"
       end
 
       it "returns the current-aptc-csr-data class for current_month" do
-        expect(helper.aptc_csr_data_type(current_month)).to eq "past-aptc-csr-data"
+        expect(helper.aptc_csr_data_type(current_year, current_month)).to eq "past-aptc-csr-data"
       end
     end
   end

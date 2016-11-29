@@ -4,14 +4,17 @@ require 'rails_helper'
 RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
     let(:person) { FactoryGirl.create(:person, :with_family ) }
     let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:year) { TimeKeeper.date_of_record.year }
     
     before :each do
       sign_in(user)
       assign(:person, person)
       assign(:family, person.primary_family)
       assign(:months_array,  Date::ABBR_MONTHNAMES.compact)
-      assign(:household_info, Admin::Aptc.build_household_level_aptc_csr_data(person.primary_family, [])) # Case with no Enrollment
+      assign(:household_info, Admin::Aptc.build_household_level_aptc_csr_data(year, person.primary_family, [])) # Case with no Enrollment
       assign(:household_members, [{ person.id =>[102.0, 102.0] }] )
+      assign(:year_options, [2016, 2017])
+      assign(:current_year, 2016)
       family = person.primary_family
       active_household = family.households.first
       hbx_enrollments = active_household.hbx_enrollments

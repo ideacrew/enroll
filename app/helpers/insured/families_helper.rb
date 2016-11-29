@@ -140,7 +140,7 @@ module Insured::FamiliesHelper
   end
 
   def all_active_enrollment_with_aptc(family)
-    family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+    family.active_household.active_hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
   end
 
   def hbx_member_names(hbx_enrollment_members)

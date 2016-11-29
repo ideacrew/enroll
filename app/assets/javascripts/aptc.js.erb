@@ -4,6 +4,7 @@ var APTCModule = ( function( window, undefined ) {
   function calculateAvailableAPTC(caller_input) {
     var person_id = $("#person_person_id").val();
     var family_id = $("#person_family_id").val();
+    var year = $("#year").val();
 
     // Household / Eligibility Stuff
     //alert($('input#max_aptc').val());
@@ -26,7 +27,7 @@ var APTCModule = ( function( window, undefined ) {
 
     $.ajax({
       type: "GET",
-      data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, applied_aptcs_array: applied_aptcs_array},
+      data:{person_id: person_id, family_id: family_id, max_aptc: max_aptc, csr_percentage: csr_percentage, applied_aptcs_array: applied_aptcs_array, year: year},
       url: "/hbx_admin/calculate_aptc_csr",
       success: function (d) {
           //$('#loading').html("");
@@ -35,13 +36,30 @@ var APTCModule = ( function( window, undefined ) {
   }
 
   // RESET
+  function change_year()  { 
+    var person_id = $("#person_person_id").val();
+    var family_id = $("#person_family_id").val();
+    var year = $("#year").val();
+    $('#reset-aptc').html("<i class=\'fa fa-spinner fa-spin fa-2x\'> </i> &nbsp;&nbsp; <b>Resetting Data By Year...</b>");
+    $.ajax({
+      type: "GET",
+      data:{person_id: person_id, family_id: family_id, year: year},
+      url: "/hbx_admin/edit_aptc_csr",
+      success: function (d) {
+        $('#loading').html("");
+      }
+    });
+  }
+
+  // Change year
   function resetFormData()  { 
     var person_id = $("#person_person_id").val();
     var family_id = $("#person_family_id").val();
+    var year = $("#year").val();
     $('#reset-aptc').html("<i class=\'fa fa-spinner fa-spin fa-2x\'> </i> &nbsp;&nbsp; <b>Resetting Data...</b>");
     $.ajax({
       type: "GET",
-      data:{person_id: person_id, family_id: family_id},
+      data:{person_id: person_id, family_id: family_id, year: year},
       url: "/hbx_admin/edit_aptc_csr",
       success: function (d) {
               $('#loading').html("");
@@ -81,7 +99,8 @@ var APTCModule = ( function( window, undefined ) {
     calculateAvailableAPTC : calculateAvailableAPTC,
     computeAppliedAPTC : computeAppliedAPTC,
     computePercentageAndSliderRatio : computePercentageAndSliderRatio,
-    resetFormData : resetFormData
+    resetFormData : resetFormData,
+    change_year: change_year,
   };
 
 } )( window );

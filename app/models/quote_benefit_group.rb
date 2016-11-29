@@ -147,15 +147,15 @@ class QuoteBenefitGroup
     combined_family = flat_roster_for_premiums
     quote_collection = Plan.shop_plans coverage_kind, quote.plan_year
     quote_collection.each {|plan|
-      @plan_costs[plan.id.to_s] = roster_premium(plan, combined_family)
+      @plan_costs[plan.id.to_s] = roster_premium(plan)
     }
     @plan_costs
   end
 
-  def roster_premium(plan, combined_family)
+  def roster_premium(plan)
     pcd = PlanCostDecoratorQuote.new(plan, nil, self, plan)
     reference_date = pcd.plan_year_start_on
-    pcd.add_premiums(combined_family, reference_date)
+    pcd.add_premiums(flat_roster_for_premiums, reference_date)
   end
 
   def flat_roster_for_premiums

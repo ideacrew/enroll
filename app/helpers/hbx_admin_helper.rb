@@ -27,9 +27,9 @@ module HbxAdminHelper
   	end
   end
 
-  def aptc_csr_data_type(month)
+  def aptc_csr_data_type(year=TimeKeeper.date_of_record.year, month)
     month_num = Date::ABBR_MONTHNAMES.index(month.to_s.capitalize || month.to_s)
-    this_month_date = Date.parse("#{TimeKeeper.date_of_record.year}-#{month_num}-01")
+    this_month_date = Date.parse("#{year}-#{month_num}-01")
     todays_date = TimeKeeper.date_of_record
     if this_month_date < todays_date
       td_style = 'past-aptc-csr-data'
