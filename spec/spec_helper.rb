@@ -88,11 +88,5 @@ RSpec.configure do |config|
   RSpec.configure do |config|
     config.include FactoryGirl::Syntax::Methods
   end
-
-  config.after(:all) do
-    if Rails.env.test?
-      FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report"])
-    end
-  end
 end
 require 'pundit/rspec'

@@ -81,4 +81,8 @@ describe TerminatedHbxEnrollments do
   it_behaves_like "returns csv file list with terminated hbx_enrollments", 'Coverage_Type', "health"
   it_behaves_like "returns csv file list with terminated hbx_enrollments", 'Enrollment_State', "coverage_terminated"
   it_behaves_like "returns csv file list with terminated hbx_enrollments", 'Market_Kind', "employer_sponsored"
+
+  after(:all) do
+    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report"])
+  end
 end
