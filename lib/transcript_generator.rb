@@ -89,7 +89,7 @@ class TranscriptGenerator
 
           if @market == 'individual'
             enrollment_removes = rows.select{|row| row[10] == 'remove' && row[11] == 'enrollment:hbx_id'}
-            rows.reject!{|row| row[10] == 'update' && row[12].blank?}
+            rows.reject!{|row| row[10] == 'update' && row[12].blank? && row[13].blank?}
             rows.reject!{|row| row[10] == 'remove' && row[11] == 'enrollment:hbx_id'}
           else
             enrollment_removes = rows.select{|row| row[11] == 'remove' && row[12] == 'enrollment:hbx_id'}
@@ -99,7 +99,7 @@ class TranscriptGenerator
 
           if rows.empty?
             if @market == 'individual'
-              csv << (first_row[0..9] + ['match', 'match:enrollment'] + [''] + enrollment_transcript.updates['match:enrollment'])
+              csv << (first_row[0..9] + ['match', 'match:enrollment'] + [''] + enrollment_transcript.updates['match:enrollment'].to_a)
             else
               csv << (first_row[0..11] + ['match', 'match:enrollment'])
             end
