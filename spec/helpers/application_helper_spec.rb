@@ -169,7 +169,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "census_employee cannot edit if linked to an employer" do
       expect(user).to receive(:roles).and_return(["employee"])
-      expect(census_employee).to receive(:is_linked?).and_return(true)
       expect(helper.may_update_census_employee?(census_employee)).to eq false # readonly -> true
     end
 

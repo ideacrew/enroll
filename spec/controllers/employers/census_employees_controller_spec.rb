@@ -446,7 +446,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:update_for_cobra).and_return false
           xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
           expect(response).to have_http_status(:success)
-          expect(flash[:error]).to eq "Please check cobra date."
+          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee. Please contact DC Health Link at 855-532-5465 for further assistance."
         end
       end
 

@@ -198,7 +198,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "Please check cobra date."
+        flash[:error] = "COBRA cannot be initiated for this employee. Please contact DC Health Link at 855-532-5465 for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."
