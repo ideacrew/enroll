@@ -17,6 +17,7 @@
           DOB
           Gender
           Primary_Person_Record_Create_Date
+          Type
          )
        count = 0
        file_name = "#{Rails.root}/public/primary_subscribers_data_with_e_case_id.csv"
@@ -34,14 +35,31 @@
               person.first_name,
               person.last_name,
               person.hbx_id,
-              person.ssn, 
+              person.ssn,
               person.dob,
               person.gender,
-              person.created_at
+              person.created_at,
+              "Primary"
              ]
+             
+             family.dependents.each do |dependent|
+              dependent_person = dependent.person
+              csv << [
+                  family.e_case_id,
+                  dependent_person.first_name,
+                  dependent_person.last_name,
+                  dependent_person.hbx_id,
+                  dependent_person.ssn,
+                  dependent_person.dob,
+                  dependent_person.gender,
+                  dependent_person.created_at,
+                  "Dependent"
+              ]
+
+             end
             count += 1
           rescue
-            puts "Bad Person record with id: #{person.id}"
+            puts "Bad Family record with id: #{family.id}"
           end
         end
       end
