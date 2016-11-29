@@ -31,7 +31,7 @@ class HbxAdminController < ApplicationController
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(year.to_i)
-    if @family.present?
+    if @family.present? && TimeKeeper.date_of_record.year == year
       @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs)
       @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(params)
     end

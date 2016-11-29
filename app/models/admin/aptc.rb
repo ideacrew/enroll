@@ -25,7 +25,7 @@ class Admin::Aptc < ApplicationController
         total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes. 
       end
       #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
-      max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f - b_value.to_f) }
+      max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f > b_value.to_f ? (a_value.to_f - b_value.to_f) : 0) }
     end
 
     def build_household_members(year, family, max_aptc=nil)

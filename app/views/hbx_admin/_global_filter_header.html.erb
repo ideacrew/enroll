@@ -2,7 +2,6 @@
   <tr>
     <td align="right"><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span></td>
     <td align="left">
-      <%#= select_year(@current_year, :start_year => TimeKeeper.date_of_record.year, :end_year => TimeKeeper.date_of_record.year + 1, :prefix => "year", :discard_type => true, :onchange => "APTCModule.change_year()") %>
       <%= select_tag('year', options_for_select(@year_options, @current_year), onchange: "APTCModule.change_year()") %>
     </td>
     <td align="center" class="calculate_available_aptc">
