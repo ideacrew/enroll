@@ -20,6 +20,8 @@ require 'csv'
            Max_APTC
            CSR_percentage
            Is_Medicaid_Chip_Eligible
+           Health_Enrollment
+           Dental_Enrollment
            Gender
            Home_Phone_Number
            Work_Phone_Number
@@ -46,6 +48,11 @@ require 'csv'
             tax_household_member = person.primary_family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.person.id == person.id } if person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
             is_medicaid_chip_eligible = tax_household_member.try(:is_medicaid_chip_eligible).present? ? "Yes" : "No"
             is_applied_for_assistance = person.try(:primary_family).try(:e_case_id).present? ?  "Yes" : "No"
+            enrollments = person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
+            health_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "health").first if enrollments.present?
+            dental_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "dental").first if enrollments.present?
+            health_enrollment = health_enr.present? ? (health_enr.kind == "employer_sponsored" ? "SHOP" : (health_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssited QHP"))  : "No Active Health Enrollment"
+            dental_enrollment = dental_enr.present? ? (dental_enr.kind == "employer_sponsored" ? "SHOP" : (dental_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssited QHP")) : "No Active Dental Enrollment"
             csv << [
               person.hbx_id,
               person.last_name,
@@ -57,6 +64,8 @@ require 'csv'
               person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:max_aptc),
               person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_percent_as_integer),
               is_medicaid_chip_eligible,
+              health_enrollment,
+              dental_enrollment,
               person.gender,
               person.home_phone,
               person.work_phone,
