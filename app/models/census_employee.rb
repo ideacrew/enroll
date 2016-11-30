@@ -17,7 +17,7 @@ class CensusEmployee < CensusMember
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
