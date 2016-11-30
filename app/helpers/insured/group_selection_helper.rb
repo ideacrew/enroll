@@ -24,9 +24,9 @@ module Insured
       end
     end
 
-    def self.flag(person, family, employee_role)
-      exp = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(person.primary_family.current_sep.effective_on)}.present? && person.primary_family.current_sep.effective_on_kind == "date_of_event" && employee_role.employer_profile.active_plan_year.present? 
-      exp && family.current_sep.effective_on < employee_role.employer_profile.active_plan_year.start_on
-    end
+    # def self.flag(person, family, employee_role)
+    #   exp = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(person.primary_family.current_sep.effective_on)}.present? && employee_role.employer_profile.active_plan_year.present? 
+    #   exp && family.current_sep.effective_on < employee_role.employer_profile.active_plan_year.start_on
+    # end
   end
 end
