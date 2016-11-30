@@ -1286,7 +1286,7 @@ class HbxEnrollment
  end
 
  def plan_year_check(employee_role)
-  covered_plan_year(employee_role).present? && family.current_sep.effective_on < employee_role.employer_profile.active_plan_year.start_on
+  covered_plan_year(employee_role).present?
  end
 
  def covered_plan_year(employee_role)
