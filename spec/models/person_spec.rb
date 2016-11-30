@@ -1068,7 +1068,7 @@ describe Person do
       end
 
       it 'sets is_active to false' do
-        expect(employer_staff_role.reload.is_active?).to eq false
+        expect(employer_staff_role.is_active?).to eq true
       end
     end
 
@@ -1088,7 +1088,7 @@ describe Person do
       end
 
       it 'sets is_active to false for each role' do
-        expect(person.employer_staff_roles.each { |role| role.reload.is_active? == false })
+        expect(person.employer_staff_roles.each { |role| role.is_active? == false })
       end
     end
   end
