@@ -1,7 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require 'csv'
 
-class PrimarySubscribersDataWithECaseId < MongoidMigrationTask
+class PrimaryFamilyMembersDataWithECaseId < MongoidMigrationTask
   def migrate
     field_names  = %w(
           Integrated_Case_ID_(e_case_id)
@@ -15,7 +15,7 @@ class PrimarySubscribersDataWithECaseId < MongoidMigrationTask
           Type
          )
        count = 0
-       file_name = "#{Rails.root}/public/primary_subscribers_data_with_e_case_id.csv"
+       file_name = "#{Rails.root}/public/primary_family_members_data_with_e_case_id.csv"
  
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names
@@ -33,7 +33,7 @@ class PrimarySubscribersDataWithECaseId < MongoidMigrationTask
               person.ssn,
               person.dob,
               person.gender,
-              person.created_at,
+              person.created_at.to_date,
               "Primary"
              ]
              
@@ -47,7 +47,7 @@ class PrimarySubscribersDataWithECaseId < MongoidMigrationTask
                   dependent_person.ssn,
                   dependent_person.dob,
                   dependent_person.gender,
-                  dependent_person.created_at,
+                  dependent_person.created_at.to_date,
                   "Dependent"
               ]
 

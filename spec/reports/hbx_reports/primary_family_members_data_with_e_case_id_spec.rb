@@ -1,11 +1,11 @@
 require "rails_helper"
 require 'csv'
-require File.join(Rails.root, "app", "reports", "hbx_reports", "primary_subscribers_data_with_e_case_id")
+require File.join(Rails.root, "app", "reports", "hbx_reports", "primary_family_members_data_with_e_case_id")
 
-describe PrimarySubscribersDataWithECaseId do
+describe PrimaryFamilyMembersDataWithECaseId do
 
   let(:given_task_name) { "with_e_case_id" }
-  subject { PrimarySubscribersDataWithECaseId.new(given_task_name, double(:current_scope => nil)) }
+  subject { PrimaryFamilyMembersDataWithECaseId.new(given_task_name, double(:current_scope => nil)) }
   let(:person1) {FactoryGirl.create(:person,
                                     :with_consumer_role,
                                     first_name: "f_name1",
@@ -33,7 +33,7 @@ describe PrimarySubscribersDataWithECaseId do
    shared_examples_for "returns csv file list of families with e_case_id" do |field_name, result|
      before :each do
        subject.migrate
-       @file = "#{Rails.root}/public/primary_subscribers_data_with_e_case_id.csv"
+       @file = "#{Rails.root}/public/primary_family_members_data_with_e_case_id.csv"
      end
  
      it "check the records included in file" do

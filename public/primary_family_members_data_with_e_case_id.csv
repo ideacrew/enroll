@@ -1,0 +1,5 @@
+"Integrated_Case_ID_(e_case_id)","Subscriber_FN","Subscriber_LN","HBX_ID","SSN","DOB","Gender","Primary_Person_Record_Create_Date","Type"
+"ID#1","Soren","White","3382429","670991234","08/13/1979","male","05/19/2016","Primary"
+"ID#1","Soren","White","234113","","07/03/2014","male","05/19/2016","Dependent"
+"ID#1","Katherine","White","234112","004991234","05/12/1968","female","05/19/2016","Dependent"
+"ID#1","Charles","White","3383180","678991234","12/30/2010","male","05/19/2016","Dependent"
