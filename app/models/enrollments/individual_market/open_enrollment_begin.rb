@@ -32,14 +32,14 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
     end
 
-    # def is_individual_assisted?(enrollment)
-    #   enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
-    # end
+    def is_individual_assisted?(enrollment)
+      enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
+    end
 
-    # def is_csr?(enrollment)
-    #   csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
-    #   (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
-    # end
+    def is_csr?(enrollment)
+      csr_plan_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
+      (enrollment.plan.metal_level == "silver") && (csr_plan_variants.include?(enrollment.plan.csr_variant_id))
+    end
 
     # def eligible_to_get_assistance?(enrollment)
     #   if @assisted_individuals[enrollment.subscriber.hbx_id]
@@ -132,6 +132,64 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       enrollment_renewal.enrollment = enrollment
       enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
       enrollment_renewal.renew
+    end
+
+    def active_enrollment_from_family(enrollment)
+      enrollment.family.active_household.hbx_enrollments.where({
+        :kind => 'individual',
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
+        :coverage_kind => enrollment.coverage_kind
+      })
+    end
+
+    def process_missing_enrollments
+      count = 0
+
+      CSV.open("#{Rails.root}/IVL_Enrollment_Renewals.csv", "w") do |csv|
+
+        csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
+          "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute", "Result"]
+
+        current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+        renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+        CSV.foreach("#{Rails.root}/individual_enrollment_change_sets_11_29_2016_19_56.csv", headers: true, :encoding => 'utf-8') do |row|
+          count += 1
+          next unless count > 10
+          if count % 100 == 0
+            puts "Found #{count} enrollments"
+          end
+
+          enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBX ID"]).first
+
+          hbx_enrollments = active_enrollment_from_family(enrollment).reject{|en| en.subscriber.present? && enrollment.subscriber.present? && en.subscriber.hbx_id != enrollment.subscriber.hbx_id }
+
+          current_coverages = hbx_enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on) }
+          renewal_coverages = hbx_enrollments.select{|en| renewal_benefit_coverage_period.contains?(en.effective_on) }
+
+          status = if current_coverages.blank?
+            ["Renewal Failed: Unable to find matching enrollment."] 
+          elsif current_coverages.size > 1
+            ["Renewal Failed: found multiple active enrollments."] 
+          elsif renewal_coverages.present?
+            en = renewal_coverages.first
+            ["Renewal Failed: Already got #{en.effective_on.year} coverage with #{en.aasm_state.camelcase} status."]
+          elsif is_individual_assisted?(current_coverages.first)
+            ["Renewal Failed: Assisted Enrollment."]
+          else
+            begin
+              process_enrollment_renewal(current_coverages.first, renewal_benefit_coverage_period)
+              ["Renewal Successful."]
+            rescue Exception => e
+              ["Renewal Failed: #{e.tos}."]
+            end
+          end
+
+          csv << (row.to_h.values + status)
+        end
+
+        puts count
+      end
     end
 
     def process_from_sheet
