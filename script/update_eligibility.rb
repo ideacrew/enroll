@@ -3,6 +3,54 @@ require 'csv'
 @slcsp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.slcsp_id
 @wrong_ssn_counter = 0
 
+def check_duplicated
+  valid_people = {}
+  dupes = {}
+  not_found = []
+  stranges = []
+
+  CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
+    ssn, hbx_id, aptc, csr = row_with_ssn
+    if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
+      ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
+      person = Person.by_ssn(ssn).first rescue nil
+    end
+
+    unless person
+      person = Person.by_hbx_id(hbx_id).first rescue nil
+    end
+
+    if hbx_id.present? && person.present?
+      person_by_hbx = Person.by_hbx_id(hbx_id).first rescue nil
+      if person_by_hbx.present? && person_by_hbx.id != person.id
+        stranges << {ssn: ssn, hbx_id: hbx_id}
+        puts "Person with ssn: #{ssn} and hbx_id: #{hbx_id} is not the same one."
+      end
+    end
+
+    if person.present?
+      matched = valid_people[person.ssn]
+      if matched
+        matched_from_dupes = dupes[person.ssn]
+        if matched_from_dupes
+          dupes[person.ssn] += matched
+        else
+          dupes[person.ssn] = matched + [{ssn: ssn, hbx_id: hbx_id}]
+        end
+        puts "Person with ssn: #{ssn}, hbx_id: #{hbx_id} is duplicated."
+      else
+        valid_people[person.ssn] = [{ssn: ssn, hbx_id: hbx_id}]
+      end
+    else
+      not_found << {ssn: ssn, hbx_id: hbx_id}
+      puts "Person with ssn: #{ssn} can't be found."
+    end
+  end
+  {dupes: {count: dupes.values.map(&:count).inject(&:+), rs: dupes},
+   mismatched: {count: stranges.count, rs: stranges},
+   not_found: {count: not_found.count, rs: not_found}}
+end
+
 def check_and_run
   ran = []
   not_run = []
