@@ -638,11 +638,13 @@ class Family
   end
 
   class << self
+    # Set the sort order to return families by primary applicant last_name, first_name
     def default_search_order
-      [
-          ["primary_applicant.name_last", 1],
-          ["primary_applicant.name_first", 1]
-      ]
+      [["primary_applicant.name_last", 1], ["primary_applicant.name_first", 1]]
+    end
+
+    def find_by_employee_role(employee_role)
+      find_all_by_primary_applicant(employee_role.person).first
     end
 
     def find_or_build_from_employee_role(new_employee_role)
@@ -679,12 +681,11 @@ class Family
     # @deprecated Use find_primary_applicant_by_person
     alias_method :find_by_primary_family_member, :find_primary_applicant_by_person
 
-    def find_by_employee_role(employee_role)
-      find_all_by_primary_applicant(employee_role.person).first
-    end
-
-    def find_by_case_id(case_id)
-      where({"e_case_id" => case_id}).first
+    # Get the family(s) with this eligibility case identifier
+    # @param id [ String ] Eligibility case ID to match 
+    # @return [ Array<Family> ] The families with this eligibilitye case id 
+    def find_by_case_id(id)
+      where({"e_case_id" => id}).to_a
     end
   end
 
@@ -701,14 +702,6 @@ class Family
         build_consumer_role(family_member)
       end
     end
-  end
-
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
-  end
-
-  def enrolled_including_waived_hbx_enrollments
-    latest_household.try(:enrolled_including_waived_hbx_enrollments)
   end
 
   def save_relevant_coverage_households
@@ -741,8 +734,6 @@ class Family
     return false if status == "aptc_unblock"
     return true if status == "aptc_block"
 
-
-
     #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
     #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
     #  true
@@ -751,12 +742,26 @@ class Family
     #end
   end
 
+  # Get all {HbxEnrollment HbxEnrollments} under this family's active household.  Includes active and inactive enrollments.
+  # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} for this family's active household
   def all_enrollments
     if self.active_household.present?
       active_household.hbx_enrollments
     end
   end
 
+  def enrolled_hbx_enrollments
+    latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def enrolled_including_waived_hbx_enrollments
+    latest_household.try(:enrolled_including_waived_hbx_enrollments)
+  end
+
+
+  # Get {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
+  # @see waivers_for_display
+  # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def enrollments_for_display
     Family.collection.aggregate([
       {"$match" => {'_id' => self._id}},
@@ -782,6 +787,9 @@ class Family
       :allow_disk_use => true)
   end
 
+  # Get waived {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
+  # @see enrollments_for_display
+  # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def waivers_for_display
     Family.collection.aggregate([
       {"$match" => {'_id' => self._id}},
