@@ -54,11 +54,11 @@ class PrimaryFamilyMembersDataWithECaseId < MongoidMigrationTask
              end
             count += 1
           rescue
-            puts "Bad Family record with id: #{family.id}"
+            puts "Bad Family record with id: #{family.id}" unless Rails.env.test?
           end
         end
       end
-      puts "Total number of families with e_case_id: #{count}"
+      puts "Total number of families with e_case_id: #{count}" unless Rails.env.test?
       
   end
 
