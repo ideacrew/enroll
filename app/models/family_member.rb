@@ -142,6 +142,6 @@ class FamilyMember
 
   def self.find(id)
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(id)).first
-    family.family_members.detect { |member| member._id.to_s == id.to_s }
+    family.family_members.detect { |member| member._id.to_s == id.to_s } unless family.blank?
   end
 end

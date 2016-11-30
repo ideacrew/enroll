@@ -100,7 +100,7 @@ class SpecialEnrollmentPeriod
   end
 
   def self.find(id)
-    family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id))
+    family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id)).first
     family.special_enrollment_periods.detect() { |sep| sep._id.to_s == id } unless family.blank?
   end
 
