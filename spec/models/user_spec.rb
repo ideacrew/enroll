@@ -320,7 +320,7 @@ describe User do
   end
 end
 
-describe "orphans", dbclean: :after_all do
+describe "orphans", dbclean: :after_each do
   let(:person) { create :person }
   let!(:user) { create :user, person: person }
 
