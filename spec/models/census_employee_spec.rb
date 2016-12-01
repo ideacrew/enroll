@@ -1268,20 +1268,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "linked?" do
-    let(:census_employee) { FactoryGirl.create(:census_employee) }
-
-    it "should return true when employee_role_linked" do
-      census_employee.aasm_state = 'employee_role_linked'
-      expect(census_employee.linked?).to be_truthy
-    end
-
-    it "should return true when cobra_linked" do
-      census_employee.aasm_state = 'cobra_linked'
-      expect(census_employee.linked?).to be_truthy
-    end
-  end
-
   context "have_valid_date_for_cobra?" do
     let(:hired_on) { TimeKeeper.date_of_record }
     let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
@@ -1368,21 +1354,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "linked?" do
+  context "is_linked?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
 
     it "should return true when aasm_state is employee_role_linked" do
       census_employee.aasm_state = 'employee_role_linked'
-      expect(census_employee.linked?).to be_truthy
+      expect(census_employee.is_linked?).to be_truthy
     end
 
     it "should return true when aasm_state is cobra_linked" do
       census_employee.aasm_state = 'cobra_linked'
-      expect(census_employee.linked?).to be_truthy
+      expect(census_employee.is_linked?).to be_truthy
     end
 
     it "should return false" do
-      expect(census_employee.linked?).to be_falsey
+      expect(census_employee.is_linked?).to be_falsey
     end
   end
 

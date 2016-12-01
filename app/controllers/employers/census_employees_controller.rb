@@ -198,7 +198,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "Please check cobra date."
+        flash[:error] = "COBRA cannot be initiated for this employee. Please contact DC Health Link at 855-532-5465 for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."
@@ -214,12 +214,12 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
+    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
         |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
     } if @census_employee.employee_role.present?
     @status = params[:status] || ''
-    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
   end
 
   def delink

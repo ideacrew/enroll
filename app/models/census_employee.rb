@@ -10,14 +10,14 @@ class CensusEmployee < CensusMember
   require 'roo'
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
-  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
+  NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
+  LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
-  NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
-  LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -83,6 +83,9 @@ class CensusEmployee < CensusMember
   scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
   scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
   scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
+  scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
+  scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
+  scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -742,7 +745,7 @@ class CensusEmployee < CensusMember
 
     event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
       transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
-      transitions from: :employment_terminated,  to: :cobra_eligible
+      transitions from: :employment_terminated, to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
@@ -771,7 +774,7 @@ class CensusEmployee < CensusMember
       transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
       transitions from: :employment_terminated,  to: :eligible
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
-      transitions from: :cobra_terminated,  to: :cobra_eligible
+      transitions from: :cobra_terminated, to: :cobra_eligible
     end
 
   end
@@ -820,10 +823,6 @@ class CensusEmployee < CensusMember
 
   def existing_cobra=(cobra)
     self.aasm_state = 'cobra_eligible' if cobra == 'true'
-  end
-
-  def linked?
-    employee_role_linked? || cobra_linked?
   end
 
   def is_cobra_status?

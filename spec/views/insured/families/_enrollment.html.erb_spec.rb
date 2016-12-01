@@ -10,6 +10,35 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     @person = person
   end
 
+  context "should display legal_name" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    let(:plan) { FactoryGirl.build(:plan) }
+    let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
+    before :each do
+      allow(hbx).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx).to receive(:plan).and_return(plan)
+      allow(hbx).to receive(:coverage_year).and_return(2016)
+    end
+
+    it "when kind is employer_sponsored" do
+      allow(hbx).to receive(:kind).and_return('employer_sponsored')
+      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to have_content(employer_profile.legal_name)
+    end
+
+    it "when kind is employer_sponsored_cobra" do
+      allow(hbx).to receive(:kind).and_return('employer_sponsored_cobra')
+      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to have_content(employer_profile.legal_name)
+    end
+
+    it "when kind is individual" do
+      allow(hbx).to receive(:kind).and_return('individual')
+      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to have_content('Individual & Family')
+    end
+  end
+
   context "without consumer_role" do
     let(:mock_organization){ instance_double("Oganization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
