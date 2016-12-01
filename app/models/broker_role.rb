@@ -267,6 +267,11 @@ class BrokerRole
     event :transfer, :after => :record_transition  do
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
     end
+
+    # Not currently supported in UI.   Datafix only person.broker_role.recertify! refs #12398
+    event :recertify, :after => :record_transition do
+      transitions from: :decertified, to: :active
+    end
   end
 
   def notify_updated
