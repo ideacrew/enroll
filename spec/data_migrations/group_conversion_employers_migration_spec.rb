@@ -57,8 +57,3 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
     end
   end
 end
-oyer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.first.aasm_state).to eq "coverage_canceled"
-      end
-    end
-  end
-end
