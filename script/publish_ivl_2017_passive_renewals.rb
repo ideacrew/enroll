@@ -29,7 +29,10 @@ enroll_pol_ids.each do |pol_id|
    "",
    {
      :routing_key => target_queue,
-     :headers => { "hbx_enrollment_id" => pol_id.to_s }
+     :headers => { 
+       "hbx_enrollment_id" => pol_id.to_s,
+       "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#auto_renew"
+     }
    }
  )
  chan.wait_for_confirms
