@@ -412,6 +412,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
               end
 
+              context "and a roster match by dependents SSN and DOB is performed" do
+                before do
+                  initial_census_employee.census_dependents = [FactoryGirl.build(:census_dependent)]
+                  initial_census_employee.save
+                end
+
+                context "using non-matching dependent ssn and dob" do
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents('000000000', Date.new(1700,01,01))).to eq []
+                  end
+                end
+
+                context "using matching dependent ssn and dob" do
+                  let(:valid_census_dependent) { initial_census_employee.census_dependents.first }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
+                  end
+                end
+              end
+
             end
           end
 

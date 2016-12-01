@@ -120,6 +120,14 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
+  scope :matchable_census_dependents, ->(ssn, dob) {
+    matched = unscoped.and(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob)
+    benefit_group_assignment_ids = matched.flat_map() do |ee|
+      ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
+    end
+    matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
+  }
+
   scope :unclaimed_matchable, ->(ssn, dob) {
    linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
