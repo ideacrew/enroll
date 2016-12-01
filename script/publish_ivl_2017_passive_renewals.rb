@@ -6,7 +6,7 @@ qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
 
-qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => Time.mktime(2016,10,31,0,0,0)}}})
+qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => window_start, "$lte" => window_end}}})
 
 enroll_pol_ids = []
 
