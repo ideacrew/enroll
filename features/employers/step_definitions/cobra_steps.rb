@@ -231,7 +231,11 @@ end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
   expect(page).to have_content('Terminated')
-  expect(page).to have_content('Coverage Selected')
+  unless TimeKeeper.date_of_record.day == 1
+    expect(page).to have_content('Coverage Selected')
+  else
+    expect(page).to have_content('Coverage Enrolled')
+  end
 end
 
 Then(/^.+ should see market type on my account page/) do
