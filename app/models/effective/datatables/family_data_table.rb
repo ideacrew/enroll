@@ -62,7 +62,8 @@ module Effective
           end
         end
         return link_type
-
+      end
+      
       def add_sep_link_type(allow)
         allow ? 'ajax' : 'disabled'
       end
@@ -72,7 +73,7 @@ module Effective
       end
 
       def cancel_enrollment_type(family, allow)
-        (family.all_enrollments.cancel_eligible.present? && allow)              ? 'ajax' : 'disabled'
+        (family.all_enrollments.cancel_eligible.present? && allow) ? 'ajax' : 'disabled'
       end
 
       def terminate_enrollment_type(family, allow)
