@@ -121,7 +121,7 @@ class Admin::Aptc < ApplicationController
       max_aptc_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       eligibility_determinations = family.active_household.all_eligibility_determinations
-      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
+      eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|
         # iterate over all the EligibilityDeterminations and store the correct max_aptc value for each month. Account for any monthly change in Eligibility Determination.
@@ -142,9 +142,9 @@ class Admin::Aptc < ApplicationController
       else
         max_aptc_value = ed.max_aptc.to_f
       end
-      # Check if  'month' >= EligibilityDetermination.determined_on date?
+      # Check if  'month' >= EligibilityDetermination.determined_at date?
 
-      if first_of_month_num_current_year >= ed.determined_on.to_date
+      if first_of_month_num_current_year >= ed.determined_at.to_date
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
         max_aptc_hash.store(month, '%.2f' % max_aptc_value)
       else
@@ -157,7 +157,7 @@ class Admin::Aptc < ApplicationController
       csr_percentage_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       eligibility_determinations = family.active_household.all_eligibility_determinations
-      eligibility_determinations.sort! {|a, b| a.determined_on <=> b.determined_on}
+      eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|
         eligibility_determinations.each do |ed|
@@ -182,8 +182,8 @@ class Admin::Aptc < ApplicationController
       else
         csr_percentage_value = ed.csr_percent_as_integer == -1 ? "limited" : ed.csr_percent_as_integer
       end
-      # Check if  'month' >= EligibilityDetermination.determined_on date?
-      if first_of_month_num_current_year >= ed.determined_on.to_date
+      # Check if  'month' >= EligibilityDetermination.determined_at date?
+      if first_of_month_num_current_year >= ed.determined_at.to_date
         # assign that month with csr_percent value from this ed (EligibilityDetermination)
         csr_percentage_hash.store(month, csr_percentage_value)
       else
@@ -271,7 +271,7 @@ class Admin::Aptc < ApplicationController
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         eligibility_redetermination_result = true
         eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
-        # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_on" timestamp and the corresponsing csr/aptc update.
+        # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_at" timestamp and the corresponsing csr/aptc update.
         latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
                                                                       "determined_on"                 => eligibility_date, 
                                                                       "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
