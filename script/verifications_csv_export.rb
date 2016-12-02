@@ -1,14 +1,15 @@
 families = Family.where({
   "households.hbx_enrollments" => {
    "$elemMatch" => {
-    # "aasm_state" => {
-    #   "$in" => ["enrolled_contingent", "unverified"]
-    #   },
+    "aasm_state" => {
+      "$in" => ["coverage_canceled", "shopping", "inactive"]
+      },
       "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
+      "effective_on" => { "$gte" => Date.new(2017,1,1) }
+      # "$or" => [
+      #   {:terminated_on => nil },
+      #   {:terminated_on.gt => TimeKeeper.date_of_record}
+      # ]
     }  
   }
 })
@@ -56,11 +57,11 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
     #   next
     # end
 
-    next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
+    # next if person.inbox.blank?
+    # next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+    # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+    #   next if secure_message.created_at > 35.days.ago
+    # end
 
     if person.consumer_role.blank?
       count += 1
