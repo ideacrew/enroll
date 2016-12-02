@@ -58,7 +58,6 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
       config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
-      config.acapi.register_async_subscribers!
     end
   end
 end
