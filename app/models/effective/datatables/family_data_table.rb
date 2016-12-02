@@ -53,6 +53,16 @@ module Effective
         ((person.user.present? || person.emails.present?) && current_user.person.hbx_staff_role) ? 'ajax' : 'disabled'
       end
 
+      def aptc_csr_link_type(family)
+        #family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
+        link_type = "disabled"
+        family.active_household.tax_households.each do |th|
+          th.eligibility_determinations.each do |ed|
+            link_type = "ajax" if ed.max_aptc > 0
+          end
+        end
+        return link_type
+
       def add_sep_link_type(allow)
         allow ? 'ajax' : 'disabled'
       end
