@@ -32,7 +32,7 @@ class TaxHousehold
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
+    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
   def current_csr_eligibility_kind
