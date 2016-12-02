@@ -26,9 +26,9 @@ namespace :report do
         csv << field_names
         census_employees.each do |census_employee|
           if census_employee.employment_terminated_on<Date.new(2016,10,31)
-            employer=census_employee.employer_role
+            employer=census_employee.employer_profile
             person=census_employee.employee_role.person
-            benefit_group_assignments=ce.benefit_group_assignments
+            benefit_group_assignments=census_employee.benefit_group_assignments
             benefit_group_assignments.each do |benefit_group_assignment|
               benefit_group_assignment.hbx_enrollments.each do |enrollment|
                 if enrollment.kind=="employer_sponsored" && enrollment.aasm_state!="coverage_terminated"
