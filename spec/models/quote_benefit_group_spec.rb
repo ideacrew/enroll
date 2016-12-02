@@ -9,12 +9,14 @@ RSpec.describe QuoteBenefitGroup, dbclean: :before_each do
   context 'benefit group calculations' do
 
     before :all do
+      Plan.all.delete
       @plan_silver = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'silver')
       @plan_gold = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'gold')
       @dental_this_year = FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables)
       @dental_next_year = FactoryGirl.create(:plan, :with_dental_coverage, :with_next_year_premium_tables)
       @plan_silver_next_year = FactoryGirl.create(:plan, :with_next_year_premium_tables)
       Caches::PlanDetails.load_record_cache!
+      sleep 1
       @current_year = TimeKeeper.date_of_record.year
       @next_year = @current_year + 1
       Plan.shop_health_plans @current_year
