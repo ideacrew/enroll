@@ -53,8 +53,8 @@ require 'csv'
             enrollments = person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
             health_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "health").first if enrollments.present?
             dental_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "dental").first if enrollments.present?
-            health_enrollment = health_enr.present? ? (health_enr.kind == "employer_sponsored" ? "SHOP" : (health_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssited QHP"))  : "No Active Health Enrollment"
-            dental_enrollment = dental_enr.present? ? (dental_enr.kind == "employer_sponsored" ? "SHOP" : (dental_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssited QHP")) : "No Active Dental Enrollment"
+            health_enrollment = health_enr.present? ? (health_enr.kind == "employer_sponsored" ? "SHOP" : (health_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP"))  : "No Active Health Enrollment"
+            dental_enrollment = dental_enr.present? ? (dental_enr.kind == "employer_sponsored" ? "SHOP" : (dental_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP")) : "No Active Dental Enrollment"
             csv << [
               person.hbx_id,
               person.last_name,
