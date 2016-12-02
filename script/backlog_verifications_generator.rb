@@ -8,15 +8,16 @@ end
 families = Family.where({
   "households.hbx_enrollments" => {
    "$elemMatch" => {
-    # "aasm_state" => {
-    #   "$in" => ["enrolled_contingent", "unverified"]
-    #   },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
-    }  
+    "aasm_state" => {
+      "$nin" => ["coverage_canceled", "shopping", "inactive"]
+      },
+    "kind" => { "$ne" => "employer_sponsored" },
+    "effective_on" => { "$gte" => Date.new(2017,1,1) }
+      # "$or" => [
+      #   {:terminated_on => nil },
+      #   {:terminated_on.gt => TimeKeeper.date_of_record}
+      # ]
+    }
   }
 })
 
@@ -30,32 +31,23 @@ others = []
 
 create_directory "#{Rails.root.to_s}/public/paper_notices/"
 
-hbx_ids = []
-CSV.foreach("#{Rails.root.to_s}/valid_gluedb_fourth_verification_reminder_data_export.csv") do |row|
-  next if row[0].strip == 'Primary HbxId'
-
-  hbx_ids << row[0].strip.to_i
-end
-
-
 CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
     'Family Id',
     'Family ECase ID',
-    'Person name', 
+    'Person name',
     'Hbx ID'
   ]
 
   count   = 0
   counter = 0
-  found = 0
 
   families.each do |family|
     counter += 1
 
     # next unless family.id.to_s == "5619ca5554726532e58b2201"
-    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
+    # next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
 
 
     begin
@@ -71,26 +63,21 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       next
     end
 
-    next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Request for Additional Information - Third Reminder").blank?
-    next if !hbx_ids.include?(person.hbx_id.to_i)
-
-    puts "----#{person.full_name}"
-
-    found += 1
-
+    # next if person.inbox.blank?
+    # next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
     # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
     #   next if secure_message.created_at > 35.days.ago
     # end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'fourth_verifications_reminder').first
-      # event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      # event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
 
       notice_trigger = event_kind.notice_triggers.first
 
+
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
-        template: notice_trigger.notice_template, 
-        subject: event_kind.title, 
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
         mpi_indicator: notice_trigger.mpi_indicator
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
@@ -106,7 +93,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         mailing_address_missing << person.full_name
       when 'active coverage not found!'
         coverage_not_found << person.full_name
-      else 
+      else
         puts "#{family.e_case_id}----#{e.to_s}"
       end
     end
@@ -120,9 +107,8 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     puts "#{count} families skipped due to missing consumer role"
   end
 
-  puts pending_ssa_validation.count 
+  puts pending_ssa_validation.count
   puts mailing_address_missing.count
   puts coverage_not_found.count
   puts others.count
-  puts found
 end
