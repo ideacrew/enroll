@@ -8,14 +8,15 @@ end
 families = Family.where({
   "households.hbx_enrollments" => {
    "$elemMatch" => {
-    # "aasm_state" => {
-    #   "$in" => ["enrolled_contingent", "unverified"]
-    #   },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
+    "aasm_state" => {
+      "$nin" => ["coverage_canceled", "shopping", "inactive"]
+      },
+    "kind" => { "$ne" => "employer_sponsored" },
+    "effective_on" => { "$gte" => Date.new(2017,1,1) }
+      # "$or" => [
+      #   {:terminated_on => nil },
+      #   {:terminated_on.gt => TimeKeeper.date_of_record}
+      # ]
     }  
   }
 })
@@ -46,7 +47,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     counter += 1
 
     # next unless family.id.to_s == "5619ca5554726532e58b2201"
-    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
+    # next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
 
 
     begin
@@ -62,14 +63,14 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       next
     end
 
-    next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
+    # next if person.inbox.blank?
+    # next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+    # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+    #   next if secure_message.created_at > 35.days.ago
+    # end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
-      # event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      # event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
 
       notice_trigger = event_kind.notice_triggers.first 
 

@@ -26,15 +26,15 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_family_members
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) && (hbx_en.effective_on >= Date.new(2017,1,1)) &&
         (
           hbx_en.terminated_on.blank? ||
           hbx_en.terminated_on >= TimeKeeper.date_of_record
         )
     end
 
-    enrollments.reject!{|e| e.coverage_terminated? }
-    enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
+    # enrollments.reject!{|e| e.coverage_terminated? }
+    # enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
 
     if enrollments.empty?
       raise 'enrollments not found!'
