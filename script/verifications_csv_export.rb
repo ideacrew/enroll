@@ -2,7 +2,7 @@ families = Family.where({
   "households.hbx_enrollments" => {
    "$elemMatch" => {
     "aasm_state" => {
-      "$in" => ["coverage_canceled", "shopping", "inactive"]
+      "$nin" => ["coverage_canceled", "shopping", "inactive"]
       },
       "kind" => { "$ne" => "employer_sponsored" },
       "effective_on" => { "$gte" => Date.new(2017,1,1) }
