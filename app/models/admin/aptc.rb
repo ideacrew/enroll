@@ -288,19 +288,21 @@ class Admin::Aptc < ApplicationController
 
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
     def update_aptc_applied_for_enrollments(params)
+      current_datetime = TimeKeeper.datetime_of_record
+      raise raise "EffectiveDateBeyondPolicysLife"
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       family = Family.find(params[:person][:family_id])
       max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc.to_f
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
-      current_datetime = TimeKeeper.datetime_of_record
+      
       params.each do |key, aptc_value|
         if key.include?('aptc_applied_')
           hbx_id = key.sub("aptc_applied_", "")
           updated_aptc_value = aptc_value.to_f
           actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
-          if actual_aptc_value != updated_aptc_value
+          if actual_aptc_value != updated_aptc_value # TODO  && check if the effective_on doesnt go to next year?????
               percent_sum_for_all_enrolles = 0.0
               enrollment_update_result = true
               original_hbx = HbxEnrollment.find(hbx_id)
@@ -354,6 +356,8 @@ class Admin::Aptc < ApplicationController
       offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
       year = hbx_created_datetime.year
       month = hbx_created_datetime.month + offset_month
+      # Based on the 15th of the month rule, if the effective date happpens to be after the policy's life (next year), 
+      # raise an error and do not create a new EligibilityDetermination (when there is an active enrollment) and/or HbxEnrollment (Eg: After Nov 15th)
       if month > 12
         year = year + 1
         month = month - 12
@@ -366,9 +370,11 @@ class Admin::Aptc < ApplicationController
       #return DateTime.new(year, month, day)
     end
 
-    def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array)
+    def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year)
       sum_of_all_applied = 0.0
       aptc_errors = Hash.new
+      aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule." if find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
+
       if applied_aptcs_array.present?
         applied_aptcs_array.each do |hbx|
           max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx[1]["hbx_id"].gsub("aptc_applied_",""), max_aptc)
@@ -405,6 +411,10 @@ class Admin::Aptc < ApplicationController
     else
       max_aptc_for_enrollment.to_f
     end
+  end
+
+  def years_with_tax_household(family)
+    family.active_household.tax_households.map(&:effective_starting_on).map(&:year).uniq
   end
 
   end #  end of class << self

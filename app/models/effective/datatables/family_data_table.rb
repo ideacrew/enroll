@@ -16,13 +16,17 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),
+             add_sep_link_type( pundit_allow(Family, :can_update_ssn?) ) ],
            ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-           ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), cancel_enrollment_type(row)],
-           ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), terminate_enrollment_type(row)],
+           ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),
+            cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),
+            terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            [("<div class='" + pundit_class(Family, :can_update_ssn?) + "'> Edit DOB / SSN </div>").html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
-           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row)],
+           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
+            aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
@@ -50,15 +54,29 @@ module Effective
       end
 
       def aptc_csr_link_type(family)
-        family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
+        #family.active_household.latest_active_tax_household.present? ? 'ajax' : 'disabled'
+        link_type = "disabled"
+        family.active_household.tax_households.each do |th|
+          th.eligibility_determinations.each do |ed|
+            link_type = "ajax" if ed.max_aptc > 0
+          end
+        end
+        return link_type
+
+      def add_sep_link_type(allow)
+        allow ? 'ajax' : 'disabled'
       end
 
-      def cancel_enrollment_type(family)
-        family.all_enrollments.cancel_eligible.present? ? 'ajax' : 'disabled'
+      def aptc_csr_link_type(family, allow)
+        (family.active_household.latest_active_tax_household.present? && allow) ? 'ajax' : 'disabled'
       end
 
-      def terminate_enrollment_type(family)
-        family.all_enrollments.can_terminate.present? ? 'ajax' : 'disabled'
+      def cancel_enrollment_type(family, allow)
+        (family.all_enrollments.cancel_eligible.present? && allow)              ? 'ajax' : 'disabled'
+      end
+
+      def terminate_enrollment_type(family, allow)
+        (family.all_enrollments.can_terminate.present? && allow)                ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
