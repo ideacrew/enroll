@@ -1,4 +1,4 @@
-%enrollee
+%affected_member
   %member
     %id
       %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{hbx_enrollment_member.person.hbx_id}"
@@ -13,7 +13,7 @@
       - if subscriber.person.person_relationship_for(hbx_enrollment_member.person).present?
         %person_relationships
           = render :partial => "events/individuals/person_relationship", :object => subscriber.person.person_relationship_for(hbx_enrollment_member.person)
-    - else 
+    - else
       %person_relationships
         = render :partial => "events/individuals/person_relationship", :object => hbx_enrollment.family.primary_family_member.person.person_relationship_for(hbx_enrollment_member.person)
     = render :partial => "events/individuals/person_demographics", :object => hbx_enrollment_member.person, as: :person_demographics
