@@ -247,12 +247,11 @@ describe User do
 end
 
 describe User do
-  context "get_announcements_by_roles_and_portal" do
+  context "get_announcements_by_roles_and_portal", dbclean: :after_all do
     let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person) }
+    let!(:user) { FactoryGirl.create(:user, person: person) }
 
-    before do
-      Announcement.destroy_all
+    before :all do
       Announcement::AUDIENCE_KINDS.each do |kind|
         FactoryGirl.create(:announcement, content: "msg for #{kind}", audiences: [kind])
       end
@@ -321,17 +320,12 @@ describe User do
   end
 end
 
-describe "orphans" do
+describe "orphans", dbclean: :after_each do
   let(:person) { create :person }
-  let(:user) { create :user, person: person }
-
-  before do
-    User.destroy_all
-  end
+  let!(:user) { create :user, person: person }
 
   context "when users have person associated" do
     it "should return no orphans" do
-      user.save!
       expect(User.orphans).to eq []
     end
   end

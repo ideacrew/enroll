@@ -9,7 +9,7 @@ RSpec.describe QuoteMember, type: :model do
 
   context "#age_on" do 
     it "should return age on a given date" do
-      expect(quote_member.age_on(Date.parse("01/01/2001"))).to eq 14
+      expect(quote_member.age_on(15.years.ago)).to eq 14
     end
   end
 
