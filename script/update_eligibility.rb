@@ -59,6 +59,7 @@ def check_and_run
   CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
+      ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
     end
 
