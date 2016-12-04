@@ -85,9 +85,7 @@ class Employers::PlanYearsController < ApplicationController
       bg_title = bg.title
       invalid_benefit_group_assignments = @employer_profile.benefit_group_assignments.select { |bga| bga.benefit_group_id.to_s == benefit_group_id }
       invalid_benefit_group_assignments.each do |invalid_benefit_group_assignment|
-        census_employee = invalid_benefit_group_assignment.census_employee
         invalid_benefit_group_assignment.delete
-        census_employee.save
       end
       bg.delete
       if plan_year.save
