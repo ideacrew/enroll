@@ -14,6 +14,7 @@ class FinancialAssistance::Applicant
 
   field :is_required_to_file_taxes, type: Boolean, default: true
   field :tax_filing_status, type: String, default: "tax_filer"
+  field :is_tax_filing_jointly, type: Boolean, default: false
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false

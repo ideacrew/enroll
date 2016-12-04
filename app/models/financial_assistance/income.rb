@@ -4,6 +4,7 @@ class FinancialAssistance::Income
 
   embedded_in :application, class_name: "::FinancialAssistance::Application"
 
+  TITLE_SIZE_RANGE = 3..30
   KINDS = %W(
     alimony_and_maintenance
     american_indian_and_alaskan_native
