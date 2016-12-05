@@ -130,6 +130,22 @@ describe BrokerRole, dbclean: :after_each do
             expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "active"
             expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "decertified"
           end
+
+          context "should be able to recertify" do
+            before do
+              registered_broker_role.recertify
+            end
+
+            it "should transition to active status" do
+              expect(registered_broker_role.aasm_state).to eq "active"
+            end
+
+            it "should record the transition" do
+              expect(registered_broker_role.workflow_state_transitions.size).to eq 4
+              expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "decertified"
+              expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "active"
+            end
+          end
         end
       end
 
