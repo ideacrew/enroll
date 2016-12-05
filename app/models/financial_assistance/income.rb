@@ -32,15 +32,15 @@ class FinancialAssistance::Income
     income_from_irs
   )
 
-  FREQUENCIES = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
+  FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
 
   field :title, type: String
   field :kind, as: :income_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
-  field :frequency, type: String
-  field :start_date, type: Date
-  field :end_date, type: Date
+  field :frequency_kind, type: String
+  field :start_on, type: Date
+  field :end_on, type: Date
   field :is_projected, type: Boolean, default: false
   field :submitted_at, type: DateTime
 
@@ -49,19 +49,21 @@ class FinancialAssistance::Income
                       allow_nil: true,
                       message: "pick a name length between #{TITLE_SIZE_RANGE}"
 
-  validates :amount,      presence: true,
-                          numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
-  validates :kind,        presence: true,
-                          inclusion: { in: KINDS, message: "%{value} is not a valid income type" }
-  validates :frequency,   presence: true,
-                          inclusion: { in: FREQUENCIES, message: "%{value} is not a valid frequency" }
-  validates :start_date,  presence: true
+  validates :amount,          presence: true,
+                              numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
+  validates :kind,            presence: true,
+                              inclusion: { in: KINDS, message: "%{value} is not a valid income type" }
+  validates :frequency_kind,  presence: true,
+                              inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
+  validates :start_on,        presence: true
+
+  validate :start_on_must_precede_end_on
 
   before_create :set_submission_timestamp
 
 
   def hours_worked_per_week
-    return 0 if end_date.blank? || end_date > TimeKeeper.date_of_record
+    return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
     hours_per_week
   end
 
@@ -74,15 +76,15 @@ class FinancialAssistance::Income
     amount == other.amount \
       && kind == other.kind \
       && frequency == other.frequency \
-      && start_date == other.start_date \
-      && end_date == other.end_date \
+      && start_on == other.start_on \
+      && end_on == other.end_on \
       && is_projected == other.is_projected \
       && submitted_at == other.submitted_at
   end
 
   def <=>(other)
-    [amount, kind, frequency, start_date, end_date, is_projected] ==
-    [other.amount, other.kind, other.frequency, other.start_date, other.end_date, other.is_projected]
+    [amount, kind, frequency, start_on, end_on, is_projected] ==
+    [other.amount, other.kind, other.frequency, other.start_on, other.end_on, other.is_projected]
   end
 
 
@@ -91,8 +93,8 @@ class FinancialAssistance::Income
       amount: (income_data[:amount] * 100).to_i,
       kind: income_data[:kind],
       frequency: income_data[:frequency],
-      start_date: income_data[:start_date],
-      end_date: income_data[:end_date],
+      start_on: income_data[:start_on],
+      end_on: income_data[:end_on],
       is_projected: income_data[:is_projected],
       submitted_at: income_data[:submitted_at])
 
@@ -105,6 +107,11 @@ private
 
   def set_submission_timestamp
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?
+  end
+
+  def start_on_must_precede_end_on
+    return unless start_on.present? && end_on.present?
+    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
   end
 
 end

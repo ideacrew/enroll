@@ -4,7 +4,7 @@ class FinancialAssistance::Applicant
 
   embedded_in :application
 
-  TAX_FILER_KINDS = %W(tax_filer tax_dependent non_filer)
+  TAX_FILER_KINDS = %W(tax_filer single joint separate dependent non_filer)
   STUDENT_KINDS = %w()
   STUDENT_SCHOOL_KINDS = %w()
 
@@ -13,8 +13,8 @@ class FinancialAssistance::Applicant
   field :is_temp_out_of_state, type: Boolean, default: false
 
   field :is_required_to_file_taxes, type: Boolean, default: true
-  field :tax_filing_status, type: String, default: "tax_filer"
-  field :is_tax_filing_jointly, type: Boolean, default: false
+  field :tax_filer_kind, type: String, default: "tax_filer"
+  field :is_joint_tax_filing, type: Boolean, default: false
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
@@ -55,19 +55,19 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
-  validates_presence_of :tax_filing_status
+  validates_presence_of :has_fixed_address
 
-  validates :tax_filing_status,
+  validates :tax_filer_kind,
     inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
     allow_blank: true
 
   alias_method :is_ia_eligible?, :is_ia_eligible
   alias_method :is_medicaid_chip_eligible?, :is_medicaid_chip_eligible
   alias_method :is_medicare_eligible?, :is_medicare_eligible
-  alias_method :is_tax_filing_jointly?, :is_tax_filing_jointly
+  alias_method :is_joint_tax_filing?, :is_joint_tax_filing
 
   def is_tax_dependent?
-    tax_filing_status.present? && tax_filing_status == "tax_dependent"
+    tax_filer_kind.present? && tax_filer_kind == "tax_dependent"
   end
 
   #### Use Person.consumer_role values for following
@@ -102,7 +102,7 @@ class FinancialAssistance::Applicant
   def prior_insurance_end_date?
   end
 
-  def has_state_health_benefits_through_date
+  def has_state_health_benefit?
   end
 
   # Has access to employer-sponsored coverage that meets ACA minimum standard value and
@@ -113,13 +113,18 @@ class FinancialAssistance::Applicant
   def is_without_assistance?
   end
 
+  def is_primary_applicant?
+    family_member.is_primary_applicant?
+  end
+
   def family_member
     return @family_member if defined?(@family_member)
     @family_member = family_members.detect { |member| member.is_primary_applicant? }
   end
 
-  def is_primary_applicant?
-    family_member.is_primary_applicant?
+  def consumer_role
+    return @consumer_role if defined?(@consumer_role)
+    @consumer_role = person.consumer_role
   end
 
   def person

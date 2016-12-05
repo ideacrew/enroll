@@ -25,7 +25,7 @@ class FinancialAssistance::Application
   field :request_kind, type: String
   field :motivation_kind, type: String
 
-  field :is_tax_filing_jointly, type: Boolean
+  field :is_joint_tax_filing, type: Boolean
   field :eligibility_determination_id, type: BSON::ObjectId
 
   field :aasm_state, type: String, default: :draft
@@ -74,7 +74,7 @@ class FinancialAssistance::Application
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
 
-  alias_method :is_tax_filing_jointly?, :is_tax_filing_jointly
+  alias_method :is_joint_tax_filing?, :is_joint_tax_filing
   alias_method :is_renewal_authorized?, :is_renewal_authorized
 
 
