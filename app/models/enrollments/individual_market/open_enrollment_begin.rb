@@ -137,7 +137,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     def active_enrollment_from_family(enrollment)
       enrollment.family.active_household.hbx_enrollments.where({
         :kind => 'individual',
-        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing'] - ["coverage_renewed", "coverage_termination_pending"]),
         :coverage_kind => enrollment.coverage_kind
       })
     end
@@ -155,7 +155,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
         CSV.foreach("#{Rails.root}/individual_enrollment_change_sets_12_05_2016_10_35.csv", headers: true, :encoding => 'utf-8') do |row|
           count += 1
-          
+
           if count % 100 == 0
             puts "Found #{count} enrollments"
           end
