@@ -837,7 +837,8 @@ class EmployerProfile
 
     resource_mapping = ApplicationEventMapper.map_resource(self.class)
     event_name = "acapi.info.events.employer.out_of_pocker_url_notifier"
-    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
+    # binding.pry
+    notify(event_name, {resource_mapping.identifier_method => self.send(resource_mapping.identifier_method).to_s})
   end
 
   def trigger_notices(event)

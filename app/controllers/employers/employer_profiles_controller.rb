@@ -256,7 +256,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def generate_checkbook_urls
     @employer_profile.generate_checkbook_notices
-    flash[:notice] = "Generating and delivering checkbook url's to employees"
+    # binding.pry
+    flash[:notice] = "Generating and delivering checkbook notice to employeer"
     redirect_to action: :show, :tab => :employees
   end
 
