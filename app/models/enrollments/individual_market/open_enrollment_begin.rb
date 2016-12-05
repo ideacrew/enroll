@@ -153,9 +153,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
-        CSV.foreach("#{Rails.root}/individual_enrollment_change_sets_11_29_2016_19_56.csv", headers: true, :encoding => 'utf-8') do |row|
+        CSV.foreach("#{Rails.root}/individual_enrollment_change_sets_12_05_2016_10_35.csv", headers: true, :encoding => 'utf-8') do |row|
           count += 1
-          next unless count > 10
+          
           if count % 100 == 0
             puts "Found #{count} enrollments"
           end
