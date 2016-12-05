@@ -126,7 +126,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
-        allow(benefit_coverage_period).to receive(:start_on).and_return double(year: 2015)
         allow(person).to receive(:has_active_consumer_role?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(HbxEnrollment).to receive(:find).and_return nil
