@@ -415,6 +415,7 @@ class HbxEnrollment
   def cancel_previous(year)
     #Perform cancel/terms of previous enrollments for the same plan year
     self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |previous_enrollment|
+      next if is_shop? && benefit_group_assignment_id != previous_enrollment.benefit_group_assignment_id
 
       previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
 
@@ -830,7 +831,7 @@ class HbxEnrollment
     enrollment.submitted_at = submitted_at
     case
     when employee_role.present?
-      if benefit_group.blank?
+      if benefit_group.blank? || benefit_group_assignment.blank?
         benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
       end
 
