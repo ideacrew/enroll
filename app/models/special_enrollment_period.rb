@@ -35,13 +35,10 @@ class SpecialEnrollmentPeriod
 
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
-  validate :end_date_follows_start_date
-
+  validate :end_date_follows_start_date, :is_eligible?
 
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id)) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id)) }
-
-
   after_initialize :set_submitted_at
 
   def start_on=(new_date)
@@ -70,7 +67,9 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind
     return @qualifying_life_event_kind if defined? @qualifying_life_event_kind
-    @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
+    if self.qualifying_life_event_kind_id.present?
+      @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
+    end
   end
 
   def qle_on=(new_qle_date)
@@ -105,7 +104,7 @@ class SpecialEnrollmentPeriod
     family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
   end
 
-private
+  private
   def set_sep_dates
     return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
     set_submitted_at
@@ -131,16 +130,16 @@ private
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
 
     self.effective_on = case effective_on_kind
-      when "date_of_event"
-        qle_on
-      when "exact_date"
-        qle_on
-      when "first_of_month"
-        first_of_month_effective_date
-      when "first_of_next_month"
-        first_of_next_month_effective_date
-      when "fixed_first_of_next_month"
-        fixed_first_of_next_month_effective_date
+    when "date_of_event"
+      qle_on
+    when "exact_date"
+      qle_on
+    when "first_of_month"
+      first_of_month_effective_date
+    when "first_of_next_month"
+      first_of_next_month_effective_date
+    when "fixed_first_of_next_month"
+      fixed_first_of_next_month_effective_date
     end
     validate_and_set_effective_on if is_shop?
   end
@@ -157,7 +156,7 @@ private
 
   def first_of_month_effective_date
     if @reference_date.day <= Setting.individual_market_monthly_enrollment_due_on
-    # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
+      # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else
       @earliest_effective_date.next_month.end_of_month + 1.day
@@ -199,6 +198,21 @@ private
       else
         qle_on.end_of_month + 1.day
       end
+    end
+  end
+
+
+  ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
+  ## HBX_Admin override
+
+
+  def is_eligible?
+    return true unless is_shop?
+
+    person = family.primary_applicant.person
+    person.active_employee_roles.any? do |employee_role|
+      eligible_date = employee_role.census_employee.earliest_eligible_date
+      eligible_date <= TimeKeeper.date_of_record
     end
   end
 

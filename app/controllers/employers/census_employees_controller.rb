@@ -80,6 +80,12 @@ class Employers::CensusEmployeesController < ApplicationController
 
     authorize @census_employee, :update?
 
+    if @census_employee.attributes[:email].present? && @census_employee.attributes[:email][:address].blank?
+      e = @census_employee.email
+      e.destroy
+      @census_employee.reload
+    end
+
     if @census_employee.save
       if destroyed_dependent_ids.present?
         destroyed_dependent_ids.each do |g|
@@ -257,7 +263,8 @@ class Employers::CensusEmployeesController < ApplicationController
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
           :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-        ]
+        ],
+      :benefit_group_assignments_attributes => [:id, :benefit_group_id]
       )
   end
 

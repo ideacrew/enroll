@@ -52,7 +52,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
 
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -84,7 +84,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -163,8 +163,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health"
+    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
