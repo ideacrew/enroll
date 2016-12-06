@@ -133,7 +133,7 @@ class PlanYear
     families.inject([]) do |enrollments, family|
       valid_enrollments = family.active_household.hbx_enrollments.where({
         :benefit_group_id.in => id_list,
-        :effective_on.lte => date.end_of_month,
+        :effective_on.lte => (Date.parse date.try(:to_s)).end_of_month,
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
       }).order_by(:'submitted_at'.desc)
 
