@@ -31,16 +31,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
         expect(portal_display_name(controller)).to eq "<a class='portal'>Welcome to the District's Health Insurance Marketplace</a>"
       end
 
-      # context "something" do
-
-      #   before do
-
-      #   end
-
-      #   it "should have I'm an Employer link when user has active employer_staff_role" do
-      #     expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/employers/employer_profiles/"+ emp_id.to_s + "\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
-      #   end
-      # end
+     
     end
 
     context "has_consumer_role?" do
