@@ -70,7 +70,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
     append_unverified_individuals(outstanding_people)
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
     notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
-    raise "Due date is before 10/26/2016" if notice.due_date <= Date.new(2016,10,25)
   end
 
   def ssn_outstanding?(person)
