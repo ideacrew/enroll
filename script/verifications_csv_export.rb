@@ -1,19 +1,38 @@
-families = Family.where({
+families = []
+families_1 = Family.where({
   "households.hbx_enrollments" => {
    "$elemMatch" => {
-    "aasm_state" => {
-      "$nin" => ["coverage_canceled", "shopping", "inactive"]
-      },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "effective_on" => { "$gte" => Date.new(2017,1,1) }
-      # "$or" => [
-      #   {:terminated_on => nil },
-      #   {:terminated_on.gt => TimeKeeper.date_of_record}
-      # ]
+    "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
+      "special_verification_period" => nil
     }  
   }
-})
+}).to_a
 
+families_2 = Family.where({
+  "households.hbx_enrollments" => {
+   "$elemMatch" => {
+    "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
+      "special_verification_period" => { "$gt" => Date.new(2016,10,25)}
+    }  
+  }
+}).to_a
+
+families_3 = Family.where({
+   "households.hbx_enrollments" => {
+    "$elemMatch" => {
+      "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2017,1,1) },
+    }  
+ }
+}).to_a
+
+families = families_3 + families_2 + families_1
+
+families.uniq
+
+puts "****************************#{families.count}"
 
 # people_ids = Person.where("consumer_role.aasm_state" => /out/i, "consumer_role.lawful_presence_determination.vlp_authority" => {"$ne" => "curam"}).map(&:id)
 # families = Family.where("family_members.person_id" => {"$in" => people_ids})
