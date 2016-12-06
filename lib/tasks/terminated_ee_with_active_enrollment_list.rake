@@ -27,11 +27,14 @@ namespace :report do
         census_employees.each do |census_employee|
           if census_employee.employment_terminated_on<Date.new(2016,10,31)
             employer=census_employee.employer_profile
-            person=census_employee.employee_role.person
+            person=census_employee.employee_role.person.present ? census_employee.employee_role.person: nil
             benefit_group_assignments=census_employee.benefit_group_assignments
+            terminate_state=HbxEnrollment::TERMINATED_STATUSES+HbxEnrollment::CANCELED_STATUSES
             benefit_group_assignments.each do |benefit_group_assignment|
               benefit_group_assignment.hbx_enrollments.each do |enrollment|
-                if enrollment.kind=="employer_sponsored" && enrollment.aasm_state!="coverage_terminated"
+                termination_verify=(terminate_state.include?enrollment.aasm_state)
+                employer_sponsor_verify=(enrollment.kind=="employer_sponsored")
+                if person&&employer_sponsor_verify&& termination_verify
                     csv << [
                       person.hbx_id,
                       person.first_name,
