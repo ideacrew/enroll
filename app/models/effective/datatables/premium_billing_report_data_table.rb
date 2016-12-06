@@ -1,5 +1,3 @@
-
-require 'pry'
 module Effective
   module Datatables
     class PremiumBillingReportDataTable < Effective::MongoidDatatable
