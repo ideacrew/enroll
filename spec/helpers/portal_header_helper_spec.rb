@@ -21,7 +21,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       end
 
         it "should have I'm an Employer link when user has active employer_staff_role" do
-          binding.pry
+         
           allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
           expect(portal_display_name('')).to eq  "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-individual.png\" alt=\"Icon individual\" /> &nbsp; I'm an Employee</a>"
         end
