@@ -7,7 +7,7 @@
   </div>
 </div>
 
-	<%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
+  	<%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
 </div>
 
 <div class="row no-buffer no_enroll">
@@ -17,14 +17,14 @@
 
 
 <script type="text/javascript">
-
-	if ($('.effective-datatable >tbody >tr').length >= 1){
-		$('.enrolled').show();
-		$('.no_enroll').hide();
-	}
-	else{
-		$('.enrolled').hide();
-		$('.no_enroll').show();
-	}
-
+ 
+ 	if ($('.effective-datatable >tbody >tr').length >= 1){
+ 		$('.enrolled').show();
+ 		$('.no_enroll').hide();
+ 	}
+ 	else{
+ 		$('.enrolled').hide();
+ 		$('.no_enroll').show();
+ 	}
+ 
  </script>
