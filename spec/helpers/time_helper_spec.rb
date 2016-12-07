@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe TimeHelper, :type => :helper do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
   let(:enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
 
@@ -10,8 +9,8 @@ RSpec.describe TimeHelper, :type => :helper do
   end
 
   describe "time remaining in words" do
-    it "counts 95 days from user created date" do
-      expect(helper.time_remaining_in_words(person.created_at)).to eq("95 days")
+    it "counts 95 days from the passed in date" do
+      expect(helper.time_remaining_in_words(TimeKeeper.date_of_record)).to eq("95 days")
     end
   end
 
