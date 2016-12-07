@@ -1,6 +1,6 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
-  before_action :check_access_to_employer_profile,:updateable?
+  before_action :check_access_to_employer_profile,:updateable?, unless: -> { request.xhr? }
 
   def create
 
