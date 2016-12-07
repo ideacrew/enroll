@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -89,6 +89,9 @@
             <% end %>
           <% end %>
 
+          <% if @employee_role.present? %>
+            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+          <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
               <h3>Benefit Type</h3>
@@ -150,8 +153,7 @@
         <br/>
           <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
-
-        <div class="col-xs-3 right-section pull-right">
+      <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank?  && @market_kind == "individual" %>
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
@@ -161,7 +163,7 @@
           <% elsif @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
           <% elsif @change_plan == "change_by_qle" %>
-            <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
+            <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
           <% elsif @change_plan == "change_plan" %>
             <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
@@ -203,7 +205,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+    <% if @employee_role.census_employee.active_benefit_group.blank? || !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -227,7 +229,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();

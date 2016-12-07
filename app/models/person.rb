@@ -202,10 +202,27 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def contact_addresses
+    existing_addresses = addresses.to_a
+    home_address = existing_addresses.detect { |addy| addy.kind == "home" }
+    return existing_addresses if home_address
+    add_employee_home_address(existing_addresses)
+  end
+
+  def add_employee_home_address(existing_addresses)
+    return existing_addresses unless employee_roles.any?
+    employee_contact_address = employee_roles.sort_by(&:hired_on).map(&:census_employee).compact.map(&:address).compact.first
+    return existing_addresses unless employee_contact_address
+    existing_addresses + [employee_contact_address]
+  end
+
+  def contact_phones
+    phones.reject { |ph| ph.full_phone_number.blank? }
+  end
+
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
   delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
-
 
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
@@ -492,11 +509,21 @@ class Person
   end
 
   def has_employer_benefits?
-    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
+    active_employee_roles.present? && active_employee_roles.any?{|r| r.benefit_group.present?}
   end
 
   def active_employee_roles
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
+  end
+
+  def has_multiple_active_employers?
+    active_census_employees.count > 1
+  end
+
+  def active_census_employees
+    census_employees = CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
+    ces = census_employees.select { |ce| ce.is_active? }
+    (ces + active_employee_roles.map(&:census_employee)).uniq
   end
 
   def has_active_employer_staff_role?
@@ -509,6 +536,12 @@ class Person
 
   def has_multiple_roles?
     consumer_role.present? && active_employee_roles.present?
+  end
+
+  def has_active_employee_role_for_census_employee?(census_employee)
+    if census_employee
+      (active_employee_roles.detect { |employee_role| employee_role.census_employee == census_employee }).present?
+    end
   end
 
   def residency_eligible?
