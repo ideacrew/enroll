@@ -16,7 +16,6 @@ module PortalHeaderHelper
       else
         "<a class='portal'>#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family</a>".html_safe
       end
-      
     elsif current_user.try(:has_broker_agency_staff_role?)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:has_employer_staff_role?)
@@ -27,8 +26,6 @@ module PortalHeaderHelper
       "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
     end
   end
-    
-
 
   # def enrollment_name
   #   begin
