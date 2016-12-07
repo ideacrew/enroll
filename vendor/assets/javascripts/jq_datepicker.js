@@ -75,6 +75,7 @@ function applyJQDatePickerSetup(ele) {
       var todays_day = todays_date.getDate();
       
 
+
       if (entered_year == todays_year) {
 
         if (entered_month == todays_month) {
@@ -87,6 +88,7 @@ function applyJQDatePickerSetup(ele) {
           } else {
 
           }
+
         }
         
       }
