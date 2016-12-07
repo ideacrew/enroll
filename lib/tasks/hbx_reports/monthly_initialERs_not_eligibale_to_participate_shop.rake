@@ -36,7 +36,13 @@ namespace :reports do
           condition_2= (census_employees.size==1 && census_employees.first.is_business_owner)
           condition_3=!employer.employer_profile.is_primary_office_local?
           plan_year=employer.employer_profile.find_plan_year_by_effective_date(effective_date)
-          condition_4= (plan_year.total_enrolled_count/plan_year.eligible_to_enroll_count<2/3) if plan_year.present?
+          if plan_year.present?
+            if plan_year.eligible_to_enroll_count==0
+              condition_4=1
+            else
+              condition_4= (plan_year.total_enrolled_count/plan_year.eligible_to_enroll_count<2/3)
+            end
+          end
           if condition_1 || condition_2 || condition_3 || condition_4
               csv << [
                     employer.legal_name,
