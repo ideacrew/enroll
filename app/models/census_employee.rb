@@ -112,7 +112,7 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
-  
+
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
@@ -214,13 +214,13 @@ class CensusEmployee < CensusMember
   def earliest_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
     if benefit_group_assignment
-      benefit_group_assignment.benefit_group.eligible_on(hired_on) 
+      benefit_group_assignment.benefit_group.eligible_on(hired_on)
     end
   end
 
   def newly_eligible_earlist_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
-    benefit_group_assignment.benefit_group.start_on 
+    benefit_group_assignment.benefit_group.start_on
   end
 
   # def first_name=(new_first_name)
@@ -471,7 +471,7 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? || (person.present? && 
+    return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
@@ -495,6 +495,7 @@ class CensusEmployee < CensusMember
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
+      CensusEmployee.terminate_future_scheduled_census_employees(new_date)
     end
 
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
@@ -508,6 +509,13 @@ class CensusEmployee < CensusMember
       return unless TimeKeeper.date_of_record.yday == 1
       CensusEmployee.where(:"aasm_state".in => NEWLY_DESIGNATED_STATES).each do |employee|
         employee.rebase_new_designee! if employee.may_rebase_new_designee?
+      end
+    end
+
+    def terminate_future_scheduled_census_employees(as_of_date)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on => as_of_date)
+      census_employees_for_termination.each do |census_employee|
+        census_employee.terminate_employee_role!
       end
     end
 
@@ -553,13 +561,13 @@ class CensusEmployee < CensusMember
           ce.save!(validate: false)
         end
       end
-    end 
+    end
 
   end
 
   aasm do
     state :eligible, initial: true
-    state :newly_designated_eligible    # congressional employee state with certain new hire rules 
+    state :newly_designated_eligible    # congressional employee state with certain new hire rules
     state :newly_designated_linked
     state :employee_role_linked
     state :employee_termination_pending
@@ -650,7 +658,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-  
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -736,7 +744,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-  
+
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
