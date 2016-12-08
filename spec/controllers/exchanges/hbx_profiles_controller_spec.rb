@@ -321,10 +321,19 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
+    let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
     before :each do
       allow(person).to receive(:csr_role).and_return(double("csr_role", cac: false))
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
+    end
+
+    it "renders the 'enable or disable link' template for hbx_staff" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(response).to render_template("exchanges/hbx_profiles/enable_or_disable_link")
     end
 
     it "renders the 'families index' template for hbx_staff" do

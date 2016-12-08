@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :enable_or_disable_link
       end
 
       member do

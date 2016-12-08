@@ -27,6 +27,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :is_disabled, type: Boolean, default: false
 
   before_save :clear_blank_fields
  #after_save :generate_family_search

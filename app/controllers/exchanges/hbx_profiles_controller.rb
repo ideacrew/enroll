@@ -216,6 +216,12 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def enable_or_disable_link  
+     getActionParams
+     @family.update_attribute(:is_disabled, !@family.is_disabled)
+     @element_to_replace_id = params[:family_actions_id]
+  end
+
   def update_effective_date
     @qle = QualifyingLifeEventKind.find(params[:id])
     respond_to do |format|
