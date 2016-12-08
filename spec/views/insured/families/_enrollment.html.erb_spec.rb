@@ -11,7 +11,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "without consumer_role" do
-    let(:mock_organization){ instance_double("Oganization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
+    let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
     let(:plan) { double("Plan",
       :name => "A Plan Name",
@@ -37,7 +37,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
@@ -47,6 +47,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
@@ -94,7 +95,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     context "when outside Employers open enrollment period and not a new hire" do
       before :each do
-        allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
         allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
         allow(census_employee).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
 
