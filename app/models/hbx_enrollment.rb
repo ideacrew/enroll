@@ -802,7 +802,7 @@ class HbxEnrollment
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    if plan_year = (hbx_enrollment.covered_plan_year(employee_role) || employee_role.employer_profile.find_plan_year_by_effective_date(effective_date))
+    if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
 
       if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
         raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -1288,11 +1288,11 @@ class HbxEnrollment
  end
 
  def plan_year_check(employee_role)
-  covered_plan_year(employee_role).present?
+  covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
  end
 
  def covered_plan_year(employee_role)
-    employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))}
+    employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
  end
 
   private
@@ -1303,7 +1303,7 @@ class HbxEnrollment
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = plan_year_check(employee_role) ? covered_plan_year(employee_role) : employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else
