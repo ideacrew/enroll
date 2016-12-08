@@ -23,6 +23,9 @@ Rails.application.routes.draw do
     end
   end
 
+  
+  get 'dashboard/home', to: 'dashboards#home'
+  
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]
