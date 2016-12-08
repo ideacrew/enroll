@@ -26,7 +26,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_family_members
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) && (hbx_en.effective_on >= Date.new(2017,1,1)) &&
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
           hbx_en.terminated_on >= TimeKeeper.date_of_record
@@ -63,9 +63,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'no family member found without uploaded documents'
     end
 
-    if enrollments.detect{|e| e.special_verification_period.present?}.blank?
-      enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
-    end
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days) unless e.special_verification_period.present?}
 
     append_unverified_individuals(outstanding_people)
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
