@@ -3,7 +3,7 @@ module Subscribers
     include Acapi::Notifiers
 
     def self.subscription_details
-      [/acapi\.info\.events\..*/]
+       ["acapi.info.events.employer.out_of_pocker_url_notifier"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
