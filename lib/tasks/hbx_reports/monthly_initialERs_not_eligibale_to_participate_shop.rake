@@ -24,7 +24,7 @@ namespace :reports do
                         Number_of_Enrolled_Employee
                         Participation_Rate
                         Is_owner_the_only_enrollee?(Y/N)
-                        Non-DC primary address? (Y/N)
+                        Non-DC_primary_address?(Y/N)
                         )
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/List_of_initial_ERs_not_meet_eligibility_to_participate_in_shop.csv"
