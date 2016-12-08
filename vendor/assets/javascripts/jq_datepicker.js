@@ -87,6 +87,7 @@ function applyJQDatePickerSetup(ele) {
             $(this).focus();
           } else {
 
+
           }
 
         }
