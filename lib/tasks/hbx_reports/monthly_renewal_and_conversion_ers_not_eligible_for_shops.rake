@@ -24,7 +24,7 @@ namespace :reports do
                         Number_of_Enrolled_Employee
                         Participation_Rate
                         Is_owner_the_only_enrollee?(Y/N)
-                        Non-DC primary address? (Y/N)
+                        Non-DC_primary_address?(Y/N)
                         )
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/List_of_renewal_and_conversion_ERs_not_meet_eligibility_to_participate_in_shop.csv"
@@ -48,10 +48,10 @@ namespace :reports do
                 employer.legal_name,
                 employer.fein,
                 employer.hbx_id,
-                employer.employer_profile.census_employees,
-                (plan_year.blank? ? '' : plan_year.employee_participation_percent),
                 employer.employer_profile.census_employees.size,
-                employer.employer_profile.is_primary_office_local?,
+                (plan_year.blank? ? '' : plan_year.employee_participation_percent),
+                employer.employer_profile.census_employees.size==1 ? 'yes' : 'no',
+                employer.employer_profile.is_primary_office_local? ? 'yes' : 'no'
             ]
             count += 1
           end
