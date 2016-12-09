@@ -1,5 +1,5 @@
 function applyJQDatePickerSetup(ele) {
-  
+
   var el = $(ele);
   if (el.is(".jq_datepicker_already_applied")) {
     return;
@@ -60,6 +60,7 @@ function applyJQDatePickerSetup(ele) {
     onSelect: function(dateText, dpInstance) {
       $(this).datepicker("hide");
       $(this).trigger('change');
+
       var string = $(this).attr("id");
       if(string.indexOf('dob')>0){
 
@@ -73,8 +74,6 @@ function applyJQDatePickerSetup(ele) {
       var todays_year = todays_date.getFullYear();
       var todays_month = todays_date.getMonth() + 1;
       var todays_day = todays_date.getDate();
-      
-
 
       if (entered_year == todays_year) {
 
@@ -96,10 +95,12 @@ function applyJQDatePickerSetup(ele) {
     }
     
    }
+
   });
   el.datepicker("refresh");
   el.addClass("jq_datepicker_already_applied");
 }
+
 
 function applyJQDatePickers() {
 
