@@ -300,7 +300,7 @@ class Organization
     changed_fields = changed_attributes.keys
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
       if changed_fields.include?(feild)
-        notify("acapi.info.events.employer.#{event_name}", {:employer_id => self.hbx_id})
+        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
     end
   end
