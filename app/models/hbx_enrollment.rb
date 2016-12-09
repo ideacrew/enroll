@@ -816,6 +816,7 @@ class HbxEnrollment
   end
 
   def self.calculate_effective_on_from(market_kind: 'shop', qle: false, family: nil, employee_role: nil, benefit_group: nil, benefit_sponsorship: HbxProfile.current_hbx.benefit_sponsorship)
+    ## We need to retool this to use age on eligibility date. Current state is causing bad premiums. 
     return nil if family.blank?
 
     case market_kind
