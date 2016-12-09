@@ -1,10 +1,10 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "remove_invalid_benefit_group_assignments_for_employer")
+require File.join(Rails.root, "app", "data_migrations", "correct_invalid_benefit_group_assignments_for_employer")
 
-describe RemoveInvalidBenefitGroupAssignmentsForEmployer do
+describe CorrectInvalidBenefitGroupAssignmentsForEmployer do
 
-  let(:given_task_name) { "remove_invalid_benefit_group_assignments_for_employer" }
-  subject { RemoveInvalidBenefitGroupAssignmentsForEmployer.new(given_task_name, double(:current_scope => nil)) }
+  let(:given_task_name) { "correct_invalid_benefit_group_assignments_for_employer" }
+  subject { CorrectInvalidBenefitGroupAssignmentsForEmployer.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
     it "has the given task name" do
@@ -37,6 +37,20 @@ describe RemoveInvalidBenefitGroupAssignmentsForEmployer do
         subject.migrate
         census_employee.reload
         expect(census_employee.benefit_group_assignments.size).to eq 1
+      end
+
+      it "should change the incorrect start on date for invalid benefit group assignment" do
+        census_employee.benefit_group_assignments.first.update_attribute(:start_on, plan_year.start_on - 2.months)
+        subject.migrate
+        census_employee.reload
+        expect(census_employee.benefit_group_assignments.first.start_on).to eq [benefit_group_one.start_on, census_employee.hired_on].compact.max
+      end
+
+      it "should change the incorrect end on date for invalid benefit group assignment" do
+        census_employee.benefit_group_assignments.first.update_attribute(:end_on, plan_year.end_on + 2.months)
+        subject.migrate
+        census_employee.reload
+        expect(census_employee.benefit_group_assignments.first.end_on).to eq plan_year.end_on
       end
     end
   end
