@@ -636,6 +636,10 @@ class Family
   def active_broker_roles
     active_household.hbx_enrollments.reduce([]) { |b, e| b << e.broker_role if e.is_active? && !e.broker_role.blank? } || []
   end
+  
+  def any_unverified_enrollments?
+    enrollments.verification_needed.any?
+  end
 
   class << self
     # Set the sort order to return families by primary applicant last_name, first_name
@@ -778,6 +782,7 @@ class Family
                   'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
                   'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
                   'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
+                  'benefit_group_id' => '$households.hbx_enrollments.benefit_group_id',
                   'state' => '$households.hbx_enrollments.aasm_state',
                   'market' => '$households.hbx_enrollments.kind',
                   'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
