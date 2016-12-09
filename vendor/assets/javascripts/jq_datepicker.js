@@ -64,7 +64,6 @@ function applyJQDatePickerSetup(ele) {
       var string = $(this).attr("id");
       if(string.indexOf('dob')>0){
 
-
       var date = $(this).val();
       var entered_dob = $(this).val();
       var entered_year = entered_dob.substring(entered_dob.length - 4);
@@ -86,7 +85,6 @@ function applyJQDatePickerSetup(ele) {
             $(this).focus();
           } else {
 
-
           }
 
         }
@@ -100,7 +98,6 @@ function applyJQDatePickerSetup(ele) {
   el.datepicker("refresh");
   el.addClass("jq_datepicker_already_applied");
 }
-
 
 function applyJQDatePickers() {
 
