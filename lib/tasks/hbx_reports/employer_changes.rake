@@ -9,7 +9,7 @@ namespace :reports do
     desc "Identify employer's updated account information"
     task :employer_changes => :environment do
       # dange range =past 7 days changes from current date
-      date_range = (Date.today - 7.days)..Date.today
+      date_range = (TimeKeeper.date_of_record - 7.days)..TimeKeeper.date_of_record
       # collect active organizations
       organizations = Organization.where(:'employer_profile'.exists=>true, :"employer_profile.aasm_state".in => ["applicant", "registered", "eligible", "binder_paid", "enrolled"])
 

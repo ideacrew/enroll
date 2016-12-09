@@ -82,7 +82,7 @@ FactoryGirl.define do
     name "Some plan name"
     carrier_profile_id { BSON::ObjectId.new }
     sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-01" }
-    active_year Date.today.year
+    active_year TimeKeeper.date_of_record.year
     metal_level { ["bronze","silver","gold","platinum"].shuffle.sample }
 
     trait :shop_health do

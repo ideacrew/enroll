@@ -77,7 +77,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record )
     end
 
     it "is_dependent_loss_of_coverage?" do

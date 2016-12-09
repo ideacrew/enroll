@@ -22,8 +22,8 @@ describe 'user account with no email address' do
     end
 
     it 'should generate user csv report in hbx_report' do
-      start_date = (Date.today-10).strftime('%d/%m/%Y')
-      end_date = Date.today.strftime('%d/%m/%Y')
+      start_date = (TimeKeeper.date_of_record-10).strftime('%d/%m/%Y')
+      end_date = TimeKeeper.date_of_record.strftime('%d/%m/%Y')
       Rake::Task["report:user_account:with_no_email_address"].invoke(start_date,end_date)
       expect(File.directory?("#{Rails.root}/hbx_report")).to be true
       expect(File.exists?("#{Rails.root}/hbx_report/users_account_with_no_email.csv")).to be true

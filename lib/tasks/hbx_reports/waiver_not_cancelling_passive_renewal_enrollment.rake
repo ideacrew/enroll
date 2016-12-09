@@ -70,7 +70,7 @@ namespace :reports do
             end
           end
         end
-        puts "Waiver Report for 9/1 Employees Generated on #{Date.today}, Total 9/1 Employees count #{count} and Employees information output file: #{file_name}"
+        puts "Waiver Report for 9/1 Employees Generated on #{TimeKeeper.date_of_record}, Total 9/1 Employees count #{count} and Employees information output file: #{file_name}"
       end # CSV close
     end
 

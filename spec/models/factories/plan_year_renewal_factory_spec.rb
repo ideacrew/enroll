@@ -43,7 +43,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     it 'should renew the employer profile' do

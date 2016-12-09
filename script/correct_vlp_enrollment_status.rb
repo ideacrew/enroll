@@ -25,7 +25,7 @@ affected_policies = Family.collection.aggregate([
     "households.hbx_enrollments.effective_on" => {"$gt" => Date.new(2015,12,31)},
     "$or" => [
       {"households.hbx_enrollments.terminated_on" => nil},
-      {"households.hbx_enrollments.terminated_on" => {"$gt" => Date.today }}
+      {"households.hbx_enrollments.terminated_on" => {"$gt" => TimeKeeper.date_of_record }}
     ]
   }},
   {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}

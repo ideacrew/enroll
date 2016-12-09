@@ -6,7 +6,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
   let(:date_of_record_to_use) { Date.new(calender_year, 5, 1) }
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   context 'New Employer' do

@@ -4,7 +4,7 @@ namespace :reports do
 
     desc "Report of Initial/Renewal/Conversion ERs that Failed Minimum Participation or Non-Owner Rule"
     task :employers_failing_minimum_participation => :environment do
-      window_date = Date.today
+      window_date = TimeKeeper.date_of_record
       valid_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED
       employers = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
         :open_enrollment_start_on => {"$lte" => window_date},

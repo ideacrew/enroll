@@ -39,7 +39,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     context "triggering a new enrollment", dbclean: :after_each do

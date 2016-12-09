@@ -26,7 +26,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   context "a new instance" do
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     context "with no arguments" do
@@ -236,7 +236,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     it "when satisfied" do

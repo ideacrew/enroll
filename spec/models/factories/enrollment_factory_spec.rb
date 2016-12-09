@@ -5,8 +5,8 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     model.class.find(model.id)
   end
 
-  let(:hired_on) { Date.today - 30.days }
-  let(:terminated_on) { Date.today - 1.days }
+  let(:hired_on) { TimeKeeper.date_of_record - 30.days }
+  let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
   let(:dob) { employee_role.dob }
   let(:ssn) { employee_role.ssn }
 

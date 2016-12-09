@@ -175,8 +175,8 @@ Given(/^Hbx Admin exists$/) do
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
-  year = (Date.today + 2.months).year
-  year = (Date.today + 2.months).year
+  year = (TimeKeeper.date_of_record + 2.months).year
+  year = (TimeKeeper.date_of_record + 2.months).year
   plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
   plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
 end
@@ -599,7 +599,7 @@ end
 
 When(/^.+ clicks? a qle event$/) do
   scroll_then_click(@browser.a(text: /Divorce/))
-  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
+  @browser.text_field(class: "interaction-field-control-qle-date").set((TimeKeeper.date_of_record + 5).strftime("%m/%d/%Y"))
   scroll_then_click(@browser.a(class: /interaction-click-control-submit/))
   @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy

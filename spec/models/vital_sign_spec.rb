@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe VitalSign, :dbclean => :around_each do
 
   before (:all) do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   let(:shop_current_enrollment_count) { 1 }

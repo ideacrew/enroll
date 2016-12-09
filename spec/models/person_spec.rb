@@ -247,7 +247,7 @@ describe Person do
         end
 
         context "and date of death preceeds date of birth" do
-          let(:params) {valid_params.deep_merge({date_of_death: Date.today - 10, dob: Date.today - 1})}
+          let(:params) {valid_params.deep_merge({date_of_death: TimeKeeper.date_of_record - 10, dob: TimeKeeper.date_of_record - 1})}
 
           it "should fail validation" do
             person = Person.new(**params)
@@ -536,7 +536,7 @@ describe Person do
 
     context "a person" do
       it "should know its age today" do
-        expect(greg.age_on(Date.today)).to eq gregs_age
+        expect(greg.age_on(TimeKeeper.date_of_record)).to eq gregs_age
       end
 
       it "should know its age on a given date" do
@@ -544,7 +544,7 @@ describe Person do
       end
 
       it "should know its age yesterday" do
-        expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
+        expect(greg.age_on(TimeKeeper.date_of_record.advance(days: -1))).to eq (gregs_age - 1)
       end
 
       it "should know its age tomorrow" do
@@ -827,7 +827,7 @@ describe Person do
 
     context "validate of date_of_birth_is_past" do
       it "should invalid" do
-        dob = (Date.today + 10.days)
+        dob = (TimeKeeper.date_of_record + 10.days)
         allow(person).to receive(:dob).and_return(dob)
         expect(person.save).to be_falsey
         expect(person.errors[:dob].any?).to be_truthy
@@ -837,7 +837,7 @@ describe Person do
 
     context "date_of_death_is_blank_or_past" do
       it "should invalid" do
-        date_of_death = (Date.today + 10.days)
+        date_of_death = (TimeKeeper.date_of_record + 10.days)
         allow(person).to receive(:date_of_death).and_return(date_of_death)
         expect(person.save).to be_falsey
         expect(person.errors[:date_of_death].any?).to be_truthy
