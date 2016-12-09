@@ -13,6 +13,8 @@ class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
+  FIELD_AND_EVENT_NAMES = {"start_on" => "broker_added", "end_on" => "broker_terminated"}
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -218,6 +220,7 @@ class EmployerProfile
 
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
+    notify_general_agent_terminated(general_agency_accounts.active)
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
   end
   alias_method :general_agency_profile=, :hire_general_agency
@@ -225,6 +228,12 @@ class EmployerProfile
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
+  end
+
+  def notify_general_agent_terminated(general_agency)
+    general_agency.each do |agency|
+    notify("acapi.info.events.employer.general_agent_terminated", {:employer_id => agency.employer_profile.hbx_id})
+    end
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -738,7 +747,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update
+  after_update :broadcast_employer_update, :notify_broker_updates, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -806,6 +815,23 @@ class EmployerProfile
 
   def notify_binder_paid
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {:employer_id => self.hbx_id}) if  self.plan_years.size == 1 && self.published_plan_year.enrolling?
+  end
+
+  def notify_broker_updates
+    changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    FIELD_AND_EVENT_NAMES.each do |feild, event_name|
+      if changed_fields.present? && changed_fields.include?(feild)
+        notify("acapi.info.events.employer.#{event_name}", {:employer_id => self.hbx_id})
+      end
+    end
+  end
+
+  def notify_general_agent_added
+    changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? && changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.general_agent_added", {:employer_id => self.hbx_id})
+    end
   end
 
   def self.by_hbx_id(an_hbx_id)
