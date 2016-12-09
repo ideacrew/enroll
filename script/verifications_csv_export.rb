@@ -66,7 +66,7 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
   families.each do |family|
     counter += 1
 
-    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
 
     begin
 

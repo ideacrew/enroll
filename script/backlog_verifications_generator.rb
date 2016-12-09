@@ -59,8 +59,9 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   counter = 0
 
   families.each do |family|
-    counter += 1
 
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
+    counter += 1
     begin
       person = family.primary_applicant.person
 
