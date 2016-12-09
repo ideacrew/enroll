@@ -191,6 +191,8 @@ class Employers::CensusEmployeesController < ApplicationController
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
         |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
     } if @census_employee.employee_role.present?
+
+    @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
   end
 

@@ -263,11 +263,18 @@ RSpec.describe Employers::CensusEmployeesController do
                          aasm_state: 'coverage_terminated'
       )
     end
-
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+      allow(hbx_enrollment).to receive(:reject).and_return(hbx_enrollment)
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
@@ -283,6 +290,7 @@ RSpec.describe Employers::CensusEmployeesController do
       get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
       expect(response).to render_template("show")
       expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
+      expect(assigns(:past_enrollments)).not_to eq([expired_enrollment])
     end
 
     it "should not return IVL enrollment in past enrollment of current employee role " do
