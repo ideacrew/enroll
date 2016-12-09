@@ -5,7 +5,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.primary_family
+    args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
@@ -26,7 +26,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_family_members
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) && (hbx_en.effective_on >= Date.new(2017,1,1)) &&
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
           hbx_en.terminated_on >= TimeKeeper.date_of_record
@@ -63,12 +63,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'no family member found without uploaded documents'
     end
 
-    # enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days) unless e.special_verification_period.present?}
 
     append_unverified_individuals(outstanding_people)
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
     notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
-    raise "Due date is before 10/26/2016" if notice.due_date <= Date.new(2016,10,25)
   end
 
   def ssn_outstanding?(person)
