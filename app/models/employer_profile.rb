@@ -726,7 +726,7 @@ class EmployerProfile
   end
 
   def notify_initial_binder_paid
-    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"}) if  self.plan_years.size == 1 && self.published_plan_year.enrolling?
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"}) if  self.plan_years.size == 1
   end
 
   def notify_broker_updates
