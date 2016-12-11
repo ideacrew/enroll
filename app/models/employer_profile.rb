@@ -223,9 +223,9 @@ class EmployerProfile
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
   end
 
-  def notify_general_agent_terminated(general_agency)
-    general_agency.each do |agency|
-    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
+  def notify_general_agent_terminated(general_agency_accounts)
+    general_agency_accounts.each do |general_agency|
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: general_agency.employer_profile.hbx_id, event_name: "general_agent_terminated"})
     end
   end
 
@@ -656,7 +656,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update, :notify_broker_updates, :notify_general_agent_added
+  after_update :broadcast_employer_update, :notify_broker_update, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -729,7 +729,7 @@ class EmployerProfile
     notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"}) if  self.plan_years.size == 1
   end
 
-  def notify_broker_updates
+  def notify_broker_update
     changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
       if changed_fields.present? && changed_fields.include?(feild)

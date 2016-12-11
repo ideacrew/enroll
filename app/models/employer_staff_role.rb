@@ -31,7 +31,7 @@ class EmployerStaffRole
     aasm_state.humanize.titleize
   end
 
-  def  notify_contact_changed
+  def notify_contact_changed
     notify("acapi.info.events.employer.contact_changed", {employer_id: EmployerProfile.find(self.employer_profile_id).hbx_id, event_name: "contact_changed"})
   end
 

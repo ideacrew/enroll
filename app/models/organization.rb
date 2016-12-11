@@ -103,7 +103,7 @@ class Organization
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
          { name: "active_broker_accounts_writing_agent" })
   before_save :generate_hbx_id
-  after_update :notify_legal_fein_changes
+  after_update :notify_legal_or_fein_change
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -295,7 +295,7 @@ class Organization
     end
   end
 
-  def notify_legal_fein_changes
+  def notify_legal_or_fein_change
     return unless self.employer_profile.present?
     changed_fields = changed_attributes.keys
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|

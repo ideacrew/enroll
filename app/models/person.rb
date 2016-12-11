@@ -718,7 +718,6 @@ class Person
 
       employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
       employer_staff_role.save
-      employer_staff_role.notify_contact_changed
       return true, person.first
     end
 
