@@ -305,6 +305,24 @@ class Organization
     end
   end
 
+  def notify_address_change(old_address_attribute,new_address_attribute)
+    changed_address = []
+    old_address_dup = old_address_attribute.clone
+    new_address_attribute["office_locations_attributes"].each_value do |address|
+      old_address = old_address_dup.select{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      old_address_dup.delete_if{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      keys = address["address_attributes"].keys
+      new_address_values = address["address_attributes"].values
+      old_addres_values = old_address.present? ? keys.map{|k| old_address[0]["address"]["#{k}"]} : []
+      changed_address << (new_address_values == old_addres_values)
+    end
+    changed_address << false if old_address_dup.present?
+    unless changed_address.all?
+      notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
+    end
+
+  end
+
   class << self
     def employer_profile_renewing_starting_on(date_filter)
       employer_profile_renewing_coverage.employer_profile_plan_year_start_on(date_filter)
