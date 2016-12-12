@@ -40,12 +40,13 @@ class Insured::GroupSelectionController < ApplicationController
     end
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
+    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
-      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      qle: qle,
       family: @family,
       employee_role: @employee_role,
-      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_group: @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
   end
 
@@ -138,7 +139,7 @@ class Insured::GroupSelectionController < ApplicationController
           benefit_group = @hbx_enrollment.benefit_group
           benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         else
-          benefit_group = @employee_role.benefit_group
+          benefit_group = @employee_role.benefit_group(qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
           benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
         end
       end
@@ -181,9 +182,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def insure_hbx_enrollment_for_shop_qle_flow
     if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      py = @employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@family.current_sep.effective_on)}
-      id_list = py.benefit_groups.map(&:id) if py.present?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.try(:first) if @family.active_household.hbx_enrollments.where(:aasm_state.ne => "shopping").present?
+      @hbx_enrollment = Insured::GroupSelectionHelper.selected_enrollment(@family, @employee_role)
     end
   end
 

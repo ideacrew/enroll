@@ -11,7 +11,6 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
-
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
     if plan_selection.employee_is_shopping_before_hire?
@@ -21,7 +20,9 @@ class Insured::PlanShoppingsController < ApplicationController
       return
     end
 
-    if !plan_selection.may_select_coverage?
+    qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
+
+    if !plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
       if plan_selection.hbx_enrollment.errors.present?
         flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
       end
@@ -95,11 +96,11 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
-    @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
+    @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
+    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }

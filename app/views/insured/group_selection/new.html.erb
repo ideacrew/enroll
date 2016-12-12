@@ -26,7 +26,6 @@
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
-
           <% if can_shop_shop?(@person) %>
             <div id="shop-coverage-household" class="<%= 'dn' if @market_kind == 'individual' %>">
               <div class="module group-selection-table health">

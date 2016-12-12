@@ -10,7 +10,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:family) {Family.new}
   let(:hbx_enrollment) {HbxEnrollment.create}
   let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
-  let(:collectiondouble) { double(effective_desc: [hbx_enrollment])}
+  let(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
   let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
   let(:benefit_group) { FactoryGirl.create(:benefit_group)}
   let(:benefit_package) { FactoryGirl.build(:benefit_package,

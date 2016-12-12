@@ -202,14 +202,14 @@ class Family
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
-  def is_eligible_to_enroll?
-    current_enrollment_eligibility_reasons.length > 0
+  def is_eligible_to_enroll?(options = {})
+    current_enrollment_eligibility_reasons(qle: options[:qle]).length > 0
   end
 
-  def current_enrollment_eligibility_reasons
+  def current_enrollment_eligibility_reasons(options = {})
     current_special_enrollment_periods.collect do |sep|
       EnrollmentEligibilityReason.new(sep)
-    end + current_eligible_open_enrollments
+    end + current_eligible_open_enrollments(qle: options[:qle])
   end
 
   def is_under_open_enrollment?
@@ -224,8 +224,8 @@ class Family
     current_shop_eligible_open_enrollments.length > 0
   end
 
-  def current_eligible_open_enrollments
-    current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
+  def current_eligible_open_enrollments(options = {})
+    current_shop_eligible_open_enrollments(qle: options[:qle]) + current_ivl_eligible_open_enrollments
   end
 
   def current_ivl_eligible_open_enrollments
@@ -241,12 +241,12 @@ class Family
     eligible_open_enrollments
   end
 
-  def current_shop_eligible_open_enrollments
+  def current_shop_eligible_open_enrollments(options = {})
     eligible_open_enrollments = []
 
     if employee_roles = primary_applicant.try(:person).try(:employee_roles) # TODO only active employee roles
       employee_roles.each do |employee_role|
-        if (benefit_group = employee_role.try(:benefit_group)) &&
+        if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
           (employer_profile = employee_role.try(:employer_profile))
           employer_profile.try(:published_plan_year).try(:enrolling?) &&
           benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on

@@ -243,7 +243,53 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment benefit_group
 
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kind, named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date],
+    hired_on: TimeKeeper.date_of_record - 15.months
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+  expired_bg = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+  employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group_id: expired_bg.id, start_on: expired_bg.start_on)
+
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date],
+    hired_on: TimeKeeper.date_of_record - 15.months
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+  renewing_bg = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+  employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group_id: renewing_bg.id, start_on: renewing_bg.start_on)
+
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
 end
 
@@ -566,6 +612,11 @@ end
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
+end
+
+And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
+  employer_profile = CensusEmployee.where(first_name: people[named_person][:first_name]).first.employee_role.employer_profile
+  expect(page).to have_content "#{employer_profile.plan_years.where(aasm_state: plan_year_state ).first.benefit_groups.first.reference_plan.name}"
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do

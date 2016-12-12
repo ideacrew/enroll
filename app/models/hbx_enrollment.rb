@@ -625,8 +625,8 @@ class HbxEnrollment
     broker_agency_profile_id.present?
   end
 
-  def can_complete_shopping?
-    household.family.is_eligible_to_enroll?
+  def can_complete_shopping?(options = {})
+    household.family.is_eligible_to_enroll?(qle: options[:qle])
   end
 
   def humanized_dependent_summary
@@ -777,7 +777,7 @@ class HbxEnrollment
 
   def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
     if employee_role.can_enroll_as_new_hire?
-      return employee_role.coverage_effective_on
+      return employee_role.coverage_effective_on(qle: qle)
     end
 
     if employee_role.census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
@@ -785,7 +785,7 @@ class HbxEnrollment
     end
 
     if qle
-      return hbx_enrollment.family.current_sep.effective_on
+      return hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     end
 
     active_plan_year = employee_role.employer_profile.show_plan_year
@@ -832,6 +832,9 @@ class HbxEnrollment
     when employee_role.present?
       if benefit_group.blank? || benefit_group_assignment.blank?
         benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
+      end
+      if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
+        raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
       end
 
       enrollment.kind = "employer_sponsored"
@@ -1192,11 +1195,11 @@ class HbxEnrollment
     (benefit_group.present?) && (benefit_group.end_on <= TimeKeeper.date_of_record)
   end
 
-  def can_select_coverage?
+  def can_select_coverage?(qle: false)
     return true unless is_shop?
 
     if employee_role.can_enroll_as_new_hire?
-      coverage_effective_date = employee_role.coverage_effective_on
+      coverage_effective_date = employee_role.coverage_effective_on(qle: qle)
     elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
       coverage_effective_date = special_enrollment_period.effective_on
     elsif benefit_group.is_open_enrollment?

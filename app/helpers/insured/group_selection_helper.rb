@@ -26,9 +26,17 @@ module Insured
       end
     end
 
-    # def self.flag(person, family, employee_role)
-    #   exp = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(person.primary_family.current_sep.effective_on)}.present? && employee_role.employer_profile.active_plan_year.present? 
-    #   exp && family.current_sep.effective_on < employee_role.employer_profile.active_plan_year.start_on
-    # end
+    def self.selected_enrollment(family, employee_role)
+      py = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.effective_on)}
+      id_list = py.benefit_groups.map(&:id) if py.present?
+      enrollments = family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list)
+      renewal_enrollment = enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).order_by(:"effective_on".desc).first
+      active_enrollment = enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).order_by(:"effective_on".desc).first
+      if py.present? && py.is_renewing?
+        return renewal_enrollment
+      else
+        return active_enrollment
+      end
+    end
   end
 end

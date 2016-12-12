@@ -133,4 +133,57 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
     end
   end
+
+
+  describe "#selected_enrollment" do
+
+    context "selelcting the enrollment" do
+      let(:person) { FactoryGirl.create(:person) }
+      let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+      let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:sep){
+        sep = family.special_enrollment_periods.new
+        sep.effective_on_kind = 'date_of_event'
+        sep.qualifying_life_event_kind= qle_kind
+        sep.qle_on= TimeKeeper.date_of_record - 7.days
+        sep.save
+        sep
+      }
+      let(:active_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'coverage_selected'
+      )}
+      let(:renewal_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'renewing_coverage_selected'
+      )}
+
+      before do
+        allow(family).to receive(:current_sep).and_return sep
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+        active_enrollment.update_attribute(:benefit_group_id, active_benefit_group.id)
+        renewal_enrollment.update_attribute(:benefit_group_id, renewal_benefit_group.id)
+      end
+
+      it "should return active enrollment if the coverage effective on covers active plan year" do
+        expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq active_enrollment
+      end
+
+      it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
+        renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
+        sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+        expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq renewal_enrollment
+      end
+
+    end
+  end
 end

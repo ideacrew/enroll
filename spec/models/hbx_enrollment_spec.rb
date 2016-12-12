@@ -1,4 +1,3 @@
-
 require 'rails_helper'
 require 'aasm/rspec'
 
@@ -184,7 +183,7 @@ describe HbxEnrollment do
               benefit_group: benefit_group
             )
             election.plan = benefit_group.elected_plans.sample
-            # election.select_coverage if election.can_complete_shopping?
+            election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
             election.save!
             election
@@ -220,7 +219,7 @@ describe HbxEnrollment do
               benefit_group: benefit_group
             )
             election.plan = benefit_group.elected_plans.sample
-            # election.select_coverage if election.can_complete_shopping?
+            election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
             election.save!
             election
@@ -751,17 +750,20 @@ describe HbxProfile, "class methods", type: :model do
     let(:coverage_household) { double}
     let(:coverage_household_members) {double}
     let(:household) {FactoryGirl.create(:household, family: family)}
-    let(:qle_effective_date) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
     let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
     let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryGirl.create(:person)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let!(:sep){
+    let(:sep){
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'date_of_event'
-      sep.qualifying_life_event_kind= qle_effective_date
-      sep.qle_on= Date.new(2016,8,26)
+      sep.qualifying_life_event_kind= qle_kind
+      sep.qle_on= TimeKeeper.date_of_record - 7.days
+      sep.start_on = sep.qle_on
+      sep.end_on = sep.qle_on + 30.days
+      sep.save
       sep
     }
 
@@ -770,12 +772,13 @@ describe HbxProfile, "class methods", type: :model do
       allow(coverage_household).to receive(:coverage_household_members).and_return []
       allow(sep).to receive(:is_active?).and_return true
       allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
+      census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id, hired_on: TimeKeeper.date_of_record - 2.months)
       census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
     end
+
     it "should return a sep with an effective date that equals to sep date" do
-       # enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
-       # expect(enrollment.effective_on).to eq sep.qle_on
+       enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+       expect(enrollment.effective_on).to eq sep.qle_on
     end
   end
 
@@ -1066,7 +1069,7 @@ describe HbxEnrollment, dbclean: :after_each do
       end
 
       it "should return benefit group and assignment" do
-        # expect(HbxEnrollment.employee_current_benefit_group(employee_role, shop_enrollment, false)).to eq [plan_year.benefit_groups.first, benefit_group_assignment]
+        expect(HbxEnrollment.employee_current_benefit_group(employee_role, shop_enrollment, false)).to eq [plan_year.benefit_groups.first, benefit_group_assignment]
       end
     end
   end

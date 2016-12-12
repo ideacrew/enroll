@@ -571,6 +571,78 @@ describe EmployeeRole, dbclean: :after_each do
       expect(employee_role.can_select_coverage?).to eq false
     end
   end
+
+  describe "#benefit_group", dbclean: :after_each do
+    subject { EmployeeRole.new(:person => person, :employer_profile => organization.employer_profile, :census_employee => census_employee) }
+    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let(:sep){
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'date_of_event'
+      sep.qualifying_life_event_kind= qle_kind
+      sep.qle_on= TimeKeeper.date_of_record - 7.days
+      sep.save
+      sep
+    }
+
+    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: person.first_name, last_name: person.last_name,
+                              dob: person.dob, ssn: person.ssn)}
+
+    before do
+      allow(family).to receive(:current_sep).and_return sep
+    end
+
+    context "plan shop through qle and having active & renewal plan years" do
+      before do
+        census_employee.benefit_group_assignments.each do |bga|
+          bga.delete 
+        end
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+        census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_group, start_on: active_benefit_group.plan_year.start_on)
+        census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: renewal_benefit_group, start_on: renewal_benefit_group.plan_year.start_on)
+      end
+
+      it "should return the active benefit group if sep effective date covers active plan year" do
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        expect(subject.benefit_group(qle: true)).to eq active_benefit_group
+      end
+
+      it "should return the renewal benefit group if sep effective date covers renewal plan year" do
+        renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+        sep.update_attribute(:effective_on, renewal_benefit_group.plan_year.start_on + 2.days)
+        expect(subject.benefit_group(qle: true)).to eq renewal_benefit_group
+      end
+    end
+
+    context "plan shop through qle and having active & expired plan years" do
+
+      let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+
+      before do
+        census_employee.benefit_group_assignments.each do |bga|
+          bga.delete 
+        end
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+        census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_group, start_on: active_benefit_group.plan_year.start_on)
+        census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: expired_benefit_group, start_on: expired_benefit_group.plan_year.start_on)
+        sep.update_attribute(:effective_on, expired_benefit_group.plan_year.end_on - 7.days)
+      end
+      it "should return the expired benefit group if sep effective date covers expired plan year & has expired benefit group assignment" do
+        expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+        expect(subject.benefit_group(qle: true)).to eq expired_benefit_group
+      end
+
+      it "should return the active benefit group if sep effective date covers expired plan year if EE was not assigned to expired benefit group" do
+        expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+        census_employee.benefit_group_assignments.where(benefit_group_id: expired_benefit_group.id).first.delete
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        expect(subject.benefit_group(qle: true)).to eq active_benefit_group
+      end
+    end
+  end
 end
 
 describe EmployeeRole do
