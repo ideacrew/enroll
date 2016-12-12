@@ -592,6 +592,7 @@ class Family
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_expired"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},

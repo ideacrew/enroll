@@ -246,7 +246,6 @@ RSpec.describe Insured::FamiliesController do
       context "with waived_hbx when display_hbx is individual" do
         let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
         let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
-        let(:expired) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_expired') }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
@@ -268,9 +267,6 @@ RSpec.describe Insured::FamiliesController do
 
         it "waived should be true" do
           expect(assigns(:waived)).to eq true
-        end
-        it "shouldnot display the expired_state" do
-          expect(assigns(:hbx_enrollment)).not_to eq([expired])
         end
       end
     end
