@@ -63,7 +63,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'no family member found without uploaded documents'
     end
 
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days) unless e.special_verification_period.present?}
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
 
     append_unverified_individuals(outstanding_people)
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
