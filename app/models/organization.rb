@@ -3,8 +3,6 @@ class Organization
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
-  include Acapi::Notifiers
-  extend Acapi::Notifiers
 
   extend Mongorder
 
@@ -19,8 +17,6 @@ class Organization
     "governmental_employer",
     "foreign_embassy_or_consulate"
   ]
-
-  FIELD_AND_EVENT_NAMES = {"legal_name" => "name_changed", "fein" => "fein_changed"}
 
   field :hbx_id, type: String
 
@@ -107,7 +103,6 @@ class Organization
   index({"employer_profile.general_agency_accounts._id" => 1})
 
   before_save :generate_hbx_id
-  after_update :notify_legal_fein_changes
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -327,15 +322,6 @@ class Organization
     end
   end
 
-  def notify_legal_fein_changes
-    return unless self.employer_profile.present?
-    changed_fields = changed_attributes.keys
-    FIELD_AND_EVENT_NAMES.each do |feild, event_name|
-      if changed_fields.include?(feild)
-        notify("acapi.info.events.employer.#{event_name}", {:employer_id => self.hbx_id})
-      end
-    end
-  end
 
   class << self
     def employer_profile_renewing_starting_on(date_filter)
