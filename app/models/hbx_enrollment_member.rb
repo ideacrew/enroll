@@ -68,6 +68,25 @@ class HbxEnrollmentMember
     @age_on_effective_date = age
   end
 
+  def age_on_eligibility_date
+    return @age_on_eligibility_date unless @age_on_eligibility_date.blank?
+    dob = person.dob
+    if eligibility_date.present?
+      age = eligibility_date.year - dob.year
+
+      # Shave off one year if elibiility starts before birthday
+      if eligibility_date.month == dob.month
+        age -= 1 if eligibility_date.day < dob.day
+      else
+        age -= 1 if eligibility_date.day < dob.month
+      end
+
+      @age_on_eligibility_date = age
+    else
+      age_on_effective_date
+    end
+  end
+
   def is_subscriber?
     self.is_subscriber
   end
