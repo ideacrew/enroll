@@ -325,9 +325,9 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
-  def all_eligibility_determinations
+  def eligibility_determinations_for_year(year)
     eds = []
-    tax_households.each do |th|
+    tax_households.tax_household_with_year(year).each do |th|
       th.eligibility_determinations.each do |ed|
         eds << ed
       end

@@ -76,7 +76,7 @@ class Admin::Aptc < ApplicationController
     end
 
     def update_aptc_applied_hash_for_month(year, aptc_applied_hash, current_hbx, month, hbx_iter, family, applied_aptc_array=nil)
-      first_of_month_num_current_year = first_of_month_converter(month, year)
+      first_of_month_num_current_year = last_of_month_converter(month, year)
       applied_aptc = 0.0 
       if applied_aptc_array.present?
         #if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
@@ -91,7 +91,7 @@ class Admin::Aptc < ApplicationController
         applied_aptc = hbx_iter.applied_aptc_amount.to_f
       end
 
-      first_of_month_num_current_year = first_of_month_converter(month, year)
+      first_of_month_num_current_year = last_of_month_converter(month, year)
       if first_of_month_num_current_year >= hbx_iter.effective_on.to_date
         aptc_applied_hash.store(month, '%.2f' % applied_aptc)
       else
@@ -120,7 +120,7 @@ class Admin::Aptc < ApplicationController
     def build_max_aptc_values(year, family, max_aptc=nil, hbxs=nil)
       max_aptc_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-      eligibility_determinations = family.active_household.all_eligibility_determinations
+      eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|
@@ -134,7 +134,7 @@ class Admin::Aptc < ApplicationController
     end
 
     def update_max_aptc_hash_for_month(max_aptc_hash, year, month, ed, max_aptc=nil, hbxs=nil)
-      first_of_month_num_current_year = first_of_month_converter(month, year)
+      first_of_month_num_current_year = last_of_month_converter(month, year)
       max_aptc_value = ""
       if max_aptc.present?
         max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
@@ -156,7 +156,7 @@ class Admin::Aptc < ApplicationController
     def build_csr_percentage_values(year, family, csr_percentage=nil)
       csr_percentage_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-      eligibility_determinations = family.active_household.all_eligibility_determinations
+      eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|
@@ -168,7 +168,7 @@ class Admin::Aptc < ApplicationController
     end
 
     def update_csr_percentages_hash_for_month(csr_percentage_hash, year, month, ed, csr_percentage=nil)
-      first_of_month_num_current_year = first_of_month_converter(month, year)
+      first_of_month_num_current_year = last_of_month_converter(month, year)
       csr_percentage_value = ""
       #csr_percentage_value = csr_percentage.present? ? csr_percentage : ed.csr_percent_as_integer
       if csr_percentage.present?
@@ -192,17 +192,18 @@ class Admin::Aptc < ApplicationController
       end  
     end
 
-    def first_of_month_converter(month, year=TimeKeeper.date_of_record.year)
+    def last_of_month_converter(month, year=TimeKeeper.date_of_record.year)
       month_num = Date::ABBR_MONTHNAMES.index(month.capitalize || month) # coverts Month name to Month Integer : "jan" -> 1
-      first_of_month_num_current_year = Date.parse("#{year}-#{month_num}-01")
-      return first_of_month_num_current_year
+      last_day = Time.days_in_month(month_num, year)
+      last_of_month_date = Date.parse("#{year}-#{month_num}-#{last_day}")
+      return last_of_month_date
     end  
 
 
     def calculate_slcsp_value(year, family, member_ids=nil)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-      date = Date.new(year, 1, 1)
+      #date = Date.new(year, 1, 1)
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       if member_ids.present?
@@ -289,7 +290,6 @@ class Admin::Aptc < ApplicationController
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
     def update_aptc_applied_for_enrollments(params)
       current_datetime = TimeKeeper.datetime_of_record
-      raise raise "EffectiveDateBeyondPolicysLife"
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       family = Family.find(params[:person][:family_id])
@@ -370,27 +370,30 @@ class Admin::Aptc < ApplicationController
       #return DateTime.new(year, month, day)
     end
 
-    def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year)
+    def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year, hbxs)
       sum_of_all_applied = 0.0
       aptc_errors = Hash.new
-      aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule." if find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
+      binding.pry
+      if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
+        aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = Settings.aptc_errors.effective_date_overflow 
+      end
 
       if applied_aptcs_array.present?
         applied_aptcs_array.each do |hbx|
           max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx[1]["hbx_id"].gsub("aptc_applied_",""), max_aptc)
           applied_aptc = hbx[1]["aptc_applied"].to_f
-          aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = "MAX Applied APTC for any Enrollment cannot be smaller than the Applied APTC. [NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
+          aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.enrollment_max_smaller_than_applied + "[NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f
         end
-      end  
+      end
       #applied_aptcs_array.each {|hbx|  if applied_aptcs_array.present?
 
       if max_aptc == "NaN"
-        aptc_errors["MAX_APTC_NON_NUMERIC"] = "Max APTC needs to be a numeric value."
+        aptc_errors["MAX_APTC_NON_NUMERIC"] = Settings.aptc_errors.max_aptc_non_numeric
       elsif applied_aptcs_array.present? && sum_of_all_applied.to_f > max_aptc.to_f
-        aptc_errors["MAX_APTC_TOO_SMALL"] = "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
+        aptc_errors["MAX_APTC_TOO_SMALL"] = Settings.aptc_errors.max_aptc_too_small
       elsif max_aptc.to_f > 9999.99
-        aptc_errors["MAX_APTC_TOO_BIG"]  = "Max APTC should be less than 9999.99"
+        aptc_errors["MAX_APTC_TOO_BIG"]  = Settings.aptc_errors.max_aptc_too_big
       end
       return aptc_errors
     end
