@@ -308,8 +308,7 @@ class Plan
   end
 
   def cat_age_off_renewal_plan
-    return @cat_age_off_renewal_plan if defined? @cat_age_off_renewal_plan
-    @cat_age_off_renewal_plan = Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
+    Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
   end
 
   # has_one renewal_plan
