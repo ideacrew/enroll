@@ -49,7 +49,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq hem_employee.age_on_effective_date * benefit_group.contribution_pct_as_int / 100.0
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq hem_employee.age_on_eligibility_date * benefit_group.contribution_pct_as_int / 100.0
         end
       end
 
@@ -143,7 +143,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
 
         it "should have correct ages for everyone" do
           plan_cost_decorator.members.each do |member|
-            expect(plan_cost_decorator.age_of(member)).to eq member.age_on_effective_date
+            expect(plan_cost_decorator.age_of(member)).to eq member.age_on_eligibility_date
           end
         end
 

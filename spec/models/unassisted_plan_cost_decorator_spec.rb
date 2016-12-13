@@ -7,7 +7,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   context "rating a large family" do
     let(:plan)            {default_plan}
     let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
-    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, age_on_eligibility_date: 55, employee_relationship: "self")}
+    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 67, age_on_eligibility_date: 55, employee_relationship: "self")}
     let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, age_on_eligibility_date: 45, employee_relationship: "spouse")}
     let!(:one)             {double("one"   , dob: 20.years.ago, age_on_effective_date: 20, age_on_eligibility_date: 20, employee_relationship: "child")}
     let!(:two)             {double("two"   , dob: 18.years.ago, age_on_effective_date: 18, age_on_eligibility_date: 18, employee_relationship: "child")}
