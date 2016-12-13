@@ -107,6 +107,10 @@ class EmployeeRole
     effective_on_date
   end
 
+  def new_coverage_effective_on
+    census_employee.new_coverage_effective_on
+  end
+
   def can_enroll_as_new_hire?    
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end

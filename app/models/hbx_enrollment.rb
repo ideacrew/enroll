@@ -776,59 +776,57 @@ class HbxEnrollment
   end
 
   def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    if employee_role.can_enroll_as_new_hire?
-      return employee_role.coverage_effective_on
-    end
-
     if employee_role.census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
       raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{employee_role.census_employee.new_hire_enrollment_period.min.strftime("%m/%d/%Y")} to enroll for coverage."
     end
 
-    if qle
-      return hbx_enrollment.family.earliest_effective_shop_sep.effective_on
-    end
+    if employee_role.can_enroll_as_new_hire?
+      employee_role.new_coverage_effective_on
+    elsif qle
+      hbx_enrollment.family.earliest_effective_shop_sep.effective_on
+    else
+      active_plan_year = employee_role.employer_profile.show_plan_year
 
-    active_plan_year = employee_role.employer_profile.show_plan_year
-    if active_plan_year.blank?
-      raise "Unable to find employer-sponsored benefits."
-    end
+      if active_plan_year.blank?
+        raise "Unable to find employer-sponsored benefits."
+      end
 
-    if !employee_role.is_under_open_enrollment?
-      raise "You may not enroll until you're eligible under an enrollment period."
-    end
+      if !employee_role.is_under_open_enrollment?
+        raise "You may not enroll until you're eligible under an enrollment period."
+      end
 
-    employee_role.employer_profile.show_plan_year.start_on
+      employee_role.employer_profile.show_plan_year.start_on
+    end
   end
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
 
-      if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
-        raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
-      end
-
-      census_employee = employee_role.census_employee
-      benefit_group_assignment = plan_year.is_renewing? ?
-      census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
-
-      if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-        raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
-      end
-
-      return benefit_group_assignment.benefit_group, benefit_group_assignment
-    else
+    if plan_year.blank?
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
+
+    if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
+      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
+    end
+
+    census_employee = employee_role.census_employee
+    benefit_group_assignment = plan_year.is_renewing? ?
+    census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
+
+    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+    end
+
+    return benefit_group_assignment.benefit_group, benefit_group_assignment    
   end
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     enrollment = HbxEnrollment.new
-
     enrollment.household = coverage_household.household
-
-
     enrollment.submitted_at = submitted_at
+
     case
     when employee_role.present?
       if benefit_group.blank? || benefit_group_assignment.blank?
@@ -1190,19 +1188,21 @@ class HbxEnrollment
   end
 
   def can_select_coverage?
-    return true unless is_shop?
+    if is_shop?
+      if employee_role.can_enroll_as_new_hire?
+        coverage_effective_date = employee_role.new_coverage_effective_on
+      elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
+        coverage_effective_date = special_enrollment_period.effective_on
+      elsif benefit_group.is_open_enrollment?
+        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
+        return false if open_enrollment_effective_date < employee_role.coverage_effective_on
+        coverage_effective_date = open_enrollment_effective_date
+      end
 
-    if employee_role.can_enroll_as_new_hire?
-      coverage_effective_date = employee_role.coverage_effective_on
-    elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
-      coverage_effective_date = special_enrollment_period.effective_on
-    elsif benefit_group.is_open_enrollment?
-      open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-      return false if open_enrollment_effective_date < employee_role.coverage_effective_on
-      coverage_effective_date = open_enrollment_effective_date
+      benefit_group_assignment_valid?(coverage_effective_date)
+    else
+      true 
     end
-
-    benefit_group_assignment_valid?(coverage_effective_date)
   end
 
   def decorated_hbx_enrollment

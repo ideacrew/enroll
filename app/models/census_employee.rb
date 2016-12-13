@@ -223,6 +223,19 @@ class CensusEmployee < CensusMember
     benefit_group_assignment.benefit_group.start_on
   end
 
+  def new_coverage_effective_on
+    benefit_group = (active_benefit_group_assignment || renewal_benefit_group_assignment).benefit_group
+    if benefit_group.present?
+
+      effective_on_date = benefit_group.effective_on_for(hired_on)
+      if newly_designated_eligible? || newly_designated_linked?
+        effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
+      end
+      
+      effective_on_date
+    end
+  end
+
   # def first_name=(new_first_name)
   #   write_attribute(:first_name, new_first_name)
   #   set_autocomplete_slug

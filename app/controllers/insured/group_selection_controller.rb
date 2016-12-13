@@ -18,7 +18,7 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
-    @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+    @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
 
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
@@ -38,9 +38,10 @@ class Insured::GroupSelectionController < ApplicationController
       @disable_market_kind = "individual" if @market_kind == "shop"
     end
 
-    insure_hbx_enrollment_for_shop_qle_flow
-    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @employee_role.try(:benefit_group))
+
+    insure_hbx_enrollment_for_shop_qle_flow
+    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?    
   end
 
   def create

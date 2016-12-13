@@ -37,8 +37,13 @@ module Insured
     end
 
     def insure_hbx_enrollment_for_shop_qle_flow
-      if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-        @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+        if @hbx_enrollment.blank? && @employee_role.present?
+          plan_year = @employee_role.employer_profile.find_plan_year_by_effective_date(@new_effective_on)
+          id_list = plan_year.benefit_groups.collect(&:_id).uniq
+          enrollments = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.where(:"benefit_group_id".in => id_list).effective_desc
+          @hbx_enrollment = enrollments.first
+        end
       end
     end
   end
