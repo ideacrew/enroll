@@ -8,25 +8,14 @@ end
 families = []
 families_1 = Family.where({
   "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
+    "$elemMatch" => {
+      "aasm_state" => { "$in" => ["enrolled_contingent"] },
       "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => nil
-    }  
-  }
+      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+  } }
 }).to_a
 
 families_2 = Family.where({
-  "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => { "$gt" => Date.new(2016,10,25)}
-    }
-  }
-}).to_a
-
-families_3 = Family.where({
    "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
@@ -34,10 +23,9 @@ families_3 = Family.where({
     }
  }
 }).to_a
-families = families_3 + families_2 + families_1
+families =   families_2 + families_1
 
-# 19744754, 19745447
-# families = [18941570].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+families.uniq!
 
 mailing_address_missing = []
 coverage_not_found = []
