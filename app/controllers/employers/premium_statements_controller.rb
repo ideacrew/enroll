@@ -7,9 +7,9 @@ class Employers::PremiumStatementsController < ApplicationController
   def show
     @employer_profile = EmployerProfile.find(params[:id])
     authorize @employer_profile, :list_enrollments?
-    bill_date = set_billing_date
+    set_billing_date
     @hbx_enrollments = @employer_profile.enrollments_for_billing(@billing_date)
-    scopes={ id: params.require(:id), billing_date: bill_date}
+    scopes={ id: params.require(:id), billing_date: @billing_date}
     @datatable = Effective::Datatables::PremiumBillingReportDataTable.new(scopes)
 
     respond_to do |format|

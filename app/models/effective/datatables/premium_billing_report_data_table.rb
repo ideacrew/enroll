@@ -1,15 +1,15 @@
 module Effective
   module Datatables
-    class PremiumBillingReportDataTable < Effective::MongoidDatatable
+    class PremiumBillingReportDataTable < Effective::ArraycolumnDatatable
      include Employers::PremiumStatementHelper
      include Pundit
 
 
      datatable do
-      array_column :full_name,:label => 'Employee Profile',
+      array_column :full_name,:label => 'Employee Profile', premium_report: true,
       :proc => Proc.new { |row|
         content_tag(:span, class: 'name') do
-          row.employee_role.person.full_name.try(:titleize)
+          name_to_listing(row.employee_role.person)
         end +
         content_tag(:span,
           content_tag(:p, "DOB: #{format_date row.employee_role.person.dob}")
@@ -22,7 +22,7 @@ module Effective
          )
         }, :filter => false, :sortable => false
 
-        array_column :title ,:label => 'Benefit Package',
+        table_column :title ,:label => 'Benefit Package',
         :proc => Proc.new { |row|
           content_tag(:span, class: 'benefit-group') do
             row.benefit_group.title.try(:titleize)
@@ -30,7 +30,7 @@ module Effective
           },:filter => false, :sortable => false
 
 
-          array_column :coverage_kind,:label => 'Insurance Coverage',
+          table_column :coverage_kind,:label => 'Insurance Coverage',
           :proc => Proc.new { |row|
             content_tag(:span) do
               content_tag(:span, class: 'name') do
@@ -45,7 +45,7 @@ module Effective
             end
             }, :filter => false, :sortable => false
 
-            array_column :cost,:label => 'COST',
+            table_column :cost,:label => 'COST',
             :proc => Proc.new { |row|
              content_tag(:span,
                "Employer Contribution: ".to_s + (number_to_currency row.total_employer_contribution.to_s)
@@ -66,6 +66,13 @@ module Effective
 
           def global_search?
             true
+          end
+          def set_billing_date
+            if params[:billing_date].present?
+              @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y")
+            else
+              @billing_date = billing_period_options.first[1]
+            end
           end
 
         end
