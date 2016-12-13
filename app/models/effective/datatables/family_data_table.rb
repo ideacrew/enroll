@@ -59,7 +59,8 @@ module Effective
         link_type = "disabled"
         family.active_household.tax_households.each do |th|
           th.eligibility_determinations.each do |ed|
-            link_type = "ajax" if ed.max_aptc > 0 && allow
+            link_type = "ajax" if ed.max_aptc > 0 && th.effective_ending_on.nil? && allow
+            #link_type = "ajax" if ed.max_aptc > 0 && allow
           end
         end
         return link_type
@@ -74,7 +75,7 @@ module Effective
       end
 
       def terminate_enrollment_type(family, allow)
-        (family.all_enrollments.can_terminate.present? && allow)                ? 'ajax' : 'disabled'
+        (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
