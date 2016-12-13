@@ -462,7 +462,7 @@ describe EmployeeRole, dbclean: :after_each do
   let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   let!(:plan_year) {

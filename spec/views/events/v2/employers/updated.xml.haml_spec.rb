@@ -30,7 +30,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         organization: organization,
         entity_kind: entity_kind,
         profile_source: 'conversion',
-        created_at: TimeKeeper.date_of_record
+        created_at: Date.today
     }
   end
 

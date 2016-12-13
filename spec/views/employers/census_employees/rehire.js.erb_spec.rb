@@ -11,7 +11,7 @@ describe "employers/census_employees/rehire.js.erb" do
     sign_in user
     assign(:employer_profile, employer_profile)
     assign(:census_employee, census_employee)
-    assign(:rehiring_date, TimeKeeper.date_of_record)
+    assign(:rehiring_date, Date.today)
     render file: "employers/census_employees/rehire.js.erb"
   end
 

@@ -425,7 +425,7 @@ RSpec.describe Insured::FamiliesController do
 
     context 'when its initial enrollment' do
       before :each do
-        post :record_sep, qle_id: @qle.id, qle_date: TimeKeeper.date_of_record
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
       it "should redirect" do
@@ -438,7 +438,7 @@ RSpec.describe Insured::FamiliesController do
 
       before :each do
         allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
-        post :record_sep, qle_id: @qle.id, qle_date: TimeKeeper.date_of_record
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
       it "should redirect with change_plan parameter" do

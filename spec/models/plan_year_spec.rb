@@ -354,7 +354,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context "when open enrollment dates valid" do
@@ -407,7 +407,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record  )
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it "plan year should be in renewing_draft state" do
@@ -2233,7 +2233,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       after(:all) do
         refresh_mailbox
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record  )
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       it 'the plan should be in renewing enrolling' do

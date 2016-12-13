@@ -14,7 +14,7 @@ RSpec.describe "events/lawful_presence/vlp_verification_request.xml.haml"
     let(:individual) { FactoryGirl.build_stubbed :generative_individual }
 
     before :each do
-      render :template => "events//lawful_presence/vlp_verification_request.xml", :locals => { :individual => individual, :coverage_start_date => TimeKeeper.date_of_record }
+      render :template => "events//lawful_presence/vlp_verification_request.xml", :locals => { :individual => individual, :coverage_start_date => Date.today }
     end
 
     it "should be schema valid" do

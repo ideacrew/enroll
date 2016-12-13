@@ -7,7 +7,7 @@ RSpec.describe CensusDependent, :type => :model do
   let(:middle_name) { "R" }   
   let(:last_name) { "Skynyrd" }   
   let(:name_sfx) { "PhD" }   
-  let(:dob) { TimeKeeper.date_of_record }
+  let(:dob) { Date.today }
   let(:ssn) { "230987654" }
   let(:gender) { "male" }
   let(:employee_relationship) { "spouse" }

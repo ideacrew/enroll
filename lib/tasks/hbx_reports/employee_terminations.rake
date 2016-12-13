@@ -46,7 +46,7 @@ namespace :reports do
         end
       end
 
-      puts "For period #{date_start} - #{TimeKeeper.date_of_record}, #{processed_count} employee terminations output to file: #{file_name}"
+      puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end
   end
 end

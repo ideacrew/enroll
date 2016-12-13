@@ -26,7 +26,7 @@ FactoryGirl.define do
       significant_other { FactoryGirl.create(:person, :with_consumer_role, gender: "female") }
       disabled_child    { FactoryGirl.create(:person, :with_consumer_role, 
                                               is_disabled: true, 
-                                              dob: (TimeKeeper.date_of_record - 27.years)) }
+                                              dob: (Date.today - 27.years)) }
     end
 
     family_members { [

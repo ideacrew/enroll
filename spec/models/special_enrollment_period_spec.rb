@@ -125,7 +125,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record )
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context "and QLE is reported before end of SEP" do
@@ -217,7 +217,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       end
 
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record )
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       it "the effective date should be in the past: first of month following the lapsed date" do

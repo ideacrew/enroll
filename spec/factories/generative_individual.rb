@@ -3,7 +3,7 @@ FactoryGirl.define do
     first_name { Forgery(:name).first_name }
     last_name { Forgery(:name).first_name }
     gender { Forgery(:personal).gender }
-    dob { TimeKeeper.date_of_record }
+    dob { Date.today }
     addresses {
       address_count = Random.rand(4)
       if address_count == 0

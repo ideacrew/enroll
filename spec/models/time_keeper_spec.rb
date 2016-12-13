@@ -94,7 +94,7 @@ RSpec.describe TimeKeeper, type: :model do
 
   context "which can avoid local cache hits" do
     before :each do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it "should return identical values for the life of the cache" do

@@ -1343,8 +1343,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       context "and new plan year begins, ending 'newly designated' status" do
         before do
-          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.end_of_year)
-          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.end_of_year + 1.day)
+          TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
+          TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
         end
 
         it "should transition 'newly designated eligible' status to initial state" do

@@ -392,7 +392,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     it "should throw error when census_employee terminate_employment error" do
       allow(census_employee).to receive(:terminate_employment).and_return(false)
-      xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: TimeKeeper.date_of_record.to_s, :format => :js
+      xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
       expect(response).to have_http_status(:success)
       expect(assigns[:fa]).to eq false
       expect(flash[:error]).to eq "Census Employee could not be terminated: Termination date must be within the past 60 days."
@@ -400,7 +400,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     context "with termination date" do
       it "should terminate census employee" do
-        xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: TimeKeeper.date_of_record.to_s, :format => :js
+        xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq true
       end

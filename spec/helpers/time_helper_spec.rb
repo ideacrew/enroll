@@ -4,7 +4,7 @@ RSpec.describe TimeHelper, :type => :helper do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
 
   before :all do
-    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   describe "time remaining in words" do
