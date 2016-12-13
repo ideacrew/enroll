@@ -33,7 +33,6 @@ describe AddingEmployeeRole do
         census_employee.reload
         expect(census_employee.employee_role).not_to eq nil     
       end
-    
     end
   end
 end
