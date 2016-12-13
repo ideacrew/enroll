@@ -300,7 +300,7 @@ class Organization
     changed_fields = changed_attributes.keys
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
       if changed_fields.include?(feild)
-        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
+        notify("info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
     end
   end
@@ -318,7 +318,7 @@ class Organization
     end
     changed_address << false if old_address_dup.present?
     unless changed_address.all?
-      notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
+      notify("info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
     end
 
   end
