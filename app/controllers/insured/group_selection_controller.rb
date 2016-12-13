@@ -1,4 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
+  include Insured::GroupSelectionHelper
+
   before_action :initialize_common_vars, only: [:create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
 
@@ -25,34 +27,25 @@ class Insured::GroupSelectionController < ApplicationController
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
-      correct_effective_on = HbxEnrollment.calculate_effective_on_from(
-        market_kind: 'individual',
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
-        family: @family,
-        employee_role: nil,
-        benefit_group: nil,
-        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+
+      correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
-    if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-      @disable_market_kind = @market_kind == "shop" ? "individual" : "shop"
+
+    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+      @disable_market_kind = "shop"
+      @disable_market_kind = "individual" if @market_kind == "shop"
     end
+
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
-    @new_effective_on = HbxEnrollment.calculate_effective_on_from(
-      market_kind:@market_kind,
-      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
-      family: @family,
-      employee_role: @employee_role,
-      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @employee_role.try(:benefit_group))
   end
 
   def create
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
-
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
@@ -81,8 +74,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
-
     hbx_enrollment.coverage_kind = @coverage_kind
 
     if hbx_enrollment.save
@@ -136,6 +127,7 @@ class Insured::GroupSelectionController < ApplicationController
     case @market_kind
     when 'shop'
       @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+
       if @hbx_enrollment.present?
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
         if @employee_role == @hbx_enrollment.employee_role
@@ -182,19 +174,4 @@ class Insured::GroupSelectionController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
   end
-
-  def insure_hbx_enrollment_for_shop_qle_flow
-    if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
-    end
-  end
-
-  private
-
-  # def is_under_open_enrollment
-  #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?
-  #     flash[:alert] = "You can only shop for plans during open enrollment."
-  #     redirect_to family_account_path
-  #   end
-  # end
 end
