@@ -167,7 +167,7 @@ RSpec.describe Employers::EmployerProfilesController do
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test1",
                                            last_name: "test1")
 
-      params ={commit: "search", status: "active", employee_name: "test11", search: true,id: employer_profile.id.to_s}
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
       xhr :get,:show, params
       expect(assigns(:census_employees).count).to eq 0
       expect(assigns(:census_employees)).to eq []
@@ -179,7 +179,7 @@ RSpec.describe Employers::EmployerProfilesController do
                                            last_name: "test1")
       census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test11",
                                             last_name: "test11")
-      params ={commit: "search", status: "active", employee_name: "test11", search: true,id: employer_profile.id.to_s}
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
       xhr :get,:show, params
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee1]
@@ -189,7 +189,7 @@ RSpec.describe Employers::EmployerProfilesController do
       employer_profile.census_employees.delete_all
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "123456789")
       census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "987654321")
-      params ={commit: "search", status: "active", employee_name: "123456789", search: true,id: employer_profile.id.to_s}
+      params ={commit: "search", status: "active", employee_search: "123456789", search: true,id: employer_profile.id.to_s}
       xhr :get,:show, params
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee]
