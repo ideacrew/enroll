@@ -1967,8 +1967,8 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
   let(:end_on) { start_on + 1.year - 1.day }
-  let(:open_enrollment_start_on) { start_on - 1.month }
-  let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
+  let(:open_enrollment_start_on) { start_on - 2.months }
+  let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 9.days }
 
   let!(:renewal_plan) {
     FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01")
@@ -2049,16 +2049,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
   context 'When family has passive renewal and selected a coverage' do
 
     let!(:renewing_plan_year) {
-      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
+      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
     }
 
     let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }
-    let!(:renewal_benefit_group_assignment) { ce.add_renew_benefit_group_assignment renewal_benefit_group }
+    let!(:renewal_benefit_group_assignment) { employer_profile.census_employees.each{|ce| ce.add_renew_benefit_group_assignment renewal_benefit_group; ce.save!;} }
 
     let!(:generate_passive_renewal) {
+      ce.update!(created_at: 2.months.ago)
+
       factory = Factories::FamilyEnrollmentRenewalFactory.new
       factory.family = family
-      factory.census_employee = ce
+      factory.census_employee = ce.reload
       factory.employer = employer_profile
       factory.renewing_plan_year = employer_profile.renewing_plan_year
       factory.renew
