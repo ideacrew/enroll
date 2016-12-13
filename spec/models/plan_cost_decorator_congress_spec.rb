@@ -4,7 +4,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
   let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new("97190"), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
   let(:hbx_enrollment)      { double("HbxEnrollment", class: HbxEnrollment, hbx_enrollment_members: hbx_enrollment_members) }
-  let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 19, age_on_eligibility_date: 19, is_subscriber?: true , primary_relationship: "self") }
+  let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 55, age_on_eligibility_date: 19, is_subscriber?: true , primary_relationship: "self") }
   let!(:hem_spouse)         { double("HbxEnrollmentMember_Spouse",   class: HbxEnrollmentMember, _id: "b", age_on_effective_date: 20, age_on_eligibility_date: 20, is_subscriber?: false, primary_relationship: "spouse") }
   let!(:hem_child_1)        { double("HbxEnrollmentMember_Child_1",  class: HbxEnrollmentMember, _id: "c", age_on_effective_date: 18, age_on_eligibility_date: 18, is_subscriber?: false, primary_relationship: "child") }
   let!(:hem_child_2)        { double("HbxEnrollmentMember_Child_2",  class: HbxEnrollmentMember, _id: "d", age_on_effective_date: 13, age_on_eligibility_date: 13, is_subscriber?: false, primary_relationship: "child") }
@@ -48,7 +48,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq hem_employee.age_on_effective_date * benefit_group.contribution_pct_as_int / 100.0
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq hem_employee.age_on_eligibility_date * benefit_group.contribution_pct_as_int / 100.0
         end
       end
 
@@ -142,7 +142,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
 
         it "should have correct ages for everyone" do
           plan_cost_decorator.members.each do |member|
-            expect(plan_cost_decorator.age_of(member)).to eq member.age_on_effective_date
+            expect(plan_cost_decorator.age_of(member)).to eq member.age_on_eligibility_date
           end
         end
 
