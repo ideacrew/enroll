@@ -255,7 +255,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
       let(:consumer_role_two) {FactoryGirl.create(:consumer_role, person: person)}
       let(:benefit_package) {double}
-      # let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
       let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family) }
       let(:rule2) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family_two) }
       let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, family: family) }
