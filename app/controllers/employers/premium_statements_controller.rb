@@ -12,7 +12,6 @@ class Employers::PremiumStatementsController < ApplicationController
     @hbx_enrollments = query.execute.hbx_enrollments
     @hbx_enrollments = @hbx_enrollments.sort_by{|row| row.employee_role.person.last_name} if @hbx_enrollments.present?
 
-
     respond_to do |format|
       format.html
       format.js
