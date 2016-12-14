@@ -3,7 +3,7 @@
     <div class="checkbox-filter-wrapper">
       <% if !@hbx_enrollment.is_shop? %>
       <h4>
-        <%= link_to 'Estimate Your Costs', 'https://dc.checkbookhealth.org/hie/dc/2016/index.cfm?data=eyJGT1JNVkFMVUVTIjp7fSwiVVJMVkFMVUVTIjp7IkNPVkVSQUdFIjoiSW5kaXZpZHVhbCIsImRhdGEiOiIifX0%3D', target: '_blank' %>
+        <%= link_to 'Estimate Your Costs', "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
       </h4>
       <% end %>
       <h4>
