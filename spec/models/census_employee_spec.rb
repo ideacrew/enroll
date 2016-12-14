@@ -1224,9 +1224,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should return both active and renewing coverages' do 
         expect(census_employee.enrollments_for_display).to eq [health_enrollment,dental_enrollment,auto_renewing_enrollment]
       end
-      it 'should not display the expired enrollment' do
-        expect(census_employee.enrollments_for_display).not_to eq [expired_enrollment]
-      end
     end
   end
   

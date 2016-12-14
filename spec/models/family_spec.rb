@@ -44,11 +44,11 @@ describe Family, "given a primary applicant and a dependent" do
                        coverage_kind: "health",
                        enrollment_kind: "open_enrollment",
                        aasm_state: 'coverage_expired'
-    )
-  }
-  it "should not return expired enrollment" do
-    expect(subject.enrollments_for_display).not_to eq([expired_enrollment])
-  end
+    )}
+
+    it "should not return expired enrollment" do
+      expect(subject.enrollments_for_display.to_a).to eq []
+    end
   end
 end
 
