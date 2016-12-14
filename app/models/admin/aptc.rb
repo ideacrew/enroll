@@ -373,7 +373,6 @@ class Admin::Aptc < ApplicationController
     def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year, hbxs)
       sum_of_all_applied = 0.0
       aptc_errors = Hash.new
-      binding.pry
       if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
         aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = Settings.aptc_errors.effective_date_overflow 
       end
