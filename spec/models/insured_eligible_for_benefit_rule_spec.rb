@@ -1,25 +1,26 @@
 require 'rails_helper'
 
 RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
+  let(:family) { double }
+  let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
   context "#is_benefit_categories_satisfied?" do
     let(:consumer_role) {double}
     let(:benefit_package) {double}
 
     it "should return true" do
       allow(benefit_package).to receive(:benefit_categories).and_return(['health', 'dental'])
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'dental', family: family)
       expect(rule.is_benefit_categories_satisfied?).to eq true
     end
 
     it "should return false" do
       allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'dental', family: family)
       expect(rule.is_benefit_categories_satisfied?).to eq false
     end
 
     it "coverage_kind" do
       allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_benefit_categories_satisfied?).to eq true
     end
   end
@@ -29,20 +30,17 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) {double}
 
     it "should return true when 0..0" do
-      allow(benefit_package).to receive(:age_range).and_return (0..0)
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      allow(benefit_package).to receive(:age_range).and_return (0..0) 
       expect(rule.is_age_range_satisfied?).to eq true
     end
 
     it "should return true when in the age range" do
       allow(benefit_package).to receive(:age_range).and_return (0..30)
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_age_range_satisfied?).to eq true
     end
 
     it "should return false when out of the age range" do
       allow(benefit_package).to receive(:age_range).and_return (0..10)
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_age_range_satisfied?).to eq false
     end
   end
@@ -58,25 +56,25 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package_with_current_date_start_on) { FactoryGirl.build(:benefit_package) }
 
     it "should return true when csr_kind is blank" do
-      rule = InsuredEligibleForBenefitRule.new(ConsumerRole.new, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(ConsumerRole.new, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is blank" do
       allow(benefit_package_with_current_date_start_on).to receive(:start_on).and_return(TimeKeeper.date_of_record)
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package_with_current_date_start_on )
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package_with_current_date_start_on, family: family )
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is equal to csr_kind" do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_87'
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return false when cost_sharing is not equal to csr_kind" do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq false
     end
   end
@@ -87,13 +85,12 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     it "return true if residency status include 'any'" do
       allow(benefit_package).to receive(:residency_status).and_return ["any", "other"]
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_residency_status_satisfied?).to eq true
     end
 
     it "return false when consumer_role is nil" do
       allow(benefit_package).to receive(:residency_status).and_return ["other"]
-      rule = InsuredEligibleForBenefitRule.new(nil, benefit_package)
+      rule = InsuredEligibleForBenefitRule.new(nil, benefit_package, family: family)
       expect(rule.is_residency_status_satisfied?).to eq false
     end
 
@@ -110,7 +107,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       it "return true if is dc resident" do
         allow(person).to receive(:is_dc_resident?).and_return true
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
         expect(rule.is_residency_status_satisfied?).to eq true
       end
 
@@ -122,27 +118,23 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         it "return true if any one's age >= 19 and is dc resident" do
           allow(family_member).to receive(:dob).and_return (TimeKeeper.date_of_record - 20.years)
           allow(family_member).to receive(:is_dc_resident?).and_return true
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
           expect(rule.is_residency_status_satisfied?).to eq true
         end
 
         it "return false if all < 19" do
           allow(family_member).to receive(:dob).and_return (TimeKeeper.date_of_record - 10.years)
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
           expect(rule.is_residency_status_satisfied?).to eq false
         end
 
         it "return false if all are not dc resident" do
           allow(family_member).to receive(:dob).and_return (TimeKeeper.date_of_record - 20.years)
           allow(family_member).to receive(:is_dc_resident?).and_return false
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
           expect(rule.is_residency_status_satisfied?).to eq false
         end
 
         it "return false if all < 19 and all are not dc resident" do
           allow(family_member).to receive(:dob).and_return (TimeKeeper.date_of_record - 10.years)
           allow(family_member).to receive(:is_dc_resident?).and_return false
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
           expect(rule.is_residency_status_satisfied?).to eq false
 
         end
@@ -156,7 +148,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
     let(:role) {FactoryGirl.create(:consumer_role_object)}
-    let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package)}
+    let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package, family: family)}
     let(:person) {double}
 
     context "consumer_role aasm_state is fully_verified" do
@@ -252,7 +244,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     context "#primary applicant" do
       let(:consumer_role) {double}
       let(:benefit_package) {double}
-      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
       let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
       it "should return family member record of primary applicant" do
         pa = family.family_members.where(is_primary_applicant: true).first
@@ -264,9 +255,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
       let(:consumer_role_two) {FactoryGirl.create(:consumer_role, person: person)}
       let(:benefit_package) {double}
-      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
-      let(:rule2) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family_two) }
-      let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, 'health', family) }
+      # let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'health', family) }
+      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family) }
+      let(:rule2) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family_two) }
+      let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, family: family) }
       let(:family) {
         family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent, person: person)
         persn = family.family_members.where(is_primary_applicant: false).first.person
