@@ -126,7 +126,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
-        allow(benefit_coverage_period).to receive(:start_on).and_return double(year: 2015)
         allow(person).to receive(:has_active_consumer_role?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(HbxEnrollment).to receive(:find).and_return nil
@@ -175,8 +174,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should redirect to family home if termination is possible" do
-      allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
-      expect(hbx_enrollment).to receive(:schedule_coverage_termination!).with(Date.today)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:terminate_benefit)
+      expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
@@ -196,11 +196,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
+    let(:census_employee) {FactoryGirl.create(:census_employee)}
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(hbx_enrollment).to receive(:rebuild_members_by_coverage_household).with(coverage_household: coverage_household).and_return(true)
       allow(family).to receive(:latest_household).and_return(household)
       allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)

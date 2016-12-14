@@ -28,6 +28,7 @@ class Plan
   field :ehb, type: Float, default: 0.0
 
   field :renewal_plan_id, type: BSON::ObjectId
+  field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
@@ -306,6 +307,10 @@ class Plan
     @carrier_profile = CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
   end
 
+  def cat_age_off_renewal_plan
+    Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
+  end
+
   # has_one renewal_plan
   def renewal_plan=(new_renewal_plan)
     if new_renewal_plan.nil?
@@ -345,7 +350,8 @@ class Plan
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost.round(2)
+      value = premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
+      BigDecimal.new("#{value}").round(2).to_f
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end
@@ -367,6 +373,34 @@ class Plan
 
   def is_csr?
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
+  end
+
+  def hsa_plan?
+    name = self.name
+    regex = name.match("HSA")
+    if regex.present?
+      return true
+    else
+      return false
+    end
+  end
+
+  def renewal_plan_type
+    hios = self.hios_base_id
+    kp = ["94506DC0390001","94506DC0390002","94506DC0390003","94506DC0390004","94506DC0390005","94506DC0390006","94506DC0390007","94506DC0390008","94506DC0390009","94506DC0390010","94506DC0390011"]
+    cf_nonhsa = ["78079DC0160001","78079DC0160002","86052DC0400003"]
+    cf_reg = ["86052DC0400001","86052DC0400002","86052DC0400004","86052DC0400007","86052DC0400008","78079DC0210001","78079DC0210002","78079DC0210003","78079DC0210004"]
+    cf_hsa = ["86052DC0400005","86052DC0400006","86052DC0400009"]
+    return "2017 Plan" if self.active_year != 2016    
+    if kp.include?(hios)
+      return "KP"
+    elsif cf_nonhsa.include?(hios)
+      return "CFNONHSA"
+    elsif cf_reg.include?(hios)
+      return "CFREG"
+    elsif cf_hsa.include?(hios)
+      return "CFHSA"
+    end
   end
 
   class << self

@@ -152,7 +152,7 @@ class QhpBuilder
     plans_to_update.each do |up_plan|
       nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
-          name: @qhp.plan_marketing_name.squish!,
+          # name: @qhp.plan_marketing_name.squish!,
           hios_id: up_plan.coverage_kind == "dental" ? up_plan.hios_id.split("-").first : up_plan.hios_id,
           hios_base_id: up_plan.hios_id.split("-").first,
           # csr_variant_id: up_plan.hios_id.include?("-") ? up_plan.hios_id.split("-").last : "",
@@ -169,7 +169,7 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
-      puts "Plan Not Saved! Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
+      puts "Plan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
   end
@@ -185,28 +185,30 @@ class QhpBuilder
   def create_plan_from_serff_data
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
       if cost_share_variance.hios_plan_and_variant_id.split("-").last != "00"
-        csr_variant_id = parse_metal_level == "dental" ? "" : /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/
-        plan = Plan.where(active_year: @plan_year,
-          hios_id: /#{@qhp.standard_component_id.strip}/,
-          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-          csr_variant_id: csr_variant_id).to_a
-        next if plan.present?
-        new_plan = Plan.new(
-          name: @qhp.plan_marketing_name.squish!,
-          hios_id: cost_share_variance.hios_plan_and_variant_id,
-          hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
-          csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
-          active_year: @plan_year,
-          metal_level: parse_metal_level,
-          market: parse_market,
-          ehb: @qhp.ehb_percent_premium,
-          # carrier_profile_id: "53e67210eb899a460300000d",
-          carrier_profile_id: get_carrier_id(@carrier_name),
-          coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
-          dental_level: @dental_metal_level
-          )
-        if new_plan.valid?
-          new_plan.save!
+        if cost_share_variance.plan_marketing_name[-2..-1] != "RE" # dont import plans ending with RE (Religious Exemption)
+          csr_variant_id = parse_metal_level == "dental" ? "" : /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/
+          plan = Plan.where(active_year: @plan_year,
+            hios_id: /#{@qhp.standard_component_id.strip}/,
+            hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
+            csr_variant_id: csr_variant_id).to_a
+          next if plan.present?
+          new_plan = Plan.new(
+            name: cost_share_variance.plan_marketing_name.squish!,
+            hios_id: cost_share_variance.hios_plan_and_variant_id,
+            hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+            csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+            active_year: @plan_year,
+            metal_level: parse_metal_level,
+            market: parse_market,
+            ehb: @qhp.ehb_percent_premium,
+            # carrier_profile_id: "53e67210eb899a460300000d",
+            carrier_profile_id: get_carrier_id(@carrier_name),
+            coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+            dental_level: @dental_metal_level
+            )
+          if new_plan.valid?
+            new_plan.save!
+          end
         end
       end
     end

@@ -6,8 +6,10 @@ class Insured::FamiliesController < FamiliesController
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
+  before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
 
@@ -30,6 +32,11 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
+    if @person.active_employee_roles.count > 1 && (@hbx_enrollments.present? || @waived_hbx_enrollments.present?)
+      @hbx_enrollments = @hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
+      @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
+    end
+
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
@@ -44,7 +51,6 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
-    @employee_role = @person.active_employee_roles.first
     @tab = params['tab'] 
     @family_members = @family.active_family_members
     respond_to do |format|
@@ -202,34 +208,35 @@ class Insured::FamiliesController < FamiliesController
   # admin manually uploads a notice for person
   def upload_notice
 
-    if params.permit![:file]
-      doc_uri = Aws::S3Storage.save(file_path, 'notices')
+    if (!params.permit![:file]) || (!params.permit![:subject])
+      flash[:error] = "File or Subject not provided"
+      redirect_to(:back)
+      return
+    elsif file_content_type != 'application/pdf'
+      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
+      redirect_to(:back)
+      return
+    end
 
-      if doc_uri.present?
-        notice_document = Document.new({ title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
-                                         format: file_content_type })
-        begin
-          @person.documents << notice_document
-          @person.save!
-
-          send_notice_upload_notifications(notice_document)
-
-          flash[:notice] = "File Saved"
-          redirect_to(:back)
-          return
-        rescue => e
-          flash[:error] = "Could not save file. "
-          redirect_to(:back)
-          return
-        end
-      else
-        flash[:error] = "Could not save file"
-        redirect_to(:back)
+    doc_uri = Aws::S3Storage.save(file_path, 'notices')
+    
+    if doc_uri.present?
+      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+                                      format: file_content_type})
+      begin
+        @person.documents << notice_document
+        @person.save!
+        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        flash[:notice] = "File Saved"
+      rescue => e
+        flash[:error] = "Could not save file."
       end
     else
-      flash[:error] = "File not uploaded"
-      redirect_to(:back)
+      flash[:error] = "Could not save file."
     end
+
+    redirect_to(:back)
+    return
   end
 
   # displays the form to upload a notice for a person
@@ -251,7 +258,25 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_employee_role
-    @employee_role = @person.active_employee_roles.first
+    employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
+
+    @employee_role = employee_role_id.present? ? @person.active_employee_roles.detect{|e| e.id.to_s == employee_role_id} : @person.active_employee_roles.first
+  end
+
+  def build_employee_role_by_census_employee_id
+    census_employee_id = (params[:employee_id].present? && params[:employee_id].include?('census_employee')) ? params[:employee_id].gsub("census_employee_", "") : nil
+    return if census_employee_id.nil?
+
+    census_employee = CensusEmployee.find_by(id: census_employee_id)
+    if census_employee.present?
+      census_employee.construct_employee_role_for_match_person
+      @employee_role = census_employee.employee_role
+      @person.reload
+    end
+  end
+
+  def find_or_build_consumer_role
+    @family.check_for_consumer_role
   end
 
   def init_qualifying_life_events
@@ -289,7 +314,6 @@ class Insured::FamiliesController < FamiliesController
         end
       end
     end
-
   end
 
   def check_for_address_info
@@ -325,19 +349,21 @@ class Insured::FamiliesController < FamiliesController
     params.permit![:file].content_type
   end
 
-  def send_notice_upload_notifications(notice)
+  def send_notice_upload_notifications(notice, subject)
     notice_upload_email
-    notice_upload_secure_message(notice)
+    notice_upload_secure_message(notice, subject)
   end
 
   def notice_upload_email
-    UserMailer.notice_uploaded_notification(@person).deliver_now
+    if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
+      (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+    end
   end
 
-  def notice_upload_secure_message(notice)
-    subject = "New Notice Available"
+  def notice_upload_secure_message(notice, subject)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
@@ -349,5 +375,6 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
 end
