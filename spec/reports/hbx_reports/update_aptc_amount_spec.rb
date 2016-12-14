@@ -30,7 +30,9 @@ describe UpdateAptcAmount do
     	hbx_enrollment1.reload
     	expect(hbx_enrollment1.applied_aptc_amount.to_f).to eql ((hbx_enrollment1.total_premium * hbx_enrollment1.plan.ehb).round(2))
     end
-
+    it "should do nothing if applied_aptc_amount is equal or less than ehb_premium" do
+      expect(hbx_enrollment1.applied_aptc_amount.to_f).to eql (550.98)
+    end
   end
 
 end
