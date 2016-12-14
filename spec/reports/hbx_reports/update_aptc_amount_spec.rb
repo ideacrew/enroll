@@ -1,10 +1,8 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "reports", "hbx_reports", "update_aptc_amount")
-
 describe UpdateAptcAmount do
-
   let(:given_task_name) { "update_aptc_amount" }
-   let(:person1) {FactoryGirl.create(:person,
+  let(:person1) {FactoryGirl.create(:person,
                                     :with_consumer_role,
                                     first_name: "F_name1",
                                     last_name:"L_name1")}
@@ -19,7 +17,6 @@ describe UpdateAptcAmount do
                                              applied_aptc_amount: 550.98
                                              )}
   subject {UpdateAptcAmount.new(given_task_name, double(:current_scope => nil))}
-
   describe "correct data input" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -34,5 +31,4 @@ describe UpdateAptcAmount do
       expect(hbx_enrollment1.applied_aptc_amount.to_f).to eql (550.98)
     end
   end
-
 end
