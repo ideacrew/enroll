@@ -1,43 +1,11 @@
-families = []
-families_1 = Family.where({
+families = Family.where({
   "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => nil
-    }  
-  }
-}).to_a
-
-families_2 = Family.where({
-  "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => { "$gt" => Date.new(2016,10,25)}
-    }  
-  }
-}).to_a
-
-families_3 = Family.where({
-   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2017,1,1) },
-    }  
- }
+      "effective_on" => { "$gte" => Date.new(2016,1,1)},
+      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+  } }
 }).to_a
-
-families = families_3 + families_2 + families_1
-
-families.uniq
-
-puts "****************************#{families.count}"
-
-# people_ids = Person.where("consumer_role.aasm_state" => /out/i, "consumer_role.lawful_presence_determination.vlp_authority" => {"$ne" => "curam"}).map(&:id)
-# families = Family.where("family_members.person_id" => {"$in" => people_ids})
-
-# families = [127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
 
 mailing_address_missing = []
 coverage_not_found = []
@@ -71,6 +39,7 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
     begin
 
     person = family.primary_applicant.person
+    # Additional checks for the next round of notices
     #  if (person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?)
     #   puts "already notified!!"
     #   next

@@ -5,39 +5,14 @@ def create_directory(path)
   Dir.mkdir path
 end
 
-families = []
-families_1 = Family.where({
+families = Family.where({
   "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => nil
-    }
-  }
-}).to_a
-
-families_2 = Family.where({
-  "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,12,31) },
-      "special_verification_period" => { "$gt" => Date.new(2016,10,25)}
-    }
-  }
-}).to_a
-
-families_3 = Family.where({
-   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2017,1,1) },
-    }
- }
+      "effective_on" => { "$gte" => Date.new(2016,1,1)},
+      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+  } }
 }).to_a
-families = families_3 + families_2 + families_1
-
-# 19744754, 19745447
-# families = [18941570].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
 
 mailing_address_missing = []
 coverage_not_found = []
