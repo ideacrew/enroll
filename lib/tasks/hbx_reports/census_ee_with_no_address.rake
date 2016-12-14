@@ -28,15 +28,15 @@ namespace :reports do
               ppl= people.limit(step).offset(total_records)
           end
           ppl.each do |person|
-            unless person.employee_roles.first.census_employee.nil?
-              csv << [
-                  person.hbx_id,
-                  person.first_name,
-                  person.last_name,
-                  person.employee_roles.first.census_employee.employer_profile.organization.legal_name,
-                  person.first.employee_roles.first.census_employee.employer_profile.organization.fein
-              ]
-              processed_count += 1
+            person.employee_roles.each do |employee_role|
+                csv << [
+                    person.hbx_id,
+                    person.first_name,
+                    person.last_name,
+                    employee_role.try(census_employee).try(employer_profile).try(organization).try(legal_name),
+                    employee_role.census_employee.try(employer_profile).try(organization).try(fein)
+                ]
+                processed_count += 1
             end
           end
           offset=offset+step
