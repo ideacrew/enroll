@@ -60,6 +60,7 @@ function applyJQDatePickerSetup(ele) {
     onSelect: function(dateText, dpInstance) {
       $(this).datepicker("hide");
       $(this).trigger('change');
+      if($(this).attr("id")=='jq_datepicker_ignore_person_dob'){
 
       var string = $(this).attr("id");
       if(string.indexOf('dob')>0){
@@ -100,7 +101,6 @@ function applyJQDatePickerSetup(ele) {
     }
     
    }
-
   });
   el.datepicker("refresh");
   el.addClass("jq_datepicker_already_applied");
