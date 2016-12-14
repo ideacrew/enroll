@@ -22,6 +22,7 @@
               <th>Market Kind</th>
               <th></th>
             </thead>
+
             <% @broker_agency_profiles.each do |broker_agency_profile| %>
               <tbody>
                 <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
@@ -43,3 +44,27 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+ 
+$('#search').keypress(function (e) { 
+    var key = e.which; 
+    if(key == 13) // the enter key code 
+    { 
+$('.search_icon').click(); 
+return false; 
+} 
+});
+$(".search_icon").click(function(){
+    
+    $.ajax({
+      url:'/exchanges/hbx_profiles/broker_agency_index_search',
+      type:'post',
+      data:'search='+$("#search").val(),
+      success:function(data){
+        $(".table-responsive").html(data);
+      }
+    })
+  })
+</script>
+
