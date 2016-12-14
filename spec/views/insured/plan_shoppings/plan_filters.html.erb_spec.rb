@@ -17,10 +17,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
-    it 'should display estimate your costs link' do
-      expect(rendered).to have_selector('a', text: /find your doctor/i)
-    end
-
     it 'should display find your doctor link' do
       expect(rendered).to have_selector('a', text: /estimate your costs/i)
     end
@@ -99,6 +95,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
+      assign(:market_kind, 'individual')
       assign(:tax_household, true)
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
@@ -131,6 +128,33 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
   end
 
+  context "with tax_household plan_shopping in shop market" do
+    let(:person) {double(has_active_consumer_role?: true)}
+
+    before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
+      assign(:person, person)
+      assign(:carriers, Array.new)
+      assign(:max_total_employee_cost, 1000)
+      assign(:max_deductible, 998)
+      assign(:max_aptc, 330)
+      assign(:market_kind, 'shop')
+      assign(:tax_household, true)
+      assign(:benefit_group, benefit_group)
+      assign(:selected_aptc_pct, 0.85)
+      assign(:elected_aptc, 280.50)
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+    end
+
+    it "should not have aptc area in shop market" do
+      expect(rendered).not_to have_selector('div.aptc')
+      expect(rendered).not_to have_selector('input#max_aptc')
+      expect(rendered).not_to have_selector('input#set_elected_pct_url')
+      expect(rendered).not_to have_selector("input[name='elected_pct']")
+    end
+  end
+
   context "with consumer_role but without tax_household" do
     let(:person) {double(has_active_consumer_role?: true)}
 
@@ -138,6 +162,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:person, person)
       assign(:carriers, Array.new)
+      assign(:market_kind, 'shop')
       assign(:max_total_employee_cost, 1000)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:benefit_group, benefit_group)
