@@ -313,6 +313,12 @@ def employer_poc
       format.js {}
     end
   end
+  
+  def broker_agency_index_search
+    search_value=params[:search]
+    @broker_agency_profiles = Organization.where(:legal_name=>/#{params[:search]}/i)
+    render :layout => false
+  end
 
   def general_agency_index
     page_string = params.permit(:gas_page)[:gas_page]

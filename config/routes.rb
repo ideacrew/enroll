@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
+        post :broker_agency_index_search
         get :general_agency_index
         get :issuer_index
         get :product_index
