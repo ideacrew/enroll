@@ -154,6 +154,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   describe "ShopForPlan using SEP" do
+    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
     let(:person) {FactoryGirl.create(:person, :with_employee_role, :with_family)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month ) }
@@ -173,13 +174,14 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
       sep.qualifying_life_event_kind_id = qle_with_date_options_available.id
-      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 04, 14)
+      sep.qle_on = qle_on
+      sep.optional_effective_on = [qle_on+5.days, qle_on+6.days, qle_on+7.days]
       sep.admin_flag = true
       sep
     }
     context "when building ShopForPlan link" do
 
-        it "should have class 'existing-sep-item' for a QLE type with date options available" do
+        it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
           expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
         end
 

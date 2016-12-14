@@ -134,6 +134,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   context "eligibility determinations for a household" do
     #let!(:tax_household1) {FactoryGirl.create(:tax_household }
+    let(:year) { TimeKeeper.date_of_record.year }
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:household) {FactoryGirl.create(:household, family: family)}
     let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
@@ -147,9 +148,9 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
       tax_household1.eligibility_determinations = [eligibility_determination1]
       tax_household2.eligibility_determinations = [eligibility_determination2]
       household.tax_households = [tax_household1, tax_household2]
-      expect(household.all_eligibility_determinations.size).to eq 2
-      household.all_eligibility_determinations.each do |ed|
-        expect(household.all_eligibility_determinations).to include(ed)
+      expect(household.eligibility_determinations_for_year(year).size).to eq 2
+      household.eligibility_determinations_for_year(year).each do |ed|
+        expect(household.eligibility_determinations_for_year(year)).to include(ed)
       end
     end
 
@@ -157,9 +158,9 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
       tax_household1.eligibility_determinations = [eligibility_determination1, eligibility_determination3]
       tax_household2.eligibility_determinations = [eligibility_determination2]
       household.tax_households = [tax_household1, tax_household2]
-      expect(household.all_eligibility_determinations.size).to eq 3
-      household.all_eligibility_determinations.each do |ed|
-        expect(household.all_eligibility_determinations).to include(ed)
+      expect(household.eligibility_determinations_for_year(year).size).to eq 3
+      household.eligibility_determinations_for_year(year).each do |ed|
+        expect(household.eligibility_determinations_for_year(year)).to include(ed)
       end
     end
   end

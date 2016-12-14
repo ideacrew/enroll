@@ -26,11 +26,11 @@ RSpec.describe HbxAdminHelper, :type => :helper do
       let(:current_year) {TimeKeeper.date_of_record.year}
 
       it "returns the past-aptc-csr-data class for past_month" do
-        expect(helper.aptc_csr_data_type(current_year, past_month)).to eq "past-aptc-csr-data"
+        expect(helper.aptc_csr_data_type(current_year, Date::ABBR_MONTHNAMES[past_month])).to eq "past-aptc-csr-data"
       end
 
       it "returns the current-aptc-csr-data class for current_month" do
-        expect(helper.aptc_csr_data_type(current_year, current_month)).to eq "past-aptc-csr-data"
+        expect(helper.aptc_csr_data_type(current_year, Date::ABBR_MONTHNAMES[current_month])).to eq "current-aptc-csr-data"
       end
     end
   end
