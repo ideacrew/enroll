@@ -15,7 +15,7 @@ class UnsetEmplyeeRoleId < MongoidMigrationTask
         end
       end
     else
-      puts "some error person with hbx_id:#{ENV['hbx_id']} not found" unless Rails.env.test?
+      raise "some error person with hbx_id:#{ENV['hbx_id']} not found"
     end
   end
 end
