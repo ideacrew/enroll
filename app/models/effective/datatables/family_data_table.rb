@@ -54,7 +54,7 @@ module Effective
       end
 
       def aptc_csr_link_type(family, allow)
-        #return "disabled" # DISABLING APTC FEATURE FOR NOW.
+        return "disabled" # DISABLING APTC FEATURE FOR NOW.
 
         link_type = "disabled"
         family.active_household.tax_households.each do |th|
@@ -67,6 +67,7 @@ module Effective
       end
 
       def add_sep_link_type(allow)
+        return "disabled" # DISABLING ADD SEP FEATURE FOR NOW.
         allow ? 'ajax' : 'disabled'
       end
 
