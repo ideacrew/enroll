@@ -83,7 +83,7 @@
 
 <% if notice.renewal_dental_enrollment.present? %>
 
-<% render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.renewal_dental_enrollment.plan.plan_name}</span>"} %>
 
   <table style='margin: 0px auto;' width='80%'>
