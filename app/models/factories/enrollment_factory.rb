@@ -187,6 +187,7 @@ module Factories
       self.link_census_employee(census_employee, role, employer_profile)
       family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
       family.family_members.map(&:__association_reload_on_person)
+      family.save_relevant_coverage_households
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         census_employee.save
