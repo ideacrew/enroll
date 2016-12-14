@@ -1,3 +1,6 @@
+# This is rake task used to generate a report of census employees linked with employers and have no address in roaster.
+# To run rake task: RAILS_ENV=production rake reports:shop:employee_with_no_address_list
+
 require 'csv'
 
 namespace :reports do
@@ -5,7 +8,7 @@ namespace :reports do
 
     desc "Employee with no address account information"
     task :employee_with_no_address_list => :environment do
-      people= Person.all_employee_roles.where(:'addresses'.exists=>false)
+      census_members = CensusMember.where(:aasm_state.in => CensusEmployee::LINKED_STATES, :'address'.exists => false)
       field_names= %w(
                       primary_subscriber_hbx_id
                       first_name
@@ -18,26 +21,24 @@ namespace :reports do
       file_name = "#{Rails.root}/hbx_report/employee_with_no_address_list.csv"
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        total_records = people.count()
+        total_records = census_members.count()
         offset =0
         step=100
         while offset <= total_records do
           if offset+step<=total_records
-              ppl= people.limit(step).offset(offset)
+            census_members= census_members.limit(step).offset(offset)
           else
-              ppl= people.limit(step).offset(total_records)
+            census_members= census_members.limit(step).offset(total_records)
           end
-          ppl.each do |person|
-            person.employee_roles.each do |employee_role|
+          census_members.each do |census_member|
                 csv << [
-                    person.hbx_id,
-                    person.first_name,
-                    person.last_name,
-                    employee_role.try(census_employee).try(employer_profile).try(organization).try(legal_name),
-                    employee_role.try(census_employee).try(employer_profile).try(organization).try(fein)
+                    census_member.try(:employee_role).try(:person).try(:hbx_id),
+                    census_member.try(:employee_role).try(:person).try(:first_name),
+                    census_member.try(:employee_role).try(:person).try(:last_name),
+                    census_member.try(:employer_profile).try(:legal_name),
+                    census_member.try(:employer_profile).try(:fein)
                 ]
                 processed_count += 1
-            end
           end
           offset=offset+step
         end
