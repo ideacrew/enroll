@@ -34,7 +34,7 @@ namespace :reports do
                     person.first_name,
                     person.last_name,
                     employee_role.try(census_employee).try(employer_profile).try(organization).try(legal_name),
-                    employee_role.census_employee.try(employer_profile).try(organization).try(fein)
+                    employee_role.try(census_employee).try(employer_profile).try(organization).try(fein)
                 ]
                 processed_count += 1
             end
