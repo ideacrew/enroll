@@ -477,6 +477,26 @@ And /^employer clicks on terminated employee$/ do
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 
+And /^employer clicks on linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should not see the address on the roaster$/ do
+  expect(page).not_to have_content /Address/
+end
+
+And /^employer clicks on linked employee without address$/ do
+  employees.first.address.delete
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should see the address on the roaster$/ do
+  expect(page).to have_content /Address/
+end
+
 And /^employer clicks on back button$/ do
   expect(page).to have_content "Details"
   find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
