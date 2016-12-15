@@ -4,7 +4,7 @@ module CioDashboard
     store_in collection: "cioDashboard"
     field :tile, type: String
     field :row_indicator, type: String
-    field :ticket_type, type: DateTime
+    field :ticket_type, type: String
     field :total_open_value, type: String
     field :total_open_indicator, type: String
     field :closed_7_day_value, type: String
