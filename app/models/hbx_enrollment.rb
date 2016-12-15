@@ -686,7 +686,7 @@ class HbxEnrollment
     year = if self.is_shop?
       benefit_group.plan_year.start_on.year
     else
-      plan.active_year if plan.present?
+      plan.try(:active_year) || effective_on.year
     end
   end
 
