@@ -1190,6 +1190,7 @@ class HbxEnrollment
     event :move_to_enrolled!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
@@ -1200,6 +1201,7 @@ class HbxEnrollment
     event :move_to_contingent!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
@@ -1212,6 +1214,7 @@ class HbxEnrollment
     event :move_to_pending!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
