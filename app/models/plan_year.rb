@@ -269,7 +269,7 @@ class PlanYear
 
   def enrollment_period_errors
     errors = []
-    minimum_length = RENEWING.include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
+    minimum_length = (RENEWING+["renewing_publish_pending"]).include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
       : Settings.aca.shop_market.open_enrollment.minimum_length.days
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
