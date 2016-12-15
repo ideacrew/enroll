@@ -317,8 +317,8 @@ module InvoiceHelper
 
   def mailing_or_primary_address(organization)
     office_locations = organization.try(:office_locations)
-    office_location = office_locations.select { |office_location| office_location.address.kind == 'mailing' }.first
-    office_location.blank? ? office_locations.first.address : office_location.address
+    mailing_office_locations, primary_office_locations = office_locations.partition { |ol| ol.address.mailing? }
+    mailing_office_locations.present? ? mailing_office_locations.first.address : primary_office_locations.first.address
   end
 
   def payment_page_for_conversion_employer
