@@ -241,6 +241,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    effective_on_option_selected = session[:effective_on_option_selected].present? ? session[:effective_on_option_selected] : nil
     if @person.nil?
       @enrolled_hbx_enrollment_plan_ids = []
     else
@@ -256,7 +257,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
       end
     end
     # for carrier search options

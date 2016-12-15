@@ -67,7 +67,6 @@ module Effective
       end
 
       def add_sep_link_type(allow)
-        return "disabled" # DISABLING ADD SEP FEATURE FOR NOW.
         allow ? 'ajax' : 'disabled'
       end
 
