@@ -36,7 +36,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
-    if @role.class.name == "ConsumerRole"
+    if @role.class.name == "ConsumerRole" 
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
         if self.public_send("is_#{element}_satisfied?")
@@ -46,9 +46,20 @@ class InsuredEligibleForBenefitRule
           false
         end
       end
+      status = false if is_age_range_satisfied_for_catastrophic? == false
       return status, @errors
     end
     [false]
+  end
+
+  def is_age_range_satisfied_for_catastrophic?
+     if @benefit_package.age_range == (0..30)
+       benefit_end_on = @benefit_package.benefit_coverage_period.end_on
+       age = age_on_benefit_end_on(@role.dob, benefit_end_on)
+       @benefit_package.age_range.cover?(age)
+     else
+       return true
+     end
   end
 
   def is_cost_sharing_satisfied?
@@ -130,6 +141,11 @@ class InsuredEligibleForBenefitRule
   #     reason
   #   end
   # end
+
+  def age_on_benefit_end_on(dob, end_on=TimeKeeper.date_of_record)
+    # calculate method depend on 6710
+    end_on.year - dob.year - ((end_on.month > dob.month || (end_on.month == dob.month && end_on.day >= dob.day)) ? 0 : 1)
+  end
 
   def age_on_next_effective_date(dob)
     today = TimeKeeper.date_of_record

@@ -10,6 +10,20 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#display_carrier_logo" do
+    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
+    let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
+    let(:plan_1){ Maybe.new(FactoryGirl.build(:plan, hios_id: "89789DC0010006-01", carrier_profile: carrier_profile)) }
+
+    it "should return uhic logo" do
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/uhic.jpg\" alt=\"Uhic\" />"
+    end
+
+    it "should return non united logo" do
+      expect(helper.display_carrier_logo(plan_1)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
+    end
+  end
+
   describe "#format_time_display" do
     let(:timestamp){ Time.now.utc }
     it "should display the time in proper format" do
@@ -47,14 +61,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#participation_rule" do
-    let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
-
-    it "should return correct eligibility criteria" do
-      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
-    end
-
-  end
 
   describe "#enrollment_progress_bar" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -140,24 +146,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   end
 
-  describe "#is_readonly" do
+  describe "#may_update_census_employee?" do
     let(:user) { double("User") }
-    let(:census_employee) { double("CensusEmployee") }
+    let(:census_employee) { double("CensusEmployee", new_record?: false, is_eligible?: false) }
+
     before do
       expect(helper).to receive(:current_user).and_return(user)
     end
+
     it "census_employee can edit if it is new record" do
       expect(user).to receive(:roles).and_return(["employee"])
-      expect(helper.is_readonly(CensusEmployee.new)).to eq false # readonly -> false
+      expect(helper.may_update_census_employee?(CensusEmployee.new)).to eq true # readonly -> false
     end
+
     it "census_employee cannot edit if linked to an employer" do
       expect(user).to receive(:roles).and_return(["employee"])
-      expect(census_employee).to receive(:employee_role_linked?).and_return(true)
-      expect(helper.is_readonly(census_employee)).to eq true # readonly -> true
+      expect(helper.may_update_census_employee?(census_employee)).to eq false # readonly -> true
     end
+
     it "hbx admin edit " do
       expect(user).to receive(:roles).and_return(["hbx_staff"])
-      expect(helper.is_readonly(CensusEmployee.new)).to eq false # readonly -> false
+      expect(helper.may_update_census_employee?(CensusEmployee.new)).to eq true # readonly -> false
     end
   end
 

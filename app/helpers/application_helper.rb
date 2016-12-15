@@ -372,11 +372,20 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier_name, options = {:width => 50})
-    if carrier_name.present?
-      carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
-      image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  def display_carrier_logo(plan, options = {:width => 50})
+    return "" if !plan.carrier_profile.extract_value.present?
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    else
+      plan.carrier_profile.legal_name.extract_value
     end
+    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def dob_in_words(age, dob)
@@ -460,10 +469,12 @@ module ApplicationHelper
     end
   end
 
-  def is_readonly(object)
-    return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
-    return true if object.try(:employee_role_linked?)  # cannot edit, employer census roster
-    return !(object.new_record? or object.try(:eligible?)) # employer census roster
+  def may_update_census_employee?(census_employee)
+    if current_user.roles.include?("hbx_staff") || census_employee.new_record? || census_employee.is_eligible?
+      true
+    else
+      false
+    end
   end
 
   def calculate_participation_minimum
@@ -574,12 +585,42 @@ module ApplicationHelper
     broker_agency_profile.default_general_agency_profile == general_agency_profile
   end
 
+  def asset_data_base64(path)
+    asset = Rails.application.assets.find_asset(path)
+    throw "Could not find asset '#{path}'" if asset.nil?
+    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
+    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
+  end
+
+  def find_plan_name(hbx_id)
+    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
+  end
+
+  def has_new_hire_enrollment_period?(census_employee)
+    census_employee.new_hire_enrollment_period.present?
+  end
+
   def eligibility_criteria(employer)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
-      ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      eligibility_text = ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      if text == "Yes"
+        "Eligible"
+      else
+        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+      end
+    else
+      "Ineligible"
+    end
+  end
+
+  def eligibility_criteria_for_export(employer)
+    if employer.show_plan_year.present?
+      @participation_count == 0 && @non_owner_participation_rule == true ? "Eligible" : "Ineligible"
+    else
+      "Ineligible"
     end
   end
 
@@ -601,14 +642,5 @@ module ApplicationHelper
     end
   end
 
-  def asset_data_base64(path)
-    asset = Rails.application.assets.find_asset(path)
-    throw "Could not find asset '#{path}'" if asset.nil?
-    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
-    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
-  end
 
-  def find_plan_name(hbx_id)
-    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
-  end
 end

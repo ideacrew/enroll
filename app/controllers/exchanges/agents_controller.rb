@@ -41,7 +41,8 @@ class Exchanges::AgentsController < ApplicationController
     person = Person.find(params[:person_id])
     consumer_role = person.consumer_role
     employee_role = person.employee_roles.last
-
+    person.set_consumer_role_url
+    
     if consumer_role && consumer_role.bookmark_url
       redirect_to bookmark_url_path(consumer_role.bookmark_url)
     elsif employee_role && employee_role.bookmark_url
@@ -79,7 +80,3 @@ class Exchanges::AgentsController < ApplicationController
     return bookmark_path
   end
 end
-
-
-
-

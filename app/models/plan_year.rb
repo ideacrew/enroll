@@ -12,6 +12,10 @@ class PlanYear
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible expired renewing_canceled conversion_expired)
 
+  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
+  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
+  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -31,6 +35,10 @@ class PlanYear
 
   # Number of Medicare Second Payers
   field :msp_count, type: Integer, default: 0
+
+  # Calculated Fields for DataTable
+  field :enrolled_summary, type: Integer, default: 0
+  field :waived_summary, type: Integer, default: 0
 
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
@@ -204,6 +212,11 @@ class PlanYear
     "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
   end
 
+  def employee_participation_percent_based_on_summary
+    return "-" if eligible_to_enroll_count == 0
+    "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
+  end
+
   def editable?
     !benefit_groups.any?(&:assigned?)
   end
@@ -284,9 +297,9 @@ class PlanYear
 
   def due_date_for_publish
     if employer_profile.plan_years.renewing.any?
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::RenewingEmployerPlanYearPublishDueDayOfMonth)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
     else
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::InitialEmployerPlanYearPublishDueDayOfMonth)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
     end
   end
 
@@ -436,6 +449,26 @@ class PlanYear
 #    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
+  def enrolled_by_bga
+    benefit_group_ids = self.benefit_groups.map(&:id)
+    candidate_benefit_group_assignments = eligible_to_enroll.map do |ce|
+        enrolled_bga_for_ce ce, benefit_group_ids
+    end.compact
+    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+    bgas = candidate_benefit_group_assignments.select do |bga|
+      enrolled_benefit_group_assignment_ids.include?(bga.id)
+    end
+  end
+
+  # TODO Get definition of enrolled count from @dan/@ram/@hannah
+  def enrolled_bga_for_ce ce, benefit_group_ids
+    bg_assignment = ce.benefit_group_assignments.detect{|assignment|
+      renewing = is_renewing? && !(assignment.initialized?) && !(assignment.coverage_terminated?)
+      enrolled = renewing || assignment.is_active?
+      enrolled && benefit_group_ids.include?(assignment.benefit_group_id)
+    }
+  end
+
   def calc_active_health_assignments_for(employee_pool)
     benefit_group_ids = self.benefit_groups.map(&:id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
@@ -457,7 +490,8 @@ class PlanYear
 
   def total_enrolled_count
     if self.employer_profile.census_employees.count < 100
-      enrolled.count
+      #enrolled.count
+      enrolled_by_bga.count
     else
       0
     end
@@ -935,11 +969,11 @@ private
     when "published", "draft", "renewing_published", "renewing_draft"
       today >= open_enrollment_start_on
     when "enrolling", "renewing_enrolling"
-      today.end_of_day >= open_enrollment_end_on
+      today > open_enrollment_end_on
     when "enrolled", "renewing_enrolled"
       today >= start_on
     when "active"
-      today >= end_on
+      today > end_on
     else
       false
     end
@@ -952,6 +986,7 @@ private
   end
 
   def trigger_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
     shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
                                                   :subject => "PlanYear Renewal Notice(3A)",
@@ -961,6 +996,7 @@ private
   end
 
   def trigger_auto_renew_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
     shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
                                                   :subject => "PlanYear Renewal Notice(3B)",
@@ -978,6 +1014,7 @@ private
   end
 
   def send_employee_invites
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|
@@ -1036,7 +1073,7 @@ private
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+    if open_enrollment_end_on > (open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
       errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
     end
 
@@ -1052,17 +1089,17 @@ private
     end
 
     # Open enrollment end date can't be after 10th of the prev month for new plan years and 13th of the prev for renewing plan years
-    if ['draft', 'renewing_draft'].include?(aasm_state)
+    # if ['draft', 'renewing_draft'].include?(aasm_state)
 
-      if is_renewing?
-        enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
-      else
-        enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
-      end
+    #   if is_renewing?
+    #     enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+    #   else
+    #     enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
+    #   end
       
-      if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-        errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
-      end
-    end
+    #   if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
+    #     errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
+    #   end
+    # end
   end
 end
