@@ -11,12 +11,10 @@ class InsuredEligibleForBenefitRule
   #     lawful_permanent_resident
   # )
 
-  def initialize(role, benefit_package, options={})
+  def initialize(role, benefit_package, coverage_kind='health')
     @role = role
     @benefit_package = benefit_package
-    @coverage_kind = options[:coverage_kind]
-    @enrollment_kind = options[:enrollment_kind]
-
+    @coverage_kind = coverage_kind
   end
 
   def setup
@@ -83,17 +81,8 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_family_relationships_satisfied?
-    return true unless relation_ship_with_primary_applicant == 'child'
-    is_child_age_satisfied? || is_child_26_with_sep_satisfied?
-  end
-
-  def is_child_age_satisfied?
-    age = (TimeKeeper.date_of_record.year - @role.dob.year)
-    relation_ship_with_primary_applicant == 'child' && age <= 25 ? true : false
-  end
-
-  def is_child_26_with_sep_satisfied?
-    (relation_ship_with_primary_applicant == 'child' && @role.dob.year+26 == TimeKeeper.date_of_record.year && @enrollment_kind =='sep' && @role.person.families.first.special_enrollment_periods.last.effective_on.year == TimeKeeper.date_of_record.year) ? true : false
+    age = age_on_next_effective_date(@role.dob)
+    relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
   end
 
   def is_benefit_categories_satisfied?
