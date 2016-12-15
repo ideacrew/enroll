@@ -49,12 +49,10 @@ namespace :reports do
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        # for each active organiztaions
         organizations.each do |organization|
 
               poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,:"employer_staff_roles.is_active" => true).first
               billing = organization.primary_office_location.address
-              # phone = organization.primary_office_location.phone
               csv << [
                   organization.hbx_id,
                   organization.dba,
@@ -78,14 +76,14 @@ namespace :reports do
                   poc.try(:middle_name),
                   poc.try(:last_name),
                   poc.try(:name_sfx),
-                  organization.try(:mailling_address) .try(:address).try(:address_kind),
-                  organization.try(:mailling_address).try(:address).try(:address_1),
-                  organization.try(:mailling_address).try(:address).try(:address_2),
-                  organization.try(:mailling_address).try(:address_3),
-                  organization.try(:mailling_address).try(:address).try(:city),
-                  organization.try(:mailling_address).try(:address).try(:state),
-                  organization.try(:mailling_address).try(:address).try(:zip),
-                  organization.try(:mailling_address).try(:phone).try(:full_phone_number),
+                  organization.try(:mailing_address).try(:address).try(:address_kind),
+                  organization.try(:mailing_address).try(:address).try(:address_1),
+                  organization.try(:mailing_address).try(:address).try(:address_2),
+                  organization.try(:mailing_address).try(:address_3),
+                  organization.try(:mailing_address).try(:address).try(:city),
+                  organization.try(:mailing_address).try(:address).try(:state),
+                  organization.try(:mailing_address).try(:address).try(:zip),
+                  organization.try(:mailing_address).try(:phone).try(:full_phone_number),
                   poc.try(:work_email).try(:address),
              
               ]
@@ -93,6 +91,6 @@ namespace :reports do
             processed_count += 1
           end
         end
-      puts "Total List of Employers for discrepancy report "
     end
+    puts "Total List of Employers for discrepancy report "
 end
