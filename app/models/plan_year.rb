@@ -7,7 +7,7 @@ class PlanYear
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
@@ -269,7 +269,7 @@ class PlanYear
 
   def enrollment_period_errors
     errors = []
-    minimum_length = (RENEWING+["renewing_publish_pending"]).include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
+    minimum_length = RENEWING.include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
       : Settings.aca.shop_market.open_enrollment.minimum_length.days
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
