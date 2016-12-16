@@ -16,7 +16,7 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
-
+    effective_on_option_selected = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil # params[:effective_on_option_selected] will exist in case of a QLE with date choice options.
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
@@ -31,7 +31,8 @@ class Insured::GroupSelectionController < ApplicationController
         family: @family,
         employee_role: nil,
         benefit_group: nil,
-        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship),
+        effective_on_option_selected: effective_on_option_selected)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
@@ -46,11 +47,12 @@ class Insured::GroupSelectionController < ApplicationController
       family: @family,
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
-    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
-
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship),
+      effective_on_option_selected: effective_on_option_selected)
+    # Save the 'effective_on_option_selected' to a session variable. This will be used later in the PlanShoppingController#set_plans_by method.
+    session[:effective_on_option_selected] = effective_on_option_selected
     generate_coverage_family_members_for_cobra
+
   end
 
   def create
