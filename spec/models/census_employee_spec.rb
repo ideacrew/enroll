@@ -1210,6 +1210,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       aasm_state: 'auto_renewing'
       )
     }
+    
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: shop_family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
 
     context 'when current and renewing coverages present' do
 
