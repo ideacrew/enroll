@@ -5,92 +5,23 @@ namespace :reports do
 
     desc "Identify employer's account information"
     task :employer_information_dc => :environment do
-    
-      # collect active organizations
-      organizations = Organization.where(:'employer_profile'.exists=>true )
-
-      field_names  = %w(
-          employer_HBX_ID
-          employer_DBA
-          employer_FEIN
-          B_CONTACT_PREFIX
-          B_CONTACT_FNAME
-          B_CONTACT_MI
-          B_CONTACT_LNAME
-          B_CONTACT_SUFFIX
-          B_address_kind
-          B_ADD1
-          B_ADD2
-          B_address_3
-          B_CITY
-          B_STATE
-          B_ZIP
-          B_PHONE
-          B_EMAIL
-          M_CONTACT_PREFIX
-          M_CONTACT_FNAME
-          M_CONTACT_MI
-          M_CONTACT_LNAME
-          M_CONTACT_SUFFIX
-          M_address_kind
-          M_ADD1
-          M_ADD2
-          M_address_3
-          M_CITY
-          M_STATE
-          M_ZIP
-          M_PHONE
-          M_EMAIL
-        )
-      processed_count = 0
-
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/employer_information_dc.csv"
-
-      CSV.open(file_name, "w", force_quotes: true) do |csv|
-        csv << field_names
-        organizations.each do |organization|
-
-              poc = Person.where(:'employer_staff_roles.employer_profile_id' =>organization.employer_profile.id,:"employer_staff_roles.is_active" => true).first
-              billing = organization.primary_office_location.address
-              csv << [
-                  organization.hbx_id,
-                  organization.dba,
-                  organization.fein,
-                  poc.try(:name_pfx),
-                  poc.try(:first_name),
-                  poc.try(:middle_name),
-                  poc.try(:last_name),
-                  poc.try(:name_sfx),
-                  billing.try(:address_kind),
-                  billing.try(:address_1),
-                  billing.try(:address_2),
-                  billing.try(:address_3),
-                  billing.try(:city),
-                  billing.try(:state),
-                  billing.try(:zip),
-                  organization.try(:primary_office_location).try(:phone).try(:full_phone_number),
-                  poc.try(:work_email).try(:address),
-                  poc.try(:name_pfx),
-                  poc.try(:first_name),
-                  poc.try(:middle_name),
-                  poc.try(:last_name),
-                  poc.try(:name_sfx),
-                  organization.try(:mailing_address).try(:address).try(:address_kind),
-                  organization.try(:mailing_address).try(:address).try(:address_1),
-                  organization.try(:mailing_address).try(:address).try(:address_2),
-                  organization.try(:mailing_address).try(:address_3),
-                  organization.try(:mailing_address).try(:address).try(:city),
-                  organization.try(:mailing_address).try(:address).try(:state),
-                  organization.try(:mailing_address).try(:address).try(:zip),
-                  organization.try(:mailing_address).try(:phone).try(:full_phone_number),
-                  poc.try(:work_email).try(:address),
-             
-              ]
-            end
-            processed_count += 1
+      begin
+        csv = CSV.open('NFP_SampleERInfo.csv',"r",:headers =>true, :encoding => 'ISO-8859-1')
+        @data= csv.to_a
+        miss_match = CSV.open('miss_match_nfp_file.csv',"w",:headers =>true, :encoding => 'ISO-8859-1')
+        @data.each do |data_row|
+          organization = Organization.where(:hbx_id => data_row["CUSTOMER_CODE"]).first
+          if organization.nil? || 
+            organization.fein != data_row["TAX_ID"] ||
+            organization.dba != data_row["CUSTOMER_NAME"]||
+            organization.primary_office_location.address.try(:address_1) !=data_row["B_ADD1"]||
+            organization.primary_office_location.address.try(:address_2) !=data_row["B_ADD2"]
+            miss_match << data_row 
           end
         end
+      rescue Exception => e
+        puts "Unable to open file #{e}"
+      end 
     end
-    puts "Total List of Employers for discrepancy report "
+  end
 end
