@@ -23,11 +23,11 @@ describe AddCoverageHouseholdMember do
     
     it "should add a household" do
       family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.each do |chm|
-       chm.delete
-       subject.migrate
-       family.households.first.reload
-       expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members).not_to eq []
-     end
+        chm.delete
+        subject.migrate
+        family.households.first.reload
+        expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members).not_to eq []
+      end
     end
 
     
