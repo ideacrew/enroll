@@ -75,6 +75,24 @@ module Transcripts
         matched_people = ::Person.where(hbx_id: person.hbx_id)
       end
 
+
+      other_matched_people = ::Person.match_by_id_info(
+            ssn: person.ssn,
+            dob: person.dob,
+            last_name: person.last_name,
+            first_name: person.first_name
+          )
+
+      if other_matched_people.size > 1 && matched_people.size == 1
+        if matched_people.first.families.blank?
+          person_with_hbx_id = other_matched_people.detect{|p| p.families.present?}
+          matched_people.first.delete
+          person_with_hbx_id.update!(hbx_id: person.hbx_id)
+          matched_people = [person_with_hbx_id]
+        end
+      end
+
+
       if matched_people.blank?
         matched_people = ::Person.match_by_id_info(
             ssn: person.ssn,
