@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 describe HbxEnrollment do
 
@@ -476,6 +477,36 @@ describe HbxEnrollment, dbclean: :after_all do
 
     end
 
+    context "should cancel previous auto renewing enrollment" do
+      before :all do
+        @enrollment6 = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment6.effective_on=TimeKeeper.date_of_record + 1.days
+        @enrollment6.aasm_state = "auto_renewing"
+        @enrollment6.save
+        @enrollment7 = household.create_hbx_enrollment_from(
+            employee_role: mikes_employee_role,
+            coverage_household: coverage_household,
+            benefit_group: mikes_benefit_group,
+            benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment7.save
+        @enrollment7.cancel_previous(2016)
+      end
+
+      it "should cancel an auto renewing enrollment" do
+        expect(@enrollment6.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should not cancel current shopping enrollment" do
+        expect(@enrollment7.aasm_state).to eq "shopping"
+      end
+    end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -720,7 +751,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan_year){ PlanYear.new(start_on: date) }
     let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
     let(:plan){ Plan.new(active_year: date.year) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, kind: "employer_sponsored", plan: plan) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
 
     it "should return plan year start on year when shop" do
       expect(hbx_enrollment.coverage_year).to eq date.year
@@ -729,6 +760,12 @@ describe HbxProfile, "class methods", type: :model do
     it "should return plan year when ivl" do
       allow(hbx_enrollment).to receive(:kind).and_return("")
       expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.plan.active_year
+    end
+
+    it "should return correct year when ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("")
+      allow(hbx_enrollment).to receive(:plan).and_return(nil)
+      expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.effective_on.year
     end
   end
 
@@ -2137,5 +2174,52 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
         expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
       end
     end
+  end
+end
+
+describe HbxEnrollment, 'state machine' do
+  let(:family) { FactoryGirl.build(:individual_market_family) }
+  subject { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
+
+  events = [:move_to_enrolled!, :move_to_contingent!, :move_to_pending!]
+
+  shared_examples_for "state machine transitions" do |current_state, new_state, event|
+    it "transition #{current_state} to #{new_state} on #{event} event" do
+      expect(subject).to transition_from(current_state).to(new_state).on_event(event)
+    end
+  end
+
+  context "move_to_enrolled event" do
+    it_behaves_like "state machine transitions", :inactive, :inactive, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :coverage_terminated, :coverage_terminated, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :coverage_canceled, :coverage_canceled, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :unverified, :coverage_selected, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :enrolled_contingent, :coverage_selected, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :coverage_selected, :coverage_selected, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :auto_renewing, :auto_renewing, :move_to_enrolled!
+  end
+
+  context "move_to_contingent event" do
+    it_behaves_like "state machine transitions", :inactive, :inactive, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_terminated, :coverage_terminated, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_canceled, :coverage_canceled, :move_to_contingent!
+    it_behaves_like "state machine transitions", :shopping, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_selected, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :unverified, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :enrolled_contingent, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_enrolled, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :auto_renewing, :enrolled_contingent, :move_to_contingent!
+  end
+
+  context "move_to_pending event" do
+    it_behaves_like "state machine transitions", :inactive, :inactive, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_terminated, :coverage_terminated, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_canceled, :coverage_canceled, :move_to_pending!
+    it_behaves_like "state machine transitions", :shopping, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :unverified, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_selected, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :enrolled_contingent, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
   end
 end

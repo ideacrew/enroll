@@ -7,7 +7,6 @@ class Employers::PlanYearsController < ApplicationController
   def new
     @plan_year = build_plan_year
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
-    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
   end
 
   def dental_reference_plans
@@ -227,7 +226,6 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
-    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
     @just_a_warning = false
     if plan_year.publish_pending?
       plan_year.withdraw_pending!
