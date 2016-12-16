@@ -10,7 +10,7 @@ class CensusEmployee < CensusMember
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible employee_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
