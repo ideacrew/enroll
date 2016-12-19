@@ -25,5 +25,5 @@ end
 
 Then(/^Hbx Admin should see the person record disabled$/) do
   wait_for_ajax(3)
-  expect(page).to have_text("John Smith1")
+  expect(page).to have_text("Disabled user John Smith1") 
 end

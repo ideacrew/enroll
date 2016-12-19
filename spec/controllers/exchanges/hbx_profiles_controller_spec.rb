@@ -328,12 +328,36 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    it "renders the 'enable or disable link' template for hbx_staff" do 
+    it "should notice user disabled" do 
        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
        @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
        xhr :get, :enable_or_disable_link, @params
        expect(response).to have_http_status(:success)
-       expect(response).to render_template("exchanges/hbx_profiles/enable_or_disable_link")
+       expect(flash[:notice]).to match(/Disabled user/)
+    end
+
+    it "should set is_disabled to true" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_truthy
+    end
+
+    it "should notice user Enabled" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(flash[:notice]).to match(/Enabled user/)
+    end
+
+    it "should set is_disabled to false" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_falsey
     end
 
     it "renders the 'families index' template for hbx_staff" do
