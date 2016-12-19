@@ -825,6 +825,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+    let(:hbx_enrollment_two) { HbxEnrollment.new(coverage_kind: 'dental') }
 
     it "should return false without benefit_group_assignment" do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
@@ -837,12 +838,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return false without hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
+        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment_two]
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
+        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment]
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
+      end
+
+      it "should return true when has both health & dental enrollments" do
+        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment, hbx_enrollment_two]
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
       end
     end
