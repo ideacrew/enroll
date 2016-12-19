@@ -102,6 +102,8 @@ class BenefitGroup
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
+  before_destroy :delete_benefit_group_assignments_and_enrollments
+  after_destroy :save_census_employee  # assigns default benefit group to census employee
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -459,6 +461,22 @@ class BenefitGroup
 
   def first_of_month_effective_on_for(date_of_hire)
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
+  end
+
+  def delete_benefit_group_assignments_and_enrollments
+    self.employer_profile.census_employees.each do |ce|
+      benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+      benefit_group_assignments.each do |bga|
+        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+        bga.destroy
+      end
+    end
+  end
+
+  def save_census_employee
+    self.employer_profile.census_employees.each do |ce|
+      ce.save
+    end
   end
 
 private
