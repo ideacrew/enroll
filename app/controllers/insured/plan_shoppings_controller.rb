@@ -33,6 +33,7 @@ class Insured::PlanShoppingsController < ApplicationController
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
+    plan_selection.set_eligibility_dates_to_previous_eligibility_dates(previous_enrollment_id)
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
