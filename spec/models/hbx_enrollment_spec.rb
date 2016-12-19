@@ -751,7 +751,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan_year){ PlanYear.new(start_on: date) }
     let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
     let(:plan){ Plan.new(active_year: date.year) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, kind: "employer_sponsored", plan: plan) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
 
     it "should return plan year start on year when shop" do
       expect(hbx_enrollment.coverage_year).to eq date.year
@@ -760,6 +760,12 @@ describe HbxProfile, "class methods", type: :model do
     it "should return plan year when ivl" do
       allow(hbx_enrollment).to receive(:kind).and_return("")
       expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.plan.active_year
+    end
+
+    it "should return correct year when ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("")
+      allow(hbx_enrollment).to receive(:plan).and_return(nil)
+      expect(hbx_enrollment.coverage_year).to eq hbx_enrollment.effective_on.year
     end
   end
 

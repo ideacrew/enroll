@@ -181,6 +181,30 @@ Given(/^Hbx Admin exists$/) do
   plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
 end
 
+Given(/^a Hbx admin with read and write permissions exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+end
+
+Given(/^a Hbx admin with read only permissions exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: false)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+end
+
 Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
