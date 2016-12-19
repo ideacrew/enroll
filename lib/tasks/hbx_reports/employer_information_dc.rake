@@ -14,8 +14,17 @@ namespace :reports do
           if organization.nil? || 
             organization.fein != data_row["TAX_ID"] ||
             organization.dba != data_row["CUSTOMER_NAME"]||
-            organization.primary_office_location.address.try(:address_1) !=data_row["B_ADD1"]||
-            organization.primary_office_location.address.try(:address_2) !=data_row["B_ADD2"]
+            organization.primary_office_location.address.try(:address_1).upcase !=data_row["B_ADD1"].upcase||
+            organization.primary_office_location.address.try(:address_2).upcase !=data_row["B_ADD2"].upcase||
+            organization.primary_office_location.address.try(:city).upcase !=data_row["B_CITY"].upcase||
+            organization.primary_office_location.address.try(:state).upcase !=data_row["B_STATE"].upcase||
+            organization.primary_office_location.address.try(:zip) !=data_row["B_ZIP"]||
+            organization.mailing_address.address.try(:address_1).upcase !=data_row["M_ADD1"].upcase|| 
+            organization.mailing_address.address.try(:address_2).upcase !=data_row["M_ADD2"].upcase||
+            organization.mailing_address.address.try(:city).upcase !=data_row["M_CITY"].upcase||
+            organization.mailing_address.address.try(:state).upcase !=data_row["M_STATE"].upcase||
+            organization.mailing_address.address.try(:zip).upcase !=data_row["M_ZIP"].upcase
+
             miss_match << data_row 
           end
         end

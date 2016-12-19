@@ -193,9 +193,10 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
-  # def mailing_address
-  #   office_locations.select{|office| office.address.kind == 'mailing'}.first
-  # end
+  def mailing_address
+    binding.pry
+    mailing_address.select{|office| office.address.kind == 'mailing'}.first
+  end
 
   # def billing_address
   #   primary_office_location
