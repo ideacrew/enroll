@@ -194,7 +194,6 @@ class Organization
   end
 
   def mailing_address
-    binding.pry
     mailing_address.select{|office| office.address.kind == 'mailing'}.first
   end
 
