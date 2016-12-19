@@ -69,7 +69,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /#{address.zip}/
   end
 
-  it "should show the address field of census employee if address not present" do
+  it "should show the address feild of census employee if address not present" do
     allow(census_employee).to receive(:address).and_return([])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Address/

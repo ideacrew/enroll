@@ -36,7 +36,17 @@ Feature: Employer can view their employees
     And the employer is logged in
     When they visit the Employee Roster
     And employer clicks on linked employee with address
-    Then employer should not see the address on the roaster
+    Then employer should not see the address on the roster
     And employer clicks on cancel button
     And employer clicks on linked employee without address
-    Then employer should see the address on the roaster
+    Then employer should see the address on the roster
+    And employer populates the address field
+    And employer clicks on update employee
+    Then employer should not see the address on the roster
+    And employer clicks on cancel button
+    And employer clicks on non-linked employee with address
+    Then employer should not see the address on the roster
+    And employer clicks on cancel button
+    And employer clicks on non-linked employee without address
+    Then employer should see the address on the roster
+    And employer logs out
