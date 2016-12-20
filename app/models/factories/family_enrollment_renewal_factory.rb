@@ -203,6 +203,14 @@ module Factories
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
+
+    # relationship offered in renewal plan year and member active in enrollment.
+    def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
+      offered_relationship_benefits=renewal_offered_relationship(renewal_enrollment)
+      relationship = PlanCostDecorator.benefit_relationship(member.primary_relationship)
+      relationship = "child_over_26" if relationship == "child_under_26" && member.person.age_on(@plan_year_start_on) >= 26
+      offered_relationship_benefits.include? relationship && member.is_covered_on?(@plan_year_start_on - 1.day)
+    end
     # Validate enrollment membership against benefit package-covered relationships
     def family_eligibility(active_enrollment, renewal_enrollment)
 
