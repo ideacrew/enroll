@@ -1,5 +1,15 @@
 class IvlNotices::NoAppealVariableIvlRenewalNotice < IvlNotices::VariableIvlRenewalNotice
 
+  def append_enrollments(eg_ids)
+    enrollments_for_notice = []
+    eg_ids.each do |eg_id|
+      enrollments_for_notice << HbxEnrollment.by_hbx_id(eg_id).first
+    end
+    enrollments_for_notice.each do |hbx_enrollment|
+      @notice.enrollments << build_enrollment(hbx_enrollment)
+    end
+  end
+
   def deliver
     build
     generate_pdf_notice
