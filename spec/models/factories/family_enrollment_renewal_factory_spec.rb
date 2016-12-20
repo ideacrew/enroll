@@ -197,5 +197,49 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
         end
       end
     end
+
+    context ".renewal_offered_relationship" do
+      let(:person)              { FactoryGirl.create(:person)}
+      let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+      let!(:auto_renewing_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                                    household: shop_family.latest_household,
+                                                                    coverage_kind: "health",
+                                                                    kind: "employer_sponsored")}
+      let!(:auto_renewing_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                                    household: shop_family.latest_household,
+                                                                    coverage_kind: "dental",
+                                                                    kind: "employer_sponsored")}
+      let(:health_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
+        ]
+      end
+      let(:dental_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            RelationshipBenefit.new(offered: false, relationship: :child_under_26, premium_pct: 50)
+        ]
+      end
+      before :each do
+        census_employee= CensusEmployee.new(:first_name => "Roger",:last_name => "Martin")
+        benefit_group_assignment = FactoryGirl.create(:benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)
+        subject.instance_variable_set(:@census_employee, census_employee)
+        allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
+        allow(benefit_group_assignment).to receive(:benefit_group).and_return renewal_benefit_group
+        allow(renewal_benefit_group).to receive(:relationship_benefits).and_return health_relationship_benefits
+        allow(renewal_benefit_group).to receive(:dental_relationship_benefits).and_return dental_relationship_benefits
+      end
+
+      it "should return offered health_relationship_benefits of renewal benefit group" do
+        expect(subject.renewal_offered_relationship(auto_renewing_health_enrollment)).to eq ["employee","spouse","child_under_26"]
+      end
+
+      it "should return offered dental_relationship_benefits of renewal benefit group" do
+        expect(subject.renewal_offered_relationship(auto_renewing_dental_enrollment)).to eq ["employee", "spouse"]
+      end
+    end
   end
 end
