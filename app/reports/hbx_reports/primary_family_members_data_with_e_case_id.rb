@@ -31,7 +31,7 @@ class PrimaryFamilyMembersDataWithECaseId < MongoidMigrationTask
             if family.has_aptc_hbx_enrollment?
               enrollments = family.latest_household.hbx_enrollments.active
               aptc = enrollments.each {|enrollment| enrollment.applied_aptc_amount > 0}.first.applied_aptc_amount.to_f
-              csr = "Yes" if family.active_household.hbx_enrollments.with_aptc.any? {|enrollment| enrollment.plan.is_csr? }
+              csr = "Yes" if family.active_household.hbx_enrollments.with_aptc.enrolled_and_renewing.any? {|enrollment| enrollment.plan.is_csr? }
             end
 
             csv << [
