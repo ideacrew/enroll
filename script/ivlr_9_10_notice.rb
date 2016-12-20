@@ -1,6 +1,8 @@
-# rails runner script/ivlr_9_notice.rb 'test_notice_10.csv'
+# rails runner script/ivlr_9_10_notice.rb <file_name> <event_name>
+# rails runner script/ivlr_9_10_notice.rb 'test_notice_10.csv' 'ivl_renewal_notice_9'
   begin
     file = ARGV[0]
+    NOTICE_GENERATOR = ARGV[1]
     csv = CSV.open(file,"r",:headers =>true)
     @data= csv.to_a
   rescue Exception => e
@@ -14,6 +16,13 @@
 
   CSV.open(file_name, "w", force_quotes: true) do |csv|
     csv << field_names
+
+    case NOTICE_GENERATOR
+    when 'ivl_renewal_notice_9'
+      event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_9').first
+    when 'ivl_renewal_notice_10'
+      event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_10').first
+    end
 
     event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_9').first
     notice_trigger = event_kind.notice_triggers.first
