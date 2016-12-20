@@ -194,6 +194,7 @@ module Factories
       end
     end
 
+    # relationship_benefits of renewal plan year
     def renewal_offered_relationship(renewal_enrollment)
       benefit_group = @census_employee.renewal_benefit_group_assignment.benefit_group
       if renewal_enrollment.coverage_kind == "health"
