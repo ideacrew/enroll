@@ -10,6 +10,17 @@ class IvlNotices::NoAppealVariableIvlRenewalNotice < IvlNotices::VariableIvlRene
     end
   end
 
+  def build
+    append_enrollments(enrollment_group_ids)
+    notice.primary_fullname = recipient.full_name.titleize || ""
+    if recipient.mailing_address
+      append_address(recipient.mailing_address)
+    else
+      # @notice.primary_address = nil
+      raise 'mailing address not present'
+    end
+  end
+
   def deliver
     build
     generate_pdf_notice
