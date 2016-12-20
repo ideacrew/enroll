@@ -177,13 +177,14 @@ module Factories
         renewal_enrollment.waive_coverage 
       end
 
-      renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
+      renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment, renewal_enrollment)
       renewal_enrollment
     end
-      
-    def clone_enrollment_members(active_enrollment)
+
+    # clone enrollment members if relationship offered in renewal plan year and active in current hbxenrollment
+    def clone_enrollment_members(active_enrollment, renewal_enrollment)
       hbx_enrollment_members = active_enrollment.hbx_enrollment_members
-      hbx_enrollment_members.reject!{|hbx_enrollment_member| !hbx_enrollment_member.is_covered_on?(@plan_year_start_on - 1.day)  }
+      hbx_enrollment_members.reject!{|member| !is_relationship_offered_and_member_covered?(member,renewal_enrollment) }
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
           applicant_id: hbx_enrollment_member.applicant_id,
@@ -211,6 +212,7 @@ module Factories
       relationship = "child_over_26" if relationship == "child_under_26" && member.person.age_on(@plan_year_start_on) >= 26
       offered_relationship_benefits.include? relationship && member.is_covered_on?(@plan_year_start_on - 1.day)
     end
+
     # Validate enrollment membership against benefit package-covered relationships
     def family_eligibility(active_enrollment, renewal_enrollment)
 
