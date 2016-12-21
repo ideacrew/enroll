@@ -27,7 +27,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "The following people are enrolled in insurance coverage beginning January 1, 2017."} %>
-
+  <br>
   <% if notice.renewal_health_enrollment.present? %>   
     <table width=75% align=center>
       <tr><td><%= notice.renewal_health_enrollment.enrollees[0] %></td><td><%= notice.renewal_health_enrollment.enrollees[4] %></td></tr>
