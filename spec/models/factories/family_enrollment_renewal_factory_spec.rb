@@ -198,7 +198,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       end
     end
 
-    context ".renewal_offered_relationship" do
+    context ".renewal_relationship_benefits" do
       let(:census_employee) {FactoryGirl.create(:census_employee)}
       let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
       let(:person) { FactoryGirl.create(:person)}
@@ -235,11 +235,11 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       end
 
       it "should return offered health_relationship_benefits of renewal benefit group" do
-        expect(subject.renewal_offered_relationship(auto_renewing_health_enrollment)).to eq ["employee","spouse","child_under_26"]
+        expect(subject.renewal_relationship_benefits(auto_renewing_health_enrollment)).to eq ["employee","spouse","child_under_26"]
       end
 
       it "should return offered dental_relationship_benefits of renewal benefit group" do
-        expect(subject.renewal_offered_relationship(auto_renewing_dental_enrollment)).to eq ["employee", "spouse"]
+        expect(subject.renewal_relationship_benefits(auto_renewing_dental_enrollment)).to eq ["employee", "spouse"]
       end
     end
 
@@ -254,7 +254,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
       let!(:plan_year_start_on) {TimeKeeper.date_of_record}
       before :each do
-        allow(subject).to receive(:renewal_offered_relationship).and_return orb
+        allow(subject).to receive(:renewal_relationship_benefits).and_return orb
         plan_year_start_on = TimeKeeper.date_of_record
         subject.instance_variable_set(:@plan_year_start_on, plan_year_start_on)
       end
