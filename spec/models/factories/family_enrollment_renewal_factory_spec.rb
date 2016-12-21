@@ -287,5 +287,26 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       end
     end
 
+    context "clone_enrollment_members" do
+      let(:person) { FactoryGirl.build_stubbed(:person)}
+      let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
+      let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+      let(:active_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
+      let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
+      let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
+
+
+      let(:renewal_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+
+      it "should return hbx_enrollment_members if member relationship offered in renewal plan year and covered in current hbx_enrollment" do
+        allow(subject).to receive(:is_relationship_offered_and_member_covered?).and_return(true)
+        expect(subject.clone_enrollment_members(active_enrollment, renewal_enrollment).length).to eq 2
+      end
+
+      it "should not return hbx_enrollment_members if member relationship not offered in renewal plan year" do
+        allow(subject).to receive(:is_relationship_offered_and_member_covered?).and_return(false)
+        expect(subject.clone_enrollment_members(active_enrollment, renewal_enrollment).length).to eq 0
+      end
+    end
   end
 end
