@@ -26,6 +26,7 @@ module Queries
     def get_decorators_for_enrollments
       benefit_groups = @employer_profile.plan_years.flat_map(&:benefit_groups)
       plan_year, billing_report_date = @employer_profile.billing_plan_year(@billing_date)
+      return nil if plan_year.nil?
       enrollment_calculations = plan_year.filter_active_enrollments_by_date(billing_report_date)
       plan_ids =  enrollment_calculations.map(&:plan_id)
       enrollment_ids = enrollment_calculations.map(&:hbx_enrollment_id)
