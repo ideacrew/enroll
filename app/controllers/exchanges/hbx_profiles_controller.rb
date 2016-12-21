@@ -306,10 +306,10 @@ def employer_poc
   end
 
   def broker_agency_index
-    @broker_agency_profiles = BrokerAgencyProfile.all
+
+    @datatable = Effective::Datatables::BrokerAgencyDatatable.new
 
     respond_to do |format|
-      format.html { render "broker" }
       format.js {}
     end
   end
