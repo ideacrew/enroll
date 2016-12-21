@@ -24,7 +24,6 @@
       event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_10').first
     end
 
-    event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_9').first
     notice_trigger = event_kind.notice_triggers.first
     @data.each do |d|
       enrollment_group_ids = []
