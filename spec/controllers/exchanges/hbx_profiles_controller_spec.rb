@@ -28,12 +28,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index")
     end
 
-    it "renders broker_agency_index_search" do
-      xhr :post, :broker_agency_index_search
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index_search")
-    end
-
     it "renders issuer_index" do
       xhr :get, :issuer_index
       expect(response).to have_http_status(:success)
