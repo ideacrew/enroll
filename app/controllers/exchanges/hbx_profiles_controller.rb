@@ -306,18 +306,13 @@ def employer_poc
   end
 
   def broker_agency_index
-    @broker_agency_profiles = BrokerAgencyProfile.all
+    @q = params.permit(:q)[:q]
+    @broker_agency_profiles = HbxProfile.search_random(@q)
 
     respond_to do |format|
       format.html { render "broker" }
       format.js {}
     end
-  end
-  
-  def broker_agency_index_search
-    search_value=params[:search]
-    @broker_agency_profiles = Organization.where(:legal_name=>/#{params[:search]}/i)
-    render :layout => false
   end
 
   def general_agency_index
