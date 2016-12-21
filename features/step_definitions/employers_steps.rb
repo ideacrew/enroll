@@ -497,16 +497,6 @@ Then /^employer should see the address on the roster$/ do
   expect(page).to have_content /Address/
 end
 
-And /^employer clicks on employee with address$/ do
-  expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
-end
-
-And /^employer clicks on employee without address$/ do
-  expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
-end
-
 And /^employer populates the address field$/ do
   fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
