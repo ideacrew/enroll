@@ -568,33 +568,6 @@ class Family
     enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
   end
 
-  def update_aptc_block_status
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
-
-    if eligibility_determinations.present? && has_aptc_hbx_enrollment?
-      self.set(status: "aptc_block")
-    end
-  end
-
-  def aptc_blocked?
-    status == "aptc_block"
-  end
-
-  def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
-    return false if qle.present?
-    return false if assistance.blank? #or qle.blank?
-    return false if status == "aptc_unblock"
-    return true if status == "aptc_block"
-
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
-    #  true
-    #else
-    #  false
-    #end
-  end
-
   def self.by_special_enrollment_period_id(special_enrollment_period_id)
     Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
   end

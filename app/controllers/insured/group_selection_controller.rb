@@ -33,7 +33,6 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_group: nil,
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
-      @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
     if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
       @disable_market_kind = @market_kind == "shop" ? "individual" : "shop"
