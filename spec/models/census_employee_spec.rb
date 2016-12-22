@@ -334,6 +334,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                               CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 3.days)
                               expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
                             end
+
+                            it "should also terminate the census employees if termination date is in the past" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record - 3.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
                           end
 
                           context "and the termination date is within the retroactive reporting time period" do
@@ -1210,6 +1216,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       aasm_state: 'auto_renewing'
       )
     }
+    
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: shop_family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
 
     context 'when current and renewing coverages present' do
 
