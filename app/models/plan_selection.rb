@@ -40,21 +40,47 @@ class PlanSelection
   end
 
   def set_eligibility_dates_to_previous_eligibility_dates(previous_enrollment_id)
-    return if previous_enrollment_id.blank?
-    previous_enrollment = HbxEnrollment.by_hbx_id(previous_enrollment_id).first
-    return if hbx_enrollment.plan.active_year != previous_enrollment.plan.active_year
-    previous_enrollment_members = {}
-    previous_enrollment.hbx_enrollment_members.each do |hbx_em|
-      hbx_id = hbx_em.person.hbx_id
-      unless hbx_em.eligibility_date.blank?
-        previous_enrollment_members[hbx_id] = hbx_em.eligibility_date
-      else
-        previous_enrollment_members[hbx_id] = hbx_em.coverage_start_on
+    if previous_enrollment_id.present?
+      previous_enrollment = HbxEnrollment.find(previous_enrollment_id)
+      return if hbx_enrollment.plan.active_year != previous_enrollment.plan.active_year
+      previous_enrollment_members = {}
+      previous_enrollment.hbx_enrollment_members.each do |hbx_em|
+        hbx_id = hbx_em.person.hbx_id
+        unless hbx_em.eligibility_date.blank?
+          previous_enrollment_members[hbx_id] = hbx_em.eligibility_date
+        else
+          previous_enrollment_members[hbx_id] = hbx_em.coverage_start_on
+        end
+      end
+    else
+      current_year = hbx_enrollment.coverage_year
+      current_year_enrollments = hbx_enrollment.household.hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_year == current_year}
+      return if current_year_enrollments.blank?
+      current_year_enrollments.sort_by!{|cye| cye.effective_on}
+      previous_enrollment_members = {}
+      current_year_enrollments.each do |hbx_enrollment|
+        next if hbx_enrollment.aasm_state == 'coverage_canceled'
+        hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
+          hbx_id = hbx_em.person.hbx_id
+          unless hbx_em.eligibility_date.blank?
+            potential_eligibility_date = hbx_em.eligibility_date
+          else
+            potential_eligibility_date = hbx_em.coverage_start_on
+          end
+          if previous_enrollment_members[hbx_id].blank?
+            previous_enrollment_members[hbx_id] = potential_eligibility_date
+          else
+            current_date = previous_enrollment_members[hbx_id]
+            if current_date > potential_eligibility_date
+              previous_enrollment_members[hbx_id] = potential_eligibility_date
+            end
+          end
+        end
       end
     end
     hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
       hbx_id = hbx_em.person.hbx_id
-      unless previous_enrollment_members[hbx_id] == nil
+      unless previous_enrollment_members[hbx_id].blank?
         hbx_em.eligibility_date = previous_enrollment_members[hbx_id]
         hbx_em.save!
       end
