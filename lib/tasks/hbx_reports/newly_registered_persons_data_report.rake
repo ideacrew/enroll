@@ -8,14 +8,16 @@ require 'csv'
      task :total_new_people_list => :environment do
 
       start_date = TimeKeeper.date_of_record - 7.days
-      end_date = TimeKeeper.date_of_record
+      end_date = TimeKeeper.date_of_record + 1.day
  
        field_names  = %w(
+           FAMILY_ID
            HBX_ID
            Last_Name
            First_Name
            Date_Of_Birth
            SSN
+           Relationship
            Application_Date
            Applied_For_Assistance
            Max_APTC
@@ -42,53 +44,73 @@ require 'csv'
  
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names
-         persons = Person.where(:"created_at" => { "$gte" => start_date, "$lte" => end_date})
- 
-        persons.each do |person|
-          begin
-            family_member = person.try(:primary_family).try(:family_members).where(person_id: person.id).try(:first) if person.try(:primary_family).try(:family_members).present?
-            tax_household_member = person.primary_family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.person.id == person.id } if person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
-            is_medicaid_chip_eligible = tax_household_member.try(:is_medicaid_chip_eligible).present? ? "Yes" : "No"
-            is_applied_for_assistance = person.try(:primary_family).try(:e_case_id).present? ?  "Yes" : "No"
-            enrollments = person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
-            health_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "health").first if enrollments.present?
-            dental_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "dental").first if enrollments.present?
-            health_enrollment = health_enr.present? ? (health_enr.kind == "employer_sponsored" ? "SHOP" : (health_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP"))  : "No Active Health Enrollment"
-            dental_enrollment = dental_enr.present? ? (dental_enr.kind == "employer_sponsored" ? "SHOP" : (dental_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP")) : "No Active Dental Enrollment"
-            csv << [
-              person.hbx_id,
-              person.last_name,
-              person.first_name,
-              person.dob,
-              person.ssn,
-              person.created_at,
-              is_applied_for_assistance,
-              person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:max_aptc),
-              person.try(:primary_family).try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_percent_as_integer),
-              is_medicaid_chip_eligible,
-              health_enrollment,
-              dental_enrollment,
-              person.gender,
-              person.home_phone,
-              person.work_phone,
-              person.mobile_phone,
-              person.home_email.try(:address),
-              person.work_email.try(:address),
-              family_member.try(:is_primary_applicant),
-              person.home_address.try(:address_1),
-              person.home_address.try(:address_2),
-              person.home_address.try(:city),
-              person.home_address.try(:state),
-              person.home_address.try(:zip),
-              person.ethnicity
-             ]
-            count += 1
-          rescue
-            puts "Bad Person record with id: #{person.id}"
+
+         families = Family.where(:"created_at" => { "$gte" => start_date, "$lt" => end_date})
+         families.each do |family|
+          primary_fm = family.primary_family_member
+          family.family_members.each do |fm|
+            begin
+              tax_household_member = primary_fm.family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.person.id == fm.person.id } if primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
+              is_medicaid_chip_eligible = tax_household_member.try(:is_medicaid_chip_eligible).present? ? "Yes" : "No"
+              is_applied_for_assistance = primary_fm.family.e_case_id.present? ?  "Yes" : "No"
+
+              enrollments = primary_fm.family.active_household.try(:hbx_enrollments)
+              health_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "health").first if enrollments.present?
+              dental_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "dental").first if enrollments.present?
+              
+              health_enrollment = if health_enr.present? && fm.is_primary_applicant
+                                    health_enr.kind == "employer_sponsored" ? "SHOP" : (health_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP")
+                                  elsif health_enr.present? && !fm.is_primary_applicant
+                                    health_enr.hbx_enrollment_members.detect { |hem| hem.family_member.id == fm.id }.present? ? "Covered Under Primary" : "No Health Enrollment"
+                                  else
+                                    "No Active Health Enrollment"
+                                  end
+
+              dental_enrollment = if dental_enr.present? && fm.is_primary_applicant
+                                    dental_enr.kind == "employer_sponsored" ? "SHOP" : (dental_enr.applied_aptc_amount > 0 ? "Assisted QHP" : "UnAssisted QHP")
+                                  elsif dental_enr.present? && !fm.is_primary_applicant
+                                    dental_enr.hbx_enrollment_members.detect { |hem| hem.family_member.id == fm.id }.present? ? "Covered Under Primary" : "No Dental Enrollment"
+                                  else
+                                    "No Active Dental Enrollment"
+                                  end
+
+              csv << [
+                fm.family.hbx_assigned_id,
+                fm.hbx_id,
+                fm.last_name,
+                fm.first_name,
+                fm.dob,
+                fm.ssn,
+                fm.primary_relationship,
+                fm.family.created_at,
+                is_applied_for_assistance,
+                primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:max_aptc),
+                primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_percent_as_integer),
+                is_medicaid_chip_eligible,
+                health_enrollment,
+                dental_enrollment,
+                fm.gender,
+                fm.person.home_phone,
+                fm.person.work_phone,
+                fm.person.mobile_phone,
+                fm.person.home_email.try(:address),
+                fm.person.work_email.try(:address),
+                fm.is_primary_applicant,
+                fm.person.home_address.try(:address_1),
+                fm.person.home_address.try(:address_2),
+                fm.person.home_address.try(:city),
+                fm.person.home_address.try(:state),
+                fm.person.home_address.try(:zip),
+                fm.person.ethnicity
+              ]
+              count += 1
+            rescue
+              puts "Bad family record with id: #{fm.family.id}"
+            end
           end
         end
       end
-      puts "Total person's that are created in a time frame of #{start_date}-#{end_date} count is #{count}"
+      puts "Total person's that are created in a time frame of #{start_date}-#{end_date - 1.day} count is #{count}"
      end
    end
  end
