@@ -216,7 +216,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
             puts "Found #{count} enrollments"
           end
 
-          hbx_enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBX ID"]).first
+          hbx_enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBXID"]).first
 
           status = if hbx_enrollment.blank?
             count += 1
