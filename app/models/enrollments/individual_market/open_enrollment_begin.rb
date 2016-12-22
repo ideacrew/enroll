@@ -192,17 +192,24 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       end
     end
 
+    def has_catastrophic_plan?(enrollment)
+      enrollment.plan.metal_level == 'catastrophic'       
+    end
+
     def process_from_sheet
       count = 0
 
       CSV.open("#{Rails.root}/IVL_Enrollment_Renewals.csv", "w") do |csv|
 
-        csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
-          "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
+        # csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
+        #   "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
+
+
+        csv << ["Enrollment HBX ID", "Subscriber HBXID",  "Subscriber Firstname",  "Subscriber Lastname", "Market", "Coverage Kind", "Coverage Start Date", "Created At", "Updated At", "Plan Name", "Plan HIOS ID",  "Enrollment Status"]
 
         renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
-        CSV.foreach("#{Rails.root}/PositiveMatchesToBeRenewed-1101.csv", headers: true, :encoding => 'utf-8') do |row|
+        CSV.foreach("#{Rails.root}/individuals_missing_passive_renewals.csv", headers: true, :encoding => 'utf-8') do |row|
           count += 1
 
           if count % 100 == 0
