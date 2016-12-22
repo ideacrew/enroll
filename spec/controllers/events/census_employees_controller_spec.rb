@@ -18,7 +18,7 @@ describe Events::CensusEmployeesController do
     before :each do
       header_params = { ssn:headers[:ssn], dob:census_employee.dob}
       allow(controller).to receive(:find_census_employee).with(header_params).and_return([census_employee])
-      allow(CensusEmployee).to receive(:matchable).with(census_employee.ssn, census_employee.dob.strftime("%Y%m%d")).and_return(census_employee)
+      allow(CensusEmployee).to receive(:search_with_ssn_dob).with(census_employee.ssn, census_employee.dob.strftime("%Y%m%d")).and_return(census_employee)
 
       allow(controller).to receive(:render_to_string).with(
           "events/census_employee/employer_response", {:formats => ["xml"], :locals => {
@@ -45,7 +45,7 @@ describe Events::CensusEmployeesController do
 
       context "matching ssn and dob" do
         it "should find the census_employee" do
-          allow(CensusEmployee).to receive(:matchable).with(census_employee.ssn, census_employee.dob).and_return(census_employee)
+          allow(CensusEmployee).to receive(:search_with_ssn_dob).with(census_employee.ssn, census_employee.dob).and_return(census_employee)
           census_employees = @controller.send(:find_census_employee, {ssn: census_employee.ssn, dob: census_employee.dob})
           expect(census_employees).to eql([census_employee])
         end
@@ -53,7 +53,7 @@ describe Events::CensusEmployeesController do
 
       context "mismatching ssn, matching dob" do
         it "should not find the census_employee" do
-          allow(CensusEmployee).to receive(:matchable).with('999999999', census_employee.dob).and_return([])
+          allow(CensusEmployee).to receive(:search_with_ssn_dob).with('999999999', census_employee.dob).and_return([])
           census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob: census_employee.dob})
           expect(census_employees).to eql([])
         end
@@ -77,8 +77,8 @@ describe Events::CensusEmployeesController do
 
       context "matching" do
         it "should find a census_employee with the dependent" do
-          allow(CensusEmployee).to receive(:matchable).with(census_dependent.ssn, census_dependent.dob).and_return([])
-          allow(CensusEmployee).to receive(:matchable_census_dependents).with(census_dependent.ssn, census_dependent.dob).and_return([census_employee])
+          allow(CensusEmployee).to receive(:search_with_ssn_dob).with(census_dependent.ssn, census_dependent.dob).and_return([])
+          allow(CensusEmployee).to receive(:search_dependent_with_ssn_dob).with(census_dependent.ssn, census_dependent.dob).and_return([census_employee])
           census_employees = @controller.send(:find_census_employee, {ssn: census_dependent.ssn, dob: census_dependent.dob})
           expect(census_employees).to eql([census_employee])
         end
@@ -86,8 +86,8 @@ describe Events::CensusEmployeesController do
 
       context "mismatching ssn, matching dob " do
         it "should not find a census_employee with the dependent" do
-          allow(CensusEmployee).to receive(:matchable).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
-          allow(CensusEmployee).to receive(:matchable_census_dependents).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
+          allow(CensusEmployee).to receive(:search_with_ssn_dob).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
+          allow(CensusEmployee).to receive(:search_dependent_with_ssn_dob).with('999999999', Date.strptime("17000101", "%Y%m%d")).and_return([])
           census_employees = @controller.send(:find_census_employee, {ssn: '999999999', dob: Date.strptime("17000101", "%Y%m%d")})
           expect(census_employees).to eql([])
         end

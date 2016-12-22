@@ -212,7 +212,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                   let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                   it "should return an empty array" do
-                    expect(CensusEmployee.matchable(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
+                    expect(CensusEmployee.search_with_ssn_dob(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
                   end
                 end
 
@@ -220,7 +220,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                   let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
 
                   it "should return the roster instance" do
-                    expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
+                    expect(CensusEmployee.search_with_ssn_dob(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
                   end
 
                   context "and a link employee role request is received" do
@@ -375,7 +375,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 context "using non-matching dependent ssn and dob" do
                   it "should return an empty array" do
-                    expect(CensusEmployee.matchable_census_dependents('000000000', Date.new(1700,01,01))).to eq []
+                    expect(CensusEmployee.search_dependent_with_ssn_dob('000000000', Date.new(1700,01,01))).to eq []
                   end
                 end
 
@@ -383,7 +383,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                   let(:valid_census_dependent) { initial_census_employee.census_dependents.first }
 
                   it "should return an empty array" do
-                    expect(CensusEmployee.matchable_census_dependents(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
+                    expect(CensusEmployee.search_dependent_with_ssn_dob(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
                   end
                 end
               end

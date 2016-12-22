@@ -98,6 +98,8 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
+  scope :search_with_ssn_dob,              ->(ssn, dob) { unscoped.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob) }
+  scope :search_dependent_with_ssn_dob,    ->(ssn, dob) { unscoped.where(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -107,13 +109,13 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
-  scope :matchable_census_dependents, ->(ssn, dob) {
-    matched = unscoped.and(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob)
-    benefit_group_assignment_ids = matched.flat_map() do |ee|
-      ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
-    end
-    matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
-  }
+  # scope :matchable_census_dependents, ->(ssn, dob) {
+  #   matched = unscoped.and(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob)
+  #   benefit_group_assignment_ids = matched.flat_map() do |ee|
+  #     ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
+  #   end
+  #   matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
+  # }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
    linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
