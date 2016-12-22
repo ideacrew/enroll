@@ -432,7 +432,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double, may_publish?: true)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish: double, publish!: double, may_publish?: true)}
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -440,6 +440,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(plan_year_proxy).to receive(:draft?).and_return(false)
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+      allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
     end
 
@@ -535,7 +536,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST force publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
