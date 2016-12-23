@@ -36,7 +36,7 @@
           hbx_enrollment = HbxEnrollment.by_hbx_id(eg_id).first
 
           if hbx_enrollment.blank?
-            raise "Unable to find enrollment #{hbx_id}"
+            raise "Unable to find enrollment #{eg_id}"
           end
 
           if !['coverage_selected', 'auto_renewing', 'enrolled_contingent'].include?(hbx_enrollment.aasm_state)
