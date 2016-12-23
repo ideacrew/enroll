@@ -36,7 +36,7 @@
           hbx_enrollment = HbxEnrollment.by_hbx_id(eg_id).first
 
           if hbx_enrollment.blank?
-            raise 'Unable to find enrollment #{hbx_id}'
+            raise "Unable to find enrollment #{hbx_id}"
           end
 
           if !['coverage_selected', 'auto_renewing', 'enrolled_contingent'].include?(hbx_enrollment.aasm_state)
@@ -86,7 +86,7 @@
           puts "No consumer role present for person.hbx_id : #{person.hbx_id}"
         end
       rescue Exception => e
-        puts "Unable to deliver to #{person.hbx_id} for the following error #{e.backtrace}"
+        puts "Unable to deliver to #{d["person.authority_member_id"]} for the following error #{e.backtrace}"
         next
       end
     end
