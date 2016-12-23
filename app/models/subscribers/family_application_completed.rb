@@ -50,7 +50,7 @@ module Subscribers
       end
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
-      throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
+      #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       new_person_flag = false
       if active_household.tax_households.size == 0
         if active_verified_tax_households.present?
