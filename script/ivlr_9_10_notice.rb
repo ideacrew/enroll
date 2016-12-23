@@ -30,6 +30,44 @@
         person = Person.where(:hbx_id => d["person.authority_member_id"]).first
         enrollment_group_ids << d["health_policy.eg_id"]
         enrollment_group_ids << d["dental_policy.eg_id"]
+
+        enrollment_group_ids.compact.each do |eg_id|
+
+          hbx_enrollment = HbxEnrollment.by_hbx_id(eg_id).first
+
+          if hbx_enrollment.blank?
+            raise 'Unable to find enrollment #{hbx_id}'
+          end
+
+          if !['coverage_selected', 'auto_renewing', 'enrolled_contingent'].include?(hbx_enrollment.aasm_state)
+             raise "Hbx Enrollment #{hbx_enrollment.hbx_id} is in #{hbx_enrollment.aasm_state}"
+          end
+
+          if hbx_enrollment.auto_renewing?
+            active_renewal = hbx_enrollment.family.active_household.hbx_enrollments.where({
+              :effective_on => Date.new(2017,1,1),
+              :kind => hbx_enrollment.kind,
+              :coverage_kind => hbx_enrollment.coverage_kind,
+              :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+              }).first
+
+            if active_renewal.present?
+              raise "Hbx Enrollment #{hbx_enrollment.hbx_id} has active renewal with id #{active_renewal.hbx_id}"
+            end
+
+            active_coverages = hbx_enrollment.family.active_household.hbx_enrollments.where({
+                :effective_on.gte => Date.new(2016,1,1),
+                :effective_on.lte => Date.new(2016,12,31),
+                :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
+                :coverage_kind => hbx_enrollment.coverage_kind,
+                :kind => 'individual'
+                })
+
+            if active_coverages.blank?
+              raise "Current 2016 coverage missing for given passive renewal #{hbx_enrollment.hbx_id}"
+            end
+
+          end
         consumer_role =person.consumer_role
         if consumer_role.present?
           builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
