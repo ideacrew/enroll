@@ -519,6 +519,12 @@ class PlanYear
     %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
   end
 
+  def application_warnings
+    if !is_application_valid?
+      application_eligibility_warnings.each_pair(){ |key, value| self.errors.add(:base, value) }
+    end
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
@@ -727,7 +733,7 @@ class PlanYear
 
     # Returns plan to draft state for edit
     event :withdraw_pending, :after => :record_transition do
-      transitions from: :publish_pending, to: :draft
+      transitions from: [:publish_pending, :renewing_publish_pending], to: :draft
     end
 
     # Plan as submitted failed eligibility check
