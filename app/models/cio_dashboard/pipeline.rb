@@ -4,7 +4,7 @@ module CioDashboard
     store_in collection: "cioDashboard"
     field :tile, type: String
     field :row_indicator, type: String
-    field :effective_month, type: DateTime
+    field :effective_month, type: String
     field :est_convert_value, type: String
     field :est_convert_indicator, type: String
     field :real_convert_value, type: String
