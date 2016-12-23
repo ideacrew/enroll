@@ -66,8 +66,8 @@
             if active_coverages.blank?
               raise "Current 2016 coverage missing for given passive renewal #{hbx_enrollment.hbx_id}"
             end
-
           end
+        end
         consumer_role =person.consumer_role
         if consumer_role.present?
           builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
