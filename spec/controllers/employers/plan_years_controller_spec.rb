@@ -432,7 +432,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish: double, publish!: double, may_publish?: true)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double, may_publish?: true)}
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))

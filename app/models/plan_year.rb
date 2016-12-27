@@ -731,9 +731,10 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
-    # Returns plan to draft state for edit
+    # Returns plan to draft state (or) renewing draft for edit
     event :withdraw_pending, :after => :record_transition do
-      transitions from: [:publish_pending, :renewing_publish_pending], to: :draft
+      transitions from: :publish_pending, to: :draft
+      transitions from: :renewing_publish_pending, to: :renewing_draft
     end
 
     # Plan as submitted failed eligibility check
