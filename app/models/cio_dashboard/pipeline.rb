@@ -18,6 +18,15 @@ module CioDashboard
     field :est_new_indicator, type: String
     field :real_new_value, type: String
     field :real_new_indicator, type: String
+
+
+    def self.pipeline_dashboard_stats
+        pipelines =[ ]
+        CioDashboard::Pipeline.all.each do |p|
+            pipelines << p if p.tile.present? && pipelines.size < 5 
+        end
+        pipelines
+    end
   end
 end
 
