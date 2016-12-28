@@ -53,6 +53,12 @@
     <div class="vertically-aligned-row auto-width">
       <div class="text-right col-xs-8">
         <div class="row">
+          <% if @census_employee.is_cobra_status? %>
+            <div id='cobra_bar'>
+              <div class='title'><strong>COBRA/Continuation</strong></div>
+              <div><strong>effective date:</strong><%= format_date @census_employee.cobra_begin_date %></div>
+            </div>
+          <% end %>
           <span><strong>Hired:</strong>
           <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
           <% if @census_employee.coverage_terminated_on.blank? %>
