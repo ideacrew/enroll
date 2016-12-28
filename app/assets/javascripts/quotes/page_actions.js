@@ -190,8 +190,27 @@ QuotePageLoad = (function() {
     })
   }
 
+  var disable_nationwide_if_dc_selected = function(selected) {
+    var criteria_id = selected.parentNode.parentNode.id
+    if (criteria_id == 'dc_in_network') {
+      if (selected.id == 'true' && selected.checked) {
+        $('#nationwide #any').prop('checked', true).addClass('active')
+        $('#nationwide #true').prop('checked', false).removeClass('active')
+        $('#nationwide #false').prop('checked', false).removeClass('active')
+        $('#nationwide').addClass('blocking')
+      }
+      else if ($('#nationwide').hasClass('blocking')) {
+        $('#nationwide #any').prop('checked', true).addClass('active')
+        $('#nationwide #true').prop('checked', false).removeClass('active')
+        $('#nationwide #false').prop('checked', false).removeClass('active')
+        $('#nationwide').removeClass('blocking')
+      }
+    }
+  }
+
   var page_load_listeners = function() {
       $('.plan_selectors .criteria').on('click',function(){
+          console.log(this)
           selected=this;
           sibs = $(selected.parentNode).siblings();
           $.each(sibs, function(){
@@ -206,6 +225,7 @@ QuotePageLoad = (function() {
             };
           });
           if (selected.checked)  this.classList.add('active');
+          disable_nationwide_if_dc_selected(selected);
           toggle_plans([])
           reset_selected_plans()
       })

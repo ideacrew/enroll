@@ -3,7 +3,7 @@
         <div  id='carriers' style='width: 200px'>
             <b>Carriers</b><br/>
             <%- @health_selectors[:carriers].each do |carrier| %>
-                <div class='criteria_style active' style='width:200px'>
+                <div class='criteria_style' style='width:200px'>
                     <input type='checkbox' id="<%=carrier[1]%>" class='criteria' > <%=carrier[0].rstrip %> </input>
                 </div>
              <% end %>
@@ -11,7 +11,7 @@
         <div id='metals'>
             <b>Metal Levels</b> </br>
             <%- @health_selectors[:metals].each do |metal| %>
-                <div class='criteria_style active'>
+                <div class='criteria_style'>
                     <input type='checkbox' id="<%=metal%>"  class='criteria'> <%= metal %> </input>
                 </div>
             <% end %>
@@ -19,7 +19,7 @@
         <div id='plan_types'>
             <b>Plan Types</b> <br>
             <%- @health_selectors[:plan_types].each do |type| %>
-            <div class='criteria_style active'>
+            <div class='criteria_style'>
                 <input type='checkbox' id="<%=type%>" class='criteria' > <%= type %> </input>
               </div>
             <% end %>
@@ -27,7 +27,7 @@
         <div id='dc_in_network'>
              <b>DC Network</b> <br>
              <%- @health_selectors[:dc_network].each do |choice| %>
-                 <div class='criteria_style active'>
+                 <div class='criteria_style'>
                      <input type='checkbox'  id="<%=choice%>" class='criteria'> <%= choice %> </input>
                  </div>
             <% end %>
@@ -35,7 +35,7 @@
         <div id='nationwide'>
             <b>Nationwide</b> <br>
             <%- @health_selectors[:nationwide].each do |choice| %>
-                <div class='criteria_style active'>
+                <div class='criteria_style'>
                     <input type='checkbox' id="<%=choice%>"  class='criteria'><%= choice %> </input>
                 </div>
             <% end %>
