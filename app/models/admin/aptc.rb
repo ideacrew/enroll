@@ -299,12 +299,12 @@ class Admin::Aptc < ApplicationController
     end
 
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
-    def update_aptc_applied_for_enrollments(params)
+    def update_aptc_applied_for_enrollments(family, params, year)
       current_datetime = TimeKeeper.datetime_of_record
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
-      family = Family.find(params[:person][:family_id])
-      max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc.to_f
+      #family = Family.find(params[:person][:family_id])
+      max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
       
       params.each do |key, aptc_value|
@@ -313,7 +313,7 @@ class Admin::Aptc < ApplicationController
           updated_aptc_value = aptc_value.to_f
           actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
-          if actual_aptc_value != updated_aptc_value # TODO  && check if the effective_on doesnt go to next year?????
+          if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
               percent_sum_for_all_enrolles = 0.0
               enrollment_update_result = true
               original_hbx = HbxEnrollment.find(hbx_id)

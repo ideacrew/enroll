@@ -31,7 +31,7 @@ class HbxAdminController < ApplicationController
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(year, @family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage])
     if @family.present? #&& TimeKeeper.date_of_record.year == year
       @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, year)
-      @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(params)
+      @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, year)
     end
     respond_to do |format|
       format.js { render "update_aptc_csr", person: @person}
