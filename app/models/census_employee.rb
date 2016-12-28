@@ -11,7 +11,7 @@ class CensusEmployee < CensusMember
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
 
@@ -617,7 +617,7 @@ class CensusEmployee < CensusMember
     end
 
     def terminate_future_scheduled_census_employees(as_of_date)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on => as_of_date)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employee_role!
       end
@@ -816,7 +816,7 @@ class CensusEmployee < CensusMember
 
     coverages_selected = lambda do |benefit_group_assignment|
       return [] if benefit_group_assignment.blank?
-      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment}
+      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment || e.aasm_state == "coverage_expired"}
       [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
     end
 

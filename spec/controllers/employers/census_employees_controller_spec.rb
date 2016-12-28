@@ -263,7 +263,13 @@ RSpec.describe Employers::CensusEmployeesController do
                          aasm_state: 'coverage_terminated'
       )
     end
-
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
