@@ -133,7 +133,17 @@ class BrokerAgencies::QuotesController < ApplicationController
   def edit
     #find quote to edit
     @quote = Quote.find(params[:id])
-
+    # binding.pry
+    if params[:broker_role_id].blank?
+      @orgs = Organization.by_broker_role(@quote.broker_role.id)
+    else
+      @orgs = Organization.by_broker_role(params[:broker_role_id])
+    end
+    # broker_role_id = @quote.broker_role.id
+# current_user.person.broker_role.id
+   # @orgs = Organization.by_broker_role(current_user.person.broker_role.id)
+   # @orgs = Organization.all_employer_profiles
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
     unless params[:duplicate_household].blank? && params[:num_of_dup].blank?
@@ -472,6 +482,35 @@ class BrokerAgencies::QuotesController < ApplicationController
     set_dental_plans
     render partial: 'my_dental_plans'
   end
+
+   def employees_list
+ 
+    employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    @employees = employer_profile.census_employees
+
+    @quote = Quote.new
+
+    @orgs = Organization.all_employer_profiles
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+
+    # # Create place holder for new member of household
+    quote = Quote.find(params[:quote_id])
+    households = quote.quote_households.destroy_all
+    @employees.each do |x|
+     max_family_id = @quote.quote_households.max(:family_id).to_i
+     qhh = QuoteHousehold.new(family_id: max_family_id + 1)
+     qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
+     @quote.quote_households << qhh
+    end 
+    qbg = QuoteBenefitGroup.new
+    @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
+    @quote.quote_benefit_groups << qbg    
+
+    respond_to do |format|
+      # format.html 
+      format.js
+    end  
+  end  
 
 
 private
