@@ -225,7 +225,7 @@ class EmployerProfile
 
   def notify_general_agent_terminated(general_agency_accounts)
     general_agency_accounts.each do |general_agency|
-    notify("info.events.employer.general_agent_terminated", {employer_id: general_agency.employer_profile.hbx_id, event_name: "general_agent_terminated"})
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: general_agency.employer_profile.hbx_id, event_name: "general_agent_terminated"})
     end
   end
 
@@ -726,14 +726,14 @@ class EmployerProfile
   end
 
   def notify_initial_binder_paid
-    notify("info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
   end
 
   def notify_broker_update
     changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
       if changed_fields.present? && changed_fields.include?(feild)
-        notify("info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
+        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
     end
   end
@@ -741,7 +741,7 @@ class EmployerProfile
   def notify_general_agent_added
     changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     if changed_fields.present? && changed_fields.include?("start_on")
-      notify("info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
+      notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
     end
   end
 
