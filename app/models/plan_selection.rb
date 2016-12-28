@@ -39,7 +39,7 @@ class PlanSelection
     hbx_enrollment.select_coverage!(qle: qle)
   end
 
-  def set_eligibility_dates_to_previous_eligibility_dates(previous_enrollment_id)
+  def set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
     if previous_enrollment_id.present?
       previous_enrollment = HbxEnrollment.find(previous_enrollment_id)
       return if hbx_enrollment.plan.active_year != previous_enrollment.plan.active_year
@@ -82,6 +82,7 @@ class PlanSelection
       hbx_id = hbx_em.person.hbx_id
       unless previous_enrollment_members[hbx_id].blank?
         hbx_em.eligibility_date = previous_enrollment_members[hbx_id]
+        hbx_em.coverage_start_on = previous_enrollment_members[hbx_id]
         hbx_em.save!
       end
     end
