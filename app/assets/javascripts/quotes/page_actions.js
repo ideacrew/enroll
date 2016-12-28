@@ -43,8 +43,6 @@ QuotePageLoad = (function() {
       if ((criteria_type == 'nationwide') && (criteria_value != String(plan['nationwide']))) {result=false; break; }
       if ((criteria_type == 'dc_in_network') && (criteria_value != String(plan['dc_in_network']))) {result=false; break; }
     }
-    if (parseInt(plan['deductible']) > parseInt(deductible_value)) {result=false}
-
     return result
   }
   var _set_plan_counts = function() {
@@ -88,7 +86,7 @@ QuotePageLoad = (function() {
         broker_role_id: $('#broker_role_id').val(),
         benefit_id: $('#benefit_group_select option:selected').val(),
         criteria_for_ui: JSON.stringify(criteria),
-        deductible_for_ui: deductible_value },
+      },
       url: '/broker_agencies/broker_roles/'+$('#broker_role_id').val()+'/quotes/criteria.js'
     })
   }
@@ -142,9 +140,6 @@ QuotePageLoad = (function() {
               roster_premiums = response['roster_premiums']
               dental_roster_premiums = response['dental_roster_premiums']
               _turn_off_criteria()
-              deductible_value = parseInt(response['summary']['deductible_value'])
-              $('#ex1').bootstrapSlider('setValue', deductible_value)
-              $('#ex1_input').val(deductible_value)
               toggle_plans(response['criteria'])
               _set_benefits()
               Quote.set_plan_costs()
@@ -290,8 +285,6 @@ QuotePageLoad = (function() {
       page_load_listeners: page_load_listeners,
       configure_benefit_group: configure_benefit_group,
       view_details: view_details,
-      toggle_plans: toggle_plans,
-      reset_selected_plans: reset_selected_plans,
       set_select_health_plans: set_select_health_plans,
       relationship_benefits: function(){return relationship_benefits},
       dental_relationship_benefits: function(){return dental_relationship_benefits},
