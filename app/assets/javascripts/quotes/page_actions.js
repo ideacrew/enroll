@@ -59,10 +59,10 @@ QuotePageLoad = (function() {
   var toggle_plans = function(criteria){
     if(criteria.length== 0){
         $.each($('.plan_selectors .active'), function() {
-            var criteria_type = this.parentNode.id
+            var criteria_type = this.parentNode.parentNode.id
             var criteria_value = this.id
             if (criteria_value != 'any') {criteria.push([criteria_type,criteria_value])}
-     })
+       })
     }
     else{
       _turn_off_criteria()
@@ -197,9 +197,20 @@ QuotePageLoad = (function() {
 
   var page_load_listeners = function() {
       $('.plan_selectors .criteria').on('click',function(){
-          selected=this; sibs = $(selected).siblings();
-          $.each(sibs, function(){ this.className='criteria' }) ;
-          selected.className='active';
+          selected=this;
+          sibs = $(selected.parentNode).siblings();
+          $.each(sibs, function(){
+            var cousins = $(this).children()
+            if(typeof(cousins[0]) != 'undefined') {
+              classList = cousins[0].classList
+              if(classList.length > 0 && classList.value.indexOf('active') > 0) {
+                this.checked = false
+                $(cousins[0]).removeClass('active')
+                $(cousins[0]).prop('checked', false)
+              };
+            };
+          });
+          if (selected.checked)  this.classList.add('active');
           toggle_plans([])
           reset_selected_plans()
       })
