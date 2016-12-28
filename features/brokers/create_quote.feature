@@ -92,6 +92,7 @@ Feature: Create Employee Roster
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
     When the broker clicks on Back to Quotes button
-    Then the broker should see avaliable Quotes 
+    Then the broker should see avaliable Quotes
     When the broker clicks on Actions.
     Then view publish quote should be disabled.
+    And Broker logs out
