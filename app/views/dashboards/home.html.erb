@@ -266,7 +266,7 @@ $(function () {
 
     <div class="row row-content">
     <div class="col-xs-6 col-sm-6">
-        <h4>Pipeline</h4>
+        <h4>SHOP 90 Day Pipeline</h4>
     <table class="table table-hover table-condensed">
     <thead>
       <tr>
@@ -280,7 +280,7 @@ $(function () {
         <th>Real New</th>    
       </tr>
     </thead>
-    <%@pipeline.each do |pipeline|%>
+    <%@pipelines.each do |pipeline|%>
         <tbody>
           <tr>
             <td></td>
@@ -305,7 +305,7 @@ $(function () {
         <th>Year Change</th>
       </tr>
     </thead>
-    <%@fundtransfer.each do |fundtransfer|%>
+    <%@fundtransfers.each do |fundtransfer|%>
         <tbody>
          <tr> 
             <td class="vert1"><%=fundtransfer.carrier%></td>
@@ -330,7 +330,7 @@ $(function () {
         <th>7-Day Change</th>
       </tr>
     </thead>
-    <%@redmine.each do |redmine|%>
+    <%@redmines.each do |redmine|%>
     <tbody>
      <tr> 
         <td class="vert1"><%=redmine.ticket_type%></td>
