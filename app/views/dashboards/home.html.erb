@@ -270,7 +270,7 @@ $(function () {
     <table class="table table-hover table-condensed">
     <thead>
       <tr>
-        
+        <th></th>
         <th>Effective Month</th>
         <th>Est. Convert</th>
         <th>Real Convert</th>
@@ -283,28 +283,14 @@ $(function () {
     <%@pipeline.each do |pipeline|%>
         <tbody>
           <tr>
-            
-            <%if pipeline.effective_month.present?%>
+            <td></td>
             <td><%=pipeline.effective_month%></td> 
-            <%end%>
-            <%if pipeline.est_convert_value.present?%>
             <td class="vert1"><%=pipeline.est_convert_value%></td>
-            <%end%>
-            <%if pipeline.real_convert_value.present?%>
             <td class="vert1"><%=pipeline.real_convert_value%></td>
-            <%end%> 
-            <%if pipeline.est_renew_value.present?%>
             <td class="vert1"><%=pipeline.est_renew_value%></td>
-            <%end%>
-            <%if pipeline.real_renew_value.present?%>
             <td class="vert1"><%=pipeline.real_renew_value%></td>
-            <%end%>
-            <%if pipeline.est_new_value.present?%>
             <td class="vert1"><%=pipeline.est_new_value%></td>
-            <%end%>
-            <%if pipeline.real_new_value.present?%>
             <td class="vert1"><%=pipeline.real_new_value%></td>
-            <%end%>  
           </tr>
     <%end%>
     </tbody>
@@ -322,18 +308,10 @@ $(function () {
     <%@fundtransfer.each do |fundtransfer|%>
         <tbody>
          <tr> 
-            <% if fundtransfer.carrier.present?%>
             <td class="vert1"><%=fundtransfer.carrier%></td>
-            <%end%>
-            <% if fundtransfer.amount.present?%>
             <td class="vert1"><%=fundtransfer.amount%></td>
-            <%end%>
-            <% if fundtransfer.month_change_value.present? %>
-            <td class="vert1"><%=(fundtransfer.month_change_value)%></td>
-            <%end%>
-            <% if fundtransfer.year_change_value.present? %>
+            <td class="vert1"><%=fundtransfer.month_change_value%></td>
             <td class="vert1"><%=fundtransfer.year_change_value%></td>
-            <%end%>
          </tr>
       <%end%>
     </tbody>
@@ -355,30 +333,14 @@ $(function () {
     <%@redmine.each do |redmine|%>
     <tbody>
      <tr> 
-        <% if redmine.ticket_type.present?%>
         <td class="vert1"><%=redmine.ticket_type%></td>
-        <%end%>
-        <% if redmine.total_open_value.present?%>
         <td class="vert1"><%=redmine.total_open_value%></td>
-        <%end%>
-        <% if redmine.closed_7_day_value.present?%>
         <td class="vert1"><%=redmine.closed_7_day_value%></td>
-        <%end%>
-        <% if redmine.opened_7_day_value.present?%>
         <td class="vert1"><%=redmine.opened_7_day_value%></td>
-        <%end%>
-        <% if redmine.avg_days_value.present?%>
         <td class="vert1"><%=redmine.avg_days_value%></td>
-        <%end%>
-        <% if redmine.target_days_value.present?%>
         <td class="vert1"><%=redmine.target_days_value%></td>
-        <%end%>
-        <% if redmine.index_value.present?%>
         <td class="vert1"><%=redmine.index_value%></td>
-        <%end%>
-        <% if redmine.change_7_day_value.present?%>
         <td class="vert1"><%=redmine.change_7_day_value%></td>
-        <%end%>
      </tr>
       <%end%>
     </tbody>
@@ -400,18 +362,10 @@ $(function () {
         <%@events.each do |events|%>
     <tbody>
      <tr> 
-        <% if events.event_value.present?%>
         <td class="vert1"><%=events.event_value%></td>
-        <%end%>
-        <% if events.impact_value.present?%>
         <td class="vert1"><%=events.impact_value%></td>
-        <%end%>
-        <% if events.on_schedule_days_value.present?%>
         <td class="vert1"><%=events.on_schedule_days_value%></td>
-        <%end%>
-        <% if events.event_date_value.present?%>
         <td class="vert1"><%=events.event_date_value%></td>
-        <%end%>
      </tr>
         <%end%>
       

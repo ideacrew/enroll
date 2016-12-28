@@ -20,7 +20,17 @@ module CioDashboard
     field :change_7_day_value, type: String
     field :change_7_day_indicator, type: String
   
-  end
+  
+
+   def self.redmine_dashboard_stats
+        redmines =[ ]
+        CioDashboard::Redmine.all.each do |r|
+            redmines << r if r.total_open_value.present? && redmines.size < 5 
+        end
+        redmines
+    end
+
+    end
 
 end
 
