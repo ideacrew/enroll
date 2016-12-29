@@ -158,6 +158,7 @@ class HbxEnrollment
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
+  scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -986,7 +987,7 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.show_enrollments_sans_canceled.shop_market.to_a.each do |enrollment|
+        household.hbx_enrollments.show_enrollments_sans_canceled.non_terminated.shop_market.to_a.each do |enrollment|
           enrollment_list << enrollment if benefit_group_assignment_id.to_s == enrollment.benefit_group_assignment_id.to_s
         end
       end
