@@ -838,22 +838,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return false without hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return []
-        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
-      end
-
-      it "should return false with dental hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment_two]
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return []
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment]
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return [hbx_enrollment]
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
       end
 
       it "should return true when has both health & dental enrollments" do
-        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return [hbx_enrollment, hbx_enrollment_two]
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return [hbx_enrollment, hbx_enrollment_two]
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
       end
     end
