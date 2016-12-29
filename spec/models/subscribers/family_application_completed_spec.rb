@@ -196,6 +196,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
       let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
       let(:tax_household_db) { family_db.active_household.tax_households.first }
+      let(:tax_household_members_db) { family_db.active_household.latest_active_tax_household.tax_household_members }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
 
@@ -238,6 +239,16 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(tax_household_db.allocated_aptc).to eq 0
           expect(tax_household_db.is_eligibility_determined).to be_truthy
           expect(tax_household_db.current_max_aptc).to eq max_aptc
+        end
+
+        it "updates the tax household member with is_ia_eligible from the payload on the primary persons family" do
+          expect(tax_household_members_db.first.is_ia_eligible).to eq true
+        end
+
+        it "updates the tax household member with is_medicaid_chip_eligible from the payload on the primary persons family" do
+          expect(tax_household_members_db).to be_truthy
+          expect(tax_household_members_db).to eq person.primary_family.active_household.latest_active_tax_household.tax_household_members
+          expect(tax_household_members_db.first.is_medicaid_chip_eligible).to eq false
         end
 
         it "updates all consumer role verifications" do
