@@ -204,16 +204,18 @@ QuotePageLoad = (function() {
           reset_selected_plans()
       })
       $('.dental_carrier, .dental_metal, .dental_plan_type, .dc_network, .nationwide').on('click', function(){
-        class_name = $(this).attr('class')
+        class_name = $(this).attr('class').split(' ')[0]
         $("." + class_name).each(function(){
           $(this).removeClass('active1')
+          $(this).prop('checked', false)
         });
         $(this).addClass('active1')
-        carrier_id = $('#dental-carriers').find('div.active1').attr('data-carrier')
-        dental_level = $('#dental-metals').find('div.active1').attr('id')
-        plan_type = $('#dental-plan_types').find('div.active1').attr('id')
-        dc_network = $('#dental-dc_in_network').find('div.active1').attr('id')
-        nationwide = $('#dental-nationwide').find('div.active1').attr('id')
+        $(this).prop('checked', true)
+        carrier_id = $('#dental-carriers').find('.active1').attr('data-carrier')
+        dental_level = $('#dental-metals').find('.active1').attr('id')
+        plan_type = $('#dental-plan_types').find('.active1').attr('id')
+        dc_network = $('#dental-dc_in_network').find('.active1').attr('id')
+        nationwide = $('#dental-nationwide').find('.active1').attr('id')
         quote = $('#quote').val()
         $.ajax({
           type: 'GET',
