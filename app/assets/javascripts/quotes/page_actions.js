@@ -195,6 +195,24 @@ QuotePageLoad = (function() {
     })
   }
 
+  var disable_dental_nationwide_if_dc_selected = function(selected) {
+    var criteria_id = selected.parentNode.parentNode.id
+    if (criteria_id == 'dental-dc_in_network') {
+      if (selected.id == 'true' && selected.checked) {
+        $('#dental-nationwide #any').prop('checked', true).addClass('active')
+        $('#dental-nationwide #true').prop('checked', false).removeClass('active')
+        $('#dental-nationwide #false').prop('checked', false).removeClass('active')
+        $('#dental-nationwide').addClass('blocking')
+      }
+      else if ($('#dental-nationwide').hasClass('blocking')) {
+        $('#dental-nationwide #any').prop('checked', true).addClass('active')
+        $('#dental-nationwide #true').prop('checked', false).removeClass('active')
+        $('#dental-nationwide #false').prop('checked', false).removeClass('active')
+        $('#dental-nationwide').removeClass('blocking')
+      }
+    }
+  }
+
   var page_load_listeners = function() {
       $('.plan_selectors .criteria').on('click',function(){
           selected=this; sibs = $(selected).siblings();
@@ -211,6 +229,7 @@ QuotePageLoad = (function() {
         });
         $(this).addClass('active1')
         $(this).prop('checked', true)
+        disable_dental_nationwide_if_dc_selected(this)
         carrier_id = $('#dental-carriers').find('.active1').attr('data-carrier')
         dental_level = $('#dental-metals').find('.active1').attr('id')
         plan_type = $('#dental-plan_types').find('.active1').attr('id')
