@@ -65,7 +65,7 @@ QuotePageLoad = (function() {
     else{
       _turn_off_criteria()
       for(var i = 0; i<criteria.length; i++){
-        $('#' + criteria[i][0] +' #' + criteria[i][1]).addClass('active')
+        $('#' + criteria[i][0] +' #' + criteria[i][1]).addClass('active').attr('checked', true)
       }
     }
     var health_plan_count = Object.keys(_select_health_plans).length
