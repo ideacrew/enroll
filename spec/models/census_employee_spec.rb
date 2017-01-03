@@ -680,7 +680,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "validation for employment_terminated_on" do
-    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year)}
+    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year - 50.days)}
 
     it "should fail when terminated date before than hired date" do
       census_employee.employment_terminated_on = census_employee.hired_on - 10.days
@@ -696,7 +696,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     it "should success" do
       census_employee.hired_on = TimeKeeper.date_of_record - 30.days
-      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 20.days
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 1.day
       expect(census_employee.valid?).to be_truthy
       expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
     end
@@ -1477,7 +1477,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       aasm_state: 'auto_renewing'
       )
     }
-    
+
     let(:expired_enrollment) do
       FactoryGirl.create(:hbx_enrollment,
                          household: shop_family.active_household,
