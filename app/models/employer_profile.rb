@@ -825,19 +825,7 @@ class EmployerProfile
   end
 
   def generate_checkbook_notices
-    ## Background job to invoke Notice 
-    # event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
-    # notice_trigger = event_kind.notice_triggers.first
-    # builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
-    #           template: notice_trigger.notice_template,
-    #           subject: event_kind.title,
-    #           mpi_indicator: notice_trigger.mpi_indicator,
-    #           }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
-
-
-    resource_mapping = ApplicationEventMapper.map_resource(self.class)
-    event_name = "acapi.info.events.employer.out_of_pocker_url_notifier"
-    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
+    OutofpocketNotifierJob.perform_later(self.id.to_s)
   end
 
 
