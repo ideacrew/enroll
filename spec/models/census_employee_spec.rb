@@ -1275,6 +1275,37 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "show_plan_end_date?" do
+    context "without coverage_terminated_on" do
+      let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+      (CensusEmployee::EMPLOYMENT_TERMINATED_STATES + CensusEmployee::COBRA_STATES).uniq.each do |state|
+        it "should return false when aasm_state is #{state}" do
+          census_employee.aasm_state = state
+          expect(census_employee.show_plan_end_date?).to be_falsey
+        end
+      end
+    end
+
+    context "with coverage_terminated_on" do
+      let(:census_employee) { FactoryGirl.build(:census_employee, coverage_terminated_on: TimeKeeper.date_of_record) }
+
+      CensusEmployee::EMPLOYMENT_TERMINATED_STATES.each do |state|
+        it "should return false when aasm_state is #{state}" do
+          census_employee.aasm_state = state
+          expect(census_employee.show_plan_end_date?).to be_truthy
+        end
+      end
+
+      (CensusEmployee::COBRA_STATES - CensusEmployee::EMPLOYMENT_TERMINATED_STATES).each do |state|
+        it "should return false when aasm_state is #{state}" do
+          census_employee.aasm_state = state
+          expect(census_employee.show_plan_end_date?).to be_falsey
+        end
+      end
+    end
+  end
+
   context "has_hbx_enrollments?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:employee_role) { FactoryGirl.build(:employee_role) }

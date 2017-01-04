@@ -81,5 +81,11 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       expect(family.enrollments.size).to eq 2
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
+
+    it "the effective_on of cobra enrollment should greater than start_on of plan_year" do
+      generate_cobra_enrollment
+      cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+      expect(cobra_enrollment.effective_on).to be >= cobra_enrollment.benefit_group.valid_plan_year.start_on
+    end
   end
 end

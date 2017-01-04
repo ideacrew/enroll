@@ -91,10 +91,10 @@
       <div class="plan-end info vertical-align-top">
         <strong class="text-danger">Plan End:
         </strong>
-        <% if @census_employee.coverage_terminated_on.present? %>
-        <span class="text-danger">
-          <%= @census_employee.coverage_terminated_on.end_of_month %>
-        </span>
+        <% if @census_employee.show_plan_end_date? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
         <% end %>
       </div>
     </div>

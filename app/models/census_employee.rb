@@ -811,6 +811,10 @@ class CensusEmployee < CensusMember
     !has_cobra_hbx_enrollment? && coverage_terminated_on.present?
   end
 
+  def show_plan_end_date?
+    is_inactive? && coverage_terminated_on.present?
+  end
+
   def enrollments_for_display
     enrollments = []
 
