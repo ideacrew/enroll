@@ -134,16 +134,16 @@ class BrokerAgencies::QuotesController < ApplicationController
     #find quote to edit
     @quote = Quote.find(params[:id])
     # binding.pry
-    if params[:broker_role_id].blank?
-      @orgs = Organization.by_broker_role(@quote.broker_role.id)
-    else
-      @orgs = Organization.by_broker_role(params[:broker_role_id])
-    end
-    # broker_role_id = @quote.broker_role.id
-# current_user.person.broker_role.id
-   # @orgs = Organization.by_broker_role(current_user.person.broker_role.id)
-   # @orgs = Organization.all_employer_profiles
+    # if params[:broker_role_id].blank?
+    #   @orgs = Organization.by_broker_role(@quote.broker_role.id)
+    # else
+    #   @orgs = Organization.by_broker_role(params[:broker_role_id])
+    # end
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    #@orgs = Organization.all_employer_profiles
     @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
     unless params[:duplicate_household].blank? && params[:num_of_dup].blank?
@@ -536,6 +536,9 @@ private
                     :quote_name,
                     :start_on,
                     :broker_role_id,
+                    :employer_type,
+                    :employer_name,
+                    :employer_profile_id,
                     :quote_benefit_groups_attributes => [:id, :title],
                     :quote_households_attributes => [ :id, :family_id , :quote_benefit_group_id,
                                        :quote_members_attributes => [ :id, :first_name, :last_name ,:dob,
