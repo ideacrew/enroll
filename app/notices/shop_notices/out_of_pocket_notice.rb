@@ -31,7 +31,6 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
       @notice.benefit_group_package_name= @recipient.plan_years.first.benefit_groups.first.title
       @notice.plan_year = @recipient.try(:plan_years).first.try(:benefit_groups).first.try(:reference_plan).name
       @notice.family_contribution= @recipient.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
-      # @notice.plan_year = ep.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
       @notice.carrier =@recipient.plan_years.first.benefit_groups.first.reference_plan.carrier_profile.legal_name
       @notice.data = {:url => url} 
   end

@@ -492,7 +492,6 @@ module ApplicationHelper
 
   def show_oop_pdf_link(aasm_state)
     (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
-  # ["enrolling" ,"published", "enrolled"," active","renewing_published", "renewing_enrolling", "renewing_enrolled"].include?(aasm_state)
   end
 
   def calculate_age_by_dob(dob)
