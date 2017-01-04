@@ -613,14 +613,14 @@ class HbxEnrollment
 
   def shop_broker_agency_account
     return nil if self.employer_profile.blank?
-    return nil if self.employer_profile.broker_agency_accounts.empty?
-    select_applicable_broker_account(self.employer_profile.broker_agency_accounts)
+    return nil if self.employer_profile.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(self.employer_profile.broker_agency_accounts.unscoped)
   end
 
   def broker_agency_account
     return shop_broker_agency_account if is_shop?
-    return nil if family.broker_agency_accounts.empty?
-    select_applicable_broker_account(family.broker_agency_accounts)
+    return nil if family.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(family.broker_agency_accounts.unscoped)
   end
 
   def time_of_purchase
@@ -1161,6 +1161,7 @@ class HbxEnrollment
     event :move_to_enrolled!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
@@ -1171,6 +1172,7 @@ class HbxEnrollment
     event :move_to_contingent!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
@@ -1183,6 +1185,7 @@ class HbxEnrollment
     event :move_to_pending!, :after => :record_transition do
       transitions from: :inactive, to: :inactive
       transitions from: :coverage_terminated, to: :coverage_terminated
+      transitions from: :void, to: :void
       transitions from: :coverage_canceled, to: :coverage_canceled
       transitions from: :shopping, to: :unverified
       transitions from: :unverified, to: :unverified
@@ -1223,19 +1226,24 @@ class HbxEnrollment
     benefit_group_assignment_valid?(coverage_effective_date)
   end
 
+  def assign_cost_decorator(decorator)
+    @cost_decorator = decorator
+  end
+
   def decorated_hbx_enrollment
+    return @cost_decorator if @cost_decorator
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
-        PlanCostDecoratorCongress.new(plan, self, benefit_group)
+        @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
-        PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
+        @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
       end
     elsif plan.present? && consumer_role.present?
-      UnassistedPlanCostDecorator.new(plan, self)
+      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
-      OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
 
