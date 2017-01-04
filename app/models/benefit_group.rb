@@ -103,7 +103,6 @@ class BenefitGroup
 
   before_save :set_congress_defaults
   before_destroy :delete_benefit_group_assignments_and_enrollments
-  after_destroy :save_census_employee  # assigns default benefit group to census employee
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -463,19 +462,15 @@ class BenefitGroup
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
-  def delete_benefit_group_assignments_and_enrollments
+  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
       benefit_group_assignments.each do |bga|
         bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
         bga.destroy
       end
-    end
-  end
-
-  def save_census_employee
-    self.employer_profile.census_employees.each do |ce|
-      ce.save
+      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
+      ce.find_or_build_benefit_group_assignment(benefit_groups.first)
     end
   end
 
