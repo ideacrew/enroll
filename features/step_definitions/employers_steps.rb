@@ -491,6 +491,51 @@ And /^employer clicks on terminated employee$/ do
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 
+And /^employer clicks on linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should not see the address on the roster$/ do
+  expect(page).not_to have_content /Address/
+end
+
+And /^employer clicks on linked employee without address$/ do
+  employees.first.address.delete
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should see the address on the roster$/ do
+  expect(page).to have_content /Address/
+end
+
+And /^employer populates the address field$/ do
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+end
+
+And /^employer clicks on update employee$/ do
+  find('.interaction-click-control-update-employee').click
+end
+
+And /^employer clicks on non-linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on non-linked employee without address$/ do
+  employees.first.address.delete
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
 And /^employer clicks on back button$/ do
   expect(page).to have_content "Details"
   find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
