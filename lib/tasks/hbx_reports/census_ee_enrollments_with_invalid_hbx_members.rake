@@ -56,6 +56,6 @@ end
 def eligible_enrollment_member?(hbx_member,enrollment)
   relationship_benefits=enrollment.benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
   relationship = PlanCostDecorator.benefit_relationship(hbx_member.primary_relationship)
-  relationship = "child_over_26" if relationship == "child_under_26" && member.person.age_on(enrollment.effective_on) >= 26
+  return false if relationship == "child_under_26" && member.person.age_on(enrollment.effective_on) >= 26
   (relationship_benefits.include?(relationship))
 end
