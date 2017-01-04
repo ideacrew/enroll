@@ -116,7 +116,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
           allow(plan_year).to receive(:withdraw_pending!)
           allow(plan_year).to receive(:is_application_valid?).and_return(false)
           allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
-          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id, publish: true
         end
 
         it "should set warnings flag" do
@@ -432,7 +432,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish: double, publish!: double, may_publish?: true)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double, may_publish?: true)}
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -472,6 +472,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     context "plan year did not publish due to warnings" do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
+        allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
         allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
