@@ -636,14 +636,14 @@ class HbxEnrollment
 
   def shop_broker_agency_account
     return nil if self.employer_profile.blank?
-    return nil if self.employer_profile.broker_agency_accounts.empty?
-    select_applicable_broker_account(self.employer_profile.broker_agency_accounts)
+    return nil if self.employer_profile.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(self.employer_profile.broker_agency_accounts.unscoped)
   end
 
   def broker_agency_account
     return shop_broker_agency_account if is_shop?
-    return nil if family.broker_agency_accounts.empty?
-    select_applicable_broker_account(family.broker_agency_accounts)
+    return nil if family.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(family.broker_agency_accounts.unscoped)
   end
 
   def time_of_purchase

@@ -89,6 +89,7 @@
     </div>
   </div>
   <div class="row">
+  <% if !@census_employee.is_linked? || !@census_employee.address.present? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
@@ -105,6 +106,7 @@
         </div>
       </div>
     </div>
+  <% end %>
     <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
