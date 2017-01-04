@@ -133,15 +133,8 @@ class BrokerAgencies::QuotesController < ApplicationController
   def edit
     #find quote to edit
     @quote = Quote.find(params[:id])
-    # binding.pry
-    # if params[:broker_role_id].blank?
-    #   @orgs = Organization.by_broker_role(@quote.broker_role.id)
-    # else
-    #   @orgs = Organization.by_broker_role(params[:broker_role_id])
-    # end
     broker_role_id = @quote.broker_role.id
     @orgs = Organization.by_broker_role(broker_role_id)
-    #@orgs = Organization.all_employer_profiles
     @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
 
     max_family_id = @quote.quote_households.max(:family_id).to_i
