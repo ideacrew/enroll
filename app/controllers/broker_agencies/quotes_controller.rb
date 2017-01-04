@@ -262,6 +262,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def build_employee_roster
     @employee_roster = parse_employee_roster_file
     @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups
     if @employee_roster.is_a?(Hash)
       @employee_roster.each do |family_id , members|
