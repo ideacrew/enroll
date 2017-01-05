@@ -223,6 +223,16 @@ class Address
     end
   end
 
+  # Determine if this address is type: "mailing"
+  #
+  # @example Is the address a mailing address?
+  #   model.mailing?
+  #
+  # @return [ true, false ] true if mailing type, false if not mailing type
+  def mailing?
+    kind.to_s == "mailing"
+  end
+
   # Determine if this address is type: "home"
   #
   # @example Is the address a home address?

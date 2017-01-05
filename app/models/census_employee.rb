@@ -10,7 +10,7 @@ class CensusEmployee < CensusMember
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible employee_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -244,6 +244,16 @@ class CensusEmployee < CensusMember
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
+  # This performs employee summary count for waived and enrolled in the latest plan year
+  def perform_employer_plan_year_count
+    if plan_year = self.employer_profile.latest_plan_year
+      plan_year.enrolled_summary = plan_year.total_enrolled_count
+      plan_year.waived_summary = plan_year.waived_count
+      plan_year.save!
+    end
+  end
+
+
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
@@ -391,6 +401,7 @@ class CensusEmployee < CensusMember
 
         end
         terminate_employee_role!
+        perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
@@ -492,6 +503,39 @@ class CensusEmployee < CensusMember
 
   class << self
 
+    def enrolled_count(benefit_group)
+
+        return 0 unless benefit_group
+
+        cnt = CensusEmployee.collection.aggregate([
+        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+        {"$unwind" => "$benefit_group_assignments"},
+        {"$match" => {"aasm_state" => { "$in" =>  EMPLOYMENT_ACTIVE_STATES  } }},
+        {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected"]} }},
+        #{"$match" => {"benefit_group_assignments.is_active" => true}},
+        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+        {"$group" => {
+            "_id" =>  { "bgid" => "$benefit_group_assignments.benefit_group_id",
+                        #"state" => "$aasm_state",
+                        #{}"active" => "$benefit_group_assignments.is_active",
+                        #{}"bgstate" => "$benefit_group_assignments.aasm_state"
+                      },
+                      "count" => { "$sum" => 1 }
+                    }
+              },
+        #{"$match" => {"count" => {"$gte" => 1}}}
+      ],
+      :allow_disk_use => true)
+
+
+      if cnt.count >= 1
+        return cnt.first['count']
+      else
+        return 0
+      end
+    end
+
+
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
@@ -513,7 +557,7 @@ class CensusEmployee < CensusMember
     end
 
     def terminate_future_scheduled_census_employees(as_of_date)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on => as_of_date)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employee_role!
       end
@@ -650,7 +694,7 @@ class CensusEmployee < CensusMember
 
     coverages_selected = lambda do |benefit_group_assignment|
       return [] if benefit_group_assignment.blank?
-      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment}
+      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment || e.aasm_state == "coverage_expired"}
       [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
     end
 
