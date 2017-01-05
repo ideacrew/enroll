@@ -685,6 +685,9 @@ class Family
     # @deprecated Use find_primary_applicant_by_person
     alias_method :find_by_primary_family_member, :find_primary_applicant_by_person
 
+    # @deprecated Use find_primary_applicant_by_person
+    alias_method :find_by_primary_applicant, :find_primary_applicant_by_person
+
     # Get the family(s) with this eligibility case identifier
     # @param id [ String ] Eligibility case ID to match 
     # @return [ Array<Family> ] The families with this eligibilitye case id 
