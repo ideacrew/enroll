@@ -12,6 +12,6 @@ Then(/^he should see the one result with the agency name$/) do
   expect(page).to have_no_content("Chase & Assoc")
 end
 
-Given(/^Hbx Admin clicks on (.*)$/) do |link_text|
+Given(/^Hbx Admin click on (.*)$/) do |link_text|
   click_link(link_text)
 end
