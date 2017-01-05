@@ -5,5 +5,5 @@
   - if office_location.address.present? && (['mailing', 'work', 'primary'].include? office_location.address.kind)
     = render :partial => "events/v2/addresses/address", :object => office_location.address
     -#Adding phone kind 'phone main' temporary, revert once phone.kind in office location fixed.
-  - if office_location.phone.present? && (['work', 'home', 'main','phone main'].include? office_location.phone.kind)
+  - if office_location.phone.present? && ((['work', 'home', 'main'].include? office_location.phone.kind) || (office_location.phone.kind == 'phone main'))
     = render partial: "events/v2/phones/phone", object: office_location.phone
