@@ -133,7 +133,6 @@ Rails.application.routes.draw do
     resources :families, only: [:show] do
       get 'new'
       member do
-        post 'unblock'
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
       end
