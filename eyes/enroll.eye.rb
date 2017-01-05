@@ -40,7 +40,7 @@ Eye.application 'eye_enroll' do
   define_forked_worker("individual_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/individual_resource_listener.rb", false)
   define_forked_worker("policy_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/policy_resource_listener.rb", false)
   define_forked_worker("policy_query_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/policy_query_listener.rb", false)
-  define_forked_worker("resque_workers", BUS_DIRECTORY, "RAILS_ENV=production; QUEUE=*; COUNT=2; bundle exec rake resque:workers", false)
+  define_forked_worker("resque_workers", BUS_DIRECTORY, "RAILS_ENV=production; QUEUE=*; COUNT=2 bundle exec rake resque:workers", false)
 
   process("unicorn") do
     working_dir BUS_DIRECTORY
