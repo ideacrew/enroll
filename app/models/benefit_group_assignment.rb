@@ -91,7 +91,7 @@ class BenefitGroupAssignment
     end
   end
 
-  def latest_hbx_enrollment_for_cobra
+  def latest_hbx_enrollments_for_cobra
     families = Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
       })
@@ -104,7 +104,9 @@ class BenefitGroupAssignment
       end
       enrollments
     end
-    hbx_enrollments.detect{ |hbx| !hbx.is_cobra_status? }
+    health_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'health' && !hbx.is_cobra_status? }
+    dental_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'dental' && !hbx.is_cobra_status? }
+    [health_hbx, dental_hbx].compact
   end
 
   def hbx_enrollment

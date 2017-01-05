@@ -548,7 +548,7 @@ class CensusEmployee < CensusMember
 
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
-    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollment_for_cobra) rescue []
+    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
 
     hbxs.compact.each do |hbx|
       enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
@@ -797,9 +797,14 @@ class CensusEmployee < CensusMember
     employee_role.present?
   end
 
-  def has_hbx_enrollments?
-    return false if employee_role.blank?
-    benefit_group_assignments.any? { |bga| bga.hbx_enrollment.present? }
+  # should disable cobra
+  # 1.waived
+  # 2.do not have an enrollment
+  # 3.census_employee or hbx_enrollment is pending
+  def is_disabled_cobra_action?
+    employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
+      (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
+      employee_termination_pending? || active_benefit_group_assignment.hbx_enrollments.any? { |hbx| hbx.coverage_termination_pending? }
   end
 
   def has_cobra_hbx_enrollment?

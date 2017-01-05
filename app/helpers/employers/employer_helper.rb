@@ -126,7 +126,7 @@ module Employers::EmployerHelper
   def cobra_button(census_employee)
     disabled = current_user.has_hbx_staff_role? == true || census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
     if census_employee.employer_profile.present? && !census_employee.employer_profile.is_conversion?
-      disabled = true unless census_employee.has_hbx_enrollments?
+      disabled = true if census_employee.is_disabled_cobra_action?
     end
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
