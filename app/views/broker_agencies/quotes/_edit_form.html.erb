@@ -38,7 +38,7 @@
 			<div id="quote-benefit-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
 				<div class="panel-body" id="quote-info">
 					<%= f.fields_for :quote_benefit_groups do |benefit_group| %>
-					<div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden"%> id="qbg">
+					<div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden"%>>
 						<div class="form-group col-sm-12">Benefit Group: <%= benefit_group.text_field :title , {size: 40, placeholder: 'Enter Benefit Group Name', benefit_group_state: benefit_group.object.persisted? } %>&nbsp;
 							<button type="button" data-quote-id="<%=@quote.id%>" data-broker-role-id="<%=@broker.id%>" data-benefit-group-id="<%=benefit_group.object.id%>" id="remove_benefit_group_button"  class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						</div>
@@ -46,7 +46,7 @@
 					</div>
 					<% end %>
 					<div class="form-group col-sm-12" style="margin-left:105px">
-					<%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br", disabled: true %>
+					<%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br"%>
 					<%= submit_tag "Add benefit Group", id: "add_benefit_group",type: 'button', onclick: "addBenefitGroup()", class: "select btn btn-primary btn-br" %>
 				</div>
 				</div>
@@ -128,7 +128,6 @@ $('button#remove_household_button').click(remove_household_handler);
 var remove_benefit_group_handler = function(){
 	var $quote_benefit_group_id = $(this);
 	if(this.getAttribute("data-benefit-group-id") != undefined){
-		if (this.getAttribute("data-persisted") == "true"){
 	 $.ajax({
         type: "POST",
         url: "/broker_agencies/broker_roles/"+this.getAttribute("data-broker-role-id") +"/quotes/" + this.getAttribute("data-quote-id")  +"/delete_benefit_group/?quote_benefit_group_id=" +this.getAttribute("data-benefit-group-id"),
@@ -143,10 +142,6 @@ var remove_benefit_group_handler = function(){
 					}
         }
     });
-	}
-	else{
-		$quote_benefit_group_id.parent().parent().hide();
-	}
 	  //$(this).parent().parent().remove();
 	}
 };
@@ -169,7 +164,10 @@ function addEmployeeRowToFamily(family, idx) {
 
 var addBenefitGroup = function () {
 	$("#quote-info.panel-body .row").each(function (index){
+		    if ($(this).css('display') == 'none'){
 		$(this).show();
+		      return false;
+}
 	})
 }
 

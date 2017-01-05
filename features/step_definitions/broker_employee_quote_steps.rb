@@ -111,6 +111,10 @@ Then(/^adds a new benefit group$/) do
   find('.interaction-click-control-save-changes').trigger 'click'
 end
 
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
+end
+
 Then(/^the broker assigns the benefit group to the family$/) do
   select "My Benefit Group", :from => "quote[quote_households_attributes][0][quote_benefit_group_id]"
 end
