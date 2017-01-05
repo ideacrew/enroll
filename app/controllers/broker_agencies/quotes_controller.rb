@@ -133,6 +133,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def edit
     #find quote to edit
     @quote = Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
 
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
@@ -252,6 +255,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def build_employee_roster
     @employee_roster = parse_employee_roster_file
     @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups
     if @employee_roster.is_a?(Hash)
       @employee_roster.each do |family_id , members|
@@ -472,6 +478,35 @@ class BrokerAgencies::QuotesController < ApplicationController
     render partial: 'my_dental_plans'
   end
 
+   def employees_list
+ 
+    employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    @employees = employer_profile.census_employees
+
+    @quote = Quote.new
+
+    @orgs = Organization.all_employer_profiles
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+
+    # # Create place holder for new member of household
+    quote = Quote.find(params[:quote_id])
+    households = quote.quote_households.destroy_all
+    @employees.each do |x|
+     max_family_id = @quote.quote_households.max(:family_id).to_i
+     qhh = QuoteHousehold.new(family_id: max_family_id + 1)
+     qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
+     @quote.quote_households << qhh
+    end 
+    qbg = QuoteBenefitGroup.new
+    @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
+    @quote.quote_benefit_groups << qbg    
+
+    respond_to do |format|
+      # format.html 
+      format.js
+    end  
+  end  
+
 
 private
 
@@ -496,6 +531,9 @@ private
                     :quote_name,
                     :start_on,
                     :broker_role_id,
+                    :employer_type,
+                    :employer_name,
+                    :employer_profile_id,
                     :quote_benefit_groups_attributes => [:id, :title],
                     :quote_households_attributes => [ :id, :family_id , :quote_benefit_group_id,
                                        :quote_members_attributes => [ :id, :first_name, :last_name ,:dob,
