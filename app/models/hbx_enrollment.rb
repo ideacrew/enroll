@@ -1206,8 +1206,9 @@ class HbxEnrollment
   end
 
   def can_be_expired?
-    (benefit_group.present?) && (benefit_group.end_on <= TimeKeeper.date_of_record)
+    benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
   end
+
 
   def can_select_coverage?
     return true unless is_shop?
