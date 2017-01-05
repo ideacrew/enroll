@@ -186,12 +186,13 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
+  wait_for_ajax
   click_button 'Publish Quote'
 end
 
 Then(/^the broker sees that the Quote is published$/) do
-  # wait_for_ajax
-  # expect(page).to have_content('Your quote has been published')
+  wait_for_ajax
+  expect(page).to have_content('Your quote has been published')
 end
 
 When(/^the broker clicks Dental Features$/) do
