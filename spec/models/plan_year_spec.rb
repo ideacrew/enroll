@@ -316,8 +316,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
           it "should fail validation on publish" do
-            expect(plan_year.enrollment_period_errors.present?).to be_truthy
-            expect(plan_year.enrollment_period_errors.last).to match(/open enrollment must end on or before/)
+            expect(plan_year.open_enrollment_date_errors.present?).to be_truthy
+            expect(plan_year.open_enrollment_date_errors[:open_enrollment_period].first).to match(/Open enrollment must end on or before/i)
           end
         end
       end
