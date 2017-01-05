@@ -347,7 +347,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR9',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_9',
@@ -368,7 +368,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR10',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_10',
