@@ -93,6 +93,7 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
+    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
