@@ -139,10 +139,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
     context "selelcting the enrollment" do
       let(:person) { FactoryGirl.create(:person) }
-      let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile)}
+      let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile, census_employee_id: census_employee.id)}
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
       let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
       let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: organization.employer_profile)}
       let(:sep){
         sep = family.special_enrollment_periods.new
         sep.effective_on_kind = 'date_of_event'
@@ -184,6 +185,23 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq renewal_enrollment
       end
 
+      context 'it should not return any enrollment' do
+
+        before do
+          allow(employee_role.census_employee).to receive(:active_benefit_group).and_return nil
+          allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return nil
+        end
+
+        it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
+          expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq nil
+        end
+
+        it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
+          renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
+          sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+          expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq nil
+        end
+      end
     end
   end
 end
