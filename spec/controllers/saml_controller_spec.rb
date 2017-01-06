@@ -39,7 +39,7 @@ RSpec.describe SamlController do
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
       end
 
-      describe "with an existing user with person" do
+      describe "with an existing user" do
         let!(:person) {FactoryGirl.create(:person, user: user)}
 
         it "should redirect back to their last portal" do
