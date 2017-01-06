@@ -60,7 +60,7 @@ module Subscribers
           end
         end
       end
-      family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
+      family.e_case_id = verified_family.integrated_case_id
       begin
         active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
       rescue
