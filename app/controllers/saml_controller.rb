@@ -18,7 +18,7 @@ class SamlController < ApplicationController
 
       oim_user = User.where(oim_id: /^#{Regexp.quote(username)}$/i).first
 
-      if oim_user.present?
+      if oim_user.present? && oim_user.person.present?
         oim_user.idp_verified = true
         oim_user.oim_id = response.name_id
         oim_user.save!
@@ -38,6 +38,7 @@ class SamlController < ApplicationController
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         end
       else
+        oim_user.destroy if oim_user.present?
         new_password = User.generate_valid_password
         new_email = response.attributes['mail'].present? ? response.attributes['mail'] : ""
         new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)

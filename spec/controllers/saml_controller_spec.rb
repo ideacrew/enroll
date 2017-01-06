@@ -39,7 +39,9 @@ RSpec.describe SamlController do
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
       end
 
-      describe "with an existing user" do
+      describe "with an existing user with person" do
+        let!(:person) {FactoryGirl.create(:person, user: user)}
+
         it "should redirect back to their last portal" do
           expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
           post :login, :SAMLResponse => sample_xml
@@ -60,6 +62,17 @@ RSpec.describe SamlController do
             expect(User.where(email: user.email).first.oim_id).to eq name_id
             expect(User.where(email: user.email).first.idp_verified).to be_truthy
           end
+        end
+      end
+
+      describe "with headless user" do
+        it "should claim the invitation" do
+          expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
+          post :login, :SAMLResponse => sample_xml
+          expect(response).to redirect_to(search_insured_consumer_role_index_path)
+          expect(flash[:notice]).to eq "Signed in Successfully."
+          expect(User.where(email: user.email).first.oim_id).to eq name_id
+          expect(User.where(email: user.email).first.idp_verified).to be_truthy
         end
       end
 
