@@ -800,11 +800,11 @@ class CensusEmployee < CensusMember
   # should disable cobra
   # 1.waived
   # 2.do not have an enrollment
-  # 3.census_employee or hbx_enrollment is pending
+  # 3.census_employee is pending
   def is_disabled_cobra_action?
     employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
       (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
-      employee_termination_pending? || active_benefit_group_assignment.hbx_enrollments.any? { |hbx| hbx.coverage_termination_pending? }
+      employee_termination_pending?
   end
 
   def has_cobra_hbx_enrollment?

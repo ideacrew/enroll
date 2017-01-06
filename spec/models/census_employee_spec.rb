@@ -1351,10 +1351,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.is_disabled_cobra_action?).to be_falsey
       end
 
-      it "should return true with pending hbx_enrollment" do
+      it "should return false with pending hbx_enrollment" do
         allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
         allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return true
-        expect(census_employee.is_disabled_cobra_action?).to be_truthy
+        expect(census_employee.is_disabled_cobra_action?).to be_falsey
       end
 
       it "should return true when employee_termination_pending" do
