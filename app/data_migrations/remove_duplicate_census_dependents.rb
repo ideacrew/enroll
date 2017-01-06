@@ -43,6 +43,6 @@ class RemoveDuplicateCensusDependents < MongoidMigrationTask
                                     person.has_active_employee_role_for_census_employee?(census_employee))
     Factories::EnrollmentFactory.build_employee_role(person, nil, census_employee.employer_profile, census_employee, census_employee.hired_on)
 
-    census_employee.link_employee_role!
+    # census_employee.link_employee_role!
   end
 end
