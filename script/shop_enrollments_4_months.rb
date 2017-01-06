@@ -29,9 +29,11 @@ end
 
 qs = Queries::PolicyAggregationPipeline.new
 
-qs.filter_to_shop.filter_to_active.eliminate_family_duplicates
-
 filter_date = (Time.now.utc.beginning_of_day)-4.months
+
+effective_date = (filter_date-4.months).to_date
+
+qs.filter_to_shop.filter_to_active.with_effective_date({"$gt" => effective_date}).eliminate_family_duplicates
 
 qs.add({ "$match" => {"policy_purchased_at" => {"$gte" => filter_date}}})
 
