@@ -14,7 +14,7 @@
         %employer_link
           - employer = hbx_enrollment.census_employee.employer_profile
           %id
-            %id= "urn:openhbx:terms:v1:employer:fein##{employer.fein}"
+            %id= "urn:openhbx:terms:v1:employer:id##{employer.hbx_id}"
           %name= employer.legal_name
           - unless employer.dba.blank?
             %dba= employer.dba
