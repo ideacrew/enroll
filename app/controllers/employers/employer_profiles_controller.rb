@@ -164,6 +164,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
     @add_staff = params[:add_staff]
+    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
   def create
