@@ -1304,6 +1304,10 @@ class HbxEnrollment
    end
  end
 
+  def assign_cost_decorator(decorator)
+    @cost_decorator = decorator
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
