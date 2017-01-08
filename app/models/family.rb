@@ -96,8 +96,7 @@ class Family
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
-
-  validates :e_case_id, uniqueness: true, allow_nil: true
+            
   validate :family_integrity
 
   after_initialize :build_household
