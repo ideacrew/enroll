@@ -58,26 +58,26 @@ module Effective
            end
 
 
-          def collection
-           @employer_profile = EmployerProfile.find(attributes[:id])
-           @billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.strptime(attributes[:billing_date], "%m/%d/%Y")
-           query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
-           @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
-          end
+           def collection
+             @employer_profile = EmployerProfile.find(attributes[:id])
+             @billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.strptime(attributes[:billing_date], "%m/%d/%Y")
+             query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
+             @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
+           end
 
-          def global_search?
+           def global_search?
             true
           end
 
           def nested_filter_definition
             {
-            employer_options: [
-              {scope: 'all', label: 'All'}
-            ],
-            top_scope: :employer_options
-            }
-          end
+              employer_options: [
+                {scope: 'all', label: 'All'}
+                ],
+                top_scope: :employer_options
+              }
+            end
 
+          end
         end
       end
-    end
