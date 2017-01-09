@@ -2353,6 +2353,36 @@ describe PlanYear, "which has the concept of export eligibility" do
   end
 end
 
+describe PlanYear, "filter_active_enrollments_by_date" do
+  let(:plan_year) { FactoryGirl.create(:plan_year)}
+  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let(:benefit_group_assignment) { double("benefit_group_assignment", id: "bga") }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:health_enrollment) { FactoryGirl.create(:hbx_enrollment, coverage_kind: 'health', household: family.active_household)}
+  let(:dental_enrollment) { FactoryGirl.create(:hbx_enrollment, coverage_kind: 'dental', household: family.active_household)}
+
+  before do
+    health_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id, effective_on: plan_year.start_on, benefit_group_id: benefit_group.id)
+    dental_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id, effective_on: plan_year.start_on, benefit_group_id: benefit_group.id)
+  end
+
+  it 'should return an array of openstruct' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.class).to eq Array
+    expect(result.first.class).to eq OpenStruct
+  end
+
+  it 'should return both health & dental enrollment ids' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.map(&:hbx_enrollment_id)).to eq [dental_enrollment.id, health_enrollment.id]
+  end
+
+  it 'should return both health & dental plan ids' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.map(&:plan_id)).to eq [dental_enrollment.plan.id, health_enrollment.plan.id]
+  end
+end
+
 #11021
 describe PlanYear, "plan year schedule changes" do
 
