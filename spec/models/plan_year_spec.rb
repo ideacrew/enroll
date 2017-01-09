@@ -2061,12 +2061,61 @@ describe PlanYear, "which has the concept of export eligibility" do
   describe PlanYear, "state machine transitions -- unhappy path" do
 
     context "an initial employer publishes a valid application and begins open enrollment" do
-      it "plan year should be in enrolling state"
+
+      let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+
+      let(:valid_plan_year_start_on)        { Date.new(2016, 11, 1) }
+      let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+      let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+      let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
+
+      let!(:plan_year) do
+        py = PlanYear.new({
+          employer_profile: employer_profile,
+          start_on: valid_plan_year_start_on,
+          end_on: valid_plan_year_end_on,
+          open_enrollment_start_on: valid_open_enrollment_start_on,
+          open_enrollment_end_on: valid_open_enrollment_end_on
+          })
+
+        py.aasm_state = "draft"
+        py.benefit_groups = [benefit_group]
+        py.save
+        py
+      end
+
+      let!(:owner) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+      let!(:non_owner) { FactoryGirl.create_list(:census_employee, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+        
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_start_on)
+        plan_year.publish!
+      end
+
+      it "plan year should be in enrolling state" do
+        expect(plan_year.enrolling?).to be_truthy
+        expect(plan_year.employer_profile.registered?).to be_truthy
+      end
 
       context "and open enrollment ends, but eligibility requirements are not met" do
-        it "should fail to meet the employee_participation_ratio_minimum"
-        it "should transition application to ineligible state"
-        it "should transition employer to applicant state"
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_end_on + 1.day)
+          plan_year.advance_date!
+        end
+
+        it "should fail to meet the employee_participation_ratio_minimum" do
+          expect(plan_year.enrollment_errors[:enrollment_ratio].present?).to be_truthy
+        end
+
+        it "should transition application to ineligible state" do
+          expect(plan_year.application_ineligible?).to be_truthy 
+        end
+
+        it "should transition employer to applicant state" do
+          expect(employer_profile.applicant?).to be_truthy
+        end
       end
     end
   end

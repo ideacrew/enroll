@@ -747,7 +747,6 @@ class PlanYear
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
 
-      transitions from: :draft,               to: :renewing_draft,      :guard  => :is_renewing_event_date_valid?
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
@@ -925,18 +924,6 @@ private
   def log_message(errors)
     msg = yield.first
     (errors[msg[0]] ||= []) << msg[1]
-  end
-
-  def is_renewing_event_date_valid?
-    today = TimeKeeper.date_of_record
-    valid = case aasm_state
-    when "draft"
-      today >= (end_on + 1.day) - Settings.
-    else
-      false
-    end
-
-    valid
   end
 
   def can_be_expired?
