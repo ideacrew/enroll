@@ -40,7 +40,7 @@
         </div>
         <% if hbx_enrollment.coverage_terminated? %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Plan Start:
+          <strong>Effective Date:
           </strong>
           <%= hbx_enrollment.effective_on %>
         </div>
@@ -54,6 +54,16 @@
           <strong>Plan Start:
           </strong>
           <%= hbx_enrollment.effective_on %>
+          <% if read_only == true %>
+          <br>
+          <strong class="text-danger">Plan End:
+          </strong>
+          <% if @census_employee.coverage_terminated_on.present? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
+          <% end %>
+          <% end %>
         </div>
         <% end %>
       </div>
@@ -89,13 +99,14 @@
     </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="plan-end info vertical-align-top">
+        <!--
         <strong class="text-danger">Plan End:
         </strong>
         <% if @census_employee.coverage_terminated_on.present? %>
         <span class="text-danger">
           <%= @census_employee.coverage_terminated_on.end_of_month %>
         </span>
-        <% end %>
+        <% end %> -->
       </div>
     </div>
     <% if hbx_enrollment.is_coverage_waived? %>
