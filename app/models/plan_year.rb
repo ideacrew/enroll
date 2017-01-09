@@ -7,7 +7,7 @@ class PlanYear
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible expired renewing_canceled conversion_expired)
@@ -560,6 +560,12 @@ class PlanYear
     %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
   end
 
+  def application_warnings
+    if !is_application_valid?
+      application_eligibility_warnings.each_pair(){ |key, value| self.errors.add(:base, value) }
+    end
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
@@ -776,9 +782,10 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
-    # Returns plan to draft state for edit
+    # Returns plan to draft state (or) renewing draft for edit
     event :withdraw_pending, :after => :record_transition do
       transitions from: :publish_pending, to: :draft
+      transitions from: :renewing_publish_pending, to: :renewing_draft
     end
 
     # Plan as submitted failed eligibility check

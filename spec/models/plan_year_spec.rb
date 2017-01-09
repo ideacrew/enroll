@@ -108,6 +108,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
+    it "contains the correct renewing states" do
+      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+    end
+
     it "census employees should not be matchable" do
       expect(plan_year.is_eligible_to_match_census_employees?).to be_falsey
     end
