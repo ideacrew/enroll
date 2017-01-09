@@ -227,7 +227,7 @@ class Employers::PlanYearsController < ApplicationController
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
     if params[:publish]
-      @just_a_warning = !plan_year.is_application_valid? ? true : false
+      @just_a_warning = !plan_year.is_application_eligible? ? true : false
       plan_year.application_warnings
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)

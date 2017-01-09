@@ -284,17 +284,6 @@ class PlanYear
     application_eligibility_warnings.blank?
   end
 
-
-  # # # does the plan year violate model integrity relative to publishing
-  # def is_application_unpublishable?
-  #   open_enrollment_date_errors.present? || application_errors.present?
-  # end
-
-  # # is the plan year compliant with all regulations
-  # def is_application_valid?
-  #   application_eligibility_warnings.blank?
-  # end
-
   def due_date_for_publish
     if employer_profile.plan_years.renewing.any?
       Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
@@ -561,7 +550,7 @@ class PlanYear
   end
 
   def application_warnings
-    if !is_application_valid?
+    if !is_application_eligible?
       application_eligibility_warnings.each_pair(){ |key, value| self.errors.add(:base, value) }
     end
   end
