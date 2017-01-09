@@ -192,6 +192,26 @@ describe BenefitGroup, type: :model do
       census_employee.reload
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 1
     end
+
+
+    context 'when deleting the new benefit group & EE already has bga with old benefit group in inactive state' do
+
+      before do
+        census_employee.benefit_group_assignments.each { |bga| bga.is_active = false }
+      end
+
+      it "should have one benefit group assignment with 1st benefit group & in inactive status" do
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id, is_active: false).size).to eq 1
+      end
+
+      it "should move the existing benefit group assignment from inactive to active" do
+        bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id, is_active: false).first
+        benefit_group_two.destroy!
+        census_employee.reload
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.id).to eq bga.id
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to eq true
+      end
+    end
   end
 end
 

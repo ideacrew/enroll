@@ -470,7 +470,11 @@ class BenefitGroup
         bga.destroy
       end
       benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
-      ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+      bga = ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+      if bga.blank?
+        existing_bga = ce.benefit_group_assignments.where(:benefit_group_id => benefit_groups.first.id).first
+        existing_bga.update_attributes(is_active: true) if self.plan_year.aasm_state == 'draft' && existing_bga.is_active == false
+      end
     end
   end
 
