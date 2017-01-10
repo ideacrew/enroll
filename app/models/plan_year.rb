@@ -906,11 +906,6 @@ class PlanYear
       (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days))
   end
 
-  # def shoppable? # is_eligible_to_shop?
-  #   (benefit_groups.size > 0) and
-  #   ((published? and employer_profile.shoppable?))
-  # end
-
   def latest_workflow_state_transition
     workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
   end
@@ -1013,11 +1008,6 @@ private
     end
   end
 
-  # attempted to publish but plan year violates publishing plan model integrity
-  # def report_unpublishable
-  #   application_eligibility_warnings.each_pair(){ |key, value| errors.add(key, value) }
-  # end
-
   def within_review_period?
     (latest_workflow_state_transition.transition_at.end_of_day + Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days) > TimeKeeper.date_of_record
   end
@@ -1070,19 +1060,5 @@ private
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
     end
-
-    # Open enrollment end date can't be after 10th of the prev month for new plan years and 13th of the prev for renewing plan years
-    # if ['draft', 'renewing_draft'].include?(aasm_state)
-
-    #   if is_renewing?
-    #     enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
-    #   else
-    #     enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
-    #   end
-      
-    #   if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-    #     errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
-    #   end
-    # end
   end
 end
