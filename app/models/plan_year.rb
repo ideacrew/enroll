@@ -923,11 +923,13 @@ private
   end
 
   def trigger_renew_notice
+    puts "********** #{aasm.current_state}"
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("planyear_renewal_3a")
   end
 
   def trigger_auto_renew_notice
+    puts "********** #{aasm.current_state}"
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("planyear_renewal_3b")
   end
