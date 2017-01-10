@@ -37,9 +37,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
-    let(:plan1) {double("Plan1", id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345', is_standard_plan: true )}
-    let(:plan2) {double("Plan2", id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346', is_standard_plan: true )}
-    let(:plan3) {double("Plan3", id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347', is_standard_plan: true )}
+    let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+    let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
+    let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
     let(:plans) {[plan1, plan2, plan3]}
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:coverage_kind){"health"}

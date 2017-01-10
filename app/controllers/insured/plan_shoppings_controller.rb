@@ -185,6 +185,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
+    # binding.pry
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)
         sort_for_csr(@plans)
@@ -201,7 +202,8 @@ class Insured::PlanShoppingsController < ApplicationController
       member_ids = @hbx_enrollment.hbx_enrollment_members.collect(&:applicant_id)
       true_count = @person.primary_family.active_household.latest_active_tax_household.tax_household_members.any_in(:applicant_id => member_ids, :is_medicaid_chip_eligible => false).count
       if true_count < 1
-        @plans = @plans.reject! {|p| p.is_csr? }
+        csr_variant_ids = [ "01", "02"]
+        @plans = @plans.select { |p| p.csr_variant_id.blank? || csr_variant_ids.include?(p.csr_variant_id)}
       end
     end
 
