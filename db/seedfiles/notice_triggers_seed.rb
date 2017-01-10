@@ -13,7 +13,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1a_application_approval',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -33,7 +33,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1b_request_documents',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -53,7 +53,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1c_application_approval',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -73,7 +73,7 @@ shop_notice_triggers = [
       {
         name: 'PlanYear Renewal',
         notice_template: 'notices/shop_notices/3a_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         mpi_indicator: 'MPI_SHOPRA',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -94,7 +94,7 @@ shop_notice_triggers = [
       {
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_notices/3b_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         mpi_indicator: 'MPI_SHOPRB',
         notice_trigger_element_group: {
           market_places: ['shop'],

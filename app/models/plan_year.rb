@@ -721,8 +721,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renew_notice]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renewal_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -739,8 +739,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
 
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_auto_renew_notice]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_auto_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renewal_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -922,16 +922,14 @@ private
     TimeKeeper.date_of_record.end_of_day == end_on
   end
 
-  def trigger_renew_notice
-    puts "********** #{aasm.current_state}"
+  def trigger_renewal_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("planyear_renewal_3a")
-  end
-
-  def trigger_auto_renew_notice
-    puts "********** #{aasm.current_state}"
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("planyear_renewal_3b")
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    if event_name == "publish"
+      self.employer_profile.trigger_notices("planyear_renewal_3a")
+    elsif event_name == "force_publish"
+      self.employer_profile.trigger_notices("planyear_renewal_3b")
+    end
   end
 
   def record_transition
