@@ -31,20 +31,36 @@ QuotePageLoad = (function() {
     })
     Quote.set_dental_plan_costs()
   }
-  var _plan_test = function(plan, criteria){
-    var result = true
-    var critters = criteria.length
-    for (var j=0; j< critters; j++){
-      var criteria_type = criteria[j][0]
-      var criteria_value = criteria[j][1]
-      if ((criteria_type == 'carriers') && (criteria_value != plan['carrier_abbrev']))   {result=false; break; }
-      if ((criteria_type == 'metals') && (criteria_value != plan['metal']))     {result=false; break; }
-      if ((criteria_type == 'plan_types') && (criteria_value != plan['plan_type'])) {result=false; break; }
-      if ((criteria_type == 'nationwide') && (criteria_value != String(plan['nationwide']))) {result=false; break; }
-      if ((criteria_type == 'dc_in_network') && (criteria_value != String(plan['dc_in_network']))) {result=false; break; }
+    var _plan_test = function(plan, criteria){
+        var result = true;
+        var critters = criteria.length;
+        var plan_variations = {};
+        var plan_options = {'carriers': 'carrier_abbrev','metals': 'metal' , 'plan_types': 'plan_type', 'nationwide': 'nationwide', 'dc_in_network': 'dc_in_network'}
+        for (var j=0; j< critters; j++){
+            if (!($.inArray(criteria[j][0], $.map(plan_variations, function(element,index) {return index})) > -1)){
+                plan_variations[criteria[j][0]] = [criteria[j][1]]
+            }else{
+                plan_variations[criteria[j][0]].push(criteria[j][1])
+            }
+        }
+        $.each (plan_variations,function(key,value){
+            plan_op = plan[plan_options[key]]
+            if (plan_op==true){
+                plan_op = 'true'
+
+            } if(plan_op == false){
+                plan_op = 'false'
+            }
+            if (!($.inArray( plan_op, value) > -1)){
+                result = false;
+                return false
+            }
+            else{
+                result= true;
+            }
+        })
+        return result;
     }
-    return result
-  }
   var _set_plan_counts = function() {
       $('#show_plan_criteria_count').text('Plans that meet your criteria: ' + String(available_health_plans))
       $('#show_plan_selected_count').text('You have selected ' + String($('.btn.active').size()) +' plans.')
@@ -217,14 +233,18 @@ QuotePageLoad = (function() {
             var cousins = $(this).children()
             if(typeof(cousins[0]) != 'undefined') {
               classList = cousins[0].classList
-              if(classList.length > 0 && classList.value.indexOf('active') > 0) {
+                if(classList.length > 0 && classList.value.indexOf('active') > 0 && ($(cousins[0]).prop('checked') == false)) {
                 this.checked = false
                 $(cousins[0]).removeClass('active')
                 $(cousins[0]).prop('checked', false)
               };
             };
           });
-          if (selected.checked)  this.classList.add('active');
+          if (selected.checked){
+              this.classList.add('active');
+          }else{
+              $(this).removeClass('active')
+          }
           disable_nationwide_if_dc_selected(selected);
           toggle_plans([])
           reset_selected_plans()
