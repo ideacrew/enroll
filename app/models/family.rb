@@ -472,9 +472,8 @@ class Family
   class << self
     def expire_individual_market_enrollments
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      expiration_date_limit = (current_benefit_period.start_on - 61.days) # Don't expire enrollments with effective less than 60 days
       query = {
-          :effective_on.lt => expiration_date_limit,
+          :effective_on.lt => current_benefit_period.start_on,
           :kind => 'individual',
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
       }
