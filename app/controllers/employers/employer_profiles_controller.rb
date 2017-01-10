@@ -325,7 +325,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                        else
                          @employer_profile.census_employees.active.sorted
                        end
-    census_employees = census_employees.search_by(params.slice(:employee_name))
+    if params["employee_search"].present?
+      query_string = CensusEmployee.search_hash(params["employee_search"])
+      census_employees = census_employees.any_of(query_string)
+    end
     @page_alphabets = page_alphabets(census_employees, "last_name")
 
     if params[:page].present?
