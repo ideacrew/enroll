@@ -185,7 +185,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    # binding.pry
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)
         sort_for_csr(@plans)
