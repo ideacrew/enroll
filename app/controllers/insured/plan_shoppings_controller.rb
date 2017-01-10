@@ -206,7 +206,8 @@ class Insured::PlanShoppingsController < ApplicationController
       member_ids = @hbx_enrollment.hbx_enrollment_members.collect(&:applicant_id)
       true_count = @person.primary_family.active_household.latest_active_tax_household.tax_household_members.any_in(:applicant_id => member_ids, :is_medicaid_chip_eligible => false).count
       if true_count < 1
-        @plans = @plans.reject! {|p| p.is_csr? }
+        csr_variant_ids = [ "01", "02"]
+        @plans = @plans.select { |p| p.csr_variant_id.blank? || csr_variant_ids.include?(p.csr_variant_id)}
       end
     end
 
