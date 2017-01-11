@@ -481,13 +481,9 @@ class BrokerAgencies::QuotesController < ApplicationController
    def employees_list
  
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
-    @employees = employer_profile.census_employees
+    @employees = employer_profile.census_employees.non_terminated
 
     @quote = Quote.new
-
-    @orgs = Organization.all_employer_profiles
-    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
-
     # # Create place holder for new member of household
     quote = Quote.find(params[:quote_id])
     households = quote.quote_households.destroy_all
