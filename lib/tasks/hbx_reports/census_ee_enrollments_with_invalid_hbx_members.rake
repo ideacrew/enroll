@@ -31,7 +31,7 @@ namespace :reports do
 
         familys.each do |family|
           next if family.enrollments.blank?
-          family.enrollments.enrolled_and_renewal.each do |enrollment|
+          family.enrollments.shop_market.enrolled_and_renewal.each do |enrollment|
             enrollment.hbx_enrollment_members.select{|hbx_member| !eligible_enrollment_member?(hbx_member,enrollment)}.each do |member|
               if member.present?
                 csv << [
@@ -45,7 +45,7 @@ namespace :reports do
                     enrollment.aasm_state
                 ]
               end
-            end if enrollment.present? && enrollment.kind == 'employer_sponsored'
+            end
           end
         end
       end
