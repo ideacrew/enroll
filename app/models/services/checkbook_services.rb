@@ -28,7 +28,6 @@ module CheckbookServices
       end
     end
 
-
     private 
     def construct_body
     {
@@ -56,8 +55,6 @@ module CheckbookServices
       end
       premium_benefit_contributions
     end
-
-
     def build_family
       family = [{'dob': census_employee.dob,'relationship': 'self'}]
       census_employee.try(:census_dependents).each do |dependent|

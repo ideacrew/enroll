@@ -50,7 +50,6 @@ class CensusEmployee < CensusMember
   before_save :assign_default_benefit_package
   before_save :allow_nil_ssn_updates_dependents
 
-
   index({aasm_state: 1})
   index({last_name: 1})
   index({dob: 1})

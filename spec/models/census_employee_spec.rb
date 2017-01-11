@@ -897,7 +897,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}

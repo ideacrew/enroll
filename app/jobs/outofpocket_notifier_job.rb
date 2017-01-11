@@ -11,6 +11,5 @@ class OutofpocketNotifierJob < ActiveJob::Base
               subject: event_kind.title,
               mpi_indicator: notice_trigger.mpi_indicator,
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
-
   end
 end

@@ -100,7 +100,6 @@ checkbook_services:
     base_url:  "https://staging.checkbookhealth.org"
     url: "https://staging.checkbookhealth.org/shop/dc/"
 
-
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."

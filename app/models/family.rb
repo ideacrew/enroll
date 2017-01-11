@@ -243,7 +243,6 @@ class Family
   def current_eligible_open_enrollments
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
   end
-  
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
