@@ -97,7 +97,7 @@ class Family
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
-            
+
   validate :family_integrity
 
   after_initialize :build_household
@@ -497,7 +497,7 @@ class Family
     end
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
-      expire_individual_market_enrollments
+      # expire_individual_market_enrollments
     end
 
     def default_search_order
