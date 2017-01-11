@@ -420,11 +420,8 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employment!(employment_terminated_on)
-
     if employment_terminated_on < TimeKeeper.date_of_record
-
       if may_terminate_employee_role?
-
         unless employee_termination_pending?
 
           self.employment_terminated_on = employment_terminated_on
@@ -435,7 +432,6 @@ class CensusEmployee < CensusMember
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
-
         end
         terminate_employee_role!
         perform_employer_plan_year_count
@@ -456,7 +452,6 @@ class CensusEmployee < CensusMember
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
-
       end
     end
 
@@ -464,7 +459,6 @@ class CensusEmployee < CensusMember
   end
 
   def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
-
     employment_based_date = employment_termination_date.end_of_month
     submitted_based_date  = TimeKeeper.date_of_record.
                               advance(Settings.
