@@ -1,8 +1,10 @@
+<% if hbx_enrollment.is_coverage_waived? %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
+<% else %>
 <% plan = hbx_enrollment.plan %>
-<% if plan.present? %>
 <div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
-    <h3 class="no-buffer">
+    <h3 class="no-buffer <%= 'canceled' if hbx_enrollment.coverage_expired? %>">
       <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
@@ -190,6 +192,4 @@
   </div>
 </div>
 </div>
-<% else %>
-<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
 <% end %>
