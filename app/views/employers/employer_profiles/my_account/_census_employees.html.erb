@@ -37,8 +37,6 @@
         <br/>
         <div class="col-xs-12 row">
           <div class="pull-right">
-          <!--  <%= link_to "Generate OOP PDF",generate_checkbook_urls_employers_employer_profile_path(@employer_profile),remote: true, class: "btn btn-default" %> -->
-
            <% if show_oop_pdf_link(@employer_profile.try(:show_plan_year).try(:aasm_state)) %>
            <%= link_to "Generate OOP PDF", "", data: {toggle: "modal", target: "#poc_cal"} %>
            <% end %>
@@ -137,7 +135,6 @@
   </div>
 </div>
 <div></div>
-
 
 <div class="modal" id="poc_cal" role="dialog">
   <div class="modal-dialog">

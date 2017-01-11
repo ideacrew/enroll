@@ -103,11 +103,10 @@ aca:
       months: 6
 
 paper_notice: 'paper-notices'
-checkbook_services: 
+checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://staging.checkbookhealth.org"
     url: "https://staging.checkbookhealth.org/shop/dc/"
-
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

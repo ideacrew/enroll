@@ -28,11 +28,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -255,11 +253,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
   end
 
-
   def generate_checkbook_urls
     @employer_profile.generate_checkbook_notices
-    # binding.pry
-    flash[:notice] = "Generating and delivering checkbook notice to employeer"
+    flash[:notice] = "Generating and delivering checkbook notice to employer"
     redirect_to action: :show, :tab => :employees
   end
 

@@ -26,6 +26,9 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
+# Background Jobs with Resque
+gem 'resque'
+
 # JS graph API
 # gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
 
