@@ -405,18 +405,21 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    if benefit_group_assignment.may_waive_coverage?
-      cancel_previous(self.effective_on.year)
-      benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
-    else
-      return false
+    return false if kind != 'employer_sponsored' # there is no concept of waiver in ivl case
+    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
+    shop_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
-
+    if coverage_kind == 'health' && benefit_group_assignment.present?
+      benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
+    end
+    return true
   end
 
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
-    update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-    propogate_waiver
+    update_current(waiver_reason: waiver_reason)
+    waive_coverage!
   end
 
   def cancel_previous(year)
@@ -612,14 +615,14 @@ class HbxEnrollment
 
   def shop_broker_agency_account
     return nil if self.employer_profile.blank?
-    return nil if self.employer_profile.broker_agency_accounts.empty?
-    select_applicable_broker_account(self.employer_profile.broker_agency_accounts)
+    return nil if self.employer_profile.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(self.employer_profile.broker_agency_accounts.unscoped)
   end
 
   def broker_agency_account
     return shop_broker_agency_account if is_shop?
-    return nil if family.broker_agency_accounts.empty?
-    select_applicable_broker_account(family.broker_agency_accounts)
+    return nil if family.broker_agency_accounts.unscoped.empty?
+    select_applicable_broker_account(family.broker_agency_accounts.unscoped)
   end
 
   def time_of_purchase
@@ -1206,8 +1209,9 @@ class HbxEnrollment
   end
 
   def can_be_expired?
-    (benefit_group.present?) && (benefit_group.end_on <= TimeKeeper.date_of_record)
+    benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
   end
+
 
   def can_select_coverage?
     return true unless is_shop?
@@ -1225,19 +1229,24 @@ class HbxEnrollment
     benefit_group_assignment_valid?(coverage_effective_date)
   end
 
+  def assign_cost_decorator(decorator)
+    @cost_decorator = decorator
+  end
+
   def decorated_hbx_enrollment
+    return @cost_decorator if @cost_decorator
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
-        PlanCostDecoratorCongress.new(plan, self, benefit_group)
+        @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
-        PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
+        @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
       end
     elsif plan.present? && consumer_role.present?
-      UnassistedPlanCostDecorator.new(plan, self)
+      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
-      OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
 

@@ -166,6 +166,19 @@ def default_office_location
   }
 end
 
+def non_dc_office_location
+  {
+  address1: "623a Spalding Ct",
+  address2: "Suite 200",
+  city: "Falls Church",
+  state: "VA",
+  zip: "22045",
+  phone_area_code: "202",
+  phone_number: "1110000",
+  phone_extension: "1111"
+  }
+end
+
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
@@ -286,7 +299,20 @@ When(/^.+ enters? office location for (.+)$/) do |location|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
 end
 
-When(/^(.+) creates? a new employer profile$/) do |named_person|
+When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
+  old_add = eval(old_add) if old_add.class == String
+  new_add = eval(new_add) if new_add.class == String
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => new_add[:address1]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => new_add[:address2]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => new_add[:city]
+
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), '#{old_add[:state]}')]]").click
+  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{new_add[:state]}')]").click
+
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => new_add[:zip]
+end
+
+When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, primary_location|
   employer = people[named_person]
   fill_in 'organization[first_name]', :with => employer[:first_name]
   fill_in 'organization[last_name]', :with => employer[:last_name]
@@ -302,7 +328,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
 
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
-  step "I enter office location for #{default_office_location}"
+  step "I enter office location for #{primary_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'

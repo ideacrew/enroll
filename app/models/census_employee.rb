@@ -557,7 +557,7 @@ class CensusEmployee < CensusMember
     end
 
     def terminate_future_scheduled_census_employees(as_of_date)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on => as_of_date)
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employee_role!
       end
@@ -607,6 +607,17 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Search query string on census employee with first name,last name,SSN.
+    def search_hash(s_rex)
+      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      {
+          "$or" => ([
+              {"first_name" => search_rex},
+              {"last_name" => search_rex},
+              {"encrypted_ssn" => encrypt_ssn(s_rex)}
+          ])
+      }
+    end
   end
 
   aasm do
