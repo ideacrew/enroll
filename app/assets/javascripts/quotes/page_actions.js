@@ -233,7 +233,7 @@ QuotePageLoad = (function() {
             var cousins = $(this).children()
             if(typeof(cousins[0]) != 'undefined') {
               classList = cousins[0].classList
-                if(classList.length > 0 && classList.value.indexOf('active') > 0 && ($(cousins[0]).prop('checked') == false)) {
+                if(classList.length > 0 && ($(cousins[0]).prop('checked') == false)) {
                 this.checked = false
                 $(cousins[0]).removeClass('active')
                 $(cousins[0]).prop('checked', false)
