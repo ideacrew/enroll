@@ -107,7 +107,10 @@ class PlanYear
         "households.hbx_enrollments.submitted_at" => 1
       }},
       {"$group" => {
-        "_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+        "_id" => {
+          "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+          "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
+        },
         "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"},
         "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
         "plan_id" => {"$last" => "$households.hbx_enrollments.plan_id"},
