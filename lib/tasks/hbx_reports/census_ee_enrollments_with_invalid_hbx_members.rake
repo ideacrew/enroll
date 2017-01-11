@@ -45,7 +45,7 @@ namespace :reports do
                     enrollment.aasm_state
                 ]
               end
-            end if enrollment.kind == 'employer_sponsored'
+            end if enrollment.present? && enrollment.kind == 'employer_sponsored'
           end
         end
       end
