@@ -4,17 +4,16 @@ percent_complete = 0
 percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
 %>
 
-
   <% if display_aasm_state? hbx_enrollment %>
     <div class="text-right">
       <% if hbx_enrollment.coverage_expired? %>
-      <span class="label label-success canceled">
-        Coverage Period Ended
-      <span>
+        <span class="label label-success canceled">
+          Coverage Period Ended
+        <span>
       <% else %>
-       <span class="label label-success">
-        <%= hbx_enrollment.aasm_state.titleize %>
-      <span>
+        <span class="label label-success">
+          <%= hbx_enrollment.aasm_state.titleize %>
+        <span>
       <% end %>
     </div>
   <% end %>
