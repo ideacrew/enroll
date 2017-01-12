@@ -648,22 +648,6 @@ class Family
       :allow_disk_use => true)
   end
 
-  # def waivers_for_display
-  #   Family.collection.aggregate([
-  #     {"$match" => {'_id' => self._id}},
-  #     {"$unwind" => '$households'},
-  #     {"$unwind" => '$households.hbx_enrollments'},
-  #     {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
-  #     {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-  #     {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-  #                   'state' => '$households.hbx_enrollments.aasm_state',
-  #                   'kind' => '$households.hbx_enrollments.kind',
-  #                   'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-  #     {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
-  #     ],
-  #     :allow_disk_use => true)
-  # end
-
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
