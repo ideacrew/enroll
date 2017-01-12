@@ -8,6 +8,9 @@ module Effective
      datatable do
       array_column :full_name,:label => 'Employee Profile', premium_report: true,
       :proc => Proc.new { |row|
+        content_tag(:span, class: 'hide') do
+          row.employee_role.person.last_name
+        end +
         content_tag(:span, class: 'name') do
           name_to_listing(row.employee_role.person)
         end +
