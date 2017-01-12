@@ -10,7 +10,7 @@ class FixInvalidRelationshipBenefitInPlanYear < MongoidMigrationTask
           child_over_26_relationship_benefit.update_attribute(:offered, false)
           puts "#{org.employer_profile.legal_name} child_over_26_relationship_benefit updated"
         end
-      end if org.employer_profile.plan_years.present?
+      end
     end
   end
 end
