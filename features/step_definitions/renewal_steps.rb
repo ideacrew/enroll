@@ -60,7 +60,7 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Effective date: " + effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Effective Date: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
 
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
