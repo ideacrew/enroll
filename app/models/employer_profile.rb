@@ -907,6 +907,6 @@ private
   end
 
   def plan_year_publishable?
-    published_plan_year.is_application_valid?
+    !published_plan_year.is_application_unpublishable? 
   end
 end
