@@ -47,7 +47,6 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
     it "should displays enrollment state when coverage selected" do
       assign(:census_employees, CensusEmployee.where(:id =>census_employee1.id).all.page)
-      puts census_employee1.active_benefit_group_assignment.benefit_group.title
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Coverage Selected/)
     end
