@@ -4,11 +4,19 @@ percent_complete = 0
 percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
 %>
 
-  <% if display_aasm_state? hbx_enrollment %>
+<%
+  formatted_enrollment_states = {
+    'coverage_terminated' => 'Terminated',
+    'coverage_expired' => 'Coverage Period Ended'
+  }
+%>
+
+ <% if display_aasm_state? hbx_enrollment %>
+     
     <div class="text-right">
-      <% if hbx_enrollment.coverage_expired? %>
+      <% if formatted_enrollment_states[hbx_enrollment.aasm_state].present? %>
         <span class="label label-success canceled">
-          Coverage Period Ended
+          <%= formatted_enrollment_states[hbx_enrollment.aasm_state] %>
         <span>
       <% else %>
         <span class="label label-success">
@@ -16,7 +24,7 @@ percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0
         <span>
       <% end %>
     </div>
-  <% end %>
+<% end %>
 
 <!-- Hide Train stops temporarily (Refs #3725) -->
 <!--

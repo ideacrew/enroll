@@ -208,6 +208,60 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
     end
+  end
 
+  context "when the enrollment is coverage_terminated" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_terminated',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should display as Terminated" do
+      expect(rendered).not_to have_text(/Coverage Terminated/)
+      expect(rendered).to have_text(/Terminated/)
+    end
+  end
+
+  context "when the enrollment is coverage_expired" do
+   
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.beginning_of_month.prev_year,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_expired',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should display coverage_expired enrollment as Coverage Period Ended" do
+      expect(rendered).not_to have_text(/Coverage Expired/)
+      expect(rendered).to have_text(/Coverage Period Ended/)
+    end
   end
 end
