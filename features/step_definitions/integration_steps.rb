@@ -134,6 +134,16 @@ def people
     "CSR" => {
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
+    },
+    "Hbx AdminEnrollments" => {
+      first_name: "Hbx Admin",
+      last_name: "Enrollments#{rand(1000)}",
+      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
+      legal_name: "Tronics",
+      dba: "Tronics",
+      fein: defined?(@u) ? @u.fein : '123123123',
+      email: defined?(@u) ? @u.email : 'hxadmin_enroll@example.com',
+      password: 'aA1!aA1!aA1!'
     }
   }
 end
@@ -207,6 +217,21 @@ Given(/^Hbx Admin exists$/) do
   year = (Date.today + 2.months).year
   plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
   plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
+end
+
+Given(/^a Hbx admin with read and write permissions and broker agencies$/) do
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  person = people['Hbx AdminEnrollments']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+  org1 = FactoryGirl.create(:organization, legal_name: 'ACME Agency')
+  broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org1)
+        org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc')
+        broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization: org2)
 end
 
 Given(/^a Hbx admin with read and write permissions exists$/) do
