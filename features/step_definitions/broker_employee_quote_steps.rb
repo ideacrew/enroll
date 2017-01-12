@@ -75,6 +75,8 @@ end
 
 When(/^broker enters valid information$/) do
   fill_in 'quote[quote_name]', with: 'Test Quote'
+  select "Prospect", :from => "quote_employer_type"
+  fill_in 'quote_employer_name', with: "prospect employer sample"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][dob]', with: "11/11/1991"
   select "Employee", :from => "quote_quote_households_attributes_0_quote_members_attributes_0_employee_relationship"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][first_name]', with: "John"
@@ -117,9 +119,18 @@ Then(/^the quote should be deleted$/) do
   expect(page).to have_content(/No data available in table/)
 end
 
+Then(/^adds a benefit group$/) do
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
+  find('.interaction-click-control-save-changes').trigger 'click'
+end
+
 Then(/^adds a new benefit group$/) do
   fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
+end
+
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
 end
 
 Then(/^the broker assigns the benefit group to the family$/) do

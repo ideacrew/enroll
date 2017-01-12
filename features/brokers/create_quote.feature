@@ -55,7 +55,7 @@ Feature: Create Employee Roster
     Then the broker enters the quote effective date
     When the broker selects employer type
     Then broker enters valid information
-    And adds a new benefit group
+    And adds a benefit group
     Then the broker assigns the benefit group to the family
     And the broker saves the quote
     And Broker logs out
@@ -86,7 +86,7 @@ Feature: Create Employee Roster
     And the broker sees that the Quote is published
     And Broker logs out
 
-   Scenario: Check for disable View Publish Quote link in Actions for Draft Quotes.
+  Scenario: Check for disable View Publish Quote link in Actions for Draft Quotes.
     Given that a broker exists
     And the Plans exist
     And the broker is signed in
@@ -101,4 +101,17 @@ Feature: Create Employee Roster
     Then the broker should see avaliable Quotes
     When the broker clicks on Actions.
     Then view publish quote should be disabled.
+    And Broker logs out
+
+  Scenario: Broker should be able to assign benefit group to a family, Check with Add Benefit Group button fucntionality
+    Given that a broker exists
+    And the broker is signed in
+    When he visits the Roster Quoting tool
+    And click on the New Quote button
+    Then the broker enters the quote effective date
+    Then broker enters valid information
+    And Click on Add Benefit Group Button to add benefit group
+    And adds a new benefit group
+    Then the broker assigns the benefit group to the family
+    And the broker saves the quote
     And Broker logs out
