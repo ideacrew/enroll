@@ -34,12 +34,12 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
   effective_date = ce.employer_profile.renewing_plan_year.start_on
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Auto Renewing') &&
-    (e.find('.enrollment-effective').text() == "Effective date: " + effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Effective Date: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Effective date: " + (effective_date - 1.year).strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Effective Date: " + (effective_date - 1.year).strftime('%m/%d/%Y'))
   }).to be_truthy
 end
 

@@ -167,6 +167,26 @@ module Insured::FamiliesHelper
     end
   end
 
+  def formatted_enrollment_states
+    {
+      'coverage_terminated' => 'Terminated',
+      'coverage_expired' => 'Coverage Period Ended'
+    }
+  end
+
+  def enrollment_coverage_end(hbx_enrollment)
+    if hbx_enrollment.coverage_terminated?
+      hbx_enrollment.terminated_on
+    elsif hbx_enrollment.coverage_expired?
+      if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
+        hbx_enrollment.benefit_group_assignment.benefit_group.end_on
+      else
+        benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first
+        benefit_coverage_period.end_on
+      end
+    end
+  end
+
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
