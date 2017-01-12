@@ -27,11 +27,13 @@ describe FixInvalidRelationshipBenefitInPlanYear do
       let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [active_benefit_group]) }
       let(:employer_profile) { FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
       let(:organization)      { FactoryGirl.create(:organization, employer_profile: employer_profile)}
-      let(:child_over_26_relationship)      { organization.employer_profile.plan_years.first.benefit_groups.map(&:relationship_benefits).flatten.select{|r| r.relationship == "child_26_and_over"}.first}
 
       it "should return offered false for child_over_26_relationship" do
+        child_over_26_relationship=organization.employer_profile.plan_years.first.benefit_groups.map(&:relationship_benefits).flatten.select{|r| r.relationship == "child_26_and_over"}.first
+        expect(child_over_26_relationship.offered).to eq true #before update
         subject.migrate
-        expect(child_over_26_relationship.offered).to eq false
+        child_over_26_relationship.reload
+        expect(child_over_26_relationship.offered).to eq false #after update
       end
     end
   end

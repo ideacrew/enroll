@@ -8,7 +8,7 @@ class FixInvalidRelationshipBenefitInPlanYear < MongoidMigrationTask
         child_over_26_relationship_benefit= plan_year.benefit_groups.map(&:relationship_benefits).flatten.select{|r| r.relationship == "child_26_and_over"}.first
         if child_over_26_relationship_benefit.offered
           child_over_26_relationship_benefit.update_attribute(:offered, false)
-          puts "#{org.employer_profile.legal_name} child_over_26_relationship_benefit updated"
+          puts "#{org.employer_profile.legal_name} child_over_26_relationship_benefit updated" unless Rails.env.test?
         end
       end
     end
