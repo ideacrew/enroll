@@ -197,6 +197,10 @@ class Invitation
     UserMailer.broker_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
+  def send_initial_invitation_for_new_hires!(census_employee)
+    UserMailer.new_hire_invitation_email(invitation_email, census_employee, self).deliver_now
+  end
+
   def self.invite_employee!(census_employee)
     if !census_employee.email_address.blank?
       invitation = self.create(
@@ -219,6 +223,19 @@ class Invitation
         :invitation_email => census_employee.email_address
       )
       invitation.send_renewal_invitation!(census_employee)
+      invitation
+    end
+  end
+
+  def self.invite_initial_employee!(census_employee)
+    if !census_employee.email_address.blank?
+      invitation = self.create(
+        :role => "employee_role",
+        :source_kind => "census_employee",
+        :source_id => census_employee.id,
+        :invitation_email => census_employee.email_address
+      )
+      invitation.send_initial_invitation_for_new_hires!(census_employee)
       invitation
     end
   end
