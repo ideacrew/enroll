@@ -1,7 +1,6 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -29,11 +28,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -255,14 +252,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
 
   end
- 
+
 
   def generate_checkbook_urls
     @employer_profile.generate_checkbook_notices
     flash[:notice] = "Generating and delivering checkbook notice to employer"
     redirect_to action: :show, :tab => :employees
   end
-  
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type

@@ -353,7 +353,7 @@ class EmployerProfile
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -827,6 +827,7 @@ class EmployerProfile
   def generate_checkbook_notices
     OutofpocketNotifierJob.perform_later(self.id.to_s)
   end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
