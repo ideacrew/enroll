@@ -24,14 +24,15 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
   end
 
   def build
-      @notice.start_on= @recipient.try(:plan_years).first.start_on
+      @notice.start_on= @recipient.try(:active_plan_year).start_on
       @notice.census_employees = @recipient.census_employees.to_a
       @notice.legal_name= @recipient.organization.legal_name
-      @notice.metal_leval= @recipient.plan_years.first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
-      @notice.benefit_group_package_name= @recipient.plan_years.first.benefit_groups.first.title
-      @notice.plan_year = @recipient.try(:plan_years).first.try(:benefit_groups).first.try(:reference_plan).name
-      @notice.family_contribution= @recipient.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
-      @notice.carrier =@recipient.plan_years.first.benefit_groups.first.reference_plan.carrier_profile.legal_name
+      @notice.metal_leval= @recipient.plan_years.order_by(:end_on => "desc").first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
+      @notice.benefit_group_package_name= @recipient.active_plan_year.benefit_groups.first.title
+      @notice.plan_year = @recipient.try(:active_plan_year).try(:benefit_groups).first.try(:reference_plan).name
+      # @notice.family_contribution= @recipient.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
+      @notice.family_contribution= @recipient.active_plan_year.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
+      @notice.carrier = @recipient.active_plan_year.benefit_groups.first.reference_plan.carrier_profile.legal_name
       @notice.data = {:url => url}
   end
 
