@@ -149,6 +149,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'warden'
+  gem 'fakeredis', :require => 'fakeredis/rspec'
 end
 
 group :production do
