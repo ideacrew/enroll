@@ -324,6 +324,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     )}
 
     before :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
       render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
