@@ -79,6 +79,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
@@ -185,6 +187,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
@@ -230,6 +234,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
@@ -255,6 +261,83 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should not show carrier contact information" do
       expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
     end
+  end
 
+  context "when the enrollment is coverage_terminated" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_terminated',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should not display status as Coverage Terminated" do
+      expect(rendered).not_to have_text(/Coverage Terminated/)
+    end
+
+    it "should display as Terminated" do
+      expect(rendered).to have_text(/Terminated/)
+    end
+  end
+
+  context "when the enrollment is coverage_expired" do
+
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+
+    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
+
+    let!(:expired_benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.create!({
+      :start_on => start_on,
+      :end_on => start_on.next_year - 1.day,
+      :open_enrollment_start_on => Date.new(start_on.year - 1, 11, 1),
+      :open_enrollment_end_on => Date.new(start_on.year, 1, 31),
+      :service_market => 'individual'
+      })}
+
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_expired',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should not display status as Coverage Expired" do
+      expect(rendered).not_to have_text(/Coverage Expired/)
+    end
+
+    it "should display coverage_expired enrollment as Coverage Period Ended" do
+      expect(rendered).to have_text(/Coverage Period Ended/)
+    end
+
+    it "should display coverage end date for expired enrollment" do
+      expect(rendered).to have_text(/Coverage End/)
+      expect(rendered).to have_text(/#{expired_benefit_coverage_period.end_on.strftime("%m/%d/%Y")}/)
+    end
   end
 end
