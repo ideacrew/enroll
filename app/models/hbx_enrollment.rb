@@ -1166,6 +1166,8 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :coverage_selected
       transitions from: :coverage_selected, to: :coverage_selected
       transitions from: :auto_renewing, to: :auto_renewing
+      transitions from: :coverage_expired, to: :coverage_expired
+      transitions from: :shopping, to: :shopping
     end
 
     event :move_to_contingent!, :after => :record_transition do
