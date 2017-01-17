@@ -22,6 +22,24 @@
           </div>
         </div>
       </div>
+      <div class="panel-body" id="quote-info">
+        <div class="row form-inline">
+          <div class="form-group col-sm-6">Type:
+            <%= f.select(:employer_type, options_for_select([["Client", "client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel employer_type", :prompt => true, required: true}) %>
+          </div>
+          <div class="form-group col-sm-6">Employer Name:
+            <% is_client_employer =  f.object.new_record?  %>
+            <% hide_client = f.object.new_record? ? 'hide' : 'hide' %>
+            <% hide_prospect = f.object.new_record? ? 'hide' : 'hide' %>
+            <%= f.text_field :employer_name, {size: 20,required: true, :placeholder => 'Employer Name', class: "prospect #{hide_prospect} "}%>
+            <% emp_profile = @quote.employer_profile %>
+            <div class="#{hide_client} client <%= emp_profile.present?  ? '' : 'hide' %>">
+
+              <%= f.select(:employer_profile_id, options_for_select(@employer_profiles.collect{|e| [e.legal_name, e.id]}, @quote.employer_profile.try(:id) ), {:include_blank => "SELECT EMPLOYERS"}, {data: {url: employees_list_broker_agencies_broker_role_quotes_path},:class => "client employer_profile", :prompt =>true, required: true})%>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="panel panel-default">
@@ -35,7 +53,7 @@
     <div id="quote-benefit-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
       <div class="panel-body" id="quote-info">
         <%= f.fields_for :quote_benefit_groups do |benefit_group| %>
-        <div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden"%>>
+        <div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden"%> id="qbg">
           <div class="form-group col-sm-12">Benefit Group: <%= benefit_group.text_field :title , {size: 40, placeholder: 'Enter Benefit Group Name', benefit_group_state: benefit_group.object.persisted? } %>&nbsp;
             <button type="button" data-quote-id="<%=@quote.id%>" data-broker-role-id="<%=@broker.id%>" data-benefit-group-id="<%=benefit_group.object.id%>" id="remove_benefit_group_button"  class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
@@ -43,7 +61,7 @@
         </div>
         <% end %>
         <div class="form-group col-sm-12" style="margin-left:105px">
-          <%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br"%>
+          <%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br", disabled: true %>
           <%= submit_tag "Add benefit Group", id: "add_benefit_group",type: 'button', onclick: "addBenefitGroup()", class: "select btn btn-primary btn-br" %>
         </div>
       </div>
@@ -118,7 +136,6 @@ else {
 
   $('button#remove_household_button').click(remove_household_handler);
 
-
   var remove_benefit_group_handler = function(){
     var $quote_benefit_group_id = $(this);
     if(this.getAttribute("data-benefit-group-id") != undefined){
@@ -138,6 +155,7 @@ else {
       });
 //$(this).parent().parent().remove();
 }
+
 };
 
 $('button#remove_benefit_group_button').click(remove_benefit_group_handler);
@@ -204,43 +222,39 @@ $(document).ready(function() {
 });
 <% end %>
 
-
 $('.employer_type').on('change', function() {
-  	if (this.value == 'client'){
-  		$('.client').removeClass('hide').prop("disabled", false);
-  		$('.prospect').addClass('hide').prop("disabled", true);
+  if (this.value == 'client'){
+    $('.client').removeClass('hide').prop("disabled", false);
+    $('.prospect').addClass('hide').prop("disabled", true);
 
-  	}else if(this.value == 'prospect'){
-  		$('.prospect').removeClass('hide').prop("disabled", false);
-  		$('.client').addClass('hide').prop("disabled", true);
-  	}
+  }else if(this.value == 'prospect'){
+    $('.prospect').removeClass('hide').prop("disabled", false);
+    $('.client').addClass('hide').prop("disabled", true);
+  }
 })
 
 $(document).ready(function() {
-	if ($('#quote_employer_type').val() == 'client'){
-		$('.prospect').prop("disabled", true);
-	}
+  if ($('#quote_employer_type').val() == 'client'){
+    $('.prospect').prop("disabled", true);
+  }
 });
 
 $('.employer_profile').on('change', function() {
-	// alert(this.getAttribute('data-url'))
-	var quote_id = '<%=@quote.id%>'
-	var broker_id = '<%= @broker.id%>'
+  var quote_id = '<%=@quote.id%>'
+  var broker_id = '<%= @broker.id%>'
   if(this.value != undefined){
-	 $.ajax({
-        type: "GET",
-        url: this.getAttribute('data-url'),
-        data: {employer_profile_id: this.value,broker_id: '' , quote_id: quote_id },
-        // dataType: "js",
-         complete: function(response){
-					if (response.responseText != "false") {
-						// $quote_benefit_group_id.parent().parent().remove();
-					}
-					else {
-						console.log("Error deleting this quote benefit group");
-					}
+    $.ajax({
+      type: "GET",
+      url: this.getAttribute('data-url'),
+      data: {employer_profile_id: this.value,broker_id: '' , quote_id: quote_id },
+      complete: function(response){
+        if (response.responseText != "false") {
         }
-   });
+        else {
+          console.log("Error deleting this quote benefit group");
+        }
+      }
+    });
   }
 });
 
