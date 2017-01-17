@@ -69,7 +69,7 @@ end
 
 When(/^the broker selects employer type$/) do
   find('.selectric-interaction-choice-control-quote-employer-type').click
-  find('.interaction-choice-control-quote-employer-profile-id-2', match: :first).click 
+  find('.interaction-choice-control-quote-employer-profile-id-2', match: :first).click
   fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
@@ -118,8 +118,12 @@ Then(/^the quote should be deleted$/) do
 end
 
 Then(/^adds a new benefit group$/) do
-  fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
+end
+
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
 end
 
 Then(/^the broker assigns the benefit group to the family$/) do
