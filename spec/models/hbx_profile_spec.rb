@@ -23,7 +23,7 @@ RSpec.describe HbxProfile, :type => :model do
       end
     end
 
-    context "with all required data", dbclean: :before do
+    context "with all required data" do
       let(:params)        { valid_params }
       let(:hbx_profile)   { HbxProfile.new(**params) }
       before :all do
