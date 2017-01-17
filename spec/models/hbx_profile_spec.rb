@@ -51,10 +51,13 @@ RSpec.describe HbxProfile, :type => :model do
       end
 
       context ".search_random", dbclean: :after_each do
-        let(:org1) { FactoryGirl.create(:organization, legal_name: 'first_one')}
-        let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1)}
-        let(:org2) { FactoryGirl.create(:organization, legal_name: 'second_one')}
-        let!(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile, organization: org2)}
+        let(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile)}
+        let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile)}
+
+        before do
+          broker_agency_profile1.organization.update_attributes(legal_name: "legal yo1")
+          broker_agency_profile2.organization.update_attributes(legal_name: "legal yo2")
+        end
 
         it "should return all the broker agencies profiles" do
           expect(HbxProfile.search_random(nil).size).to eq 2
@@ -62,8 +65,8 @@ RSpec.describe HbxProfile, :type => :model do
         end
 
         it "should return the  searched broker agency instances" do
-          expect(HbxProfile.search_random(org1.legal_name).size).to eq 1
-          expect(HbxProfile.search_random(org1.legal_name).first.class).to eq BrokerAgencyProfile
+          expect(HbxProfile.search_random(broker_agency_profile1.organization.legal_name).size).to eq 1
+          expect(HbxProfile.search_random(broker_agency_profile1.organization.legal_name).first.class).to eq BrokerAgencyProfile
         end
       end
     end
