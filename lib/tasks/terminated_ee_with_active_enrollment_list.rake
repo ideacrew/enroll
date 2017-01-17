@@ -27,7 +27,7 @@ namespace :report do
         census_employees.each do |census_employee|
           if census_employee.employment_terminated_on<Date.new(2016,10,31)
             employer=census_employee.employer_profile
-            person=census_employee.employee_role.person.present ? census_employee.employee_role.person: nil
+            person=census_employee.try(:employee).try(:person)
             benefit_group_assignments=census_employee.benefit_group_assignments
             #terminate_state=HbxEnrollment::TERMINATED_STATUSES+HbxEnrollment::CANCELED_STATUSES
             active_state=%w(coverage_selected coverage_enrolled)
