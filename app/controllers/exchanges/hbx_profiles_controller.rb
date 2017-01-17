@@ -309,6 +309,10 @@ def employer_poc
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
 
+    #@q = params.permit(:q)[:q]
+    #@broker_agency_profiles = HbxProfile.search_random(@q)
+
+
     respond_to do |format|
       format.js {}
     end
