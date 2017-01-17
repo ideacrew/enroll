@@ -293,7 +293,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "when the enrollment is coverage_expired" do
+  context "when the enrollment is coverage_expired", dbclean: :before_each do
 
     let(:plan) {FactoryGirl.create(:plan)}
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
@@ -324,7 +324,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     )}
 
     before :each do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
       render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
