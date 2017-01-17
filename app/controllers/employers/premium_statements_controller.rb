@@ -15,14 +15,14 @@ class Employers::PremiumStatementsController < ApplicationController
       format.html
       format.js
       format.csv do
-        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
+        send_data(csv_for, type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
       end
     end
   end
 
   private
 
-  def csv_for(hbx_enrollments)
+  def csv_for
     query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
     hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments   
     (output = "").tap do
