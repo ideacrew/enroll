@@ -290,12 +290,6 @@ class CensusEmployee < CensusMember
     benefit_group_assignments << bga
   end
 
-  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
-    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-    reset_active_benefit_group_assignments(new_benefit_group)
-    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
-  end
-
   def qle_30_day_eligible?
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
