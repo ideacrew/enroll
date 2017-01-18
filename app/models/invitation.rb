@@ -197,8 +197,8 @@ class Invitation
     UserMailer.broker_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
-  def send_initial_invitation_for_new_hires!(census_employee)
-    UserMailer.new_hire_invitation_email(invitation_email, census_employee, self).deliver_now
+  def send_initial_employee_invitation!(census_employee)
+    UserMailer.initial_employee_invitation_email(invitation_email, census_employee, self).deliver_now
   end
 
   def self.invite_employee!(census_employee)
@@ -235,7 +235,7 @@ class Invitation
         :source_id => census_employee.id,
         :invitation_email => census_employee.email_address
       )
-      invitation.send_initial_invitation_for_new_hires!(census_employee)
+      invitation.send_initial_employee_invitation!(census_employee)
       invitation
     end
   end

@@ -2279,7 +2279,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(deliveries.map(&:subject).uniq.join('')).to eq(user_mailer_renewal_invitation_subject)
           expect(deliveries.flat_map(&:to)).to eq(benefit_group.census_employees.map(&:email_address))
           benefit_group.census_employees.each do |census_employee_recepient|
-            user_mailer_new_hire_invitation_body(census_employee_recepient).each do |body_line|
+            user_mailer_initial_employee_invitation_body(census_employee_recepient).each do |body_line|
               deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
             end
           end

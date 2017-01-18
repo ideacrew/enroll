@@ -30,9 +30,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def new_hire_invitation_email(email, census_employee, invitation)
+  def initial_employee_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
-      format.html { render "new_hire_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
     end
   end
 
