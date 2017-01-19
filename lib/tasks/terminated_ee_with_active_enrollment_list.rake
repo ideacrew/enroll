@@ -28,7 +28,7 @@ namespace :report do
           if census_employee.employment_terminated_on<Date.new(2016,10,31)
             employer=census_employee.employer_profile
             temp = Maybe.new(census_employee)
-            person=temp.employee_roles.first.person.extract_value
+            person=temp.employee_role.person.extract_value
             #person=census_employee.try(:employee_roles).first.try(:person)
             benefit_group_assignments=census_employee.benefit_group_assignments
             #terminate_state=HbxEnrollment::TERMINATED_STATUSES+HbxEnrollment::CANCELED_STATUSES
@@ -54,7 +54,7 @@ namespace :report do
              end
             end
           end
-          puts "Total employee with terminated census employee and non-terminatead hbx_enrollment count #{processed_count}" unless Rails.env == 'test'
+          #puts "Total employee with terminated census employee and non-terminatead hbx_enrollment count #{processed_count}" unless Rails.env == 'test'
         end
       end
     end
