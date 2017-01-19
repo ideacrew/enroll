@@ -184,24 +184,36 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
     employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
 
-
+    @memo = {}
     @records_filtered = @orgs.count
     @total_records = @orgs.count
 
     @draw = dt_query.draw
     @payload = employer_profiles.map { |er|
+      if er.active_broker_agency_account.present?
+        broker_agency_profile = er.active_broker_agency_account.broker_agency_profile
+        edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.memoize_active_broker(@memo))
+        broker = view_context.link_to er.memoize_active_broker(@memo).full_name, edit_path, class: "interaction-click-control-broker-show", method: :get
+      else
+        broker = 'Nothing'
+      end
       {
        :nothing => ('<input type="checkbox" name="employer_Ids[]" value="' + er.id.to_s + '">'),
        :fein => view_context.number_to_obscured_fein(er.fein),
        :legal_name => er.legal_name,
        :ee_count => er.roster_size.to_i,
-       :er_state => er.aasm_state.humanize
-
+       :er_state => er.aasm_state.humanize,
+       :broker => broker
      }
     }
     render
 
   end
+
+  # <% if er.active_broker_agency_account.present? %>
+  #                       <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
+  #                       <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.memoize_active_broker(@memo)) %>
+  #                         <td><%= link_to er.memoize_active_broker(@memo).full_name, edit_path, class: "interaction-click-control-broker-show", method: :get %></td>
 
   def assign
 
