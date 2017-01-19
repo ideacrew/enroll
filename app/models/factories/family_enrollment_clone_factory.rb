@@ -67,7 +67,7 @@ module Factories
       if TimeKeeper.date_of_record < active_enrollment.effective_on
         active_enrollment.cancel_coverage! if active_enrollment.may_cancel_coverage?
       else
-        active_enrollment.terminate_coverage! if active_enrollment.may_terminate_coverage?
+        active_enrollment.terminate_coverage!(effective_on - 1.days) if active_enrollment.may_terminate_coverage?
       end
 
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
