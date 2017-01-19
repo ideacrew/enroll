@@ -1620,6 +1620,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       context "and new plan year begins, ending 'newly designated' status" do
+        let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
           TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
@@ -1637,5 +1638,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
 
+  end
+  describe "search_hash" do
+    context 'census search query' do
+      it "should return query string for census employee name" do
+        employee_search = "test1"
+        expected_result = {"$or"=>[{"first_name"=>/test1/i}, {"last_name"=>/test1/i}, {"encrypted_ssn"=>"+MZq0qWj9VdyUd9MifJWpQ=="}]}
+        result=CensusEmployee.search_hash(employee_search)
+        expect(result).to eq expected_result
+      end
+    end
   end
 end

@@ -307,12 +307,6 @@ class CensusEmployee < CensusMember
     benefit_group_assignments << bga
   end
 
-  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
-    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-    reset_active_benefit_group_assignments(new_benefit_group)
-    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
-  end
-
   def qle_30_day_eligible?
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
@@ -667,6 +661,17 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Search query string on census employee with first name,last name,SSN.
+    def search_hash(s_rex)
+      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      {
+          "$or" => ([
+              {"first_name" => search_rex},
+              {"last_name" => search_rex},
+              {"encrypted_ssn" => encrypt_ssn(s_rex)}
+          ])
+      }
+    end
   end
 
   aasm do
