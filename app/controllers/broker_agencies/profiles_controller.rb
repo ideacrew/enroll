@@ -1,10 +1,11 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
+  include DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -165,6 +166,37 @@ class BrokerAgencies::ProfilesController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def employer_datatable
+
+    dt_query = extract_datatable_parameters
+
+
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+
+    @records_filtered = 1
+    @total_records = 1
+
+    @draw = dt_query.draw
+    @payload = employer_profiles.map { |er|
+      {
+       :nothing => ('<input type="checkbox" name="employer_Ids[]" value="' + er.id.to_s + '">'),
+       :fein => view_context.number_to_obscured_fein(er.fein),
+       :legal_name => er.legal_name,
+       :ee_count => er.roster_size.to_i,
+       :er_state => er.aasm_state.humanize,
+
+     }
+    }
+    render
+
   end
 
   def assign
