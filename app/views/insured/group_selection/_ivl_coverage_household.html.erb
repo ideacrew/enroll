@@ -14,6 +14,10 @@
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
         end
 
+        if can_shop_resident?(@person)
+          is_coverage = true
+        end
+
         #TEMPORARY CODE DO NOT COPY  TODO
         %>
         <tr class="<%='ineligible_row' unless is_coverage%>">

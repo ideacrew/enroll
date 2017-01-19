@@ -217,6 +217,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:r1) {FactoryGirl.create(:resident_role)}
+    let(:r2) {FactoryGirl.create(:resident_role)}
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
     let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first)}
     let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first)}
