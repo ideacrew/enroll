@@ -169,12 +169,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employer_datatable
-
     cursor        = params[:start]  || 0
     page_size     = params[:length] || 10
 
     dt_query = extract_datatable_parameters
-
 
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id).offset(cursor).limit(page_size)
@@ -187,6 +185,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @memo = {}
     @records_filtered = @orgs.count
     @total_records = @orgs.count
+    broker_role = current_user.person.broker_role || nil
+    general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
 
     @draw = dt_query.draw
     @payload = employer_profiles.map { |er|
@@ -197,16 +197,31 @@ class BrokerAgencies::ProfilesController < ApplicationController
       else
         broker = 'Nothing'
       end
+
+      if er.active_general_agency_account.present?
+        ga_legal_name = er.hashed_active_general_agency_legal_name(general_agency_profiles)
+        clear_assign_path = view_context.pundit_span(EmployerProfile, :updateable?)  + view_context.link_to(' clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true)
+        general_agency = ga_legal_name + clear_assign_path
+      else
+        general_agency = 'Nothing'
+      end
+      effective_date = er.published_plan_year.try(:effective_date).to_s + view_context.pundit_span(EmployerProfile, :list_enrollments?) + view_context.link_to(' (Review)', employers_premium_statement_path(er))
+
       {
        :nothing => ('<input type="checkbox" name="employer_Ids[]" value="' + er.id.to_s + '">'),
        :fein => view_context.number_to_obscured_fein(er.fein),
-       :legal_name => er.legal_name,
+       :legal_name => (view_context.link_to er.legal_name, employers_employer_profile_path(er)+"?tab=home"),
        :ee_count => er.roster_size.to_i,
        :er_state => er.aasm_state.humanize,
-       :broker => broker
+       :broker => broker,
+       :effective_date => effective_date,
+       :general_agency => general_agency,
+
      }
     }
     render
+
+
 
   end
 
