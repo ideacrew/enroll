@@ -170,19 +170,23 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def employer_datatable
 
+    cursor        = params[:start]  || 0
+    page_size     = params[:length] || 10
+
     dt_query = extract_datatable_parameters
 
 
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id).offset(cursor).limit(page_size)
     else
       broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id)
+      @orgs = Organization.by_broker_role(broker_role_id).offset(cursor).limit(page_size)
     end
     employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
 
-    @records_filtered = 1
-    @total_records = 1
+
+    @records_filtered = @orgs.count
+    @total_records = @orgs.count
 
     @draw = dt_query.draw
     @payload = employer_profiles.map { |er|
@@ -191,7 +195,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
        :fein => view_context.number_to_obscured_fein(er.fein),
        :legal_name => er.legal_name,
        :ee_count => er.roster_size.to_i,
-       :er_state => er.aasm_state.humanize,
+       :er_state => er.aasm_state.humanize
 
      }
     }
