@@ -190,7 +190,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     @draw = dt_query.draw
     @payload = employer_profiles.map { |er|
-      if er.active_broker_agency_account.present?
+      if er.active_broker_agency_account.present? && er.memoize_active_broker(@memo)
         broker_agency_profile = er.active_broker_agency_account.broker_agency_profile
         edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.memoize_active_broker(@memo))
         broker = view_context.link_to er.memoize_active_broker(@memo).full_name, edit_path, class: "interaction-click-control-broker-show", method: :get
