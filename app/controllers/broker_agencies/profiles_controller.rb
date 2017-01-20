@@ -110,7 +110,20 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
 
-    @families = @broker_agency_profile.families
+    #@families = Family.by_broker_agency_profile_id(@broker_agency_profile.id).skip(cursor).limit(page_size)
+
+    employer_profiles = Organization.by_broker_agency_profile(@broker_agency_profile.id).skip(cursor).limit(page_size.to_i/2)
+    emp_ids = employer_profiles.map{|e| e.employer_profile.id}
+    linked_employees = Person.where(:'employee_roles.employer_profile_id'.in => emp_ids)
+    linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+
+    employee_families = linked_active_employees.map(&:primary_family).to_a
+    consumer_families = Family.by_broker_agency_profile_id(@broker_agency_profile.id).skip(cursor).limit(page_size.to_i/2).to_a
+    @families = (consumer_families + employee_families).uniq
+
+
+    total_records = @families.count
+
 
     @records_filtered = is_search ? @families.count : @families.count
     @total_records = @families.count
