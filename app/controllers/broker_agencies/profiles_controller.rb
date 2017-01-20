@@ -92,6 +92,40 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def family_datatable
+    cursor        = params[:start]  || 0
+    page_size     = params[:length] || 10
+    id = params[:id]
+
+    is_search = false
+
+    dt_query = extract_datatable_parameters
+
+    if current_user.has_broker_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_hbx_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+    else
+      redirect_to new_broker_agencies_profile_path
+      return
+    end
+
+    total_families = @broker_agency_profile.families
+
+    @families = total_families
+
+
+    @families = Family.all
+
+    @records_filtered = is_search ? @families.count : @families.count
+    @total_records = @families.count
+    @draw = dt_query.draw
+
+
+    render
+
+  end
+
   def family_index
     @q = params.permit(:q)[:q]
     id = params.permit(:id)[:id]

@@ -1,0 +1,11 @@
+{
+  "draw" : <%= @draw %>,
+  "recordsTotal" : <%= @total_records %>,
+  "recordsFiltered" : <%= @records_filtered %>,
+  "data" : [
+<% @families.each_with_index do |family, idx| %>
+  <%= render :partial => "broker_agencies/profiles/family_datatable_entry", :object => family %>
+  <%= (idx == @families.length - 1) ? "" : "," %>
+<% end %>
+  ]
+}
