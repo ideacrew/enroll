@@ -181,7 +181,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.by_broker_role(broker_role_id).skip(cursor).limit(page_size)
     end
     employer_profiles = @orgs.map { |o| o.employer_profile } unless @orgs.blank?
-
+    employer_ids = employer_profiles.map(&:id)
+    @census_totals = Hash.new(0)
+    census_member_counts = CensusMember.collection.aggregate([
+      { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+      { "$group" => {"_id" => "$employer_profile_id", "count" => {"$sum" => 1}}}
+    ])
+    census_member_counts.each do |cmc|
+      @census_totals[cmc["_id"]] = cmc["count"]
+    end
     @memo = {}
     @records_filtered = @orgs.count
     @total_records = @orgs.count
