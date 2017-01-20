@@ -91,6 +91,8 @@ class Family
 
   index({"irs_groups.hbx_assigned_id" => 1})
   index({"family_members.person_id" => 1, hbx_assigned_id: 1})
+
+  index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,

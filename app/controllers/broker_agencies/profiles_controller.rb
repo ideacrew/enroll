@@ -114,7 +114,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @records_filtered = query.filtered_count
 
     @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
-
+    primary_member_ids = @families.map do |fam|
+      fam.primary_family_member.person_id
+    end
+    @primary_member_cache = {}
+    Person.where(:_id => { "$in" => primary_member_ids }).each do |pers|
+      @primary_member_cache[pers.id] = pers
+    end
     @draw = dt_query.draw
   end
 
