@@ -110,7 +110,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
 
-    @families = Family.by_broker_agency_profile_id(@broker_agency_profile.id).skip(cursor).limit(page_size.to_i).to_a
+    @families = Family.by_broker_agency_profile_id(@broker_agency_profile.id).skip(cursor).limit(page_size)
 
 
     total_records = @families.count
