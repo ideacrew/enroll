@@ -10,7 +10,7 @@
         <table class="table table-striped" id="Broker-Employer-dataTable">
           <thead>
           <tr>
-            <th><%= check_box_tag 'ER-Invoice-check-all' %></th>
+            <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
             <th>FEIN</th>
             <th>Legal Name</th>
             <th>EE Count</th>
@@ -78,14 +78,14 @@
         //     table.draw();
         // });
         //
-        // // Check/Uncheck All Checkboxes
-        // $('#ER-Invoice-check-all').click(function() {
-        //     var action = $(this).is(':checked') ? true : false;
-        //     var group = $('input[name="employerId[]"]');
-        //     group.each(function () {
-        //       $(this).prop("checked", action);
-        //     });
-        // });
+        // Check/Uncheck All Checkboxes
+        $('#BrokerAgencyProfile-check-all').click(function() {
+            var action = $(this).is(':checked') ? true : false;
+            var group = $('input[name="employer_ids[]"]');
+            group.each(function () {
+              $(this).prop("checked", action);
+            });
+        });
 
 
       </script>
