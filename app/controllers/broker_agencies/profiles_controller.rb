@@ -101,6 +101,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     dt_query = extract_datatable_parameters
 
+    @page_size = page_size
+
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
     elsif current_user.has_hbx_staff_role?

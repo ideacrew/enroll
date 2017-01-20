@@ -5,7 +5,7 @@
   "data" : [
 <% @families.each_with_index do |family, idx| %>
   <%= render :partial => "broker_agencies/profiles/family_datatable_entry", :object => family %>
-  <%= (idx == @families.length - 1) ? "" : "," %>
+  <%= (idx == @page_size - 1) ? "" : "," %>
 <% end %>
   ]
 }
