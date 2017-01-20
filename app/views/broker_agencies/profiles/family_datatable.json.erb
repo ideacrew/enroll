@@ -3,9 +3,9 @@
   "recordsTotal" : <%= @total_records %>,
   "recordsFiltered" : <%= @records_filtered %>,
   "data" : [
-<% @families.each_with_index do |family, idx| %>
+<% @families.to_a.each_with_index do |family, idx| %>
   <%= render :partial => "broker_agencies/profiles/family_datatable_entry", :object => family %>
-  <%= (idx == @page_size - 1) ? "" : "," %>
+  <%= (idx == @families.to_a.length - 1) ? "" : "," %>
 <% end %>
   ]
 }

@@ -112,18 +112,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
 
-    @families = Family.by_broker_agency_profile_id(@broker_agency_profile.id).skip(cursor).limit(page_size)
+    family_query = Family.by_broker_agency_profile_id(@broker_agency_profile.id)
+    
+    @families = family_query.skip(cursor.to_i).limit(page_size.to_i)
 
-
-    total_records = @families.count
-
-
-    @records_filtered = is_search ? @families.count : @families.count
-    @total_records = @families.count
+    @records_filtered = family_query.count
+    @total_records = family_query.count
     @draw = dt_query.draw
-
-    render
-
   end
 
   def family_index
