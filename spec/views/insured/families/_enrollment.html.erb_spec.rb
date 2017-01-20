@@ -38,7 +38,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:hbx_enrollment) {double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
@@ -112,7 +112,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "when under a special enrollment but hbx_enrollment is missing a special_enrollment_period id" do
       before :each do
         allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(true)
-        allow(hbx_enrollment).to receive(:special_enrollment_period?).and_return(nil)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
       it "should not disable the Make Changes button" do
