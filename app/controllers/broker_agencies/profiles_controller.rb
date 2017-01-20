@@ -110,17 +110,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
 
-    total_families = @broker_agency_profile.families
-
-    @families = total_families
-
-
-    @families = Family.all
+    @families = @broker_agency_profile.families
 
     @records_filtered = is_search ? @families.count : @families.count
     @total_records = @families.count
     @draw = dt_query.draw
-
 
     render
 
