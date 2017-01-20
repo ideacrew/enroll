@@ -172,6 +172,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     cursor        = params[:start]  || 0
     page_size     = params[:length] || 10
 
+    is_search = false
+
     dt_query = extract_datatable_parameters
 
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
@@ -180,6 +182,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.by_broker_role(broker_role_id).skip(cursor).limit(page_size)
     end
+
+    total_records = @orgs.count
+
+    if params[:search][:value].present?
+      @orgs = @orgs.where(legal_name: /.*#{dt_query.search_string}.*/i)
+      is_search = true
+    end
+
     employer_profiles = @orgs.map { |o| o.employer_profile } unless @orgs.blank?
     employer_ids = employer_profiles.map(&:id)
     @census_totals = Hash.new(0)
@@ -191,8 +201,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @census_totals[cmc["_id"]] = cmc["count"]
     end
     @memo = {}
-    @records_filtered = @orgs.count
-    @total_records = @orgs.count
+
+    @records_filtered = is_search ? @orgs.count : total_records
+    @total_records = total_records
     broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
     @draw = dt_query.draw
