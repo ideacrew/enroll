@@ -209,10 +209,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     dt_query = extract_datatable_parameters
 
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id).skip(cursor).limit(page_size)
+      @orgs = Organization.unscoped.by_broker_agency_profile(@broker_agency_profile._id)
     else
       broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id).skip(cursor).limit(page_size)
+      @orgs = Organization.unscoped.by_broker_role(broker_role_id)
     end
 
     total_records = @orgs.count
@@ -222,7 +222,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       is_search = true
     end
 
-    employer_profiles = @orgs.map { |o| o.employer_profile } unless @orgs.blank?
+    employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
     employer_ids = employer_profiles.map(&:id)
     @census_totals = Hash.new(0)
     census_member_counts = CensusMember.collection.aggregate([
