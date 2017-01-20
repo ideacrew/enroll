@@ -38,7 +38,8 @@
           "serverSide": true,
           "ordering" : false,
           "paging": true,
-          "lengthMenu": [ 10, 25, 50, 100],
+	  "lengthMenu": [ 10, 25, 50, 100],
+	  "searchDelay" : 500,
           "ajax": {
             url: "<%= family_datatable_broker_agencies_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
             type: "POST",

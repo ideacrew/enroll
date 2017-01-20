@@ -93,15 +93,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def family_datatable
-    cursor        = params[:start]  || 0
-    page_size     = params[:length] || 10
     id = params[:id]
 
     is_search = false
 
     dt_query = extract_datatable_parameters
-
-    @page_size = page_size
 
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
@@ -112,12 +108,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
 
-    family_query = Family.by_broker_agency_profile_id(@broker_agency_profile.id)
-    
-    @families = family_query.skip(cursor.to_i).limit(page_size.to_i)
+    query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
-    @records_filtered = family_query.count
-    @total_records = family_query.count
+    @total_records = query.total_count    
+    @records_filtered = query.filtered_count
+
+    @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
+
     @draw = dt_query.draw
   end
 

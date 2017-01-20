@@ -126,6 +126,7 @@ class Person
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
+  index({first_name: 1, last_name: 1, hbx_id: 1, encrypted_ssn: 1}, {name: "person_searching_index"})
 
   index({encrypted_ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
