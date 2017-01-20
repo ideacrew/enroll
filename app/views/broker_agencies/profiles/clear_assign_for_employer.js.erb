@@ -1,3 +1,4 @@
 <% if @employer_profile.present? %>
-  $("#employer_<%= @employer_profile.id %>").find('td.general_agency').html("");
+setTabContent("<%= escape_javascript render "employers" %>");
+set_active_ontab("#employers-tab");
 <% end %>
