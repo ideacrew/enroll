@@ -4,7 +4,7 @@
   "recordsFiltered" : <%= @records_filtered %>,
   "data" : [
 <% @employer_profiles.each_with_index do |ep, idx| %>
-  <%= render :partial => "broker_agencies/profiles/_employer_datatable_entry", :object => ep %>
+  <%= render :partial => "broker_agencies/profiles/employer_datatable_entry", :object => ep %>
   <%= (idx == @employer_profiles.length - 1) ? "" : "," %>
 <% end %>
   ]
