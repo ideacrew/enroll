@@ -2,7 +2,11 @@
   "draw" : <%= @draw %>,
   "recordsTotal" : <%= @total_records %>,
   "recordsFiltered" : <%= @records_filtered %>,
-  "data" :
+  "data" : [
+<% @employer_profiles.each_with_index do |ep, idx| %>
+  <%= render :partial => "broker_agencies/profiles/_employer_datatable_entry", :object => ep %>
+  <%= (idx == @employer_profiles.length - 1) ? "" : "," %>
+<% end %>
+  ]
   <%=  @payload.to_json.html_safe %>
-
 }
