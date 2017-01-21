@@ -91,13 +91,14 @@ class Family
 
   index({"irs_groups.hbx_assigned_id" => 1})
   index({"family_members.person_id" => 1, hbx_assigned_id: 1})
+
+  index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
 
-  validates :e_case_id, uniqueness: true, allow_nil: true
   validate :family_integrity
 
   after_initialize :build_household
@@ -471,8 +472,28 @@ class Family
   end
 
   class << self
+    def expire_individual_market_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      expiration_date_limit = (current_benefit_period.start_on - 61.days) # Don't expire enrollments with effective less than 60 days
+      query = {
+          :effective_on.lt => expiration_date_limit,
+          :kind => 'individual',
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
+      }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+      families.each do |family|
+        begin
+          family.active_household.hbx_enrollments.where(query).each do |enrollment|
+            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+          end
+        rescue Exception => e
+          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+        end
+      end
+    end
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
+      # expire_individual_market_enrollments
     end
 
     def default_search_order
