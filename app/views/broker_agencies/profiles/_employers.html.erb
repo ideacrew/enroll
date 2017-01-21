@@ -72,13 +72,6 @@
           } );
         });
 
-        // Trigger datatable redraw on 90 day (30,60,90) filter buttons
-        // $('#ERInvoiceFilter-Dropdown').change(function() {
-        //     var table = $('#ER-invoices-dataTable').dataTable().api();
-        //     table.draw();
-        // });
-        //
-        // Check/Uncheck All Checkboxes
         $('#BrokerAgencyProfile-check-all').click(function() {
             var action = $(this).is(':checked') ? true : false;
             var group = $('input[name="employer_ids[]"]');

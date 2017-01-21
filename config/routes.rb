@@ -303,6 +303,7 @@ Rails.application.routes.draw do
         get :assign
         post :update_assign
         post :employer_datatable
+        post :family_datatable
         post :set_default_ga
       end
 
