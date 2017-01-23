@@ -492,7 +492,7 @@ class Family
     end
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
-      # expire_individual_market_enrollments
+      expire_individual_market_enrollments
     end
 
     def default_search_order
