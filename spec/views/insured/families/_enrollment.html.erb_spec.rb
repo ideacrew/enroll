@@ -229,7 +229,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should not display status as Coverage Terminated" do 
+    it "should not display status as Coverage Terminated" do
       expect(rendered).not_to have_text(/Coverage Terminated/)
     end
 
@@ -238,14 +238,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "when the enrollment is coverage_expired" do
-   
+  context "when the enrollment is coverage_expired", dbclean: :before_each do
     let(:plan) {FactoryGirl.create(:plan)}
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
- 
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
 
-    let!(:expired_benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.create!({
+    let(:expired_benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.create!({
       :start_on => start_on,
       :end_on => start_on.next_year - 1.day,
       :open_enrollment_start_on => Date.new(start_on.year - 1, 11, 1),
@@ -253,10 +251,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :service_market => 'individual'
       })}
 
-    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
 
-    let!(:enrollment) {
+    let(:enrollment) {
       FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
@@ -269,10 +267,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     )}
 
     before :each do
+      hbx_profile.save!
+      expired_benefit_coverage_period.save!
+      family.save!
+      enrollment.save!
       render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should not display status as Coverage Expired" do 
+    it "should not display status as Coverage Expired" do
       expect(rendered).not_to have_text(/Coverage Expired/)
     end
 
