@@ -264,17 +264,17 @@ class Insured::FamiliesController < FamiliesController
     @notices = @person.documents.where(subject: 'notice')
   end
 
-  def download_tax_docs
+  def download_tax_documents_form
     
   end
 
-  def download
-    if params[:identifier].split("tax_documents#")[1].persent?
+  def download_tax_documents
+    if params[:identifier].split("tax_documents#")[1].present?
       uri = params[:identifier].split("tax_documents#")[1]
       send_data Aws::S3Storage.find(uri), filename: params[:title]
     else
       flash[:error] = "File does not exist or you are not authorized to access it."
-      redirect_to download_tax_docs_insured_families_path
+      redirect_to download_tax_documents_form_insured_families_path
     end
   end
 

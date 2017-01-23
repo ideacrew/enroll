@@ -153,8 +153,8 @@ Rails.application.routes.draw do
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
-        get 'download_tax_docs'
-        get 'download'
+        get 'download_tax_documents_form'
+        get 'download_tax_documents'
       end
 
       resources :people do

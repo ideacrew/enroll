@@ -20,7 +20,7 @@
   	   		<tr>
   	   		  <td><%= tax_doc.title %></td>
   			   <td><%= tax_doc.subject %></td>
-  			   <td><%= link_to "Download", download_insured_families_path(title: tax_doc.title, identifier: tax_doc.identifier), class: "btn btn-primary" %></td>
+  			   <td><%= link_to "Download", download_tax_documents_insured_families_path(title: tax_doc.title, identifier: tax_doc.identifier), class: "btn btn-primary" %></td>
   			   </tr>
   		   <% end %>	
         </tbody>
