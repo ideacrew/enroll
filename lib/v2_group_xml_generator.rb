@@ -16,7 +16,7 @@ class V2GroupXmlGenerator
   XML_NS = "http://openhbx.org/api/terms/1.0"
 
   CARRIER_ABBREVIATIONS = {
-      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
+      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthcare": "UHIC", "Delta Dental": "DDPA",
       "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
 
   # Inputs
