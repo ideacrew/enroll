@@ -158,6 +158,7 @@ class HbxEnrollment
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
+  scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -982,34 +983,18 @@ class HbxEnrollment
     enrollment_list.map(&:benefit_group_assignment_id).uniq
   end
 
-  def self.find_shop_and_health_by_benefit_group_assignment(benefit_group_assignment)
+  def self.find_enrollments_by_benefit_group_assignment(benefit_group_assignment)
     return [] if benefit_group_assignment.blank?
     benefit_group_assignment_id = benefit_group_assignment.id
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.show_enrollments_sans_canceled.shop_market.by_coverage_kind("health").each do |enrollment|
+        household.hbx_enrollments.show_enrollments_sans_canceled.non_terminated.shop_market.to_a.each do |enrollment|
           enrollment_list << enrollment if benefit_group_assignment_id.to_s == enrollment.benefit_group_assignment_id.to_s
         end
       end
     end rescue ''
-    enrollment_list
-  end
-
-  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-    return [] if benefit_group_assignments.blank?
-    id_list = benefit_group_assignments.collect(&:_id).uniq
-    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
-
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.enrolled_and_renewing_and_shopping.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
-        end
-      end
-    end
     enrollment_list
   end
 
