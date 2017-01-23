@@ -3,6 +3,7 @@
 def cancel_previous(person)
   person.primary_family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).to_a.each do |enr|
     enr.cancel_coverage!
+    puts "cancel coverage under enrollment #{enr.hbx_id}"
   end
   person.save!
 end
@@ -15,6 +16,7 @@ def enroll_coverage(hbx_id, census_employee)
   else
     HbxEnrollment.by_hbx_id(hbx_id).first.update_attributes(aasm_state: 'coverage_enrolled', terminated_on: nil)
   end
+  puts "Enrolling coverage under enrollment #{hbx_id}"
 end
 
 person_hbx_ids = ['19826396', '19826395', '19834991']
