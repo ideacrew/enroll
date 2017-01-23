@@ -133,11 +133,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   end
 
-  context "with consumer_role" do
+  context "with consumer_role", dbclean: :before_each do
     let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
@@ -152,7 +152,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
-      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
