@@ -387,6 +387,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_CAT16',
+    title: 'Important Tax Information about your Catastrophic Health Coverage',
+    description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
+    resource_name: 'consumer_role',
+    event_name: 'final_catastrophic_plan_2016',
+    notice_triggers: [
+      {
+        name: 'Final Catastrophic Plan Notice',
+        notice_template: 'notices/ivl/final_catastrophic_plan_letter',
+        notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
+        mpi_indicator: 'MPI_CAT16',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
