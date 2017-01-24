@@ -1327,9 +1327,9 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 2.years).first
       expect(enrollment.coverage_expired?).to be_truthy
     end
-    it "should not expire coverage with begin date less than 60 days" do
+    it "should expire coverage with begin date less than 60 days" do
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => sep_effective_date).first
-      expect(enrollment.coverage_expired?).to be_falsey
+      expect(enrollment.coverage_expired?).to be_truthy
     end
     it "should not expire coverage for current year" do
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
