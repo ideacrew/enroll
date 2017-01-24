@@ -5,7 +5,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employees) { CensusEmployee.all.page(1).per(20) }
+  let(:census_employees) { [census_employee1, census_employee2, census_employee3] }
 
   let(:person) { FactoryGirl.create(:person) }
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
@@ -40,12 +40,11 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
   context 'when employee has active coverage' do
     before do
-      allow_any_instance_of(CensusEmployee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment1)
-      allow(census_employee1).to receive_message_chain(:active_benefit_group_assignment,:benefit_group,:title).and_return("coverage_selected")
+      allow(census_employee1).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment1)
     end
 
     it "should displays enrollment state when coverage selected" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee1.id).all.page)
+      assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Enrolled/)
     end
@@ -54,44 +53,43 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   context 'when employee coverage terminated' do
     before do
       allow(census_employee2).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment2)
-      census_employee2.update_attributes(aasm_state: 'employment_terminated', employment_terminated_on: TimeKeeper.date_of_record)
+      allow(census_employee2).to receive(:aasm_state).and_return 'employment_terminated'
+      allow(census_employee2).to receive(:can_elect_cobra?).and_return true
       allow(census_employee2).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
-      allow_any_instance_of(CensusEmployee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment2)
-      allow(census_employee2).to receive_message_chain(:active_benefit_group_assignment,:benefit_group,:title).and_return("coverage_terminated")
     end
 
     it "should displays enrollment state as coverage terminated" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Terminated/)
     end
 
     it "should displays rehire function" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_selector('span', text: 'Rehire')
     end
 
     it "should displays cobra function" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_selector('span', text: 'COBRA')
     end
 
     it "should displays cobra confirm area" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_selector('tr.cobra_confirm')
     end
 
     it "should displays termination date when status is all" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to have_content('Termination Date')
     end
 
     it "should displays termination date when status is terminated" do
-      assign(:census_employees, CensusEmployee.where(:id =>census_employee2.id).all.page)
+      assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "terminated"
       expect(rendered).to have_content('Termination Date')
     end
@@ -100,13 +98,11 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   context 'when employee is waived' do
     before do
       hbx_enrollment.update_attributes(aasm_state: 'inactive')
-      # allow(census_employee3).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment3)
-      allow_any_instance_of(CensusEmployee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment3)
-      allow(census_employee3).to receive_message_chain(:active_benefit_group_assignment,:benefit_group,:title).and_return("coverage_waived")
+      allow(census_employee3).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment3)
     end
 
     it "should displays enrollment status as waived" do
-      assign(:census_employees, CensusEmployee.where(:id => census_employee3.id).all.page)
+      assign(:census_employees, [census_employee3])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Waived/)
     end
@@ -130,7 +126,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
     it "should displays no results found" do
       assign(:search, true)
-      assign(:census_employees, CensusEmployee.where(:id => '12123123123123').all.page)
+      assign(:census_employees, [])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match /No results found/
     end
@@ -145,10 +141,11 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(employer_profile).to receive(:renewing_published_plan_year).and_return(true)
+
     end
 
     it "should displays the renewal enrollment aasm state" do
-      assign(:census_employees, CensusEmployee.where(:id => census_employee1.id).all.page)
+      assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Renewal Enrollment Status/)
     end
@@ -166,7 +163,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     end
 
     it "should displays the renewal enrollment aasm state" do
-      assign(:census_employees,CensusEmployee.where(:id => census_employee1.id).all.page)
+      assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to_not match(/Renewal Enrollment Status/)
       expect(rendered).to_not match(/#{benefit_group_assignment.aasm_state.humanize}/)
