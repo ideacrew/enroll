@@ -267,23 +267,6 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
     end
 
-    context "Hiding Address in CensusEmployee page if linked and populated" do
-      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
-      before :each do
-        census_employee.aasm_state="employee_role_linked"
-        census_employee.save!
-        census_employee.reload
-      end
-      it "should not show address fields" do 
-        allow(census_employee).to receive(:address).and_return(address)
-        render template: "employers/census_employees/show.html.erb"
-        expect(rendered).not_to match /#{address.address_1}/
-        expect(rendered).not_to match /#{address.address_2}/
-        expect(rendered).not_to match /#{address.city}/
-        expect(rendered).not_to match /#{address.state}/i
-        expect(rendered).not_to match /#{address.zip}/
-      end
-
     context "Employee status" do
         let(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", hired_on: Time.now-15.days, employer_profile: employer_profile) }
       before :each do
@@ -303,5 +286,25 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         render template: "employers/census_employees/show.html.erb"
         expect(rendered).not_to match /Terminated:/i
       end
+    end
+
+    context "Hiding Address in CensusEmployee page if linked and populated" do
+      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
+      before :each do
+        census_employee.aasm_state="employee_role_linked"
+        census_employee.save!
+        census_employee.reload
+      end
+      it "should not show address fields" do
+        allow(census_employee).to receive(:address).and_return(address)
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).not_to match /#{address.address_1}/
+        expect(rendered).not_to match /#{address.address_2}/
+        expect(rendered).not_to match /#{address.city}/
+        expect(rendered).not_to match /#{address.state}/i
+        expect(rendered).not_to match /#{address.zip}/
+      end
+
+    end
   end
 end
