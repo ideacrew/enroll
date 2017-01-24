@@ -240,17 +240,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   context "when the enrollment is coverage_expired", dbclean: :before_each do
     let(:plan) {FactoryGirl.create(:plan)}
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :last_years_coverage_period) }
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
-
-    let(:expired_benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.create!({
-      :start_on => start_on,
-      :end_on => start_on.next_year - 1.day,
-      :open_enrollment_start_on => Date.new(start_on.year - 1, 11, 1),
-      :open_enrollment_end_on => Date.new(start_on.year, 1, 31),
-      :service_market => 'individual'
-      })}
-
+    let(:end_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year + 1.year - 1.day }
     let(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
 
@@ -268,7 +260,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       hbx_profile.save!
-      expired_benefit_coverage_period.save!
       family.save!
       enrollment.save!
       render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -284,7 +275,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display coverage end date for expired enrollment" do
       expect(rendered).to have_text(/Coverage End/)
-      expect(rendered).to have_text(/#{expired_benefit_coverage_period.end_on.strftime("%m/%d/%Y")}/)
+      expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
     end
   end
 end
