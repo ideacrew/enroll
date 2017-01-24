@@ -249,10 +249,6 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
-
-        it "waived should be false" do
-          expect(assigns(:waived)).to eq false
-        end
       end
 
       context "with waived_hbx when display_hbx is individual" do
@@ -278,10 +274,6 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
-        end
-
-        it "waived should be true" do
-          expect(assigns(:waived)).to eq true
         end
       end
     end
