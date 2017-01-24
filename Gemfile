@@ -26,9 +26,6 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
-# Background Jobs with Resque
-gem 'resque'
-
 # JS graph API
 # gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
 
@@ -60,6 +57,9 @@ gem 'symmetric-encryption', '~> 3.6.0'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
+
+#For Background jobs
+gem 'resque'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
@@ -152,6 +152,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'warden'
+  gem 'fakeredis', :require => 'fakeredis/rspec'
 end
 
 group :production do
