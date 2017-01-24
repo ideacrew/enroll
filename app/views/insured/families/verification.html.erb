@@ -6,6 +6,7 @@
 	<h1 class="darkblue no-buffer">Documents</h1>
 	<span class='text-right'>
 	  <%= link_to "Download Tax Documents", download_tax_documents_form_insured_families_path(), class: "btn btn-primary" if current_user.has_hbx_staff_role? %>
+    <%= link_to "Download Tax Documents", download_tax_documents_form_insured_families_path(), class: "btn btn-primary" if @person.has_consumer_role? %>
 	  
 	</span>
 </div>
