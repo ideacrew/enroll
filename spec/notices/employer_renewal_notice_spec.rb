@@ -21,7 +21,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
-      it "should initialze" do 
+      it "should initialze" do
         expect{ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
