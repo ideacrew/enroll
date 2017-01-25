@@ -496,9 +496,27 @@ class Family
         end
       end
     end
+
+    def begin_coverage_for_ivl_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state => 'auto_renewing'
+        }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+
+      families.each do |family|
+        family.active_household.hbx_enrollments.where(query).each do |enrollment|
+          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+        end
+      end
+    end
+
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
       expire_individual_market_enrollments
+      begin_coverage_for_ivl_enrollments
     end
 
     def default_search_order
