@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice, :download_tax_documents]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
@@ -269,14 +269,18 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def download_tax_documents
-    if params[:identifier].split("tax_documents#")[1].present?
-      uri = params[:identifier].split("tax_documents#")[1]
-      send_data Aws::S3Storage.find(uri), filename: params[:title]
-    else
-      flash[:error] = "File does not exist or you are not authorized to access it."
-      redirect_to download_tax_documents_form_insured_families_path
-    end
-  end
+   if params[:identifier].split("tax_documents#")[1].present?
+     uri = params[:identifier].split("tax_documents#")[1]
+     send_data Aws::S3Storage.find(uri), filename: params[:title]
+  
+   elsif params[:identifier].present?
+     uri = params[:identifier]
+     send_data Aws::S3Storage.find(uri)
+   else
+     flash[:error] = "File does not exist or you are not authorized to access it."
+     redirect_to download_tax_documents_form_insured_families_path
+   end
+ end
 
   def delete_consumer_broker
     @family = Family.find(params[:id])
