@@ -238,7 +238,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "when the enrollment is coverage_expired", dbclean: :before_each do
+  context "when the enrollment is coverage_expired" do
     let(:plan) {FactoryGirl.create(:plan)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :last_years_coverage_period) }
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
@@ -259,6 +259,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     )}
 
     before :each do
+      DatabaseCleaner.clean
       hbx_profile.save!
       family.save!
       enrollment.save!
