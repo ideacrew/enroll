@@ -43,10 +43,8 @@ module Effective
       else
       unless @datatable.global_search_string.blank?
         text = @datatable.global_search_string.downcase
-        #if @array_condition
           collection = collection.select do |row| 
             enrollment_search(row,text)
-        # end
         end
       end        
     end

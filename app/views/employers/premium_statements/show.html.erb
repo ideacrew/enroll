@@ -31,7 +31,6 @@
     <%= render 'show' %>
   </div>
 <br>
-<%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
 </div>
 
 <script>
@@ -50,5 +49,8 @@ $(function() {
     $('#billing_date').val($('option:selected', this).val());
     $("#billing_date_form").submit();
   });
+
+ $('.custom_filter').hide();
+
 });
 </script>

@@ -8,6 +8,9 @@ module Effective
      datatable do
       array_column :full_name,:label => 'Employee Profile', premium_report: true,
       :proc => Proc.new { |row|
+        content_tag(:span, class: 'hide') do
+          row.employee_role.person.last_name
+        end +
         content_tag(:span, class: 'name') do
           name_to_listing(row.employee_role.person)
         end +
@@ -59,22 +62,25 @@ module Effective
 
 
            def collection
-            @employer_profile = EmployerProfile.find(attributes[:id])
-            @billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.parse(attributes[:billing_date])
-            @hbx_enrollments = @employer_profile.enrollments_for_billing(set_billing_date)
-          end
+             @employer_profile = EmployerProfile.find(attributes[:id])
+             @billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.strptime(attributes[:billing_date], "%m/%d/%Y")
+             query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
+             @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
+           end
 
-          def global_search?
+           def global_search?
             true
           end
-          def set_billing_date
-            if params[:billing_date].present?
-              @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y")
-            else
-              @billing_date = billing_period_options.first[1]
-            end
-          end
 
+          def nested_filter_definition
+            {
+              employer_options: [
+                {scope: 'all', label: 'All'}
+                ],
+                top_scope: :employer_options
+              }
+            end
+
+          end
         end
       end
-    end
