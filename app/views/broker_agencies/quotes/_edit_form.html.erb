@@ -28,22 +28,13 @@
 						<div class="form-group col-sm-6">Type:
 							<%= f.select(:employer_type, options_for_select([["Client", "client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel employer_type", :prompt => true, required: true}) %>
 						</div>
-						<div class="form-group col-sm-6">Employer Name: 
-						<% is_client_employer =  f.object.new_record?  %>
-						<% hide_client = f.object.new_record? ? 'hide' : 'hide' %>
-						<% hide_prospect = f.object.new_record? ? 'hide' : 'hide' %>
-						<%= f.text_field :employer_name, {size: 20,required: true, :placeholder => 'Employer Name', class: "prospect #{hide_prospect} "}%>
-
-						<% emp_profile = @quote.employer_profile %>
-				<div class="#{hide_client} client <%= emp_profile.present?  ? '' : 'hide' %>">
-						
-						<%= f.select(:employer_profile_id, options_for_select(@employer_profiles.collect{|e| [e.legal_name, e.id]}, @quote.employer_profile.try(:id) ), {:include_blank => "SELECT EMPLOYERS"}, {data: {url: employees_list_broker_agencies_broker_role_quotes_path},:class => "client employer_profile", :prompt =>true, required: true})%>
-						</div>
-
+						<div class="form-group col-sm-6">Employer Name:
+							<div class="type">
+								<%= render 'families', type: @quote.employer_type %>
+							</div>
 						</div>
 					</div>
 				</div>
-
 
 			</div>
 		</div>
@@ -212,45 +203,23 @@ $(document).ready(function() {
 <% end %>
 
 
-$('.employer_type').on('change', function() {
-  	if (this.value == 'client'){
-		$('.client').removeClass('hide').prop('required',true).css("display","block");
-		$('.prospect').addClass('hide').prop('required',false).css("display","none");
-
-  	}else if(this.value == 'prospect'){
-		$('.prospect').removeClass('hide').prop('required',true).css("display","block");
-		$('.client').addClass('hide').prop('required',false).css("display","none");
-  	}
-})
-
-$(document).ready(function() {
-	if ($('#quote_employer_type').val() == 'client'){
-		$('.prospect').prop("disabled", true);
-	}
-});
-
-
-
-$('.employer_profile').on('change', function() {
-	// alert(this.getAttribute('data-url'))
-	var quote_id = '<%=@quote.id%>'
-	var broker_id = '<%= @broker.id%>'
-  if(this.value != undefined){
-	 $.ajax({
-        type: "GET",
-        url: this.getAttribute('data-url'),
-        data: {employer_profile_id: this.value,broker_id: '' , quote_id: quote_id },
-        // dataType: "js",
-         complete: function(response){
-					if (response.responseText != "false") {
-						// $quote_benefit_group_id.parent().parent().remove();
-					}
-					else {
-						console.log("Error deleting this quote benefit group");
-					}
+$(document).on('change','.employer_profile' ,function() {
+  var quote_id = '<%=@quote.id%>'
+  var broker_id = '<%= @broker.id%>'
+  // if(this.value != undefined){
+    $.ajax({
+      type: "GET",
+      url: this.getAttribute('data-url'),
+      data: {employer_profile_id: this.value,broker_id: '' , quote_id: quote_id },
+      complete: function(response){
+        if (response.responseText != "false") {
         }
-   });
-  }
+        else {
+          console.log("Error deleting this quote benefit group");
+        }
+      }
+    });
+  // }
 });
 
 
