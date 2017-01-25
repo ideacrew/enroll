@@ -1,3 +1,4 @@
+<h4 class="filter"> <strong><%= params[:status].try(:humanize) || "Active" %></strong>  </h4>
 <% if @search %>
 <% if @census_employees.present? %>
 <% else %>
