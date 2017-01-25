@@ -51,7 +51,8 @@ $(function () {
         chart: {
             borderColor: '#000000',
             borderWidth: 0,
-            type: 'column'
+            type: 'column',
+            height: 200
         },
         title: {
             text: ''
@@ -69,7 +70,8 @@ $(function () {
         yAxis: [{
             min: 0,
             title: {
-                text: 'Percent'
+                text: 'Percent',
+                margin: 40
             }
         }, {
             title: {
@@ -78,7 +80,8 @@ $(function () {
             opposite: true
         }],
         legend: {
-            shadow: false
+            shadow: false,
+            itemDistance: 50
         },
         credits: {
             enabled: false
