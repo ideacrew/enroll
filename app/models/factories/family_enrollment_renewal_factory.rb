@@ -31,7 +31,7 @@ module Factories
       prev_plan_year_end   = @plan_year_start_on - 1.day
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? && !enrollment.is_cobra_status? }
+      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
 
       if shop_enrollments.present?
         passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a

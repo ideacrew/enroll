@@ -27,7 +27,7 @@ module Employers::EmployerHelper
 
       %W(health dental).each do |coverage_kind|
         if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-          enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
+          enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
         end
       end
       enrollment_states << '' if enrollment_states.compact.empty?
@@ -49,6 +49,22 @@ module Employers::EmployerHelper
       if enrollment_statuses.include?(enrollment_status.to_s)
         return bgsm_state
       end
+    end
+  end
+
+  def employee_benefit_group_assignment_status(census_employee, enrollment_status)
+    state = benefit_group_assignment_status(enrollment_status)
+    if census_employee.is_cobra_status?
+      case state
+      when 'coverage_waived'
+        'cobra_waived'
+      when 'coverage_renewing'
+        'cobra_renewed'
+      else
+        state
+      end
+    else
+      state
     end
   end
 

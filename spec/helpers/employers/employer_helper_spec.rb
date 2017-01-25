@@ -23,6 +23,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                             )}
 
     before do
+      allow(benefit_group_assignment).to receive(:census_employee).and_return(census_employee)
       allow(benefit_group_assignment).to receive(:aasm_state).and_return("coverage_selected")
       allow(census_employee).to receive(:employee_role).and_return(employee_role)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)

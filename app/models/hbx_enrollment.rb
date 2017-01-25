@@ -430,7 +430,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    return false if kind != 'employer_sponsored' # there is no concept of waiver in ivl case
+    return false unless is_shop? # there is no concept of waiver in ivl case
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
@@ -523,7 +523,7 @@ class HbxEnrollment
   end
 
   def is_shop?
-    kind == "employer_sponsored" || kind == 'employer_sponsored_cobra'
+    ['employer_sponsored', 'employer_sponsored_cobra'].include?(kind)
   end
 
   def is_shop_sep?

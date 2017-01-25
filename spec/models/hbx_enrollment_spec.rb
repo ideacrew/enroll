@@ -646,6 +646,7 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
     let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household)}
+    let(:enrollment_three) { FactoryGirl.create(:hbx_enrollment, :cobra_shop, household: family.active_household)}
     before do
       benefit_group_assignment.update_attribute(:hbx_enrollment_id, enrollment_two.id)
       enrollment_two.update_attributes(benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
@@ -1326,6 +1327,12 @@ context "Benefits are terminated" do
 
 
     it "should be SHOP enrollment kind" do
+      expect(shop_enrollment.is_shop?).to be_truthy
+    end
+
+    it "should be SHOP enrollment kind when employer_sponsored_cobra" do
+      shop_enrollment.kind = 'employer_sponsored_cobra'
+      expect(shop_enrollment.kind).to eq 'employer_sponsored_cobra'
       expect(shop_enrollment.is_shop?).to be_truthy
     end
 
