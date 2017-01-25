@@ -390,6 +390,7 @@ $(function() {
       search = $("#census_employee_search input#employee_search").val();
       $('#employees_' + filter).siblings().hide();
       $('#employees_' + filter).show();
+      $("#status").val(filter);
       $.ajax({
         url: $('span[name=employee_families_url]').text() + '.js',
         type: "GET",
