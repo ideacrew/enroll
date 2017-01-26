@@ -20,7 +20,6 @@ class Insured::GroupSelectionController < ApplicationController
     initialize_common_vars
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
@@ -41,7 +40,17 @@ class Insured::GroupSelectionController < ApplicationController
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @employee_role.try(:benefit_group))
 
     insure_hbx_enrollment_for_shop_qle_flow
-    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?    
+
+    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
+    @new_effective_on = HbxEnrollment.calculate_effective_on_from(
+      market_kind:@market_kind,
+      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      family: @family,
+      employee_role: @employee_role,
+      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
@@ -76,7 +85,8 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
     hbx_enrollment.coverage_kind = @coverage_kind
-
+    # Set effective_on if this is a case of QLE with date options available.
+    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
