@@ -1,4 +1,3 @@
-<h4 style="color:#007bc4;" align="right"> <strong><%= params[:status].try(:humanize) || "Active" %></strong>  </h4>
 <% if @search || params[:employee_search] %>
 <% if @census_employees.present? %>
 <% else %>

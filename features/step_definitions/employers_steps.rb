@@ -499,7 +499,7 @@ And /^employer clicks on linked employee with address$/ do
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
-  expect(page).to have_content val.humanize
+  expect(page).to have_content val.upcase
 end
 
 And /^ER enters (.*) EE name on search bar$/ do |val|
