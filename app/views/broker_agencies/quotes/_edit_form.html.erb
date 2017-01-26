@@ -223,14 +223,14 @@ $(document).ready(function() {
 <% end %>
 
 $('.employer_type').on('change', function() {
-  if (this.value == 'client'){
-    $('.client').removeClass('hide').prop("disabled", false);
-    $('.prospect').addClass('hide').prop("disabled", true);
+  	if (this.value == 'client'){
+		$('.client').removeClass('hide').prop('required',true).css("display","block");
+		$('.prospect').addClass('hide').prop('required',false).css("display","none");
 
-  }else if(this.value == 'prospect'){
-    $('.prospect').removeClass('hide').prop("disabled", false);
-    $('.client').addClass('hide').prop("disabled", true);
-  }
+  	}else if(this.value == 'prospect'){
+		$('.prospect').removeClass('hide').prop('required',true).css("display","block");
+		$('.client').addClass('hide').prop('required',false).css("display","none");
+  	}
 })
 
 $(document).ready(function() {
