@@ -4,22 +4,12 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
 
-  def select_market(person, params)
-    return params[:market_kind] if params[:market_kind].present?
-    if @person.try(:has_active_employee_role?)
-      'shop'
-    elsif @person.try(:has_active_consumer_role?)
-      'individual'
-    else
-      nil
-    end
-  end
-
   def new
     set_bookmark_url
     initialize_common_vars
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
+
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
