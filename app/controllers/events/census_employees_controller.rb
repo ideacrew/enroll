@@ -32,7 +32,7 @@ module Events
     end
 
     def find_census_employee(options)
-      (CensusEmployee.matchable(options[:ssn], options[:dob]).to_a + CensusEmployee.matchable_census_dependents(options[:ssn], options[:dob]).to_a).uniq
+      (CensusEmployee.search_with_ssn_dob(options[:ssn], options[:dob]).to_a + CensusEmployee.search_dependent_with_ssn_dob(options[:ssn], options[:dob]).to_a).uniq
     end
   end
 end
