@@ -6,13 +6,14 @@ module Events
       begin
         reply_to = properties.reply_to
         headers = properties.headers || {}
+        census_employees=[]
 
-        census_employees = find_census_employee({ssn: headers[:ssn], dob: Date.parse(headers[:dob])})
-
-        return_status = "200"
-        if census_employees.empty?
-          return_status = "404"
+        if headers[:ssn].present? && headers[:dob].present?
+          census_employees = find_census_employee({ssn: headers[:ssn], dob: Date.parse("#{headers[:dob]}")})
+          return_status = "200"
         end
+
+        return_status = "404" if census_employees.empty?
 
         response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
         reply_with(connection, reply_to, return_status, response_payload)
