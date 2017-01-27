@@ -30,7 +30,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: project_gems/effective_datatables-2.6.14
+  remote: ./project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
       coffee-rails
@@ -652,4 +652,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
-   1.14.2
+   1.13.6
