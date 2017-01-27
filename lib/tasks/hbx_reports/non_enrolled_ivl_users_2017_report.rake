@@ -23,7 +23,7 @@ namespace :reports do
         begin
           count = 0
           persons = Person.all_consumer_roles
-          persons.to_a.each do |person|
+          persons.each do |person|
             if person.active_employee_roles.blank? && person.primary_family.try(:active_household).present? && person.primary_family.active_household.hbx_enrollments.by_year(2017).enrolled.blank?
               
               best_email = person.home_email.try(:address) || person.work_email.try(:address) || " No Home (or) Work E-mail"
