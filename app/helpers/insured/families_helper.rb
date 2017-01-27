@@ -30,9 +30,9 @@ module Insured::FamiliesHelper
 
   def tax_info_url
     if ENV['AWS_ENV'] == 'prod'
-      "http://dchealthlink.com/individuals/2016-tax-info"
+      "https://dchealthlink.com/individuals/tax-documents"
     else
-      "http://staging.dchealthlink.com/individuals/2016-tax-info"
+      "https://staging.dchealthlink.com/individuals/tax-documents"
     end
   end
 
