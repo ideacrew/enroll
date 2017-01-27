@@ -96,10 +96,6 @@ aca:
         months: 2
 paper_notice: 'paper-notices'
 
-tax_info:
-  url: "http://staging.dchealthlink.com/individuals/2016-tax-info"
-  #url_prod: "http://dchealthlink.com/individuals/2016-tax-info"
-
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."

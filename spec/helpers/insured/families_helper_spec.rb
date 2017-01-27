@@ -199,4 +199,19 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
+  describe "#tax_info_url" do
+    context "when selecting download tax documents link" do
+      it "should redirect from production environment" do
+        ENV['AWS_ENV'] = 'prod'
+        expect(helper.tax_info_url).to eq "http://dchealthlink.com/individuals/2016-tax-info"
+      end
+
+      it "should redirect from test environment" do
+        ENV['AWS_ENV'] = 'test'
+        expect(helper.tax_info_url).to eq "http://staging.dchealthlink.com/individuals/2016-tax-info"
+      end
+    end
+
+  end
+
 end

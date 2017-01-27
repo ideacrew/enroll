@@ -28,6 +28,14 @@ module Insured::FamiliesHelper
     false
   end
 
+  def tax_info_url
+    if ENV['AWS_ENV'] == 'prod'
+      "http://dchealthlink.com/individuals/2016-tax-info"
+    else
+      "http://staging.dchealthlink.com/individuals/2016-tax-info"
+    end
+  end
+
   def shift_purchase_time(policy)
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
