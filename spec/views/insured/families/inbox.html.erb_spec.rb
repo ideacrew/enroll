@@ -32,6 +32,11 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
       render template: "insured/families/inbox.html.erb"
       expect(rendered).not_to match(/Download Tax Documents/i)
     end
+
+    it "should not display the download tax documents button for employee" do
+      render template: "insured/families/inbox.html.erb"
+      expect(rendered).not_to match(/Download Tax Documents/i)
+    end
   end
 
   context "as insured" do
@@ -59,6 +64,23 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
       expect(rendered).to_not match(/Download Tax Documents/i)
     end
   end
+
+  context "as employee" do
+    before :each do
+      allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return(true)
+    end
+
+    it "should display the upload notices button" do
+      render template: "insured/families/inbox.html.erb"
+      expect(rendered).to match(/upload notices/i)
+    end
+    
+    it "should not display the download tax documents button for employee" do
+      render template: "insured/families/inbox.html.erb"
+      expect(rendered).not_to match(/Download Tax Documents/i)
+    end
+  end
+
 end
 
 
