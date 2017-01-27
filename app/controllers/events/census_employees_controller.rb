@@ -9,24 +9,14 @@ module Events
         headers = properties.headers || {}
         census_employees=[]
 
-        logger.info "CensusEmployeesController#resource properties.headers #{properties.headers.inspect}"
-        log "CensusEmployeesController#resource properties.headers #{properties.headers.inspect}"
-
-        if headers[:ssn].present? && headers[:dob].present?
-          census_employees = find_census_employee({ssn: headers[:ssn], dob: Date.parse("#{headers[:dob]}")})
+        if headers["ssn"].present? && headers["dob"].present?
+          census_employees = find_census_employee({ssn: headers["ssn"], dob: Date.parse(headers["dob"])})
           return_status = "200"
         end
-
-        logger.info "CensusEmployeesController#resource census_employees #{census_employees.inspect}"
-        log "CensusEmployeesController#resource census_employees #{census_employees.inspect}"
-
 
         return_status = "404" if census_employees.empty?
 
         response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
-
-        logger.info "CensusEmployeesController#resource response_payload #{response_payload}"
-        log "CensusEmployeesController#resource response_payload #{response_payload}"
 
         reply_with(connection, reply_to, return_status, response_payload)
       rescue Exception => e
