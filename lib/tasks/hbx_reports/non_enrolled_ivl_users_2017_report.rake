@@ -20,29 +20,29 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        begin
           count = 0
           persons = Person.all_consumer_roles
           persons.each do |person|
-            if person.active_employee_roles.blank? && person.primary_family.try(:active_household).present? && person.primary_family.active_household.hbx_enrollments.by_year(2017).enrolled.blank?
-              
-              best_email = person.home_email.try(:address) || person.work_email.try(:address) || " No Home (or) Work E-mail"
-              enrollment = person.primary_family.active_household.hbx_enrollments.by_year(2017).my_enrolled_plans.first || person.primary_family.active_household.hbx_enrollments.by_year(2016).enrolled.shop_market.first
-              term_date = enrollment.present? ? enrollment.terminated_on || enrollment.benefit_group.try(:end_on) : "No IVL (or) active SHOP Enrollment"
-              
-              csv << [
-                person.first_name,
-                person.last_name,
-                best_email,
-                term_date,
-                person.primary_family.created_at
-              ]
-              count +=1
+            begin
+              if person.active_employee_roles.blank? && person.primary_family.try(:active_household).present? && person.primary_family.active_household.hbx_enrollments.by_year(2017).enrolled.blank?
+                
+                best_email = person.home_email.try(:address) || person.work_email.try(:address) || " No Home (or) Work E-mail"
+                enrollment = person.primary_family.active_household.hbx_enrollments.by_year(2017).my_enrolled_plans.first || person.primary_family.active_household.hbx_enrollments.by_year(2016).enrolled.shop_market.first
+                term_date = enrollment.present? ? enrollment.terminated_on || enrollment.benefit_group.try(:end_on) : "No IVL (or) active SHOP Enrollment"
+                
+                csv << [
+                  person.first_name,
+                  person.last_name,
+                  best_email,
+                  term_date,
+                  person.primary_family.created_at
+                ]
+                count +=1
+              end
+            rescue
+              puts "bad person record"
             end
           end
-        rescue
-          puts "bad person record"
-        end
         puts "Report generated on persons with Ivl Roles & with NO active employee roles"
         puts "Total non-enrolled ivl's for 2017 are #{count}"
       end
