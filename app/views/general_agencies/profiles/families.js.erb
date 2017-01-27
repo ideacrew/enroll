@@ -1,10 +1,4 @@
 setTabContent("<%= escape_javascript render "families" %>");
 set_active_ontab("#families-tab");
-$('table').DataTable({
-  paging: true
-});
-
-
-// setTabContent("<%= escape_javascript render "families" %>");
-// set_active_ontab("#families-tab");
-
+initializeDataTables();
+$('.custom_filter').hide();

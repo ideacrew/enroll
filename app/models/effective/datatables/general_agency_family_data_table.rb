@@ -1,17 +1,16 @@
-
 module Effective
   module Datatables
-    class GeneralAgencyFamilyDataTable < Effective::MongoidDatatable
+    class GeneralAgencyFamilyDataTable < Effective::ArraycolumnDatatable
 
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| 
+        array_column :name, :label => 'Name', :proc => Proc.new { |row| 
           pp = row.primary_applicant.person
           link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id)
            }, :filter => false, :sortable => false
 
-        table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| 
+        array_column :ssn, :label => 'SSN', :proc => Proc.new { |row| 
            begin
-             pp = row.primary_applicant.person.full_name
+             pp = row.primary_applicant.person
              number_to_obscured_ssn(pp.ssn)
            rescue
            end
@@ -36,15 +35,9 @@ module Effective
           pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
       end
 
-      scopes do
-         # scope :legal_name, "Hello"
-      end
-
       def collection
-          general_agency_profile = GeneralAgencyProfile.find(attributes[:id])
-          @families = Family.scoped
-        # @families = general_agency_profile.families
-
+        general_agency_profile = GeneralAgencyProfile.find(attributes[:id])
+        @families = general_agency_profile.families
       end
 
       def global_search?
@@ -52,9 +45,11 @@ module Effective
       end
 
       def nested_filter_definition
-   
+        {
+          families:[{scope:"all", label:"All"},],
+          top_scope: :families
+        }
       end
-
     end
   end
 end
