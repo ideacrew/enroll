@@ -203,14 +203,14 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     context "production environment" do
       it "should redirect from production environment" do
         allow(ENV).to receive(:[]).with("AWS_ENV").and_return("prod")
-        expect(helper.tax_info_url).to eq "http://dchealthlink.com/individuals/2016-tax-info"
+        expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
       end
     end 
 
     context "non-production environment" do
       it "should redirect from test environment" do
         allow(ENV).to receive(:[]).with("AWS_ENV").and_return("preprod")
-        expect(helper.tax_info_url).to eq "http://staging.dchealthlink.com/individuals/2016-tax-info"
+        expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
       end
     end
 
