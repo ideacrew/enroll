@@ -373,7 +373,8 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
-
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
   find('.interaction-click-control-confirm').click
 end
 
