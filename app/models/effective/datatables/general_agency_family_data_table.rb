@@ -1,4 +1,3 @@
-
 module Effective
   module Datatables
     class GeneralAgencyFamilyDataTable < Effective::MongoidDatatable
@@ -34,10 +33,6 @@ module Effective
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
           pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
       end
-
-#      scopes do
-         # scope :legal_name, "Hello"
-#      end
 
       def collection
         @collection ||= Queries::GeneralAgencyFamiliesQuery.new(attributes[:id])
