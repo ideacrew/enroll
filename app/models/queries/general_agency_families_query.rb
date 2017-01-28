@@ -8,8 +8,8 @@ module Queries
       self
     end
 
-    def initialize(general_agency)
-      @general_agency = general_agency
+    def initialize(general_agency_id)
+      @general_agency_id = BSON::ObjectId.from_string(general_agency_id)
     end
 
     def skip(num)
@@ -63,7 +63,7 @@ module Queries
 
     def employer_ids
       @employer_ids ||= Organization.collection.aggregate([
-        { "$match" => { :'employer_profile.general_agency_accounts' => {:$elemMatch => { general_agency_profile_id: @general_agency.id} } } },
+        { "$match" => { :'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: 'active', general_agency_profile_id: @general_agency_id} } } },
         { "$group" => { "_id" => "$employer_profile._id" }}
       ]).map { |rec| rec["_id"] }
     end

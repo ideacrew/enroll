@@ -40,21 +40,11 @@ module Effective
 #      end
 
       def collection
-        general_agency_profile = GeneralAgencyProfile.find(attributes[:id])
-        @collection ||= Queries::GeneralAgencyFamiliesQuery.new(general_agency_profile)
+        @collection ||= Queries::GeneralAgencyFamiliesQuery.new(attributes[:id])
       end
 
       def global_search?
         true
-      end
-
-      def to_json
-        val = super
-        raise val.inspect
-      end
-
-      def total_records
-        collection.size
       end
 
       # Override the callback to allow caching of sub-queries
