@@ -14,9 +14,9 @@ module Subscribers
     def process_response(payload)
       begin
         stringed_key_payload = payload.stringify_keys
-        # xml = stringed_key_payload['body']
-        idp_uuid = stringed_key_payload['_id']
-        user_name = stringed_key_payload['userName']
+        stringed_key_body = JSON.parse(stringed_key_payload['body'].gsub('=>', ':')).stringify_keys
+        idp_uuid = stringed_key_body['_id']
+        user_name = stringed_key_body['userName']
         return_status = stringed_key_payload["return_status"].to_s
 
         if "201" == return_status.to_s
