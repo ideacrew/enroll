@@ -43,8 +43,11 @@ module Effective
       else
       unless @datatable.global_search_string.blank?
         text = @datatable.global_search_string.downcase
-          collection = collection.select do |row| 
-            enrollment_search(row,text)
+        #if @array_condition
+          collection = collection.select do |row|
+            collection[0].try(:class) == 'Organization' ? enrollment_search(row,text) : ga_serch(row,text)
+            # ga_serch(row,text)
+        # end
         end
       end        
     end
@@ -67,6 +70,10 @@ module Effective
       row.employee_role.person.ssn.try(:downcase).match(text) || row.benefit_group.title.match(text).try(:downcase) ||
       row.coverage_kind.try(:downcase).match(text) || row.humanized_dependent_summary.to_s.match(text).try(:downcase) ||
       row.plan.carrier_profile.legal_name.to_s.try(:downcase).match(text)  || row.plan.name.to_s.try(:downcase).match(text)
+    end
+    def ga_serch(row,text)
+      row.primary_applicant.person.full_name.try(:downcase).match(text) ||
+      row.primary_applicant.person.ssn.try(:downcase).match(text)   
     end
   end
 end
