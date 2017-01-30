@@ -32,7 +32,6 @@ describe PrimaryPOC do
         employer_staff_role.save
         person.make_primary(true)
         expect(person.active_employer_staff_roles.first.primary_poc).to eq true
-        binding.pry
       end
     
   end
