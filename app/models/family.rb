@@ -91,13 +91,14 @@ class Family
 
   index({"irs_groups.hbx_assigned_id" => 1})
   index({"family_members.person_id" => 1, hbx_assigned_id: 1})
+
+  index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
 
-  validates :e_case_id, uniqueness: true, allow_nil: true
   validate :family_integrity
 
   after_initialize :build_household
@@ -471,8 +472,45 @@ class Family
   end
 
   class << self
+    def expire_individual_market_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on.lt => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
+      }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+      families.each do |family|
+        begin
+          family.active_household.hbx_enrollments.where(query).each do |enrollment|
+            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+          end
+        rescue Exception => e
+          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+        end
+      end
+    end
+
+    def begin_coverage_for_ivl_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state => 'auto_renewing'
+        }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+
+      families.each do |family|
+        family.active_household.hbx_enrollments.where(query).each do |enrollment|
+          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+        end
+      end
+    end
+
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
+      expire_individual_market_enrollments
+      begin_coverage_for_ivl_enrollments
     end
 
     def default_search_order
@@ -548,7 +586,7 @@ class Family
       end
     end
   end
-  
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -610,11 +648,8 @@ class Family
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$nin" => ['void', "coverage_canceled"]} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_expired"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
@@ -628,22 +663,6 @@ class Family
                   'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
                   "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
       {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
-      ],
-      :allow_disk_use => true)
-  end
-
-  def waivers_for_display
-    Family.collection.aggregate([
-      {"$match" => {'_id' => self._id}},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
-      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-                    'state' => '$households.hbx_enrollments.aasm_state',
-                    'kind' => '$households.hbx_enrollments.kind',
-                    'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
       ],
       :allow_disk_use => true)
   end
