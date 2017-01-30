@@ -65,7 +65,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3A',
-    title: 'PlanYear Renewal Notice(3A)',
+    title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3a',
@@ -86,7 +86,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3B',
-    title: 'PlanYear Renewal Notice(3B)',
+    title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3b',
