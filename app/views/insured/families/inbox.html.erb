@@ -6,7 +6,7 @@
     <h1 class="darkblue no-buffer">Messages</h1>
     <span class='text-right'>
       <%= link_to "Upload Notices", upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? %>
-      <%= link_to "Download Tax Documents", tax_info_url, class: "btn btn-primary", target: '_blank' if (@person.consumer_role.present? || current_user.has_hbx_staff_role?) && @person.ssn.present? && !@person.employee_roles.present? %>
+      <%= link_to "Download Tax Documents", tax_info_url, class: "btn btn-primary", target: '_blank' if (@person.consumer_role.present? || current_user.has_hbx_staff_role? || !@person.employee_roles.present? ) && @person.ssn.present? && @person.consumer_role.present? %>
     </span>
   </div>
   <%= render 'inbox', provider: @person %>
