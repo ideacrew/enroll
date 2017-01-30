@@ -28,14 +28,6 @@ module Insured::FamiliesHelper
     false
   end
 
-  def tax_info_url
-    if ENV['AWS_ENV'] == 'prod'
-      "https://dchealthlink.com/individuals/tax-documents"
-    else
-      "https://staging.dchealthlink.com/individuals/tax-documents"
-    end
-  end
-
   def shift_purchase_time(policy)
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
@@ -213,5 +205,23 @@ module Insured::FamiliesHelper
 
   def dual_role_without_shop_sep?
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
+  end
+
+  def tax_info_url
+    if ENV['AWS_ENV'] == 'prod'
+      "https://dchealthlink.com/individuals/tax-documents"
+    else
+      "https://staging.dchealthlink.com/individuals/tax-documents"
+    end
+  end
+
+  def show_download_tax_documents_button?
+    if @person.ssn.blank?
+      false
+    elsif !@person.user.has_consumer_role? 
+      false
+    elsif @person.user.has_consumer_role? 
+      true
+    end
   end
 end
