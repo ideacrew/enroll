@@ -24,6 +24,14 @@ FactoryGirl.define do
       coverage_kind "dental"
     end
 
+    trait :with_hbx_enrollment_member do
+      after(:create) do |hbx_enrollment,evaluator|
+        create :hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: evaluator.amount
+      end
+
+    end
+
+
     trait :individual_unassisted do
       kind "individual"
       elected_premium_credit 0
