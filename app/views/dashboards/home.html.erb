@@ -397,21 +397,23 @@ $(function () {
         <th class="texLef">Avg Session</th>
       </tr>
     </thead>
+    <%@webactivitys.each do |web|%>
     <tbody>
       <tr>
         <td></td>
-        <td class="texLef">94</td>
+        <td class="texLef"><%=web.apdex_value%></td>
         <td><span class="glyphicon glyphicon-asterisk" style="color: green"></span></td>
-        <td class="texLef">1.19k</td>
+        <td class="texLef"><%=web.page_views_value%></td>
         <td></td>
-        <td class="texLef">440</td>
+        <td class="texLef"><%=web.new_visitors_value%></td>
         <td></td>
-        <td class="texLef">218</td>
+        <td class="texLef"><%=web.return_visitors_value%></td>
         <td></td>
-        <td class="texLef">1:48s</td>
+        <td class="texLef"><%=web.load_time_value%>s</td>
         <td></td>
-        <td class="texLef">6:20s</td>
+        <td class="texLef"><%=web.avg_session_value%>s</td>
       </tr>
+      <%end%>
     </tbody>
     </table>
 
@@ -432,19 +434,21 @@ $(function () {
         <th class="texLef">Max Wait</th>
       </tr>
     </thead>
+    <%@callcenters.each do |center|%>
     <tbody>
       <tr>
         <td></td>
-        <td class="texLef">482</td>
+        <td class="texLef"><%=center.received_value%></td>
         <td></td>
-        <td class="texLef">461</td>
+        <td class="texLef"><%=center.answered_value%></td>
         <td></td>
-        <td class="texLef">12</td>
+        <td class="texLef"><%=center.abandoned_value%></td>
         <td><span class="glyphicon glyphicon-asterisk" style="color: red"></span></td>
-        <td class="texLef">0:28m</td>
+        <td class="texLef"><%=center.avg_wait_value%>m</td>
         <td></td>
-        <td class="texLef">6:35m</td>
+        <td class="texLef"><%=center.max_wait_value%>m</td>
       </tr>
+      <%end%>
     </tbody>
     </table>
 
