@@ -347,7 +347,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR9',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_9',
@@ -368,7 +368,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR10',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_10',
@@ -378,6 +378,27 @@ ivl_notice_triggers = [
         notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
         notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR10',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_CAT16',
+    title: 'Important Tax Information about your Catastrophic Health Coverage',
+    description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
+    resource_name: 'consumer_role',
+    event_name: 'final_catastrophic_plan_2016',
+    notice_triggers: [
+      {
+        name: 'Final Catastrophic Plan Notice',
+        notice_template: 'notices/ivl/final_catastrophic_plan_letter',
+        notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
+        mpi_indicator: 'MPI_CAT16',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
