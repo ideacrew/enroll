@@ -1,7 +1,6 @@
 module Events
   class CensusEmployeesController < ::ApplicationController
     include Acapi::Amqp::Responder
-    include Acapi::Notifiers
 
     def resource(connection, delivery_info, properties, body)
       begin
