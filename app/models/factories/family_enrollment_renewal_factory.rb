@@ -31,7 +31,7 @@ module Factories
       prev_plan_year_end   = @plan_year_start_on - 1.day
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
+      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? && !enrollment.cobra_future_active? }
 
       if shop_enrollments.present?
         passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
@@ -96,6 +96,7 @@ module Factories
 
       renewal_enrollment.waiver_reason = waived_enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
+      renewal_enrollment.submitted_at = TimeKeeper.datetime_of_record
 
       if renewal_enrollment.save
         return

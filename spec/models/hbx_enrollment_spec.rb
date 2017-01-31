@@ -1905,7 +1905,8 @@ context "A cancelled external enrollment", :dbclean => :after_each do
 end
 
 context "for cobra", :dbclean => :after_each do
-  let(:enrollment) { HbxEnrollment.new }
+  let(:enrollment) { HbxEnrollment.new(kind: 'employer_sponsored') }
+  let(:cobra_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored_cobra') }
 
   context "is_cobra_status?" do
     it "should return false" do
@@ -1915,6 +1916,24 @@ context "for cobra", :dbclean => :after_each do
     it "should return true" do
       enrollment.kind = 'employer_sponsored_cobra' 
       expect(enrollment.is_cobra_status?).to be_truthy
+    end
+  end
+
+  context "cobra_future_active?" do
+    it "should return false when not cobra" do
+      expect(enrollment.cobra_future_active?).to be_falsey
+    end
+
+    context "when cobra" do
+      it "should return false" do
+        allow(cobra_enrollment).to receive(:future_active?).and_return false
+        expect(cobra_enrollment.cobra_future_active?).to be_falsey
+      end
+
+      it "should return true" do
+        allow(cobra_enrollment).to receive(:future_active?).and_return true
+        expect(cobra_enrollment.cobra_future_active?).to be_truthy
+      end
     end
   end
 

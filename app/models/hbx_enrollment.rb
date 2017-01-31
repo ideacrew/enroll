@@ -404,6 +404,10 @@ class HbxEnrollment
     terminated_on >= effective_on
   end
 
+  def cobra_future_active?
+    is_cobra_status? && future_active?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
