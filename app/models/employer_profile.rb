@@ -94,16 +94,6 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
-  def benefit_group_assignments
-    benefit_group_assignments = []
-    self.census_employees.each do |census_employee|
-      census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-        benefit_group_assignments << benefit_group_assignment
-      end
-    end
-    return benefit_group_assignments
-  end
-
   def covered_employee_roles
     covered_ee_ids = CensusEmployee.by_employer_profile_id(self.id).covered.only(:employee_role_id)
     EmployeeRole.ids_in(covered_ee_ids)
@@ -816,6 +806,10 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+  def trigger_notices(event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
 private
