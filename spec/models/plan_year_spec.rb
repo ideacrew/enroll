@@ -28,6 +28,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -2213,10 +2214,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-  describe 'sends employee invitation email when .is_renewal?', focus: true do
+  describe 'sends employee invitation email', focus: true do
     include_context 'MailSpecHelper'
 
-    context 'publishes renewal draft' do
+    context 'when .is_renewal?' do
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:calender_year) { TimeKeeper.date_of_record.year }
       let(:plan_year_start_on) { Date.new(calender_year, 4, 1) }
@@ -2267,6 +2268,34 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         benefit_group.census_employees.each do |census_employee_recepient|
           user_mailer_renewal_invitation_body(census_employee_recepient).each do |body_line|
             deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
+          end
+        end
+      end
+
+      context "enrolling" do
+        before do
+          refresh_mailbox
+          plan_year.open_enrollment_end_on = Date.new(calender_year, 3, 10)
+          plan_year.aasm_state = "draft"
+          plan_year.publish!
+          TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 5.days)
+        end
+
+        it 'the plan should be in enrolling' do
+          expect(plan_year.enrolling?).to be_truthy
+          expect(plan_year.aasm_state).to eq('enrolling')
+        end
+
+        it 'should send invitations to benefit group census employees' do
+          deliveries = ActionMailer::Base.deliveries
+          expect(deliveries).not_to be_empty
+          expect(deliveries.count).to eq(benefit_group.census_employees.count)
+          expect(deliveries.map(&:subject).uniq.join('')).to eq(user_mailer_renewal_invitation_subject)
+          expect(deliveries.flat_map(&:to)).to eq(benefit_group.census_employees.map(&:email_address))
+          benefit_group.census_employees.each do |census_employee_recepient|
+            user_mailer_initial_employee_invitation_body(census_employee_recepient).each do |body_line|
+              deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
+            end
           end
         end
       end
@@ -2469,6 +2498,7 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
+        allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 
