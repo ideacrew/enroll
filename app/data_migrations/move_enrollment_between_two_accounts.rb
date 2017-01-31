@@ -18,13 +18,18 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     if index == -1
       raise "No enrollment found"
     else
-      bp.primary_family.active_household.hbx_enrollments[index].hbx_id
       hbx1 = bp.primary_family.active_household.hbx_enrollments[index]
 
-      # add the enrollent to good person
+      # add the enrollment to the good person
       gp.primary_family.latest_household.update_attributes!(:hbx_enrollments => gp.primary_family.latest_household.hbx_enrollments.append(hbx1))
 
       #find the family members to be added to the new hbx_enrollments
+      if moveable(gp.primary_family,hbx1)
+        #move
+      else
+        #alert(not moveable due to family member not match)
+      end
+
       fm= gp.primary_family.latest_household.hbx_enrollments[0].hbx_enrollment_members.first.family_member
       hbx_total=gp.primary_family.latest_household.hbx_enrollments.size
       gp.primary_family.latest_household.hbx_enrollments[hbx_total-1].hbx_enrollment_members.first.update_attributes!(:family_member => fm)
@@ -42,5 +47,16 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
       hh.hbx_enrollments = hbx
       hh.save!
     end
+  end
+
+  def moveable (family, enrollment)
+    enrollment_ppl=enrollment.hbx_enrollment_members.map{|a| a.hbx_id}
+    family_ppl=family.family_members.map{|a| a.person}
+    if enrollment_ppl.to_set.subset?(family_ppl.to_set)
+      return true
+    else
+      return false
+    end
+
   end
 end
