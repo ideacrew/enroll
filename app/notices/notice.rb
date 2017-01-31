@@ -143,7 +143,8 @@ class Notice
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
-      format: "application/pdf"
+      format: "application/pdf",
+      description: mpi_indicator
     })
 
     if notice.save
