@@ -27,11 +27,10 @@ describe DestroyDuplicatesWithEnr do
             FactoryGirl.build(:family_member, :person => person2, :family => f, is_primary_applicant: false)
            ]
          end
-    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, :person => person1, is_active: true)}
-    let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family1.active_household, hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2])}
-    let!(:hbx_enrollment2) {FactoryGirl.create(:hbx_enrollment, household: family1.active_household, hbx_enrollment_members: [hbx_enrollment_member2])}
-    let!(:hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family1.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-    let!(:hbx_enrollment_member2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family1.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, :person => person1, is_active: true)}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family1.active_household, hbx_id: "0000", aasm_state: "coverage_selected", hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2])}
+  let!(:hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family1.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let!(:hbx_enrollment_member2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family1.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
 
   describe "correct data input" do
     it "has the given task name" do
@@ -51,10 +50,11 @@ describe DestroyDuplicatesWithEnr do
       expect(family1.enrollments.first.hbx_enrollment_members.count).to eql 1
     end
   end
+
   shared_examples_for "returns csv file list with duplicate family members" do |field_name, result|
     before :each do
       subject.migrate
-      @file = "#{Rails.root}/hbx_report/destroy_duplicates_with_.csv"
+      @file = "#{Rails.root}/hbx_report/destroy_duplicates_with_enr.csv"
     end
 
     it "check the records included in file" do
@@ -67,5 +67,12 @@ describe DestroyDuplicatesWithEnr do
         expect(csv_obj[field_name]).to eq result
       end
     end
+  end
+
+  it_behaves_like "returns csv file list with duplicate family members", 'Enrollment_HBX_ID', "0000"
+  it_behaves_like "returns csv file list with duplicate family members", 'Enrollment_aasm_state', "coverage_selected"
+
+  after(:all) do
+    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report"])
   end
 end
