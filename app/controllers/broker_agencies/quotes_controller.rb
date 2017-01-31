@@ -210,8 +210,8 @@ class BrokerAgencies::QuotesController < ApplicationController
       scrollTo = 0
     end
 
-    if params[:quote][:employer_type] == 'prospect'
-      @quote.quote_households.destroy_all if @quote.quote_households.present?
+    if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
+      @quote.quote_households if @quote.quote_households.present?
       @quote.update_attributes(employer_profile_id: nil)
     end
 
@@ -486,12 +486,14 @@ class BrokerAgencies::QuotesController < ApplicationController
   def employees_list
  
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    quote = Quote.find(params[:quote_id])
+    @quote_benefit_group_dropdown = quote.quote_benefit_groups
+
     unless employer_profile.blank?
       @employees = employer_profile.census_employees.non_terminated
 
       @quote = Quote.new
       # # Create place holder for new member of household
-      quote = Quote.find(params[:quote_id])
       households = quote.quote_households.destroy_all
       @employees.each do |x|
        max_family_id = @quote.quote_households.max(:family_id).to_i
@@ -499,10 +501,7 @@ class BrokerAgencies::QuotesController < ApplicationController
        qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
        @quote.quote_households << qhh
       end
-      qbg = QuoteBenefitGroup.new
-      @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
-      @quote.quote_benefit_groups << qbg
-      @employee_present = true
+       @employee_present = true
     else
       @quote = Quote.new
       qbg = QuoteBenefitGroup.new
@@ -515,8 +514,6 @@ class BrokerAgencies::QuotesController < ApplicationController
       qm = QuoteMember.new
       qhh.quote_members << qm
       @quote.quote_households << qhh
-      @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
-      @quote.quote_benefit_groups << qbg
       @employee_present = false
     end
     respond_to do |format|
