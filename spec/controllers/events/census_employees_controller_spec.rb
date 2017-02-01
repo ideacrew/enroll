@@ -10,13 +10,13 @@ describe Events::CensusEmployeesController do
     let(:census_employee) { ep = FactoryGirl.create(:employer_profile);
     ce = FactoryGirl.create(:census_employee, {employer_profile_id: ep.id, middle_name: 'sample_middle'});
     ce }
-    let(:headers) { {ssn: census_employee.ssn, dob: census_employee.dob.strftime("%Y%m%d")} }
+    let(:headers) { {"ssn" => census_employee.ssn, "dob" => census_employee.dob.strftime("%Y%m%d")} }
     let(:properties) { double(:headers => headers, :reply_to => reply_to_key) }
 
     let(:body) { rendered_template }
 
     before :each do
-      header_params = { ssn:headers[:ssn], dob:census_employee.dob}
+      header_params = { ssn:headers["ssn"], dob:census_employee.dob}
       allow(controller).to receive(:find_census_employee).with(header_params).and_return([census_employee])
       allow(CensusEmployee).to receive(:search_with_ssn_dob).with(census_employee.ssn, census_employee.dob.strftime("%Y%m%d")).and_return(census_employee)
 
