@@ -82,7 +82,6 @@ class PlanSelection
       hbx_id = hbx_em.person.hbx_id
       unless previous_enrollment_members[hbx_id].blank?
         hbx_em.eligibility_date = previous_enrollment_members[hbx_id]
-        hbx_em.coverage_start_on = previous_enrollment_members[hbx_id]
         hbx_em.save!
       end
     end
