@@ -84,7 +84,7 @@ namespace :reports do
                                   "No Active Dental Enrollment"
                                 end
             mailing_address = fm.person.addresses.detect { |adr| adr.kind == "mailing" }
-            citizen_status = fm.person.citizen_status || "No Info"
+            citizen_status = fm.person.citizen_status.try(:humanize) || "No Info"
             naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(fm.person.citizen_status) if fm.person.citizen_status.present?
             employment_status = fm.person.active_employee_roles.present? ? "Employed" : "Not Employed"
             tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(fm.person.citizen_status) if fm.person.citizen_status.present?
