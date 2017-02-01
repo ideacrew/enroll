@@ -215,24 +215,25 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   describe "show_download_tax_documents_button?" do
-    let(:user) { FactoryGirl.build_stubbed(:user)}
-    let(:person) { FactoryGirl.build_stubbed(:person, user:user)}
+    let(:person) { FactoryGirl.create(:person)}
+    
     before do
       helper.instance_variable_set(:@person, person)
     end
     
     context "as consumer" do
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
       context "had a SSN" do
         before do
-          allow(user).to receive(:has_consumer_role?).and_return true
-          allow(person).to receive(:ssn).and_return '123456789'
+          person.consumer_role = consumer_role
+            person.ssn = '123456789'
         end   
         it "should display the download tax documents button" do
          expect(helper.show_download_tax_documents_button?).to eq true
         end
 
         context "current user is hbx staff" do
-          let(:current_user) { FactoryGirl.build(:user, :hbx_staff)}
+          let(:current_user) { FactoryGirl.build(:hbx_staff)}
           it "should display the download tax documents button" do
             expect(helper.show_download_tax_documents_button?).to eq true
           end
@@ -241,8 +242,9 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
       context "had no SSN" do
         before do
-         allow(person).to receive(:ssn).and_return ''
+          person.ssn = ''
         end   
+
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button?).to eq false
         end
@@ -251,23 +253,22 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
 
     context "as employee and has no consumer role" do
-      let(:user) { FactoryGirl.build_stubbed(:user)}
-      let(:person) { FactoryGirl.build_stubbed(:person, user:user)}
+      let(:person) { FactoryGirl.create(:person)}
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
 
       before do
-        allow(user).to receive(:has_employee_role?).and_return true
-        allow(user).to receive(:has_consumer_role?).and_return false
+        person.employee_roles = [employee_role]
       end
 
       context "had a SSN" do
         before do
-          allow(person).to receive(:ssn).and_return '123456789'
-        end   
+          person.ssn = '123456789'
+        end
+
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button?).to eq false
         end
       end
-
     end
 
   end

@@ -218,9 +218,9 @@ module Insured::FamiliesHelper
   def show_download_tax_documents_button?
     if @person.ssn.blank?
       false
-    elsif !@person.user.has_consumer_role? 
+    elsif @person.consumer_role.blank?
       false
-    elsif @person.user.has_consumer_role? 
+    elsif @person.consumer_role.present? 
       true
     end
   end
