@@ -136,6 +136,7 @@ class User
   field :last_sign_in_at,    type: Time
   field :current_sign_in_ip, type: String
   field :last_sign_in_ip,    type: String
+  field :idp_uuid, type: String
 
   field :authentication_token
   field :roles, :type => Array, :default => []
