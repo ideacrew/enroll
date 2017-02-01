@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe RuleSet::HbxEnrollment::IndividualMarketVerification do
   subject { RuleSet::HbxEnrollment::IndividualMarketVerification.new(enrollment) }
-  let(:enrollment) { instance_double(HbxEnrollment, :affected_by_verifications_made_today? => is_currently_active, :benefit_sponsored? => is_shop_enrollment, :plan_id => plan_id) }
+  let(:enrollment) { instance_double(HbxEnrollment, :affected_by_verifications_made_today? => is_currently_active, :benefit_sponsored? => is_shop_enrollment, :plan_id => plan_id, :coverage_expired? => false) }
   let(:is_currently_active) { true }
   let(:is_shop_enrollment) { false }
   let(:plan_id) { double }
