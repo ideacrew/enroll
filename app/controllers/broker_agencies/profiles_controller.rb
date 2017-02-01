@@ -14,7 +14,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   COLUMN_TO_FIELD_MAP = {
     "2"     => "legal_name",
-    "4"     => "employer_profile.plan_years.aasm_state",
+    "4"     => "employer_profile.aasm_state",
     "5"     => "employer_profile.plan_years.start_on"
   }
 
