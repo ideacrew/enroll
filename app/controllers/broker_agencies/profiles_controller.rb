@@ -12,6 +12,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   layout 'single_column'
 
+  COLUMN_TO_FIELD_MAP = {
+    "2"     => "legal_name",
+    "4"     => "employer_profile.plan_years.aasm_state",
+    "5"     => "employer_profile.plan_years.start_on"
+  }
+
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
   end
@@ -110,7 +116,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
-    @total_records = query.total_count    
+    @total_records = query.total_count
     @records_filtered = query.filtered_count
 
     @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
@@ -200,6 +206,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employer_datatable
+
+
+
+    order_by = COLUMN_TO_FIELD_MAP[params[:order]["0"][:column]].try(:to_sym)
+    #Organization.exists(employer_profile: true).unscoped.limit(20).order_by(order_by.asc).map(&:legal_name)
+    #Organization.exists(employer_profile: true).unscoped.limit(50).order_by(:'employer_profile.plan_years.start_on'.asc).map(&:legal_name)
+
     cursor        = params[:start]  || 0
     page_size     = params[:length] || 10
 
@@ -212,6 +225,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     else
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.unscoped.by_broker_role(broker_role_id)
+    end
+
+    if order_by.present?
+      @orgs = @orgs.order_by(order_by.send(params[:order]["0"][:dir]))
     end
 
     total_records = @orgs.count
