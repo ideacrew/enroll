@@ -39,7 +39,7 @@ namespace :report do
                 employer_sponsor_verify=(enrollment.kind=="employer_sponsored")
                 if person&&employer_sponsor_verify&& termination_verify
                     csv << [
-                      person.hbx_id,
+                      hbx.hbx_id,
                       person.first_name,
                       person.last_name,
                       employer.fein,
