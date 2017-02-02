@@ -135,8 +135,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     @quote = Quote.find(params[:id])
     broker_role_id = @quote.broker_role.id
     @orgs = Organization.by_broker_role(broker_role_id)
-    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
-
+    @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
     unless params[:duplicate_household].blank? && params[:num_of_dup].blank?
@@ -209,6 +208,11 @@ class BrokerAgencies::QuotesController < ApplicationController
     elsif params[:commit] == "Save Changes"
       notice_message = "Successfully saved quote/employee roster."
       scrollTo = 0
+    end
+
+    if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
+      @quote.quote_households if @quote.quote_households.present?
+      @quote.update_attributes(employer_profile_id: nil)
     end
 
     if (@quote.update_attributes(update_params) && @quote.update_attributes(insert_params))
@@ -480,30 +484,52 @@ class BrokerAgencies::QuotesController < ApplicationController
     render partial: 'my_dental_plans'
   end
 
-   def employees_list
+  def employees_list
  
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
-    @employees = employer_profile.census_employees.non_terminated
-
-    @quote = Quote.new
-    # # Create place holder for new member of household
     quote = Quote.find(params[:quote_id])
-    households = quote.quote_households.destroy_all
-    @employees.each do |x|
-     max_family_id = @quote.quote_households.max(:family_id).to_i
-     qhh = QuoteHousehold.new(family_id: max_family_id + 1)
-     qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
-     @quote.quote_households << qhh
-    end 
-    qbg = QuoteBenefitGroup.new
-    @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
-    @quote.quote_benefit_groups << qbg    
+    @quote_benefit_group_dropdown = quote.quote_benefit_groups
 
+    unless employer_profile.blank?
+      @employees = employer_profile.census_employees.non_terminated
+
+      @quote = Quote.new
+      # # Create place holder for new member of household
+      households = quote.quote_households.destroy_all
+      @employees.each do |x|
+       max_family_id = @quote.quote_households.max(:family_id).to_i
+       qhh = QuoteHousehold.new(family_id: max_family_id + 1)
+       qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
+       @quote.quote_households << qhh
+      end
+       @employee_present = true
+    else
+      @quote = Quote.new
+      qbg = QuoteBenefitGroup.new
+      # Create place holder for a new household and new member for the roster
+      qhh = QuoteHousehold.new
+      # Increment family id so the new place holder contains max + 1
+      max_family_id = @quote.quote_households.max(:family_id).to_i
+      qhh.family_id = max_family_id + 1
+      # Create place holder for new member of household
+      qm = QuoteMember.new
+      qhh.quote_members << qm
+      @quote.quote_households << qhh
+      @employee_present = false
+    end
     respond_to do |format|
       # format.html 
       format.js
     end  
-  end  
+  end
+
+  def employee_type
+    @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
+    @employee_type = params[:type]
+  end
 
 
 private

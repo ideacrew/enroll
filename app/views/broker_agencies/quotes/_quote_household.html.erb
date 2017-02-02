@@ -1,3 +1,4 @@
+<%  read_only = @employee_present ? true : false %>
 <div id="family-panel">
   <div class="panel panel-default">
 		<div class="panel-heading">
@@ -32,7 +33,7 @@
 				<%= qhh.fields_for :quote_members do |qm| %>
 
 					<div id='quotes-container'%>
-					<%= render "quote_members", qm:qm,qhh:qhh %>
+					<%= render "quote_members", qm:qm,qhh:qhh, readonly: read_only%>
 					</div>
 				<% end %>
 			</div>
