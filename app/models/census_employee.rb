@@ -205,7 +205,6 @@ class CensusEmployee < CensusMember
   end
 
   def new_hire_enrollment_period
-    binding.pry
     start_on = [hired_on, TimeKeeper.date_according_to_exchange_at(created_at)].max
     end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
     (start_on.beginning_of_day)..(end_on.end_of_day)
