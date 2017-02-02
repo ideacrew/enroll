@@ -9,7 +9,7 @@ namespace :report do
     task :employee_list => :environment do
       census_employees = CensusEmployee.linked.where(aasm_state: "employment_terminated",employee_role_id: {:$exists => true}).all
       field_names  = %w(
-               hbx_id
+               enrollment_hbx_id
                first_name
                last_name
                employer_fein
@@ -39,7 +39,7 @@ namespace :report do
                 employer_sponsor_verify=(enrollment.kind=="employer_sponsored")
                 if person&&employer_sponsor_verify&& termination_verify
                     csv << [
-                      person.hbx_id,
+                      enrollment.hbx_id,
                       person.first_name,
                       person.last_name,
                       employer.fein,
