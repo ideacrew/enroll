@@ -50,9 +50,10 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
   end
 
   def moveable (family, enrollment)
-    enrollment_ppl=enrollment.hbx_enrollment_members.map{|a| a.hbx_id}
-    family_ppl=family.family_members.map{|a| a.person}
-    if enrollment_ppl.to_set.subset?(family_ppl.to_set)
+    binding.pry
+    enrollment_ppl_hbx_ids=enrollment.hbx_enrollment_members.map{|a| a.person.hbx_id}
+    family_ppl_hbx_ids=family.family_members.map{|a| a.person.hbx_id}
+    if enrollment_ppl_hbx_ids.to_set.subset?(family_ppl_hbx_ids.to_set)
       return true
     else
       return false

@@ -50,4 +50,60 @@ describe MoveEnrollmentBetweenTwoAccount do
     end
 
   end
+
+  describe ".moveable" do
+    describe " the enrollment has no enrollment member" do
+      let(:given_task_name) { "move_enrollment_between_two_accounts" }
+      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
+      let(:person1) { FactoryGirl.create(:person, hbx_id: "0000") }
+      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
+      let(:person2) { FactoryGirl.create(:person, hbx_id: "1111") }
+      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+      let(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+      it "should be movable" do
+        expect(subject.moveable(family1,hbx_enrollment1)).to eql true
+      end
+    end
+    describe " the enrollment has enrollment members but not are subset of family members" do
+      let(:given_task_name) { "move_enrollment_between_two_accounts" }
+      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
+      let(:person1) { FactoryGirl.create(:person, hbx_id: "2222") }
+      let(:person11) { FactoryGirl.create(:person) }
+      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+      let(:person2) { FactoryGirl.create(:person, hbx_id: "3333") }
+      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+      let(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+      let(:hbx_enrollment_member1){FactoryGirl.create(:hbx_enrollment_member,applicant_id:person2.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment1)
+      }
+      before do
+        family1.add_family_member(person11)
+        family1.relate_new_member(person11, "child")
+      end
+      it "should be movable" do
+        expect(subject.moveable(family1,hbx_enrollment1)).to eql true
+      end
+    end
+    describe " the enrollment has enrollment members and are subset of family members" do
+      let(:given_task_name) { "move_enrollment_between_two_accounts" }
+      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
+      let(:person1) { FactoryGirl.create(:person, hbx_id: "4444") }
+      let(:person11) {FactoryGirl.create(:person) }
+      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+      let(:person2) { FactoryGirl.create(:person, hbx_id: "5555") }
+      let(:person3) { FactoryGirl.create(:person, hbx_id: "6666") }
+
+      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person3)}
+      let!(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+      let!(:hbx_enrollment_member1){FactoryGirl.create(:hbx_enrollment_member,applicant_id:person3.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment1)
+      }
+      before do
+        family1.add_family_member(person11)
+        family1.relate_new_member(person11, "child")
+      end
+      it "should not be movable" do
+        expect(subject.moveable(family1,hbx_enrollment1)).to eql false
+      end
+    end
+  end
+
 end
