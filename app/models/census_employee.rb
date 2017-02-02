@@ -135,30 +135,25 @@ class CensusEmployee < CensusMember
   end
 
   def assign_default_benefit_package
-    self.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING + ['draft']).order_by(:start_on.asc).each do |py|
-      if self.benefit_group_assignments.detect{|bg_assign| py.benefit_groups.map(&:id).include?(bg_assign.benefit_group_id) }.blank?
-        find_or_build_benefit_group_assignment(py.benefit_groups.first)
+    # Assign Active Benefit Group Assignment
+    if employer_profile.plan_years.published.present?
+      py = employer_profile.plan_years.published.first
+      if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
+        add_benefit_group_assignment(py.benefit_groups.first, py.start_on)
       end
-    end
-  end
-
-  def find_or_build_benefit_group_assignment(benefit_group)
-    return unless benefit_group
-    return if self.benefit_group_assignments.where(:benefit_group_id => benefit_group.id).present?
-
-    active = false
-    if active_benefit_group_assignment.blank?
-      active = true
-    else
-      if PlanYear::PUBLISHED.include?(benefit_group.plan_year.aasm_state)
-        self.benefit_group_assignments = self.benefit_group_assignments.map do |bg_assignment|
-          bg_assignment.is_active = false
-          bg_assignment
-        end
+    elsif draft_py = employer_profile.plan_years.where(aasm_state: 'draft').first
+      if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != draft_py
+        add_benefit_group_assignment(draft_py.benefit_groups.first, draft_py.start_on)
       end
     end
 
-    self.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: benefit_group, start_on: benefit_group.start_on, is_active: active)
+    # Assign Renewing Benefit Group Assignment
+    if employer_profile.plan_years.renewing.present?
+      py = employer_profile.plan_years.renewing.first
+      if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
+        add_renew_benefit_group_assignment(py.benefit_groups.first)
+      end
+    end
   end
 
   def find_or_create_benefit_group_assignment(benefit_group)
