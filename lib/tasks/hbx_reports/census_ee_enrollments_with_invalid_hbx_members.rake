@@ -54,7 +54,7 @@ namespace :reports do
 end
 
 def eligible_enrollment_member?(hbx_member,enrollment)
-  relationship_benefits=enrollment.benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
+  relationship_benefits = enrollment.try(:benefit_group).present? ? enrollment.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : []
   relationship = PlanCostDecorator.benefit_relationship(hbx_member.primary_relationship)
   return false if relationship == "child_under_26" && hbx_member.person.age_on(enrollment.effective_on) >= 26
   (relationship_benefits.include?(relationship))
