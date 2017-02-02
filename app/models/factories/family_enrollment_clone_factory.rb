@@ -44,7 +44,7 @@ module Factories
 
     def effective_on_for_cobra(enrollment)
       effective_on_by_terminated = @census_employee.coverage_terminated_on.end_of_month + 1.days 
-      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for(@census_employee.hired_on) 
+      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for_cobra(@census_employee.hired_on) 
       [effective_on_by_terminated, effective_on_by_benefit_group].max
     end
 
