@@ -8,7 +8,8 @@ module Events
         headers = properties.headers || {}
         census_employees=[]
 
-        if headers["ssn"].present? && headers["dob"].present?
+        dob =  Date.parse(headers["dob"]) rescue nil
+        if headers["ssn"].present? && dob.kind_of?(Date)
           census_employees = find_census_employee({ssn: headers["ssn"], dob: Date.parse(headers["dob"])})
           return_status = "200"
         end
