@@ -115,7 +115,7 @@ shop_notice_triggers = [
       {
         name: 'Group Renewal Notice',
         notice_template: 'notices/shop_notices/5_employer_renewal_notice',
-        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        notice_builder: 'ShopNotices::RenewalGroupNotice',
         mpi_indicator: 'MPI_SHOP5',
         notice_trigger_element_group: {
           market_places: ['shop'],
