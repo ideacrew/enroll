@@ -2293,6 +2293,7 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :coverage_selected, :move_to_enrolled!
     it_behaves_like "state machine transitions", :coverage_selected, :coverage_selected, :move_to_enrolled!
     it_behaves_like "state machine transitions", :auto_renewing, :auto_renewing, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_enrolled!
   end
 
   context "move_to_contingent event" do
@@ -2305,6 +2306,7 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :enrolled_contingent, :move_to_contingent!
     it_behaves_like "state machine transitions", :coverage_enrolled, :enrolled_contingent, :move_to_contingent!
     it_behaves_like "state machine transitions", :auto_renewing, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_contingent!
   end
 
   context "move_to_pending event" do
@@ -2317,5 +2319,6 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_pending!
   end
 end
