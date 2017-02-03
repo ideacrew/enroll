@@ -60,7 +60,7 @@ namespace :reports do
         primary_fm = family.primary_family_member
         family.family_members.each do |fm|
           begin
-            tax_household_member = primary_fm.family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.person.id == fm.person.id } if primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
+            tax_household_member = primary_fm.family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.family_member.present? && thm.person.id == fm.person.id } if primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
             is_medicaid_chip_eligible = tax_household_member.try(:is_medicaid_chip_eligible).present? ? "Yes" : "No"
             is_applied_for_assistance = primary_fm.family.e_case_id.present? ?  "Yes" : "No"
 
