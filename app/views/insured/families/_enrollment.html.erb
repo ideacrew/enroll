@@ -41,12 +41,6 @@
           </strong>
           <%= enrollment_coverage_end(hbx_enrollment) %>
         </div>
-        <% elsif hbx_enrollment.census_employee.is_cobra_status? %>
-          <div class="enrollment-effective info vertical-align-top">
-          <strong>Effective Date:
-          </strong>
-          <%= hbx_enrollment.cobra_begin_date %>
-        </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
           <strong>Effective Date:

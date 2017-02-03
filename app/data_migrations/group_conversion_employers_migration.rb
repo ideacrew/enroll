@@ -11,13 +11,13 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
         next
       end
       organization.first.employer_profile.plan_years.each do |plan_year|
-        if plan_year.start_on.year == 2015
+        if plan_year.start_on.year == 2016
           plan_year.migration_expire! if plan_year.may_migration_expire?
         end
       end
       plan_years = organization.first.employer_profile.plan_years.published + organization.first.employer_profile.plan_years.renewing_published_state + organization.first.employer_profile.plan_years.where(aasm_state: "draft") + organization.first.employer_profile.plan_years.where(aasm_state: "renewing_publish_pending")
       plan_years.each do |plan_year|
-        if plan_year.start_on.year == 2016
+        if plan_year.start_on.year == 2017
           plan_year.update_attribute(:aasm_state, "canceled")
           id_list = plan_year.benefit_groups.map(&:id)
           families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)

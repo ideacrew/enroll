@@ -15,7 +15,7 @@ FactoryGirl.define do
 
     trait :with_expired_and_active_plan_years do
       before :create do |organization, evaluator|
-        organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2015,12,1)
+        organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2016,12,1)
       end
       after :create do |organization, evaluator|
         start_on = (TimeKeeper.date_of_record - 1.month).beginning_of_month - 1.year
