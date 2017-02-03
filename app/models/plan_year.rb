@@ -3,14 +3,19 @@ class PlanYear
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
+
+  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
+  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
+  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
   # Plan Year time period
   field :start_on, type: Date
@@ -30,6 +35,10 @@ class PlanYear
 
   # Number of Medicare Second Payers
   field :msp_count, type: Integer, default: 0
+
+  # Calculated Fields for DataTable
+  field :enrolled_summary, type: Integer, default: 0
+  field :waived_summary, type: Integer, default: 0
 
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
@@ -108,7 +117,10 @@ class PlanYear
         "households.hbx_enrollments.submitted_at" => 1
       }},
       {"$group" => {
-        "_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+        "_id" => {
+          "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+          "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
+        },
         "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"},
         "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
         "plan_id" => {"$last" => "$households.hbx_enrollments.plan_id"},
@@ -203,6 +215,11 @@ class PlanYear
   def employee_participation_percent
     return "-" if eligible_to_enroll_count == 0
     "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
+  end
+
+  def employee_participation_percent_based_on_summary
+    return "-" if eligible_to_enroll_count == 0
+    "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
   end
 
   def editable?
@@ -408,6 +425,26 @@ class PlanYear
 #    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
+  def enrolled_by_bga
+    benefit_group_ids = self.benefit_groups.map(&:id)
+    candidate_benefit_group_assignments = eligible_to_enroll.map do |ce|
+        enrolled_bga_for_ce ce, benefit_group_ids
+    end.compact
+    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+    bgas = candidate_benefit_group_assignments.select do |bga|
+      enrolled_benefit_group_assignment_ids.include?(bga.id)
+    end
+  end
+
+  # TODO Get definition of enrolled count from @dan/@ram/@hannah
+  def enrolled_bga_for_ce ce, benefit_group_ids
+    bg_assignment = ce.benefit_group_assignments.detect{|assignment|
+      renewing = is_renewing? && !(assignment.initialized?) && !(assignment.coverage_terminated?)
+      enrolled = renewing || assignment.is_active?
+      enrolled && benefit_group_ids.include?(assignment.benefit_group_id)
+    }
+  end
+
   def calc_active_health_assignments_for(employee_pool)
     benefit_group_ids = self.benefit_groups.map(&:id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
@@ -429,7 +466,8 @@ class PlanYear
 
   def total_enrolled_count
     if self.employer_profile.census_employees.count < 100
-      enrolled.count
+      #enrolled.count
+      enrolled_by_bga.count
     else
       0
     end
@@ -492,6 +530,12 @@ class PlanYear
 
   def employees_are_matchable?
     %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
+  end
+
+  def application_warnings
+    if !is_application_valid?
+      application_eligibility_warnings.each_pair(){ |key, value| self.errors.add(:base, value) }
+    end
   end
 
   class << self
@@ -695,14 +739,15 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renewal_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
-    # Returns plan to draft state for edit
+    # Returns plan to draft state (or) renewing draft for edit
     event :withdraw_pending, :after => :record_transition do
       transitions from: :publish_pending, to: :draft
+      transitions from: :renewing_publish_pending, to: :renewing_draft
     end
 
     # Plan as submitted failed eligibility check
@@ -713,8 +758,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
 
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => :trigger_auto_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renewal_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -897,23 +942,14 @@ private
     TimeKeeper.date_of_record.end_of_day == end_on
   end
 
-  def trigger_renew_notice
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
-                                                  :subject => "PlanYear Renewal Notice(3A)",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
-  end
-
-  def trigger_auto_renew_notice
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
-                                                  :subject => "PlanYear Renewal Notice(3B)",
-                                                  :trigger_type => "auto",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
+  def trigger_renewal_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    if event_name == "publish"
+      self.employer_profile.trigger_notices("planyear_renewal_3a")
+    elsif event_name == "force_publish"
+      self.employer_profile.trigger_notices("planyear_renewal_3b")
+    end
   end
 
   def record_transition
@@ -924,10 +960,17 @@ private
   end
 
   def send_employee_invites
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|
           Invitation.invite_renewal_employee!(ce)
+        end
+      end
+    elsif enrolling?
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_initial_employee!(ce)
         end
       end
     else

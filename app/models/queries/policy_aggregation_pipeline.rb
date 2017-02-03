@@ -13,7 +13,7 @@ module Queries
         { "$unwind" => "$households"},
         { "$unwind" => "$households.hbx_enrollments"},
         { "$match" => {"households.hbx_enrollments" => {"$ne" => nil}}},
-        { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}}}
+        { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}, "households.hbx_enrollments.external_enrollment" => {"$ne" => true}}}
       ]
     end
 
@@ -83,13 +83,15 @@ module Queries
       self
     end
 
+
+    # TODO: Fix me to use the master list of statuses
     def filter_to_active
       add({
         "$match" => {
           "households.hbx_enrollments.plan_id" => { "$ne" => nil},
-          "households.hbx_enrollments.aasm_state" => { "$nin" => [
-            "shopping", "inactive", "coverage_canceled", "coverage_terminated"
-          ]}
+          "households.hbx_enrollments.aasm_state" => { "$in" => 
+            (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES)
+          }
         }
       })
       self
@@ -202,7 +204,9 @@ module Queries
     end
 
     def filter_criteria_expression
+        project_property("hbx_enrollment_members", "$households.hbx_enrollments.hbx_enrollment_members") +
         project_property("policy_start_on", "$households.hbx_enrollments.effective_on") +
+        project_property("policy_end_on", "$households.hbx_enrollments.terminated_on") +
         project_property("family_created_at", "$created_at") +
         project_property("policy_purchased_at", { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }) +
 =begin
@@ -228,7 +232,7 @@ module Queries
         "state_transitions",
           { "$cond" =>
             [
-              "$households.hbx_enrollment.workflow_state_transitions",
+              "$households.hbx_enrollments.workflow_state_transitions",
               {"$map" => {
                  "input" => "$households.hbx_enrollments.workflow_state_transitions",
                  "as" => "state_trans",
@@ -269,7 +273,8 @@ module Queries
 
     def denormalized_properties
       filter_criteria_expression + 
-        project_property("_id", "$households.hbx_enrollments.hbx_id")  +
+        project_property("_id", "$households.hbx_enrollments._id")  +
+        project_property("hbx_id", "$households.hbx_enrollments.hbx_id")  +
         project_property("consumer_role_id", "$households.hbx_enrollments.consumer_role_id") +
         project_property("benefit_group_id", "$households.hbx_enrollments.benefit_group_id") +
         project_property("benefit_group_assignment_id", "$households.hbx_enrollments.benefit_group_assignment_id")
@@ -291,7 +296,9 @@ module Queries
           last("plan_id") +
           last("aasm_state") +
           last("enrollment_kind") +
-          last("family_created_at")
+          last("coverage_kind") +
+          last("family_created_at") +
+          last("hbx_enrollment_members")
         ))
       @pipeline = @pipeline + flow.to_pipeline
       self

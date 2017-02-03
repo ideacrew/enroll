@@ -13,7 +13,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1a_application_approval',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -33,7 +33,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1b_request_documents',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -53,7 +53,7 @@ shop_notice_triggers = [
       {
         name: 'Employer notice trigger',
         notice_template: 'notices/shop_notices/1c_application_approval',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -65,15 +65,15 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3A',
-    title: 'Renewal/Conversion Employer Publishes Plan',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'Plan Offerings Finalized',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3a',
     notice_triggers: [
       {
         name: 'PlanYear Renewal',
-        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_template: 'notices/shop_notices/3a_employer_plan_year_renewal',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         mpi_indicator: 'MPI_SHOPRA',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -86,15 +86,15 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP3B',
-    title: 'Renewal/Conversion Employer Auto-Published',
-    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    title: 'Plan Offerings Finalized',
+    description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3b',
     notice_triggers: [
       {
         name: 'PlanYear Renewal Auto-Published',
-        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerNotice',
+        notice_template: 'notices/shop_notices/3b_employer_plan_year_renewal',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
         mpi_indicator: 'MPI_SHOPRB',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -334,7 +334,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice - UQHP',
         notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR8',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -347,7 +347,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR9',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_9',
@@ -355,7 +355,7 @@ ivl_notice_triggers = [
       {
         name: 'December Final Insurance Enrollment Notice',
         notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR9',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -368,7 +368,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLR10',
-    title: 'ACTION REQUIRED - Your 2017 Final Insurance Enrollment Notice',
+    title: 'Your 2017 Final Insurance Enrollment Notice',
     description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
     resource_name: 'consumer_role',
     event_name: 'ivl_renewal_notice_10',
@@ -376,8 +376,29 @@ ivl_notice_triggers = [
       {
         name: 'December Final Insurance Enrollment Notice',
         notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR10',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_CAT16',
+    title: 'Important Tax Information about your Catastrophic Health Coverage',
+    description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
+    resource_name: 'consumer_role',
+    event_name: 'final_catastrophic_plan_2016',
+    notice_triggers: [
+      {
+        name: 'Final Catastrophic Plan Notice',
+        notice_template: 'notices/ivl/final_catastrophic_plan_letter',
+        notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
+        mpi_indicator: 'MPI_CAT16',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
