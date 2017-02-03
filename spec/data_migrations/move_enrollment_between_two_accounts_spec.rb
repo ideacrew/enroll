@@ -12,96 +12,122 @@ describe MoveEnrollmentBetweenTwoAccount do
     end
   end
 
-  describe "adding coverage household member", dbclean: :after_each do
 
-    let(:person1) { FactoryGirl.create(:person, hbx_id: "0000") }
-    let(:person2) { FactoryGirl.create(:person, hbx_id: "1111") }
-    #let(:family_member2) {FactoryGirl.create(:family_member)}
-    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
-    let(:hbx_enrollment_member) {person2}
-    let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+  # #example:
+  # describe "Delete dental enrollments" do
+  #   subject { DeleteDentalEnrollment.new }
+  #
+  #   context "a family with 2 dental and 2 health enrollments" do
+  #     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  #     let(:dental_enrollment1) {FactoryGirl.create(:hbx_enrollment, :with_dental_coverage_kind, household: family.active_household)}
+  #     let(:dental_enrollment2) {FactoryGirl.create(:hbx_enrollment, :with_dental_coverage_kind, household: family.active_household)}
+  #     let(:health_enrollment1) {FactoryGirl.create(:hbx_enrollment,household: family.active_household)}
+  #     let(:health_enrollment2) {FactoryGirl.create(:hbx_enrollment,household: family.active_household)}
+  #
+  #     it "deletes the dentals" do
+  #       expect(family.active_household.hbx_enrollments).to include dental_enrollment1
+  #       expect(family.active_household.hbx_enrollments).to include dental_enrollment2
+  #       expect(family.active_household.hbx_enrollments).to include health_enrollment1
+  #       expect(family.active_household.hbx_enrollments).to include health_enrollment2
+  #       family.primary_applicant.person.update_attribute(:hbx_id, "1234567890")
+  #       expect(family.primary_applicant.person.hbx_id).to eq "1234567890"
+  #       DeleteDentalEnrollment.migrate("1234567890")
+  #       p = Person.where(hbx_id: "1234567890").first
+  #       expect(p.primary_family.active_household.hbx_enrollments.where(coverage_kind: "health").size).to eq 2
+  #       expect(p.primary_family.active_household.hbx_enrollments.where(coverage_kind: "dental").size).to eq 0
+  #     end
+  #   end
+  # end
 
-    let(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment,hbx_id:"2222",household: family1.active_household)}
-    let(:hbx_enrollment2) {FactoryGirl.create(:hbx_enrollment,hbx_id:"3333",household: family1.active_household)}
-    let(:hbx_enrollment3) {FactoryGirl.create(:hbx_enrollment,hbx_id:"4444",household: family2.active_household)}
 
 
-
-
+  describe "move an enrollment from one person to another person", dbclean: :after_each do
+    subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
     before do
-      allow(ENV).to receive(:[]).with('old_account_hbx_id').and_return person1.hbx_id
-      allow(ENV).to receive(:[]).with('new_account_hbx_id').and_return person2.hbx_id
-      allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment1.hbx_id
+      allow(ENV).to receive(:[]).with('old_account_hbx_id').and_return person2.hbx_id
+      allow(ENV).to receive(:[]).with('new_account_hbx_id').and_return person1.hbx_id
+      allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment.hbx_id
     end
-
-    it "should remove the enrollment from person1 to person2" do
-      person1.save
-      person2.save
-      family1.save
-      family2.save
-      expect(person1.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment1)
-      expect(person2.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment1)
-      subject.migrate
-      family1.reload
-      family2.reload
-      expect(person1.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment1)
-      expect(person2.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment1)
-
-    end
-
-  end
-
-  describe ".moveable" do
-    describe " the enrollment has no enrollment member" do
-      let(:given_task_name) { "move_enrollment_between_two_accounts" }
-      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
+    context "hbx_enrollment is movable" do
       let(:person1) { FactoryGirl.create(:person, hbx_id: "0000") }
       let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
       let(:person2) { FactoryGirl.create(:person, hbx_id: "1111") }
       let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
-      let(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
-      it "should be movable" do
-        expect(subject.moveable(family1,hbx_enrollment1)).to eql true
-      end
-    end
-    describe " the enrollment has enrollment members but not are subset of family members" do
-      let(:given_task_name) { "move_enrollment_between_two_accounts" }
-      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
-      let(:person1) { FactoryGirl.create(:person, hbx_id: "2222") }
-      let(:person11) { FactoryGirl.create(:person) }
-      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person1)}
-      let(:person2) { FactoryGirl.create(:person, hbx_id: "3333") }
-      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
-      let(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
-      let(:hbx_enrollment_member1){FactoryGirl.create(:hbx_enrollment_member,applicant_id:person2.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment1)
+      let(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+      let(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,applicant_id:person2.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment)
       }
       before do
-        family1.add_family_member(person11)
-        family1.relate_new_member(person11, "child")
+        family1.add_family_member(person2)
+        family1.relate_new_member(person2, "child")
+        person2.save
+        family2.save
       end
       it "should be movable" do
-        expect(subject.moveable(family1,hbx_enrollment1)).to eql true
+        expect(person2.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment)
+        expect(person1.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+        subject.migrate
+        family1.reload
+        family2.reload
+        expect(person1.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+        expect(person2.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment)
       end
     end
-    describe " the enrollment has enrollment members and are subset of family members" do
-      let(:given_task_name) { "move_enrollment_between_two_accounts" }
-      subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }
-      let(:person1) { FactoryGirl.create(:person, hbx_id: "4444") }
-      let(:person11) {FactoryGirl.create(:person) }
-      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person1)}
-      let(:person2) { FactoryGirl.create(:person, hbx_id: "5555") }
-      let(:person3) { FactoryGirl.create(:person, hbx_id: "6666") }
 
-      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person3)}
-      let!(:hbx_enrollment1) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
-      let!(:hbx_enrollment_member1){FactoryGirl.create(:hbx_enrollment_member,applicant_id:person3.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment1)
+    context "hbx_enrollment is not movable" do
+      let(:person1) { FactoryGirl.create(:person, hbx_id: "0000") }
+      let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
+      let(:person2) { FactoryGirl.create(:person, hbx_id: "1111") }
+      let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+      let(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+      let(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,applicant_id:person2.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment)
       }
       before do
-        family1.add_family_member(person11)
-        family1.relate_new_member(person11, "child")
+        person2.save
+        family2.save
+        person1.save
+        family1.save
       end
       it "should not be movable" do
-        expect(subject.moveable(family1,hbx_enrollment1)).to eql false
+        expect(person2.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment)
+        expect(person1.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+        subject.migrate
+        family1.reload
+        family2.reload
+        expect(person1.primary_family.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+        expect(person2.primary_family.active_household.hbx_enrollments).to include(hbx_enrollment)
+      end
+    end
+  end
+
+
+  describe ".moveable", dbclean: :after_each do
+    let(:person1) { FactoryGirl.create(:person, hbx_id: "0000") }
+    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
+    let(:person2) { FactoryGirl.create(:person, hbx_id: "1111") }
+    let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+    let(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family2.active_household)}
+    context "the enrollment has no enrollment member" do
+      it "should be movable" do
+        expect(subject.moveable(family1,hbx_enrollment)).to eql true
+      end
+    end
+    context "the enrollment has enrollment members but not are subset of family members" do
+      let(:hbx_enrollment_member){FactoryGirl.create(:hbx_enrollment_member,applicant_id:person2.id,eligibility_date:Date.new(),hbx_enrollment: hbx_enrollment)
+      }
+      before do
+        family1.add_family_member(person2)
+        family1.relate_new_member(person2, "child")
+      end
+      it "should be movable" do
+        expect(subject.moveable(family1,hbx_enrollment)).to eql true
+      end
+    end
+    context "the enrollment has members that are not a subset of family's  members" do
+      let!(:hbx_enrollment_member){ FactoryGirl.create(:hbx_enrollment_member, applicant_id:family2.primary_family_member.id,
+                                                        eligibility_date:Date.new(), hbx_enrollment: hbx_enrollment)
+                                  }
+      it "should not be movable" do
+        expect(subject.moveable(family1,hbx_enrollment)).to eql false
       end
     end
   end
