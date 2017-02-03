@@ -207,11 +207,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def employer_datatable
 
-
-
     order_by = EMPLOYER_DT_COLUMN_TO_FIELD_MAP[params[:order]["0"][:column]].try(:to_sym)
-    #Organization.exists(employer_profile: true).unscoped.limit(20).order_by(order_by.asc).map(&:legal_name)
-    #Organization.exists(employer_profile: true).unscoped.limit(50).order_by(:'employer_profile.plan_years.start_on'.asc).map(&:legal_name)
 
     cursor        = params[:start]  || 0
     page_size     = params[:length] || 10
