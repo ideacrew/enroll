@@ -262,9 +262,7 @@ class Household
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: Time.now,
-      coverage_start: coverage_start,
-      enrollment_kind: enrollment_kind
+      submitted_at: Time.now
     )
   end
 
