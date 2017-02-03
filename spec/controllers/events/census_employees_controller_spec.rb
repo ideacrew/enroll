@@ -35,6 +35,26 @@ describe Events::CensusEmployeesController do
       })
       controller.resource(connection, reply_to_key, properties, rendered_template)
     end
+
+    context "header with invalid dob format" do
+      let(:headers) { {"ssn" => census_employee.ssn, "dob" => "19642310"} }
+      before :each do
+        allow(controller).to receive(:render_to_string).with(
+         "events/census_employee/employer_response", {:formats => ["xml"], :locals => {
+                                                       :census_employees => []
+                                                   }}).and_return(rendered_template)
+      end
+
+      it "should return return_status = 404" do
+        expect(exchange).to receive(:publish).with(rendered_template, {
+          :routing_key => reply_to_key,
+          :headers => {
+              :return_status => "404",
+          }
+        })
+        controller.resource(connection, reply_to_key, properties, rendered_template)
+      end
+    end
   end
 
   describe "find_census_employee" do
