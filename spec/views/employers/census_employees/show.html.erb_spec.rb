@@ -238,7 +238,9 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     before :each do
       allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
-      assign(:past_enrollments, [past_enrollments])
+      # assign(:past_enrollments, [past_enrollments])
+
+      allow(census_employee).to receive(:past_enrollments).and_return([past_enrollments])
     end
 
     it "should display past enrollments" do
