@@ -707,6 +707,15 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
+  def past_enrollments
+    if employee_role.blank?
+      []      
+    else
+      enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}
+    end
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
