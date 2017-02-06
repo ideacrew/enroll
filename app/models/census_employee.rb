@@ -135,24 +135,35 @@ class CensusEmployee < CensusMember
   end
 
   def assign_default_benefit_package
-    # Assign Active Benefit Group Assignment
+
+    ### Assign Active Benefit Group Assignment
     if employer_profile.plan_years.published.present?
       py = employer_profile.plan_years.published.first
       if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
-        add_benefit_group_assignment(py.benefit_groups.first, py.start_on)
+        find_or_build_benefit_group_assignment(py.benefit_groups.first)
       end
     elsif draft_py = employer_profile.plan_years.where(aasm_state: 'draft').first
       if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != draft_py
-        add_benefit_group_assignment(draft_py.benefit_groups.first, draft_py.start_on)
+        find_or_build_benefit_group_assignment(draft_py.benefit_groups.first)
       end
     end
 
-    # Assign Renewing Benefit Group Assignment
+    ### Assign Renewing Benefit Group Assignment
     if employer_profile.plan_years.renewing.present?
       py = employer_profile.plan_years.renewing.first
       if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
         add_renew_benefit_group_assignment(py.benefit_groups.first)
       end
+    end
+  end
+
+  def find_or_build_benefit_group_assignment(benefit_group)
+    assignment = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc).first
+
+    if assignment.present?
+      assignment.make_active
+    else
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
     end
   end
 

@@ -472,12 +472,13 @@ class BenefitGroup
           bga.destroy
         end
 
-        ce.save
+        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
+        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
       end
     end
   end
 
-private
+  private
 
   def set_congress_defaults
     return true unless is_congress
