@@ -19,6 +19,21 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
     super
   end
 
+  def create_secure_inbox_message(notice)
+    if notice.description == "MPI_SHOPRA"
+      body = "<br>Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}. <br> Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}. Click" +
+            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
+              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + " here " + "</a>"+"for more details"
+    elsif notice.description == "MPI_SHOPRB"
+      body = "<br>DC Health Link finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>. <br> Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}. Click" +
+        "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
+          recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" +" here "+ "</a>"+"for more details"
+    end
+
+    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
+    message.save!
+  end
+
   def build
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
