@@ -43,11 +43,11 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
 end
 
-Then(/Employee (.*) should have the renewing plan year start date as earliest effective date/) do |named_person|
+Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   census_employee = employer_profile.census_employees.where(first_name: person[:first_name], last_name: person[:last_name]).first
-  bg = (census_employee.active_benefit_group_assignment || census_employee.renewal_benefit_group_assignment).benefit_group
+  bg = plan_year == "renewing" ? census_employee.renewal_benefit_group_assignment.benefit_group : census_employee.active_benefit_group_assignment.benefit_group
   if bg.effective_on_for(census_employee.hired_on) == employer_profile.renewing_plan_year.start_on
   else
     expect(page).to have_content "Raising this failure, b'coz this else block should never be executed"
