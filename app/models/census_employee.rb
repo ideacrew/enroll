@@ -602,14 +602,27 @@ class CensusEmployee < CensusMember
 
     # Search query string on census employee with first name,last name,SSN.
     def search_hash(s_rex)
-      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      clean_str = s_rex.strip
+      search_rex = Regexp.compile(Regexp.escape(clean_str), true)
       {
           "$or" => ([
               {"first_name" => search_rex},
               {"last_name" => search_rex},
-              {"encrypted_ssn" => encrypt_ssn(s_rex)}
-          ])
+              {"encrypted_ssn" => encrypt_ssn(clean_str)}
+          ]+ additional_exprs(clean_str)
+          )
       }
+    end
+
+    def additional_exprs(clean_str)
+      additional_exprs = []
+      if clean_str.include?(" ")
+        parts = clean_str.split(" ").compact
+        first_re = Regexp.new(Regexp.escape(parts.first), true)
+        last_re = Regexp.new(Regexp.escape(parts.last), true)
+        additional_exprs << {:first_name => first_re, :last_name => last_re}
+      end
+      additional_exprs
     end
   end
 
