@@ -1453,12 +1453,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
   describe "search_hash" do
     context 'census search query' do
+
       it "should return query string for census employee name" do
         employee_search = "test1"
         expected_result = {"$or"=>[{"first_name"=>/test1/i}, {"last_name"=>/test1/i}, {"encrypted_ssn"=>"+MZq0qWj9VdyUd9MifJWpQ=="}]}
         result=CensusEmployee.search_hash(employee_search)
         expect(result).to eq expected_result
       end
+
+      it "census employee query string for full name" do
+        employee_search = "test1 test2"
+        expected_result = {"$or"=>[{"first_name"=>/test1\ test2/i}, {"last_name"=>/test1\ test2/i}, {"encrypted_ssn"=>"0m50gjJW7mR4HLnepJyFmg=="}, {:first_name=>/test1/i, :last_name=>/test2/i}]}
+        result=CensusEmployee.search_hash(employee_search)
+        expect(result).to eq expected_result
+      end
+
     end
   end
 end
