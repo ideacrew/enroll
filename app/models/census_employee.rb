@@ -137,20 +137,15 @@ class CensusEmployee < CensusMember
   def assign_default_benefit_package
 
     ### Assign Active Benefit Group Assignment
-    if employer_profile.plan_years.published.present?
-      py = employer_profile.plan_years.published.first
+    py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
+    if py.present?
       if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
         find_or_build_benefit_group_assignment(py.benefit_groups.first)
-      end
-    elsif draft_py = employer_profile.plan_years.where(aasm_state: 'draft').first
-      if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != draft_py
-        find_or_build_benefit_group_assignment(draft_py.benefit_groups.first)
       end
     end
 
     ### Assign Renewing Benefit Group Assignment
-    if employer_profile.plan_years.renewing.present?
-      py = employer_profile.plan_years.renewing.first
+    if py = employer_profile.plan_years.renewing.first
       if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
         add_renew_benefit_group_assignment(py.benefit_groups.first)
       end
