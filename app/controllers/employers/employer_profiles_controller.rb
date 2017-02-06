@@ -256,7 +256,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def generate_checkbook_urls
     @employer_profile.generate_checkbook_notices
-    flash[:notice] = "Generating and delivering checkbook notice to employer"
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
     redirect_to action: :show, :tab => :employees
   end
 
