@@ -14,7 +14,7 @@
     %website= employer.organization.home_page
   - if employer.staff_roles.any?
     %contacts
-      = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
+      = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq.sort_by { |staff| staff.user_id? ? 0 : 1 }
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
   = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if employer.broker_agency_profile
   %employer_profile
