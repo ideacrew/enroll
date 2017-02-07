@@ -25,7 +25,7 @@ namespace :report do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         census_employees.each do |census_employee|
-          if census_employee.employment_terminated_on<Date.new(2016,10,31)
+          if census_employee.employment_terminated_on<TimeKeeper.date_of_record
             employer=census_employee.employer_profile
             temp = Maybe.new(census_employee)
             person=temp.employee_role.person.extract_value
