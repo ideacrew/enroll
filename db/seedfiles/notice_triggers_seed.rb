@@ -107,7 +107,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_Out_of_pocket_notice',
-    title: 'Out of pocket calculator',
+    title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
     description: 'Out of pocket calculator notifier',
     resource_name: 'employer',
     event_name: 'out_of_pocker_url_notifier',

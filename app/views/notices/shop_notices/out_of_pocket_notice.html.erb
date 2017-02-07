@@ -1,4 +1,4 @@
-<%notice.census_employees.each do |census_employee| %>
+<%notice.benefit_group_assignments.each do |benefit_group_id| %>
   <%= render partial: 'notices/shared/logo' %>
 
   <table class="total_table" border="0">
@@ -53,7 +53,7 @@
   	<% if relationship_benefit.premium_pct >0%>
   		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
   	<%else%>
-  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: Not Available <br></	br>" %>
+  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: 0.0% <br></	br>" %>
   	<%end%>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>

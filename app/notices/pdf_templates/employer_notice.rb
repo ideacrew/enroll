@@ -25,7 +25,7 @@ module PdfTemplates
     attribute :coverage_start_on, Date
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
-    attribute :census_employees, Array
+    attribute :benefit_group_assignments, Hash
 
     def shop?
       return true
