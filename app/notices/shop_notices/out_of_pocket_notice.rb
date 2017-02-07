@@ -47,7 +47,9 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
             "<br>offerings and contributions.  Click here to download a custom set of instructions that you can  " +
             "<br>share with your eligible employees to enable them to use Plan Match to find the right health " +
             "<br>plan for them:</p>" +
-            "<br><p><u>Employee Plan Match – Instructions for Your Eligible Employees</u></p>" +
+            # "<br><p><u>Employee Plan Match – Instructions for Your Eligible Employees</u></p>" + 
+            "<br><a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + "Employee Plan Match – Instructions for Your Eligible Employees"  + "</a>" +
             "<br></p><strong>What is Plan Match? </strong> " +
             "<br>Plan Match, DC Health Link's health plan comparison tool powered by Consumers' CHECKBOOK," +
             "<br>takes your employees through a few simple steps to find the best health plan for them.</p>" +
@@ -67,9 +69,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
             "<br>available as part of your benefits offerings. </p>" +
             "<br><p><strong>Can employees enroll directly using Plan Match? </strong>" +
             "<br>Since Plan Match is an anonymous health plan comparison tool, eligible employees will still need " +
-            "<br>to log into their DCHealthLink.com employee account to quickly complete their plan selection.</p>" +
-            "<br><a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
-              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<br>to log into their DCHealthLink.com employee account to quickly complete their plan selection.</p>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
