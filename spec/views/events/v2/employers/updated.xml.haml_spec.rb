@@ -42,6 +42,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
     let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
+    let(:email) { FactoryGirl.build(:email, kind: 'work') }
+    let(:phone) {FactoryGirl.build(:phone, kind: "work")}
+    let(:staff2) { FactoryGirl.create(:person, first_name: "Jack", last_name: "Bruce", user_id: "", emails:[email], phones:[phone])}
 
     include AcapiVocabularySpecHelpers
 
@@ -53,7 +56,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
 
     before :each do
-      allow(employer).to receive(:staff_roles).and_return([staff])
+      allow(employer).to receive(:staff_roles).and_return([staff,staff2])
       render :template => "events/v2/employers/updated", :locals => { :employer => employer }
       @doc = Nokogiri::XML(rendered)
     end
@@ -62,8 +65,12 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
     end
 
-    it "should have contact email" do
-      expect(@doc.xpath("//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
+    it "should have linked contact email first" do
+      expect(@doc.xpath("//x:contacts//x:contact[1]//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
+    end
+
+    it "unlinked contact email sorted last" do
+      expect(@doc.xpath("//x:contacts//x:contact[last()]//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff2.work_email_or_best
     end
 
     it "should have shop_transfer" do
@@ -110,7 +117,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     context "person of contact" do
       it "should be included in xml" do
-        expect(rendered).to have_selector('contact', count: 1)
+        expect(rendered).to have_selector('contact', count: 2)
       end
     end
 
