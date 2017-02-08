@@ -46,7 +46,6 @@ class V2GroupXmlGenerator
 # create a hash with key as carrier and value as array [organization_xml, carrier, plan year end date, plan year start date]
 # 4 if carrier-switch then generate xml for each of the dropped carrier and add to hash.
     @feins.uniq.each do |fein|
-    @feins.each do |fein|
 
       begin
         employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
@@ -123,6 +122,12 @@ class V2GroupXmlGenerator
       node.remove
     end
     doc.xpath("//cv:plan_year[not(cv:benefit_groups)]", {:cv => XML_NS}).each do |node|
+      node.remove
+    end
+    doc.xpath("//cv:broker_agency_profile[not(cv:brokers)]", {:cv => XML_NS}).each do |node|
+      node.remove
+    end
+    doc.xpath("//cv:employer_profile/cv:brokers[not(cv:broker_account)]", {:cv => XML_NS}).each do |node|
       node.remove
     end
     employer_id = doc.at_xpath("//cv:organization/cv:id/cv:id", {:cv => XML_NS}).content
