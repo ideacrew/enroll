@@ -45,6 +45,7 @@ class V2GroupXmlGenerator
 # 3 using remove_other_carrier_nodes, remove the carrier plans of carriers other then 'carrier'
 # create a hash with key as carrier and value as array [organization_xml, carrier, plan year end date, plan year start date]
 # 4 if carrier-switch then generate xml for each of the dropped carrier and add to hash.
+    @feins.uniq.each do |fein|
     @feins.each do |fein|
 
       begin
