@@ -40,8 +40,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], aasm_state:'published',
                   created_at: Date.new)}
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-
-    let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
+    let(:user){FactoryGirl.create(:user)}
+    let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone, :user_id => user.id)}
     let(:email) { FactoryGirl.build(:email, kind: 'work') }
     let(:phone) {FactoryGirl.build(:phone, kind: "work")}
     let(:staff2) { FactoryGirl.create(:person, first_name: "Jack", last_name: "Bruce", user_id: "", emails:[email], phones:[phone])}
@@ -65,12 +65,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
     end
 
-    it "should have linked contact email first" do
-      expect(@doc.xpath("//x:contacts//x:contact[1]//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
-    end
-
-    it "unlinked contact email sorted last" do
-      expect(@doc.xpath("//x:contacts//x:contact[last()]//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff2.work_email_or_best
+    it "should need to have only linked poc contact email" do
+      expect(@doc.xpath("//x:contacts//x:contact//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
     end
 
     it "should have shop_transfer" do
@@ -116,8 +112,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     end
 
     context "person of contact" do
-      it "should be included in xml" do
-        expect(rendered).to have_selector('contact', count: 2)
+      it "should be included only linked poc in xml" do
+        expect(rendered).to have_selector('contact', count: 1)
       end
     end
 
