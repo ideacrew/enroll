@@ -105,6 +105,28 @@ shop_notice_triggers = [
       }
     ] 
   },
+
+  {
+    hbx_id: 'SHOP6',
+    title: 'Welcome to DC Health Link, Group Renewal Available',
+    description: 'Renewing Your Health Insurance Coverage for Your Small Business on November 1, 2016',
+    resource_name: 'employer',
+    event_name: 'conversion_group_renewal',
+    notice_triggers: [
+      {
+        name: 'Conversion, Group Renewal Available',
+        notice_template: 'notices/shop_notices/3b_employer_plan_year_renewal',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        mpi_indicator: 'MPI_SHOP6',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
