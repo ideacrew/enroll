@@ -27,7 +27,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
       @notice.start_on= @recipient.try(:active_plan_year).start_on
       @notice.benefit_group_assignments =  @recipient.benefit_group_assignments.group_by(&:benefit_group_id)
       @notice.legal_name= @recipient.organization.legal_name
-      @notice.metal_leval= @recipient.plan_years.order_by(:end_on => "desc").first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
+      # @notice.metal_leval= @recipient.plan_years.order_by(:end_on => "desc").first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
       @notice.benefit_group_package_name= @recipient.active_plan_year.benefit_groups.first.title
       @notice.plan_year = @recipient.try(:active_plan_year).try(:benefit_groups).first.try(:reference_plan).name
       # @notice.family_contribution= @recipient.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
