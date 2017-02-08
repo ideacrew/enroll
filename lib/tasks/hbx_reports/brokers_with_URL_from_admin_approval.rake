@@ -7,6 +7,7 @@ namespace :reports do
     task :brokers_with_URL_from_admin_approval => :environment do
       invitations=Invitation.where(role:"broker_role").all
       field_names  = %w(
+          Broker_Agency_Legal_Name
           First_Name
           Last_Name
           Email
@@ -19,7 +20,7 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
-          broker=BrokerRole.where(id: invitation.source_id).first
+          broker=BrokerRole.find(invitation.source_id).first
           unless broker.nil?
           csv << [
               broker.broker_agency_profile.try(:legal_name),
