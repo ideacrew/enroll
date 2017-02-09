@@ -3,7 +3,6 @@ require 'nokogiri'
 module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
-    binding.pry
     BASE_URL =  Settings.checkbook_services.base_url
     def initialize(census_employee)
       @census_employee= census_employee
