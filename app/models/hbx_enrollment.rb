@@ -1129,7 +1129,7 @@ class HbxEnrollment
                     to: :void,
                  guard: :termination_attributes_cleared?
 
-      transitions from: [:shopping, :coverage_selected, :coverage_enrolled, :transmitted_to_carrier, :coverage_enrolled,
+      transitions from: [:shopping, :coverage_selected, :coverage_enrolled, :transmitted_to_carrier,
                           :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
                           :auto_renewing, :renewing_waived, :renewing_coverage_selected,
                           :renewing_transmitted_to_carrier, :renewing_coverage_enrolled,
