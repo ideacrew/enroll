@@ -43,10 +43,21 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
 end
 
-Then(/Employee (.*) should see renewing plan year start date as earliest effective date/) do |named_person|
+Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  find('label', text: "Enroll as an employee of #{employer_profile.legal_name} with coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}.")
+  census_employee = employer_profile.census_employees.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  bg = plan_year == "renewing" ? census_employee.renewal_benefit_group_assignment.benefit_group : census_employee.active_benefit_group_assignment.benefit_group
+  if bg.effective_on_for(census_employee.hired_on) == employer_profile.renewing_plan_year.start_on
+  else
+    expect(page).to have_content "Raising this failure, b'coz this else block should never be executed"
+  end
+end
+
+Then(/Employee (.*) should not see earliest effective date on the page/) do |named_person|
+  person = people[named_person]
+  employer_profile = EmployerProfile.find_by_fein(person[:fein])
+  expect(page).not_to have_content "coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}."
 end
 
 And(/(.*) already matched and logged into employee portal/) do |named_person|
