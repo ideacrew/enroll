@@ -74,7 +74,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
             :plan =>{"update"=>{}}, 
             :hbx_enrollment_members =>{
               "update"=>{"hbx_id:#{primary.hbx_id}"=>{}}, 
-              "add"=>{"hbx_id"=>{"hbx_id"=>spouse.hbx_id, "is_subscriber"=>false, "coverage_start_on"=> Date.new(2016,1,1), "coverage_end_on"=>Date.new(2016,1,31)}}
+              "add"=>{"hbx_id"=>{"hbx_id"=>spouse.hbx_id, "is_subscriber"=>false, "coverage_start_on"=> Date.new(TimeKeeper.date_of_record.year,1,1), "coverage_end_on"=>Date.new(TimeKeeper.date_of_record.year,1,31)}}
             }
           }
         }
