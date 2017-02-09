@@ -3,6 +3,7 @@ require 'nokogiri'
 module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
+    binding.pry
     BASE_URL =  Settings.checkbook_services.base_url
     def initialize(census_employee)
       @census_employee= census_employee
@@ -10,22 +11,22 @@ module CheckbookServices
     end
 
     def generate_url
-      begin
-      puts construct_body.to_json
-      # byebug
-      @result = HTTParty.post(@url,
-              :body => construct_body.to_json,
-              :headers => { 'Content-Type' => 'application/json' } )
-      @doc=Nokogiri::HTML(@result.parsed_response)
-      uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
-      if uri.present?
-        return BASE_URL+uri.first.value
-      else
-        raise "Unable to generate url"
-      end
-      rescue Exception => e
-        puts "Exception #{e}"
-      end
+      # begin
+      # # puts construct_body.to_json
+      # # binding.pry
+      # @result = HTTParty.post(@url,
+      #         :body => construct_body.to_json,
+      #         :headers => { 'Content-Type' => 'application/json' } )
+      # @doc=Nokogiri::HTML(@result.parsed_response)
+      # uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
+      # if uri.present?
+      #   return BASE_URL+uri.first.value
+      # else
+      #   raise "Unable to generate url"
+      # end
+      # rescue Exception => e
+      #   puts "Exception #{e}"
+      # end
     end
 
     private
