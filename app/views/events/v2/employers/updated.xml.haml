@@ -13,8 +13,10 @@
   - if !employer.organization.home_page.blank?
     %website= employer.organization.home_page
   - if employer.staff_roles.any?
+  - linked_staff = employer.staff_roles.uniq.select(&:user_id)
+  - staff_roles = linked_staff.present? ? linked_staff : employer.staff_roles.uniq
     %contacts
-      = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
+      = render :partial => "events/v2/employers/owner_contact", :collection => staff_roles.sort_by(&:created_at).reverse!
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
   = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if employer.broker_agency_profile
   %employer_profile
