@@ -39,6 +39,7 @@
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "1.Your employer's plan year start date  : #{notice.start_on}"} %>
+  
   <% plan_offering = if benefit_groups.first.benefit_group.plan_option_kind == "single_carrier"
       'All Plans From A Single Carrier'
     elsif benefit_groups.first.benefit_group.plan_option_kind  == "metal_level" 
@@ -58,11 +59,7 @@
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
   <% premium_benefit_contributions = "" ; notice.family_contribution.each do |relationship_benefit| %>
-  	<% if relationship_benefit.premium_pct >0%>
-  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
-  	<%else%>
-  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: 0.0% <br></	br>" %>
-  	<%end%>
+		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
   <div class="page-break-before"/>
