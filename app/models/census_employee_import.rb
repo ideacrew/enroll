@@ -7,8 +7,8 @@ class CensusEmployeeImport
 
   validate :check_relationships
 
-  TEMPLATE_DATE = Date.new(2015, 9, 6)
-  TEMPLATE_VERSION = "1.0"
+  TEMPLATE_DATE = Date.new(2016, 10, 26)
+  TEMPLATE_VERSION = "1.1"
   TEMPLATE_DATE_CELL = 7
   TEMPLATE_VERSION_CELL = 13
 
@@ -32,21 +32,23 @@ class CensusEmployeeImport
       plan_year
       kind
       address_1
+      address_2
       city
       state
       zip
+      newly_designated
     )
 
   CENSUS_MEMBER_RECORD_TITLES = [
-      "Family ID #(to match family members to the EE)",
+      "Family ID #(to match family members to the EE & each household gets a unique number)",
       "Relationship(EE, Spouse, Domestic Partner, or Child)",
       "Last Name",
       "First Name",
       "Middle Name or Initial(optional)",
       "Suffix(optional)",
       "Email Address",
-      "SSN / TIN(Required for EE)",
-      "Date of Birth",
+      "SSN / TIN(Required for EE & enter without dashes)",
+      "Date of Birth(MM/DD/YYYY)",
       "Gender",
       "Date of Hire",
       "Date of Termination(optional)",
@@ -55,6 +57,7 @@ class CensusEmployeeImport
       "Plan Year(Optional)",
       "Address Kind(Optional)",
       "Address Line 1(Optional)",
+      "Address Line 2(Optional)",
       "City(Optional)",
       "State(Optional)",
       "Zip(Optional)"
@@ -87,7 +90,9 @@ class CensusEmployeeImport
     @imported_census_employees ||= load_imported_census_employees
     @imported_census_employees.compact!
     @imported_census_employees.each do |census_employee|
-      census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
+      if census_employee.is_a? CensusEmployee
+        census_employee.errors.add :base, "Email is required" if census_employee.email.blank?
+      end
     end
     @imported_census_employees
   end
@@ -98,7 +103,6 @@ class CensusEmployeeImport
 
     @sheet = @roster.sheet(0)
     @last_ee_member = {}
-
     # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references
     # First three rows are header content
     sheet_header_row = @sheet.row(1)
@@ -113,7 +117,6 @@ class CensusEmployeeImport
     (4..@sheet.last_row).each_with_index.map do |i, index|
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
-
       if record[:termination_date].present?
         census_employee = terminate_employee(record)
       else
@@ -122,6 +125,18 @@ class CensusEmployeeImport
           break
         else
           census_employee = add_or_update_census_member(record)
+        end
+      end
+
+      if record[:newly_designated] == '1'
+        begin
+          census_employee.newly_designate
+        rescue Exception => e
+          self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+        end
+      elsif record[:newly_designated] == '0'
+        if census_employee.may_rebase_new_designee?
+          census_employee.rebase_new_designee
         end
       end
 
@@ -189,7 +204,7 @@ class CensusEmployeeImport
     member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
     member.employer_profile = @employer_profile
     assign_benefit_group(member, record[:benefit_group], record[:plan_year])
-    address = Address.new({kind:record[:kind], address_1: record[:address_1], city: record[:city],
+    address = Address.new({kind:'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
                            state: record[:state], zip: record[:zip] })
     member.address = address if address.valid?
     member
@@ -200,11 +215,13 @@ class CensusEmployeeImport
       py.start_on.year.to_s == plan_year
     end
     return if plan_year_found.nil?
+    return if benefit_group.nil?
     benefit_group_found = plan_year_found.benefit_groups.detect do |bg|
       bg.title.casecmp(benefit_group) == 0
     end
     return if benefit_group_found.nil?
     member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id , start_on: plan_year_found.start_on})
+    member.benefit_group_assignments.last.make_active
   end
 
   def parse_row(row)
@@ -225,9 +242,11 @@ class CensusEmployeeImport
     plan_year = parse_text(row["plan_year"])
     kind = parse_text(row["kind"])
     address_1 = parse_text(row["address_1"])
+    address_2 = parse_text(row["address_2"])
     city = parse_text(row["city"])
     state = parse_text(row["state"])
     zip = parse_text(row["zip"])
+    newly_designated = parse_boolean(row["newly_designated"])
     {
         employer_assigned_family_id: employer_assigned_family_id,
         employee_relationship: employee_relationship,
@@ -246,9 +265,11 @@ class CensusEmployeeImport
         plan_year: plan_year,
         kind: kind,
         address_1: address_1,
+        address_2: address_2,
         city: city,
         state: state,
-        zip: zip
+        zip: zip,
+        newly_designated: newly_designated
     }
   end
 
@@ -264,7 +285,7 @@ class CensusEmployeeImport
 
   def column_header_valid?(column_header_row)
     clean_header = column_header_row.reduce([]) { |memo, header_text| memo << sanitize_value(header_text) }
-    clean_header == CENSUS_MEMBER_RECORD
+    clean_header == CENSUS_MEMBER_RECORD || clean_header == CENSUS_MEMBER_RECORD[0..-2]
   end
 
   def parse_relationship(cell)
@@ -322,9 +343,8 @@ class CensusEmployeeImport
   end
 
   def save
-
     if imported_census_employees.map(&:valid?).all?
-      if !self.valid?
+      if !self.valid? || self.errors.present?
         return false
       end
 

@@ -36,12 +36,14 @@ gem 'font-awesome-rails', '4.5.0.1'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'nokogiri', '1.6.7.2'
 
-gem 'mongoid', '5.0.1'
 gem 'mongo', '2.1.2'
+gem 'mongoid', '5.0.1'
+gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", branch: "master"
+# gem 'mongoid-history', '~> 5.1.0'
+gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "mongoid-autoinc"
 gem 'mongoid-versioning'
-
 gem 'money-rails', '~> 1.3.0'
 gem "mongoid-enum"
 gem 'mongo_session_store-rails4', '~> 6.0.0'
@@ -56,6 +58,9 @@ gem 'symmetric-encryption', '~> 3.6.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
+
+#For Background jobs
+gem 'resque'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
@@ -97,6 +102,7 @@ gem 'wicked_pdf', '1.0.6'
 gem "recaptcha", '1.1.0'
 
 gem 'jquery-datatables-rails', '3.4.0'
+gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
@@ -139,11 +145,12 @@ group :test do
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'poltergeist'
   gem 'capybara-screenshot'
-  gem 'database_cleaner', '1.5.1'
+  gem 'database_cleaner', '1.5.3'
   gem 'shoulda-matchers', '3.1.1'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'warden'
+  gem 'fakeredis', :require => 'fakeredis/rspec'
 end
 
 group :production do
