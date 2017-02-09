@@ -1,4 +1,4 @@
-<%notice.census_employees.each do |census_employee| %>
+<%notice.benefit_group_assignments.each do |benefit_group_id,benefit_groups| %>
   <%= render partial: 'notices/shared/logo' %>
 
   <table class="total_table" border="0">
@@ -39,9 +39,18 @@
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "1.Your employer's plan year start date  : #{notice.start_on}"} %>
+  
+  <% plan_offering = if benefit_groups.first.benefit_group.plan_option_kind == "single_carrier"
+      'All Plans From A Single Carrier'
+    elsif benefit_groups.first.benefit_group.plan_option_kind  == "metal_level" 
+     'All Plans From A Given Metal Level'
+    elsif benefit_groups.first.benefit_group.plan_option_kind == "single_plan" 
+      'A Single Plan'
+    end %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "2.Your employer's plan offerings  : #{notice.metal_leval.capitalize.titleize}"} %>
+  content: "2.Your employer's plan offerings  : #{plan_offering.capitalize.titleize}"} %>
+
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums  : #{notice.carrier} - #{notice.plan_year} "} %>
@@ -50,11 +59,7 @@
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
   <% premium_benefit_contributions = "" ; notice.family_contribution.each do |relationship_benefit| %>
-  	<% if relationship_benefit.premium_pct >0%>
-  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
-  	<%else%>
-  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: Not Available <br></	br>" %>
-  	<%end%>
+		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
   <div class="page-break-before"/>
