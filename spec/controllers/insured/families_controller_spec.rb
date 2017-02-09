@@ -23,6 +23,33 @@ RSpec.describe Insured::FamiliesController do
       expect(response).to be_redirect
     end
   end
+
+  context "#check_for_address_info" do
+    let(:user) { double("User") }
+    let(:person) { double("Person", user: user) }
+    let(:family) { double("Family") }
+    let(:consumer_role) { double("ConsumerRole") }
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:identity_verified?).and_return(false)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(person).to receive(:active_employee_roles).and_return([])
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:addresses).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to ridp page if user has not verified identity" do
+      get :home
+      expect(response).to redirect_to("/insured/consumer_role/ridp_agreement")
+    end
+  end
+
   context "set_current_user  as agent" do
     let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com', person: person) }
     let(:person) { FactoryGirl.create(:person) }

@@ -1143,6 +1143,7 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :coverage_selected
       transitions from: :coverage_selected, to: :coverage_selected
       transitions from: :auto_renewing, to: :auto_renewing
+      transitions from: :coverage_expired, to: :coverage_expired
     end
 
     event :move_to_contingent!, :after => :record_transition do
@@ -1156,6 +1157,7 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
       transitions from: :auto_renewing, to: :enrolled_contingent
+      transitions from: :coverage_expired, to: :coverage_expired
     end
 
     event :move_to_pending!, :after => :record_transition do
@@ -1169,6 +1171,7 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified
+      transitions from: :coverage_expired, to: :coverage_expired
     end
 
     event :force_select_coverage, :after => :record_transition do

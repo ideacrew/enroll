@@ -321,7 +321,7 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && (!@person.user.identity_verified? && !@person.user.idp_verified?)
+      elsif @person.user && !@person.user.identity_verified? 
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end

@@ -31,13 +31,13 @@ class HbxAdminController < ApplicationController
 
   def update_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
-    #year = (params[:year] || TimeKeeper.date_of_record.year).to_i
-    year = params[:year]
+    year = params[:person][:current_year].to_i
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
     @hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(year.to_i)
+    @household_info = Admin::Aptc.build_household_level_aptc_csr_data(year, @family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage])
     if @family.present? #&& TimeKeeper.date_of_record.year == year
-      @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs)
+      @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, year)
       @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(params)
     end
     respond_to do |format|
