@@ -10,11 +10,12 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Plan Name</th>
-              <th>Plan Premium</th>
-              <th>Applied APTC</th>
-              <th>Effective On</th>
-              <th>Terminated On</th>
+              <th>Name</th>
+              <th>Premium</th>
+              <th>APTC</th>
+              <th>Effective</th>
+              <th>Term. On</th>
+              <th>State</th>
             </tr>
           </thead>
           <tbody>
@@ -24,7 +25,9 @@
                 <td><%=number_to_currency(hbx.total_premium)%></td>
                 <td><%=number_to_currency(hbx.applied_aptc_amount.to_f)%></td>
                 <td><%=hbx.effective_on%></td>
-                <td><%=hbx.terminated_on || "Active"%></td>
+                <td><%=hbx.terminated_on || "--"%></td>
+                <td><%=hbx.aasm_state.titleize%></td>
+
               </tr>
             <%end%>
           </tbody>
