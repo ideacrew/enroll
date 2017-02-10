@@ -57,11 +57,7 @@ module Effective
 
       def aptc_csr_link_type(family, allow)
         # Only Enable editing APTC for 2017 now.
-        if family.active_household.latest_active_tax_household_with_year(2017).present?
-          family.active_household.latest_active_tax_household_with_year(2017).latest_eligibility_determination.max_aptc > 0 && allow ? 'ajax' : 'disabled'
-        else
-          'disabled'
-        end
+        family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
       end
 
       def add_sep_link_type(allow)
