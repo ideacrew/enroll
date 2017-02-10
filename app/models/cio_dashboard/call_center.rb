@@ -2,9 +2,9 @@ module CioDashboard
   class CallCenter
     include Mongoid::Document
     store_in collection: "cioDashboard"
-    field :received_value, type: String
-    field :answered_value, type: String
-    field :abandoned_value, type: String
+    field :received_value, type: Integer
+    field :answered_value, type: Integer
+    field :abandoned_value, type: Integer
     field :avg_wait_value, type: String
     field :max_wait_value, type: String
     
