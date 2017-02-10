@@ -408,7 +408,7 @@ module Importers
     end
 
     def cancel_other_enrollments_for_bga(bga)
-      enrollments = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bga)
+      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
       enrollments.each do |en|
         en.hbx_enrollment_members.each do |hen|
            hen.coverage_end_on = hen.coverage_start_on
