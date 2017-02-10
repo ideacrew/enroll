@@ -525,6 +525,7 @@ class CensusEmployee < CensusMember
 
   def update_for_cobra(cobra_date)
     self.cobra_begin_date = cobra_date
+    self.elect_cobra
     self.save
   rescue => e
     false
