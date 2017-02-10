@@ -57,6 +57,7 @@ gem 'symmetric-encryption', '~> 3.6.0'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
+gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
 
 #For Background jobs
 gem 'resque'
