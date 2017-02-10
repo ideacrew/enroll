@@ -525,7 +525,6 @@ class CensusEmployee < CensusMember
 
   def update_for_cobra(cobra_date)
     self.cobra_begin_date = cobra_date
-    self.
     self.save
   rescue => e
     false
@@ -538,6 +537,7 @@ class CensusEmployee < CensusMember
   def benefit_group_assignments_for_cobra
     # 6 months buffer between create date and open enrollment start date indicates this is most likely a conversion and should not be picked up.
     benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year && employer_profile.published_plan_year.created_at < (employer_profile.published_plan_year.open_enrollment_start_on + 6.months)) }
+    ce.benefit_group_assignments.select { |bga| (bga == ce.renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year && employer_profile.published_plan_year.created_at < (employer_profile.published_plan_year.open_enrollment_start_on + 6.months)) }
   end
 
   def build_hbx_enrollment_for_cobra
