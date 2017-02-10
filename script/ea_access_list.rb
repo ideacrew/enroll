@@ -9,7 +9,7 @@
   processed_count = 0
   
   CSV.open(file_name, "w", force_quotes: true) do |csv|
-    csv << ["User Id", "User's Name", "Roles", "Created Date", "Last Login Date"]
+    csv << ["User Id", "User's Name", "OIM ID", "Email" ,"Roles", "Created Date", "Last Login Date"]
     while offset < user_count
       User.offset(offset).limit(batch_size).each do |user|
         if processed_count % 1000 == 0
@@ -18,9 +18,9 @@
         begin
           person = user.person
           if person.nil?
-            csv << ["No person record found", "No person record", user.roles, user.created_at, user.last_sign_in_at]
+            csv << ["No person record found", "No person record", user.oim_id, user.email, user.roles, user.created_at, user.last_sign_in_at]
           else
-            csv << [user.person.hbx_id, user.person.full_name, user.roles, user.created_at, user.last_sign_in_at]
+            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.roles, user.created_at, user.last_sign_in_at]
           end
         rescue Exception => e
           puts "Errors #{e} #{e.backtrace}"
