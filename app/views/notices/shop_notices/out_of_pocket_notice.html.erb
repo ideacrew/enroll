@@ -58,7 +58,9 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
-  <% premium_benefit_contributions = "" ; notice.family_contribution.each do |relationship_benefit| %>
+  <%family_benefits = benefit_groups.first.benefit_group.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
+
+  <% premium_benefit_contributions = "" ; family_benefits.each do |relationship_benefit| %>
 		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
