@@ -23,7 +23,7 @@
     %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.entity_kind}"
     - if !employer.sic_code.blank?
       %sic_code= employer.sic_code
-    - if employer.broker_agency_accounts.present?
+    - if employer.broker_agency_accounts.unscoped.present?
       %brokers
         = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts.unscoped,
         :locals => { :employer_profile => employer }
