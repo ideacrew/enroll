@@ -12,7 +12,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee Soren White should see renewing plan year start date as earliest effective date
+      Then Employee Soren White should have the renewing plan year start date as earliest effective date
+      And Employee Soren White should not see earliest effective date on the page
 
   Scenario: New Hire can't buy coverage before open enrollment of renewing plan year through Shop for Plans
     Given Conversion Employer for Soren White exists with active and renewing plan year
@@ -66,7 +67,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee Soren White should see renewing plan year start date as earliest effective date
+      Then Employee Soren White should have the renewing plan year start date as earliest effective date
+      Then Employee Soren White should not see earliest effective date on the page
 
   Scenario: Existing Employee can't buy coverage before open enrollment of renewing plan year
      Given Conversion Employer for Soren White exists with active and renewing plan year

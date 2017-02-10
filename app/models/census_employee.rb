@@ -525,7 +525,7 @@ class CensusEmployee < CensusMember
 
   def update_for_cobra(cobra_date)
     self.cobra_begin_date = cobra_date
-    self.elect_cobra
+    self.
     self.save
   rescue => e
     false
@@ -536,7 +536,8 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_group_assignments_for_cobra
-    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year) }
+    # 6 months buffer between create date and open enrollment start date indicates this is most likely a conversion and should not be picked up.
+    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year && employer_profile.published_plan_year.created_at < (employer_profile.published_plan_year.open_enrollment_start_on + 6.months)) }
   end
 
   def build_hbx_enrollment_for_cobra
@@ -727,9 +728,9 @@ class CensusEmployee < CensusMember
       transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
 
-    event :reinstate_eligibility, :after => [:record_transition] do 
+    event :reinstate_eligibility, :after => [:record_transition] do
       transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
-      transitions from: :employment_terminated,  to: :eligible 
+      transitions from: :employment_terminated,  to: :eligible
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated, to: :cobra_eligible
     end
