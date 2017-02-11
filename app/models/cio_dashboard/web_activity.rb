@@ -2,10 +2,10 @@ module CioDashboard
   class WebActivity
     include Mongoid::Document
     store_in collection: "cioDashboard"
-    field :apdex_value, type: String
+    field :apdex_value, type: Integer
     field :page_views_value, type: String
-    field :new_visitors_value, type: String
-    field :return_visitors_value, type: String
+    field :new_visitors_value, type: Integer
+    field :return_visitors_value, type: Integer
     field :load_time_value, type: String
     field :avg_session_value, type: String
     

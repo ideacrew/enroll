@@ -5,7 +5,7 @@ module CioDashboard
     field :tile, type: String
     field :row_indicator, type: String
     field :carrier, type: String
-    field :amount, type: String
+    field :amount, type: Integer
     field :month_change_value, type: String
     field :month_change_indicator, type: String
     field :year_change_value,type: String
