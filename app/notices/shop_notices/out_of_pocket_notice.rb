@@ -25,7 +25,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
 
   def build
       @notice.start_on= @recipient.try(:show_plan_year).start_on
-      @notice.benefit_group_assignments =  @recipient.benefit_group_assignments.group_by(&:benefit_group_id)
+      @notice.benefit_group_assignments =  @recipient.census_employees.map(&:active_benefit_group_assignment).compact.group_by(&:benefit_group_id)
       @notice.legal_name= @recipient.organization.legal_name
       # @notice.metal_leval= @recipient.plan_years.order_by(:end_on => "desc").first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
       @notice.benefit_group_package_name= @recipient.show_plan_year.benefit_groups.first.title
