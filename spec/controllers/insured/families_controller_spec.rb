@@ -836,3 +836,35 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 end
+
+RSpec.describe Insured::FamiliesController do
+  let(:hbx_enrollment) { HbxEnrollment.new }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:bucket_name) { 'tax-documents' }
+  let(:key) {"sample-key"}
+  let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}" }
+  let(:params) { {family: {identifier: doc_id}} }
+  
+    context "Failed Download" do
+      it "fails with an error message" do
+        allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+        allow(person).to receive(:primary_family).and_return(family)
+        sign_in(user)
+        get :download_tax_documents, identifier: ''
+        expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
+      end
+    end
+
+    context "Successful Download" do
+      it "downloads successfully without error message" do
+        allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+        allow(person).to receive(:primary_family).and_return(family)
+        sign_in(user)
+        get :download_tax_documents, identifier: doc_id
+        expect(flash[:error]).to be_nil
+        expect(response.status).to eq(200)
+      end
+    end
+  end

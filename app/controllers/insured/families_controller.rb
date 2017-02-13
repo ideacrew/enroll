@@ -238,6 +238,24 @@ class Insured::FamiliesController < FamiliesController
     @notices = @person.documents.where(subject: 'notice')
   end
 
+  def download_tax_documents_form
+    
+  end
+
+  def download_tax_documents
+   if params[:identifier].split("tax_documents#")[1].present?
+     uri = params[:identifier].split("tax_documents#")[1]
+     send_data Aws::S3Storage.find(uri), filename: params[:title]
+  
+   elsif params[:identifier].present?
+     uri = params[:identifier]
+     send_data Aws::S3Storage.find(uri)
+   else
+     flash[:error] = "File does not exist or you are not authorized to access it."
+     redirect_to download_tax_documents_form_insured_families_path
+   end
+ end
+
   def delete_consumer_broker
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy

@@ -1250,6 +1250,32 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
   end
 end
 
+describe Family, ".tax_documents", dbclean: :after_each do
+  let(:family) { FactoryGirl.build(:family)}
+
+  context "had no tax documents" do
+    before do
+      family.documents = []
+    end
+
+    it "should return no documents" do
+      expect(family.tax_documents).to eq([])
+    end
+  end
+
+  context "had a tax document" do
+    let(:tax_document) { FactoryGirl.build(:tax_document)}
+
+    before do
+      family.documents = [tax_document]
+    end
+
+    it "should return 1 documents" do
+      expect(family.tax_documents).to eq([tax_document])
+    end
+  end
+end
+
 describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
 
@@ -1297,32 +1323,6 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     it "should begin coverage on dental passive renewal" do
       enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'dental').first
       expect(enrollment.coverage_selected?).to be_truthy
-    end
-  end
-end
-
-describe Family, ".tax_documents", dbclean: :after_each do
-  let(:family) { FactoryGirl.build(:family)}
-
-  context "had no tax documents" do
-    before do
-      family.documents = []
-    end
-
-    it "should return no documents" do
-      expect(family.tax_documents).to eq([])
-    end
-  end
-
-  context "had a tax document" do
-    let(:tax_document) { FactoryGirl.build(:tax_document)}
-
-    before do
-      family.documents = [tax_document]
-    end
-
-    it "should return 1 documents" do
-      expect(family.tax_documents).to eq([tax_document])
     end
   end
 end
