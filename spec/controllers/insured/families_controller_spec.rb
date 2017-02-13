@@ -24,32 +24,6 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  context "#check_for_address_info" do
-    let(:user) { double("User") }
-    let(:person) { double("Person", user: user) }
-    let(:family) { double("Family") }
-    let(:consumer_role) { double("ConsumerRole") }
-
-    before :each do
-      allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:identity_verified?).and_return(false)
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
-      allow(person).to receive(:has_active_employee_role?).and_return(false)
-      allow(person).to receive(:has_active_consumer_role?).and_return(true)
-      allow(person).to receive(:primary_family).and_return(family)
-      allow(person).to receive(:active_employee_roles).and_return([])
-      allow(person).to receive(:consumer_role).and_return(consumer_role)
-      allow(person).to receive(:addresses).and_return(true)
-      sign_in user
-    end
-
-    it "should redirect to ridp page if user has not verified identity" do
-      get :home
-      expect(response).to redirect_to("/insured/consumer_role/ridp_agreement")
-    end
-  end
-
   context "set_current_user  as agent" do
     let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com', person: person) }
     let(:person) { FactoryGirl.create(:person) }
@@ -122,6 +96,37 @@ RSpec.describe Insured::FamiliesController do
       allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
 
       session[:portal] = "insured/families"
+    end
+
+    context "#check_for_address_info" do
+      before :each do
+        allow(person).to receive(:user).and_return(user)
+        allow(user).to receive(:identity_verified?).and_return(false)
+        allow(person).to receive(:has_active_employee_role?).and_return(false)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:active_employee_roles).and_return([])
+        allow(person).to receive(:employee_roles).and_return([])
+        allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
+        allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        sign_in user
+      end
+
+      it "should redirect to ridp page if user has not verified identity" do
+        get :home
+        expect(response).to redirect_to("/insured/consumer_role/ridp_agreement")
+      end
+
+      it "should redirect to edit page if user do not have addresses" do
+        allow(person).to receive(:addresses).and_return []
+        get :home
+        expect(response).to redirect_to(edit_insured_consumer_role_path(consumer_role))
+      end
+
+      it "should not redirect to ridp page through paper application although user has not verified identity" do
+        get :home, session[:original_application_type] = 'paper'
+        expect(response).not_to redirect_to("/insured/consumer_role/ridp_agreement")
+      end
     end
 
     context "for SHOP market" do
