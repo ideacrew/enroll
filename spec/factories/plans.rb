@@ -109,6 +109,7 @@ FactoryGirl.define do
     factory :active_shop_health_plan,             traits: [:shop_health, :this_year, :with_premium_tables]
     factory :active_individual_dental_plan,       traits: [:individual_dental, :this_year, :with_premium_tables]
     factory :active_individual_catastophic_plan,  traits: [:catastrophic, :this_year, :with_premium_tables]
+
     factory :active_csr_87_plan,                  traits: [:csr_87, :this_year, :with_premium_tables]
     factory :active_csr_00_plan,                  traits: [:csr_00, :this_year, :with_premium_tables]
 
