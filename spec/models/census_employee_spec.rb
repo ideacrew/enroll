@@ -105,13 +105,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
       end
-      
+
       it "allow dependent ssn's to be updated to nil" do
         initial_census_employee.census_dependents = [dependent]
         initial_census_employee.save!
         expect(initial_census_employee.census_dependents.first.ssn).to match(nil)
       end
-      
+
       it "ignores depepent ssn's if ssn not nil" do
         initial_census_employee.census_dependents = [dependent2]
         initial_census_employee.save!
@@ -128,11 +128,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-      
+
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
-        
+
         it "should not have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.valid?).to be_truthy
@@ -148,7 +148,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-      
+
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -332,6 +332,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                             it "should return the existing state of the census employee if today's date > termination date" do
                               initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employment_terminated")
                               CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 3.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should also terminate the census employees if termination date is in the past" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record - 3.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record)
                               expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
                             end
                           end
@@ -615,20 +621,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
-
-  context "a plan year application is submitted" do
-    before do
-      plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day if plan_year.open_enrollment_start_on = TimeKeeper.date_of_record
-      plan_year.publish!
-    end
-
-    it "should be in published status" do
-      expect(plan_year.aasm_state).to eq "published"
-    end
-  end
-
+  
   context "validation for employment_terminated_on" do
-    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year)}
+    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year - 50.days)}
 
     it "should fail when terminated date before than hired date" do
       census_employee.employment_terminated_on = census_employee.hired_on - 10.days
@@ -643,7 +638,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     it "should success" do
-      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 20.days
+      census_employee.employment_terminated_on = TimeKeeper.date_of_record - 1.day
       expect(census_employee.valid?).to be_truthy
       expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
     end
@@ -825,6 +820,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+    let(:hbx_enrollment_two) { HbxEnrollment.new(coverage_kind: 'dental') }
 
     it "should return false without benefit_group_assignment" do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
@@ -837,17 +833,103 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return false without hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return []
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
       end
 
       it "should return true when has health hbx_enrollment" do
-        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return [hbx_enrollment]
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
+      end
+
+      it "should return true when has both health & dental enrollments" do
+        allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).and_return [hbx_enrollment, hbx_enrollment_two]
         expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
       end
     end
   end
 
+  context "terminating census employee on the roster & actions on existing enrollments", dbclean: :after_each do
+
+    context "change the aasm state & populates terminated on of enrollments" do
+      let(:census_employee) { FactoryGirl.create(:census_employee) }
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health') }
+      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'dental') }
+      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'renewing_waived') }
+
+      before do
+        allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment, hbx_enrollment_two, hbx_enrollment_three], [])
+      end
+
+      termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]
+      termination_dates.each do |terminated_on|
+
+        context 'move the enrollment aasm state to pending status' do
+
+          before do
+            census_employee.terminate_employment!(terminated_on)
+          end
+
+          it "should move the health enrollment to pending status if effective date is in past" do
+            expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+          end
+
+          it "should set the coverage termination on date on the health enrollment" do
+            expect(hbx_enrollment.terminated_on).to eq census_employee.earliest_coverage_termination_on(terminated_on)
+          end
+
+          it "should move the dental enrollment to pending status if effective date is in past" do
+            expect(hbx_enrollment_two.aasm_state).to eq 'coverage_termination_pending'
+          end
+
+          it "should set the coverage termination on date on the dental enrollment" do
+            expect(hbx_enrollment_two.terminated_on).to eq census_employee.earliest_coverage_termination_on(terminated_on)
+          end
+        end
+
+        context 'move the enrollment aasm state to cancel status' do
+
+          before do
+            hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
+            hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
+            census_employee.terminate_employment!(terminated_on)
+          end
+
+          it "should cancel the health enrollment if effective date is in future" do
+            expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+          end
+
+          it "should set the coverage termination on date on the health enrollment" do
+            expect(hbx_enrollment.terminated_on).to eq nil
+          end
+
+          it "should cancel the dental enrollment if effective date is in future" do
+            expect(hbx_enrollment_two.aasm_state).to eq 'coverage_canceled'
+          end
+
+          it "should set the coverage termination on date on the dental enrollment" do
+            expect(hbx_enrollment_two.terminated_on).to eq nil
+          end
+        end
+
+        context 'move to enrollment aasm state to inactive state' do
+
+          before do
+            census_employee.terminate_employment!(terminated_on)
+          end
+
+          it "should move the waived enrollment to inactive state" do
+            expect(hbx_enrollment_three.aasm_state).to eq 'inactive'
+          end
+
+          it "should set the coverage termination on date on the dental enrollment" do
+            expect(hbx_enrollment_three.terminated_on).to eq nil
+          end
+        end
+      end
+    end
+  end
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}
@@ -1031,7 +1113,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context '.find_or_build_benefit_group_assignment' do
-    
+
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
@@ -1058,7 +1140,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:census_employee) { CensusEmployee.create(**valid_params) }
 
     before do
-      census_employee.benefit_group_assignments.each{|bg| bg.delete} 
+      census_employee.benefit_group_assignments.each{|bg| bg.delete}
     end
 
     context 'when benefit group assignment with benefit group already exists' do
@@ -1211,14 +1293,22 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       )
     }
 
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: shop_family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
+
     context 'when current and renewing coverages present' do
 
-      it 'should return both active and renewing coverages' do 
+      it 'should return both active and renewing coverages' do
         expect(census_employee.enrollments_for_display).to eq [health_enrollment,dental_enrollment,auto_renewing_enrollment]
       end
     end
   end
-  
+
   context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
     let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
     let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
@@ -1342,6 +1432,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       context "and new plan year begins, ending 'newly designated' status" do
+        let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
           TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
@@ -1359,5 +1450,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
 
+  end
+  describe "search_hash" do
+    context 'census search query' do
+      it "should return query string for census employee name" do
+        employee_search = "test1"
+        expected_result = {"$or"=>[{"first_name"=>/test1/i}, {"last_name"=>/test1/i}, {"encrypted_ssn"=>"+MZq0qWj9VdyUd9MifJWpQ=="}]}
+        result=CensusEmployee.search_hash(employee_search)
+        expect(result).to eq expected_result
+      end
+    end
   end
 end

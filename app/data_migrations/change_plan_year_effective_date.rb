@@ -24,6 +24,7 @@ class ChangePlanYearEffectiveDate < MongoidMigrationTask
         end
       end
       if plan_year.save!
+        Rake::Task["migrations:correct_invalid_benefit_group_assignments_for_employer"].invoke unless Rails.env.test?
         puts "Plan Year Saved!!" unless Rails.env.test?
         plan_year.force_publish! if plan_year.may_force_publish?
       else
