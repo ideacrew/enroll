@@ -16,11 +16,10 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
 
   def deliver
     build
-    create_inbox_message(notice)
     super
   end
 
-  def create_inbox_message(notice)
+  def create_secure_inbox_message(notice)
     if notice.description == "MPI_SHOPRA"
       body = "<br>Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}. <br> Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}. Click" +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
