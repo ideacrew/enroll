@@ -67,13 +67,13 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "patch update" do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }
-    let(:org) { double("Organization", id: "test") }
-
+    let(:org) { FactoryGirl.create(:organization)}
+    let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
-      allow(Organization).to receive(:find).and_return(org)
       allow(controller).to receive(:sanitize_broker_profile_params).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
     end
 
     it "should success with valid params" do
@@ -89,6 +89,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       #expect(response).to render_template("edit")
       #expect(response).to have_http_status(:redirect)
       #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
+    end
+
+    it "should update record" do
+      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates"}
+      broker_agency_profile.primary_broker_role.person.reload
+      expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
   end
 
@@ -213,31 +219,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       families[2].primary_applicant.person.update_attributes!(last_name: 'jones3')
     end
 
-    it 'should render 21 familes' do
+    it "renders the families_index template" do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
-      expect(assigns(:families).count).to eq(21)
-      expect(assigns(:page_alphabets).count).to eq(2)
-      expect(assigns(:page_alphabets)).to include("J")
-      expect(assigns(:page_alphabets)).to include("S")
-    end
-
-    it "should render families starting with J" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, page: 'J'
-      expect(assigns(:families).count).to eq(3)
-    end
-
-    it "should render families named Smith" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
-      expect(assigns(:families).count).to eq(27)
+      expect(response).to render_template("broker_agencies/profiles/family_index")
     end
   end
 

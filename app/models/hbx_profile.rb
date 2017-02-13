@@ -105,6 +105,19 @@ class HbxProfile
       end
       notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
     end
+
+    def search_random(search_param)
+      if search_param.present?
+        organizations = Organization.where(legal_name: /#{search_param}/i)
+        broker_agency_profiles = []
+        organizations.each do |org|
+          broker_agency_profiles << org.broker_agency_profile if org.broker_agency_profile.present?
+        end
+      else
+        broker_agency_profiles = BrokerAgencyProfile.all
+      end
+      broker_agency_profiles
+    end
   end
 
   ## Application-level caching
@@ -116,7 +129,10 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  IndividualEnrollmentDueDayOfMonth = 15
+
+  # IndividualEnrollmentDueDayOfMonth = 15
+  # Temporary change for Dec 2015 extension
+  IndividualEnrollmentDueDayOfMonth = 19
   IndividualEnrollmentTerminationMinimum = 14.days
 
   ## Carriers
@@ -219,6 +235,4 @@ class HbxProfile
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end
-
-
 end
