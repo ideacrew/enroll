@@ -57,6 +57,10 @@ gem 'symmetric-encryption', '~> 3.6.0'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
+gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
+
+#For Background jobs
+gem 'resque'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
@@ -146,6 +150,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'warden'
+  gem 'fakeredis', :require => 'fakeredis/rspec'
 end
 
 group :production do
