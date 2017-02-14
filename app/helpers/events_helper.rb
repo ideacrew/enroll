@@ -31,4 +31,20 @@ module EventsHelper
       reference_number_base + sprintf("%05i",ran.rand(65535))
     end
   end
+
+  def employer_plan_years(employer)
+    if (is_renewal_conversion_employer?(employer) && Date.today > (employer.renewing_published_plan_year.start_on - 15.days))  || (is_initial_employer?(employer) && Date.today > (employer.published_plan_year.start_on - 15.days))
+      employer.plan_years.select(&:eligible_for_export?)
+    elsif (!employer.is_conversion? && employer.renewing_published_plan_year.present?)
+      employer.active_plan_year.to_a
+    end
+  end
+
+  def is_initial_employer?(employer)
+    employer.published_plan_year.present? && !employer.renewing_published_plan_year.present?
+  end
+
+  def is_renewal_conversion_employer?(employer)
+    employer.published_plan_year.present? && employer.renewing_published_plan_year.present?
+  end
 end
