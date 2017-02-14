@@ -376,8 +376,8 @@ private
       :no_dc_address,
       :no_dc_address_reason, 
       :id,
-      :is_applying_coverage,
-      :consumer_role
+      :consumer_role,
+      :is_applying_coverage
     ]
   end
 
