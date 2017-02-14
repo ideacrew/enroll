@@ -43,8 +43,8 @@ module Factories
     end
 
     def effective_on_for_cobra(enrollment)
-      effective_on_by_terminated = @census_employee.coverage_terminated_on.end_of_month + 1.days 
-      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for_cobra(@census_employee.hired_on) 
+      effective_on_by_terminated = @census_employee.coverage_terminated_on.end_of_month + 1.days
+      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for_cobra(@census_employee.hired_on)
       [effective_on_by_terminated, effective_on_by_benefit_group].max
     end
 
@@ -53,6 +53,7 @@ module Factories
       clone_enrollment.benefit_group_id = active_enrollment.benefit_group_id
       clone_enrollment.employee_role_id = active_enrollment.employee_role_id
       clone_enrollment.plan_id = active_enrollment.plan_id
+      clone_enrollment.coverage_kind = active_enrollment.coverage_kind
       clone_enrollment.kind = 'employer_sponsored_cobra'
       effective_on = effective_on_for_cobra(active_enrollment)
       clone_enrollment.effective_on = effective_on
@@ -73,7 +74,7 @@ module Factories
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
       clone_enrollment
     end
-      
+
     def clone_enrollment_members(active_enrollment)
       hbx_enrollment_members = active_enrollment.hbx_enrollment_members
       effective_on = effective_on_for_cobra(active_enrollment)
@@ -87,6 +88,6 @@ module Factories
       end
     end
   end
-  
+
   class FamilyEnrollmentCloneFactoryError < StandardError; end
 end
