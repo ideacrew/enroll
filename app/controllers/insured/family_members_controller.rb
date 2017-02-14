@@ -102,7 +102,7 @@ class Insured::FamilyMembersController < ApplicationController
   def update
     @dependent = Forms::FamilyMember.find(params.require(:id))
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-
+    consumer_role.check_for_critical_changes(params[:dependent]) if consumer_role
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       respond_to do |format|
         format.html { render 'show' }
