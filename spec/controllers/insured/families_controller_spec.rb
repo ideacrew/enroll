@@ -122,11 +122,6 @@ RSpec.describe Insured::FamiliesController do
         get :home
         expect(response).to redirect_to(edit_insured_consumer_role_path(consumer_role))
       end
-
-      it "should not redirect to ridp page through paper application although user has not verified identity" do
-        get :home, session[:original_application_type] = 'paper'
-        expect(response).not_to redirect_to("/insured/consumer_role/ridp_agreement")
-      end
     end
 
     context "for SHOP market" do
