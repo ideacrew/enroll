@@ -27,13 +27,6 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
       @notice.start_on= @recipient.try(:active_and_published_plan_year).start_on
       @notice.benefit_group_assignments =  @recipient.census_employees.map(&:active_benefit_group_assignment).compact.group_by(&:benefit_group_id)
       @notice.legal_name= @recipient.organization.legal_name
-      # @notice.metal_leval= @recipient.plan_years.order_by(:end_on => "desc").first.try(:benefit_groups).try(:first).try(:reference_plan).try(:metal_level)
-      # @notice.benefit_group_package_name= @recipient.active_and_published_plan_year.benefit_groups.first.title
-      # @notice.benefit_group_package_name = @notice.active_and_published_plan_year.benefit_groups.map(&:title).select {|r| puts r}
-      # @notice.plan_year = @recipient.try(:active_and_published_plan_year).try(:benefit_groups).first.try(:reference_plan).name
-      # @notice.family_contribution= @recipient.plan_years.first.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
-      @notice.family_contribution= @recipient.active_and_published_plan_year.benefit_groups.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }
-      @notice.carrier = @recipient.active_and_published_plan_year.benefit_groups.first.reference_plan.carrier_profile.legal_name
       @notice.data = {:url => url} 
   end
 
