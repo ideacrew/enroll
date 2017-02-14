@@ -47,6 +47,7 @@ class FindOrCreateInsuredPerson
           no_ssn: context.no_ssn,
           dob: context.dob,
           gender: context.gender,
+          is_applying_coverage: context.is_applying_coverage
         ), true
       end
     else

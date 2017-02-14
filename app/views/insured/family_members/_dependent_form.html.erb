@@ -101,6 +101,26 @@
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
             <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
           </div>
+
+
+          <% unless @person.has_active_employee_role? %>
+            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+              <span>Is this person applying for coverage?</span>
+            </div>
+
+            <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
+              <div class="radio">
+                <%= f.radio_button :is_applying_coverage, true, class: "required floatlabel", id: 'is_applying_coverage_true'%>
+                <label for="is_applying_coverage_true"><span>TRUE</span></label>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+              <div class="radio">
+                <%= f.radio_button :is_applying_coverage, false, class: "required floatlabel", id: 'is_applying_coverage_false' %>
+                <label for="is_applying_coverage_false"><span>FALSE</span></label>
+              </div>
+            </div>
+          <% end %>
         </div>
 
         <% if @person.has_active_consumer_role? %>

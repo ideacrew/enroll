@@ -16,7 +16,8 @@ describe Person do
         last_name: last_name,
         ssn: ssn,
         gender: gender,
-        addresses: [address]
+        addresses: [address],
+        is_applying_coverage: true
       }
     end
 

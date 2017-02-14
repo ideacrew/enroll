@@ -28,7 +28,8 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
         ssn: nil,
         no_ssn: nil,
         dob: dob,
-        gender: nil).and_return(new_person)
+        gender: nil,
+        :is_applying_coverage=>nil).and_return(new_person)
     end
 
     it "should create that person and return them" do
