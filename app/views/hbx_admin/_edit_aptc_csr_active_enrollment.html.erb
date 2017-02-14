@@ -7,6 +7,7 @@
       <%= f.hidden_field :person_id, value: @person.id %>
       <%= f.hidden_field :family_id, value: @family.id %>
       <%= f.hidden_field :hbx_enrollment_id, value: @hbx.id if @hbx.present?%>
+      <%= f.hidden_field :current_year, value: @current_year%>
 
       <%= render 'global_filter_header.html.erb'%>
 

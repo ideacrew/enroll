@@ -808,6 +808,10 @@ class EmployerProfile
     self.profile_source == "conversion"
   end
 
+  def trigger_notices(event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
@@ -862,6 +866,6 @@ private
   end
 
   def plan_year_publishable?
-    published_plan_year.is_application_valid?
+    !published_plan_year.is_application_unpublishable? 
   end
 end

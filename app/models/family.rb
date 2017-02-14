@@ -69,6 +69,20 @@ class Family
          "households.hbx_enrollments.created_at" => 1},
          {name: "state_and_created"})
 
+    index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.effective_on" => 1,
+         "households.hbx_enrollments.terminated_on" => 1
+         },
+         {name: "kind_and_state_and_created_and_terminated"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.coverage_kind" => 1,
+         "households.hbx_enrollments.effective_on" => 1
+         },
+         {name: "kind_and_state_and_coverage_kind_effective_date"})
+
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
@@ -151,7 +165,7 @@ class Family
   scope :all_enrollments,                     ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id, ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id, ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".ne => "employer_sponsored").where(:"households.hbx_enrollments.kind".ne => "coverall") }
+  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
@@ -198,6 +212,19 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
+  end
+
+  def primary_family_member=(new_primary_family_member)
+    self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
+
+    existing_family_member = find_family_member_by_person(new_primary_family_member)
+    if existing_family_member.present?
+      existing_family_member.is_primary_applicant = true
+    else
+      add_family_member(new_primary_family_member, is_primary_applicant: true)
+    end
+
+    primary_family_member
   end
 
   def primary_family_member
@@ -490,9 +517,27 @@ class Family
         end
       end
     end
+
+    def begin_coverage_for_ivl_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state => 'auto_renewing'
+        }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+
+      families.each do |family|
+        family.active_household.hbx_enrollments.where(query).each do |enrollment|
+          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+        end
+      end
+    end
+
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
       expire_individual_market_enrollments
+      begin_coverage_for_ivl_enrollments
     end
 
     def default_search_order

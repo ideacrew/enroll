@@ -6,7 +6,7 @@ RSpec.describe Admin::Aptc, :type => :model do
   # Household
   let(:family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) {FactoryGirl.create(:household, family: family)}
-  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
   let(:sample_max_aptc_1) {511.78}
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
@@ -27,6 +27,8 @@ RSpec.describe Admin::Aptc, :type => :model do
     before(:each) do
       allow(family).to receive(:active_household).and_return household
       allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
+      allow(eligibility_determination_2).to receive(:tax_household).and_return tax_household
       allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1, eligibility_determination_2]
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
     end
@@ -88,7 +90,7 @@ RSpec.describe Admin::Aptc, :type => :model do
 
       end
       it "should save a new determination when the Max APTC / CSR is updated" do
-        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [])).to eq true
+        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year)).to eq true
       end
 
     end

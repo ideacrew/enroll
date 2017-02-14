@@ -208,4 +208,22 @@ module Insured::FamiliesHelper
   def dual_role_without_shop_sep?
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
   end
+
+  def tax_info_url
+    if ENV['AWS_ENV'] == 'prod'
+      "https://dchealthlink.com/individuals/tax-documents"
+    else
+      "https://staging.dchealthlink.com/individuals/tax-documents"
+    end
+  end
+
+  def show_download_tax_documents_button?
+    if @person.ssn.blank?
+      false
+    elsif @person.consumer_role.blank?
+      false
+    elsif @person.consumer_role.present? 
+      true
+    end
+  end
 end
