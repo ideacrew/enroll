@@ -16,7 +16,7 @@ module Effective
               content_tag(:span) do
                 link_to ' (Review)', employers_premium_statement_path(row.employer_profile.id)
                end
-             end }, :filter => false, :sortable => false
+             end }, :filter => false, :sortable => true
 
         table_column :broker_agency_profile, :label => 'Broker Agency Name', :proc => Proc.new { |row| row.employer_profile.broker_agency_profile.organization.legal_name if row.employer_profile.broker_agency_profile.present? }, :filter => false, :sortable => false
       end
