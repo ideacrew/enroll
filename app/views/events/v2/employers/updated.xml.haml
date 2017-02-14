@@ -25,8 +25,12 @@
       %brokers
         = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts.unscoped,
         :locals => { :employer_profile => employer }
-    - plan_years = employer.plan_years.select(&:eligible_for_export?)
-    - if plan_years
+    - plan_years = []
+    - if ((employer.renewing_published_plan_year.present? && Date.today > employer.renewing_published_plan_year.first.start_on - 15.days)  || (employer.plan_years.published.present? && Date.today > employer.published.first.start_on - 15.days))
+      - plan_years = employer.plan_years.select(&:eligible_for_export?)
+    - elsif !employer.is_conversion?
+      - plan_years = employer.active_plan_year.to_a
+    - if plan_years.present?
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => plan_years
     - if employer.is_coversion_employer?
