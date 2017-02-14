@@ -60,6 +60,18 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
+
+    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+      if @dependent.save
+        @created = true
+        respond_to do |format|
+          format.html { render 'show_resident' }
+          format.js { render 'show_resident' }
+        end
+      end
+      return
+    end
+
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|

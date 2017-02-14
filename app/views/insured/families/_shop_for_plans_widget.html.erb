@@ -71,6 +71,7 @@
                 options.merge!(person_id: @person.id) if @person.present?
                 options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
                 options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
+                options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
               %>
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
                 You are not under open enrollment period.
