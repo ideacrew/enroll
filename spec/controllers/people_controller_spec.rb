@@ -39,27 +39,16 @@ RSpec.describe PeopleController do
       allow(controller).to receive(:sanitize_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(consumer_role).to receive(:check_for_critical_changes)
+      allow(person).to receive(:update_attributes).and_return(true)
+      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      person_attributes[:addresses_attributes] = addresses_attributes
       sign_in user
+      post :update, id: person.id, person: person_attributes
     end
 
     context "duplicate addresses records" do
       it "clean all existing addresses " do
-        allow(person).to receive(:has_active_consumer_role?).and_return(false)
-        allow(person).to receive(:update_attributes).and_return(true)
-        person_attributes[:addresses_attributes] = addresses_attributes
-
-        post :update, id: person.id, person: person_attributes
         expect(person.addresses).to eq []
-      end
-
-      it "keep old addresses if person update failed" do
-        allow(person).to receive(:has_active_consumer_role?).and_return(false)
-        allow(person).to receive(:update_attributes).and_return(false)
-        person_attributes[:addresses_attributes] = addresses_attributes
-        address = person.addresses
-
-        post :update, id: person.id, person: person_attributes
-        expect(person.addresses).to eq address
       end
     end
 
@@ -69,7 +58,6 @@ RSpec.describe PeopleController do
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)
         allow(vlp_document).to receive(:save).and_return(true)
-        allow(vlp_document).to receive(:update_attributes).and_return(true)
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
         person_attributes[:consumer_role_attributes] = consumer_role_attributes
 
@@ -84,9 +72,8 @@ RSpec.describe PeopleController do
       it "when employee" do
         person_attributes[:emails_attributes] = email_attributes
         allow(controller).to receive(:get_census_employee).and_return(census_employee)
-        allow(person).to receive(:has_active_consumer_role?).and_return(false)
         allow(person).to receive(:update_attributes).and_return(true)
-        
+
         post :update, id: person.id, person: person_attributes
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
