@@ -63,7 +63,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   context "action path" do
     let(:benefit_group) { double }
     let(:new_hire_enrollment_period) { TimeKeeper.date_of_record..(TimeKeeper.date_of_record + 30.days) }
-    
+
     before :each do
       assign :person, person
       assign :family, family
