@@ -73,7 +73,7 @@ RSpec.describe PeopleController do
         person_attributes[:emails_attributes] = email_attributes
         allow(controller).to receive(:get_census_employee).and_return(census_employee)
         allow(person).to receive(:update_attributes).and_return(true)
-
+        
         post :update, id: person.id, person: person_attributes
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
