@@ -490,6 +490,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_move_reason' template" do
@@ -520,6 +521,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_insurance_reason' template" do
@@ -547,6 +549,7 @@ RSpec.describe Insured::FamiliesController do
 
     before(:each) do
       sign_in(user)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_qle_date' template" do
