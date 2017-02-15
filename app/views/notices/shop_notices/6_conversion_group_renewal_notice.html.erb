@@ -17,7 +17,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Welcome to #{Settings.site.short_name}! This notice contains important information about renewing your health insurance coverage for your small business. Your renewal will be processed through #{Settings.site.short_name} this year. The #{Settings.site.short_name} team has been working closely with <health insurance carrier name> on your renewal, and <health insurance carrier name> has informed us that your policy is scheduled to be renewed on <Coverage effective date>."} %>
+  content: "Welcome to #{Settings.site.short_name}! This notice contains important information about renewing your health insurance coverage for your small business. Your renewal will be processed through #{Settings.site.short_name} this year. The #{Settings.site.short_name} team has been working closely with #{notice.plan.plan_carrier} on your renewal, and #{notice.plan.plan_carrier} has informed us that your policy is scheduled to be renewed on #{notice.plan.coverage_start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>If you want to keep your current coverage, we will renew you automatically in the coverage you are currently offering.</strong> You will begin receiving monthly invoices from #{Settings.site.short_name}, not your carrier."} %>
