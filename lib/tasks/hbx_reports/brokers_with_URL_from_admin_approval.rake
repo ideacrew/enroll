@@ -20,18 +20,20 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
-          broker=BrokerRole.find(invitation.source_id).first
-          unless broker.nil?
-          csv << [
-              broker.broker_agency_profile.try(:legal_name),
-              broker.person.first_name,
-              broker.person.last_name,
-              broker.email_address,
-              broker.npn,
-              invitation.created_at,
-              "http://enroll.dchealthlink.com/invitations/#{invitation.id}/claim"
-          ]
+          unless BrokerRole.find(invitation.source_id)
+            broker=BrokerRole.find(invitation.source_id).first
+            unless broker.nil?
+              csv << [
+                broker.broker_agency_profile.try(:legal_name),
+                broker.person.first_name,
+                broker.person.last_name,
+                broker.email_address,
+                broker.npn,
+                invitation.created_at,
+                "http://enroll.dchealthlink.com/invitations/#{invitation.id}/claim"
+              ]
               processed_count += 1
+              end
           end
         end
       end
