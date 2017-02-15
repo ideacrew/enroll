@@ -79,16 +79,7 @@
                 <%= format_date ivl_enrollment_effective_date %>.
               <% end %>
               <br/>
-              <% if @family.active_seps.last && !dual_role_without_shop_sep?%>
-                <p>Would you like to use your existing special enrollment period? "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"</p>
-                <p>
-                  <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                  <%= build_link_for_sep_type(@active_admin_sep, 'Shop with existing SEP') %>
-                </p>
-                <p><%= link_to 'Qualify for new SEP', find_sep_insured_families_path(options) %></p>
-              <% else %>
-                <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
-              <% end %>
+              <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
             <% else %>
               You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
               <div id="shop-for-plans-widget">
