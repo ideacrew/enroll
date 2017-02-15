@@ -93,7 +93,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
     end
 
-    it "should display the is_applying_coverage field option" do
+    it "should not display the is_applying_coverage field option" do
       expect(rendered).not_to match /Is this person applying for coverage?/
     end
 

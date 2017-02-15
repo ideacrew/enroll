@@ -116,6 +116,9 @@ function validationForIndianTribeMember() {
     $('#tribal_id_alert').hide()
   });
   $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
       alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
       e.preventDefault && e.preventDefault();
@@ -148,6 +151,9 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForUsCitizenOrUsNational(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a US Citizen or US National?');
       PersonValidations.restoreRequiredAttributes(e);
@@ -155,6 +161,9 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForIncarcerated(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you currently incarcerated?');
       PersonValidations.restoreRequiredAttributes(e);
@@ -162,6 +171,9 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForNaturalizedCitizen(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a naturalized citizen?');
       PersonValidations.restoreRequiredAttributes(e);
@@ -273,6 +285,14 @@ $(document).ready(function() {
     PersonValidations.validationForNaturalizedCitizen(e);
     PersonValidations.validationForIncarcerated(e);
     PersonValidations.validationForVlpDocuments(e);
+  });
+
+  $('input[name="person[is_applying_coverage]"]').change(function () {
+    if($('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      $("#consumer_fields_sets").hide();
+    }else{
+      $("#consumer_fields_sets").show();
+    }
   });
 
 });

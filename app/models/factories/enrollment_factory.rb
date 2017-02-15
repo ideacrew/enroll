@@ -38,7 +38,6 @@ module Factories
 
     def self.construct_consumer_role(person_params, user)
       person_params = person_params[:person]
-      # binding.pry
       person, person_new = initialize_person(
         user, person_params["name_pfx"], person_params["first_name"],
         person_params["middle_name"] , person_params["last_name"],

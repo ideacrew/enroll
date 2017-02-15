@@ -374,7 +374,8 @@ private
       :tribal_id,
       :no_dc_address,
       :no_dc_address_reason, 
-      :id
+      :id,
+      :is_applying_coverage
     ]
   end
 

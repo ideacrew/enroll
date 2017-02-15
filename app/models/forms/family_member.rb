@@ -17,6 +17,7 @@ module Forms
     def initialize(*attributes)
       @addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
       @same_with_primary = "true"
+      @is_applying_coverage = true
       super
     end
 
@@ -214,7 +215,8 @@ module Forms
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
-        :addresses => [home_address, mailing_address]
+        :addresses => [home_address, mailing_address],
+        :is_applying_coverage => found_family_member.person.is_applying_coverage
       })
     end
 
