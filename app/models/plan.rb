@@ -358,16 +358,15 @@ class Plan
   end
 
   def dental?
-    self.coverage_kind.downcase == "dental"
+    coverage_kind && coverage_kind.downcase == "dental"
   end
 
   def health?
-    self.coverage_kind.downcase == "health"
+    coverage_kind && coverage_kind.downcase == "health"
   end
 
   def is_dental_only?
-    return false if self.coverage_kind.blank?
-    self.coverage_kind.downcase == "dental"
+    dental?
   end
 
   def can_use_aptc?
