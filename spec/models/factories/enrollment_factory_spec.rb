@@ -693,8 +693,8 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "dob" => primary.person_demographics.birth_date,
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
-          "gender" => primary.person_demographics.sex.split('#').last,
-          "is_applying_coverage" => false
+          "gender" => primary.person_demographics.sex.split('#').last
+          # "is_applying_coverage" => false
         }
       }
     end
@@ -713,9 +713,9 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
       expect {person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")}.not_to raise_error
     end
 
-    it "should is_applying_coverage should be false" do
-      expect(person.is_applying_coverage).to eq false
-    end
+    # it "should is_applying_coverage should be false" do
+    #   expect(person.is_applying_coverage).to eq false
+    # end
 
   end
 

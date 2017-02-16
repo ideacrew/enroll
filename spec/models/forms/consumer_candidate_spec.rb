@@ -8,8 +8,8 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
                                      :first_name => "yo",
                                      :last_name => "guy",
                                      :gender => "m",
-                                     :user_id => 20,
-                                     :is_applying_coverage => false
+                                     :user_id => 20
+                                     # :is_applying_coverage => false
                                  })
   }
   let(:person) {FactoryGirl.create(:person)}
@@ -47,8 +47,8 @@ describe "match a person in db" do
                                      :first_name => search_param_name.first_name,
                                      :last_name => search_param_name.last_name,
                                      :gender => "m",
-                                     :user_id => 20,
-                                     :is_applying_coverage => false
+                                     :user_id => 20
+                                     # :is_applying_coverage => false
                                  })
   }
 

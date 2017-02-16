@@ -228,8 +228,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :is_incarcerated => "no",
       :tribal_id => "test",
       :no_dc_address=>nil,
-      :no_dc_address_reason=>nil,
-      :is_applying_coverage=>true
+      :no_dc_address_reason=>nil
+      # :is_applying_coverage=>true
     }
   }
 
@@ -292,7 +292,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
-      expect(subject.is_applying_coverage).to eq true
+      # expect(subject.is_applying_coverage).to eq true
     end
   end
 end
@@ -359,14 +359,14 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil, :is_applying_coverage=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil, :is_applying_coverage=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
