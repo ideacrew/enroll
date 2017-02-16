@@ -32,7 +32,7 @@ namespace :report do
             #person=census_employee.try(:employee_roles).first.try(:person)
             benefit_group_assignments=census_employee.benefit_group_assignments
             #terminate_state=HbxEnrollment::TERMINATED_STATUSES+HbxEnrollment::CANCELED_STATUSES
-            active_state=%w(coverage_selected coverage_enrolled)
+            active_state=HbxEnrollment::ENROLLED_STATUSES
             benefit_group_assignments.each do |benefit_group_assignment|
               benefit_group_assignment.hbx_enrollments.each do |enrollment|
                 termination_verify=(active_state.include?enrollment.aasm_state)
