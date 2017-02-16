@@ -16,9 +16,14 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
 
   def deliver
     build
+    attach_envelope
     super
   end
 
+  def attach_envelope
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+  end
+  
   def build
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
