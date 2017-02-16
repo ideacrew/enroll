@@ -65,7 +65,7 @@ class Insured::FamiliesController < FamiliesController
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @resident_role_id = params[:resident_role_id]
     else
-      @resident_role_id = @person.resident_role.id
+      @resident_role_id = @person.try(:resident_role).try(:id)
     end
 
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
@@ -321,7 +321,7 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified? 
+      elsif @person.user && !@person.user.identity_verified?
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
