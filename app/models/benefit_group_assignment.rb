@@ -76,16 +76,27 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
-  def hbx_enrollments
-    families = Family.where({
+  def covered_families
+    Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
-      })
+    })
+  end
 
-    families.inject([]) do |enrollments, family|
+  def hbx_enrollments
+    covered_families.inject([]) do |enrollments, family|
       family.households.each do |household|
         enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment| 
           enrollment.benefit_group_assignment_id == self.id
         end.to_a
+      end
+      enrollments
+    end
+  end
+
+  def active_and_waived_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.non_expired_and_non_terminated.select { |enrollment| enrollment.benefit_group_assignment_id == self.id }
       end
       enrollments
     end
