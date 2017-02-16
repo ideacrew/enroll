@@ -143,7 +143,8 @@ module Forms
     def extract_consumer_role_params
       {
         :citizen_status => @citizen_status,
-        :vlp_document_id => vlp_document_id
+        :vlp_document_id => vlp_document_id,
+        :is_applying_coverage => is_applying_coverage
       }
     end
 
@@ -165,8 +166,7 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason,
-        :is_applying_coverage => is_applying_coverage
+        :no_dc_address_reason => no_dc_address_reason
       }
     end
 
@@ -215,8 +215,7 @@ module Forms
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
-        :addresses => [home_address, mailing_address],
-        :is_applying_coverage => found_family_member.person.is_applying_coverage
+        :addresses => [home_address, mailing_address]
       })
     end
 

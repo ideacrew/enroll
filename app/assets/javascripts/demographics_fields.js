@@ -1,3 +1,21 @@
+function isApplyingCoverage(target){
+
+fields = 'input[name='+target+']'
+
+  if($(fields).length > 0){
+    if($(fields).not(":checked").val() == "true"){
+      $("#consumer_fields_sets").hide();
+    }
+    $(fields).change(function () {
+      if($(fields).not(":checked").val() == "true"){
+        $("#consumer_fields_sets").hide();
+      }else{
+        $("#consumer_fields_sets").show();
+      }
+    });
+  }
+}
+
 function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").change(function() {
@@ -287,12 +305,5 @@ $(document).ready(function() {
     PersonValidations.validationForVlpDocuments(e);
   });
 
-  $('input[name="person[is_applying_coverage]"]').change(function () {
-    if($('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
-      $("#consumer_fields_sets").hide();
-    }else{
-      $("#consumer_fields_sets").show();
-    }
-  });
-
+  isApplyingCoverage('"person[is_applying_coverage]"');
 });
