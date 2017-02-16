@@ -861,6 +861,12 @@ class Person
     end
   end
 
+  def check_for_ridp(session_var)
+    if user && session_var == 'paper'
+      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+    end
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
