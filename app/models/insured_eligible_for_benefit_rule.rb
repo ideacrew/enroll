@@ -61,7 +61,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_applying_coverage_status_satisfied?
-    @role.person.is_applying_coverage?
+    @role.is_applying_coverage?
   end
 
   def is_age_range_satisfied_for_catastrophic?

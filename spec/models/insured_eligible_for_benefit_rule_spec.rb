@@ -402,15 +402,15 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       allow(benefit_package).to receive_message_chain('benefit_eligibility_element_group.class.fields.keys').and_return([])
     end
 
-    it "should return false if is_applying_coverage is set to false for the cosumer_role" do
-      allow(consumer_role).to receive_message_chain('person.is_applying_coverage?').and_return(false)
+    it "should return a false status if is_applying_coverage is false for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(false)
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
       status = rule.satisfied?.first
       expect(status).to eq false
     end
 
-    it "should return true if is_applying_coverage is set to true for the cosumer_role" do
-      allow(consumer_role).to receive_message_chain('person.is_applying_coverage?').and_return(true)
+    it "should return a true status if is_applying_coverage is true for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(true)
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
       status = rule.satisfied?.first
       expect(status).to eq true
