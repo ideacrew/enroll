@@ -229,7 +229,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :tribal_id => "test",
       :no_dc_address=>nil,
       :no_dc_address_reason=>nil
-      # :is_applying_coverage=>true
     }
   }
 
@@ -292,7 +291,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
-      # expect(subject.is_applying_coverage).to eq true
     end
   end
 end

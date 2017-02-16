@@ -17,7 +17,6 @@ describe Person do
         ssn: ssn,
         gender: gender,
         addresses: [address]
-        # is_applying_coverage: true
       }
     end
 
