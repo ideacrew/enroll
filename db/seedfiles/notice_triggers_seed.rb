@@ -138,7 +138,7 @@ shop_notice_triggers = [
       {
         name: 'Conversion, Group Renewal Available',
         notice_template: 'notices/shop_notices/6_conversion_group_renewal_notice',
-        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        notice_builder: 'ShopNotices::ConversionRenewalNotice',
         mpi_indicator: 'MPI_SHOP6',
         notice_trigger_element_group: {
           market_places: ['shop'],
