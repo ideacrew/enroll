@@ -10,7 +10,7 @@ class ShopNotices::ConversionRenewalNotice < ShopNotices::RenewalGroupNotice
   end
 
   def conversion_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'coversion_employer_attachment.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'conversion_employer_attachment.pdf')]
   end
 
 end
