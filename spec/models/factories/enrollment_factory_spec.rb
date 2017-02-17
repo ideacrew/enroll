@@ -693,7 +693,7 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "dob" => primary.person_demographics.birth_date,
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
-          "gender" => primary.person_demographics.sex.split('#').last
+          "gender" => primary.person_demographics.sex.split('#').last,
           "is_applying_coverage" => false
         }
       }
@@ -714,7 +714,7 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     end
 
     it "should is_applying_coverage should be false" do
-      expect(person.is_applying_coverage).to eq false
+      expect(person.consumer_role.is_applying_coverage).to eq false
     end
 
   end
