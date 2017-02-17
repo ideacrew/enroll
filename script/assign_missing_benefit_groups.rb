@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = '{Rails.root}/shop_report_errors_fix_bgas_only.csv'
+filename = "{Rails.root}/shop_report_errors_fix_bgas_only.csv"
 
 def choose_plan_year(hbx_enrollment,employer)
   effective_date = hbx_enrollment.effective_on
