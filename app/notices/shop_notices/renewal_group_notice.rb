@@ -1,21 +1,16 @@
 class ShopNotices::RenewalGroupNotice < ShopNotices::EmployerRenewalNotice
 
   def deliver
-    build
     append_data
     super
   end
 
   def append_data
-    active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
     renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
-    notice.renewing_plan = PdfTemplates::Plan.new({
+    notice.plan = PdfTemplates::Plan.new({
           :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on,
           :coverage_start_on => renewing_plan_year.start_on
         })
-    notice.active_plan = PdfTemplates::Plan.new({
-      :coverage_start_on => active_plan_year.start_on
-    })
   end
 
   def create_secure_inbox_message(notice)
