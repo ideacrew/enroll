@@ -7,10 +7,10 @@ FactoryGirl.define do
     active_year         { TimeKeeper.date_of_record.year }
     coverage_kind       "health"
     metal_level         "silver"
-    plan_type           "HMO"
+    plan_type           "pos"
     market              "shop"
     ehb                 0.9943
-    carrier_profile         { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
+    carrier_profile     { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
 
@@ -32,6 +32,56 @@ FactoryGirl.define do
         end_on = start_on + 1.year - 1.day
         create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
       end
+    end
+
+    trait :csr_00 do
+      coverage_kind   "health"
+      metal_level     "silver"
+      market          "individual"
+      csr_variant_id  "00"
+    end
+
+    trait :csr_87 do
+      coverage_kind   "health"
+      metal_level     "silver"
+      market          "individual"
+      csr_variant_id  "87"
+    end
+
+    trait :catastrophic do
+      coverage_kind   "health"
+      metal_level     "catastrophic"
+      market          "individual"
+    end
+
+    trait :individual_health do
+      coverage_kind   "health"
+      market          "individual"
+    end
+
+    trait :individual_dental do
+      coverage_kind   "dental"
+      market          "individual"
+      metal_level     "low"
+    end
+
+    trait :shop_health do
+      coverage_kind   "health"
+      market          "shop"
+    end
+
+    trait :shop_dental do
+      coverage_kind   "dental"
+      market          "shop"
+      metal_level     "high"
+    end
+
+    trait :this_year do
+      active_year Time.now.year
+    end
+
+    trait :next_year do
+      active_year Time.now.year
     end
 
     trait :premiums_for_2015 do
@@ -58,6 +108,7 @@ FactoryGirl.define do
     factory :active_shop_health_plan,             traits: [:shop_health, :this_year, :with_premium_tables]
     factory :active_individual_dental_plan,       traits: [:individual_dental, :this_year, :with_premium_tables]
     factory :active_individual_catastophic_plan,  traits: [:catastrophic, :this_year, :with_premium_tables]
+
     factory :active_csr_87_plan,                  traits: [:csr_87, :this_year, :with_premium_tables]
     factory :active_csr_00_plan,                  traits: [:csr_00, :this_year, :with_premium_tables]
 
@@ -67,6 +118,7 @@ FactoryGirl.define do
     factory :renewal_individual_catastophic_plan, traits: [:catastrophic, :next_year, :with_premium_tables]
     factory :renewal_csr_87_plan,                 traits: [:csr_87, :next_year, :with_premium_tables]
     factory :renewal_csr_00_plan,                 traits: [:csr_00, :next_year, :with_premium_tables]
+
   end
 
   factory :premium_table do

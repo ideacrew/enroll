@@ -1357,39 +1357,58 @@ describe Person do
     end
   end
 
+  describe "#check_for_ridp" do
+    let(:subject) { Person.new }
+    let(:person) { FactoryGirl.create(:person, user: user) }
+    let(:user) { FactoryGirl.create(:user)}
+
+    before do
+      user.unset(:identity_final_decision_code)
+    end
+
+    it "should not set the ridp for non-paper applications" do
+      person.check_for_ridp('')
+      expect(user.identity_verified?).to eq false
+    end
+
+    it "should set the ridp for paper applications" do
+      person.check_for_ridp('paper')
+      expect(user.identity_verified?).to eq true
+    end
+
+    it "should return nil if there is no user record" do
+      person.user.destroy!
+      expect(person.check_for_ridp(nil)).to eq nil
+    end
+  end
+
   describe "changing the bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, user: user) }
     let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
+    let(:user) { FactoryGirl.create(:user)}
     before(:each) do
       allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
+      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
     end
 
     it "should not change the bookmark_url if they not passed RIDP" do
-      person.user = FactoryGirl.create(:user, :consumer)
       person.user.update_attributes(:idp_verified => false)
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
     it "should not change the bookmark_url if they don't have addresses" do
-      person.user = FactoryGirl.create(:user, :consumer)
-      person.user.update_attributes(:idp_verified => true)
-      person.user.ridp_by_payload!
+      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
       person.addresses.to_a.each do |add|
         add.delete
       end
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
     it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
-      person.user = FactoryGirl.create(:user, :consumer)
-      person.user.update_attribute(:idp_verified, true)
-      person.user.ridp_by_payload!
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
+      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/families/home"
     end

@@ -119,6 +119,7 @@ class HbxEnrollment
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
+  associated_with_one :broker, :writing_agent_id, "BrokerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
@@ -564,6 +565,11 @@ class HbxEnrollment
     end
   end
 
+  def <=>(other)
+    other_members = other.hbx_enrollment_members # - other.terminated_members
+    [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
+  end
+
   # This performs employee summary count for waived and enrolled in the latest plan year
   def perform_employer_plan_year_count
     if is_shop?
@@ -574,7 +580,6 @@ class HbxEnrollment
       plan_year.save!
     end
   end
-
 
   def enroll_step
     ENROLLMENT_TRAIN_STOPS_STEPS[self.aasm_state]
@@ -1014,7 +1019,6 @@ class HbxEnrollment
     state :coverage_terminated    # coverage ended
 
     state :coverage_expired
-
     state :inactive   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
 
     # Verified Lawful Presence (VLP) flags
@@ -1126,7 +1130,7 @@ class HbxEnrollment
                     to: :void,
                  guard: :termination_attributes_cleared?
 
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled,
+      transitions from: [:shopping, :coverage_selected, :coverage_enrolled, :transmitted_to_carrier,
                           :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
                           :auto_renewing, :renewing_waived, :renewing_coverage_selected,
                           :renewing_transmitted_to_carrier, :renewing_coverage_enrolled,
@@ -1145,6 +1149,7 @@ class HbxEnrollment
       transitions from: :coverage_selected, to: :coverage_selected
       transitions from: :auto_renewing, to: :auto_renewing
       transitions from: :coverage_expired, to: :coverage_expired
+      transitions from: :shopping, to: :shopping
     end
 
     event :move_to_contingent!, :after => :record_transition do

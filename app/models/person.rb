@@ -682,12 +682,12 @@ class Person
       raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
 
       matches = Array.new
-      matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
+      matches.concat Person.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
       #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
         last_exp = /^#{last_name}$/i
-        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).active.to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end
@@ -880,6 +880,12 @@ class Person
       if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
         consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
       end
+    end
+  end
+
+  def check_for_ridp(session_var)
+    if user && session_var == 'paper'
+      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
     end
   end
 
