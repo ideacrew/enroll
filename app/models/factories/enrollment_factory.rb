@@ -216,7 +216,8 @@ module Factories
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
                                  dependent.dob, dependent.gender, "employee")
-      if person.present?
+
+      if person.present? && person.persisted?
         relationship = person_relationship_for(dependent.employee_relationship)
         primary.ensure_relationship_with(person, relationship)
         family.add_family_member(person) unless family.find_family_member_by_person(person)
