@@ -76,7 +76,7 @@ module Importers
       employer = find_employer
       found_carrier = find_carrier
 
-      puts "Processing....#{employer.legal_name}...#{employer.fein}"
+      # puts "Processing....#{employer.legal_name}...#{employer.fein}"
 
       current_coverage_start = calculated_coverage_start
       
