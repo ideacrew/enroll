@@ -24,7 +24,7 @@ module Forms
               numericality: true
     validate :dob_not_in_future
     validate :ssn_or_checkbox
-    validate :uniq_ssn
+    validate :uniq_ssn, :uniq_ssn_dob
     validate :age_less_than_18
     attr_reader :dob
 
