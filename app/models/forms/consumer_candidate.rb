@@ -78,7 +78,7 @@ module Forms
       person_with_ssn_dob = person_with_ssn.where(dob: dob)
       if person_with_ssn != person_with_ssn_dob
         errors.add(:base,
-          "The social security number/dob combination is incorrect. Please enter a valid dob.")
+          "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
       end
     end
 

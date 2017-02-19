@@ -10,7 +10,7 @@ module Importers
 
       new_organization = Organization.where(:fein => fein).first
 
-      puts "Processing Add ---#{legal_name}"
+      puts "Processing Add ---#{legal_name}"  unless Rails.env.test?
       if new_organization
         new_organization.create_employer_profile({
           :broker_agency_accounts => assign_brokers,
