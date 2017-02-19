@@ -73,6 +73,15 @@ module Forms
       end
     end
 
+    def uniq_ssn_dob
+      person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
+      person_with_ssn_dob = person_with_ssn.where(dob: dob)
+      if person_with_ssn != person_with_ssn_dob
+        errors.add(:base,
+          "The social security number/dob combination is incorrect. Please enter a valid dob.")
+      end
+    end
+
     def does_not_match_a_different_users_person
       matched_person = match_person
       if matched_person.present?
