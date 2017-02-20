@@ -461,7 +461,7 @@ describe Person do
     end
 
     it 'matches by ssn' do
-      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq [@p1]
+      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq []
     end
 
     it 'matches by ssn, last_name and dob' do
@@ -479,66 +479,13 @@ describe Person do
     it 'not match last_name and dob if ssn provided (match is already done if ssn ok)' do
       expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob, ssn: '999884321').size).to eq 0
     end
-  end
-
-  describe '.match_by_id_info_for_conversion' do
-    before(:all) do
-      @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
-      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
-      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
-      @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
-    end
-
-    after(:all) do
-      DatabaseCleaner.clean
-    end
-
-    it 'matches by last_name, first name and dob if no previous ssn and no current ssn' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name)).to eq [@p4]
-    end
-
-    it 'matches by last_name, first name and dob if no previous ssn and yes current ssn' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123')).to eq [@p4]
-    end
-
-    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p0.last_name, dob: @p0.dob, first_name: @p0.first_name)).to eq [@p0]
-    end
-
-    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn and UPPERCASED' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p0.last_name.upcase, dob: @p0.dob, first_name: @p0.first_name.upcase)).to eq [@p0]
-    end
-
-    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn and LOWERCASED' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p0.last_name.downcase, dob: @p0.dob, first_name: @p0.first_name.downcase)).to eq [@p0]
-    end
-
-    it 'matches by ssn' do
-      expect(Person.match_by_id_info_for_conversion(ssn: @p1.ssn)).to eq []
-    end
-
-    it 'matches by ssn, last_name and dob' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p2.last_name, dob: @p2.dob, ssn: @p2.ssn)).to eq [@p2]
-    end
-
-    it 'not match last_name and dob if not on same record' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p0.last_name, dob: @p1.dob, first_name: @p4.first_name).size).to eq 0
-    end
-
-    it 'returns empty array for non-matches' do
-      expect(Person.match_by_id_info_for_conversion(ssn: "577600345")).to eq []
-    end
-
-    it 'not match last_name and dob if ssn provided (match is already done if ssn ok)' do
-      expect(Person.match_by_id_info_for_conversion(last_name: @p0.last_name, dob: @p0.dob, ssn: '999884321').size).to eq 0
-    end
 
     it 'ssn, dob present, then should return person object' do
-      expect(Person.match_by_id_info_for_conversion(dob: @p0.dob, ssn: '999884321').size).to eq 0
+      expect(Person.match_by_id_info(dob: @p0.dob, ssn: '999884321').size).to eq 0
     end
 
     it 'ssn present, dob not present then should return empty array' do
-      expect(Person.match_by_id_info_for_conversion(ssn: '999884321').size).to eq 0
+      expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
   end
 

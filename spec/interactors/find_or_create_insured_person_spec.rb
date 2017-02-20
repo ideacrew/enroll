@@ -49,7 +49,7 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
     }
 
     before :each do
-      allow(Person).to receive(:match_by_id_info_for_conversion).with(ssn: nil, dob: dob, first_name: first_name, last_name: last_name).and_return([found_person])
+      allow(Person).to receive(:match_by_id_info).with(ssn: nil, dob: dob, first_name: first_name, last_name: last_name).and_return([found_person])
     end
 
     it "should return the found person" do

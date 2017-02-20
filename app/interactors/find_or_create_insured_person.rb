@@ -3,7 +3,7 @@ class FindOrCreateInsuredPerson
 
   def call
     user = context.user
-    people = Person.match_by_id_info_for_conversion(
+    people = Person.match_by_id_info(
       ssn: context.ssn,
       dob: context.dob,
       last_name: context.last_name,
