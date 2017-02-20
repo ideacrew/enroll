@@ -65,7 +65,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
     let(:dependent1_attrs) do 
       {
         :dep_1_ssn=>spouse.ssn,
-        :dep_1_dob=>spouse.dob,
+        :dep_1_dob=>spouse.dob.strftime("%m/%d/%Y"),
         :dep_1_gender=>spouse.gender,
         :dep_1_name_first=>spouse.first_name,
         :dep_1_name_last=>spouse.last_name,
@@ -76,7 +76,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
     let(:dependent2_attrs) do
       {
         :dep_2_ssn=>child.ssn,
-        :dep_2_dob=>child.dob,
+        :dep_2_dob=>child.dob.strftime("%m/%d/%Y"),
         :dep_2_gender=>child.gender,
         :dep_2_name_first=>child.first_name,
         :dep_2_name_last=>child.last_name,
@@ -87,7 +87,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
     let(:dependent3_attrs) do
       {
         :dep_3_ssn=>child1.ssn,
-        :dep_3_dob=>child1.dob,
+        :dep_3_dob=>child1.dob.strftime("%m/%d/%Y"),
         :dep_3_gender=>child1.gender,
         :dep_3_name_first=>child1.first_name,
         :dep_3_name_last=>child1.last_name,
