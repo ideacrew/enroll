@@ -765,11 +765,15 @@ describe Factories::EnrollmentFactory, "with an exisiting consumer role" do
 
   context ".build_family" do
     let(:subject) { Factories::EnrollmentFactory }
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 
     it "should add a family to a person without one" do
       subject.build_family(person,[])
       expect(person.primary_family).to be_truthy
+    end
+
+    it "should is_applying_coverage should be false" do
+      expect(person.consumer_role.is_applying_coverage).to eq true
     end
 
   end
