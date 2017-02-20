@@ -1,5 +1,6 @@
 module Forms
   class ConsumerCandidate
+    include Acapi::Notifiers
     include ActiveModel::Model
     include ActiveModel::Validations
 
@@ -79,6 +80,7 @@ module Forms
       if person_with_ssn != person_with_ssn_dob
         errors.add(:base,
           "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
+        log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
 
