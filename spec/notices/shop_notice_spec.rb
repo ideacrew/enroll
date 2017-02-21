@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe ShopNotices::EmployerRenewalNotice do
+RSpec.describe ShopNotice do
   let(:employer_profile){ create :employer_profile}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',
                             :notice_template => 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
-                            :notice_builder => 'ShopNotices::EmployerRenewalNotice',
+                            :notice_builder => 'ShopNotice',
                             :mpi_indicator => 'MPI_SHOPRA',
                             :title => "Renewal/Conversion Employer Publishes Plan"})
                           }
@@ -22,7 +22,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -39,7 +39,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopNotice.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessory info" do
       @employer_notice.build
