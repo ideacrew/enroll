@@ -1,6 +1,7 @@
 class ShopNotices::RenewalGroupNotice < ShopNotices::EmployerRenewalNotice
 
   def deliver
+    build
     append_data
     super
   end
