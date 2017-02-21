@@ -116,6 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
+
   #after_save :generate_family_search
   after_create :create_inbox
 
@@ -279,9 +280,10 @@ class Person
     end
   end
 
+
   #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
-
+  
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
     if !deleted_messages.blank?
@@ -433,6 +435,7 @@ class Person
   end
 
   def ensure_relationship_with(person, relationship)
+    return if person.blank?
     existing_relationship = self.person_relationships.detect do |rel|
       rel.relative_id.to_s == person.id.to_s
     end
@@ -679,7 +682,7 @@ class Person
       raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
 
       matches = Array.new
-      matches.concat Person.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
+      matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query), dob: dob_query).to_a unless ssn_query.blank?
       #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
@@ -858,6 +861,12 @@ class Person
       if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
         consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
       end
+    end
+  end
+
+  def check_for_ridp(session_var)
+    if user && session_var == 'paper'
+      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
     end
   end
 
