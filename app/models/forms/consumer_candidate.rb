@@ -74,8 +74,8 @@ module Forms
     end
 
     def uniq_ssn_dob
-      person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
-      person_with_ssn_dob = person_with_ssn.where(dob: dob)
+      person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+      person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
         errors.add(:base,
           "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
