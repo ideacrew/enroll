@@ -59,7 +59,10 @@
     <%
     first_checked = true
     second_checked = false
-    if @consumer_role.present?
+    if @use_person.present?
+      first_checked = @person.is_applying_coverage == 'true'
+      second_checked = @person.is_applying_coverage == 'false'
+    elsif @consumer_role.present?
       first_checked = @consumer_role.is_applying_coverage
       second_checked = !@consumer_role.is_applying_coverage
     end
