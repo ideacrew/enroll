@@ -196,7 +196,8 @@ module Subscribers
 
       if !ssn.blank?
         Person.where({
-          :encrypted_ssn => Person.encrypt_ssn(ssn)
+          :encrypted_ssn => Person.encrypt_ssn(ssn),
+          :dob => dob
         }).first
       else
         Person.where({

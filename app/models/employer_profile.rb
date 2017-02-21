@@ -26,6 +26,9 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+#  field :converted_from_carrier_at, type: DateTime, default: nil
+#  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
+
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
@@ -832,6 +835,10 @@ class EmployerProfile
     end
   end
 
+  def conversion_employer?
+    !self.converted_from_carrier_at.blank?
+  end
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
@@ -910,6 +917,6 @@ private
   end
 
   def plan_year_publishable?
-    !published_plan_year.is_application_unpublishable? 
+    !published_plan_year.is_application_unpublishable?
   end
 end

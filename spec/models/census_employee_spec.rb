@@ -764,7 +764,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:person) {double}
-    let(:family) {double(active_household: double(hbx_enrollments: double(active: double(open_enrollments: [@enrollment]))))}
+    let(:family) {double(active_household: double(hbx_enrollments: double(shop_market: double(enrolled_and_renewing: double(open_enrollments: [@enrollment])))))}
+
     let(:benefit_group) {double}
     before :all do
       create_brady_census_families

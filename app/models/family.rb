@@ -30,6 +30,7 @@ class Family
   field :is_disabled, type: Boolean, default: false
 
   before_save :clear_blank_fields
+
  #after_save :generate_family_search
 
   belongs_to  :person
@@ -117,6 +118,7 @@ class Family
   validate :family_integrity
 
   after_initialize :build_household
+
  # after_save :update_family_search_collection
  # after_destroy :remove_family_search_record
 

@@ -888,11 +888,9 @@ class HbxEnrollment
     end
   end
 
-
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-
 
     enrollment.submitted_at = submitted_at
     case

@@ -84,6 +84,15 @@ class PlanYear
     )
   }
 
+  scope :published_and_expired_plan_years_by_date, ->(date) {
+    where(
+      "$and" => [
+        {:aasm_state.in => PUBLISHED + ['expired'] },
+        {:"start_on".lte => date, :"end_on".gte => date}
+      ]
+    )
+  }
+  
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -837,7 +846,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:enrolled, :active], to: :canceled
+      transitions from: [:published, :enrolling, :enrolled, :active], to: :canceled
     end
 
     # Coverage disabled due to non-payment
@@ -965,6 +974,7 @@ private
       false
     end
   end
+
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
@@ -1047,10 +1057,9 @@ private
   end
 
   def open_enrollment_date_checks
+    return if canceled? || expired? || renewing_canceled?
+    return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
-    if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
-      return false
-    end
 
     if start_on != start_on.beginning_of_month
       errors.add(:start_on, "must be first day of the month")

@@ -213,7 +213,7 @@ class CensusEmployee < CensusMember
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && (employee_role.read_attribute(:hired_on).blank? || hired_on != Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d')))
       employee_role.set(hired_on: hired_on)
-      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
+      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.open_enrollments rescue []
       enrollments.each do |enrollment|
         if hired_on > enrollment.effective_on
           effective_on = enrollment.benefit_group.effective_on_for(hired_on)
@@ -870,7 +870,7 @@ class CensusEmployee < CensusMember
 
   def past_enrollments
     if employee_role.blank?
-      []      
+      []
     else
       enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
       enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}
