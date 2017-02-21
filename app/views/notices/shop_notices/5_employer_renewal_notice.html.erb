@@ -20,10 +20,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.coverage_start_on.strftime("%m/%d/%Y")}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.coverage_start_on - 1.month).strftime("%m/10/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
+  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on.strftime("%m/%d/%Y")}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.start_on - 1.month).strftime("%m/10/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your employees will also have until #{notice.plan_year.open_enrollment_end_on.strftime("%A")}, #{notice.plan_year.open_enrollment_end_on.strftime("%m/%d/%Y")} to make their plan selections. Please note that our Small Business Specialist will only be available until #{((notice.plan_year.coverage_start_on - 1.month)+9.days).strftime("%A")}, #{(notice.plan_year.coverage_start_on - 1.month).strftime("%m/10/%Y")} to provide assistance with any difficulties that your employees may experience."} %>
+  content: "Your employees will also have until #{notice.plan_year.open_enrollment_end_on.strftime("%A")}, #{notice.plan_year.open_enrollment_end_on.strftime("%m/%d/%Y")} to make their plan selections. Please note that our Small Business Specialist will only be available until #{((notice.plan_year.start_on - 1.month)+9.days).strftime("%A")}, #{(notice.plan_year.start_on - 1.month).strftime("%m/10/%Y")} to provide assistance with any difficulties that your employees may experience."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Please provide us with dates and times that are convenient to you for one of our Small Business Specialist to contact you or your broker to provide assistance."} %>
