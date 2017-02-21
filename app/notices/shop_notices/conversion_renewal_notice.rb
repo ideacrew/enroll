@@ -1,4 +1,4 @@
-class ShopNotices::ConversionRenewalNotice < ShopNotices::RenewalGroupNotice
+class ShopNotices::ConversionRenewalNotice < ShopNotice
 
   def deliver
     build
