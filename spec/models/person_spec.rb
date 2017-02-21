@@ -461,7 +461,7 @@ describe Person do
     end
 
     it 'matches by ssn' do
-      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq [@p1]
+      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq []
     end
 
     it 'matches by ssn, last_name and dob' do
@@ -478,6 +478,14 @@ describe Person do
 
     it 'not match last_name and dob if ssn provided (match is already done if ssn ok)' do
       expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob, ssn: '999884321').size).to eq 0
+    end
+
+    it 'ssn, dob present, then should return person object' do
+      expect(Person.match_by_id_info(dob: @p0.dob, ssn: '999884321').size).to eq 0
+    end
+
+    it 'ssn present, dob not present then should return empty array' do
+      expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
   end
 
