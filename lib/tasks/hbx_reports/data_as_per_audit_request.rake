@@ -3,10 +3,10 @@ require 'csv'
  # The task to run is RAILS_ENV=production bundle exec rake reports:audit_requested_list
 namespace :reports do
  
-  desc "List of unassisted IVL's registered in enroll from 10/01/2015 to 10/31/2016"
+  desc "List of unassisted IVL's registered in enroll from 10/12/2015 to 10/31/2016"
   task :audit_requested_list => :environment do
 
-    start_date = Date.new(2015,10,1)
+    start_date = Date.new(2015,10,12)
     end_date = Date.new(2016,9,30)
 
      field_names  = %w(
