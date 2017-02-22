@@ -80,6 +80,12 @@ module Factories
       renewal_enrollment.enrollment_kind = "open_enrollment"
       renewal_enrollment.kind = "employer_sponsored"
 
+      if @census_employee.renewal_benefit_group_assignment.blank?
+        @census_employee.add_renew_benefit_group_assignment(@renewing_plan_year.benefit_groups.first)
+      end
+
+      benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
+
       benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
       if benefit_group_assignment.blank?
         message = "Unable to find benefit_group_assignment for census_employee: \n"\
@@ -164,9 +170,12 @@ module Factories
 
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
+     
+      if @census_employee.renewal_benefit_group_assignment.blank?
+        @census_employee.add_renew_benefit_group_assignment(@renewing_plan_year.benefit_groups.first)
+      end
 
       benefit_group_assignment = @census_employee.renewal_benefit_group_assignment
-
 
       if benefit_group_assignment.blank?
         message = "Unable to find benefit_group_assignment for census_employee: \n"\

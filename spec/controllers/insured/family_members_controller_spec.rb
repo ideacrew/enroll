@@ -217,7 +217,7 @@ RSpec.describe Insured::FamilyMembersController do
     let(:address) { double }
     let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
-    let(:dependent_properties) { { "first_name" => "lkjdfkajdf"} }
+    let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
 
     before(:each) do
@@ -243,7 +243,6 @@ RSpec.describe Insured::FamilyMembersController do
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(assigns(:dependent).addresses.class).to eq Array
       end
-
     end
 
     describe "with a valid dependent" do

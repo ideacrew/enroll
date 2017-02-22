@@ -849,10 +849,11 @@ class HbxEnrollment
     end
   end
 
+
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-
 
     enrollment.submitted_at = submitted_at
     case
@@ -871,7 +872,7 @@ class HbxEnrollment
         enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
         enrollment.enrollment_kind = "open_enrollment"
       end
-
+    
       enrollment.benefit_group_id = benefit_group.id
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
     when consumer_role.present?

@@ -212,7 +212,21 @@ module Factories
       end
       return family
     end
-    
+
+    def self.initialize_dependent(family, primary, dependent)
+      person, new_person = initialize_person(nil, nil, dependent.first_name,
+                                 dependent.middle_name, dependent.last_name,
+                                 dependent.name_sfx, dependent.ssn,
+                                 dependent.dob, dependent.gender, "employee")
+
+      if person.present? && person.persisted?
+        relationship = person_relationship_for(dependent.employee_relationship)
+        primary.ensure_relationship_with(person, relationship)
+        family.add_family_member(person) unless family.find_family_member_by_person(person)
+      end
+      person
+    end
+
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
@@ -244,11 +258,13 @@ module Factories
       when 0
         # Assign employee-specifc attributes
         person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
-      when 1
-        roles.first
+        # when 1
+        #   roles.first
+        # else
+        #   # What am I doing here?
+        #   nil
       else
-        # What am I doing here?
-        nil
+        roles.first
       end
     end
 
@@ -268,16 +284,6 @@ module Factories
 
     def self.initialize_primary_applicant(family, person)
       family.add_family_member(person, is_primary_applicant: true) unless family.find_family_member_by_person(person)
-    end
-
-    def self.initialize_dependent(family, primary, dependent)
-      person, new_person = initialize_person(nil, nil, dependent.first_name,
-                                 dependent.middle_name, dependent.last_name,
-                                 dependent.name_sfx, dependent.ssn,
-                                 dependent.dob, dependent.gender, "employee")
-      relationship = person_relationship_for(dependent.employee_relationship)
-      primary.ensure_relationship_with(person, relationship)
-      family.add_family_member(person) unless family.find_family_member_by_person(person)
     end
 
     def self.person_relationship_for(census_relationship)

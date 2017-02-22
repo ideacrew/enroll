@@ -155,6 +155,7 @@ class CensusEmployee < CensusMember
           bg_assignment.is_active = false
           bg_assignment
         end
+        active = true
       end
     end
 
@@ -194,7 +195,7 @@ class CensusEmployee < CensusMember
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && hired_on != employee_role.hired_on
       employee_role.set(hired_on: hired_on)
-      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
+      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.open_enrollments rescue []
       enrollments.each do |enrollment|
         if hired_on > enrollment.effective_on
           effective_on = enrollment.benefit_group.effective_on_for(hired_on)
