@@ -124,12 +124,6 @@ class V2GroupXmlGenerator
     doc.xpath("//cv:plan_year[not(cv:benefit_groups)]", {:cv => XML_NS}).each do |node|
       node.remove
     end
-    doc.xpath("//cv:broker_agency_profile[not(cv:brokers)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
-    doc.xpath("//cv:employer_profile/cv:brokers[not(cv:broker_account)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
     employer_id = doc.at_xpath("//cv:organization/cv:id/cv:id", {:cv => XML_NS}).content
     has_last_year = false
     has_this_year = false
