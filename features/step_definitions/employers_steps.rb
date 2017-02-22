@@ -570,6 +570,41 @@ Then /^they should see that employee's details$/ do
   wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
+
+And /^employer click on pencil symbol next to employee status bar$/ do
+  find('.fa-pencil').click
+end
+
+Then /^employer should see the terminate button$/ do
+  find_link('Terminate').visible?
+end
+
+And /^employer clicks on terminate button$/ do
+  click_link('Terminate')
+end
+
+Then /^employer should see the field to enter termination date$/ do
+  expect(page).to have_content 'ENTER DATE OF TERMINATION'
+end
+
+And /^employer clicks on terminate button with DOT as today$/ do
+  find('.date-picker.date-field').set("#{TimeKeeper.date_of_record}")
+  find('.btn-primary.btn-sm').click
+end
+
+And /^employer clicks on terminate button with DOT in the past greater than 60 days$/ do
+  find('.date-picker.date-field').set("#{TimeKeeper.date_of_record - 3.months }")
+  find('.btn-primary.btn-sm').click
+end
+
+Then /^employer should see the success flash notice$/ do
+  expect(page).to have_content /Successfully terminated Census Employee./
+end
+
+Then /^employer should see the error flash notice$/ do
+  expect(page).to have_content /Census Employee could not be terminated: Termination date must be within the past 60 days./
+end
+
 When(/^the employer goes to benefits tab$/) do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
 end
