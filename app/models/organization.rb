@@ -111,7 +111,7 @@ class Organization
          { name: "broker_agency_employer_search_index" })
 
   before_save :generate_hbx_id
-  after_update :notify_legal_or_fein_change
+  after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -331,11 +331,18 @@ class Organization
     end
   end
 
+  def check_legal_name_or_fein_changed?
+    fein_changed? || legal_name_changed?
+  end
+
+  def legal_name_or_fein_change_attributes
+    @changed_fields = changed_attributes.keys
+  end
+
   def notify_legal_or_fein_change
     return unless self.employer_profile.present?
-    changed_fields = changed_attributes.keys
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
-      if changed_fields.include?(feild)
+      if @changed_fields.include?(feild)
         notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
     end
