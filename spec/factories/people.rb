@@ -9,7 +9,6 @@ FactoryGirl.define do
     is_incarcerated false
     is_active true
     gender "male"
-    is_applying_coverage true
 
     #association :employee_role, strategy: :build
 

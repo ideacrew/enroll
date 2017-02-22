@@ -51,7 +51,9 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
-  field :is_applying_coverage, type: Boolean, default: true
+
+  delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
+
   # Login account
   belongs_to :user
 
