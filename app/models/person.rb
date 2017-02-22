@@ -51,7 +51,6 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
-
   # Login account
   belongs_to :user
 
