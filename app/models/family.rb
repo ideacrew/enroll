@@ -229,6 +229,11 @@ class Family
     primary_family_member
   end
 
+  def terminated_enrollments
+    return [] if  latest_household.blank?
+    enrollments.order_by(:created_at => "DESC").select{|h| h.aasm_state == "coverage_terminated"}
+  end
+  
   def primary_family_member
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
