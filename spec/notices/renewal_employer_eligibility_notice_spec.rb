@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe ShopNotice do
+RSpec.describe ShopNotices::RenewalEmployerEligibilityNotice do
   let(:employer_profile){ create :employer_profile}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',
                             :notice_template => 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
-                            :notice_builder => 'ShopNotice',
+                            :notice_builder => 'ShopNotices::RenewalEmployerEligibilityNotice',
                             :mpi_indicator => 'MPI_SHOPRA',
-                            :title => "Renewal/Conversion Employer Publishes Plan"})
+                            :title => "Plan Offerings Finalized"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
@@ -22,7 +22,7 @@ RSpec.describe ShopNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopNotices::RenewalEmployerEligibilityNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe ShopNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopNotices::RenewalEmployerEligibilityNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -39,7 +39,7 @@ RSpec.describe ShopNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopNotices::RenewalEmployerEligibilityNotice.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessory info" do
       @employer_notice.build
