@@ -294,7 +294,7 @@ $(function () {
             <td class="vert1"><%=pipeline.est_renew_value%></td>
             <td ><%=pipeline.real_renew_value%></td>
             <td class="vert1"><%=pipeline.est_new_value%></td>
-            <td class="vert1"><%=pipeline.real_new_value%></td>
+            <td ><%=pipeline.real_new_value%></td>
           </tr>
     <%end%>
     </tbody>
@@ -312,7 +312,7 @@ $(function () {
     <%@fundtransfers.each do |fundtransfer|%>
         <tbody>
          <tr> 
-            <td class="vert1"><%=fundtransfer.carrier%></td>
+            <td ><%=fundtransfer.carrier%></td>
             <td class="vert1">$<%=fundtransfer.amount%></td>
             <td class="vert1"><%=fundtransfer.month_change_value.to_f * 100%>%</td>
             <td class="vert1"><%=fundtransfer.year_change_value.to_f * 100 %>%</td>
@@ -337,14 +337,14 @@ $(function () {
     <%@redmines.each do |redmine|%>
     <tbody>
      <tr> 
-        <td class="vert1"><%=redmine.ticket_type%></td>
-        <td class="vert1"><%=redmine.total_open_value%></td>
+        <td ><%=redmine.ticket_type%></td>
+        <td ><%=redmine.total_open_value%></td>
         <td class="vert1"><%=redmine.closed_7_day_value%></td>
-        <td class="vert1"><%=redmine.opened_7_day_value%></td>
+        <td ><%=redmine.opened_7_day_value%></td>
         <td class="vert1"><%=redmine.avg_days_value%></td>
-        <td class="vert1"><%=redmine.target_days_value%></td>
+        <td ><%=redmine.target_days_value%></td>
         <td class="vert1"><%=redmine.index_value%></td>
-        <td class="vert1"><%=redmine.change_7_day_value%></td>
+        <td ><%=redmine.change_7_day_value%></td>
      </tr>
       <%end%>
     </tbody>
@@ -369,7 +369,7 @@ $(function () {
         <td ><%=events.event_value%></td>
         <td ><%=events.impact_value%></td>
         <td ><%= events.on_schedule_days_value.present? ? events.on_schedule_days_value : "N/A" %></td>
-        <td ><%=events.event_date_value%></td>
+        <td><%=Date.strptime(events.event_date_value,"%Y-%m-%d").strftime("%m-%d-%Y")%></td>
      </tr>
         <%end%>
       
@@ -412,7 +412,7 @@ $(function () {
         <td></td>
         <td class="texLef"><%=web.load_time_value%></td>
         <td></td>
-        <td class="texLef"><%=web.avg_session_value%></td>
+        <td class="texLef"><%=web.avg_session_value%>s</td>
       </tr>
       <%end%>
     </tbody>

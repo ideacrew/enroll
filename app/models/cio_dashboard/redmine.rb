@@ -11,7 +11,7 @@ module CioDashboard
     field :closed_7_day_indicator,type: String
     field :opened_7_day_value, type: Integer
     field :opened_7_day_indicator, type: String
-    field :avg_days_value, type: Integer
+    field :avg_days_value, type: Float
     field :avg_days_indicator, type: String
     field :target_days_value, type: Integer
     field :target_days_indicator, type: String
