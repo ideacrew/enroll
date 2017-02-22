@@ -68,13 +68,9 @@ Then(/^the broker enters the quote effective date$/) do
 end
 
 When(/^the broker selects employer type$/) do
-  find('.selectric-interaction-choice-control-quote-employer-type').click
-
-#   find('.interaction-choice-control-quote-employer-profile-id-2', match: :first).click
-
-  select "Prospect", :from => "quote_employer_type"
-
-  fill_in 'quote[employer_name]', with: "prospect test Employee"
+ find('.interaction-choice-control-quote-employer-type').click()
+ find('.interaction-choice-control-quote-employer-type-2').select_option
+ fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do
@@ -96,9 +92,9 @@ Then(/^the broker should see a successful message$/) do
   expect(page).to have_content('Successfully saved quote/employee roster.')
 end
 
-Then(/^the broker clicks on Back to Quotes button$/) do
+Then(/^the broker clicks on Home button$/) do
   sleep 2
-  find('.interaction-click-control-back-to-quotes').trigger 'click'
+  find('.interaction-click-control-home').trigger 'click'
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
@@ -130,16 +126,8 @@ Then(/^adds a benefit group$/) do
 end
 
 Then(/^adds a new benefit group$/) do
-  fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
-end
-
-Then(/^Click on Add Benefit Group Button to add benefit group$/) do
-  # click_button 'Add benefit Group'
-end
-
-Then(/^the broker assigns the benefit group to the family$/) do
-  select "My Benefit Group", :from => "quote[quote_households_attributes][0][quote_benefit_group_id]"
 end
 
 Then(/^the broker saves the quote$/) do
@@ -213,28 +201,13 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
-  wait_for_ajax
-  click_button 'Publish Quote'
+   page.find_button("Publish Quote").trigger("click")
 end
 
 Then(/^the broker sees that the Quote is published$/) do
-  wait_for_ajax
   expect(page).to have_content('Your quote has been published')
 end
 
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
-end
-
-
-Then(/^the broker should see avaliable Quotes$/) do
-  find('#Tab\\:all').visible?
-  end
-
-When(/^the broker clicks on Actions\.$/) do
-  find_button('Actions').click
-end
-
-Then(/^view publish quote should be disabled\.$/) do
-  find_link('View Published Quote')['disabled'].should == 'disabled'
 end

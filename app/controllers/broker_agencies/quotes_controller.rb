@@ -32,7 +32,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     end
   end
 
-  def show 
+  def show
     @q = Quote.find(params[:id])
     @benefit_groups = @q.quote_benefit_groups
     @quote_benefit_group = (params[:benefit_group_id] && @q.quote_benefit_groups.find(params[:benefit_group_id])) || @benefit_groups.first
@@ -43,7 +43,6 @@ class BrokerAgencies::QuotesController < ApplicationController
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)
     @health_plan_quote_criteria  = Plan.build_plan_features('shop', 'health', @q.plan_year).to_json
-
     @dental_plans = Plan.shop_dental_plans @q.plan_year
     @dental_selectors = Plan.build_plan_selectors('shop', 'dental', @q.plan_year)
     dental_plan_quote_criteria  = Plan.build_plan_features('shop', 'dental',@q.plan_year) .to_json
@@ -157,11 +156,12 @@ class BrokerAgencies::QuotesController < ApplicationController
 
     # Increment family id so the new place holder contains max + 1
     qhh.family_id = max_family_id + 1
-
     # Create place holder for new member of household
-    qm = QuoteMember.new
-    qhh.quote_members << qm
-    @quote.quote_households << qhh
+    if params[:new_family].present?
+      qm = QuoteMember.new
+      qhh.quote_members << qm
+      @quote.quote_households << qhh
+    end
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
     @quote.quote_benefit_groups << qbg
 
@@ -203,22 +203,28 @@ class BrokerAgencies::QuotesController < ApplicationController
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
     if params[:commit] == "Add Employee"
+      new_family = true
       notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
+      new_family = nil
       notice_message = "Successfully saved quote/employee roster."
       scrollTo = 0
+    elsif params[:commit] == "Save"
+      new_family = @quote.quote_households.count > 0 ? '' : true
     end
-
     if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
       @quote.quote_households if @quote.quote_households.present?
       @quote.update_attributes(employer_profile_id: nil)
     end
-
     if (@quote.update_attributes(update_params) && @quote.update_attributes(insert_params))
       duplicate_household = @quote.quote_households.where(family_id: params[:duplicate_household]).first.try(:id).try(:to_str)
       num_of_dup = duplicate_household ? params[:num_of_dup] : nil
-      redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
+      if params[:commit] == "Create Quote"
+        redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
+      else
+        redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, new_family: new_family, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
+      end
     else
       redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote) ,  :flash => { :error => "Unable to update the employee roster." }
     end
@@ -277,10 +283,13 @@ class BrokerAgencies::QuotesController < ApplicationController
         @quote.save!
       end
     end
-    render "edit"
+    redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote)
   end
 
   def upload_employee_roster
+    @quote = Quote.find(params[:id])
+    emp = params[:type] == 'prospect' ? { employer_name: params[:name] } : {employer_profile_id: params[:profile_id]}
+    @quote.update_attributes({employer_type: params[:type], start_on: params[:effective_date], quote_name: params[:quote_name]}.merge(emp))
   end
 
   def download_employee_roster
@@ -485,7 +494,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   end
 
   def employees_list
- 
+
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
     quote = Quote.find(params[:quote_id])
     @quote_benefit_group_dropdown = quote.quote_benefit_groups
@@ -504,23 +513,13 @@ class BrokerAgencies::QuotesController < ApplicationController
       end
        @employee_present = true
     else
-      @quote = Quote.new
-      qbg = QuoteBenefitGroup.new
-      # Create place holder for a new household and new member for the roster
-      qhh = QuoteHousehold.new
-      # Increment family id so the new place holder contains max + 1
-      max_family_id = @quote.quote_households.max(:family_id).to_i
-      qhh.family_id = max_family_id + 1
-      # Create place holder for new member of household
-      qm = QuoteMember.new
-      qhh.quote_members << qm
-      @quote.quote_households << qhh
+      tmp_households
       @employee_present = false
     end
     respond_to do |format|
-      # format.html 
+      # format.html
       format.js
-    end  
+    end
   end
 
   def employee_type
@@ -529,6 +528,9 @@ class BrokerAgencies::QuotesController < ApplicationController
     @orgs = Organization.by_broker_role(broker_role_id)
     @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
     @employee_type = params[:type]
+    if @quote.employer_type == 'client' && params[:type] == 'prospect'
+      @quote.quote_households.destroy_all
+    end
   end
 
 
@@ -700,17 +702,36 @@ private
   end
 
   def set_dental_plans
-    @dental_plans = Plan.shop_dental_by_active_year(2016)
-    @dental_plans_count = Plan.shop_dental_by_active_year(2016).count
-    @dental_plans = @dental_plans.by_carrier_profile(params[:carrier_id]) if params[:carrier_id].present? && params[:carrier_id] != 'any'
-    @dental_plans = @dental_plans.by_dental_level(params[:dental_level]) if params[:dental_level].present? && params[:dental_level] != 'any'
-    @dental_plans = @dental_plans.by_plan_type(params[:plan_type]) if params[:plan_type].present? && params[:plan_type] != 'any'
-    @dental_plans = @dental_plans.by_dc_network(params[:dc_network]) if params[:dc_network].present? && params[:dc_network] != 'any'
-    @dental_plans = @dental_plans.by_nationwide(params[:nationwide]) if params[:nationwide].present? && params[:nationwide] != 'any'
+    @dental_plans = Plan.shop_dental_by_active_year(2017)
+    @dental_plans_count = Plan.shop_dental_by_active_year(2017).count
+    carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
+    dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
+    plan_type = params[:plan_type].nil? ? [] : params[:plan_type]
+    dc_network = params[:dc_network].nil?  ? [] : params[:dc_network]
+    nationwide = params[:nationwide].nil? ? [] : params[:nationwide]
+    @dental_plans = @dental_plans.by_carrier_profile_for_bqt(params[:carrier_id]) unless  carrier.empty? || carrier.include?('')
+    @dental_plans = @dental_plans.by_dental_level_for_bqt(params[:dental_level])  unless  dental_level.empty? || dental_level.include?('')
+    @dental_plans = @dental_plans.by_plan_type_for_bqt(params[:plan_type])   unless  plan_type.empty? || plan_type.include?('')
+    @dental_plans = @dental_plans.by_dc_network(params[:dc_network])  unless  dc_network.empty? || dc_network.include?('')
+    @dental_plans = @dental_plans.by_nationwide(params[:nationwide])  unless  nationwide.empty? || nationwide.include?('')
   end
 
   def validate_roles
     current_user.has_broker_role? || current_user.has_hbx_staff_role?
+  end
+
+  def tmp_households
+    @quote = Quote.new
+    qbg = QuoteBenefitGroup.new
+    # Create place holder for a new household and new member for the roster
+    qhh = QuoteHousehold.new
+    # Increment family id so the new place holder contains max + 1
+    max_family_id = @quote.quote_households.max(:family_id).to_i
+    qhh.family_id = max_family_id + 1
+    # Create place holder for new member of household
+    qm = QuoteMember.new
+    qhh.quote_members << qm
+    @quote.quote_households << qhh
   end
 
 end
