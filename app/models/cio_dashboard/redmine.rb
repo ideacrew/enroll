@@ -25,7 +25,7 @@ module CioDashboard
    def self.redmine_dashboard_stats
         redmines =[ ]
         CioDashboard::Redmine.all.each do |r|
-            redmines << r if r.total_open_value.present? && redmines.size < 5 
+            redmines << r if r.total_open_value.present? && redmines.size < 7 
         end
         redmines
     end

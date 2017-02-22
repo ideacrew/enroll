@@ -284,14 +284,15 @@ $(function () {
       </tr>
     </thead>
     <%@pipelines.each do |pipeline|%>
+    <% next if pipeline.effective_month.nil? %>
         <tbody>
           <tr>
             <td></td>
-            <td><%=pipeline.effective_month%></td> 
-            <td class="vert1"><%=pipeline.est_convert_value%></td>
-            <td class="vert1"><%=pipeline.real_convert_value%></td>
+            <td><%=Date.strptime(pipeline.effective_month,"%Y-%m").strftime("%b-%Y")%></td>
+            <td ><%=pipeline.est_convert_value%></td>
+            <td ><%=pipeline.real_convert_value%></td>
             <td class="vert1"><%=pipeline.est_renew_value%></td>
-            <td class="vert1"><%=pipeline.real_renew_value%></td>
+            <td ><%=pipeline.real_renew_value%></td>
             <td class="vert1"><%=pipeline.est_new_value%></td>
             <td class="vert1"><%=pipeline.real_new_value%></td>
           </tr>
@@ -312,9 +313,9 @@ $(function () {
         <tbody>
          <tr> 
             <td class="vert1"><%=fundtransfer.carrier%></td>
-            <td class="vert1"><%=fundtransfer.amount%></td>
-            <td class="vert1"><%=fundtransfer.month_change_value%></td>
-            <td class="vert1"><%=fundtransfer.year_change_value%></td>
+            <td class="vert1">$<%=fundtransfer.amount%></td>
+            <td class="vert1"><%=fundtransfer.month_change_value.to_f * 100%>%</td>
+            <td class="vert1"><%=fundtransfer.year_change_value.to_f * 100 %>%</td>
          </tr>
       <%end%>
     </tbody>
@@ -365,10 +366,10 @@ $(function () {
         <%@events.each do |events|%>
     <tbody>
      <tr> 
-        <td class="vert1"><%=events.event_value%></td>
-        <td class="vert1"><%=events.impact_value%></td>
-        <td class="vert1"><%=events.on_schedule_days_value%></td>
-        <td class="vert1"><%=events.event_date_value%></td>
+        <td ><%=events.event_value%></td>
+        <td ><%=events.impact_value%></td>
+        <td ><%= events.on_schedule_days_value.present? ? events.on_schedule_days_value : "N/A" %></td>
+        <td ><%=events.event_date_value%></td>
      </tr>
         <%end%>
       
@@ -409,9 +410,9 @@ $(function () {
         <td></td>
         <td class="texLef"><%=web.return_visitors_value%></td>
         <td></td>
-        <td class="texLef"><%=web.load_time_value%>s</td>
+        <td class="texLef"><%=web.load_time_value%></td>
         <td></td>
-        <td class="texLef"><%=web.avg_session_value%>s</td>
+        <td class="texLef"><%=web.avg_session_value%></td>
       </tr>
       <%end%>
     </tbody>
