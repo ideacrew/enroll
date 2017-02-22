@@ -2,8 +2,8 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
 
   def deliver
     build
-    generate_pdf_notice
     append_data
+    generate_pdf_notice
 
     if employer_profile.is_conversion?
       conversion_attachment
