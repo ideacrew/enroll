@@ -455,6 +455,11 @@ When /^click on one of their employees$/ do
   click_link employees.first.full_name
 end
 
+And /^click on one of their past terminated employee$/ do
+  employees.first.update_attributes(aasm_state: 'employment_terminated', coverage_terminated_on: TimeKeeper.date_of_record - 30.days, employment_terminated_on: TimeKeeper.date_of_record - 30.days)
+  click_link employees.first.full_name
+end
+
 Given /^the employer has employees$/ do
   employees employer_profile: employer.employer_profile
 end
@@ -575,34 +580,36 @@ And /^employer click on pencil symbol next to employee status bar$/ do
   find('.fa-pencil').click
 end
 
-Then /^employer should see the terminate button$/ do
-  find_link('Terminate').visible?
+Then /^employer should see the (.*) button$/ do |status|
+  find_link(status.capitalize).visible?
 end
 
-And /^employer clicks on terminate button$/ do
-  click_link('Terminate')
+And /^employer clicks on (.*) button$/ do |status|
+  click_link(status.capitalize)
 end
 
-Then /^employer should see the field to enter termination date$/ do
-  expect(page).to have_content 'ENTER DATE OF TERMINATION'
+Then /^employer should see the field to enter (.*) date$/ do |status|
+  status = status == 'termination' ? 'ENTER DATE OF TERMINATION' : 'ENTER DATE OF REHIRE'
+  expect(page).to have_content status
 end
 
-And /^employer clicks on terminate button with DOT as today$/ do
-  find('.date-picker.date-field').set("#{TimeKeeper.date_of_record}")
+And /^employer clicks on (.*) button with date as (.*)$/ do |status, date|
+  date = date == 'today' ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 3.months
+  find('.date-picker.date-field').set date
   find('.btn-primary.btn-sm').click
 end
 
-And /^employer clicks on terminate button with DOT in the past greater than 60 days$/ do
-  find('.date-picker.date-field').set("#{TimeKeeper.date_of_record - 3.months }")
-  find('.btn-primary.btn-sm').click
-end
-
-Then /^employer should see the success flash notice$/ do
-  expect(page).to have_content /Successfully terminated Census Employee./
+Then /^employer should see the (.*) success flash notice$/ do |status|
+  result = status == 'terminated' ? "Successfully terminated Census Employee." : "Successfully rehired Census Employee."
+  expect(page).to have_content result
 end
 
 Then /^employer should see the error flash notice$/ do
   expect(page).to have_content /Census Employee could not be terminated: Termination date must be within the past 60 days./
+end
+
+Then /^employer should see the rehired error flash notice$/ do
+  expect(page).to have_content "Rehiring date can't occur before terminated date."
 end
 
 When(/^the employer goes to benefits tab$/) do
