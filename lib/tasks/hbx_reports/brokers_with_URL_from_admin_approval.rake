@@ -20,8 +20,8 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
-          unless BrokerRole.find(invitation.source_id)
-            broker=BrokerRole.find(invitation.source_id).first
+          unless BrokerRole.find(invitation.source_id).nil?
+            broker=BrokerRole.find(invitation.source_id)
             unless broker.nil?
               csv << [
                 broker.broker_agency_profile.try(:legal_name),
