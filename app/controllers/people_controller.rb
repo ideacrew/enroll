@@ -198,13 +198,12 @@ class PeopleController < ApplicationController
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
-
       redirect_path = family_account_path
     end
 
 
     respond_to do |format|
-      if @person.update_attributes(person_params)
+      if @person.update_attributes(person_params.except(:is_applying_coverage))
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage])
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }

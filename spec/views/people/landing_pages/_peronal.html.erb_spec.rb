@@ -31,7 +31,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       end
 
       it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is this person applying for coverage?/
+        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
       end
 
       it "should have no-dc-address-reasons area" do

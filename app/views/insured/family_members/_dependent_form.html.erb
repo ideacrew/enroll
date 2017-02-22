@@ -105,7 +105,7 @@
 
           <% if @person.has_active_consumer_role? %>
             <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-              <span>Is this person applying for coverage?</span>
+              <span>Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage?</span>
             </div>
             <%
             first_checked = true
