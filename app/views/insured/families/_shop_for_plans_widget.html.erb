@@ -31,29 +31,21 @@
     <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) %>
     <%= hidden_field_tag 'shop_for_plans', 'shop_for_plans' %>
 
-        <div class="panel panel-default" id='shop-for-plans-widget'>
-          <div class="panel-body">
-            <div class="row">
-              <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-                <div class='image-area'>
-                  <%= image_tag 'icons/shop_for_plan.png', style: 'width: 45px;' %>
-                </div>
-                <strong>Shop for health and dental plans</strong>
+      <div class="panel panel-default" id='shop-for-plans-widget'>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+              <div class='image-area'>
+                <%= image_tag 'icons/shop_for_plan.png', style: 'width: 45px;' %>
               </div>
-          <% if @family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)%>
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
-              <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
-                Shop for Plans
-              </button>
+              <strong>Shop for health and dental plans</strong>
             </div>
-          <% else %>
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
               <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
             </div>
-          <% end %>
+          </div>
         </div>
       </div>
-    </div>
   <% end %>
 <% end %>
 
@@ -71,12 +63,14 @@
                 options.merge!(person_id: @person.id) if @person.present?
                 options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
                 options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
+                options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
               %>
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
                 You are not under open enrollment period.
               <% else %>
                 <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
-                <%= format_date ivl_enrollment_effective_date %>.
+                  <%= format_date ivl_enrollment_effective_date %>.
+                </p>
               <% end %>
               <br/>
               <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>

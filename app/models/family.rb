@@ -226,7 +226,7 @@ class Family
     else
       add_family_member(new_primary_family_member, is_primary_applicant: true)
     end
-    
+
     primary_family_member
   end
 

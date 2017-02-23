@@ -19,6 +19,7 @@ class Insured::GroupSelectionController < ApplicationController
     set_bookmark_url
     initialize_common_vars
     effective_on_option_selected = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil # params[:effective_on_option_selected] will exist in case of a QLE with date choice options.
+
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
