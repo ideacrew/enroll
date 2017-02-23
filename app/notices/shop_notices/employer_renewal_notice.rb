@@ -8,7 +8,7 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
     if employer_profile.is_conversion?
       conversion_attachment
     end
-
+    attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
