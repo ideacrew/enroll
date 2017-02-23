@@ -89,6 +89,8 @@ class Insured::ConsumerRolesController < ApplicationController
             format.html { render 'no_match' }
           end
         end
+      elsif @consumer_candidate.errors[:ssn_dob_taken].present?
+        format.html { render 'search' }
       elsif @consumer_candidate.errors[:ssn_taken].present?
         text = "The SSN entered is associated with an existing user. "
         text += "Please #{view_context.link_to('Sign In', SamlInformation.iam_login_url)} with your user name and password "
@@ -192,10 +194,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def ridp_agreement
     set_current_person
-    if session[:original_application_type] == 'paper'
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-      return
-    elsif @person.completed_identity_verification?
+    if @person.completed_identity_verification?
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
