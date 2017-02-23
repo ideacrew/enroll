@@ -155,6 +155,7 @@ class CensusEmployee < CensusMember
           bg_assignment.is_active = false
           bg_assignment
         end
+        active = true
       end
     end
 
@@ -194,7 +195,7 @@ class CensusEmployee < CensusMember
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && hired_on != employee_role.hired_on
       employee_role.set(hired_on: hired_on)
-      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
+      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.open_enrollments rescue []
       enrollments.each do |enrollment|
         if hired_on > enrollment.effective_on
           effective_on = enrollment.benefit_group.effective_on_for(hired_on)
@@ -290,12 +291,6 @@ class CensusEmployee < CensusMember
     benefit_group_assignments << bga
   end
 
-  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
-    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
-    reset_active_benefit_group_assignments(new_benefit_group)
-    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
-  end
-
   def qle_30_day_eligible?
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
@@ -383,7 +378,6 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employment!(employment_terminated_on)
-
     if employment_terminated_on < TimeKeeper.date_of_record
 
       if may_terminate_employee_role?
@@ -393,10 +387,10 @@ class CensusEmployee < CensusMember
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
 
         end
@@ -414,10 +408,10 @@ class CensusEmployee < CensusMember
 
       if may_schedule_employee_termination? || employee_termination_pending?
           schedule_employee_termination!
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
@@ -492,13 +486,13 @@ class CensusEmployee < CensusMember
     active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
   end
 
-  def has_active_health_coverage?(plan_year)
+  def has_active_health_coverage?(plan_year) # Related code is commented out
     benefit_group_ids = plan_year.benefit_groups.map(&:id)
 
     bg_assignment = active_benefit_group_assignment if benefit_group_ids.include?(active_benefit_group_assignment.try(:benefit_group_id))
     bg_assignment = renewal_benefit_group_assignment if benefit_group_ids.include?(renewal_benefit_group_assignment.try(:benefit_group_id))
 
-    bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
+    bg_assignment.present? && HbxEnrollment.enrolled_shop_health_benefit_group_ids([bg_assignment]).present?
   end
 
   class << self
@@ -607,6 +601,17 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Search query string on census employee with first name,last name,SSN.
+    def search_hash(s_rex)
+      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      {
+          "$or" => ([
+              {"first_name" => search_rex},
+              {"last_name" => search_rex},
+              {"encrypted_ssn" => encrypt_ssn(s_rex)}
+          ])
+      }
+    end
   end
 
   aasm do

@@ -306,10 +306,14 @@ def employer_poc
   end
 
   def broker_agency_index
-    @broker_agency_profiles = BrokerAgencyProfile.all
+
+    @datatable = Effective::Datatables::BrokerAgencyDatatable.new
+
+    #@q = params.permit(:q)[:q]
+    #@broker_agency_profiles = HbxProfile.search_random(@q)
+
 
     respond_to do |format|
-      format.html { render "broker" }
       format.js {}
     end
   end
@@ -435,7 +439,7 @@ def employer_poc
     authorize  Family, :can_update_ssn?
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
-    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
 
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
