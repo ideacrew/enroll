@@ -342,7 +342,7 @@ class Organization
   def notify_legal_or_fein_change
     return unless self.employer_profile.present?
     FIELD_AND_EVENT_NAMES.each do |feild, event_name|
-      if @changed_fields.include?(feild)
+      if @changed_fields.present? && @changed_fields.include?(feild)
         notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
     end
