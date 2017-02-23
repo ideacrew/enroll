@@ -309,11 +309,16 @@ $(function () {
         <th>Year Change</th>
       </tr>
     </thead>
+    <% def separate_comma(number)%>
+        <%number = number.to_s.split('.')%>
+        <%number[0].reverse!.gsub!(/(\d{3})(?=\d)/, '\\1,').reverse!%>
+        <%number.join('.')%>
+    <%end%>
     <%@fundtransfers.each do |fundtransfer|%>
         <tbody>
          <tr> 
             <td ><%=fundtransfer.carrier%></td>
-            <td class="vert1">$<%=fundtransfer.amount%></td>
+            <td class="vert1">$<%=separate_comma(fundtransfer.amount)%></td>
             <td class="vert1"><%=fundtransfer.month_change_value.to_f * 100%>%</td>
             <td class="vert1"><%=fundtransfer.year_change_value.to_f * 100 %>%</td>
          </tr>
