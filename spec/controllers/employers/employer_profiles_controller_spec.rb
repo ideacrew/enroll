@@ -599,6 +599,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       allow(organization).to receive(:errors).and_return nil
       allow(organization).to receive(:notify_address_change).and_return(true)
+      allow(organization).to receive(:notify_legal_or_fein_change).and_return(true)
       sign_in(user)
       expect(Organization).to receive(:find)
 
@@ -623,6 +624,7 @@ RSpec.describe Employers::EmployerProfilesController do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(false)
         allow(organization).to receive(:notify_address_change).and_return(true)
+        allow(organization).to receive(:notify_legal_or_fein_change).and_return(true)
         sign_in(user)
         put :update, id: organization.id
         expect(response).to be_redirect
@@ -633,6 +635,7 @@ RSpec.describe Employers::EmployerProfilesController do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(true)
         allow(organization).to receive(:notify_address_change).and_return(true)
+        allow(organization).to receive(:notify_legal_or_fein_change).and_return(true)
         sign_in(user)
         put :update, id: organization.id
         expect(response).to be_redirect
