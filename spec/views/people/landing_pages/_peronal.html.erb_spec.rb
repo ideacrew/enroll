@@ -30,6 +30,10 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
         expect(rendered).to have_selector('div#consumer_fields')
       end
 
+      it "should display the is_applying_coverage field option" do
+        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
+      end
+
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
@@ -50,6 +54,10 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       it "should not have no-dc-address-reasons area" do
         expect(rendered).not_to match /homeless DC resident/
         expect(rendered).not_to match /living outside of DC temporarily and intend to return/
+      end
+
+      it "should not display the is_applying_coverage field option" do
+        expect(rendered).not_to match /Is this person applying for coverage?/
       end
 
       it "should have home address fields" do
