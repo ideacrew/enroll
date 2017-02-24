@@ -435,4 +435,20 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
     end
   end
+
+  describe "GET employer_profile datatable" do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    before :each do
+      sign_in user
+      xhr :get, :employer_datatable, id: broker_agency_profile.id, employer_id: employer_profile.id, search: {value: ''}
+    end
+
+    it "search for employers in BrokerAgencies without search string" do
+      expect(assigns(:employer_profile)).to eq nil
+    end
+  end
 end
