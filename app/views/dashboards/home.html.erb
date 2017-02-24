@@ -18,6 +18,7 @@ td, th {
   /*border-right: solid 1px #000000; 
   border-left: solid 1px #000000;*/
 }
+
 .texLef{
   text-align: left;
 }
@@ -28,6 +29,14 @@ table {
 .vert1 {
   border-left: 1px solid #000000;
 }
+
+.green{
+    color: green
+}
+
+.text_bold { 
+    font-weight: bold;
+ }
 
 .row.vertical-divider > div[class^="td"] {
   text-align: center;
@@ -283,12 +292,15 @@ $(function () {
         <th>Real New</th>    
       </tr>
     </thead>
-    <%@pipelines.each do |pipeline|%>
+    <%@pipelines.each_with_index do |pipeline,index|%>
     <% next if pipeline.effective_month.nil? %>
         <tbody>
+        <%
+            indicator_class = get_indicator_class(pipeline)
+        %>
           <tr>
             <td></td>
-            <td><%=Date.strptime(pipeline.effective_month,"%Y-%m").strftime("%b-%Y")%></td>
+            <td><%= raw indicator_class %><%=Date.strptime(pipeline.effective_month,"%Y-%m").strftime("%b-%Y")%></td>
             <td ><%=pipeline.est_convert_value%></td>
             <td ><%=pipeline.real_convert_value%></td>
             <td class="vert1"><%=pipeline.est_renew_value%></td>
@@ -309,18 +321,17 @@ $(function () {
         <th>Year Change</th>
       </tr>
     </thead>
-    <% def separate_comma(number)%>
-        <%number = number.to_s.split('.')%>
-        <%number[0].reverse!.gsub!(/(\d{3})(?=\d)/, '\\1,').reverse!%>
-        <%number.join('.')%>
-    <%end%>
-    <%@fundtransfers.each do |fundtransfer|%>
+    <%@fundtransfers.each_with_index do |fundtransfer,index|%>
         <tbody>
+        <%
+            indicator_class = get_indicator_class(fundtransfer)
+            @fundtransfers.size-1 == index ? class_name = "vert1 text_bold" : class_name = "vert1"
+        %>
          <tr> 
-            <td ><%=fundtransfer.carrier%></td>
-            <td class="vert1">$<%=separate_comma(fundtransfer.amount)%></td>
-            <td class="vert1"><%=fundtransfer.month_change_value.to_f * 100%>%</td>
-            <td class="vert1"><%=fundtransfer.year_change_value.to_f * 100 %>%</td>
+            <td class="<%=class_name%>"><%=fundtransfer.carrier%></td>
+            <td class="<%=class_name%>"><%=number_to_currency(fundtransfer.amount)%></td>
+            <td class="<%=class_name%>"><%=(fundtransfer.month_change_value.to_f * 100).to_i%>%<%= raw indicator_class %></td>
+            <td class="<%=class_name%>"><%=(fundtransfer.year_change_value.to_f * 100).to_i%>%</td>
          </tr>
       <%end%>
     </tbody>
@@ -368,13 +379,16 @@ $(function () {
         <th>Event Date</th>
       </tr>
     </thead>
-        <%@events.each do |events|%>
+        <%@events.each_with_index do |event,index|%>
     <tbody>
+    <%
+            indicator_class = get_indicator_class(event)
+    %>
      <tr> 
-        <td ><%=events.event_value%></td>
-        <td ><%=events.impact_value%></td>
-        <td ><%= events.on_schedule_days_value.present? ? events.on_schedule_days_value : "N/A" %></td>
-        <td><%=Date.strptime(events.event_date_value,"%Y-%m-%d").strftime("%m-%d-%Y")%></td>
+        <td ><%= raw indicator_class %><%=event.event_value%></td>
+        <td ><%=event.impact_value%></td>
+        <td ><%= event.on_schedule_days_value.present? ? event.on_schedule_days_value : "N/A" %></td>
+        <td><%=Date.strptime(event.event_date_value,"%Y-%m-%d").strftime("%m-%d-%Y")%></td>
      </tr>
         <%end%>
       
