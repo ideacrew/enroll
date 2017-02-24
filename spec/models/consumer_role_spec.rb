@@ -260,7 +260,6 @@ describe ConsumerRole, dbclean: :after_each do
           consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
           expect(consumer.ssn_validation).to eq("valid")
-          expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
           expect(consumer.lawful_presence_determination.citizenship_result).to eq("not_lawfully_present_in_us")
         end
       end
