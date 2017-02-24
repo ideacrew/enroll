@@ -26,8 +26,9 @@
 				</div>
 				<div class="panel-body" id="quote-info">
 					<div class="row form-inline">
+          <!-- Disabling client for now as per business request -->
 						<div class="form-group col-sm-6">Type:
-							<%= f.select(:employer_type, options_for_select([["Client", "client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
+							<%= f.select(:employer_type, options_for_select([["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
 						</div>
 						<div class="form-group col-sm-6">Employer Name:
 							<div class="type">
