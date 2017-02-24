@@ -10,7 +10,7 @@ class Insured::FamilyMembersController < ApplicationController
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
       @family.hire_broker_agency(current_user.person.broker_role.try(:id))
-      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id], :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit], :qle_id => params[:qle_id])
+      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id], :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
     end
 
     if @type == "employee"
