@@ -69,7 +69,7 @@ end
 
 When(/^the broker selects employer type$/) do
  find('.interaction-choice-control-quote-employer-type').click()
- find('.interaction-choice-control-quote-employer-type-2').select_option
+ select "Prospect", :from => "quote_employer_type"
  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
