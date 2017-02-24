@@ -223,12 +223,12 @@ describe ConsumerRole, dbclean: :after_each do
       context "coverage_purchased" do
         it "changes state to dhs_pending on coverage_purchased! for non_native without ssn" do
           person.ssn=nil
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:dhs_pending).on_event(:coverage_purchased)
         end
 
         it "changes state to ssa_pending on coverage_purchased! for non_native with SSN" do
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
         end
 
@@ -257,7 +257,7 @@ describe ConsumerRole, dbclean: :after_each do
           expect(consumer.ssn_validation).to eq("valid")
         end
         it "changes state to dhs_pending for non native citizen" do
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
           expect(consumer.ssn_validation).to eq("valid")
           expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
@@ -305,7 +305,7 @@ describe ConsumerRole, dbclean: :after_each do
         end
         it "changes state from dhs_pending to fully_verified" do
           person.ssn=nil
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
           expect(consumer.lawful_presence_determination.verification_successful?).to eq true
         end
@@ -344,7 +344,7 @@ describe ConsumerRole, dbclean: :after_each do
 
           it "change #{state} to dhs_pending if DHS applied" do
             person.ssn=nil
-            consumer.citizen_status = "not_us"
+            consumer.citizen_status = "non_native_citizen"
             expect(consumer).to transition_from(state).to(:dhs_pending).on_event(:redetermine, verification_attr)
             expect(consumer.lawful_presence_determination.verification_pending?).to eq true
           end
