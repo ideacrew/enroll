@@ -554,8 +554,8 @@ module ApplicationHelper
     end
   end
 
-  def disable_purchase?(disabled, hbx_enrollment)
-    disabled || !hbx_enrollment.can_select_coverage?
+  def disable_purchase?(disabled, hbx_enrollment, options = {})
+    disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
 
   def get_key_and_bucket(uri)
