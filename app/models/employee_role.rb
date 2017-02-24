@@ -70,13 +70,13 @@ class EmployeeRole
   end
 
   def benefit_group(qle: nil)
-      if qle && active_coverage_benefit_group
-        active_coverage_benefit_group
-      elsif qle && renewal_coverage
-        census_employee.renewal_published_benefit_group
-      else
-        census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
-      end
+    if qle && active_coverage_benefit_group
+      active_coverage_benefit_group
+    elsif qle && renewal_coverage
+      census_employee.renewal_published_benefit_group
+    else
+      census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+    end
   end
 
   def active_coverage_benefit_group
@@ -87,7 +87,7 @@ class EmployeeRole
       effective_on = person.primary_family.current_sep.effective_on
       return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on > effective_on
     end
-    bg = census_employee.published_benefit_group
+    bg = census_employee.active_benefit_group
     effective_on = person.primary_family.current_sep.effective_on
     return bg if bg.start_on <= effective_on &&  bg.end_on > effective_on
   end
