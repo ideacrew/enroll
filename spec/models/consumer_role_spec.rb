@@ -369,12 +369,12 @@ end
       context "coverage_purchased" do
         it "changes state to dhs_pending on coverage_purchased! for non_native without ssn" do
           person.ssn=nil
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:dhs_pending).on_event(:coverage_purchased)
         end
 
         it "changes state to ssa_pending on coverage_purchased! for non_native with SSN" do
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
         end
 
@@ -461,7 +461,7 @@ end
         end
         it "changes state from dhs_pending to fully_verified" do
           person.ssn=nil
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
           expect(consumer.lawful_presence_determination.verification_successful?).to eq true
         end
@@ -500,7 +500,7 @@ end
 
           it "change #{state} to dhs_pending if DHS applied" do
             person.ssn=nil
-            consumer.citizen_status = "not_us"
+            consumer.citizen_status = "non_native_citizen"
             expect(consumer).to transition_from(state).to(:dhs_pending).on_event(:redetermine, verification_attr)
             expect(consumer.lawful_presence_determination.verification_pending?).to eq true
           end
