@@ -1113,7 +1113,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context '.find_or_build_benefit_group_assignment' do
+  context '.assign_default_benefit_package' do
 
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -1123,12 +1123,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
-    it 'should have benefit group assignments assigned with both active and renewal plan year' do
-      expect(census_employee.benefit_group_assignments.size).to eq 2
-      expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
-      expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
+
+    it 'should have renewal benefit group assignment' do 
       expect(census_employee.renewal_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.renewal_benefit_group_assignment.benefit_group).to eq renewal_benefit_group
+    end
+
+    it 'should have active benefit group assignment' do 
+      expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
+      expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
     end
   end
 
