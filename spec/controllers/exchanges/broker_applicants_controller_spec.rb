@@ -73,7 +73,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       before :each do
         FactoryGirl.create(:hbx_profile)
-        put :update, id: broker_role.person.id, approve: true, format: :js
+        put :update, id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
         broker_role.reload
       end
 
@@ -93,7 +93,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       context 'when application is approved' do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-          put :update, id: broker_role.person.id, approve: true, format: :js
+          put :update, id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
           broker_role.reload
         end
 
