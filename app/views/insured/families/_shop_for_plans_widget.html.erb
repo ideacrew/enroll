@@ -1,4 +1,34 @@
 <% if @person.active_employee_roles.blank? %>
+<% if (@person.consumer_role.present? || @person.active_employee_roles.any?) && !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)%>
+<% action_path = find_sep_insured_families_path  %>
+
+<%= form_tag action_path, method: :get do %>
+
+<% if @hbx_enrollments.present? %>
+<%= hidden_field_tag 'change_plan', 'change_plan' %>
+<% end %>
+<%= hidden_field_tag 'person_id', @person.try(:id) %>
+<% if @employee_role.present? %>
+<%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) %>
+<% end %>
+<%= hidden_field_tag 'shop_for_plans', 'shop_for_plans' %>
+<div class="panel panel-default module" id='shop-for-plans-widget'>
+  <div class="panel-body">
+    <div class="row flex">
+      <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+        <div class='image-area'>
+          <%= image_tag 'icons/shop_for_plan.png', style: 'width: 45px;' %>
+        </div>
+        <strong>Shop for health and dental plans</strong>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+        <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+<% else %>
 <div class="panel panel-default module" id='shop-for-plans-widget'>
   <div class="panel-body">
     <div class="row flex">
@@ -16,6 +46,7 @@
     </div>
   </div>
 </div>
+<% end %>
         <% else %>
 
         <% action_path = find_sep_insured_families_path  %>
