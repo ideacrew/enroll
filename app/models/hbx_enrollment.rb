@@ -850,7 +850,7 @@ class HbxEnrollment
   end
 
 
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, external_enrollment: false, coverage_start: nil)
 
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
@@ -869,7 +869,11 @@ class HbxEnrollment
         enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
         enrollment.enrollment_kind = "special_enrollment"
       else
-        enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+        if external_enrollment
+          enrollment.effective_on = coverage_start
+        else
+          enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+        end
         enrollment.enrollment_kind = "open_enrollment"
       end
     
