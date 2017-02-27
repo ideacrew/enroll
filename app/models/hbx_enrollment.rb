@@ -933,7 +933,6 @@ class HbxEnrollment
       else
         raise "You may not enroll until you're eligible under an enrollment period"
       end
-
     when resident_role.present?
       enrollment.kind = "coverall"
       enrollment.resident_role = resident_role

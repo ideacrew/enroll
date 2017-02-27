@@ -31,11 +31,8 @@ module Factories
       else
         consumer_role.errors.add(:person, "unable to update person")
       end
-
      return consumer_role
-
     end
-
 
     def self.add_resident_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
@@ -66,9 +63,7 @@ module Factories
       else
         resident_role.errors.add(:person, "unable to update person")
       end
-
      return resident_role
-
     end
 
     def self.construct_consumer_role(person_params, user)
@@ -246,6 +241,20 @@ module Factories
       return family
     end
 
+    def self.initialize_dependent(family, primary, dependent)
+      person, new_person = initialize_person(nil, nil, dependent.first_name,
+                                 dependent.middle_name, dependent.last_name,
+                                 dependent.name_sfx, dependent.ssn,
+                                 dependent.dob, dependent.gender, "employee")
+
+      if person.present? && person.persisted?
+        relationship = person_relationship_for(dependent.employee_relationship)
+        primary.ensure_relationship_with(person, relationship)
+        family.add_family_member(person) unless family.find_family_member_by_person(person)
+      end
+      person
+    end
+
     def self.construct_resident_role(person_params, user)
       person_params = person_params[:person]
       person, person_new = initialize_person(
@@ -289,20 +298,6 @@ module Factories
     def self.find_or_build_resident_role(person)
       return person.resident_role if person.resident_role.present?
       person.build_resident_role(is_applicant: true)
-    end
-
-    def self.initialize_dependent(family, primary, dependent)
-      person, new_person = initialize_person(nil, nil, dependent.first_name,
-                                 dependent.middle_name, dependent.last_name,
-                                 dependent.name_sfx, dependent.ssn,
-                                 dependent.dob, dependent.gender, "employee")
-
-      if person.present? && person.persisted?
-        relationship = person_relationship_for(dependent.employee_relationship)
-        primary.ensure_relationship_with(person, relationship)
-        family.add_family_member(person) unless family.find_family_member_by_person(person)
-      end
-      person
     end
 
     private
