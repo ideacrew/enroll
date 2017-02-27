@@ -869,7 +869,7 @@ class HbxEnrollment
         enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
         enrollment.enrollment_kind = "special_enrollment"
       else
-        if external_enrollment
+        if external_enrollment && coverage_start.present?
           enrollment.effective_on = coverage_start
         else
           enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
