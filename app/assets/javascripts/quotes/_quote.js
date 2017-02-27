@@ -115,6 +115,9 @@ var Quote = ( function() {
         elected_plans_list = selected_plans(coverage_kind)
         inject_plan_into_quote(quote_id, benefit_group_id, plan_id, elected, coverage_kind, elected_plans_list)
         _open_quote()
+        if(coverage_kind == 'health'){
+          alert('You can now select dental offerings.This is optional; employers are not required to offer dental coverage.');
+        }
         $('#dental-feature-mgmt-header a').trigger('click')
     })
   }
