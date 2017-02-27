@@ -1,16 +1,17 @@
 class ShopNotices::OutOfPocketNotice < ShopNotice
 
-  def initialize(employer_profile, args = {})
-    args[:template] =  "notices/shop_notices/out_of_pocket_notice.html.erb"
-    args[:market_kind] = 'shop'
-    args[:notice] = PdfTemplates::EmployerNotice.new
-    args[:recipient] = employer_profile
-    args[:recipient_document_store] = employer_profile
-    args[:name] = employer_profile.organization.legal_name
-    self.header = "notices/shared/header.html.erb"
-    super(args)
-    self.subject=  "#{args[:subject]}"
-  end
+  # def initialize(employer_profile, args = {})
+  #   self.employer_profile = employer_profile
+  #   args[:template] =  "notices/shop_notices/out_of_pocket_notice.html.erb"
+  #   args[:market_kind] = 'shop'
+  #   args[:notice] = PdfTemplates::EmployerNotice.new
+  #   args[:recipient] = employer_profile
+  #   args[:recipient_document_store] = employer_profile
+  #   args[:name] = employer_profile.organization.legal_name
+  #   self.header = "notices/shared/header.html.erb"
+  #   super(args)
+  #   self.subject=  "#{args[:subject]}"
+  # end
 
   def deliver
     build
