@@ -57,11 +57,20 @@
           <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
         </div>
         <% end %>
-
       </div>
     </div>
-  </div><br>
-
+  </div>
+<% if @person.has_active_employee_role? && @person.ssn.present? %>
+  <br>
+<div id="employer-coverage-msg">
+  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+    <div class="alert alert-success alert-dismissible">
+      Your answer to this question does not apply to coverage offered by an employer.
+    </div>
+  </div>
+    </div>
+    <% end %>
+  <br />
   <% if @person.has_active_consumer_role? %>
   <div id="consumer_fields_sets">
     <%= render 'shared/consumer_fields', f: f %><br>

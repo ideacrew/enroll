@@ -120,6 +120,10 @@
         </div>
 
         <% if @person.has_active_consumer_role? %>
+          <%= render 'shared/ssn_coverage_msg' %>
+        <% end %>
+
+        <% if @person.has_active_consumer_role? %>
           <br>
           <div id="consumer_fields_sets">
           <%= render 'shared/consumer_fields', f: f %>
