@@ -346,6 +346,7 @@ class Organization
 
   def legal_name_or_fein_change_attributes
     @changed_fields = changed_attributes.keys
+    notify_legal_or_fein_change if changed_attributes.keys.include?("fein")
   end
 
   def notify_legal_or_fein_change
