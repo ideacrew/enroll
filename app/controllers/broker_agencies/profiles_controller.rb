@@ -236,7 +236,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
 
     employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
-    employer_ids = employer_profiles.present? ? employer_profiles.map(&:id) : []
+    employer_ids = employer_profiles.map(&:id)
     @census_totals = Hash.new(0)
     census_member_counts = CensusMember.collection.aggregate([
       { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
@@ -252,7 +252,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
     @draw = dt_query.draw
-    @employer_profiles = employer_profiles.present? ? employer_profiles : []
+    @employer_profiles = employer_profiles
     render
   end
 
