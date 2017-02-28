@@ -20,31 +20,35 @@ class ExpireConversionEmployers < MongoidMigrationTask
           puts "Processing (#{fein}) - #{employer.legal_name}"
         end
 
-        data = [employer.fein, employer.legal_name, employer.is_conversion?]
-
-        if plan_year = employer.plan_years.where(:start_on => start_on).first
-          data += [plan_year.aasm_state.camelcase]
-
-          plan_year_enrollments(plan_year).each do |enrollment|
-            enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-          end
-
-          plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
-          plan_year.cancel! if plan_year.may_cancel?
-          data += [plan_year.aasm_state.camelcase]
-        else
-          data += [nil, nil]
-        end
-
-        if off_exchange_py = employer.plan_years.where(:start_on => start_on.prev_year).first
-          data += [off_exchange_py.aasm_state.camelcase]
-          off_exchange_py.conversion_expire! if off_exchange_py.may_conversion_expire?
-          data += [off_exchange_py.aasm_state.camelcase]
-        end
-
-        csv << data 
+        csv << update_employer_plan_years(employer, start_on)
       end
     end
+  end
+
+  def update_employer_plan_years(employer, start_on)
+    data = [employer.fein, employer.legal_name, employer.is_conversion?]
+
+    if plan_year = employer.plan_years.where(:start_on => start_on).first
+      data += [plan_year.aasm_state.camelcase]
+
+      plan_year_enrollments(plan_year).each do |enrollment|
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      end
+
+      plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+      plan_year.cancel! if plan_year.may_cancel?
+      data += [plan_year.aasm_state.camelcase]
+    else
+      data += [nil, nil]
+    end
+
+    if off_exchange_py = employer.plan_years.where(:start_on => start_on.prev_year).first
+      data += [off_exchange_py.aasm_state.camelcase]
+      off_exchange_py.conversion_expire! if off_exchange_py.may_conversion_expire?
+      data += [off_exchange_py.aasm_state.camelcase]
+    end
+
+    data 
   end
 
   def prepend_zeros(number, n)
