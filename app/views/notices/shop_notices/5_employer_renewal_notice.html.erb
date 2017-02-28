@@ -23,7 +23,7 @@
   content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on.strftime("%m/%d/%Y")}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.start_on - 1.month).strftime("%m/10/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your employees will also have until #{notice.plan_year.start_on - 1.month).strftime("%m/13/%Y")} to make their plan selections."} %>
+  content: "Your employees will also have until #{(notice.plan_year.start_on - 1.month).strftime("%m/13/%Y")} to make their plan selections."} %>
 <br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Employer Renewal Process:",
