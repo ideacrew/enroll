@@ -2189,10 +2189,15 @@ describe PlanYear, "filter_active_enrollments_by_date" do
     expect(result.map(&:plan_id)).to eq [dental_enrollment.plan.id, health_enrollment.plan.id]
   end
 
-  context "termination date of plan year is before plan_year end_on date" do
+  context "termination date of enrollment is prior to the billing date" do
 
     before do
       health_enrollment.update_attributes(terminated_on: plan_year.end_on - 3.months)
+    end
+
+    it 'should not return health enrollment' do
+      result = plan_year.filter_active_enrollments_by_date(plan_year.end_on - 1.months)
+      expect(result.map(&:plan_id).include?(health_enrollment.plan.id)).to eq false
     end
 
     it 'should return only dental_enrollment' do
