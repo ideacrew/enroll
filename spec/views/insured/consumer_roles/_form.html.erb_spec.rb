@@ -34,4 +34,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     expect(rendered).to match /Is this person applying for coverage?/
   end
 
+  it "should display the affirmative message" do
+    expect(rendered).to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
+  end
 end
