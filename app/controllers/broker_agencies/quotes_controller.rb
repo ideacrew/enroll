@@ -34,11 +34,12 @@ class BrokerAgencies::QuotesController < ApplicationController
 
   def show 
     @q = Quote.find(params[:id])
-    @benefit_groups = @q.quote_benefit_groups
+    @benefit_groups = @q.quote_benefit_groups.limit(2)
     @quote_benefit_group = (params[:benefit_group_id] && @q.quote_benefit_groups.find(params[:benefit_group_id])) || @benefit_groups.first
 
     #active_year = Date.today.year
     @coverage_kind = "health"
+    @section = !params[:section].present?
 
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)
@@ -59,6 +60,11 @@ class BrokerAgencies::QuotesController < ApplicationController
     @dental_roster_premiums = dental_roster_premiums.to_json
     @quote_criteria = @quote_benefit_group.criteria_for_ui
     @benefit_pcts_json = @bp_hash.to_json
+    unless @section
+    respond_to do |format|
+        format.js
+    end
+    end
   end
 
   def health_cost_comparison
