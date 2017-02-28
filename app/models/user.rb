@@ -136,6 +136,7 @@ class User
   field :last_sign_in_at,    type: Time
   field :current_sign_in_ip, type: String
   field :last_sign_in_ip,    type: String
+  field :idp_uuid, type: String
 
   field :authentication_token
   field :roles, :type => Array, :default => []
@@ -246,6 +247,10 @@ class User
 
   def has_consumer_role?
     person && person.consumer_role
+  end
+
+  def has_resident_role?
+    person && person.resident_role
   end
 
   def has_employer_staff_role?

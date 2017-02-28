@@ -1,5 +1,5 @@
-# A time period during which Organizations, including {HbxProfile}, who are eligible for a {BenefitSponsorship}, may offer 
-# {BenefitPackage}(s) to participants within a market place. Each {BenefitCoveragePeriod} includes an open enrollment 
+# A time period during which Organizations, including {HbxProfile}, who are eligible for a {BenefitSponsorship}, may offer
+# {BenefitPackage}(s) to participants within a market place. Each {BenefitCoveragePeriod} includes an open enrollment
 # period, during which eligible partipants may enroll.
 
 class BenefitCoveragePeriod
@@ -36,6 +36,8 @@ class BenefitCoveragePeriod
   validate :end_date_follows_start_date
 
   before_save :set_title
+
+  scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
 
   # Sets the ACA Second Lowest Cost Silver Plan (SLCSP) reference plan
   #
@@ -104,7 +106,7 @@ class BenefitCoveragePeriod
     (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
   end
 
-  # The earliest enrollment termination effective date, based on this date and site settings 
+  # The earliest enrollment termination effective date, based on this date and site settings
   #
   # @param date [ Date ] The comparision date.
   #
@@ -172,11 +174,11 @@ class BenefitCoveragePeriod
     [[effective_date, start_on].max, end_on].min
   end
 
-  # Determine list of available products (plans), based on member enrollment eligibility for each {BenefitPackage} under this 
-  # {BenefitCoveragePeriod}. In the Individual market, BenefitPackage types may include Catastrophic, Cost Sharing 
+  # Determine list of available products (plans), based on member enrollment eligibility for each {BenefitPackage} under this
+  # {BenefitCoveragePeriod}. In the Individual market, BenefitPackage types may include Catastrophic, Cost Sharing
   # Reduction (CSR), etc., and eligibility criteria such as member age, ethnicity, residency and lawful presence.
   #
-  # @param hbx_enrollment_members [ Array ] the list of enrolling members 
+  # @param hbx_enrollment_members [ Array ] the list of enrolling members
   # @param coverage_kind [ String ] the benefit type.  Only 'health' is currently supported
   # @param tax_household [ TaxHousehold ] the tax household members belong to if eligible for financial assistance
   #
@@ -188,7 +190,12 @@ class BenefitCoveragePeriod
       family = hbx_enrollment_members.first.hbx_enrollment.family
       hbx_enrollment_members.map(&:family_member).each do |family_member|
         consumer_role = family_member.person.consumer_role
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind: coverage_kind, family: family)
+        resident_role = family_member.person.resident_role
+        unless resident_role.nil?
+          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family)
+        else
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind: coverage_kind, family: family)
+        end
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied
@@ -215,7 +222,7 @@ class BenefitCoveragePeriod
       organizations.size > 0 ? all.select{ |bcp| bcp.id == id }.first : nil
     end
 
-    # The HBX benefit coverage period instance that includes this date within its start and end dates 
+    # The HBX benefit coverage period instance that includes this date within its start and end dates
     #
     # @param date [ Date ] the comparison date
     #
@@ -235,7 +242,7 @@ class BenefitCoveragePeriod
       end
     end
 
-    # All HBX benefit coverage periods 
+    # All HBX benefit coverage periods
     #
     # @example Which HBX benefit coverage periods are defined?
     #   BenefitCoveragePeriod.all

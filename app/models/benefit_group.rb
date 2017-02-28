@@ -102,6 +102,7 @@ class BenefitGroup
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
+  before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -461,7 +462,23 @@ class BenefitGroup
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
-private
+  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+    self.employer_profile.census_employees.each do |ce|
+      benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+
+      if benefit_group_assignments.present?
+        benefit_group_assignments.each do |bga|
+          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+          bga.destroy
+        end
+
+        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
+        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+      end
+    end
+  end
+
+  private
 
   def set_congress_defaults
     return true unless is_congress

@@ -1,11 +1,11 @@
-# A model for grouping and organizing a {Person} with their related {FamilyMember FamilyMember(s)}, 
+# A model for grouping and organizing a {Person} with their related {FamilyMember FamilyMember(s)},
 # benefit enrollment eligibility, financial assistance eligibility and availability, benefit enrollments,
 # broker agents, and documents.
 #
 # Each family has one or more {FamilyMember FamilyMembers}, each associated with a {Person} instance.  Each
-# Family has exactly one FamilyMember designated as the {#primary_applicant}. A Person can belong to 
+# Family has exactly one FamilyMember designated as the {#primary_applicant}. A Person can belong to
 # more than one Family, but may be the primary_applicant of only one active Family.
-# 
+#
 # Family is a top level physical MongoDB Collection.
 
 class Family
@@ -52,7 +52,7 @@ class Family
   after_initialize :build_household
   before_save :clear_blank_fields
 
-  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, 
+  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
   # index({hbx_assigned_id: 1}, {unique: true})
@@ -76,6 +76,20 @@ class Family
   index({"households.hbx_enrollments.aasm_state" => 1,
          "households.hbx_enrollments.created_at" => 1},
          {name: "state_and_created"})
+
+    index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.effective_on" => 1,
+         "households.hbx_enrollments.terminated_on" => 1
+         },
+         {name: "kind_and_state_and_created_and_terminated"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.coverage_kind" => 1,
+         "households.hbx_enrollments.effective_on" => 1
+         },
+         {name: "kind_and_state_and_coverage_kind_effective_date"})
 
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
@@ -101,14 +115,21 @@ class Family
 
   index({"special_enrollment_periods._id" => 1})
 
+  index({"family_members.person_id" => 1, hbx_assigned_id: 1})
+
+  index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
+  # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
 
-  validates :e_case_id, uniqueness: true, allow_nil: true
   validate :family_integrity
 
+  after_initialize :build_household
+
+ # after_save :update_family_search_collection
+ # after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
       where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
@@ -158,7 +179,7 @@ class Family
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".ne => "employer_sponsored") }
+  scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
@@ -212,6 +233,19 @@ class Family
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
 
+  def primary_family_member=(new_primary_family_member)
+    self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
+
+    existing_family_member = find_family_member_by_person(new_primary_family_member)
+    if existing_family_member.present?
+      existing_family_member.is_primary_applicant = true
+    else
+      add_family_member(new_primary_family_member, is_primary_applicant: true)
+    end
+
+    primary_family_member
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 
@@ -234,7 +268,7 @@ class Family
   # @example Which {FamilyMember} references this {Person}?
   #   model.find_family_member_by_person
   #
-  # @param person [ Person ] the {Person} to match 
+  # @param person [ Person ] the {Person} to match
   #
   # @return [ FamilyMember ] the family member who matches this person
   def find_family_member_by_person(person)
@@ -291,7 +325,7 @@ class Family
   #
   # @see current_ivl_eligible_open_enrollments
   # @see current_shop_eligible_open_enrollments
-  # 
+  #
   # @return [ Array<EnrollmentEligibilityReason> ] The SHOP and Individual Market {EnrollmentEligibilityReasons} active for this family on today's date
   def current_eligible_open_enrollments
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
@@ -309,7 +343,7 @@ class Family
   #
   # @see current_ivl_eligible_open_enrollments
   # @see current_shop_eligible_open_enrollments
-  # 
+  #
   # @return [ Array<EnrollmentEligibilityReason> ] The SHOP and Individual Market {EnrollmentEligibilityReasons} active for this family on today's date
   def current_eligible_open_enrollments
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
@@ -420,8 +454,8 @@ class Family
     seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
-  # Get the {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this family with the 
-  # earliest coverage effective date, regardless of Individual or SHOP Market. This is a method to obtain 
+  # Get the {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this family with the
+  # earliest coverage effective date, regardless of Individual or SHOP Market. This is a method to obtain
   # the 'most advantageous' coverage, based on earliest start date
   #
   # @see earliest_effective_shop_sep
@@ -430,14 +464,14 @@ class Family
   # @example Get the {SpecialEnrollmentPeriod} with earliest effective date
   #   model.earliest_effective_sep
   #
-  # @return [ SpecialEnrollmentPeriod ] The SEP eligibility active on today's date with earliest 
+  # @return [ SpecialEnrollmentPeriod ] The SEP eligibility active on today's date with earliest
   #   coverage effective date
   def earliest_effective_sep
     special_enrollment_periods.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
-  # Get the SHOP market {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this 
-  # family with the earliest coverage effective date. This is a method to obtain the 'most advantageous' coverage, 
+  # Get the SHOP market {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this
+  # family with the earliest coverage effective date. This is a method to obtain the 'most advantageous' coverage,
   # based on earliest start date
   #
   # @example Get the SHOP market {SpecialEnrollmentPeriod} with earliest effective date
@@ -446,14 +480,14 @@ class Family
   # @see earliest_effective_sep
   # @see earliest_effective_ivl_sep
   #
-  # @return [ SpecialEnrollmentPeriod ] The SHOP market SEP eligibility active on today's date with earliest 
+  # @return [ SpecialEnrollmentPeriod ] The SHOP market SEP eligibility active on today's date with earliest
   #   coverage effective date
   def earliest_effective_shop_sep
     special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
-  # Get the Individual market {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this 
-  # family with the earliest coverage effective date. This is a method to obtain the 'most advantageous' coverage, 
+  # Get the Individual market {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this
+  # family with the earliest coverage effective date. This is a method to obtain the 'most advantageous' coverage,
   # based on earliest start date
   #
   # @example Get the Individual market {SpecialEnrollmentPeriod} with earliest effective date
@@ -462,7 +496,7 @@ class Family
   # @see earliest_effective_sep
   # @see earliest_effective_shop_sep
   #
-  # @return [ SpecialEnrollmentPeriod ] The Individual market SEP eligibility active on today's date with earliest 
+  # @return [ SpecialEnrollmentPeriod ] The Individual market SEP eligibility active on today's date with earliest
   #   coverage effective date
   def earliest_effective_ivl_sep
     special_enrollment_periods.individual_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
@@ -524,7 +558,7 @@ class Family
   end
 
   # Create a {FamilyMember} referencing this {Person}
-  # 
+  #
   # @param [ Person ] person The person to add to the family.
   # @param [ Hash ] opts The options to create the family member.
   # @option opts [ true, false ] :is_primary_applicant (false) This person is the primary family member
@@ -654,7 +688,7 @@ class Family
     broker_agency_accounts.detect { |account| account.is_active? }
   end
 
-  # Get the {BrokerRole BrokerRoles} on active enrollments. This method queries enrollment transactions, thus may return 
+  # Get the {BrokerRole BrokerRoles} on active enrollments. This method queries enrollment transactions, thus may return
   # a broker who the family has since terminated.  Compare this to the active broker returned by {#current_broker_agency}.
   # If this family has employer-sponsored benefits, the employer's broker choice will appear in transactions for those enrollments.
   #
@@ -667,7 +701,7 @@ class Family
   def active_broker_roles
     active_household.hbx_enrollments.reduce([]) { |b, e| b << e.broker_role if e.is_active? && !e.broker_role.blank? } || []
   end
-  
+
   def any_unverified_enrollments?
     enrollments.verification_needed.any?
   end
@@ -676,6 +710,47 @@ class Family
     # Set the sort order to return families by primary applicant last_name, first_name
     def default_search_order
       [["primary_applicant.name_last", 1], ["primary_applicant.name_first", 1]]
+    end
+
+    def expire_individual_market_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on.lt => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
+      }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+      families.each do |family|
+        begin
+          family.active_household.hbx_enrollments.where(query).each do |enrollment|
+            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+          end
+        rescue Exception => e
+          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+        end
+      end
+    end
+
+    def begin_coverage_for_ivl_enrollments
+      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      query = {
+          :effective_on => current_benefit_period.start_on,
+          :kind => 'individual',
+          :aasm_state => 'auto_renewing'
+        }
+      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
+
+      families.each do |family|
+        family.active_household.hbx_enrollments.where(query).each do |enrollment|
+          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+        end
+      end
+    end
+
+    # Manage: SEPs, FamilyMemberAgeOff
+    def advance_day(new_date)
+      expire_individual_market_enrollments
+      begin_coverage_for_ivl_enrollments
     end
 
     def find_by_employee_role(employee_role)
@@ -697,14 +772,14 @@ class Family
     end
 
     # Get all families where this person is a member
-    # @param person [ Person ] Person to match 
+    # @param person [ Person ] Person to match
     # @return [ Array<Family> ] The families where this person is a member
     def find_all_by_person(person)
       where("family_members.person_id" => person.id)
     end
 
     # Get the family where this person is the primary applicant
-    # @param person [ Person ] Person to match 
+    # @param person [ Person ] Person to match
     # @return [ Array<Family> ] The families where this person is primary applicant
     def find_primary_applicant_by_person(person)
       find_all_by_person(person).select() { |f| f.primary_applicant.person.id.to_s == person.id.to_s }
@@ -720,8 +795,8 @@ class Family
     alias_method :find_by_primary_applicant, :find_primary_applicant_by_person
 
     # Get the family(s) with this eligibility case identifier
-    # @param id [ String ] Eligibility case ID to match 
-    # @return [ Array<Family> ] The families with this eligibilitye case id 
+    # @param id [ String ] Eligibility case ID to match
+    # @return [ Array<Family> ] The families with this eligibilitye case id
     def find_by_case_id(id)
       where({"e_case_id" => id}).to_a
     end
@@ -742,7 +817,21 @@ class Family
     end
   end
 
-  
+  def build_resident_role(family_member, opts = {})
+    person = family_member.person
+    return if person.resident_role.present?
+    person.build_resident_role({:is_applicant => false}.merge(opts))
+    person.save!
+  end
+
+  def check_for_resident_role
+    if primary_applicant.person.resident_role.present?
+      active_family_members.each do |family_member|
+        build_resident_role(family_member)
+      end
+    end
+  end
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -815,11 +904,8 @@ class Family
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$nin" => ['void', "coverage_canceled"]} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_expired"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
@@ -836,6 +922,7 @@ class Family
       ],
       :allow_disk_use => true)
   end
+
 
   # Get waived {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
   # @see enrollments_for_display
@@ -854,6 +941,10 @@ class Family
       {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
       ],
       :allow_disk_use => true)
+  end
+
+  def generate_family_search
+    ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
 private

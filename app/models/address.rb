@@ -55,7 +55,7 @@ class Address
     nil #todo
   end
 
-  # Determine if an address instance is empty 
+  # Determine if an address instance is empty
   #
   # @example Is the address blank?
   #   model.blank?
@@ -68,11 +68,11 @@ class Address
   end
 
   # Get the full address formatted as a string with each line enclosed within html <div> tags
-  # 
+  #
   # @example Get the full address as a <div> delimited string
   #   model.to_html
   #
-  # @return [ String ] the full address 
+  # @return [ String ] the full address
   def to_html
     if address_2.blank?
       "<div>#{address_1.strip()}</div><div>#{city}, #{state} #{zip}</div>".html_safe
@@ -82,11 +82,11 @@ class Address
   end
 
   # Get the full address formatted as a <br/> delimited string
-  # 
+  #
   # @example Get the full address formatted as a <br/> delimited string
   #   model.to_s
   #
-  # @return [ String ] the full address 
+  # @return [ String ] the full address
   def to_s
     city.present? ? city_delim = city + "," : city_delim = city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
@@ -94,11 +94,11 @@ class Address
   end
 
   # Get the full address formatted as a string
-  # 
+  #
   # @example Get the full address formatted as a string
   #   model.full_address
   #
-  # @return [ String ] the full address 
+  # @return [ String ] the full address
   def full_address
     city.present? ? city_delim = city + "," : city_delim = city
     [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
@@ -162,19 +162,19 @@ class Address
   end
 
   # @overload city=(new_city)
-  # 
+  #
   # Sets the new city name
-  # 
-  # @param new_city [String] the new city name 
+  #
+  # @param new_city [String] the new city name
   def city=(new_city)
     write_attribute(:city, new_city.to_s.squish)
   end
 
   # @overload state=(new_state)
-  # 
+  #
   # Sets the new state name
-  # 
-  # @param new_state [String] the new state name 
+  #
+  # @param new_state [String] the new state name
   def state=(new_state)
     write_attribute(:state, new_state.to_s.squish)
   end
@@ -188,7 +188,7 @@ class Address
   # @example Set nine digit postal zip code
   #   model.zip = "20002-0001"
   #
-  # @param new_zip [String] the new zip code 
+  # @param new_zip [String] the new zip code
   def zip=(new_zip)
     write_attribute(:zip, new_zip.to_s.squish)
   end
@@ -244,9 +244,9 @@ class Address
   end
 
   # Compare passed address with this address
-  # 
+  #
   # @param another_address [ Object ] The address to be compared.
-  # 
+  #
   # @return [ true, false ] true if addresses are the same, false if addresses are different
   def matches?(another_address)
     return(false) if another_address.nil?
@@ -254,7 +254,13 @@ class Address
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
   end
 
-private
+  def same_address?(another_address)
+    return(false) if another_address.nil?
+    attrs_to_match = [:address_1, :address_2, :address_3, :city, :state, :zip]
+    attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
+  end
+
+  private
 
   def attribute_matches?(attribute, other)
     self[attribute].to_s.downcase == other[attribute].to_s.downcase

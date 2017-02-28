@@ -63,6 +63,7 @@ class FamilyMember
   after_create :update_family_status_when_create
   after_update :update_family_status_when_destroy
 
+
   def former_family=(new_former_family)
     raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
     self.former_family_id = new_former_family._id

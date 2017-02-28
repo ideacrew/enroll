@@ -85,7 +85,9 @@ RSpec.describe Employers::EmployerProfilesController do
     ) }
     let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
     let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    
+    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { plan_year.employer_profile}
 
     let(:policy) {double("policy")}
@@ -158,6 +160,39 @@ RSpec.describe Employers::EmployerProfilesController do
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
 
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
+      expect(assigns(:census_employees).count).to eq 1
+      expect(assigns(:census_employees)).to eq [census_employee]
+    end
+
+    it "census_employee record not found" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test1",
+                                           last_name: "test1")
+
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
+      expect(assigns(:census_employees).count).to eq 0
+      expect(assigns(:census_employees)).to eq []
+    end
+
+    it "should return census_employee when searching with name" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test1",
+                                           last_name: "test1")
+      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test11",
+                                            last_name: "test11")
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
+      expect(assigns(:census_employees).count).to eq 1
+      expect(assigns(:census_employees)).to eq [census_employee1]
+    end
+
+    it "should return census_employee when searching with ssn" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "123456789")
+      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "987654321")
+      params ={commit: "search", status: "active", employee_search: "123456789", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee]
     end
