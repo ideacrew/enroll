@@ -376,3 +376,12 @@ Tabcontrol
 {
   display: list-item;
 }
+
+.steps > ul > li.first {
+  border: 0px solid #b7b7b7 !important;
+  transition: border-color 0.3s ease-in-out 0s !important;
+  -moz-transition: border-color 0.3s ease-in-out 0s !important;
+  -webkit-transition: border-color 0.3s ease-in-out 0s !important;
+  -o-transition: border-color 0.3s ease-in-out 0s !important;
+  -ms-transition: border-color 0.3s ease-in-out 0s !important;
+}

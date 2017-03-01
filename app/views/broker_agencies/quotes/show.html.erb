@@ -3,42 +3,35 @@
   <h2>Quote Calculator</h2>
   <div  role="tab" id="feature-mgmt-header">
     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group-mgmt">
-      <b>Quote Benefit Group Selection</b>
+    <b>Quote Benefit Group Selection</b>
     </a>
   </div>
   <br>
   <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true)%>">
     <% @benefit_groups.each_with_index do |benefit_group, index| %>
     <% if index == 0 %>
-    <% @first_quote = benefit_group.title %>
     <h3><%= benefit_group.title%></h3>
     <section>
-      <div id='first_div'>
+      <div class="step_section_<%= index%>">
         <%= render partial: 'quote_calculate', locals: {benefit_group: benefit_group }%>
       </div>
     </section>
     <% else %>
     <h3><%= benefit_group.title %></h3>
     <section>
-      <div id='second_div'>
-        <%#= render partial: 'quote_calculate', locals: {benefit_group: benefit_group}%>
+      <div id='second_div' class="step_section_<%= index%>">
       </div>
     </section>
+    <% end %>
+    <% end %>
   </div>
-
-  <% end %>
-  <% end %>
-
 </div>
-</div>
-
 
 <script type="text/javascript">
 
   $(document).on('ready page:load', function () {
     QuotePageLoad.set_select_health_plans(<%=raw @health_plan_quote_criteria %>)
     Quote.show_benefit_group("<%= @q.id%>", "<%= @quote_benefit_group.id%>")
-
   });
 
   $("#quote-roster").steps({
@@ -49,22 +42,24 @@
     autoFocus: true,
     onStepChanged: function (event, currentIndex, newIndex)
     {
-      if(currentIndex == 1){
-        $.ajax({
-          type: "GET",
-          url: $("#quote-roster").data('url'),
-          data: {
-            broker_role_id: "<%= @broker.id %>",
-            id: "<%= @q.id %>",
-            section: true
-          }
-        });
-      }else{
-        location.reload();
-      }
+
+      $.ajax({
+        type: "GET",
+        url: $("#quote-roster").data('url'),
+        data: {
+          broker_role_id: "<%= @broker.id %>",
+          id: "<%= @q.id %>",
+          section: true,
+          row: currentIndex
+        }
+      });
     }
   });
 
-// $('.actions').hide()
-$('ul li.last').addClass('done')
+  $("li[role='tab']").each(function( index ) {
+    if (!$(this).hasClass('first')){
+      $( this ).addClass('done');
+    }
+  });
+
 </script>

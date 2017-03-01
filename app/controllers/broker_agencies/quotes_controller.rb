@@ -34,12 +34,13 @@ class BrokerAgencies::QuotesController < ApplicationController
 
   def show 
     @q = Quote.find(params[:id])
-    @benefit_groups = @q.quote_benefit_groups.limit(2)
+    @benefit_groups = @q.quote_benefit_groups
     @quote_benefit_group = (params[:benefit_group_id] && @q.quote_benefit_groups.find(params[:benefit_group_id])) || @benefit_groups.first
 
     #active_year = Date.today.year
     @coverage_kind = "health"
     @section = !params[:section].present?
+    @index = params[:row].to_i
 
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)

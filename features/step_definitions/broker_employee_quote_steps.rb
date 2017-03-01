@@ -193,7 +193,7 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
-   page.find_button("Publish Quote").trigger("click")
+  find('#publish_quote').trigger 'click'
 end
 
 Then(/^the broker sees that the Quote is published$/) do
