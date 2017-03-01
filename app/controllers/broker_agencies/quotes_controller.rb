@@ -39,6 +39,8 @@ class BrokerAgencies::QuotesController < ApplicationController
 
     #active_year = Date.today.year
     @coverage_kind = "health"
+    @section = !params[:section].present?
+    @index = params[:row].to_i
 
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)
@@ -59,6 +61,11 @@ class BrokerAgencies::QuotesController < ApplicationController
     @dental_roster_premiums = dental_roster_premiums.to_json
     @quote_criteria = @quote_benefit_group.criteria_for_ui
     @benefit_pcts_json = @bp_hash.to_json
+    unless @section
+    respond_to do |format|
+        format.js
+    end
+    end
   end
 
   def health_cost_comparison
