@@ -155,5 +155,4 @@ module Employers::EmployerHelper
     end
     return false
   end
-  
 end
