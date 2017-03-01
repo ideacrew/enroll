@@ -841,5 +841,6 @@ Then(/Devops can verify session logs/) do
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end

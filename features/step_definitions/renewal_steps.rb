@@ -67,5 +67,6 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end

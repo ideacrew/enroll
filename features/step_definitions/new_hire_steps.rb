@@ -126,5 +126,6 @@ When(/Employee clicks continue on the family members page/) do
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end

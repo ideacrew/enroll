@@ -15,5 +15,6 @@ Given(/(.*) is newly designated/) do |named_person|
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end

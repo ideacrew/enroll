@@ -594,5 +594,6 @@ Then(/^the employer sees a successful message$/) do
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end

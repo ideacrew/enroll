@@ -250,5 +250,6 @@ Then(/Employee should see family members page and clicks continue/) do
 end
 
 AfterStep do |scenario|
+  sleep 1
   screenshot("")
 end
