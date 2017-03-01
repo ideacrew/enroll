@@ -2,8 +2,49 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
   def migrate
+    #find two person accounts and all the hbx_enrollments
     gp = Person.where(hbx_id:ENV['new_account_hbx_id']).first
     bp = Person.where(hbx_id:ENV['old_account_hbx_id']).first
+    hbx_enrollments= bp.primary_family.active_household.hbx_enrollments
+
+    #rebuild the family
+    #add the family members of the old enrollments to the new enrollment
+    family=gp.primary_family
+    hbx_enrollments.each do |hbx_enrollment|
+
+      family_ppl_hbx_ids=family.family_members.map{|a| a.person.hbx_id}.to_a
+      unless hbx_enrollment.hbx_enrollment_members
+        hbx_enrollment.hbx_enrollment_members.each do |hbx_enrollment_member|
+           if family_ppl_hbx_ids.includes? hbx_enrollment_member.person.hbx_id
+             family.add_family_member(hbx_enrollment_member.person)
+           end
+        end
+      end
+    end
+
+
+
+    #move the hbx_enrollments
+
+    hbx_enrollments.each do |hbx_enrollment|
+      if hbx_enrollment.is_shop?
+         #check whether it is movable
+         # build hbx_enrollment
+         # update employee_role_id, benefit_group_id, benefit_group_assignment
+         #delete the original hbx_enrollment
+      elsif hbx_enrollment.kind == "individual"
+         #build hbx_enrollment
+         #update consumer_role_id
+         #delete the original hbx_enrollment
+      else
+        puts "Enrollment #{hbx_enrollment.id} can not be moved due to it is neither ivl or shop"
+      end
+
+    end
+
+
+
+
     enroll_hbx_id=ENV['enrollment_hbx_id']
     if  bp.primary_family.active_household.hbx_enrollments.where(hbx_id:enroll_hbx_id).first
       hbx1 = bp.primary_family.active_household.hbx_enrollments.where(hbx_id:enroll_hbx_id).first
