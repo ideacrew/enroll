@@ -213,3 +213,7 @@ end
 Then /there is an unlinked POC/ do
   find('td', text: /Unlinked/)
 end
+
+AfterStep do |scenario|
+  screenshot("")
+end

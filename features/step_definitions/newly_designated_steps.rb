@@ -13,3 +13,7 @@ Given(/(.*) is newly designated/) do |named_person|
     plan_year.save!
   end
 end
+
+AfterStep do |scenario|
+  screenshot("")
+end

@@ -248,3 +248,7 @@ Then(/Employee should see family members page and clicks continue/) do
     click_link "Continue"
   end
 end
+
+AfterStep do |scenario|
+  screenshot("")
+end

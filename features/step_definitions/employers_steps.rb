@@ -592,3 +592,7 @@ end
 Then(/^the employer sees a successful message$/) do
   expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end
+
+AfterStep do |scenario|
+  screenshot("")
+end

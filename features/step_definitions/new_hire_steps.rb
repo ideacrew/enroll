@@ -124,3 +124,7 @@ When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
   wait_for_ajax
 end
+
+AfterStep do |scenario|
+  screenshot("")
+end
