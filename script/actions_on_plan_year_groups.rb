@@ -28,8 +28,8 @@ FEINS.each do |fein|
 
     if organization.employer_profile.is_coversion_employer?
       plan_year = organization.employer_profile.plan_years.detect { |py| py.start_on.year == 2016}
-      if plan_year.present? && plan_year.may_migration_expire?
-        plan_year.migration_expire!
+      if plan_year.present? && plan_year.may_conversion_expire?
+        plan_year.conversion_expire!
         puts 'moved 2016 plan year state to migration expired'
       end
     end
