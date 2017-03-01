@@ -839,8 +839,3 @@ Then(/Devops can verify session logs/) do
   #user was a consumer
   expect(user.person.consumer_role).not_to be nil
 end
-
-AfterStep do |scenario|
-  sleep 1
-  screenshot("")
-end

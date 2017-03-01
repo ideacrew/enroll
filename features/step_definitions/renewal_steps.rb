@@ -66,7 +66,3 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
 end
 
-AfterStep do |scenario|
-  sleep 1
-  screenshot("")
-end
