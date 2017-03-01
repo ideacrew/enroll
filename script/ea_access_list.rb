@@ -31,6 +31,8 @@
               ce = emp.census_employee
               csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.roles, user.created_at, user.last_sign_in_at, ce.hired_on, ce.employment_terminated_on]
             end
+          elsif person.hbx_staff_role?
+            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, person.hbx_staff_role.subrole, user.created_at, user.last_sign_in_at ]
           else
             csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.roles, user.created_at, user.last_sign_in_at, ]
           end
