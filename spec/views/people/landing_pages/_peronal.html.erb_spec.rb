@@ -111,10 +111,12 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     end
   end
 
-  context "with employee_role" do
+  context "with both employee_role and consumer_role" do
     let(:person) {FactoryGirl.create(:person, :ssn => "123456789")}
     before :each do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      allow(person).to receive(:consumer_role).and_return consumer_role
+      allow(person).to receive(:has_active_consumer_role?).and_return true
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign(:person, person)
       render :template => "people/landing_pages/_personal.html.erb"

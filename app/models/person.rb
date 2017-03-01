@@ -3,6 +3,7 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Mongoid::Attributes::Dynamic
 
   include Notify
   include UnsetableSparseFields

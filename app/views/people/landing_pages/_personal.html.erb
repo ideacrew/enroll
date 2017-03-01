@@ -60,7 +60,7 @@
       </div>
     </div>
   </div>
-<% if @person.has_active_employee_role? && @person.ssn.present? %>
+<% if @person.has_active_consumer_role? && @person.has_active_employee_role? && @person.ssn.present? %>
   <br>
 <div id="employer-coverage-msg">
   <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
