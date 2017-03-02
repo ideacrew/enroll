@@ -167,4 +167,9 @@ module VerificationHelper
   def text_center(v_type, person)
     (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
   end
+
+  # returns vlp_documents array for consumer
+  def documents_list(person)
+    person.consumer_role.vlp_documents if person.consumer_role
+  end
 end
