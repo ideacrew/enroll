@@ -10,7 +10,7 @@ class ShopNotice < Notice
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
     args[:to] = employer_profile.staff_roles.first.work_email_or_best
-    args[:name] = "testing"
+    args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
