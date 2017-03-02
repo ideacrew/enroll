@@ -199,7 +199,6 @@
     padding: 0 15% 5%;
     .btn-primary {
       padding: 4%;
-      font-size: auto;
       font-size: 13px;
       background-color: transparent;
       border: solid 1px #ccc;
@@ -326,4 +325,71 @@
 			text-transform: capitalize;
 		}
 	}
+  // ***** Consumer Documents Verification ******** //
+
+  &.verification-process {
+    .family-member, .person {
+      padding: 10px;
+      padding-left: 0;
+      padding-right: 0;
+      margin-bottom: 10px;
+      .person {
+        border-bottom: 3px solid $primary-gray;
+        font-weight: bold;
+      }
+      .selectric {
+        border: solid 1px $primary-gray;
+        border-radius: 5px;
+        -webkit-border-radius:5px;
+        -moz-border-radius:5px;
+        width: 200px;
+        height: 30px;
+        p {
+          font-size:0.9em;
+          margin-top: -7px;
+        }
+        .button {
+          margin-top: -7px;
+        }
+      }
+    }
+    .btn-default {
+      background-color: #ffffff;
+      width: 195px;
+      padding: 4px;
+      margin-top: 0;
+      overflow: hidden;
+    }
+    .btn-default:hover {
+      text-decoration: underline;
+    }
+    .lb-md {
+      font-size: 0.9em;
+      vertical-align: middle;
+    }
+    .verification-update-reason {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid $primary-gray;
+      display: none;
+    }
+    .verification-document {
+      border: 1px solid $primary-gray;
+    }
+    .v-doc-list {
+      border: 1px solid $primary-gray;
+      margin-top:20px;
+      padding: 5px;
+      background-color: $primary-white;
+      -webkit-border-radius:5px;
+      -moz-border-radius:5px;
+      border-radius:5px;
+      .v-doc-elem {
+        margin: 5px;
+      }
+    }
+  }
+
+  // --- end of consumer verification --- //
 }
