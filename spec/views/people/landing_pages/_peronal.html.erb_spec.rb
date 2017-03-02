@@ -34,6 +34,10 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
         expect(rendered).to match /Is #{person.first_name} applying for coverage?/
       end
 
+      it "should display the affirmative message" do
+        expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
+      end
+
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
@@ -58,6 +62,10 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
 
       it "should not display the is_applying_coverage field option" do
         expect(rendered).not_to match /Is this person applying for coverage?/
+      end
+
+      it "should display the affirmative message" do
+        expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
       end
 
       it "should have home address fields" do
@@ -100,6 +108,36 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     it "should not show save button" do
       render :template => "people/landing_pages/_personal.html.erb"
       expect(rendered).to have_selector('.blocking', text: 'Save' )
+    end
+  end
+
+  context "with both employee_role and consumer_role" do
+    let(:person) {FactoryGirl.create(:person, :ssn => "123456789")}
+    before :each do
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      allow(person).to receive(:consumer_role).and_return consumer_role
+      allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:has_active_employee_role?).and_return true
+      assign(:person, person)
+      render :template => "people/landing_pages/_personal.html.erb"
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).to match /Your answer to this question does not apply to coverage offered by an employer./
+    end
+  end
+
+  context "with employee_role" do
+    let(:person) {FactoryGirl.create(:person)}
+    before :each do
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      allow(person).to receive(:has_active_employee_role?).and_return true
+      assign(:person, person)
+      render :template => "people/landing_pages/_personal.html.erb"
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
     end
   end
 end
