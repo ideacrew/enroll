@@ -1215,12 +1215,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
 
-    it 'should have renewal benefit group assignment' do 
+    it 'should have renewal benefit group assignment' do
       expect(census_employee.renewal_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.renewal_benefit_group_assignment.benefit_group).to eq renewal_benefit_group
     end
 
-    it 'should have active benefit group assignment' do 
+    it 'should have active benefit group assignment' do
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
     end
@@ -1693,6 +1693,106 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.past_enrollments).not_to include(ivl_dental_enrollment)
         expect(census_employee.past_enrollments).not_to include(ivl_expired_dental_enrollment)
       end
+    end
+  end
+
+ context '.enrollments_for_display' do
+
+    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:census_employee) {
+      ce = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+      ce.update_attributes({employee_role: employee_role})
+      family = Family.find_or_build_from_employee_role(employee_role)
+      ce
+    }
+
+    let!(:auto_renewing_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: census_employee.employee_role.person.primary_family.active_household,
+      coverage_kind: "health",
+      kind: "employer_sponsored",
+      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
+      employee_role_id: census_employee.employee_role.id,
+      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+      aasm_state: "auto_renewing"
+      )
+    }
+
+    let!(:auto_renewing_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: census_employee.employee_role.person.primary_family.active_household,
+      coverage_kind: "dental",
+      kind: "employer_sponsored",
+      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
+      employee_role_id: census_employee.employee_role.id,
+      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+      aasm_state: "auto_renewing"
+      )
+    }
+
+    let(:enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: census_employee.employee_role.person.primary_family.active_household,
+      coverage_kind: "health",
+      kind: "employer_sponsored",
+      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+      employee_role_id: census_employee.employee_role.id,
+      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+      aasm_state: "coverage_selected"
+      )
+    }
+
+
+    shared_examples_for "enrollments for display" do |state, status, result|
+
+      let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "health",
+        kind: "employer_sponsored",
+        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+        aasm_state: state
+        )
+      }
+
+      let!(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "dental",
+        kind: "employer_sponsored",
+        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+        aasm_state: state
+        )
+      }
+
+      it "should #{status}return #{state} health enrollment" do
+        expect(census_employee.enrollments_for_display[0].try(:aasm_state) == state).to eq result
+      end
+
+      it "should #{status}return #{state} dental enrollment" do
+        expect(census_employee.enrollments_for_display[1].try(:aasm_state) == state).to eq result
+      end
+    end
+
+    it_behaves_like "enrollments for display", "coverage_selected", "", true
+    it_behaves_like "enrollments for display", "coverage_enrolled", "", true
+    it_behaves_like "enrollments for display", "coverage_termination_pending", "", true
+    it_behaves_like "enrollments for display", "coverage_terminated", "not ", false
+    it_behaves_like "enrollments for display", "coverage_expired", "not ", false
+    it_behaves_like "enrollments for display", "shopping", "not ", false
+
+    it 'should return auto renewing health enrollment' do
+      expect(census_employee.enrollments_for_display[0]).to eq auto_renewing_health_enrollment
+    end
+
+    it 'should return auto renewing dental enrollment' do
+      expect(census_employee.enrollments_for_display[1]).to eq auto_renewing_dental_enrollment
+    end
+
+    it "should return current and renewing coverages" do
+      enrollment
+      expect(census_employee.enrollments_for_display).to eq [enrollment, auto_renewing_health_enrollment, auto_renewing_dental_enrollment]
     end
   end
 

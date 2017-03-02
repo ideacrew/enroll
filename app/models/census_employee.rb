@@ -859,7 +859,7 @@ class CensusEmployee < CensusMember
 
     coverages_selected = lambda do |benefit_group_assignment|
       return [] if benefit_group_assignment.blank?
-      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment || e.aasm_state == "coverage_expired"}
+      coverages = benefit_group_assignment.active_and_waived_enrollments.reject{|e| e.external_enrollment }
       [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
     end
 
