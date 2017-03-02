@@ -133,7 +133,7 @@ class BenefitCoveragePeriod
         unless resident_role.nil?
           rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family)
         else
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, {coverage_kind:coverage_kind, family: family, new_effective_on: hbx_enrollment_members.first.hbx_enrollment.effective_on})
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment_members.first.hbx_enrollment.effective_on })
         end
         satisfied = false and break unless rule.satisfied?[0]
       end

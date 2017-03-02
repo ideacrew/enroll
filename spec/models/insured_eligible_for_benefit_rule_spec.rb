@@ -21,7 +21,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     it "should return true if benefit package have the benefit categories with the current coverage kind" do
       allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
       expect(rule.is_benefit_categories_satisfied?).to eq true
     end
   end
@@ -262,7 +261,11 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
     let(:role) {FactoryGirl.create(:consumer_role_object)}
+<<<<<<< HEAD
     let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package, {family: family, coverage_kind:'health'})}
+=======
+    let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package, family: family)}
+>>>>>>> master
     let(:person) {double}
 
     context "consumer_role aasm_state is fully_verified" do
