@@ -19,6 +19,7 @@
 
           <p>Costs are based on the roster associated with this quote of  <b><%= @q.quote_households.count %></b> families:</p>
           <% @q.quote_benefit_groups.each do |benefit_group| %>
+          <% if benefit_group.dental_plan  || benefit_group.plan %>
             <div class="panel-body">
               <h3 class="title no-buffer">
                 <%= "Benefit Group: #{benefit_group.title}" %>
@@ -82,7 +83,7 @@
                 </div>
                 <div class="col-xs-12 quote-details">
                   <div class="col-xs-12 quote-health-details">
-                    <p>Below is your Employer's Health Plan offering Spectrum. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
+                    <p>Below is your Employer's Health Plan offering. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
                     <% if benefit_group.plan %>
                       <table class = "employer-health-contribution">
                         <tr>
@@ -132,10 +133,10 @@
                       </div>
                     <%end%>
                   </div>
+                  <% if benefit_group.dental_plan %>
                   <div class="col-xs-12 quote-dental-details">
-                    <p>Below is your Employer's Dental Plan offering Spectrum. Your offerings are based on
+                    <p>Below is your Employer's Dental Plan offering. Your offerings are based on
                      <%=display_dental_plan_option_kind benefit_group%>.</p>
-                    <% if benefit_group.dental_plan %>
                       <table class = "employer-dental-contribution">
                         <tr>
                           <th>Offered</th>
@@ -190,12 +191,13 @@
                           </div>
                         </div>
                       </div>
-                    <%end%>
                   </div>
+                <%end%>
                 </div>
               </div>
             </div>
             <br>
+          <% end %>
           <% end%>
           <p>**Actual costs may vary.</p>
         </div>
