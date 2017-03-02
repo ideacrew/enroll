@@ -16,6 +16,7 @@ class InsuredEligibleForBenefitRule
     @family = options[:family]
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
+    @new_effective_on = options[:new_effective_on]
   end
 
   def setup
