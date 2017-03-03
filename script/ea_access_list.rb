@@ -19,7 +19,7 @@
           person = user.person
           if person.nil?
             csv << ["No person record found", "No person record", user.oim_id, user.email, user.roles, user.created_at, user.last_sign_in_at]
-          elsif person.employer_staff_roles?
+          elsif person.has_active_employer_staff_role?
             employer_profile_id = person.employer_staff_roles.first.employer_profile_id
             employer_profile = EmployerProfile.find(employer_profile_id)
             employer_profile.broker_agency_accounts.unscoped.all.each do |baa|
