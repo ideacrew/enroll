@@ -91,6 +91,24 @@ class BenefitGroupAssignment
     end
   end
 
+  def latest_hbx_enrollments_for_cobra
+    families = Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+      })
+
+    hbx_enrollments = families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.enrollments_for_cobra.select do |enrollment| 
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
+    health_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'health' && !hbx.is_cobra_status? }
+    dental_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'dental' && !hbx.is_cobra_status? }
+    [health_hbx, dental_hbx].compact
+  end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 
@@ -155,7 +173,7 @@ class BenefitGroupAssignment
     end
 
     event :delink_coverage, :after => :record_transition do
-      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void, :coverage_renewing, :coverage_waived], to: :initialized, after: :propogate_delink
     end
   end
 
