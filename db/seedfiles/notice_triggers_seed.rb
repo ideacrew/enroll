@@ -74,6 +74,7 @@ shop_notice_triggers = [
         name: 'Initial Employer SHOP Approval Notice',
         notice_template: 'notices/shop_notices/2_initial_employer_approval_notice',
         notice_builder: 'ShopNotices::InitialEmployerEligibilityNotice',
+        mpi_indicator: 'MPI_SHOP2A',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
