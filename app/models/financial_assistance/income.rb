@@ -34,14 +34,22 @@ class FinancialAssistance::Income
 
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
 
+  TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
+
   field :title, type: String
   field :kind, as: :income_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
+  field :amount_tax_exempt, type: Integer, default: 0
   field :frequency_kind, type: String
   field :start_on, type: Date
   field :end_on, type: Date
   field :is_projected, type: Boolean, default: false
+  field :tax_form, type: String
+  field :employer_name, type: String
+  field :employer_id, type: Integer
+  field :income_from_native_american, type: Boolean
+  field :has_education_scholarship_income, type: Boolean
   field :submitted_at, type: DateTime
 
   validates_length_of :title, 
