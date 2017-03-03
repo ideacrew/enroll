@@ -65,6 +65,8 @@ class FinancialAssistance::Income
                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
   validates :start_on,        presence: true
 
+  validates :tax_form,        presence: true,
+                              inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
   validate :start_on_must_precede_end_on
 
   before_create :set_submission_timestamp
