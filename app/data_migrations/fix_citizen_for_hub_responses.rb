@@ -24,11 +24,12 @@ class UpdateCitizenStatus < MongoidMigrationTask
   def fix_citizen_status(person)
     all_person_versions = person.versions.reverse
     all_person_versions.each do |person_v|
-      next if lpd(person).citizen_status == lpd(person_v).citizen_status
+      next if person.citizen_status == person_v.citizen_status
       if version_state_reliable?(person_v)
-        lpd(person).update_attributes!(:citizen_status => lpd(person_v).citizen_status)
+        old_status = person.citizen_status
+        lpd(person).update_attributes!(:citizen_status => person_v.citizen_status)
         unless Rails.env.test?
-          puts "Person ID: #{person.id} citizen status was changed to #{lpd(person_v).citizen_status}"
+          puts "Person ID: #{person.id} citizen status was changed from #{old_status} to ==> #{person_v.citizen_status}"
         end
       end
     end
@@ -39,14 +40,14 @@ class UpdateCitizenStatus < MongoidMigrationTask
   end
 
   def authority_acceptable?(person_v)
-    !lpd(person_v).vlp_authority.present? || lpd(person_v).vlp_authority == "curam"
+    !lpd(person_v).try(:vlp_authority).present? || lpd(person_v).try(:vlp_authority) == "curam"
   end
 
   def status_acceptable(person_v)
-    ACCEPTABLE_STATES.include? lpd(person_v).citizen_status
+    ACCEPTABLE_STATES.include? lpd(person_v).try(:citizen_status)
   end
 
   def lpd(person)
-    person.consumer_role.lawful_presence_determination
+    person.try(:consumer_role).try(:lawful_presence_determination)
   end
 end
