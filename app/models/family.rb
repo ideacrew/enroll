@@ -29,6 +29,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
+
  #after_save :generate_family_search
 
   belongs_to  :person
@@ -69,6 +70,20 @@ class Family
          "households.hbx_enrollments.created_at" => 1},
          {name: "state_and_created"})
 
+    index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.effective_on" => 1,
+         "households.hbx_enrollments.terminated_on" => 1
+         },
+         {name: "kind_and_state_and_created_and_terminated"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+         "households.hbx_enrollments.aasm_state" => 1,
+         "households.hbx_enrollments.coverage_kind" => 1,
+         "households.hbx_enrollments.effective_on" => 1
+         },
+         {name: "kind_and_state_and_coverage_kind_effective_date"})
+
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
@@ -102,6 +117,7 @@ class Family
   validate :family_integrity
 
   after_initialize :build_household
+
  # after_save :update_family_search_collection
  # after_destroy :remove_family_search_record
 
@@ -198,6 +214,19 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
+  end
+
+  def primary_family_member=(new_primary_family_member)
+    self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
+
+    existing_family_member = find_family_member_by_person(new_primary_family_member)
+    if existing_family_member.present?
+      existing_family_member.is_primary_applicant = true
+    else
+      add_family_member(new_primary_family_member, is_primary_applicant: true)
+    end
+
+    primary_family_member
   end
 
   def primary_family_member
@@ -583,6 +612,21 @@ class Family
     if primary_applicant.person.consumer_role.present?
       active_family_members.each do |family_member|
         build_consumer_role(family_member)
+      end
+    end
+  end
+
+  def build_resident_role(family_member, opts = {})
+    person = family_member.person
+    return if person.resident_role.present?
+    person.build_resident_role({:is_applicant => false}.merge(opts))
+    person.save!
+  end
+
+  def check_for_resident_role
+    if primary_applicant.person.resident_role.present?
+      active_family_members.each do |family_member|
+        build_resident_role(family_member)
       end
     end
   end

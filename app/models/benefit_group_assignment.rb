@@ -173,7 +173,7 @@ class BenefitGroupAssignment
     end
 
     event :delink_coverage, :after => :record_transition do
-      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void], to: :initialized, after: :propogate_delink
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void, :coverage_renewing, :coverage_waived], to: :initialized, after: :propogate_delink
     end
   end
 
