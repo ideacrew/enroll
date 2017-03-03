@@ -22,7 +22,7 @@
   content: "Thank you for applying to offer group health coverage through DC Health Link."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees starting «coverage effective date» through DC Health Link. You can proceed to the next steps outlined below."} %>
+  content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees starting #{notice.plan_year.start_on} through DC Health Link. You can proceed to the next steps outlined below."} %>
 <br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
@@ -85,8 +85,8 @@
                 <span style="width: 300px;">
                   <span style="float: left; width: 95px;"><strong>Finalize Coverage and Pay First Month’s Premium</strong></span>
                   <span style="float: left; width: 95px;">
-                    Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received and cleared no later than 5:00 p.m. on «binder payment deadline» in order for your coverage to take effect on «coverage effective date».  Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br>
-                    If your first month’s premium is not received and cleared by 5:00 p.m. on «binder payment deadline», your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.<br><br>
+                    Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received and cleared no later than 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date%> in order for your coverage to take effect on <%=notice.plan_year.start_on%>.  Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br>
+                    If your first month’s premium is not received and cleared by 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.<br><br>
                   </span>
               </span>
             </li>
