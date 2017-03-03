@@ -797,7 +797,7 @@ class CensusEmployee < CensusMember
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
-    return true if current_user.has_hbx_staff_role?
+    return true if current_user.try(:has_hbx_staff_role?)
     cobra_begin_date.present? && hired_on <= cobra_begin_date &&
       coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
       coverage_terminated_on <= cobra_begin_date &&
