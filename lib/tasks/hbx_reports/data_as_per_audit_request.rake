@@ -51,7 +51,7 @@ namespace :reports do
           versioned_person = primary_fm.person.versions.detect { |ver| submitted_application(ver, start_date, end_date) }
           submitted_app_primary = versioned_person || (primary_fm.person if submitted_application(primary_fm.person, start_date, end_date))
           
-          if submitted_app_primary.present? && submitted_app_primary.consumer_role.present?
+          if submitted_app_primary.present? && submitted_app_primary.consumer_role.present? && !(submitted_app_primary.consumer_role.bookmark_url.include? "edit")
             family.family_members.each do |fm|
               versioned_person = fm.is_primary_applicant ? submitted_app_primary : (fm.person.versions[0] || fm.person)
               
