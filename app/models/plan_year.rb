@@ -821,7 +821,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:published, :enrolling, :enrolled, :active], to: :canceled
+      transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled
     end
 
     # Coverage disabled due to non-payment
