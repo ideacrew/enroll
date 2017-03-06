@@ -55,7 +55,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
   end
 
@@ -81,7 +81,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   it "should not show the plan" do
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([])
     assign(:hbx_enrollments, [])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
@@ -120,7 +120,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should not show the dental enrollment if it is external" do
     hbx_enrollment_two.update_attributes(:external_enrollment => true)
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment_two])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment_two])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
@@ -237,7 +237,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       aasm_state: 'coverage_terminated' ) }
 
     before :each do
-      allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
+      allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
       assign(:past_enrollments, [past_enrollments])
     end
 
@@ -250,7 +250,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     context "with not health, but dental and past enrollments" do
       before :each do
-        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([dental_hbx_enrollment])
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([dental_hbx_enrollment])
       end
       it "should display past enrollments" do
         render template: "employers/census_employees/show.html.erb"
