@@ -38,7 +38,11 @@ module Events
         end
       rescue Exception=>e
         ex.publish(
-          "#{individual_id} update failed - #{e.inspect}",
+          JSON.dump(
+            {
+              exception: e.inspect,
+              backtrace: e.backtrace.inspect
+              }),
           {
             :routing_key => reply_to,
             :headers => {
