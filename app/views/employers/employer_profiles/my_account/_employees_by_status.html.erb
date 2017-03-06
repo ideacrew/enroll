@@ -96,7 +96,7 @@
             <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
               <%=cobra_effective_date(census_employee) %>
             </td>
-            <td>
+            <td colspan="2">
               <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
                 <strong>&nbsp;Submit</strong>
               </a>
@@ -112,7 +112,7 @@
             <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
               <%=cobra_effective_date(census_employee) %>
             </td>
-            <td>
+            <td colspan="2">
               <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_reinstate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_reinstate', '<%= census_employee.id %>')">
                 <strong>&nbsp;Submit</strong>
               </a>

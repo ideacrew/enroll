@@ -53,7 +53,12 @@
     <div class="vertically-aligned-row auto-width">
       <div class="text-right col-xs-4">
         <div class="row">
-          <span></span>
+          <% if @census_employee.is_cobra_status? %>
+            <div id='cobra_bar'>
+              <div class='title'><strong>COBRA/Continuation</strong></div>
+              <div><strong>effective date:</strong><%= format_date @census_employee.cobra_begin_date %></div>
+            </div>
+          <% end %>
           <span><strong><%= is_rehired(@census_employee) ? "Rehired:" : "Hired:" %></strong>
           <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
           <% if @census_employee.coverage_terminated_on.blank? %>
@@ -124,6 +129,8 @@
       </div>
     </div>
 
+    <!-- Disable COBRA Functionality from this page for now. -->
+    <!--
     <div class="col-xs-12 row">
       <br/>
       <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-default return_to_employee_roster', "aria-expanded" => "true" %>
@@ -162,9 +169,9 @@
               </a>
             </span>
           </div>
-        </div> 
+        </div>
       <%end%>
-  </div>
+  </div>-->
   <div class="row">
     <div class="col-xs-12">
       <h3>

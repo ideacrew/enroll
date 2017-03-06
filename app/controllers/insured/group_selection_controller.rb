@@ -86,8 +86,8 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
-
     hbx_enrollment.coverage_kind = @coverage_kind
+
     if @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment.kind = 'employer_sponsored_cobra'
       hbx_enrollment.effective_on = @employee_role.census_employee.coverage_terminated_on.end_of_month + 1.days if @employee_role.census_employee.need_update_hbx_enrollment_effective_on?
@@ -95,6 +95,7 @@ class Insured::GroupSelectionController < ApplicationController
         raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
       end
     end
+
     # Set effective_on if this is a case of QLE with date options available.
     hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
 

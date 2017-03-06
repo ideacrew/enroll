@@ -42,8 +42,10 @@ module Factories
       enrollment.propogate_terminate(term_date)
     end
 
-    def effective_on_for_cobra
-      @census_employee.coverage_terminated_on.end_of_month + 1.days 
+    def effective_on_for_cobra(enrollment)
+      effective_on_by_terminated = @census_employee.coverage_terminated_on.end_of_month + 1.days
+      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for_cobra(@census_employee.hired_on)
+      [effective_on_by_terminated, effective_on_by_benefit_group].max
     end
 
     def clone_cobra_enrollment(active_enrollment, clone_enrollment)
@@ -51,38 +53,41 @@ module Factories
       clone_enrollment.benefit_group_id = active_enrollment.benefit_group_id
       clone_enrollment.employee_role_id = active_enrollment.employee_role_id
       clone_enrollment.plan_id = active_enrollment.plan_id
+      clone_enrollment.coverage_kind = active_enrollment.coverage_kind
       clone_enrollment.kind = 'employer_sponsored_cobra'
-      clone_enrollment.effective_on = effective_on_for_cobra
+      effective_on = effective_on_for_cobra(active_enrollment)
+      clone_enrollment.effective_on = effective_on
       if active_enrollment.benefit_group.plan_year.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
         clone_enrollment.effective_on = active_enrollment.effective_on
       else
         clone_enrollment.select_coverage
-        clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on_for_cobra
+        clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on
       end
       clone_enrollment.generate_hbx_signature
       if TimeKeeper.date_of_record < active_enrollment.effective_on
         active_enrollment.cancel_coverage! if active_enrollment.may_cancel_coverage?
       else
-        active_enrollment.terminate_coverage! if active_enrollment.may_terminate_coverage?
+        active_enrollment.terminate_coverage!(effective_on - 1.days) if active_enrollment.may_terminate_coverage?
       end
 
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
       clone_enrollment
     end
-      
+
     def clone_enrollment_members(active_enrollment)
       hbx_enrollment_members = active_enrollment.hbx_enrollment_members
+      effective_on = effective_on_for_cobra(active_enrollment)
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
           applicant_id: hbx_enrollment_member.applicant_id,
-          eligibility_date: effective_on_for_cobra,
-          coverage_start_on: effective_on_for_cobra,
+          eligibility_date: effective_on,
+          coverage_start_on: effective_on,
           is_subscriber: hbx_enrollment_member.is_subscriber
         })
       end
     end
   end
-  
+
   class FamilyEnrollmentCloneFactoryError < StandardError; end
 end

@@ -645,6 +645,7 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
     let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household)}
+    let(:enrollment_three) { FactoryGirl.create(:hbx_enrollment, :cobra_shop, household: family.active_household)}
     before do
       benefit_group_assignment.update_attribute(:hbx_enrollment_id, enrollment_two.id)
       enrollment_two.update_attributes(benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
@@ -1372,6 +1373,12 @@ context "Benefits are terminated" do
       expect(shop_enrollment.is_shop?).to be_truthy
     end
 
+    it "should be SHOP enrollment kind when employer_sponsored_cobra" do
+      shop_enrollment.kind = 'employer_sponsored_cobra'
+      expect(shop_enrollment.kind).to eq 'employer_sponsored_cobra'
+      expect(shop_enrollment.is_shop?).to be_truthy
+    end
+
     context "and coverage is terminated" do
       before do
         shop_enrollment.terminate_benefit(TimeKeeper.date_of_record)
@@ -1941,7 +1948,8 @@ context "A cancelled external enrollment", :dbclean => :after_each do
 end
 
 context "for cobra", :dbclean => :after_each do
-  let(:enrollment) { HbxEnrollment.new }
+  let(:enrollment) { HbxEnrollment.new(kind: 'employer_sponsored') }
+  let(:cobra_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored_cobra') }
 
   context "is_cobra_status?" do
     it "should return false" do
@@ -1951,6 +1959,24 @@ context "for cobra", :dbclean => :after_each do
     it "should return true" do
       enrollment.kind = 'employer_sponsored_cobra'
       expect(enrollment.is_cobra_status?).to be_truthy
+    end
+  end
+
+  context "cobra_future_active?" do
+    it "should return false when not cobra" do
+      expect(enrollment.cobra_future_active?).to be_falsey
+    end
+
+    context "when cobra" do
+      it "should return false" do
+        allow(cobra_enrollment).to receive(:future_active?).and_return false
+        expect(cobra_enrollment.cobra_future_active?).to be_falsey
+      end
+
+      it "should return true" do
+        allow(cobra_enrollment).to receive(:future_active?).and_return true
+        expect(cobra_enrollment.cobra_future_active?).to be_truthy
+      end
     end
   end
 

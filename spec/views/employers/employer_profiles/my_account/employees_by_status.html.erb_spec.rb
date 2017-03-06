@@ -25,9 +25,9 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
   let(:benefit_group) { BenefitGroup.new }
 
-  let(:benefit_group_assignment1) { double(hbx_enrollments: [enrollment_with_coverage_selected], benefit_group: benefit_group)}
-  let(:benefit_group_assignment2) { double(hbx_enrollments: [enrollment_with_coverage_terminated], benefit_group: benefit_group)}
-  let(:benefit_group_assignment3) { double(hbx_enrollments: [hbx_enrollment], benefit_group: benefit_group) }
+  let(:benefit_group_assignment1) { double(hbx_enrollments: [enrollment_with_coverage_selected], benefit_group: benefit_group, census_employee: census_employee1)}
+  let(:benefit_group_assignment2) { double(hbx_enrollments: [enrollment_with_coverage_terminated], benefit_group: benefit_group, census_employee: census_employee1)}
+  let(:benefit_group_assignment3) { double(hbx_enrollments: [hbx_enrollment], benefit_group: benefit_group, census_employee: census_employee1) }
 
   before :each do
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true))

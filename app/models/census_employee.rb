@@ -13,7 +13,7 @@ class CensusEmployee < CensusMember
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
@@ -442,10 +442,11 @@ class CensusEmployee < CensusMember
 
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
+
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
         end
         terminate_employee_role!
@@ -462,10 +463,10 @@ class CensusEmployee < CensusMember
 
       if may_schedule_employee_termination? || employee_termination_pending?
           schedule_employee_termination!
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
+          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
       end
     end
@@ -559,9 +560,9 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def update_for_cobra(cobra_date)
+  def update_for_cobra(cobra_date,current_user=nil)
     self.cobra_begin_date = cobra_date
-    self.elect_cobra
+    self.elect_cobra(current_user)
     self.save
   rescue => e
     false
@@ -572,12 +573,13 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_group_assignments_for_cobra
-    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year) }
+    # 6 months buffer between create date and open enrollment start date indicates this is most likely a conversion and should not be picked up.
+    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year && employer_profile.published_plan_year.created_at < (employer_profile.published_plan_year.open_enrollment_start_on + 6.months)) }
   end
 
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
-    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollment_for_cobra) rescue []
+    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
 
     hbxs.compact.each do |hbx|
       enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
@@ -719,8 +721,9 @@ class CensusEmployee < CensusMember
     state :newly_designated_linked
     state :employee_role_linked
     state :cobra_linked
-    state :employee_termination_pending
+    state :newly_designated_linked
     state :cobra_termination_pending
+    state :employee_termination_pending
     state :employment_terminated
     state :cobra_terminated
     state :rehired
@@ -829,7 +832,8 @@ class CensusEmployee < CensusMember
     ['employment_terminated'].include?(aasm_state)
   end
 
-  def have_valid_date_for_cobra?
+  def have_valid_date_for_cobra?(current_user = nil)
+    return true if current_user.try(:has_hbx_staff_role?)
     cobra_begin_date.present? && hired_on <= cobra_begin_date &&
       coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
       coverage_terminated_on <= cobra_begin_date &&
@@ -840,9 +844,14 @@ class CensusEmployee < CensusMember
     employee_role.present?
   end
 
-  def has_hbx_enrollments?
-    return false if employee_role.blank?
-    benefit_group_assignments.any? { |bga| bga.hbx_enrollment.present? }
+  # should disable cobra
+  # 1.waived
+  # 2.do not have an enrollment
+  # 3.census_employee is pending
+  def is_disabled_cobra_action?
+    employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
+      (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
+      employee_termination_pending?
   end
 
   def has_cobra_hbx_enrollment?
@@ -852,6 +861,10 @@ class CensusEmployee < CensusMember
 
   def need_update_hbx_enrollment_effective_on?
     !has_cobra_hbx_enrollment? && coverage_terminated_on.present?
+  end
+
+  def show_plan_end_date?
+    is_inactive? && coverage_terminated_on.present?
   end
 
   def enrollments_for_display

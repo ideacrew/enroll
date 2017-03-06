@@ -215,7 +215,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
-    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)

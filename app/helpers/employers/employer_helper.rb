@@ -31,7 +31,7 @@ module Employers::EmployerHelper
 
       %W(health dental).each do |coverage_kind|
         if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-          enrollment_states << "#{benefit_group_assignment_status(coverage.aasm_state)} (#{coverage_kind})"
+          enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
         end
       end
       enrollment_states << '' if enrollment_states.compact.empty?
@@ -53,6 +53,22 @@ module Employers::EmployerHelper
       if enrollment_statuses.include?(enrollment_status.to_s)
         return bgsm_state
       end
+    end
+  end
+
+  def employee_benefit_group_assignment_status(census_employee, enrollment_status)
+    state = benefit_group_assignment_status(enrollment_status)
+    if census_employee.is_cobra_status?
+      case state
+      when 'coverage_waived'
+        'cobra_waived'
+      when 'coverage_renewing'
+        'cobra_renewed'
+      else
+        state
+      end
+    else
+      state
     end
   end
 
@@ -119,28 +135,28 @@ module Employers::EmployerHelper
 
   def cobra_effective_date(census_employee)
     disabled = current_user.has_hbx_staff_role? ? false : true
-    content_tag(:div) do 
+    content_tag(:div) do
      content_tag(:span,"COBRA/Continuation Effective Date:  ") +
-      content_tag(:span, :class=>"confirm-cobra" ,:style=>"display:inline;") do 
-        content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled ) 
+      content_tag(:span, :class=>"confirm-cobra" ,:style=>"display:inline;") do
+        content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled )
       end
     end.html_safe
   end
 
   def cobra_button(census_employee)
-    disabled = current_user.has_hbx_staff_role? == true || census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
+    disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
     if census_employee.employer_profile.present? && !census_employee.employer_profile.is_conversion?
-      disabled = true unless census_employee.has_hbx_enrollments?
+      disabled = true if census_employee.is_disabled_cobra_action?
     end
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
-    if census_employee.cobra_terminated? 
-      button_text = 'COBRA REINSTATE' 
+    if census_employee.cobra_terminated?
+      button_text = 'COBRA REINSTATE'
       toggle_class = ".cobra_reinstate_"
       disabled = !current_user.has_hbx_staff_role?
     end
-    content_tag(:a, :class => "show_confirm show_cobra_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
-      content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg", 
+    content_tag(:a, :class => "show_confirm show_cobra_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do
+      content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg",
         :onclick => "$(this).closest('tr').nextAll('#{toggle_class}#{census_employee.id}').toggle()")
     end
   end

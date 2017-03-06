@@ -17,9 +17,7 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid
-                              emergency_medicaid hcr_chip
-                            )
+  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
 
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
@@ -116,7 +114,6 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
-  #field :is_cobra, type: Boolean, default: false
   field :is_tranding_partner_transmittable, type: Boolean, default: false
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
@@ -410,6 +407,10 @@ class HbxEnrollment
     terminated_on >= effective_on
   end
 
+  def cobra_future_active?
+    is_cobra_status? && future_active?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -436,7 +437,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    return false if kind != 'employer_sponsored' # there is no concept of waiver in ivl case
+    return false unless is_shop? # there is no concept of waiver in ivl case
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
@@ -529,7 +530,7 @@ class HbxEnrollment
   end
 
   def is_shop?
-    kind == "employer_sponsored" || kind == 'employer_sponsored_cobra'
+    ['employer_sponsored', 'employer_sponsored_cobra'].include?(kind)
   end
 
   def is_coverall?
