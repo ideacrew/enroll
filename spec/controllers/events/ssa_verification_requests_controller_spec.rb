@@ -6,7 +6,7 @@ describe Events::SsaVerificationRequestsController do
     let(:outbound_event_name) { "acapi.info.events.lawful_presence.ssa_verification_request" }
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
-    let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
+    let(:mock_now) { TimeKeeper.datetime_of_record }
 
     it "should send out a message to the bus with the request to validate ssa" do
       @event_name = ""
