@@ -18,13 +18,5 @@
     field :sep_yoy, type: String
 
     default_scope ->{where(tile: "left_enrollment_type" )}
-
-    # def self.enrollment_dashboard_stats
-    #     enrollments =[ ]
-    #     IvlCovered::EnrollmentType.all.each do |c|
-    #         enrollments << c if c.month_one.present? && enrollments.size < 5 
-    #     end
-    #     enrollments
-    # end
   end
 end
