@@ -29,7 +29,7 @@ class UpdateCitizenStatus < MongoidMigrationTask
         old_status = person.citizen_status
         lpd(person).update_attributes!(:citizen_status => person_v.citizen_status)
         unless Rails.env.test?
-          puts "Person ID: #{person.id} citizen status was changed from #{old_status} to ==> #{person_v.citizen_status}"
+          puts "Person HBX_ID: #{person.hbx_id} citizen status was changed from #{old_status} to ==> #{person_v.citizen_status}"
         end
       end
     end
