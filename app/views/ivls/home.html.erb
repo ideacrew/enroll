@@ -649,26 +649,29 @@ $(function () {
     <thead>
       <tr>
         <th class="texLef">SEP</th>
-        <th>Mar 16</th>
-        <th>Apr 16</th>
-        <th>May 16</th>
-        <th>Jun 16</th>
-        <th>Jul 16</th>
-        <th>Aug 16</th>
-        <th>Sep 16</th>
-        <th>Oct 16</th>
-        <th>Nov 16</th>
-        <th>Dec 16</th>
-        <th>Jan 17</th>
-        <th>Feb 17</th>
+        <%@seps.each do |s|%>
+        <th><%=s.month_one%></th>
+        <th><%=s.month_two%></th>
+        <th><%=s.month_three%></th>
+        <th><%=s.month_four%></th>
+        <th><%=s.month_five%></th>
+        <th><%=s.month_six%></th>
+        <th><%=s.month_seven%></th>
+        <th><%=s.month_eight%></th>
+        <th><%=s.month_nine%></th>
+        <th><%=s.month_ten%></th>
+        <th><%=s.month_eleven%></th>
+        <th><%=s.month_twelve%></th>
         <th>Total</th>
         <th>%</th>
+        <%end%>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="texLef">Lost Coverage</td>
-        <td>14</td>
+        <%@seps.each do |s|%>
+        <td><%=s.lost_coverage_one%></td>
         <td>8</td>
         <td>148</td>
         <td>139</td>
@@ -682,6 +685,7 @@ $(function () {
         <td>0</td>
         <td>851</td>
         <td>24%</td>
+        <%end%>
       </tr>
       <tr>
         <td class="texLef">Birth</td>
