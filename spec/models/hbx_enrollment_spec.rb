@@ -2247,26 +2247,15 @@ describe HbxEnrollment, dbclean: :after_all do
   context "Cancel / Terminate Previous Enrollments for Shop" do
     let(:household) {mikes_family.households.first}
     let(:coverage_household) {household.coverage_households.first}
-    let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
     let(:family) {FactoryGirl.build(:family)}
 
     before :each do
       allow(coverage_household).to receive(:household).and_return household
       allow(household).to receive(:family).and_return family
-      @enrollment1 = household.create_hbx_enrollment_from(
-        employee_role: mikes_employee_role,
-        coverage_household: coverage_household,
-        benefit_group: mikes_benefit_group,
-        benefit_group_assignment: @mikes_benefit_group_assignments
-      )
+      @enrollment1 = household.create_hbx_enrollment_from(employee_role: mikes_employee_role, coverage_household: coverage_household, benefit_group: mikes_benefit_group, benefit_group_assignment: @mikes_benefit_group_assignments)
       @enrollment1.aasm_state = "coverage_selected"
       @enrollment1.save
-      @enrollment2 = household.create_hbx_enrollment_from(
-        employee_role: mikes_employee_role,
-        coverage_household: coverage_household,
-        benefit_group: mikes_benefit_group,
-        benefit_group_assignment: @mikes_benefit_group_assignments
-      )
+      @enrollment2 = household.create_hbx_enrollment_from(employee_role: mikes_employee_role, coverage_household: coverage_household, benefit_group: mikes_benefit_group, benefit_group_assignment: @mikes_benefit_group_assignments)
       @enrollment2.save
     end
 
@@ -2278,32 +2267,22 @@ describe HbxEnrollment, dbclean: :after_all do
 
   context "Cancel / Terminate Previous Enrollments for IVL" do
     attr_reader :enrollment, :household, :coverage_household
-    before :all do
-      @household = mikes_family.households.first
-      @coverage_household = household.coverage_households.first
-      @enrollment = household.create_hbx_enrollment_from(
-        employee_role: mikes_employee_role,
-        coverage_household: coverage_household,
-        benefit_group: mikes_benefit_group,
-        benefit_group_assignment: @mikes_benefit_group_assignments
-      )
-    end
+
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-    let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
     let(:family) {FactoryGirl.build(:family)}
+
     before :each do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
       allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
       allow(coverage_household).to receive(:household).and_return household
       allow(household).to receive(:family).and_return family
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
       @enrollment1 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
-      @enrollment1.update_current( aasm_state: "coverage_selected",
-                                  enrollment_signature: "somerandomthing!",
-                                  effective_on: TimeKeeper.date_of_record.beginning_of_month
-                                )
+      @enrollment1.update_current( aasm_state: "coverage_selected", enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month                        )
       @enrollment2 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
       @enrollment2.update_current(enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month)
     end
