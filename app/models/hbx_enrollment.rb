@@ -146,7 +146,7 @@ class HbxEnrollment
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
-  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled", "auto_renewing"] )}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing", "enrolled_contingent"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
@@ -461,20 +461,28 @@ class HbxEnrollment
 
       previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
 
-      if (previous_enrollment.enrollment_signature == self.enrollment_signature && !previous_enrollment.is_shop? && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.is_shop? && TimeKeeper.date_of_record < previous_enrollment.effective_on)
-
-        if previous_enrollment.may_cancel_coverage?
-          previous_enrollment.cancel_coverage!(previous_enrollment.effective_on)
-        end
-      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && !previous_enrollment.is_shop? && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.is_shop? && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
-        if previous_enrollment.may_terminate_coverage?
-          term_date = self.effective_on - 1.day
-          term_date = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum if (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum) > term_date && self.effective_on > (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum)
-
-          previous_enrollment.terminate_coverage
-          previous_enrollment.update_current(terminated_on: term_date)
+      if (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on)
+        execute_cancel_coverage(previous_enrollment)
+      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
+        if previous_enrollment.effective_on == self.effective_on
+          execute_cancel_coverage(previous_enrollment)
+        else
+          execute_terminate_coverage(previous_enrollment)
         end
       end
+    end
+  end
+
+  def execute_cancel_coverage(enrollment)
+    enrollment.cancel_coverage!(enrollment.effective_on) if enrollment.may_cancel_coverage?
+  end
+
+  def execute_terminate_coverage(enrollment)
+    if enrollment.may_terminate_coverage?
+      term_date = self.effective_on - 1.day
+      term_date = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum if (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum) > term_date && self.effective_on > (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum)
+      enrollment.terminate_coverage
+      enrollment.update_current(terminated_on: term_date)
     end
   end
 
@@ -490,7 +498,9 @@ class HbxEnrollment
     end
 
     shop_enrollments.each do |enrollment|
-      if enrollment.currently_active? && enrollment.may_terminate_coverage?
+      if enrollment.currently_active? && self.effective_on == enrollment.effective_on
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      elsif enrollment.currently_active? && enrollment.may_terminate_coverage?
         terminate_proc.call(enrollment)
       elsif enrollment.future_active?
         if enrollment.effective_on >= self.effective_on

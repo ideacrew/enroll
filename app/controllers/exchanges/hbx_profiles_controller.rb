@@ -285,7 +285,7 @@ def employer_poc
   end
 
   def terminate_enrollment
-    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
+    @hbxs = Family.find(params[:family]).all_enrollments.can_terminate
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
