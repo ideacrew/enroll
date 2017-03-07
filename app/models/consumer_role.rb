@@ -663,7 +663,7 @@ class ConsumerRole
   end
 
   def update_all_verification_types(*args)
-    person.verification_types.each{|v_type| update_verification_type(v_type, "Person in Curam") }
+    person.verification_types.each{|v_type| update_verification_type(v_type, "person is fully verified") }
   end
 
   def update_verification_type(v_type, update_reason)
