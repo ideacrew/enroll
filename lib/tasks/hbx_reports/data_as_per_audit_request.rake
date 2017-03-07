@@ -77,7 +77,7 @@ namespace :reports do
                                     end
 
                 mailing_address = versioned_person.addresses.detect { |adr| adr.kind == "mailing" }
-                citizen_status = versioned_person.citizen_status.try(:humanize) || "No Info"
+                citizen_status = versioned_person.citizen_status.try(:humanize) || (fm.person.citizen_status.try(:humanize) if !fm.is_primary_applicant ) || "No Info"
                 naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(versioned_person.citizen_status) if versioned_person.citizen_status.present?
                 tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(versioned_person.citizen_status) if versioned_person.citizen_status.present?
 
