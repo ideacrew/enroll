@@ -289,30 +289,33 @@ $(function () {
       </tr>
     </thead>
     <tbody>
+    <%@annual_enrollments.each do |annual|%>
       <tr>
+      
         <td class="texLef">Auto Renewals</td>
-        <td>12,239</td>
-        <td>49%</td>
-        <td>-4%</td>
+        <td><%=annual.auto_renewals_count%></td>
+        <td><%=annual.auto_renewals_share%>%</td>
+        <td><%=annual.auto_renewals_yoy%>%</td>     
       </tr>
       <tr>
         <td class="texLef">Active Renewals</td>
-        <td>2,971</td>
-        <td>12%</td>
-        <td>9%</td>
+        <td><%=annual.active_renewals_count%></td>
+        <td><%=annual.active_renewals_share%>%</td>
+        <td><%=annual.active_renewals_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">New Customers</td>
-        <td>6,484</td>
-        <td>26%</td>
-        <td>21%</td>
+        <td><%=annual.new_customers_count%></td>
+        <td><%=annual.new_customers_share%>%</td>
+        <td><%=annual.new_customers_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
-        <td>3,530</td>
-        <td>14%</td>
-        <td>7%</td>
+        <td><%=annual.sep_count%></td>
+        <td><%=annual.sep_share%>%</td>
+        <td><%=annual.sep_yoy%>%</td>
       </tr>
+      <%end%>
 
       <tr>
         <td>&nbsp;</td>
@@ -322,23 +325,25 @@ $(function () {
       </tr>
       
       <tr>
+      <%@annual_carriers.each do |carrier|%>
         <th class="texLef">Carrier</th>
         <th>#</th>
         <th>%</th>
         <th>YoY</th>
       </tr>
       <tr>
-        <td class="texLef">CareFirst</td>
-        <td>16,315</td>
-        <td>81%</td>
-        <td>0%</td>
+        <td class="texLef"><%=carrier.carrier_first_name%></td>
+        <td><%=carrier.carrier_first_count%></td>
+        <td><%=carrier.carrier_first_share%>%</td>
+        <td><%=carrier.carrier_first_yoy%>%</td>
       </tr>
       <tr>
-        <td class="texLef">Kaiser</td>
-        <td>3,815</td>
-        <td>19%</td>
-        <td>0%</td>
+        <td class="texLef"><%=carrier.carrier_secondName%></td>
+        <td><%=carrier.carrier_second_count%></td>
+        <td><%=carrier.carrier_second_share%>%</td>
+        <td><%=carrier.carrier_second_yoy%>%</td>
       </tr>
+      <%end%>
 
       <tr>
         <td>&nbsp;</td>
@@ -535,21 +540,22 @@ $(function () {
 
 <h4>Enrollments by Type - 3/1/2016 to 2/28/2017</h4>
     <table class="table table-hover table-condensed">
+    <%@enrollments.each do |enroll|%>
     <thead>
       <tr>
         <th class="texLef">Enrollment</th>
-        <th>Mar 16</th>
-        <th>Apr 16</th>
-        <th>May 16</th>
-        <th>Jun 16</th>
-        <th>Jul 16</th>
-        <th>Aug 16</th>
-        <th>Sep 16</th>
-        <th>Oct 16</th>
-        <th>Nov 16</th>
-        <th>Dec 16</th>
-        <th>Jan 17</th>
-        <th>Feb 17</th>
+        <th><%=enroll.month_one%></th>
+        <th><%=enroll.month_two%></th>
+        <th><%=enroll.month_three%></th>
+        <th><%=enroll.month_four%></th>
+        <th><%=enroll.month_five%></th>
+        <th><%=enroll.month_six%></th>
+        <th><%=enroll.month_seven%></th>
+        <th><%=enroll.month_eight%></th>
+        <th><%=enroll.month_nine%></th>
+        <th><%=enroll.month_ten%></th>
+        <th><%=enroll.month_eleven%></th>
+        <th><%=enroll.month_twelve%></th>
         <th>Total</th>
         <th>%</th>
       </tr>
@@ -557,91 +563,91 @@ $(function () {
     <tbody>
       <tr>
         <td class="texLef">Auto Renew</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>12,239</td>
-        <td>0</td>
-        <td>12,239</td>
-        <td>49%</td>
+        <td><%=enroll.auto_renew_one%></td>
+        <td><%=enroll.auto_renew_two%></td>
+        <td><%=enroll.auto_renew_three%></td>
+        <td><%=enroll.auto_renew_four%></td>
+        <td><%=enroll.auto_renew_five%></td>
+        <td><%=enroll.auto_renew_six%></td>
+        <td><%=enroll.auto_renew_seven%></td>
+        <td><%=enroll.auto_renew_eight%></td>
+        <td><%=enroll.auto_renew_nine%></td>
+        <td><%=enroll.auto_renew_ten%></td>
+        <td><%=enroll.auto_renew_eleven%></td>
+        <td><%=enroll.auto_renew_twelve%></td>
+        <td><%=enroll.auto_renew_total%></td>
+        <td><%=enroll.auto_renew_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Active Renew</td> 
-        M
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>2,246</td>
-        <td>371</td>
-        <td>354</td>
-        <td>2,971</td>
-        <td>12%</td>
+        <td><%=enroll.active_renew_one%></td>
+        <td><%=enroll.active_renew_two%></td>
+        <td><%=enroll.active_renew_three%></td>
+        <td><%=enroll.active_renew_four%></td>
+        <td><%=enroll.active_renew_five%></td>
+        <td><%=enroll.active_renew_six%></td>
+        <td><%=enroll.active_renew_seven%></td>
+        <td><%=enroll.active_renew_eight%></td>
+        <td><%=enroll.active_renew_nine%></td>
+        <td><%=enroll.active_renew_ten%></td>
+        <td><%=enroll.active_renew_eleven%></td>
+        <td><%=enroll.active_renew_twelve%></td>
+        <td><%=enroll.active_renew_total%></td>
+        <td><%=enroll.active_renew_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">New Customer</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>3,250</td>
-        <td>1,551</td>
-        <td>1,683</td>
-        <td>6,484</td>
-        <td>26%</td>
+        <td><%=enroll.newCustomer_one%></td>
+        <td><%=enroll.newCustomer_two%></td>
+        <td><%=enroll.newCustomer_three%></td>
+        <td><%=enroll.newCustomer_four%></td>
+        <td><%=enroll.newCustomer_five%></td>
+        <td><%=enroll.newCustomer_six%></td>
+        <td><%=enroll.newCustomer_seven%></td>
+        <td><%=enroll.newCustomer_eight%></td>
+        <td><%=enroll.newCustomer_nine%></td>
+        <td><%=enroll.newCustomer_ten%></td>
+        <td><%=enroll.newCustomer_eleven%></td>
+        <td><%=enroll.newCustomer_twelve%></td>
+        <td><%=enroll.newCustomer_total%></td>
+        <td><%=enroll.newCustomer_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
-        <td>57</td>
-        <td>46</td>
-        <td>547</td>
-        <td>647</td>
-        <td>634</td>
-        <td>712</td>
-        <td>650</td>
-        <td>216</td>
-        <td>21</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>3,530</td>
-        <td>14%</td>
+        <td><%=enroll.sep_one%></td>
+        <td><%=enroll.sep_two%></td>
+        <td><%=enroll.sep_three%></td>
+        <td><%=enroll.sep_four%></td>
+        <td><%=enroll.sep_five%></td>
+        <td><%=enroll.sep_six%></td>
+        <td><%=enroll.sep_seven%></td>
+        <td><%=enroll.sep_eight%></td>
+        <td><%=enroll.sep_nine%></td>
+        <td><%=enroll.sep_ten%></td>
+        <td><%=enroll.sep_eleven%></td>
+        <td><%=enroll.sep_twelve%></td>
+        <td><%=enroll.sep_total%></td>
+        <td><%=enroll.sep_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Total</td>
-        <td>57</td>
-        <td>46</td>
-        <td>547</td>
-        <td>647</td>
-        <td>634</td>
-        <td>712</td>
-        <td>650</td>
-        <td>216</td>
-        <td>21</td>
-        <td>5,496</td>
-        <td>14,161</td>
-        <td>2,037</td>
-        <td>25,224</td>
-        <td>100%</td>
+        <td><%=enroll.total_one%></td>
+        <td><%=enroll.total_two%></td>
+        <td><%=enroll.total_three%></td>
+        <td><%=enroll.total_four%></td>
+        <td><%=enroll.total_five%></td>
+        <td><%=enroll.total_six%></td>
+        <td><%=enroll.total_seven%></td>
+        <td><%=enroll.total_eight%></td>
+        <td><%=enroll.total_nine%></td>
+        <td><%=enroll.total_ten%></td>
+        <td><%=enroll.total_eleven%></td>
+        <td><%=enroll.total_twelve%></td>
+        <td><%=enroll.total_total%></td>
+        <td><%=enroll.total_share%>%</td>
       </tr>
     </tbody>
+    <%end%>
     </table>
 
 <h4>SEPs by Type - 3/1/2016 to 2/28/2017</h4>
@@ -696,7 +702,7 @@ $(function () {
         <td><%=s.birth_eight%></td>
         <td><%=s.birth_nine%></td>
         <td><%=s.birth_ten%></td>
-        <td><%=s.birth_eleven%></td>birth_total
+        <td><%=s.birth_eleven%></td>
         <td><%=s.birth_twelve%></td>
         <td><%=s.birth_total%></td>
         <td><%=s.birth_share%>%</td>
