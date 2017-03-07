@@ -434,7 +434,7 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
-  describe "notify_legal_or_fein_change" do
+  describe "notify_legal_name_or_fein_change" do
 
     context "notify update" do
       let(:employer_profile) { FactoryGirl.build(:employer_profile) }
@@ -445,13 +445,13 @@ RSpec.describe Organization, dbclean: :after_each do
       it "notify legal name updated" do
         organization.instance_variable_set(:@changed_fields, changed_fields)
         expect(organization).to receive(:notify).exactly(1).times
-        organization.notify_legal_or_fein_change
+        organization.notify_legal_name_or_fein_change
       end
 
       it "notify fein updated" do
         organization.instance_variable_set(:@changed_fields, changed_fields1)
         expect(organization).to receive(:notify).exactly(1).times
-        organization.notify_legal_or_fein_change
+        organization.notify_legal_name_or_fein_change
       end
     end
   end
