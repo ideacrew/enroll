@@ -36,20 +36,22 @@ module Events
             )
           end
         end
-      rescue Exception=>e
-        ex.publish(
-          JSON.dump(
-            {
+      rescue Exception => e
+        with_response_exchange(connection) do |ex|
+          ex.publish(
+            JSON.dump({
               exception: e.inspect,
               backtrace: e.backtrace.inspect
               }),
-          {
-            :routing_key => reply_to,
-            :headers => {
-              :return_status => "500"
-              :individual_id => individual_id
+            {
+              :routing_key => reply_to,
+              :headers => {
+                :return_status => "500",
+                :individual_id => individual_id
+              }
             }
-            })
+          )
+        end
       end
     end
   end
