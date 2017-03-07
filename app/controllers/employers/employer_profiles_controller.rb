@@ -211,7 +211,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @organization.save(validate: false)
 
       if @organization.update_attributes(employer_profile_params)
-        @organization.notify_legal_or_fein_change
+        @organization.notify_legal_name_or_fein_change
         @organization.notify_address_change(@organization_dup,employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)

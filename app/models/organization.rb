@@ -20,7 +20,7 @@ class Organization
     "foreign_embassy_or_consulate"
   ]
 
-  FIELD_AND_EVENT_NAMES = {"legal_name" => "name_changed", "fein" => "fein_changed"}
+  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_changed"}
 
   field :hbx_id, type: String
 
@@ -346,12 +346,12 @@ class Organization
 
   def legal_name_or_fein_change_attributes
     @changed_fields = changed_attributes.keys
-    notify_legal_or_fein_change if changed_attributes.keys.include?("fein")
+    notify_legal_name_or_fein_change if changed_attributes.keys.include?("fein")
   end
 
-  def notify_legal_or_fein_change
+  def notify_legal_name_or_fein_change
     return unless self.employer_profile.present?
-    FIELD_AND_EVENT_NAMES.each do |feild, event_name|
+    FIELD_AND_EVENT_NAMES_MAP.each do |feild, event_name|
       if @changed_fields.present? && @changed_fields.include?(feild)
         notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
       end
