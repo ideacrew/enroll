@@ -318,18 +318,6 @@ class Family
     current_shop_eligible_open_enrollments.length > 0
   end
 
-  # Get list of Individual and SHOP market Open and Special Enrollment Period eligibilities currently available to this family
-  #
-  # @example Get the list of {EnrollmentEligibilityReason EnrollmentEligibilityReasons}
-  #   model.current_ivl_eligible_open_enrollments
-  #
-  # @see current_ivl_eligible_open_enrollments
-  # @see current_shop_eligible_open_enrollments
-  #
-  # @return [ Array<EnrollmentEligibilityReason> ] The SHOP and Individual Market {EnrollmentEligibilityReasons} active for this family on today's date
-  def current_eligible_open_enrollments
-    current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
-  end
   def current_enrollment_eligibility_reasons
     current_special_enrollment_periods.collect do |sep|
       EnrollmentEligibilityReason.new(sep)
