@@ -5,7 +5,6 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
 
   embedded_in :tax_household
-  embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
 
