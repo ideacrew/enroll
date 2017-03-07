@@ -85,17 +85,17 @@ class EmployeeRole
       bg_list = expired_plan_year.benefit_groups.map(&:id)
       bg = self.census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_group)
       effective_on = person.primary_family.current_sep.effective_on
-      return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on > effective_on
+      return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on >= effective_on
     end
     bg = census_employee.active_benefit_group
     effective_on = person.primary_family.current_sep.effective_on
-    return bg if bg.start_on <= effective_on &&  bg.end_on > effective_on
+    return bg if bg.start_on <= effective_on &&  bg.end_on >= effective_on
   end
 
   def renewal_coverage
     bg = census_employee.renewal_published_benefit_group
     effective_on = person.primary_family.current_sep.effective_on
-    bg.start_on <= effective_on &&  bg.end_on > effective_on if bg.present?
+    bg.start_on <= effective_on &&  bg.end_on >= effective_on if bg.present?
   end
 
   def is_under_open_enrollment?
