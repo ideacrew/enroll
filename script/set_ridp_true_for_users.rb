@@ -31,9 +31,9 @@ end
 start_date = Date.new(2015,10,10)
 end_date = Date.new(2015,10,12)
 count = 0
-Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" => end_date}).each do |person|
+Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" => end_date}, :user => {:$exists => true}).each do |person|
   begin
-    if person.user && !person.user.identity_verified?
+    if !person.user.identity_verified?
       if user_having_enrollments?(person)
         person.user.update_attributes(:identity_final_decision_code => User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE, :identity_response_description_text => 'curam_data_migration')
         count +=1
