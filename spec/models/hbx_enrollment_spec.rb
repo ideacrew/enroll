@@ -765,6 +765,8 @@ describe HbxProfile, "class methods", type: :model do
       allow(coverage_household).to receive(:coverage_household_members).and_return []
       allow(sep).to receive(:is_active?).and_return true
       allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+      expired_py = organization.employer_profile.plan_years.where(aasm_state: 'expired').first
+      census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: expired_py.benefit_groups[0], start_on: expired_py.benefit_groups[0].start_on)
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id, hired_on: TimeKeeper.date_of_record - 2.months)
       census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
     end
