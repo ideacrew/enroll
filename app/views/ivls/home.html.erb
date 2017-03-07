@@ -646,11 +646,11 @@ $(function () {
 
 <h4>SEPs by Type - 3/1/2016 to 2/28/2017</h4>
     <table class="table table-hover table-condensed">
+    <%@seps.each do |s|%>
     <thead>
       <tr>
         <th class="texLef">SEP</th>
-        <%@seps.each do |s|%>
-        <th><%=s.month_one%></th>
+        <th><%=s.month_one.to_i%></th>
         <th><%=s.month_two%></th>
         <th><%=s.month_three%></th>
         <th><%=s.month_four%></th>
@@ -664,115 +664,113 @@ $(function () {
         <th><%=s.month_twelve%></th>
         <th>Total</th>
         <th>%</th>
-        <%end%>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="texLef">Lost Coverage</td>
-        <%@seps.each do |s|%>
-        <td><%=s.lost_coverage_one%></td>
-        <td>8</td>
-        <td>148</td>
-        <td>139</td>
-        <td>123</td>
-        <td>185</td>
-        <td>171</td>
-        <td>59</td>
-        <td>4</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>851</td>
-        <td>24%</td>
-        <%end%>
+        <td><%=s.lost_coverage_one.to_i%></td>
+        <td><%=s.lost_coverage_two%></td>
+        <td><%=s.lost_coverage_three%></td>
+        <td><%=s.lost_coverage_four%></td>
+        <td><%=s.lost_coverage_five%></td>
+        <td><%=s.lost_coverage_six%></td>
+        <td><%=s.lost_coverage_seven%></td>
+        <td><%=s.lost_coverage_eight%></td>
+        <td><%=s.lost_coverage_nine%></td>
+        <td><%=s.lost_coverage_ten%></td>
+        <td><%=s.lost_coverage_eleven%></td>
+        <td><%=s.lost_coverage_twelve%></td>
+        <td><%=s.lost_coverage_total%></td>
+        <td><%=s.lost_coverage_share%></td>
       </tr>
       <tr>
         <td class="texLef">Birth</td>
-        <td>11</td>
-        <td>14</td>
-        <td>121</td>
-        <td>133</td>
-        <td>141</td>
-        <td>125</td>
-        <td>119</td>
-        <td>28</td>
-        <td>3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>695</td>
-        <td>20%</td>
+        <td><%=s.birth_one%></td>
+        <td><%=s.birth_two%></td>
+        <td><%=s.birth_three%></td>
+        <td><%=s.birth_four%></td>
+        <td><%=s.birth_five%></td>
+        <td><%=s.birth_six%></td>
+        <td><%=s.birth_seven%></td>
+        <td><%=s.birth_eight%></td>
+        <td><%=s.birth_nine%></td>
+        <td><%=s.birth_ten%></td>
+        <td><%=s.birth_eleven%></td>birth_total
+        <td><%=s.birth_twelve%></td>
+        <td><%=s.birth_total%></td>
+        <td><%=s.birth_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Citizenship</td>
-        <td>6</td>
-        <td>2</td>
-        <td>48</td>
-        <td>75</td>
-        <td>83</td>
-        <td>61</td>
-        <td>65</td>
-        <td>22</td>
-        <td>3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>365</td>
-        <td>10%</td>
+        <td><%=s.citizenship_one%></td>
+        <td><%=s.citizenship_two%></td>
+        <td><%=s.citizenship_three%></td>
+        <td><%=s.citizenship_four%></td>
+        <td><%=s.citizenship_five%></td>
+        <td><%=s.citizenship_six%></td>
+        <td><%=s.citizenship_seven%></td>
+        <td><%=s.citizenship_eight%></td>
+        <td><%=s.citizenship_nine%></td>
+        <td><%=s.citizenship_ten%></td>
+        <td><%=s.citizenship_eleven%></td>
+        <td><%=s.citizenship_twelve%></td>
+        <td><%=s.citizenship_total%></td>
+        <td><%=s.citizenship_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Relocation</td>
-        <td>5</td>
-        <td>2</td>
-        <td>49</td>
-        <td>46</td>
-        <td>51</td>
-        <td>67</td>
-        <td>70</td>
-        <td>26</td>
-        <td>2</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>318</td>
-        <td>9%</td>
+        <td><%=s.relocation_one%></td>
+        <td><%=s.relocation_two%></td>
+        <td><%=s.relocation_three%></td>
+        <td><%=s.relocation_four%></td>
+        <td><%=s.relocation_five%></td>
+        <td><%=s.relocation_six%></td>
+        <td><%=s.relocation_seven%></td>
+        <td><%=s.relocation_eight%></td>
+        <td><%=s.relocation_nine%></td>
+        <td><%=s.relocation_ten%></td>
+        <td><%=s.relocation_eleven%></td>
+        <td><%=s.relocation_twelve%></td>
+        <td><%=s.relocation_total%></td>
+        <td><%=s.relocation_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Other</td>
-        <td>21</td>
-        <td>20</td>
-        <td>181</td>
-        <td>254</td>
-        <td>236</td>
-        <td>274</td>
-        <td>225</td>
-        <td>81</td>
-        <td>9</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1,301</td>
-        <td>37%</td>
+        <td><%=s.other_one%></td>
+        <td><%=s.other_two%></td>
+        <td><%=s.other_three%></td>
+        <td><%=s.other_four%></td>
+        <td><%=s.other_five%></td>
+        <td><%=s.other_six%></td>
+        <td><%=s.other_seven%></td>
+        <td><%=s.other_eight%></td>
+        <td><%=s.other_nine%></td>
+        <td><%=s.other_ten%></td>
+        <td><%=s.other_eleven%></td>
+        <td><%=s.other_twelve%></td>
+        <td><%=s.other_total%></td>
+        <td><%=s.other_share%>%</td>
       </tr>
       <tr>
         <td class="texLef">Total</td>
-        <td>57</td>
-        <td>46</td>
-        <td>547</td>
-        <td>647</td>
-        <td>634</td>
-        <td>712</td>
-        <td>650</td>
-        <td>216</td>
-        <td>21</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>3,530</td>
-        <td>100%</td>
+        <td><%=s.total_one%></td>
+        <td><%=s.total_two%></td>
+        <td><%=s.total_three%></td>
+        <td><%=s.total_four%></td>
+        <td><%=s.total_five%></td>
+        <td><%=s.total_six%></td>
+        <td><%=s.total_seven%></td>
+        <td><%=s.total_eight%></td>
+        <td><%=s.total_nine%></td>
+        <td><%=s.total_ten%></td>
+        <td><%=s.total_eleven%></td>
+        <td><%=s.total_twelve%></td>
+        <td><%=s.total_total%></td>
+        <td><%=s.total_share%>%</td>
       </tr>
     </tbody>
+    <%end%>
     </table>
 
  <h4>Discontinued or Reinstated Covered Lives - 3/1/2016 to 2/28/2017</h4>

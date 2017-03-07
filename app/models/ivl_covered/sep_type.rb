@@ -4,8 +4,8 @@ module IvlCovered
     store_in collection: "ivlCovered"
 
     field :tile , type: String
-    field :month_one, type: String
-    field :month_two, type: String
+    field :month_one, type: Integer
+    field :month_two, type: Integer
     field :month_three, type: String
     field :month_four, type: String
 
