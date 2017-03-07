@@ -2,21 +2,29 @@ require "rails_helper"
 
 describe RuleSet::HbxEnrollment::IndividualMarketVerification do
   subject { RuleSet::HbxEnrollment::IndividualMarketVerification.new(enrollment) }
-  let(:enrollment) { instance_double(HbxEnrollment, :affected_by_verifications_made_today? => is_currently_active, :benefit_sponsored? => is_shop_enrollment, :plan_id => plan_id) }
-  let(:is_currently_active) { true }
-  let(:is_shop_enrollment) { false }
-  let(:plan_id) { double }
+
+  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
+  let(:enrollment_status) { 'coverage_selected' }
+
+  let(:family)        { create(:family, :with_primary_family_member) }
+  let(:enrollment)    { create(:hbx_enrollment, household: family.latest_household,
+                                                 effective_on: effective_on,
+                                                 kind: "individual",
+                                                 submitted_at: effective_on - 10.days,
+                                                 aasm_state: enrollment_status
+                                                 ) }
 
   describe "for a shop policy" do
-    let(:is_shop_enrollment) { true }
+
     it "should not be applicable" do
+      allow(enrollment).to receive(:benefit_sponsored?).and_return(true)
       expect(subject.applicable?).to eq false
     end
   end
 
   describe "for an inactive individual policy" do
-    let(:is_currently_active) { false }
-
+    let(:enrollment_status) { 'shopping' }
+  
     it "should not be applicable" do
       expect(subject.applicable?).to eq false
     end
@@ -52,12 +60,13 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
     end
 
     context "enrollment with fully verified member" do
+      let(:enrollment_status) { 'enrolled_contingent' }
+
       it "return move_to_enrolled! event" do
         allow(subject).to receive(:roles_for_determination).and_return([fully_verified_person.consumer_role])
         expect(subject.determine_next_state).to eq :move_to_enrolled!
       end
     end
-
 
     context "enrollment with outstanding member" do
       it "return move_to_contingent! event" do
