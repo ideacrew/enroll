@@ -5,7 +5,7 @@ FactoryGirl.define do
     start_on { qle_on }
     end_on  { qle_on + 30.days }
     effective_on  { qle_on.end_of_month + 1 }
-    submitted_at  { TimeKeeper.datetime_of_record }
+    submitted_at  { Time.now }
     
 
     trait :expired do
