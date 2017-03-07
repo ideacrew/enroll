@@ -35,7 +35,7 @@ Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" =>
   begin
     if person.user && !person.user.identity_verified?
       if user_having_enrollments?(person)
-        person.user.update_attributes(:identity_final_decision_code => USER::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE, :identity_response_description_text => 'curam_data_migration')
+        person.user.update_attributes(:identity_final_decision_code => User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE, :identity_response_description_text => 'curam_data_migration')
         count +=1
       end
     end
