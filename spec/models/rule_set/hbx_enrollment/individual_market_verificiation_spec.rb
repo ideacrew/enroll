@@ -59,13 +59,22 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       end
     end
 
-    context "enrollment with fully verified member" do
+    context "enrollment with fully verified member and status contingent" do
       let(:enrollment_status) { 'enrolled_contingent' }
 
       it "return move_to_enrolled! event" do
         allow(subject).to receive(:roles_for_determination).and_return([fully_verified_person.consumer_role])
         expect(subject.determine_next_state).to eq :move_to_enrolled!
       end
+    end
+
+    context "enrollment with fully verified member and status not pending/contingent" do
+      let(:enrollment_status) { 'coverage_selected' }
+      
+      it 'should return do_nothing' do
+        allow(subject).to receive(:roles_for_determination).and_return([fully_verified_person.consumer_role])
+        expect(subject.determine_next_state).to eq :do_nothing
+      end 
     end
 
     context "enrollment with outstanding member" do
