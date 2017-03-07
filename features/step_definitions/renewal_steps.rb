@@ -62,6 +62,5 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
     (e.find('.label-success').text() == 'Coverage Selected') &&
     (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
-
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
 end

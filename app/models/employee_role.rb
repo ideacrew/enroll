@@ -15,7 +15,7 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :language_preference, type: String, default: "English"
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
@@ -94,6 +94,14 @@ class EmployeeRole
 
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
+
+  def is_cobra_status?
+    if census_employee.present?
+      census_employee.is_cobra_status?
+    else
+      false
+    end
+  end
 
   def coverage_effective_on
     if benefit_group.present?
