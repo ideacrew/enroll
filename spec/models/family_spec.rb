@@ -658,21 +658,21 @@ describe Family, "large family with multiple employees - The Brady Bunch", :dbcl
   let(:family_member_id) {mikes_family.primary_applicant.id}
 
   it "should be possible to find the family_member from a family_member_id" do
-    expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+    expect(FamilyMember.find(family_member_id).id.to_s).to eq family_member_id.to_s
   end
 
   context "Family.find_by_primary_applicant" do
     context "on Mike" do
       let(:find) {Family.find_by_primary_applicant(mike)}
       it "should find Mike's family" do
-        expect(find.id.to_s).to eq mikes_family.id.to_s
+        expect(find).to include mikes_family
       end
     end
 
     context "on Carol" do
       let(:find) {Family.find_by_primary_applicant(carol)}
       it "should find Carol's family" do
-        expect(find.id.to_s).to eq carols_family.id.to_s
+        expect(find).to include carols_family
       end
     end
   end
