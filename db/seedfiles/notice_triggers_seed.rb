@@ -64,6 +64,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP2',
+    title: 'Employer Approval Notice',
+    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    resource_name: 'employer',
+    event_name: 'initial_employer_approval',
+    notice_triggers: [
+      {
+        name: 'Initial Employer SHOP Approval Notice',
+        notice_template: 'notices/shop_notices/2_initial_employer_approval_notice',
+        notice_builder: 'ShopNotices::InitialEmployerEligibilityNotice',
+        mpi_indicator: 'MPI_SHOP2A',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP3A',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
