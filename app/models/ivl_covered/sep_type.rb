@@ -128,13 +128,5 @@ module IvlCovered
     field :total_share, type: String
 
     default_scope ->{where(tile: "right_sep_type" )}
-
-    # def self.sep_dashboard_stats
-    #     seps =[ ]
-    #     IvlCovered::SepType.all.each do |s|
-    #         seps << s if s.month_one.present? && seps.size < 7 
-    #     end
-    #     seps
-    # end
   end
 end

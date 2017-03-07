@@ -11,7 +11,6 @@ module IvlCovered
     field :female_share, type: String
     field :female_yoy, type: String
     
-
     default_scope ->{where(tile: "left_gender" )}
   end
 end

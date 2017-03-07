@@ -64,13 +64,5 @@ module IvlCovered
     field :reinstatements_twelve, type: String
 
     default_scope ->{where(tile: "right_discontinued" )}
-
-    # def self.discontinuedreinstatedlives_dashboard_stats
-    #     discontinuedreinstatedlives =[ ]
-    #     IvlCovered::DiscontinuedReinstatedCoveredLives.all.each do |dr|
-    #         discontinuedreinstatedlives << dr if dr.month_one.present? && discontinuedreinstatedlives.size < 7 
-    #     end
-    #     discontinuedreinstatedlives
-    # end
   end
 end

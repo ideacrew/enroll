@@ -12,7 +12,6 @@ module IvlCovered
     field :no_share, type: String
     field :no_yoy, type: String
     
-
     default_scope ->{where(tile: "left_aptc" )}
   end
 end

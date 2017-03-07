@@ -50,13 +50,5 @@ module IvlCovered
     field :enrolled_twelve, type: String
     
     default_scope ->{where(tile: "right_new_accounts" )}
-
-    # def self.total_accounts_dashboard_stats
-    #     totalaccounts =[ ]
-    #     IvlCovered::DiscontinuedReinstatedCoveredLives.all.each do |ta|
-    #         totalaccounts << ta if ta.month_one.present? && totalaccounts.size < 7 
-    #     end
-    #     totalaccounts
-    # end
   end
 end
