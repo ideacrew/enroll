@@ -369,7 +369,7 @@ class Person
     self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
-  # Get the {Family} where this {Person} is the primary family membver
+  # Get the {Family} where this {Person} is the primary family member
   #
   # family itegrity ensures only one active family can be the primary for a person
   #
