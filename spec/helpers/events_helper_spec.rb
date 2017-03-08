@@ -40,21 +40,67 @@ describe EventsHelper, "given an address_kind" do
     it "should return false if employer is not initial" do
       expect(subject.is_initial_employer?(employer_profile2)).to eq false
     end
+    it "should return false if employer is not initial" do
+      employer_profile1.profile_source='conversion'
+      employer_profile1.save
+      expect(subject.is_initial_employer?(employer_profile1)).to eq false
+    end
   end
 
-  describe "is_renewal_conversion_employer?" do
 
+  describe "is_renewal_employer?" do
     let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
-    let(:employer_profile1){ FactoryGirl.create(:employer_profile, plan_years: [active_plan_year]) }
-    let(:employer_profile2){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
-    it "should return true if employer is not renewal" do
-      expect(subject.is_renewal_or_conversion_employer?(employer_profile1)).to eq false
+    it "should return true if employer is renewal_employer" do
+      expect(subject.is_renewal_employer?(employer_profile)).to eq true
     end
 
-    it "should return true if employer is renewal" do
-      expect(subject.is_renewal_or_conversion_employer?(employer_profile2)).to eq true
+    it "should return false if employer is not renewal_employer" do
+      employer_profile.profile_source='conversion'
+      employer_profile.save
+      expect(subject.is_renewal_employer?(employer_profile)).to eq false
+    end
+  end
+
+  describe "is_conversion_employer??" do
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+    let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
+
+    it "should return false if employer is not conversion_employer" do
+      expect(subject.is_conversion_employer?(employer_profile)).to eq false
+    end
+
+    it "should return true if employer is conversion_employer" do
+      employer_profile.profile_source='conversion'
+      employer_profile.save
+      expect(subject.is_conversion_employer?(employer_profile)).to eq true
+    end
+  end
+
+  describe "is_renewal_or_conversion_employer?" do
+
+    let(:employer_profile){ FactoryGirl.create(:employer_profile) }
+
+    it "should return true if employer is renewal employer" do
+      allow(subject).to receive(:is_renewal_employer?).with(employer_profile).and_return true
+      expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq true
+    end
+
+    it "should return fasle if employer is not renewal employer" do
+      allow(subject).to receive(:is_renewal_employer?).with(employer_profile).and_return false
+      expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq false
+    end
+    it "should return true if employer is conversion employer" do
+      allow(subject).to receive(:is_conversion_employer?).with(employer_profile).and_return true
+      expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq true
+    end
+
+    it "should return false if employer is not conversion employer" do
+      allow(subject).to receive(:is_conversion_employer?).with(employer_profile).and_return false
+      expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq false
     end
   end
 
