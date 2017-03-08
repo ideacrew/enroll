@@ -54,7 +54,7 @@
     <% end %>
   </table>
 
-  <h3>Detailed Employer cost breakdown for selected plans:</h3>
+  <h3>Detailed Employee cost breakdown for selected plans:</h3>
   <div class="mygrid-wrapper-div">
     <table class="quote-detail-cost">
     <tr>
@@ -84,14 +84,11 @@
       <td class="quote_detail_results_header">Age</td>
       <% @quote_results.keys.each do |de| %>
 
-        <td class="quote_detail_results_header" style='padding-left: 100px'>Employer Cost</td>
+        <td class="quote_detail_results_header" style='padding-left: 100px'>Employee Cost</td>
       <% end %>
 
     </tr>
     <% @quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
-    <% if index != 0  && @quote_results.first[1][:detail].flatten[index][:family_id] != @quote_results.first[1][:detail].flatten[index-1][:family_id] %>
-      <tr><td>&nbsp;</td></tr>
-    <% end %>
 
       <tr>
         <td class="quote_detail_results">
@@ -105,7 +102,7 @@
         </td>
         <% @quote_results.keys.each do |de| %>
           <td class="quote_detail_results"  style='padding-left: 100px'>
-            <b><%= @quote_results[de][:detail].flatten[index][:employer_contribution].round(2) %></b>
+            <b><%= @quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b>
           </td>
         <% end %>
       </tr>
