@@ -23,6 +23,8 @@ class FamilyMember
   # Immediately preceding family where this person was a member
   field :former_family_id, type: BSON::ObjectId
 
+  validate :no_duplicate_family_members
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
@@ -132,5 +134,14 @@ class FamilyMember
   def self.find(id)
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(id)).first
     family.family_members.detect { |member| member._id.to_s == id.to_s } unless family.blank?
+  end
+
+  private 
+
+  def no_duplicate_family_members
+    return unless family
+    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+    end
   end
 end
