@@ -68,7 +68,6 @@ module Importers
           errors.add(:fein, "employer don't exists with given fein")
         end
         has_data_not_changed_since_import
-        organization.employer_profile.update(registered_on: registered_on)
 
         if errors.empty?
           puts "Processing Update #{fein}---Data Sheet# #{legal_name}---Enroll App# #{organization.legal_name}" unless Rails.env.test?
