@@ -336,9 +336,10 @@ class HbxEnrollment
 
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable?
-      self.send(eligibility_ruleset.determine_next_state)
-      self.save!
+    if eligibility_ruleset.applicable? 
+      if eligibility_ruleset.determine_next_state != :do_nothing
+        self.send(eligibility_ruleset.determine_next_state)
+      end
     end
   end
 
@@ -1212,45 +1213,25 @@ class HbxEnrollment
                     to:  :void
     end
 
-    event :move_to_enrolled!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_enrolled, :after => :record_transition do
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
-      transitions from: :coverage_selected, to: :coverage_selected
-      transitions from: :auto_renewing, to: :auto_renewing
-      transitions from: :coverage_expired, to: :coverage_expired
-      transitions from: :shopping, to: :shopping
     end
 
-    event :move_to_contingent!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_contingent, :after => :record_transition do
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
-      transitions from: :enrolled_contingent, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
       transitions from: :auto_renewing, to: :enrolled_contingent
-      transitions from: :coverage_expired, to: :coverage_expired
     end
 
-    event :move_to_pending!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_pending, :after => :record_transition do
       transitions from: :shopping, to: :unverified
-      transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified
-      transitions from: :coverage_expired, to: :coverage_expired
     end
 
     event :force_select_coverage, :after => :record_transition do
