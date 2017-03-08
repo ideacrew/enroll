@@ -19,94 +19,94 @@ module IvlCovered
     field :month_eleven, type: String
     field :month_twelve, type: String
     
-    field :auto_renew_one, type: String
-    field :auto_renew_two, type: String
-    field :auto_renew_three, type: String
-    field :auto_renew_four, type: String
+    field :auto_renew_one, type: Integer
+    field :auto_renew_two, type: Integer
+    field :auto_renew_three, type: Integer
+    field :auto_renew_four, type: Integer
 
-    field :auto_renew_five, type: String
-    field :auto_renew_six, type: String
-    field :auto_renew_seven, type: String
-    field :auto_renew_eight, type: String
+    field :auto_renew_five, type: Integer
+    field :auto_renew_six, type: Integer
+    field :auto_renew_seven, type: Integer
+    field :auto_renew_eight, type: Integer
 
-    field :auto_renew_nine, type: String
-    field :auto_renew_ten, type: String
-    field :auto_renew_eleven, type: String
-    field :auto_renew_twelve, type: String
+    field :auto_renew_nine, type: Integer
+    field :auto_renew_ten, type: Integer
+    field :auto_renew_eleven, type: Integer
+    field :auto_renew_twelve, type: Integer
 
-    field :auto_renew_total, type: String
+    field :auto_renew_total, type: Integer
     field :auto_renew_share, type: String
 
-    field :active_renew_one, type: String
-    field :active_renew_two, type: String
-    field :active_renew_three, type: String
-    field :active_renew_four, type: String
+    field :active_renew_one, type: Integer
+    field :active_renew_two, type: Integer
+    field :active_renew_three, type: Integer
+    field :active_renew_four, type: Integer
 
-    field :active_renew_five, type: String
-    field :active_renew_six, type: String
-    field :active_renew_seven, type: String
-    field :active_renew_eight, type: String
+    field :active_renew_five, type: Integer
+    field :active_renew_six, type: Integer
+    field :active_renew_seven, type: Integer
+    field :active_renew_eight, type: Integer
 
-    field :active_renew_nine, type: String
-    field :active_renew_ten, type: String
-    field :active_renew_eleven, type: String
-    field :active_renew_twelve, type: String
+    field :active_renew_nine, type: Integer
+    field :active_renew_ten, type: Integer
+    field :active_renew_eleven, type: Integer
+    field :active_renew_twelve, type: Integer
 
-    field :active_renew_total, type: String
+    field :active_renew_total, type: Integer
     field :active_renew_share, type: String
 
-    field :newCustomer_one, type: String
-    field :newCustomer_two, type: String
-    field :newCustomer_three, type: String
-    field :newCustomer_four, type: String
+    field :newCustomer_one, type: Integer
+    field :newCustomer_two, type: Integer
+    field :newCustomer_three, type: Integer
+    field :newCustomer_four, type: Integer
 
-    field :newCustomer_five, type: String
-    field :newCustomer_six, type: String
-    field :newCustomer_seven, type: String
-    field :newCustomer_eight, type: String
+    field :newCustomer_five, type: Integer
+    field :newCustomer_six, type: Integer
+    field :newCustomer_seven, type: Integer
+    field :newCustomer_eight, type: Integer
 
-    field :newCustomer_nine, type: String
-    field :newCustomer_ten, type: String
-    field :newCustomer_eleven, type: String
+    field :newCustomer_nine, type: Integer
+    field :newCustomer_ten, type: Integer
+    field :newCustomer_eleven, type: Integer
     field :newCustomer_twelve, type: String
 
-    field :newCustomer_total, type: String
+    field :newCustomer_total, type: Integer
     field :newCustomer_share, type: String
 
-    field :sep_one, type: String
-    field :sep_two, type: String
-    field :sep_three, type: String
-    field :sep_four, type: String
+    field :sep_one, type: Integer
+    field :sep_two, type: Integer
+    field :sep_three, type: Integer
+    field :sep_four, type: Integer
 
-    field :sep_five, type: String
-    field :sep_six, type: String
-    field :sep_seven, type: String
-    field :sep_eight, type: String
+    field :sep_five, type: Integer
+    field :sep_six, type: Integer
+    field :sep_seven, type: Integer
+    field :sep_eight, type: Integer
 
-    field :sep_nine, type: String
-    field :sep_ten, type: String
-    field :sep_eleven, type: String
-    field :sep_twelve, type: String
+    field :sep_nine, type: Integer
+    field :sep_ten, type: Integer
+    field :sep_eleven, type: Integer
+    field :sep_twelve, type: Integer
 
-    field :sep_total, type: String
+    field :sep_total, type: Integer
     field :sep_share, type: String
 
-    field :total_one, type: String
-    field :total_two, type: String
-    field :total_three, type: String
-    field :total_four, type: String
+    field :total_one, type: Integer
+    field :total_two, type: Integer
+    field :total_three, type: Integer
+    field :total_four, type: Integer
 
-    field :total_five, type: String
-    field :total_six, type: String
-    field :total_seven, type: String
-    field :total_eight, type: String
+    field :total_five, type: Integer
+    field :total_six, type: Integer
+    field :total_seven, type: Integer
+    field :total_eight, type: Integer
 
-    field :total_nine, type: String
-    field :total_ten, type: String
-    field :total_eleven, type: String
-    field :total_twelve, type: String
+    field :total_nine, type: Integer
+    field :total_ten, type: Integer
+    field :total_eleven, type: Integer
+    field :total_twelve, type: Integer
 
-    field :total_total, type: String
+    field :total_total, type: Integer
     field :total_share, type: String
 
     default_scope ->{where(tile: "right_enrollment_type" )}

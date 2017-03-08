@@ -117,12 +117,14 @@ $(function () {
             }
         },
         series: [{
+            <%@totalaccounts.each do |ta|%>
             name: 'Account',
-            data: [60, 50, 554, 658, 642, 724, 661, 222, 26, 3140, 1602, 1776]
+            data: [<%=ta.account_one%>,<%=ta.account_two%>, <%=ta.account_three%>, <%=ta.account_four%>, <%=ta.account_five%>, <%=ta.account_six%>, <%=ta.account_seven%>, <%=ta.account_eight%>, <%=ta.account_nine%>, <%=ta.account_ten%>, <%=ta.account_eleven%>, <%=ta.account_twelve%>]
 
         }, {
             name: 'Enrolled',
             data: [57, 46, 547, 647, 634, 712, 650, 216, 21, 3050, 1551, 1683]
+            <%end%>
 
         }]
     });
