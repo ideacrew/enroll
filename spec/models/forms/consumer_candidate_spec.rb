@@ -1,75 +1,74 @@
 require 'rails_helper'
 describe Forms::ConsumerCandidate, "asked to match a person" do
 
-  subject {
-    Forms::ConsumerCandidate.new({
-                                     :dob => "1982-10-12",
-                                     :ssn => "123-45-6789",
-                                     :first_name => "yo",
-                                     :last_name => "guy",
-                                     :gender => "m",
-                                     :user_id => 20
-                                 })
-  }
-  let(:person) {FactoryGirl.create(:person)}
+  let(:user){ create(:user) }
+  let(:person) { create(:person, :with_ssn, user: user) }
+
+  let(:params) { {
+      :dob => "2012-10-12",
+      :ssn => person.ssn,
+      :first_name => "yo",
+      :last_name => "guy",
+      :gender => "m",
+      :user_id => 20
+  } }
+
+  subject { Forms::ConsumerCandidate.new(params) }
+
   context "uniq ssn" do
-    it "return true when ssn is blank" do
-      allow(subject).to receive(:ssn).and_return(nil)
-      expect(subject.uniq_ssn).to eq true
-    end
+    context 'when ssn blank' do
+      let(:params) { {:ssn => nil} }
 
-    it "add errors when duplicated ssn with a user account" do
-      allow(subject).to receive(:ssn).and_return("123456789")
-      allow(Person).to receive(:where).and_return([person])
-      allow(person).to receive(:user).and_return(true)
-      subject.uniq_ssn
-      expect(subject.errors[:ssn_taken]).to eq ["The social security number you entered is affiliated with another account."]
-    end
-
-    it "does not add errors when duplicated ssn and no account" do
-      allow(subject).to receive(:ssn).and_return("123456789")
-      allow(Person).to receive(:where).and_return([person])
-      allow(person).to receive(:user).and_return(false)
-      subject.uniq_ssn
-      expect(subject.errors[:base]).to eq []
-    end
-
-    describe "applying for coverage" do
-      before do
-        allow(subject).to receive(:is_applying_coverage?).and_return true
-        subject.ssn_or_checkbox
-      end
-      it "pass validation" do
-        expect(subject).to be_valid
-      end
-
-      it "fails validation with ssn or ssn checkbox" do
-        allow(subject).to receive(:ssn).and_return(nil)
-        allow(subject).to receive(:no_ssn).and_return("0")
-        expect(subject).not_to be_valid
-        expect(subject.errors[:base]).to eq ["Check No SSN box or enter a valid SSN"]
+      it "return true " do
+        expect(subject.uniq_ssn).to eq true
       end
     end
 
-    describe "NOT applying for coverage" do
-      before do
-        allow(subject).to receive(:is_applying_coverage?).and_return false
-        subject.ssn_or_checkbox
-      end
-      it "pass validation" do
-        expect(subject).to be_valid
-      end
-
-      it "fails validation with ssn or ssn checkbox" do
-        allow(subject).to receive(:ssn).and_return(nil)
-        allow(subject).to receive(:no_ssn).and_return("0")
-        expect(subject).to be_valid
+    context 'when ssn matches with claimed user account' do
+      it "should add errors" do
+        subject.uniq_ssn
+        expect(subject.errors[:ssn_taken]).to eq ["The social security number you entered is affiliated with another account."]
       end
     end
 
+    context 'when ssn matches with unclaimed user account' do
+      let(:person) { create(:person, :with_ssn) }
+
+      it "should not add errors" do
+        subject.uniq_ssn
+        expect(subject.errors[:base]).to eq []
+      end
+    end
+  end
+
+  context "uniq ssn & dob" do
+    context 'when ssn blank' do
+      let(:params) { {:ssn => nil} }
+
+      it "return true " do
+        expect(subject.uniq_ssn_dob).to eq true
+      end
+    end
+
+    context 'when ssn & dob combination did not match with existing person' do
+      let(:params) { {:ssn => person.ssn, :dob => "2012-10-12"} }
+
+      it "should add errors" do
+        subject.uniq_ssn_dob
+        expect(subject.errors[:base]).to eq ["This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}."]
+      end
+    end
+
+    context "does not add errors when ssn & dob matches with existing person record" do
+      let(:params) { {:ssn => person.ssn, :dob => person.dob.strftime("%Y-%m-%d")} }
+
+      it 'should not add errors' do
+        subject.uniq_ssn_dob
+        expect(subject.errors[:base]).to eq []
+      end
+    end
   end
 end
-
 
 describe "match a person in db" do
   let(:subject) {
@@ -128,3 +127,48 @@ describe "match a person in db" do
     end
   end
 end
+
+describe "Is applying for coverage?" do
+  let(:params) { {
+      :dob => "1982-10-12",
+      :first_name => "yo",
+      :last_name => "guy",
+      :gender => "m",
+      :user_id => 20
+  } }
+  subject { Forms::ConsumerCandidate.new(params) }
+
+  context "applying for coverage" do
+    before do
+      allow(subject).to receive(:is_applying_coverage?).and_return true
+      subject.ssn_or_checkbox
+    end
+    it "pass validation" do
+      expect(subject).to be_valid
+    end
+
+    it "fails validation with ssn or ssn checkbox" do
+      allow(subject).to receive(:ssn).and_return(nil)
+      allow(subject).to receive(:no_ssn).and_return("0")
+      expect(subject).not_to be_valid
+      expect(subject.errors[:base]).to eq ["Check No SSN box or enter a valid SSN"]
+    end
+  end
+
+  context "NOT applying for coverage" do
+    before do
+      allow(subject).to receive(:is_applying_coverage?).and_return false
+      subject.ssn_or_checkbox
+    end
+    it "pass validation" do
+      expect(subject).to be_valid
+    end
+
+    it "fails validation with ssn or ssn checkbox" do
+      allow(subject).to receive(:ssn).and_return(nil)
+      allow(subject).to receive(:no_ssn).and_return("0")
+      expect(subject).to be_valid
+    end
+  end
+end
+
