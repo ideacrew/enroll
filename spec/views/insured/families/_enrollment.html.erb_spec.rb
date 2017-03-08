@@ -323,5 +323,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_text(/Coverage End/)
       expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
     end
+
   end
 end

@@ -254,6 +254,7 @@ module Forms
     end
 
     def try_update_person(person)
+      person.consumer_role.update_attributes(:is_applying_coverage => is_applying_coverage) if person.consumer_role
       person.update_attributes(extract_person_params).tap do
         bubble_person_errors(person)
       end
