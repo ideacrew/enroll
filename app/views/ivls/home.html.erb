@@ -117,13 +117,13 @@ $(function () {
             }
         },
         series: [{
-            <%@totalaccounts.each do |ta|%>
+            <%@totalaccounts.each do |chart|%>
             name: 'Account',
-            data: [<%=ta.account_one%>,<%=ta.account_two%>, <%=ta.account_three%>, <%=ta.account_four%>, <%=ta.account_five%>, <%=ta.account_six%>, <%=ta.account_seven%>, <%=ta.account_eight%>, <%=ta.account_nine%>, <%=ta.account_ten%>, <%=ta.account_eleven%>, <%=ta.account_twelve%>]
+            data: [<%=chart.account_one%>,<%=chart.account_two%>, <%=chart.account_three%>, <%=chart.account_four%>, <%=chart.account_five%>, <%=chart.account_six%>, <%=chart.account_seven%>, <%=chart.account_eight%>, <%=chart.account_nine%>, <%=chart.account_ten%>, <%=chart.account_eleven%>, <%=chart.account_twelve%>]
 
         }, {
             name: 'Enrolled',
-            data: [57, 46, 547, 647, 634, 712, 650, 216, 21, 3050, 1551, 1683]
+            data: [<%=chart.enrolled_one%>, <%=chart.enrolled_two%>, <%=chart.enrolled_three%>, <%=chart.enrolled_four%>, <%=chart.enrolled_five%>, <%=chart.enrolled_six%>, <%=chart.enrolled_seven%>, <%=chart.enrolled_eight%>, <%=chart.enrolled_nine%>, <%=chart.enrolled_ten%>, <%=chart.enrolled_eleven%>, <%=chart.enrolled_twelve%>]
             <%end%>
 
         }]
@@ -221,15 +221,17 @@ $(function () {
             }
         },
         series: [{
+            <%@covered_lives.each do |covered|%>
             name: 'Cancel',
-            data: [114, 162, 155, 161, 165, 163, 155, 132, 121, 145, 120, 135]
+            data: [<%=covered.cancel_one%>, <%=covered.cancel_two%>, <%=covered.cancel_three%>, <%=covered.cancel_four%>, <%=covered.cancel_five%>, <%=covered.cancel_six%>, <%=covered.cancel_seven%>, <%=covered.cancel_eight%>, <%=covered.cancel_nine%>, <%=covered.cancel_ten%>, <%=covered.cancel_eleven%>, <%=covered.cancel_twelve%>]
         }, {
             name: 'Term',
-            data: [225, 261, 214, 253, 243, 228, 264, 239, 218, 345, 120, 162]
+            data: [<%=covered.terminations_one%>, <%=covered.terminations_two%>, <%=covered.terminations_three%>, <%=covered.terminations_four%>, <%=covered.terminations_five%>, <%=covered.terminations_six%>, <%=covered.terminations_seven%>, <%=covered.terminations_eight%>, <%=covered.terminations_nine%>, <%=covered.terminations_ten%>, <%=covered.terminations_eleven%>, <%=covered.terminations_twelve%>]
         }, {
             name: 'Reinstate',
-            data: [15, 11, 16, 13, 13, 18, 14, 10, 18, 20, 262, 14]
+            data: [<%=covered.reinstatements_one%>, <%=covered.reinstatements_two%>, <%=covered.reinstatements_three%>, <%=covered.reinstatements_four%>, <%=covered.reinstatements_five%>, <%=covered.reinstatements_six%>, <%=covered.reinstatements_seven%>, <%=covered.reinstatements_eight%>, <%=covered.reinstatements_nine%>, <%=covered.reinstatements_ten%>, <%=covered.reinstatements_eleven%>, <%=covered.reinstatements_twelve%>]
         }]
+        <%end%>
     });
 });
         </script>

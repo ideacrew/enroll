@@ -7,6 +7,7 @@ class IvlsController < ApplicationController
     @totalaccounts=IvlCovered::TotalAccounts.all
     @annual_enrollments=IvlCovered::AnnualEnrollmentType.all
     @annual_carriers=IvlCovered::AnnualCarrierType.all
+    @covered_lives=IvlCovered::DiscontinuedReinstatedCoveredLives.all
 
   end
 
