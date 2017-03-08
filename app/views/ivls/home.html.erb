@@ -401,6 +401,7 @@ $(function () {
       </tr>
 
       <tr>
+      <%@annual_status.each do |status|%>
         <th class="texLef">Status</th>
         <th>#</th>
         <th>%</th>
@@ -408,15 +409,16 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Primary</td>
-        <td>19,850</td>
-        <td>82%</td>
-        <td>5%</td>
+        <td><%=status.primary_count%></td>
+        <td><%=status.primary_share%>%</td>
+        <td><%=status.primary_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td>2,445</td>
-        <td>18%</td>
-        <td>-10%</td>
+        <td><%=status.dependent_count%></td>
+        <td><%=status.dependent_share%>%</td>
+        <td><%=status.dependent_yoy%>%</td>
+        <%end%>
       </tr>
  
       <tr>
@@ -427,6 +429,7 @@ $(function () {
       </tr>
 
       <tr>
+      <%@age_groups.each do |age|%>
         <th class="texLef">Age Group</th>
         <th>#</th>
         <th>%</th>
@@ -434,51 +437,52 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">< 1</td>
-        <td>300</td>
-        <td>1%</td>
-        <td>3%</td>
+        <td><%=age.zero_count%></td>
+        <td><%=age.zero_share%>%</td>
+        <td><%=age.zero_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-        <td>1,201</td>
-        <td>6%</td>
-        <td>1%</td>
+        <td><%=age.one_count%></td>
+        <td><%=age.one_share%>%</td>
+        <td><%=age.one_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-        <td>1,452</td>
-        <td>7%</td>
-        <td>16%</td>
+        <td><%=age.eighteen_count%></td>
+        <td><%=age.eighteen_share%>%</td>
+        <td><%=age.eighteen_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-        <td>8,591</td>
-        <td>39%</td>
-        <td>-7%</td>
+        <td><%=age.twentysix_count%></td>
+        <td><%=age.twentysix_share%>%</td>
+        <td><%=age.twentysix_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-        <td>4,588</td>
-        <td>21%</td>
-        <td>8%</td>
+        <td><%=age.thirtyfive_count%></td>
+        <td><%=age.thirtyfive_share%>%</td>
+        <td><%=age.thirtyfive_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-        <td>3,081</td>
-        <td>14%</td>
-        <td>9%</td>
+        <td><%=age.fortyfive_count%></td>
+        <td><%=age.fortyfive_share%>%</td>
+        <td><%=age.fortyfive_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td>2,766</td>
-        <td>12%</td>
-        <td>2%</td>
+        <td><%=age.fiftyfive_count%></td>
+        <td><%=age.fiftyfive_share%>%</td>
+        <td><%=age.fiftyfive_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-        <td>193</td>
-        <td>1%</td>
-        <td>-11%</td>
+        <td><%=age.sixtyfive_count%></td>
+        <td><%=age.sixtyfive_share%>%</td>
+        <td><%=age.sixtyfive_yoy%>%</td>
+        <%end%>
       </tr>
 
       <tr>
@@ -489,6 +493,7 @@ $(function () {
       </tr>
 
       <tr>
+      <%@over_all_aptc.each do |aptc|%>
         <th class="texLef">APTC</th>
         <th>#</th>
         <th>%</th>
@@ -496,15 +501,16 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Yes</td>
-        <td>1,465</td>
-        <td>7%</td>
-        <td>10%</td>
+        <td><%=aptc.yes_count%></td>
+        <td><%=aptc.yes_share%>%</td>
+        <td><%=aptc.yes_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">No</td>
-        <td>18,553</td>
-        <td>93%</td>
-        <td>-2%</td>
+        <td><%=aptc.no_count%></td>
+        <td><%=aptc.no_share%>%</td>
+        <td><%=aptc.no_yoy%>%</td>
+        <%end%>
       </tr>
 
       <tr>
@@ -515,6 +521,7 @@ $(function () {
       </tr>
 
       <tr>
+      <%@overall_genders.each do |gender|%>
         <th class="texLef">Gender</th>
         <th>#</th>
         <th>%</th>
@@ -522,16 +529,17 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Male</td>
-        <td>10,515</td>
-        <td>48%</td>
-        <td>-2%</td>
+        <td><%=gender.male_count%></td>
+        <td><%=gender.male_share%>%</td>
+        <td><%=gender.male_yoy%>%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td>11,371</td>
-        <td>52%</td>
-        <td>2%</td>
+        <td><%=gender.female_count%></td>
+        <td><%=gender.female_share%>%</td>
+        <td><%=gender.female_yoy%>%</td>
       </tr>
+      <%end%>
     </tbody>
     </table>
 

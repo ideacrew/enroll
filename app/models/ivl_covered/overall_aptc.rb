@@ -5,10 +5,10 @@ module IvlCovered
 
     field :tile , type: String
     field :tile, type: String
-    field :yes_count, type: String
+    field :yes_count, type: Integer
     field :yes_share, type: String
     field :yes_yoy, type: String
-    field :no_count, type: String
+    field :no_count, type: Integer
     field :no_share, type: String
     field :no_yoy, type: String
     

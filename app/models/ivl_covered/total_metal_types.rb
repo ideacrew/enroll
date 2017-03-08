@@ -4,7 +4,7 @@ module IvlCovered
     store_in collection: "ivlCovered"
 
     field :tile , type: String
-    field :platinum_count, type: String
+    field :platinum_count, type: Integer
     field :platinum_share, type: String
     field :platinum_yoy, type: String
     field :gold_count, type: String
