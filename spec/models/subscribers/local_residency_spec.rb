@@ -54,12 +54,12 @@ describe Subscribers::LocalResidency do
     let(:payload) { "lsjdfioennnklsjdfe" }
 
     it "should store responses correctly" do
-      consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: payload})
+      consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: payload})
       consumer_role.person.save!
       found_person = Person.find(person_id)
       ssa_response = found_person.consumer_role.local_residency_responses.first
       expect(ssa_response.body).to eq payload
-      consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: payload})
+      consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: payload})
       found_person = Person.find(person_id)
       expect(found_person.consumer_role.local_residency_responses.length).to eq(2)
     end

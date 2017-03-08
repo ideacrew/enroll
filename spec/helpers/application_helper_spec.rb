@@ -25,7 +25,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#format_time_display" do
-    let(:timestamp){ Time.now.utc }
+    let(:timestamp){ TimeKeeper.datetime_of_record.utc }
     it "should display the time in proper format" do
       expect(helper.format_time_display(timestamp)).to eq timestamp.in_time_zone('Eastern Time (US & Canada)')
     end
@@ -36,7 +36,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#group_xml_transmitted_message" do
-    let(:employer_profile_1){ double("EmployerProfile", xml_transmitted_timestamp: Time.now.utc, legal_name: "example1 llc.") }
+    let(:employer_profile_1){ double("EmployerProfile", xml_transmitted_timestamp: TimeKeeper.datetime_of_record.utc, legal_name: "example1 llc.") }
     let(:employer_profile_2){ double("EmployerProfile", xml_transmitted_timestamp: nil, legal_name: "example2 llc.") }
 
     it "should display re-submit message if xml is being transmitted again" do

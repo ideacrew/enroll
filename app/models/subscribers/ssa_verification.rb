@@ -22,12 +22,12 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
 
         consumer_role = person.consumer_role
-        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
 
         #TODO change response handler
         if "503" == return_status.to_s
           args = OpenStruct.new
-          args.determined_at = Time.now
+          args.determined_at = TimeKeeper.datetime_of_record
           args.vlp_authority = 'ssa'
           consumer_role.ssn_invalid!(args)
           consumer_role.save
@@ -51,16 +51,16 @@ module Subscribers
       args = OpenStruct.new
 
       if xml_hash[:ssn_verification_failed].eql?("true")
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'ssa'
         consumer_role.ssn_invalid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'ssa'
         args.citizenship_result = ::ConsumerRole::US_CITIZEN_STATUS
         consumer_role.ssn_valid_citizenship_valid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("false")
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'ssa'
         args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.ssn_valid_citizenship_invalid!(args)

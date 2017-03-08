@@ -3,7 +3,7 @@ FactoryGirl.define do
     association :person
     sequence(:e_case_id) {|n| "abc#{n}12xyz#{n}"}
     renewal_consent_through_year  2017
-    submitted_at Time.now
+    submitted_at TimeKeeper.datetime_of_record
     updated_at "user"
 
     transient do

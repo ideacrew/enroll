@@ -6,7 +6,7 @@ RSpec.describe WorkflowStateTransition, type: :model do
 
   let(:from_state) { "applicant" }
   let(:to_state) { "approved" }
-  let(:transition_at) { Time.now }
+  let(:transition_at) { TimeKeeper.datetime_of_record }
 
   describe ".new" do
     let(:valid_params) do
@@ -39,7 +39,7 @@ RSpec.describe WorkflowStateTransition, type: :model do
       let(:mock_time) { Time.mktime(2014, 2, 13, 0, 0, 0) }
 
       before do
-        allow(Time).to receive(:now).and_return(mock_time)
+        allow(TimeKeeper).to receive(:datetime_of_record).and_return(mock_time)
       end
 
       it "should set the transition_at value before validation" do

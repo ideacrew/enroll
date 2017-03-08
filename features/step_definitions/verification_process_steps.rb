@@ -67,7 +67,7 @@ Then(/^Consumer does not see FedHub details table$/) do
 end
 
 When(/^the consumer is completely verified$/) do
-  user.person.consumer_role.import!(OpenStruct.new({:determined_at => Time.now, :vlp_authority => "hbx"}))
+  user.person.consumer_role.import!(OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record, :vlp_authority => "hbx"}))
 end
 
 Then(/^verification types have to be visible$/) do

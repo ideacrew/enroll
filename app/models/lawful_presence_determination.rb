@@ -92,7 +92,7 @@ class LawfulPresenceDetermination
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      transition_at: Time.now
+      transition_at: TimeKeeper.datetime_of_record
     )
   end
 end
