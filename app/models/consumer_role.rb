@@ -363,7 +363,7 @@ class ConsumerRole
 
     before_all_events :ensure_validation_states
 
-    event :import, :after => [:record_transition, :notify_of_eligibility_change] do
+    event :import, :after => [:record_transition, :notify_of_eligibility_change, :update_all_verification_types] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
       transitions from: :dhs_pending, to: :fully_verified
@@ -402,6 +402,7 @@ class ConsumerRole
       transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
@@ -676,6 +677,22 @@ class ConsumerRole
 
   def all_types_verified?
     person.verification_types.all?{ |type| is_type_verified?(type) }
+  end
+
+  def update_all_verification_types(*args)
+    person.verification_types.each{|v_type| update_verification_type(v_type, "person is fully verified") }
+  end
+
+  def update_verification_type(v_type, update_reason)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.authorize!(verification_attr)
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    all_types_verified? ? verify_ivl_by_admin : "#{v_type} successfully verified."
   end
 
   def is_type_verified?(type)
