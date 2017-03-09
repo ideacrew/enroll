@@ -1,5 +1,5 @@
 # Run the following rake task: RAILS_ENV=production bundle exec rake reports:non_ridp_users_with_enrollments
-
+# we don't have to move this report to PROD
 require 'csv'
 namespace :reports do
   desc 'Non-curam Users in a time frame where users can bypass RIDP by changing URL issue present'
@@ -14,6 +14,7 @@ namespace :reports do
       SSN
       DOB
       Has_IVL_Enrollment
+      Has_SHOP_Enrollment
       Active_Enrollment_Market
     )
 
@@ -24,9 +25,10 @@ namespace :reports do
       Person.all_consumer_roles.where(:"created_at" => { "$gte" => start_date, "$lte" => end_date}, :user => {:$exists => true}).each do |person|
         begin
           if !person.user.identity_verified? && person.primary_family.present? && person.primary_family.e_case_id.blank?
-            if person.primary_family.active_household.present? && person.primary_family.active_household.hbx_enrollments.present?
+            if person.primary_family.active_household.present? && (person.primary_family.active_household.hbx_enrollments.present? || (person.consumer_role.bookmark_url.present? && (person.consumer_role.bookmark_url.include? 'home')))
               count = count + 1
               invl_enr = person.primary_family.active_household.hbx_enrollments.individual_market.present?
+              shop_enr = person.primary_family.active_household.hbx_enrollments.shop_market.present?
               active_enr = person.primary_family.active_household.hbx_enrollments.enrolled.first
               row << [
                 person.hbx_id,
@@ -34,6 +36,7 @@ namespace :reports do
                 person.ssn,
                 person.dob,
                 invl_enr,
+                shop_enr,
                 active_enr.try(:kind)
               ]
             end
