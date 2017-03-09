@@ -70,6 +70,7 @@ class Insured::GroupSelectionController < ApplicationController
       if sep.present?
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
+
       hbx_enrollment.plan = @hbx_enrollment.plan
     end
 
