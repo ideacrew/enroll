@@ -1,7 +1,7 @@
 module Enrollments
   module Replicator
 
-    class EmployerSponsored < Core
+    class EmployerSponsored < Base
 
       def determine_replication_type
       end

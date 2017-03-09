@@ -1,6 +1,6 @@
 module Enrollments
   module Replicator
-    class Individual < Core
+    class Individual < Base
 
       def determine_replication_type
         benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
