@@ -15,9 +15,9 @@ class ShopNotices::InitialEmployerDenialNotice < ShopNotice
     plan_year.application_eligibility_warnings.each do |k, v|
       case k.to_s
       when "fte_count"
-        plan_year_warnings << "Full Time Employees count not in 1-50(can't be 0)"
+        plan_year_warnings << "Full Time Equivalent must be 1-50"
       when "primary_office_location"
-        plan_year_warnings << "address not in DC"
+        plan_year_warnings << "primary business address not located in the District of Columbia"
       end
     end
     notice.plan_year = PdfTemplates::PlanYear.new({
