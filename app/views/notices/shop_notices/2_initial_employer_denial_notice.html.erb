@@ -22,7 +22,7 @@
   { content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.  However, based upon the information you have provided, we are unable to verify your eligibility to offer group health coverage in #{Settings.site.short_name} at this time."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "We have been unable to determine whether your organization meets #{Settings.site.short_name} eligibility criteria [Employer Eligibility Criteria “one”, “two”, “three” and/or “four”], as listed below."} %>
+  { content: "We have been unable to determine whether your organization meets #{Settings.site.short_name} eligibility criteria #{notice.plan_year.warnings.join(' and ')} as listed below."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "In order to participate in #{Settings.site.short_name}, federal and District regulations require that an employer:"} %>
@@ -59,7 +59,7 @@
   { contents: ["Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   "By calling #{notice.hbe.phone}."] } %>
+                                                                   ["By calling #{notice.hbe.phone}."] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

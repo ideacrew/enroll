@@ -7,6 +7,7 @@ module PdfTemplates
     attribute :start_on, Date
     attribute :end_on, Date
     attribute :carrier_name, String
+    attribute :warnings, Array[String]
     
   end
 end
