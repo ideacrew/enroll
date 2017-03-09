@@ -1013,7 +1013,7 @@ private
   end
 
   def initial_employer_approval_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
     self.employer_profile.trigger_notices("initial_employer_approval")
   end
 
