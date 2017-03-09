@@ -36,6 +36,7 @@ Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" =>
     if !person.user.identity_verified?
       if user_having_enrollments?(person)
         person.user.update_attributes(:identity_final_decision_code => User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE, :identity_response_description_text => 'curam_data_migration')
+        puts 'updated RIDP status for person FirstName: #{person.first_name} LastName: #{person.last_name} Hbx_Id: #{person.hbx_id}'
         count +=1
       end
     end
@@ -43,5 +44,5 @@ Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" =>
     puts "Bad person record #{person.id}"
   end
 end
-puts "Total effected users created on 10/11/2015 are #{count}"
+puts "Total effected users that were created on 10/11/2015 are #{count}"
 
