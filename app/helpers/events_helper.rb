@@ -33,26 +33,30 @@ module EventsHelper
   end
 
   def employer_plan_years(employer)
-    if (is_renewal_or_conversion_employer?(employer) && TimeKeeper.date_of_record >= ((employer.renewing_published_plan_year.start_on - 1.month)+15.days))  || (is_initial_employer?(employer) && TimeKeeper.date_of_record >= ((employer.published_plan_year.start_on - 1.month)+15.days))
+    if (is_renewal_or_conversion_employer?(employer) && TimeKeeper.date_of_record >= ((employer.renewing_published_plan_year.start_on - 1.month)+15.days))  || (is_initial_or_conversion_employer?(employer) && TimeKeeper.date_of_record >= ((employer.published_plan_year.start_on - 1.month)+15.days))
       employer.plan_years.select(&:eligible_for_export?)
-    elsif is_renewal_employer?(employer)
+    elsif is_renewal_employer?(employer) || is_conversion_employer_renewing?(employer)
       employer.active_plan_year.to_a
     end
   end
 
-  def is_initial_employer?(employer)
-    employer.published_plan_year.present? && employer.renewing_published_plan_year.blank? && !employer.is_conversion?
+  def is_initial_or_conversion_employer?(employer)
+    (employer.published_plan_year.present? && employer.renewing_published_plan_year.blank?) && (!employer.is_conversion? || (employer.is_conversion? && !employer.published_plan_year.coverage_period_contains?(employer.registered_on)))
   end
 
   def is_renewal_employer?(employer)
     employer.published_plan_year.present? && employer.renewing_published_plan_year.present? && !employer.is_conversion?
   end
 
-  def is_conversion_employer?(employer)
-    employer.published_plan_year.present? && employer.renewing_published_plan_year.present? && employer.is_conversion?
+  def is_conversion_employer_renewing?(employer)
+    employer.is_conversion? && employer.published_plan_year.present? && !employer.published_plan_year.coverage_period_contains?(employer.registered_on) && employer.renewing_published_plan_year.present?
+  end
+
+  def is_new_conversion_employer?(employer)
+    employer.is_conversion? && employer.active_plan_year.present? && employer.active_plan_year.coverage_period_contains?(employer.registered_on) && employer.renewing_published_plan_year.present?
   end
 
   def is_renewal_or_conversion_employer?(employer)
-    is_conversion_employer?(employer) || is_renewal_employer?(employer)
+    is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_conversion_employer_renewing?(employer)
   end
 end
