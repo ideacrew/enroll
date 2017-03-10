@@ -1023,7 +1023,7 @@ private
   end
 
   def initial_employer_denial_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || application_eligibility_warnings.each {|k,v| ["ineligible", "minimum_employer_contribution"].include?(k) })
     self.employer_profile.trigger_notices("initial_employer_denial")
   end
 
