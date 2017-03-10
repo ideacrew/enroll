@@ -82,20 +82,20 @@ describe EventsHelper, "given an address_kind" do
     end
   end
 
-  describe "is_conversion_employer_renewing?" do
+  describe "is_renewing_conversion_employer?" do
     let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
     let(:employer_profile2){ FactoryGirl.create(:employer_profile,profile_source:'conversion', plan_years: [renewing_plan_year,active_plan_year]) }
     let(:employer_profile1){ FactoryGirl.create(:employer_profile,profile_source:'conversion', plan_years: [active_plan_year]) }
 
     it "should return false if conversion employer renewing has only active plan year" do
-      expect(subject.is_conversion_employer_renewing?(employer_profile1)).to eq false
+      expect(subject.is_renewing_conversion_employer?(employer_profile1)).to eq false
     end
 
     it "should return true if conversion employer renewing" do
       employer_profile2.registered_on=TimeKeeper.date_of_record-1.year
       employer_profile2.save
-      expect(subject.is_conversion_employer_renewing?(employer_profile2)).to eq true
+      expect(subject.is_renewing_conversion_employer?(employer_profile2)).to eq true
     end
   end
 
@@ -122,7 +122,7 @@ describe EventsHelper, "given an address_kind" do
       expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq false
     end
     it "should return true if employer is renewing conversion employer" do
-      allow(subject).to receive(:is_conversion_employer_renewing?).with(employer_profile).and_return true
+      allow(subject).to receive(:is_renewing_conversion_employer?).with(employer_profile).and_return true
       expect(subject.is_renewal_or_conversion_employer?(employer_profile)).to eq true
     end
   end
@@ -226,7 +226,7 @@ describe EventsHelper, "given an address_kind" do
           allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
         end
 
-        it "should returna active and renewal plan year" do
+        it "should return active and renewal plan year" do
           employer_profile2.profile_source='conversion'
           employer_profile2.save
           expect(subject.employer_plan_years(employer_profile2)).to eq [renewing_plan_year,active_plan_year]
@@ -255,7 +255,7 @@ describe EventsHelper, "given an address_kind" do
           allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
         end
 
-        it "should returna active and renewal plan year" do
+        it "should return active and renewal plan year" do
           employer_profile2.profile_source='conversion'
           employer_profile2.registered_on=TimeKeeper.date_of_record-1.year
           employer_profile2.save
