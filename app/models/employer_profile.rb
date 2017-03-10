@@ -139,6 +139,8 @@ class EmployerProfile
     return unless active_broker_agency_account
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
+    active_broker_agency_account.save!
+    notify_broker_terminated
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -212,12 +214,17 @@ class EmployerProfile
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
+    notify_general_agent_terminated
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
+  end
+
+  def notify_general_agent_terminated
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -657,7 +664,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => :notify_binder_paid
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -731,7 +738,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update
+  after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -799,6 +806,28 @@ class EmployerProfile
 
   def notify_binder_paid
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
+  end
+
+  def notify_initial_binder_paid
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+  end
+
+  def notify_broker_added
+    changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? &&  changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.broker_added", {employer_id: self.hbx_id, event_name: "broker_added"})
+    end
+  end
+
+  def notify_broker_terminated
+    notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+  end
+
+  def notify_general_agent_added
+    changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? && changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
+    end
   end
 
   def conversion_employer?
