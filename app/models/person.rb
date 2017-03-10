@@ -888,8 +888,6 @@ class Person
     if ssn.present?
       errors.add(:base, 'SSN is invalid') if is_ssn_invalid? || is_ssn_sequential? || is_ssn_has_same_number?
     end
-
-    true
   end
 
   def is_ssn_invalid?
