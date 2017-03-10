@@ -25,7 +25,7 @@ describe EventsHelper, "given an address_kind" do
       expect(subject.office_location_address_kind("slkdjfkld")).to eq "slkdjfkld"
     end
   end
-  # registered_on:active_plan_year.start_on,
+
   describe "is_initial_or_conversion_employer?" do
 
     let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
