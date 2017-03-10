@@ -36,8 +36,11 @@ class FinancialAssistance::Income
 
   TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
 
+  WAGE_TYPE_KINDS = %W(W2 1099)
+
   field :title, type: String
   field :kind, as: :income_type, type: String
+  field :wage_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
   field :amount_tax_exempt, type: Integer, default: 0
@@ -61,6 +64,9 @@ class FinancialAssistance::Income
                               numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
   validates :kind,            presence: true,
                               inclusion: { in: KINDS, message: "%{value} is not a valid income type" }
+
+  validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
+
   validates :frequency_kind,  presence: true,
                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
   validates :start_on,        presence: true

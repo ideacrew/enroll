@@ -48,7 +48,8 @@ class FinancialAssistance::Applicant
   field :is_five_year_bar_met, type: Boolean, default: false
   field :is_forty_quarters, type: Boolean, default: false
 
-  field :non_ssn_apply_reason, type: Boolean
+  field :is_ssn_applied, type: Boolean
+  field :non_ssn_apply_reason, type: String
 
   # 5 Yr. Bar QNs.
   field :moved_on_or_after_welfare_reformed_law, type: Boolean
