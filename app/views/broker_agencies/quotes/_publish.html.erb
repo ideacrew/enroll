@@ -67,7 +67,7 @@
                     </td>
                     <td class="col-md-2 col-xs-2">
                       <p>
-                        <%=benefit_group.plan.carrier_profile.abbrev.upcase %>
+                        <%=benefit_group.plan.carrier_profile.legal_name %>
                       </p>
                     </td>
                     <td class="col-md-2 col-xs-2">
@@ -96,7 +96,7 @@
                     </td>
                     <td class="col-md-2 col-xs-2">
                       <p>
-                        <%=benefit_group.dental_plan.carrier_profile.abbrev.upcase %>
+                        <%=benefit_group.dental_plan.carrier_profile.legal_name %>
                       </p>
                     </td>
                     <td class="col-md-2 col-xs-2">
@@ -132,7 +132,6 @@
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Relationship</th>
-                  <th>DOB</th>
                 </tr>
               </thead>
               <% @q.quote_households.each do |quote_household| %>
@@ -142,7 +141,6 @@
                   <td><%=member.first_name%></td>
                   <td><%= member.last_name%></td>
                   <td><%= member.employee_relationship.humanize%></td>
-                  <td><%= member.dob%></td>
                 </tr>
                 <% end %>
                 <% end %>
