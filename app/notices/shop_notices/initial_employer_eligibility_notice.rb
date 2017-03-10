@@ -15,7 +15,7 @@ class ShopNotices::InitialEmployerEligibilityNotice < ShopNotice
           :start_on => plan_year.start_on,
         })
     #binder payment deadline
-    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date].strftime("%m/%d/%Y")
+    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
 
 end

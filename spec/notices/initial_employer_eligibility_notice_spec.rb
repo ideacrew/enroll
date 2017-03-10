@@ -59,7 +59,7 @@ RSpec.describe ShopNotices::InitialEmployerEligibilityNotice do
     end
     it "should append necessary" do
       plan_year = employer_profile.plan_years.first
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date].strftime("%m/%d/%Y")
+      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
