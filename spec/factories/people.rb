@@ -20,7 +20,7 @@ FactoryGirl.define do
     end
 
     trait :with_ssn do
-      sequence(:ssn) { |n| 222222220 + n }
+      sequence(:ssn) { |n| 898999887 + n }
     end
 
     trait :with_work_email do

@@ -901,15 +901,27 @@ class Person
   def is_ssn_sequential?
     # SSN should not have 6 or more sequential numbers
     sequences = []
-    ssn.split('').map(&:to_i).each_cons(2) {|a,b| sequences << [a, b] if b == a + 1}
-    sequences.size >= 5
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a + 1
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
   end
 
   def is_ssn_has_same_number?
     # SSN should not have 6 or more of the same number in a row
     sequences = []
-    ssn.split('').map(&:to_i).each_cons(2) {|a,b| sequences << [a, b] if b == a }
-    sequences.size >= 5
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
   end
 
   def create_inbox
