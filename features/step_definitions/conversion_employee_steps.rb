@@ -1,5 +1,6 @@
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
+
   secondary_organization = FactoryGirl.create :organization, legal_name: person[:mlegal_name],
                                                    dba: person[:mdba],
                                                    fein: person[:mfein]
@@ -11,33 +12,35 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                             last_name: person[:last_name],
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
-  open_enrollment_start_on = (TimeKeeper.date_of_record-1.month).end_of_month + 1.day
-  open_enrollment_end_on = open_enrollment_start_on.next_month + 12.days
-  start_on = open_enrollment_start_on + 2.months
+
+
+
+  open_enrollment_start_on = TimeKeeper.date_of_record
+  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 13.days
+  start_on = open_enrollment_end_on.next_month.beginning_of_month
   end_on = start_on + 1.year - 1.day
 
-  secondary_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
-                                                       start_on: start_on - 1.year - 3.months,
-                                                       end_on: (end_on - 1.year - 3.months).end_of_month,
-                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year - 3.months,
-                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days - 3.months,
+
+  active_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+                                                       start_on: start_on - 1.year,
+                                                       end_on: end_on - 1.year,
+                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year,
+                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
                                                        fte_count: 2,
                                                        aasm_state: :published
-  secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: secondary_plan_year
-  secondary_plan_year.expire!
 
+  secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+  renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
                                              start_on: start_on,
                                              end_on: end_on,
                                              open_enrollment_start_on: open_enrollment_start_on,
                                              open_enrollment_end_on: open_enrollment_end_on,
                                              fte_count: 2,
-                                             aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year,
-                                                     title: 'this is the BGGG'
-  plan_year.publish!
+                                             aasm_state: :renewing_enrolling
+
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, title: 'this is the BGGG'
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
@@ -176,12 +179,6 @@ end
 Then(/(.*) should see New Hire Badges for 2st ER/) do |named_person|
   person = people[named_person]
   expect(page).to have_content(person[:mlegal_name])
-end
-
-When(/2st ER for (.*) published renewing plan year/) do |named_person|
-  person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:mfein])
-  employer_profile.renewing_plan_year.publish!
 end
 
 When(/(.*) click the button of new hire badge for 2st ER/) do |named_person|
