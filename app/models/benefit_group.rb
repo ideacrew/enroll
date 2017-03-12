@@ -278,6 +278,15 @@ class BenefitGroup
     end
   end
 
+  def effective_on_for_cobra(date_of_hire)
+    case effective_on_kind
+    when "date_of_hire"
+      [plan_year.start_on, date_of_hire].max
+    when "first_of_month"
+      [plan_year.start_on, eligible_on(date_of_hire)].max
+    end
+  end
+
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
@@ -465,20 +474,20 @@ class BenefitGroup
   def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
-      benefit_group_assignments.each do |bga|
-        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-        bga.destroy
-      end
-      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
-      bga = ce.find_or_build_benefit_group_assignment(benefit_groups.first)
-      if bga.blank?
-        existing_bga = ce.benefit_group_assignments.where(:benefit_group_id => benefit_groups.first.id).first
-        existing_bga.update_attributes(is_active: true) if self.plan_year.aasm_state == 'draft' && existing_bga.is_active == false
+
+      if benefit_group_assignments.present?
+        benefit_group_assignments.each do |bga|
+          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+          bga.destroy
+        end
+
+        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
+        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
       end
     end
   end
 
-private
+  private
 
   def set_congress_defaults
     return true unless is_congress
