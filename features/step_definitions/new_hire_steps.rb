@@ -76,8 +76,15 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   end
 end
 
+And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
+  employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
+  employer_profile.plan_years.each do |plan_year|
+    plan_year.benefit_groups.each{|bg| bg.update_attributes(effective_on_kind: rule) }
+  end
+end
+
 Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
-  employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
+  employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
 end
